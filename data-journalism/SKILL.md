@@ -7,6 +7,17 @@ description: Data journalism workflows for analysis, visualization, and storytel
 
 Systematic approaches for finding, analyzing, and presenting data in journalism.
 
+## When to activate
+
+- Acquiring data from public sources or FOIA
+- Cleaning messy or inconsistent datasets
+- Performing statistical analysis on data
+- Choosing the right chart type for a story
+- Creating data visualizations
+- Writing methodology documentation
+- Avoiding common statistical pitfalls
+- Building data-driven narratives
+
 ## Data acquisition
 
 ### Public data sources
@@ -572,3 +583,22 @@ fig.savefig('chart.png', dpi=150, bbox_inches='tight')
 - Data Journalism Handbook (datajournalism.com)
 - Flowing Data (flowingdata.com)
 - The Pudding (pudding.cool) - examples
+
+## Related skills
+
+- **accessibility-compliance** - Make visualizations accessible
+- **foia-requests** - Obtain datasets from government
+- **python-pipeline** - Build data processing workflows
+- **web-scraping** - Collect data from websites
+
+---
+
+## Skill metadata
+
+| Field | Value |
+|-------|-------|
+| Version | 1.1.0 |
+| Updated | 2025-12-26 |
+| Author | Claude Skills for Journalism |
+| Domain | Journalism, Data Analysis |
+| Complexity | Intermediate-Advanced |

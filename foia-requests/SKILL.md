@@ -7,6 +7,17 @@ description: Freedom of Information Act (FOIA) and public records request workfl
 
 Comprehensive guide for obtaining government records through freedom of information laws.
 
+## When to activate
+
+- Drafting a new FOIA or public records request
+- Choosing which agency to request records from
+- Understanding exemptions that may apply
+- Tracking pending requests across agencies
+- Responding to fee estimates or clarification requests
+- Appealing a denial or excessive redactions
+- Managing large document productions
+- Planning multi-agency request strategies
+
 ## Understanding FOIA landscape
 
 ### Jurisdiction overview
@@ -486,3 +497,22 @@ For each document, track:
 - Search previous requests/responses
 - Agency response time data
 ```
+
+## Related skills
+
+- **data-journalism** - Analyze data obtained through FOIA
+- **source-verification** - Verify documents received
+- **digital-archive** - Preserve and organize obtained records
+- **interview-transcription** - Follow up with sources about records
+
+---
+
+## Skill metadata
+
+| Field | Value |
+|-------|-------|
+| Version | 1.1.0 |
+| Updated | 2025-12-26 |
+| Author | Claude Skills for Journalism |
+| Domain | Journalism, Transparency |
+| Complexity | Intermediate |

@@ -7,6 +7,16 @@ description: Methodology for effective AI-assisted software development. Use whe
 
 Practical strategies for building software effectively with AI coding assistants.
 
+## When to activate
+
+- Starting a new project with AI assistance
+- Planning features before implementation
+- Debugging AI-generated code that isn't working
+- Managing version control in AI workflows
+- Testing and validating AI-written code
+- Working with Cursor, Windsurf, or similar tools
+- Refactoring code written by AI assistants
+
 ## Planning process
 
 Start by working with the AI to write a detailed implementation plan in a markdown file.
@@ -87,3 +97,22 @@ AI assistants help with more than writing code:
 **Regular refactoring**: Once tests are in place, refactor frequently. Ask the AI to identify refactoring candidates.
 
 **Stay current**: Try every new model release. Different models excel at different tasks—experiment to find which works best for your use case.
+
+## Related skills
+
+- **python-pipeline** - Build data processing systems
+- **electron-dev** - Desktop app development patterns
+- **zero-build-frontend** - Static frontend approaches
+- **web-scraping** - Data collection tools
+
+---
+
+## Skill metadata
+
+| Field | Value |
+|-------|-------|
+| Version | 1.1.0 |
+| Updated | 2025-12-26 |
+| Author | Claude Skills for Journalism |
+| Domain | Development, AI |
+| Complexity | Beginner-Intermediate |

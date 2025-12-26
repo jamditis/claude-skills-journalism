@@ -31,6 +31,9 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 | [source-verification](./source-verification/) | SIFT method, digital verification, reverse image search, social media account analysis, building verification trails |
 | [foia-requests](./foia-requests/) | Public records request drafting, tracking systems, appeals process, state-specific guidance |
 | [data-journalism](./data-journalism/) | Data acquisition, cleaning, analysis, visualization, and storytelling for newsrooms |
+| [interview-transcription](./interview-transcription/) | Interview preparation, recording workflows, transcription, quote management, source databases |
+| [social-media-intelligence](./social-media-intelligence/) | Social monitoring, narrative tracking, account analysis, coordination detection, OSINT |
+| [crisis-communications](./crisis-communications/) | Breaking news protocol, rapid verification, crisis response templates, misinformation counter-messaging |
 
 ### Academic and research
 
@@ -38,6 +41,12 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 |-------|-------------|
 | [academic-writing](./academic-writing/) | Research design, literature reviews, IMRaD structure, peer review responses, grant proposals |
 | [digital-archive](./digital-archive/) | Building archives with AI enrichment, entity extraction, knowledge graphs |
+
+### Communications and publishing
+
+| Skill | Description |
+|-------|-------------|
+| [newsletter-publishing](./newsletter-publishing/) | Email newsletter creation, subscriber management, deliverability, A/B testing, analytics |
 
 ### Development (for building tools)
 
@@ -48,6 +57,7 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 | [python-pipeline](./python-pipeline/) | Data processing pipelines with modular architecture |
 | [web-scraping](./web-scraping/) | Content extraction with anti-bot handling and poison pill detection |
 | [zero-build-frontend](./zero-build-frontend/) | Static web apps without build tools, CDN-loaded frameworks |
+| [accessibility-compliance](./accessibility-compliance/) | WCAG compliance, alt text, accessible charts, keyboard navigation, screen reader support |
 
 ## Skill structure
 
@@ -116,6 +126,56 @@ When working on research:
 "Create an abstract for my paper about [topic]"
 ```
 
+### Interview management
+
+When conducting interviews:
+
+```
+"Help me prepare questions for an interview with [source]"
+"Set up a transcription workflow for my recordings"
+"Create a source database for my investigation"
+```
+
+### Social media intelligence
+
+When investigating online narratives:
+
+```
+"Help me analyze this account for authenticity"
+"Track how this claim is spreading across platforms"
+"Check for signs of coordinated behavior"
+```
+
+### Crisis communications
+
+When handling breaking news or crises:
+
+```
+"Help me verify this breaking news claim"
+"Draft a holding statement for [situation]"
+"Set up a rapid verification workflow"
+```
+
+### Newsletter publishing
+
+When building audience through email:
+
+```
+"Help me design a newsletter template"
+"What subject lines work best for journalism newsletters?"
+"Set up A/B testing for my newsletter"
+```
+
+### Accessibility
+
+When building accessible content:
+
+```
+"Write alt text for this news photo"
+"Make this data visualization accessible"
+"Audit my site for WCAG compliance"
+```
+
 ## Contributing
 
 Contributions welcome! Please:
@@ -145,12 +205,17 @@ Contributions welcome! Please:
 
 ## Related resources
 
+### Skills and context engineering
+- [Agent Skills for Context Engineering](https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering) - Foundational skill patterns
 - [Anthropic official skills](https://github.com/anthropics/skills)
 - [Claude Code documentation](https://docs.anthropic.com/claude-code)
 - [Agent Skills Standard](http://agentskills.io)
+
+### Journalism resources
 - [NICAR (Investigative Reporters & Editors)](https://www.ire.org/nicar/)
 - [First Draft News](https://firstdraftnews.org/)
 - [Verification Handbook](https://verificationhandbook.com/)
+- [Bellingcat OSINT guides](https://www.bellingcat.com/resources/)
 
 ## License
 

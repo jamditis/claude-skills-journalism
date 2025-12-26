@@ -7,6 +7,17 @@ description: Journalism source verification and fact-checking workflows. Use whe
 
 Systematic approaches for verifying sources, claims, and digital content in journalism and research.
 
+## When to activate
+
+- Verifying claims before publication
+- Checking source credibility and expertise
+- Investigating social media accounts for authenticity
+- Performing reverse image searches
+- Analyzing videos for manipulation
+- Building verification trails for legal/editorial review
+- Archiving evidence before deletion
+- Preparing for interviews with unknown sources
+
 ## Verification framework
 
 ### The SIFT method
@@ -370,3 +381,22 @@ Recommended tools:
 - Google News Initiative (newsinitiative.withgoogle.com)
 - Verification Handbook (verificationhandbook.com)
 - SPJ ethics resources (spj.org/ethics)
+
+## Related skills
+
+- **social-media-intelligence** - Deep analysis of social accounts and networks
+- **interview-transcription** - Pre-interview background checks
+- **crisis-communications** - Rapid verification under deadline pressure
+- **foia-requests** - Obtain documents to verify claims
+
+---
+
+## Skill metadata
+
+| Field | Value |
+|-------|-------|
+| Version | 1.1.0 |
+| Updated | 2025-12-26 |
+| Author | Claude Skills for Journalism |
+| Domain | Journalism, Fact-checking |
+| Complexity | Intermediate |
