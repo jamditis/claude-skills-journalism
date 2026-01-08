@@ -49,6 +49,14 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 | [web-scraping](./web-scraping/) | Content extraction with anti-bot handling and poison pill detection |
 | [zero-build-frontend](./zero-build-frontend/) | Static web apps without build tools, CDN-loaded frameworks |
 
+### Security (ship without getting sued)
+
+| Skill | Description |
+|-------|-------------|
+| [security-checklist](./security-checklist/) | Pre-deployment security audit covering auth, input validation, secrets, and compliance |
+| [secure-auth](./secure-auth/) | Production-ready authentication patterns (sessions, JWTs, OAuth, MFA) |
+| [api-hardening](./api-hardening/) | Rate limiting, input validation, CORS, API key management |
+
 ## Skill structure
 
 Each skill follows the Claude Agent Skills standard:
