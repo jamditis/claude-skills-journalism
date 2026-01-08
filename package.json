@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "playwright": "^1.57.0",
-    "puppeteer-core": "^24.34.0"
+    "puppeteer-core": "^24.34.0",
+    "single-file-cli": "^2.0.83"
   }
 }
