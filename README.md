@@ -24,13 +24,32 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 
 ## Skills overview
 
-### Journalism and media
+### Core journalism skills
 
 | Skill | Description |
 |-------|-------------|
 | [source-verification](./source-verification/) | SIFT method, digital verification, reverse image search, social media account analysis, building verification trails |
 | [foia-requests](./foia-requests/) | Public records request drafting, tracking systems, appeals process, state-specific guidance |
 | [data-journalism](./data-journalism/) | Data acquisition, cleaning, analysis, visualization, and storytelling for newsrooms |
+| [newsroom-style](./newsroom-style/) | AP Style enforcement, attribution rules, headline formatting, number conventions |
+| [interview-prep](./interview-prep/) | Pre-interview research, question frameworks, recording consent, attribution guidelines |
+| [story-pitch](./story-pitch/) | Pitch templates for daily news, features, investigations, op-eds, and freelance queries |
+| [fact-check-workflow](./fact-check-workflow/) | Claim extraction, evidence gathering, rating scales, correction protocols |
+| [editorial-workflow](./editorial-workflow/) | Story assignment tracking, deadline management, editorial calendars, handoff protocols |
+
+### Writing quality
+
+| Skill | Description |
+|-------|-------------|
+| [ai-writing-detox](./ai-writing-detox/) | Eliminate AI-generated patterns that erode reader trust. Banned words, phrases, and structures with alternatives |
+
+### Project documentation
+
+| Skill | Description |
+|-------|-------------|
+| [project-memory](./project-memory/) | Generate CLAUDE.md files that capture project-specific knowledge. Includes templates for editorial tools, events, publications, research, pipelines, and archives |
+| [project-retrospective](./project-retrospective/) | Generate LESSONS.md files that document what worked and what didn't. Templates for investigations, events, publications, and tools |
+| [template-selector](./template-selector/) | Decision tree for choosing the right project documentation template |
 
 ### Academic and research
 
@@ -56,6 +75,18 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 | [security-checklist](./security-checklist/) | Pre-deployment security audit covering auth, input validation, secrets, and compliance |
 | [secure-auth](./secure-auth/) | Production-ready authentication patterns (sessions, JWTs, OAuth, MFA) |
 | [api-hardening](./api-hardening/) | Rate limiting, input validation, CORS, API key management |
+
+## Hooks
+
+Hooks are automated checks that run at specific points in your workflow.
+
+| Hook | Event | Description |
+|------|-------|-------------|
+| [ap-style-check](./hooks/ap-style-check.md) | PostToolUse | Flag common AP Style violations after writing/editing |
+| [ai-slop-detector](./hooks/ai-slop-detector.md) | PostToolUse | Warn about AI-generated patterns that erode trust |
+| [pre-publish-checklist](./hooks/pre-publish-checklist.md) | Stop | Reminder checklist before completing journalism tasks |
+
+All hooks are non-blocking warnings, not enforcement.
 
 ## Skill structure
 
@@ -94,34 +125,44 @@ When you ask Claude to verify a claim or check a source:
 "Help me check if this image is authentic"
 ```
 
-### FOIA requests
+### Interview preparation
 
-When working with public records:
-
-```
-"Draft a FOIA request for EPA records about [topic]"
-"How do I appeal this FOIA denial?"
-"Track my pending public records requests"
-```
-
-### Data journalism
-
-When analyzing data for stories:
+When preparing for interviews:
 
 ```
-"Help me clean this messy CSV of campaign finance data"
-"What's the right chart type for showing change over time?"
-"Write a methodology box for my data story"
+"Help me prepare questions for interviewing the mayor about the budget"
+"What background research should I do before this interview?"
+"Create a question framework for an investigative interview"
 ```
 
-### Academic writing
+### Story pitching
 
-When working on research:
+When developing story ideas:
 
 ```
-"Help me structure my literature review"
-"Draft a response to these peer reviewer comments"
-"Create an abstract for my paper about [topic]"
+"Help me pitch this feature story idea"
+"Draft a query letter for this freelance investigation"
+"What's the angle for this daily news story?"
+```
+
+### Fact-checking
+
+When verifying claims:
+
+```
+"Walk me through fact-checking this politician's statement"
+"Help me document the evidence for this claim"
+"What rating should this fact-check receive?"
+```
+
+### Project documentation
+
+When setting up or closing projects:
+
+```
+"Generate a CLAUDE.md for this investigation project"
+"Write a retrospective for the conference website we just finished"
+"Which template should I use for this newsletter project?"
 ```
 
 ## Contributing
@@ -150,6 +191,7 @@ Contributions welcome! Please:
 - **Communications professionals** - content strategy, research methods
 - **Fact-checkers** - verification workflows, evidence documentation
 - **Digital archivists** - preservation, metadata, knowledge graphs
+- **Editors** - workflow management, style enforcement, quality control
 
 ## Related resources
 
@@ -159,6 +201,7 @@ Contributions welcome! Please:
 - [NICAR (Investigative Reporters & Editors)](https://www.ire.org/nicar/)
 - [First Draft News](https://firstdraftnews.org/)
 - [Verification Handbook](https://verificationhandbook.com/)
+- [AP Stylebook](https://www.apstylebook.com/)
 
 ## License
 
