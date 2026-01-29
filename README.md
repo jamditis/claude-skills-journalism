@@ -33,9 +33,18 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 | [data-journalism](./data-journalism/) | Data acquisition, cleaning, analysis, visualization, and storytelling for newsrooms |
 | [newsroom-style](./newsroom-style/) | AP Style enforcement, attribution rules, headline formatting, number conventions |
 | [interview-prep](./interview-prep/) | Pre-interview research, question frameworks, recording consent, attribution guidelines |
+| [interview-transcription](./interview-transcription/) | Recording workflows, transcription, quote management, source databases |
 | [story-pitch](./story-pitch/) | Pitch templates for daily news, features, investigations, op-eds, and freelance queries |
 | [fact-check-workflow](./fact-check-workflow/) | Claim extraction, evidence gathering, rating scales, correction protocols |
 | [editorial-workflow](./editorial-workflow/) | Story assignment tracking, deadline management, editorial calendars, handoff protocols |
+| [crisis-communications](./crisis-communications/) | Breaking news protocol, rapid verification, crisis response, misinformation countering |
+| [social-media-intelligence](./social-media-intelligence/) | Social monitoring, narrative tracking, account analysis, coordination detection, OSINT |
+
+### Communications and publishing
+
+| Skill | Description |
+|-------|-------------|
+| [newsletter-publishing](./newsletter-publishing/) | Email newsletter creation, subscriber management, deliverability, A/B testing |
 
 ### Writing quality
 
@@ -57,6 +66,9 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 |-------|-------------|
 | [academic-writing](./academic-writing/) | Research design, literature reviews, IMRaD structure, peer review responses, grant proposals |
 | [digital-archive](./digital-archive/) | Building archives with AI enrichment, entity extraction, knowledge graphs |
+| [web-archiving](./web-archiving/) | Wayback Machine, Archive.today, legal evidence preservation, multi-archive redundancy |
+| [content-access](./content-access/) | Unpaywall, CORE, Semantic Scholar APIs, library databases, ethical access patterns |
+| [page-monitoring](./page-monitoring/) | Change detection, RSS generation, webhook alerts, automatic archiving on changes |
 
 ### Development (for building tools)
 
@@ -67,6 +79,8 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 | [python-pipeline](./python-pipeline/) | Data processing pipelines with modular architecture |
 | [web-scraping](./web-scraping/) | Content extraction with anti-bot handling and poison pill detection |
 | [zero-build-frontend](./zero-build-frontend/) | Static web apps without build tools, CDN-loaded frameworks |
+| [mobile-debugging](./mobile-debugging/) | Eruda, vConsole, remote debugging, iOS debugging, console capture |
+| [accessibility-compliance](./accessibility-compliance/) | WCAG compliance, alt text, accessible charts, keyboard navigation |
 
 ### Security (ship without getting sued)
 
@@ -165,6 +179,26 @@ When setting up or closing projects:
 "Which template should I use for this newsletter project?"
 ```
 
+### Social media intelligence
+
+When investigating online narratives:
+
+```
+"Help me analyze this account for authenticity"
+"Track how this claim is spreading across platforms"
+"Check for signs of coordinated behavior"
+```
+
+### Web archiving and monitoring
+
+When preserving or tracking content:
+
+```
+"Archive this page to multiple services for redundancy"
+"Set up monitoring for changes to this government page"
+"Find academic papers related to this topic"
+```
+
 ## Contributing
 
 Contributions welcome! Please:
@@ -202,6 +236,7 @@ Contributions welcome! Please:
 - [First Draft News](https://firstdraftnews.org/)
 - [Verification Handbook](https://verificationhandbook.com/)
 - [AP Stylebook](https://www.apstylebook.com/)
+- [Bellingcat OSINT guides](https://www.bellingcat.com/resources/)
 
 ## License
 

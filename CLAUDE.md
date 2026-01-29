@@ -19,38 +19,49 @@ claude-skills-journalism/
 │   ├── ai-slop-detector.md      # PostToolUse: Warn about AI patterns
 │   └── pre-publish-checklist.md # Stop: Pre-publication reminder
 │
-├── # Core journalism skills
+├── # Core journalism skills (11)
 ├── source-verification/         # SIFT method, verification trails
 ├── foia-requests/               # Public records requests
 ├── data-journalism/             # Data analysis and storytelling
 ├── newsroom-style/              # AP Style enforcement
 ├── interview-prep/              # Interview preparation
+├── interview-transcription/     # Recording, transcription, quotes
 ├── story-pitch/                 # Pitch templates
 ├── fact-check-workflow/         # Claim verification
 ├── editorial-workflow/          # Assignment tracking, calendars
+├── crisis-communications/       # Breaking news, rapid verification
+├── social-media-intelligence/   # OSINT, account analysis
 │
-├── # Writing quality
+├── # Communications and publishing (1)
+├── newsletter-publishing/       # Email newsletters, subscribers
+│
+├── # Writing quality (1)
 ├── ai-writing-detox/            # Eliminate AI writing patterns
 │
-├── # Project documentation
+├── # Project documentation (3)
 ├── project-memory/              # CLAUDE.md generation
 │   └── templates/               # 6 project type templates
 ├── project-retrospective/       # LESSONS.md generation
 │   └── templates/               # 4 project type templates
 ├── template-selector/           # Choose the right template
 │
-├── # Academic
+├── # Academic and research (5)
 ├── academic-writing/            # Research and academic writing
 ├── digital-archive/             # Archive building
+├── web-archiving/               # Wayback, Archive.today, evidence
+├── content-access/              # Unpaywall, CORE, library access
+├── page-monitoring/             # Change detection, alerts
 │
-├── # Development
+├── # Development (7)
 ├── vibe-coding/                 # AI-assisted development
 ├── electron-dev/                # Electron patterns
 ├── python-pipeline/             # Data pipelines
 ├── web-scraping/                # Content extraction
 ├── zero-build-frontend/         # No-build web apps
+├── mobile-debugging/            # Eruda, vConsole, remote debug
+├── accessibility-compliance/    # WCAG, alt text, a11y
 │
-└── # Security
+└── # Security (3)
     ├── security-checklist/      # Pre-deployment audit
     ├── secure-auth/             # Authentication patterns
     └── api-hardening/           # API security
