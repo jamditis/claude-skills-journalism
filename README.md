@@ -92,15 +92,38 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 
 ## Hooks
 
-Hooks are automated checks that run at specific points in your workflow.
+Hooks are automated checks that run at specific points in your workflow. All hooks are **non-blocking warnings**—they provide guidance but don't prevent actions.
+
+### Writing quality hooks
 
 | Hook | Event | Description |
 |------|-------|-------------|
-| [ap-style-check](./hooks/ap-style-check.md) | PostToolUse | Flag common AP Style violations after writing/editing |
-| [ai-slop-detector](./hooks/ai-slop-detector.md) | PostToolUse | Warn about AI-generated patterns that erode trust |
-| [pre-publish-checklist](./hooks/pre-publish-checklist.md) | Stop | Reminder checklist before completing journalism tasks |
+| [ap-style-check](./hooks/ap-style-check.md) | PostToolUse | Flag common AP Style violations |
+| [ai-slop-detector](./hooks/ai-slop-detector.md) | PostToolUse | Warn about AI-generated patterns |
+| [accessibility-check](./hooks/accessibility-check.md) | PostToolUse | Check alt text, heading structure, link text |
 
-All hooks are non-blocking warnings, not enforcement.
+### Verification hooks
+
+| Hook | Event | Description |
+|------|-------|-------------|
+| [source-attribution-check](./hooks/source-attribution-check.md) | PostToolUse | Flag unattributed quotes and claims |
+| [verification-reminder](./hooks/verification-reminder.md) | PostToolUse | Prompt to verify facts before including |
+| [data-methodology-check](./hooks/data-methodology-check.md) | PostToolUse | Ensure data stories include methodology |
+
+### Editorial workflow hooks
+
+| Hook | Event | Description |
+|------|-------|-------------|
+| [source-diversity-check](./hooks/source-diversity-check.md) | PostToolUse | Note when sources may lack diversity |
+| [legal-review-flag](./hooks/legal-review-flag.md) | PostToolUse | Flag potentially defamatory content |
+| [pre-publish-checklist](./hooks/pre-publish-checklist.md) | Stop | Reminder checklist before completing tasks |
+| [deadline-tracker](./hooks/deadline-tracker.md) | SessionStart | Surface upcoming deadlines |
+
+### Preservation hooks
+
+| Hook | Event | Description |
+|------|-------|-------------|
+| [archive-reminder](./hooks/archive-reminder.md) | PostToolUse | Remind to archive URLs when citing sources |
 
 ## Skill structure
 

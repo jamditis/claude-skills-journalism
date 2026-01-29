@@ -14,10 +14,18 @@ claude-skills-journalism/
 ├── README.md                    # User documentation
 ├── LICENSE
 │
-├── hooks/                       # Automated workflow checks
-│   ├── ap-style-check.md        # PostToolUse: Flag AP Style violations
-│   ├── ai-slop-detector.md      # PostToolUse: Warn about AI patterns
-│   └── pre-publish-checklist.md # Stop: Pre-publication reminder
+├── hooks/                       # Automated workflow checks (11 hooks)
+│   ├── ap-style-check.md        # Writing: AP Style violations
+│   ├── ai-slop-detector.md      # Writing: AI patterns
+│   ├── accessibility-check.md   # Writing: Alt text, headings
+│   ├── source-attribution-check.md  # Verification: Unattributed claims
+│   ├── verification-reminder.md # Verification: Fact-check prompt
+│   ├── data-methodology-check.md    # Verification: Methodology docs
+│   ├── source-diversity-check.md    # Editorial: Source diversity
+│   ├── legal-review-flag.md     # Editorial: Defamation risk
+│   ├── pre-publish-checklist.md # Editorial: Pre-publish reminder
+│   ├── deadline-tracker.md      # Editorial: Deadline surfacing
+│   └── archive-reminder.md      # Preservation: Archive URLs
 │
 ├── # Core journalism skills (11)
 ├── source-verification/         # SIFT method, verification trails
@@ -84,15 +92,34 @@ Instructions, templates, and workflows.
 
 ## Hooks
 
-Hooks run automatically at specific workflow events:
+Hooks run automatically at specific workflow events. All are **non-blocking warnings**.
 
+### Writing quality
 | Hook | Event | Purpose |
 |------|-------|---------|
 | ap-style-check | PostToolUse(Write,Edit) | Flag AP Style violations |
 | ai-slop-detector | PostToolUse(Write,Edit) | Warn about AI patterns |
-| pre-publish-checklist | Stop | Remind about verification |
+| accessibility-check | PostToolUse(Write,Edit) | Check alt text, headings, links |
 
-All hooks are **non-blocking warnings**. They provide guidance but don't prevent actions.
+### Verification
+| Hook | Event | Purpose |
+|------|-------|---------|
+| source-attribution-check | PostToolUse(Write,Edit) | Flag unattributed quotes/claims |
+| verification-reminder | PostToolUse(Write,Edit) | Prompt fact verification |
+| data-methodology-check | PostToolUse(Write,Edit) | Ensure methodology documented |
+
+### Editorial workflow
+| Hook | Event | Purpose |
+|------|-------|---------|
+| source-diversity-check | PostToolUse(Write,Edit) | Note sourcing diversity |
+| legal-review-flag | PostToolUse(Write,Edit) | Flag defamation risk |
+| pre-publish-checklist | Stop | Pre-publication reminder |
+| deadline-tracker | SessionStart | Surface upcoming deadlines |
+
+### Preservation
+| Hook | Event | Purpose |
+|------|-------|---------|
+| archive-reminder | PostToolUse(Write,Edit) | Remind to archive URLs |
 
 ## Installation
 
