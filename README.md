@@ -74,6 +74,7 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 
 | Skill | Description |
 |-------|-------------|
+| [test-first-bugs](./test-first-bugs/) | Test-driven bug fixing: write failing test first, then fix with subagents |
 | [vibe-coding](./vibe-coding/) | AI-assisted software development methodology based on YC best practices |
 | [electron-dev](./electron-dev/) | Electron + React desktop application development patterns |
 | [python-pipeline](./python-pipeline/) | Data processing pipelines with modular architecture |
@@ -124,6 +125,13 @@ Hooks are automated checks that run at specific points in your workflow. All hoo
 | Hook | Event | Description |
 |------|-------|-------------|
 | [archive-reminder](./hooks/archive-reminder.md) | PostToolUse | Remind to archive URLs when citing sources |
+
+### Bug fixing hooks
+
+| Hook | Event | Description |
+|------|-------|-------------|
+| [bug-report-detector](./hooks/bug-report-detector.md) | UserPromptSubmit | Detect bug reports and remind to follow test-first workflow |
+| [enforce-test-first](./hooks/enforce-test-first.md) | PreToolUse | Block source code edits until a test file has been written |
 
 ## Skill structure
 

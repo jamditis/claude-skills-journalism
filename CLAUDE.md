@@ -1,5 +1,15 @@
 # Claude skills collection
 
+## Bug-fixing workflow
+
+When a bug is reported, don't immediately attempt to fix it. Instead:
+
+1. **Write a failing test first** that reproduces the bug
+2. **Launch subagents** to work on fixing the bug
+3. **Verify the fix** by running the test — a passing test proves the bug is fixed
+
+---
+
 Collection of Claude Code skills for journalism, media, academia, and technical workflows.
 
 ## Project overview
@@ -14,7 +24,7 @@ claude-skills-journalism/
 ├── README.md                    # User documentation
 ├── LICENSE
 │
-├── hooks/                       # Automated workflow checks (11 hooks)
+├── hooks/                       # Automated workflow checks (13 hooks)
 │   ├── ap-style-check.md        # Writing: AP Style violations
 │   ├── ai-slop-detector.md      # Writing: AI patterns
 │   ├── accessibility-check.md   # Writing: Alt text, headings
@@ -25,7 +35,9 @@ claude-skills-journalism/
 │   ├── legal-review-flag.md     # Editorial: Defamation risk
 │   ├── pre-publish-checklist.md # Editorial: Pre-publish reminder
 │   ├── deadline-tracker.md      # Editorial: Deadline surfacing
-│   └── archive-reminder.md      # Preservation: Archive URLs
+│   ├── archive-reminder.md      # Preservation: Archive URLs
+│   ├── bug-report-detector.md   # Bug fixing: Detect bug reports
+│   └── enforce-test-first.md    # Bug fixing: Enforce test-first workflow
 │
 ├── # Core journalism skills (11)
 ├── source-verification/         # SIFT method, verification trails
@@ -60,7 +72,8 @@ claude-skills-journalism/
 ├── content-access/              # Unpaywall, CORE, library access
 ├── page-monitoring/             # Change detection, alerts
 │
-├── # Development (7)
+├── # Development (8)
+├── test-first-bugs/             # Test-driven bug fixing workflow
 ├── vibe-coding/                 # AI-assisted development
 ├── electron-dev/                # Electron patterns
 ├── python-pipeline/             # Data pipelines
