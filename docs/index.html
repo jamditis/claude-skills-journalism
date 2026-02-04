@@ -130,6 +130,33 @@
             border-radius: 2px;
         }
 
+        .featured-badge {
+            background: linear-gradient(135deg, #CA3553 0%, #a82a44 100%);
+            color: white;
+            font-size: 9px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(202, 53, 83, 0.4); }
+            50% { box-shadow: 0 0 8px 2px rgba(202, 53, 83, 0.3); }
+        }
+
+        .skill-card-featured {
+            background: linear-gradient(135deg, rgba(202, 53, 83, 0.08) 0%, rgba(255, 255, 255, 0.5) 100%);
+            border: 2px solid rgba(202, 53, 83, 0.3);
+        }
+
+        .skill-card-featured:hover {
+            border-color: #CA3553;
+            box-shadow: 0 15px 40px -10px rgba(202, 53, 83, 0.2);
+        }
+
         @media (max-width: 640px) {
             .fluid-title { font-size: 14vw !important; }
         }
@@ -347,19 +374,10 @@
             <section class="reveal-section mb-32">
                 <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <h2 class="font-display text-4xl font-light italic">02 / Communications</h2>
-                    <span class="section-label">2 Skills</span>
+                    <span class="section-label">1 Skill</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <a href="pdf-playground/" class="skill-card deckle-card p-6 transition-all duration-300 block group border-2 border-accent/20">
-                        <div class="flex items-start justify-between mb-3">
-                            <i data-lucide="file-text" class="w-5 h-5 text-accent"></i>
-                            <span class="text-[9px] font-bold tracking-widest text-accent uppercase">Plugin</span>
-                        </div>
-                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">pdf-playground</h3>
-                        <p class="text-sm text-mist leading-relaxed">Create professional proposals, reports, one-pagers, newsletters, slides, and event materials with customizable branding.</p>
-                    </a>
-
                     <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/newsletter-publishing" class="skill-card deckle-card p-6 transition-all duration-300 block group">
                         <div class="flex items-start justify-between mb-3">
                             <i data-lucide="mail" class="w-5 h-5 text-accent"></i>
@@ -375,17 +393,31 @@
             <section class="reveal-section mb-32">
                 <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <h2 class="font-display text-4xl font-light italic">03 / Design &amp; production</h2>
-                    <span class="section-label">1 Skill</span>
+                    <span class="section-label">2 Skills</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <a href="pdf-playground/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="layout" class="w-5 h-5 text-[#CA3553]"></i>
+                            <span class="featured-badge">Interactive Plugin</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#CA3553] transition-colors">pdf-playground</h3>
+                        <p class="text-sm text-mist leading-relaxed">Full Claude Code plugin with 6 document types, live preview, brand customization, and conversational editing. Create proposals, reports, slides, and more.</p>
+                        <div class="flex flex-wrap gap-2 mt-3">
+                            <span class="text-[8px] bg-[#CA3553]/10 text-[#CA3553] px-2 py-1 rounded font-semibold">Templates</span>
+                            <span class="text-[8px] bg-[#CA3553]/10 text-[#CA3553] px-2 py-1 rounded font-semibold">Preview</span>
+                            <span class="text-[8px] bg-[#CA3553]/10 text-[#CA3553] px-2 py-1 rounded font-semibold">Branding</span>
+                        </div>
+                    </a>
+
                     <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-design" class="skill-card deckle-card p-6 transition-all duration-300 block group">
                         <div class="flex items-start justify-between mb-3">
                             <i data-lucide="file-text" class="w-5 h-5 text-accent"></i>
-                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">PDF</span>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Skill</span>
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">pdf-design</h3>
-                        <p class="text-sm text-mist leading-relaxed">Professional PDF reports and proposals with interactive editing, brand system, budget tables, multi-page layouts.</p>
+                        <p class="text-sm text-mist leading-relaxed">Standalone skill for PDF reports and proposals with print-ready CSS patterns and layout guidance.</p>
                     </a>
                 </div>
             </section>

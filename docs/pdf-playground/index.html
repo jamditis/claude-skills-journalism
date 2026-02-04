@@ -115,7 +115,7 @@
             <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">
                 ← Back to all skills
             </a>
-            <a href="https://github.com/jamditis/claude-skills-journalism/tree/main/pdf-playground" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-playground" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">
                 View on GitHub →
             </a>
         </div>
@@ -226,6 +226,79 @@
             </div>
         </section>
 
+        <!-- Interactive Demo -->
+        <section id="demo" class="py-24 px-6 bg-ink text-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">See it in action</h2>
+                    <p class="text-lg text-white/70 max-w-2xl mx-auto">
+                        PDF Playground works through natural conversation. Describe what you need, iterate with feedback, and export when ready.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                    <!-- Chat Interface -->
+                    <div class="bg-[#1a1a1a] rounded-xl overflow-hidden shadow-2xl">
+                        <div class="bg-[#252525] px-4 py-3 flex items-center gap-2 border-b border-white/10">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            <span class="ml-3 text-white/50 text-sm font-mono">claude</span>
+                        </div>
+
+                        <div id="chat-messages" class="p-4 space-y-4 h-[420px] overflow-y-auto">
+                            <!-- Messages will be inserted here -->
+                        </div>
+
+                        <div class="border-t border-white/10 p-4">
+                            <div class="flex gap-2">
+                                <input type="text" id="demo-input" placeholder="Type a message..."
+                                    class="flex-1 bg-[#252525] text-white px-4 py-2 rounded-lg border border-white/10 focus:border-accent focus:outline-none text-sm"
+                                    disabled>
+                                <button id="demo-btn" class="bg-accent hover:bg-accentDark text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                    Send
+                                </button>
+                            </div>
+                            <p class="text-white/40 text-xs mt-2">Demo mode — press "Start demo" to see the workflow</p>
+                        </div>
+                    </div>
+
+                    <!-- Document Preview -->
+                    <div class="relative">
+                        <div id="doc-preview" class="doc-preview aspect-[8.5/11] w-full max-w-md mx-auto transition-all duration-500 opacity-30">
+                            <div class="p-8 h-full flex flex-col">
+                                <div class="text-center mb-auto">
+                                    <div class="text-xs text-gray-400 uppercase tracking-wide mb-2">Document preview</div>
+                                    <div id="preview-title" class="text-2xl font-bold text-gray-300">Your document</div>
+                                    <div id="preview-subtitle" class="text-sm text-gray-400 mt-1">will appear here</div>
+                                </div>
+                                <div id="preview-content" class="mt-auto space-y-3 opacity-50">
+                                    <div class="h-3 bg-gray-200 rounded w-full"></div>
+                                    <div class="h-3 bg-gray-200 rounded w-5/6"></div>
+                                    <div class="h-3 bg-gray-200 rounded w-4/5"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button id="start-demo" class="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg cursor-pointer hover:bg-black/40 transition-colors">
+                            <span class="bg-accent text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 shadow-lg">
+                                <i data-lucide="play" class="w-5 h-5"></i>
+                                Start demo
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-12 text-center">
+                    <p class="text-white/50 text-sm mb-4">Ready to try it yourself?</p>
+                    <a href="#install" class="inline-flex items-center gap-2 bg-accent text-white font-semibold px-6 py-3 rounded-lg hover:bg-accentDark transition-colors">
+                        <i data-lucide="download" class="w-5 h-5"></i>
+                        Install PDF Playground
+                    </a>
+                </div>
+            </div>
+        </section>
+
         <!-- Brand Customization -->
         <section class="py-24 px-6 bg-white/50">
             <div class="max-w-6xl mx-auto">
@@ -305,7 +378,7 @@ style:
                             <h3 class="font-display text-xl font-bold">Configure your brand (optional)</h3>
                         </div>
                         <p class="text-mist mb-4">Create <code>.claude/pdf-playground.local.md</code> in your project with your brand settings.</p>
-                        <a href="https://github.com/jamditis/claude-skills-journalism/tree/main/pdf-playground/brands" class="text-accent font-semibold hover:underline">
+                        <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-playground/brands" class="text-accent font-semibold hover:underline">
                             See example brand configs →
                         </a>
                     </div>
@@ -327,19 +400,19 @@ style:
                 <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-16">Documentation</h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <a href="https://github.com/jamditis/claude-skills-journalism/tree/main/pdf-playground#readme" class="block p-6 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                    <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-playground#readme" class="block p-6 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
                         <i data-lucide="book" class="w-8 h-8 mb-4 text-accent"></i>
                         <h3 class="font-display text-xl font-bold mb-2">README</h3>
                         <p class="text-white/70 text-sm">Full installation instructions and usage guide.</p>
                     </a>
 
-                    <a href="https://github.com/jamditis/claude-skills-journalism/tree/main/pdf-playground/brands" class="block p-6 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                    <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-playground/brands" class="block p-6 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
                         <i data-lucide="palette" class="w-8 h-8 mb-4 text-accent"></i>
                         <h3 class="font-display text-xl font-bold mb-2">Brand configs</h3>
                         <p class="text-white/70 text-sm">Example brand configurations to copy and customize.</p>
                     </a>
 
-                    <a href="https://github.com/jamditis/claude-skills-journalism/tree/main/pdf-playground/templates" class="block p-6 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                    <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-playground/templates" class="block p-6 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
                         <i data-lucide="layout-template" class="w-8 h-8 mb-4 text-accent"></i>
                         <h3 class="font-display text-xl font-bold mb-2">Templates</h3>
                         <p class="text-white/70 text-sm">HTML templates for all document types.</p>
@@ -364,6 +437,111 @@ style:
 
     <script>
         lucide.createIcons();
+
+        // Interactive demo
+        const demoConversation = [
+            { role: 'user', text: '/proposal 2025 Community News Initiative' },
+            { role: 'assistant', text: 'I\'ll create a funding proposal for the 2025 Community News Initiative. Let me check your brand configuration...' },
+            { role: 'assistant', text: 'Found your brand settings. Creating a multi-page proposal with your colors (#CA3553) and fonts (Playfair Display).' },
+            { role: 'system', text: '📄 Created: community-news-initiative-proposal.html', preview: { title: '2025 Community News Initiative', subtitle: 'Funding proposal', style: 'accent' } },
+            { role: 'user', text: 'Can you add a budget table on page 3?' },
+            { role: 'assistant', text: 'Adding a budget table to page 3. I\'ll use your brand colors for the header and total row.' },
+            { role: 'system', text: '✅ Updated: Added budget table with Year 1 ($150,000) and Year 2 ($175,000) totals.', preview: { title: '2025 Community News Initiative', subtitle: 'Funding proposal • Budget added', style: 'complete' } },
+            { role: 'user', text: '/preview' },
+            { role: 'assistant', text: 'Opening the document in the browser for preview...' },
+            { role: 'system', text: '🖥️ Preview opened. What changes would you like to make?', preview: { title: '2025 Community News Initiative', subtitle: 'Ready for PDF export', style: 'final' } },
+        ];
+
+        let currentStep = 0;
+        const chatMessages = document.getElementById('chat-messages');
+        const startBtn = document.getElementById('start-demo');
+        const docPreview = document.getElementById('doc-preview');
+        const previewTitle = document.getElementById('preview-title');
+        const previewSubtitle = document.getElementById('preview-subtitle');
+        const previewContent = document.getElementById('preview-content');
+
+        function createMessageElement(msg) {
+            const div = document.createElement('div');
+            const bubble = document.createElement('div');
+            const text = document.createElement('p');
+            text.className = 'text-sm';
+            text.textContent = msg.text;
+
+            if (msg.role === 'user') {
+                div.className = 'flex justify-end';
+                bubble.className = 'bg-accent text-white px-4 py-2 rounded-2xl rounded-br-md max-w-[80%]';
+            } else if (msg.role === 'assistant') {
+                div.className = 'flex justify-start';
+                bubble.className = 'bg-[#252525] text-white/90 px-4 py-2 rounded-2xl rounded-bl-md max-w-[80%]';
+            } else if (msg.role === 'system') {
+                div.className = 'flex justify-start';
+                bubble.className = 'bg-green-900/30 text-green-400 px-4 py-2 rounded-lg max-w-[80%] border border-green-500/20';
+                text.className = 'text-sm font-mono';
+                if (msg.preview) updatePreview(msg.preview);
+            }
+
+            bubble.appendChild(text);
+            div.appendChild(bubble);
+            return div;
+        }
+
+        function updatePreview(preview) {
+            docPreview.classList.remove('opacity-30');
+            docPreview.classList.add('opacity-100');
+            previewTitle.textContent = preview.title;
+            previewTitle.className = 'text-2xl font-bold text-gray-800';
+            previewSubtitle.textContent = preview.subtitle;
+            previewSubtitle.className = 'text-sm text-gray-500 mt-1';
+
+            // Clear and rebuild preview content
+            previewContent.textContent = '';
+            previewContent.classList.remove('opacity-50');
+
+            const createBar = (color, width) => {
+                const bar = document.createElement('div');
+                bar.className = `h-3 rounded ${width}`;
+                bar.style.backgroundColor = color;
+                return bar;
+            };
+
+            if (preview.style === 'accent') {
+                previewContent.appendChild(createBar('#CA3553', 'w-full'));
+                previewContent.appendChild(createBar('#d1d5db', 'w-5/6'));
+                previewContent.appendChild(createBar('#d1d5db', 'w-4/5'));
+            } else if (preview.style === 'complete' || preview.style === 'final') {
+                previewContent.appendChild(createBar('#CA3553', 'w-full'));
+                previewContent.appendChild(createBar('#d1d5db', 'w-5/6'));
+                const spacer = document.createElement('div');
+                spacer.className = 'h-2 bg-gray-200 rounded w-full mt-4';
+                previewContent.appendChild(spacer);
+                previewContent.appendChild(createBar('#e5e7eb', 'w-full h-2'));
+                const total = document.createElement('div');
+                total.className = 'h-2 rounded w-full';
+                total.style.backgroundColor = 'rgba(202, 53, 83, 0.3)';
+                previewContent.appendChild(total);
+
+                if (preview.style === 'final') {
+                    const ready = document.createElement('div');
+                    ready.className = 'text-xs text-green-600 mt-3 font-semibold';
+                    ready.textContent = '✓ Ready for export';
+                    previewContent.appendChild(ready);
+                }
+            }
+        }
+
+        async function runDemo() {
+            startBtn.style.display = 'none';
+            chatMessages.textContent = '';
+            currentStep = 0;
+
+            for (const msg of demoConversation) {
+                await new Promise(r => setTimeout(r, msg.role === 'user' ? 800 : 1200));
+                chatMessages.appendChild(createMessageElement(msg));
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        startBtn.addEventListener('click', runDemo);
     </script>
 </body>
 </html>
