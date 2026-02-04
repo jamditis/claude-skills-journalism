@@ -46,6 +46,12 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 |-------|-------------|
 | [newsletter-publishing](./newsletter-publishing/) | Email newsletter creation, subscriber management, deliverability, A/B testing |
 
+### Design and production
+
+| Skill | Description |
+|-------|-------------|
+| [pdf-design](./pdf-design/) | Professional PDF reports and proposals with interactive editing, CCM brand system, budget tables, multi-page layouts |
+
 ### Writing quality
 
 | Skill | Description |
