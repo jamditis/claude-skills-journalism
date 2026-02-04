@@ -8,7 +8,29 @@ Skills are modular instruction sets that extend Claude's capabilities for specia
 
 ## Installation
 
-### For Claude Code users
+### Plugins (recommended)
+
+This repo includes full Claude Code plugins that can be installed via the plugin marketplace:
+
+```bash
+# Add this repo as a plugin marketplace
+claude plugin marketplace add https://github.com/jamditis/claude-skills-journalism
+
+# Install the pdf-playground plugin
+claude plugin install pdf-playground@claude-skills-journalism
+
+# Restart Claude Code to load the plugin
+```
+
+**Available plugins:**
+
+| Plugin | Description | Commands |
+|--------|-------------|----------|
+| [pdf-playground](./pdf-playground/) | Interactive PDF report and proposal design | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` |
+
+### Skills (manual installation)
+
+For individual skills without the plugin system:
 
 ```bash
 # Clone to your Claude skills directory
