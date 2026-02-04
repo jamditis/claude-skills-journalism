@@ -7,125 +7,172 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'display': ['Fraunces', 'serif'],
+                        'body': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'canvas': '#ede6d4',
+                        'ink': '#121212',
+                        'clay': '#2d2a26',
+                        'mist': '#c4bfb4',
+                        'accent': '#475569',
+                        'accentDark': '#334155',
+                        'accentDeep': '#1e293b',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body { font-family: 'Source Sans 3', sans-serif; }
-        h1, h2, h3 { font-family: 'Playfair Display', serif; }
-        .accent-gradient { background: linear-gradient(135deg, #475569 0%, #1e293b 100%); }
-        .accent-text { color: #475569; }
-        .accent-border { border-color: #475569; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Fraunces', serif; }
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("https://www.transparenttextures.com/patterns/natural-paper.png"),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .hero-gradient {
+            background:
+                url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='none' stroke='%23475569' stroke-opacity='0.08' stroke-width='1'/%3E%3C/svg%3E"),
+                linear-gradient(135deg, #475569 0%, #334155 50%, #1e293b 100%);
+        }
+        .feature-card {
+            background: white;
+            border: 1px solid rgba(0,0,0,0.08);
+            transition: all 0.2s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
         .banned-word {
             display: inline-block;
             text-decoration: line-through;
             color: #ef4444;
             background: #fef2f2;
             padding: 0 4px;
-            border-radius: 2px;
+            border-radius: 4px;
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900">
-    <!-- Header -->
-    <header class="accent-gradient text-white">
-        <nav class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="../" class="text-white/80 hover:text-white flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<body class="bg-canvas text-ink">
+    <div class="paper-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="../" class="text-clay/70 hover:text-ink flex items-center gap-2 text-sm font-medium transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
-                Back to all skills
+                All skills
             </a>
-            <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-white/80 hover:text-white">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
                 </svg>
             </a>
-        </nav>
+        </div>
+    </nav>
 
-        <div class="max-w-6xl mx-auto px-4 py-16 text-center">
-            <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-6">
+    <!-- Hero -->
+    <header class="hero-gradient text-white pt-24 pb-20 relative overflow-hidden">
+        <div class="max-w-5xl mx-auto px-6 relative z-10">
+            <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm mb-6 border border-white/20">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                 </svg>
                 Editorial skill
             </div>
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">AI writing detox</h1>
-            <p class="text-xl text-white/90 max-w-2xl mx-auto">
+            <h1 class="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight">AI writing detox</h1>
+            <p class="text-xl text-white/90 max-w-2xl leading-relaxed">
                 Eliminate AI-generated writing patterns that erode reader trust. Essential for journalists using AI assistance who need human-sounding output.
             </p>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 py-12">
+    <main class="max-w-5xl mx-auto px-6 py-16 relative z-10">
         <!-- Core principle -->
-        <section class="mb-16">
-            <div class="bg-slate-900 text-white rounded-xl p-8 text-center">
-                <p class="text-2xl font-medium mb-2">Good writing is invisible.</p>
-                <p class="text-slate-400">If readers notice the writing style, it's distracting from the content. AI patterns are noticeable—they break trust.</p>
+        <section class="mb-20">
+            <div class="bg-ink text-white rounded-2xl p-10 text-center">
+                <p class="font-display text-2xl font-medium mb-3">Good writing is invisible.</p>
+                <p class="text-white/60">If readers notice the writing style, it's distracting from the content. AI patterns are noticeable—they break trust.</p>
             </div>
         </section>
 
         <!-- Banned words -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">Banned words (delete or replace)</h2>
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">Banned words (delete or replace)</h2>
+            <div class="feature-card rounded-2xl overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full">
                         <thead>
-                            <tr class="bg-gray-50 border-b border-gray-200">
+                            <tr class="bg-mist/20 border-b border-mist/30">
                                 <th class="text-left px-6 py-4 font-semibold">Word</th>
                                 <th class="text-left px-6 py-4 font-semibold">Why it's bad</th>
                                 <th class="text-left px-6 py-4 font-semibold">Alternative</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200">
+                        <tbody class="divide-y divide-mist/20">
                             <tr>
                                 <td class="px-6 py-3"><span class="banned-word">delve</span></td>
-                                <td class="px-6 py-3 text-gray-600">AI signature word</td>
+                                <td class="px-6 py-3 text-clay/70">AI signature word</td>
                                 <td class="px-6 py-3 text-green-700">explore, examine, look at</td>
                             </tr>
                             <tr>
                                 <td class="px-6 py-3"><span class="banned-word">realm</span></td>
-                                <td class="px-6 py-3 text-gray-600">Pretentious</td>
+                                <td class="px-6 py-3 text-clay/70">Pretentious</td>
                                 <td class="px-6 py-3 text-green-700">area, field</td>
                             </tr>
                             <tr>
                                 <td class="px-6 py-3"><span class="banned-word">tapestry</span></td>
-                                <td class="px-6 py-3 text-gray-600">Purple prose</td>
+                                <td class="px-6 py-3 text-clay/70">Purple prose</td>
                                 <td class="px-6 py-3 text-green-700">(delete entirely)</td>
                             </tr>
                             <tr>
                                 <td class="px-6 py-3"><span class="banned-word">landscape</span></td>
-                                <td class="px-6 py-3 text-gray-600">Corporate speak</td>
+                                <td class="px-6 py-3 text-clay/70">Corporate speak</td>
                                 <td class="px-6 py-3 text-green-700">situation, environment</td>
                             </tr>
                             <tr>
                                 <td class="px-6 py-3"><span class="banned-word">leverage</span></td>
-                                <td class="px-6 py-3 text-gray-600">Jargon</td>
+                                <td class="px-6 py-3 text-clay/70">Jargon</td>
                                 <td class="px-6 py-3 text-green-700">use</td>
                             </tr>
                             <tr>
                                 <td class="px-6 py-3"><span class="banned-word">robust</span></td>
-                                <td class="px-6 py-3 text-gray-600">Meaningless</td>
+                                <td class="px-6 py-3 text-clay/70">Meaningless</td>
                                 <td class="px-6 py-3 text-green-700">strong, reliable</td>
                             </tr>
                             <tr>
                                 <td class="px-6 py-3"><span class="banned-word">seamless</span></td>
-                                <td class="px-6 py-3 text-gray-600">Almost always false</td>
+                                <td class="px-6 py-3 text-clay/70">Almost always false</td>
                                 <td class="px-6 py-3 text-green-700">smooth, easy</td>
                             </tr>
                             <tr>
                                 <td class="px-6 py-3"><span class="banned-word">comprehensive</span></td>
-                                <td class="px-6 py-3 text-gray-600">Rarely necessary</td>
+                                <td class="px-6 py-3 text-clay/70">Rarely necessary</td>
                                 <td class="px-6 py-3 text-green-700">full, complete</td>
                             </tr>
                             <tr>
                                 <td class="px-6 py-3"><span class="banned-word">transformative</span></td>
-                                <td class="px-6 py-3 text-gray-600">Hyperbolic</td>
+                                <td class="px-6 py-3 text-clay/70">Hyperbolic</td>
                                 <td class="px-6 py-3 text-green-700">changed, improved</td>
                             </tr>
                             <tr>
                                 <td class="px-6 py-3"><span class="banned-word">innovative</span></td>
-                                <td class="px-6 py-3 text-gray-600">Empty praise</td>
+                                <td class="px-6 py-3 text-clay/70">Empty praise</td>
                                 <td class="px-6 py-3 text-green-700">(describe what's new)</td>
                             </tr>
                         </tbody>
@@ -135,12 +182,12 @@
         </section>
 
         <!-- Banned phrases -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">Banned phrases</h2>
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">Banned phrases</h2>
             <div class="grid md:grid-cols-3 gap-6">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="feature-card rounded-2xl p-6">
                     <h3 class="font-semibold mb-4 text-red-700">Throat-clearing (delete entirely)</h3>
-                    <ul class="space-y-2 text-sm text-gray-600">
+                    <ul class="space-y-2 text-sm text-clay/70">
                         <li>"It's important to note that..."</li>
                         <li>"In today's [X] landscape..."</li>
                         <li>"Let's dive/delve into..."</li>
@@ -149,9 +196,9 @@
                         <li>"It's worth mentioning that..."</li>
                     </ul>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="feature-card rounded-2xl p-6">
                     <h3 class="font-semibold mb-4 text-red-700">AI enthusiasm</h3>
-                    <ul class="space-y-2 text-sm text-gray-600">
+                    <ul class="space-y-2 text-sm text-clay/70">
                         <li>"This is a game-changer"</li>
                         <li>"...and that's a good thing!"</li>
                         <li>"Here's the thing:"</li>
@@ -159,9 +206,9 @@
                         <li>"...and I'm here for it"</li>
                     </ul>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="feature-card rounded-2xl p-6">
                     <h3 class="font-semibold mb-4 text-red-700">Corporate buzzwords</h3>
-                    <ul class="space-y-2 text-sm text-gray-600">
+                    <ul class="space-y-2 text-sm text-clay/70">
                         <li>"Moving forward..."</li>
                         <li>"Going forward..."</li>
                         <li>"At this point in time..."</li>
@@ -173,61 +220,61 @@
         </section>
 
         <!-- Before and after -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">Before and after</h2>
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">Before and after</h2>
             <div class="space-y-6">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="feature-card rounded-2xl overflow-hidden">
                     <div class="bg-red-50 px-6 py-3 border-b border-red-100">
                         <span class="text-sm font-medium text-red-700">AI slop</span>
                     </div>
                     <div class="p-6">
-                        <p class="text-gray-600 italic">
+                        <p class="text-clay/70 italic">
                             "In today's rapidly evolving media landscape, it's crucial to understand the multifaceted nature of AI tools. Let's delve into how these robust solutions can help journalists leverage cutting-edge technology."
                         </p>
                     </div>
                     <div class="bg-green-50 px-6 py-3 border-t border-green-100">
                         <span class="text-sm font-medium text-green-700">Human writing</span>
                     </div>
-                    <div class="p-6 border-t border-gray-100">
-                        <p class="text-gray-900 font-medium">
+                    <div class="p-6 border-t border-mist/20">
+                        <p class="text-ink font-medium">
                             "AI tools do three things well: drafting, research, and analysis. Here's when to use each."
                         </p>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="feature-card rounded-2xl overflow-hidden">
                     <div class="bg-red-50 px-6 py-3 border-b border-red-100">
                         <span class="text-sm font-medium text-red-700">AI slop (news lede)</span>
                     </div>
                     <div class="p-6">
-                        <p class="text-gray-600 italic">
+                        <p class="text-clay/70 italic">
                             "The city council meeting was a comprehensive and transformative discussion that fundamentally addressed key issues affecting residents in a meaningful way."
                         </p>
                     </div>
                     <div class="bg-green-50 px-6 py-3 border-t border-green-100">
                         <span class="text-sm font-medium text-green-700">Human writing</span>
                     </div>
-                    <div class="p-6 border-t border-gray-100">
-                        <p class="text-gray-900 font-medium">
+                    <div class="p-6 border-t border-mist/20">
+                        <p class="text-ink font-medium">
                             "The city council voted 5-2 Tuesday to raise property taxes by 3 percent."
                         </p>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="feature-card rounded-2xl overflow-hidden">
                     <div class="bg-red-50 px-6 py-3 border-b border-red-100">
                         <span class="text-sm font-medium text-red-700">AI slop (feature intro)</span>
                     </div>
                     <div class="p-6">
-                        <p class="text-gray-600 italic">
+                        <p class="text-clay/70 italic">
                             "In the rich tapestry of American journalism, few stories are as compelling as the one about to unfold. This isn't just a profile—it's a journey into the heart of what makes local news truly matter."
                         </p>
                     </div>
                     <div class="bg-green-50 px-6 py-3 border-t border-green-100">
                         <span class="text-sm font-medium text-green-700">Human writing</span>
                     </div>
-                    <div class="p-6 border-t border-gray-100">
-                        <p class="text-gray-900 font-medium">
+                    <div class="p-6 border-t border-mist/20">
+                        <p class="text-ink font-medium">
                             "Maria Rodriguez has published a newspaper for 47 years. She's never missed an issue."
                         </p>
                     </div>
@@ -235,49 +282,49 @@
             </div>
         </section>
 
-        <!-- The substitution table -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">Quick substitutions</h2>
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <!-- Quick substitutions -->
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">Quick substitutions</h2>
+            <div class="feature-card rounded-2xl p-8">
                 <div class="grid md:grid-cols-2 gap-x-12 gap-y-2">
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500">utilize</span>
+                    <div class="flex justify-between py-2 border-b border-mist/20">
+                        <span class="text-clay/60">utilize</span>
                         <span class="font-medium">→ use</span>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500">facilitate</span>
+                    <div class="flex justify-between py-2 border-b border-mist/20">
+                        <span class="text-clay/60">facilitate</span>
                         <span class="font-medium">→ help</span>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500">implement</span>
+                    <div class="flex justify-between py-2 border-b border-mist/20">
+                        <span class="text-clay/60">implement</span>
                         <span class="font-medium">→ build, add, create</span>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500">functionality</span>
+                    <div class="flex justify-between py-2 border-b border-mist/20">
+                        <span class="text-clay/60">functionality</span>
                         <span class="font-medium">→ feature</span>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500">methodology</span>
+                    <div class="flex justify-between py-2 border-b border-mist/20">
+                        <span class="text-clay/60">methodology</span>
                         <span class="font-medium">→ method</span>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500">in order to</span>
+                    <div class="flex justify-between py-2 border-b border-mist/20">
+                        <span class="text-clay/60">in order to</span>
                         <span class="font-medium">→ to</span>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500">due to the fact that</span>
+                    <div class="flex justify-between py-2 border-b border-mist/20">
+                        <span class="text-clay/60">due to the fact that</span>
                         <span class="font-medium">→ because</span>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500">at this point in time</span>
+                    <div class="flex justify-between py-2 border-b border-mist/20">
+                        <span class="text-clay/60">at this point in time</span>
                         <span class="font-medium">→ now</span>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500">a large number of</span>
+                    <div class="flex justify-between py-2 border-b border-mist/20">
+                        <span class="text-clay/60">a large number of</span>
                         <span class="font-medium">→ many</span>
                     </div>
-                    <div class="flex justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500">has the ability to</span>
+                    <div class="flex justify-between py-2 border-b border-mist/20">
+                        <span class="text-clay/60">has the ability to</span>
                         <span class="font-medium">→ can</span>
                     </div>
                 </div>
@@ -285,65 +332,67 @@
         </section>
 
         <!-- The verbal tic test -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">The verbal tic test</h2>
-            <p class="text-gray-600 mb-6">Read your text aloud. Does it sound like:</p>
-            <div class="grid md:grid-cols-2 gap-4">
-                <div class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
-                    <svg class="w-6 h-6 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                    <span>A TED talk introduction? <strong>Rewrite.</strong></span>
-                </div>
-                <div class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
-                    <svg class="w-6 h-6 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                    <span>A LinkedIn post? <strong>Rewrite.</strong></span>
-                </div>
-                <div class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
-                    <svg class="w-6 h-6 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                    <span>A press release? <strong>Rewrite.</strong></span>
-                </div>
-                <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
-                    <svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
-                    <span>How you'd explain it to a colleague? <strong>Keep it.</strong></span>
+        <section class="bg-ink text-white -mx-6 px-6 py-16 mb-20 md:-mx-[calc((100vw-64rem)/2+1.5rem)] md:px-[calc((100vw-64rem)/2+1.5rem)]">
+            <div class="max-w-5xl mx-auto">
+                <h2 class="font-display text-2xl font-semibold mb-6 text-white">The verbal tic test</h2>
+                <p class="text-white/70 mb-8">Read your text aloud. Does it sound like:</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-red-500/10 border border-red-500/20 rounded-xl px-5 py-4 flex items-center gap-3">
+                        <svg class="w-6 h-6 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        <span class="text-white/80">A TED talk introduction? <strong class="text-white">Rewrite.</strong></span>
+                    </div>
+                    <div class="bg-red-500/10 border border-red-500/20 rounded-xl px-5 py-4 flex items-center gap-3">
+                        <svg class="w-6 h-6 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        <span class="text-white/80">A LinkedIn post? <strong class="text-white">Rewrite.</strong></span>
+                    </div>
+                    <div class="bg-red-500/10 border border-red-500/20 rounded-xl px-5 py-4 flex items-center gap-3">
+                        <svg class="w-6 h-6 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        <span class="text-white/80">A press release? <strong class="text-white">Rewrite.</strong></span>
+                    </div>
+                    <div class="bg-green-500/10 border border-green-500/20 rounded-xl px-5 py-4 flex items-center gap-3">
+                        <svg class="w-6 h-6 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        <span class="text-white/80">How you'd explain it to a colleague? <strong class="text-white">Keep it.</strong></span>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Quick self-check -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">Quick self-check before publishing</h2>
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <p class="text-gray-600 mb-4">Search your text for these. Found any? Your writing needs another pass:</p>
-                <div class="grid md:grid-cols-4 gap-3">
-                    <div class="bg-gray-100 rounded-lg px-4 py-2 text-center">
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">Quick self-check before publishing</h2>
+            <div class="feature-card rounded-2xl p-8">
+                <p class="text-clay/70 mb-6">Search your text for these. Found any? Your writing needs another pass:</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="bg-mist/20 rounded-xl px-4 py-3 text-center">
                         <code class="text-red-600">"delve"</code>
                     </div>
-                    <div class="bg-gray-100 rounded-lg px-4 py-2 text-center">
+                    <div class="bg-mist/20 rounded-xl px-4 py-3 text-center">
                         <code class="text-red-600">"landscape"</code>
                     </div>
-                    <div class="bg-gray-100 rounded-lg px-4 py-2 text-center">
+                    <div class="bg-mist/20 rounded-xl px-4 py-3 text-center">
                         <code class="text-red-600">"crucial"</code>
                     </div>
-                    <div class="bg-gray-100 rounded-lg px-4 py-2 text-center">
+                    <div class="bg-mist/20 rounded-xl px-4 py-3 text-center">
                         <code class="text-red-600">"robust"</code>
                     </div>
-                    <div class="bg-gray-100 rounded-lg px-4 py-2 text-center">
+                    <div class="bg-mist/20 rounded-xl px-4 py-3 text-center">
                         <code class="text-red-600">"leverage"</code>
                     </div>
-                    <div class="bg-gray-100 rounded-lg px-4 py-2 text-center">
+                    <div class="bg-mist/20 rounded-xl px-4 py-3 text-center">
                         <code class="text-red-600">"comprehensive"</code>
                     </div>
-                    <div class="bg-gray-100 rounded-lg px-4 py-2 text-center">
+                    <div class="bg-mist/20 rounded-xl px-4 py-3 text-center">
                         <code class="text-red-600">Starting "So,"</code>
                     </div>
-                    <div class="bg-gray-100 rounded-lg px-4 py-2 text-center">
+                    <div class="bg-mist/20 rounded-xl px-4 py-3 text-center">
                         <code class="text-red-600">"rich" (modifier)</code>
                     </div>
                 </div>
@@ -351,76 +400,80 @@
         </section>
 
         <!-- The ultimate test -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">The ultimate test</h2>
-            <div class="bg-slate-100 rounded-xl p-8">
-                <p class="text-lg text-gray-700 mb-6">Before accepting any AI-assisted text, ask:</p>
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">The ultimate test</h2>
+            <div class="feature-card rounded-2xl p-8 bg-mist/10">
+                <p class="text-lg text-clay/80 mb-6">Before accepting any AI-assisted text, ask:</p>
                 <ol class="space-y-4">
-                    <li class="flex items-start gap-3">
-                        <span class="w-6 h-6 rounded-full bg-slate-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">1</span>
-                        <span>Can I delete this word/phrase without losing meaning? <strong>→ Delete it</strong></span>
+                    <li class="flex items-start gap-4">
+                        <span class="w-8 h-8 rounded-full bg-accent text-white text-sm font-bold flex items-center justify-center flex-shrink-0">1</span>
+                        <span class="text-clay/80">Can I delete this word/phrase without losing meaning? <strong class="text-ink">→ Delete it</strong></span>
                     </li>
-                    <li class="flex items-start gap-3">
-                        <span class="w-6 h-6 rounded-full bg-slate-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">2</span>
-                        <span>Is this the simplest way to say this? <strong>→ Simplify</strong></span>
+                    <li class="flex items-start gap-4">
+                        <span class="w-8 h-8 rounded-full bg-accent text-white text-sm font-bold flex items-center justify-center flex-shrink-0">2</span>
+                        <span class="text-clay/80">Is this the simplest way to say this? <strong class="text-ink">→ Simplify</strong></span>
                     </li>
-                    <li class="flex items-start gap-3">
-                        <span class="w-6 h-6 rounded-full bg-slate-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">3</span>
-                        <span>Would I say this out loud to a colleague? <strong>→ If not, rewrite</strong></span>
+                    <li class="flex items-start gap-4">
+                        <span class="w-8 h-8 rounded-full bg-accent text-white text-sm font-bold flex items-center justify-center flex-shrink-0">3</span>
+                        <span class="text-clay/80">Would I say this out loud to a colleague? <strong class="text-ink">→ If not, rewrite</strong></span>
                     </li>
-                    <li class="flex items-start gap-3">
-                        <span class="w-6 h-6 rounded-full bg-slate-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">4</span>
-                        <span>Does this add information or just sound impressive? <strong>→ If the latter, cut it</strong></span>
+                    <li class="flex items-start gap-4">
+                        <span class="w-8 h-8 rounded-full bg-accent text-white text-sm font-bold flex items-center justify-center flex-shrink-0">4</span>
+                        <span class="text-clay/80">Does this add information or just sound impressive? <strong class="text-ink">→ If the latter, cut it</strong></span>
                     </li>
                 </ol>
             </div>
         </section>
 
         <!-- Headline case -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">Case sensitivity</h2>
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <p class="text-gray-600 mb-4"><strong>Always use sentence case for headings, not title case.</strong></p>
-                <div class="grid md:grid-cols-2 gap-4">
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">Case sensitivity</h2>
+            <div class="feature-card rounded-2xl p-8">
+                <p class="text-clay/80 mb-6"><strong class="text-ink">Always use sentence case for headings, not title case.</strong></p>
+                <div class="grid md:grid-cols-2 gap-8">
                     <div>
-                        <p class="text-sm text-red-600 mb-2">Wrong (Title Case)</p>
-                        <p class="text-gray-600">Getting Started With Your Project</p>
-                        <p class="text-gray-600">How To Use The Tool</p>
-                        <p class="text-gray-600">Best Practices For Journalism</p>
+                        <p class="text-sm text-red-600 mb-3 font-medium">Wrong (Title Case)</p>
+                        <div class="space-y-2 text-clay/70">
+                            <p>Getting Started With Your Project</p>
+                            <p>How To Use The Tool</p>
+                            <p>Best Practices For Journalism</p>
+                        </div>
                     </div>
                     <div>
-                        <p class="text-sm text-green-600 mb-2">Right (sentence case)</p>
-                        <p class="text-gray-900 font-medium">Getting started with your project</p>
-                        <p class="text-gray-900 font-medium">How to use the tool</p>
-                        <p class="text-gray-900 font-medium">Best practices for journalism</p>
+                        <p class="text-sm text-green-600 mb-3 font-medium">Right (sentence case)</p>
+                        <div class="space-y-2 text-ink font-medium">
+                            <p>Getting started with your project</p>
+                            <p>How to use the tool</p>
+                            <p>Best practices for journalism</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Installation -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">Installation</h2>
-            <div class="bg-gray-900 rounded-xl p-6 text-gray-100 font-mono text-sm">
-                <p class="text-gray-400 mb-2"># Clone the repository</p>
-                <p class="mb-4">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
-                <p class="text-gray-400 mb-2"># Copy the skill to your Claude config</p>
-                <p>cp -r claude-skills-journalism/ai-writing-detox ~/.claude/skills/</p>
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">Installation</h2>
+            <div class="bg-ink rounded-2xl p-6 font-mono text-sm overflow-x-auto">
+                <p class="text-white/50 mb-2"># Clone the repository</p>
+                <p class="text-white mb-4">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
+                <p class="text-white/50 mb-2"># Copy the skill to your Claude config</p>
+                <p class="text-white">cp -r claude-skills-journalism/ai-writing-detox ~/.claude/skills/</p>
             </div>
-            <p class="mt-4 text-gray-600">
+            <p class="mt-4 text-clay/70">
                 Or download just this skill from the
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/ai-writing-detox" class="accent-text hover:underline" target="_blank">GitHub repository</a>.
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/ai-writing-detox" class="text-accent hover:text-accentDark underline underline-offset-2" target="_blank">GitHub repository</a>.
             </p>
         </section>
 
         <!-- CTA -->
         <section class="text-center">
-            <div class="bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl p-8 text-white">
-                <h2 class="text-2xl font-bold mb-4">Write like a human</h2>
-                <p class="text-slate-300 mb-6 max-w-xl mx-auto">
+            <div class="hero-gradient rounded-2xl p-10 text-white">
+                <h2 class="font-display text-2xl font-bold mb-4">Write like a human</h2>
+                <p class="text-white/80 mb-8 max-w-xl mx-auto">
                     If readers think "AI wrote this," you've already lost their trust.
                 </p>
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/ai-writing-detox" target="_blank" class="inline-flex items-center gap-2 bg-white text-slate-800 px-6 py-3 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/ai-writing-detox" target="_blank" class="inline-flex items-center gap-2 bg-white text-accent px-6 py-3 rounded-full font-semibold hover:bg-white/95 transition-colors shadow-lg">
                     View on GitHub
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
@@ -431,15 +484,15 @@
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-gray-200 mt-16">
-        <div class="max-w-6xl mx-auto px-4 py-8">
+    <footer class="border-t border-mist/30 mt-16 relative z-10">
+        <div class="max-w-5xl mx-auto px-6 py-8">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-gray-600 text-sm">
-                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="accent-text hover:underline">Center for Cooperative Media</a>
+                <p class="text-clay/60 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accent hover:text-accentDark underline underline-offset-2">Center for Cooperative Media</a>
                 </p>
                 <div class="flex items-center gap-6">
-                    <a href="../" class="text-gray-600 hover:text-gray-900 text-sm">All skills</a>
-                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-gray-600 hover:text-gray-900 text-sm">GitHub</a>
+                    <a href="../" class="text-clay/60 hover:text-ink text-sm transition-colors">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/60 hover:text-ink text-sm transition-colors">GitHub</a>
                 </div>
             </div>
         </div>

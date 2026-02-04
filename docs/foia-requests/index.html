@@ -1,522 +1,569 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FOIA requests - Claude skills for journalism</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>FOIA requests | Public records workflows for journalists</title>
+    <meta name="description" content="Freedom of Information Act and public records request workflows. Draft requests, track submissions, understand exemptions, and file appeals.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="FOIA requests">
+    <meta property="og:description" content="Public records request workflows for investigative journalists, researchers, and transparency advocates.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jamditis.github.io/claude-skills-journalism/foia-requests/">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Fraunces', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        canvas: '#ede6d4',
+                        ink: '#121212',
+                        clay: '#d6cdb7',
+                        mist: '#6b6b6b',
+                        accent: '#7c3aed',
+                        accentDark: '#6d28d9',
+                    },
+                }
+            }
+        }
+    </script>
+
     <style>
-        body { font-family: 'Source Sans 3', sans-serif; }
-        h1, h2, h3 { font-family: 'Playfair Display', serif; }
-        .accent-gradient { background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); }
-        .accent-text { color: #7c3aed; }
-        .accent-border { border-color: #7c3aed; }
-        .exemption-card { transition: all 0.2s ease; }
-        .exemption-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(124, 58, 237, 0.2); }
+        body {
+            background-color: #ede6d4;
+            color: #121212;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("https://www.transparenttextures.com/patterns/natural-paper.png"),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%);
+        }
+
+        .feature-card {
+            background: white;
+            border: 1px solid rgba(18, 18, 18, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+        }
+
+        code {
+            background: rgba(18, 18, 18, 0.06);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #1a1a1a;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900">
-    <!-- Header -->
-    <header class="accent-gradient text-white">
-        <nav class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="../" class="text-white/80 hover:text-white flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
-                Back to all skills
-            </a>
-            <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-white/80 hover:text-white">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
-                </svg>
-            </a>
-        </nav>
+<body class="font-sans">
+    <div class="paper-overlay"></div>
 
-        <div class="max-w-6xl mx-auto px-4 py-16 text-center">
-            <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-6">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-                Public records skill
+    <!-- Nav -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">
+                ← Back to all skills
+            </a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/foia-requests" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">
+                View on GitHub →
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero-gradient text-white pt-32 pb-24 px-6 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/>
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+        </div>
+
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide uppercase mb-6">
+                Public Records Skill
             </div>
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">FOIA requests</h1>
-            <p class="text-xl text-white/90 max-w-2xl mx-auto">
+            <h1 class="font-display text-5xl md:text-7xl font-black leading-[0.9] mb-6">
+                FOIA<br>Requests
+            </h1>
+            <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-10 font-light">
                 Freedom of Information Act and public records request workflows for investigative journalists, researchers, and transparency advocates.
             </p>
+            <div class="flex flex-wrap gap-4">
+                <a href="#install" class="inline-flex items-center gap-2 bg-white text-accent font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    Install Skill
+                </a>
+                <a href="#docs" class="inline-flex items-center gap-2 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/20 transition-colors border border-white/20">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                    Documentation
+                </a>
+            </div>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 py-12">
-        <!-- Overview section -->
-        <section class="mb-16">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                <h2 class="text-2xl font-bold mb-4">What this skill does</h2>
-                <p class="text-gray-600 text-lg mb-6">
-                    Guides you through the complete public records lifecycle: drafting effective requests, understanding exemptions, tracking submissions, handling responses, and filing appeals when necessary.
-                </p>
-                <div class="grid md:grid-cols-3 gap-6">
-                    <div class="flex items-start gap-3">
-                        <div class="w-10 h-10 rounded-lg accent-gradient flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold mb-1">Draft requests</h3>
-                            <p class="text-sm text-gray-600">Professional templates with fee waiver language and scope management</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <div class="w-10 h-10 rounded-lg accent-gradient flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold mb-1">Track submissions</h3>
-                            <p class="text-sm text-gray-600">Manage deadlines, responses, and multi-agency coordination</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <div class="w-10 h-10 rounded-lg accent-gradient flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold mb-1">File appeals</h3>
-                            <p class="text-sm text-gray-600">Challenge improper denials and over-redaction</p>
-                        </div>
-                    </div>
+    <main class="relative z-10">
+        <!-- Key capabilities -->
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Complete records workflow</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">
+                        From drafting requests to filing appeals. Everything you need to obtain government records.
+                    </p>
                 </div>
-            </div>
-        </section>
 
-        <!-- Jurisdiction overview -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">Understanding FOIA landscape</h2>
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 exemption-card">
-                    <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                        </svg>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="file-edit" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Draft requests</h3>
+                        <p class="text-mist text-sm">Professional templates with fee waiver language, scope management, and agency-specific terminology.</p>
                     </div>
-                    <h3 class="text-lg font-semibold mb-2">Federal FOIA</h3>
-                    <p class="text-sm text-gray-600 mb-3">5 U.S.C. § 552</p>
-                    <p class="text-gray-600 text-sm">Covers executive branch agencies. 20 business day response deadline. 9 exemptions.</p>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 exemption-card">
-                    <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/>
-                        </svg>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="shield-check" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Understand exemptions</h3>
+                        <p class="text-mist text-sm">The 9 federal exemptions explained, plus state-by-state variations and challenge strategies.</p>
                     </div>
-                    <h3 class="text-lg font-semibold mb-2">State laws</h3>
-                    <p class="text-sm text-gray-600 mb-3">Varies by state</p>
-                    <p class="text-gray-600 text-sm">All 50 states have public records laws. Exemptions and deadlines vary widely.</p>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 exemption-card">
-                    <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="clipboard-check" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Track submissions</h3>
+                        <p class="text-mist text-sm">Manage deadlines, tracking numbers, responses, and multi-agency coordination.</p>
                     </div>
-                    <h3 class="text-lg font-semibold mb-2">Local records</h3>
-                    <p class="text-sm text-gray-600 mb-3">Often covered by state law</p>
-                    <p class="text-gray-600 text-sm">Municipal, county, and school board records. Usually fastest turnaround.</p>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="file-search" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Review responses</h3>
+                        <p class="text-mist text-sm">Checklists for completeness, redaction analysis, and identifying over-withholding.</p>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="scale" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">File appeals</h3>
+                        <p class="text-mist text-sm">Administrative appeal templates for improper denials, inadequate searches, and fee disputes.</p>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="map" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">50-state guide</h3>
+                        <p class="text-mist text-sm">Complete state-by-state reference with statute citations, deadlines, and legislative exemptions.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Federal exemptions -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">The 9 federal FOIA exemptions</h2>
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-200">
-                    <div class="p-6">
-                        <div class="space-y-4">
-                            <div class="flex items-start gap-3">
-                                <span class="w-6 h-6 rounded bg-purple-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
-                                <div>
-                                    <p class="font-medium">National security</p>
-                                    <p class="text-sm text-gray-500">Classified information</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-3">
-                                <span class="w-6 h-6 rounded bg-purple-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">2</span>
-                                <div>
-                                    <p class="font-medium">Internal personnel rules</p>
-                                    <p class="text-sm text-gray-500">Agency housekeeping</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-3">
-                                <span class="w-6 h-6 rounded bg-purple-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">3</span>
-                                <div>
-                                    <p class="font-medium">Statutory exemptions</p>
-                                    <p class="text-sm text-gray-500">Other laws prohibit disclosure</p>
-                                </div>
-                            </div>
+        <section class="py-24 px-6 bg-ink text-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">The 9 federal exemptions</h2>
+                    <p class="text-lg text-white/70 max-w-2xl mx-auto">
+                        Know what agencies can withhold — and when to challenge their claims.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">1</span>
+                            <h3 class="font-display text-lg font-bold">National security</h3>
                         </div>
+                        <p class="text-white/70 text-sm">Classified information properly withheld under executive order.</p>
                     </div>
-                    <div class="p-6">
-                        <div class="space-y-4">
-                            <div class="flex items-start gap-3">
-                                <span class="w-6 h-6 rounded bg-purple-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">4</span>
-                                <div>
-                                    <p class="font-medium">Trade secrets</p>
-                                    <p class="text-sm text-gray-500">Confidential business info</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-3">
-                                <span class="w-6 h-6 rounded bg-purple-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">5</span>
-                                <div>
-                                    <p class="font-medium">Inter/intra-agency memos</p>
-                                    <p class="text-sm text-gray-500">Deliberative process privilege</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-3">
-                                <span class="w-6 h-6 rounded bg-purple-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">6</span>
-                                <div>
-                                    <p class="font-medium">Personal privacy</p>
-                                    <p class="text-sm text-gray-500">Personnel, medical files</p>
-                                </div>
-                            </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">2</span>
+                            <h3 class="font-display text-lg font-bold">Internal personnel rules</h3>
                         </div>
+                        <p class="text-white/70 text-sm">Agency housekeeping matters with no public interest.</p>
                     </div>
-                    <div class="p-6">
-                        <div class="space-y-4">
-                            <div class="flex items-start gap-3">
-                                <span class="w-6 h-6 rounded bg-purple-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">7</span>
-                                <div>
-                                    <p class="font-medium">Law enforcement</p>
-                                    <p class="text-sm text-gray-500">Could interfere with proceedings</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-3">
-                                <span class="w-6 h-6 rounded bg-purple-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">8</span>
-                                <div>
-                                    <p class="font-medium">Financial institutions</p>
-                                    <p class="text-sm text-gray-500">Bank examination reports</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-3">
-                                <span class="w-6 h-6 rounded bg-purple-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">9</span>
-                                <div>
-                                    <p class="font-medium">Geological data</p>
-                                    <p class="text-sm text-gray-500">Oil and gas well info</p>
-                                </div>
-                            </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">3</span>
+                            <h3 class="font-display text-lg font-bold">Statutory exemptions</h3>
                         </div>
+                        <p class="text-white/70 text-sm">Other federal laws prohibit disclosure.</p>
+                    </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">4</span>
+                            <h3 class="font-display text-lg font-bold">Trade secrets</h3>
+                        </div>
+                        <p class="text-white/70 text-sm">Confidential business information submitted to government.</p>
+                    </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">5</span>
+                            <h3 class="font-display text-lg font-bold">Deliberative process</h3>
+                        </div>
+                        <p class="text-white/70 text-sm">Inter/intra-agency memos. Often overused — challenge liberally.</p>
+                    </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">6</span>
+                            <h3 class="font-display text-lg font-bold">Personal privacy</h3>
+                        </div>
+                        <p class="text-white/70 text-sm">Personnel and medical files. Balance against public interest.</p>
+                    </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">7</span>
+                            <h3 class="font-display text-lg font-bold">Law enforcement</h3>
+                        </div>
+                        <p class="text-white/70 text-sm">Could interfere with proceedings or endanger individuals.</p>
+                    </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">8</span>
+                            <h3 class="font-display text-lg font-bold">Financial institutions</h3>
+                        </div>
+                        <p class="text-white/70 text-sm">Bank examination reports and related records.</p>
+                    </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">9</span>
+                            <h3 class="font-display text-lg font-bold">Geological data</h3>
+                        </div>
+                        <p class="text-white/70 text-sm">Oil and gas well information (rarely invoked).</p>
                     </div>
                 </div>
-                <div class="bg-purple-50 px-6 py-4 border-t border-gray-200">
-                    <p class="text-sm text-purple-800">
-                        <strong>Important:</strong> Agencies must segregate and release non-exempt portions. Always challenge over-redaction.
+
+                <div class="mt-8 p-4 bg-accent/20 rounded-lg border border-accent/30">
+                    <p class="text-center text-white/90 text-sm">
+                        <strong>Remember:</strong> Agencies must segregate and release non-exempt portions. Always challenge over-redaction.
                     </p>
                 </div>
             </div>
         </section>
 
-        <!-- Request writing tips -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">Drafting effective requests</h2>
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        Do this
-                    </h3>
-                    <ul class="space-y-3 text-gray-600">
-                        <li class="flex items-start gap-2">
-                            <span class="text-green-500 mt-1">•</span>
-                            <span><strong>Be specific but not too narrow:</strong> "Emails between [Office] and [External Party] regarding [Topic] from [Date Range]"</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-green-500 mt-1">•</span>
-                            <span><strong>Use agency terminology:</strong> Research how they categorize information</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-green-500 mt-1">•</span>
-                            <span><strong>Define your terms:</strong> Specify what you mean by "communications"</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-green-500 mt-1">•</span>
-                            <span><strong>Request specific record types:</strong> Emails, texts, memos, contracts, datasets</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                        Avoid this
-                    </h3>
-                    <ul class="space-y-3 text-gray-600">
-                        <li class="flex items-start gap-2">
-                            <span class="text-red-500 mt-1">•</span>
-                            <span><strong>Too broad:</strong> "All documents about climate change"</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-red-500 mt-1">•</span>
-                            <span><strong>Too narrow:</strong> "The email from John Smith on March 15, 2024 at 2:47 PM"</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-red-500 mt-1">•</span>
-                            <span><strong>Vague terminology:</strong> Using "regarding" when you mean "primarily about"</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="text-red-500 mt-1">•</span>
-                            <span><strong>Missing date ranges:</strong> Open-ended requests get denied or delayed</span>
-                        </li>
-                    </ul>
+        <!-- Request tips -->
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <h2 class="font-display text-4xl md:text-5xl font-light italic mb-6">Write requests<br><span class="font-black">that get results.</span></h2>
+                        <p class="text-lg text-mist mb-8">
+                            The difference between a successful request and months of delays often comes down to how you phrase it. The skill includes tested templates and strategies.
+                        </p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5"></i>
+                                <span><strong>Be specific but not too narrow</strong> — define date ranges, offices, and record types</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5"></i>
+                                <span><strong>Use agency terminology</strong> — research how they categorize information</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5"></i>
+                                <span><strong>Include fee waiver language</strong> — as a journalist, you likely qualify</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5"></i>
+                                <span><strong>Request rolling releases</strong> — get records as they're processed</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <pre><code class="text-sm">Pursuant to [STATUTE], I request:
+
+- Emails between [Office] and
+  [External Party] regarding [Topic]
+  from [Start Date] to [End Date]
+
+- All contracts, invoices, and
+  purchase orders related to [Subject]
+
+- Meeting minutes and agendas for
+  [Committee] from [Date Range]
+
+Please provide records in digital
+format as they become available.</code></pre>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Key resources -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">Essential resources</h2>
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <table class="w-full">
-                    <thead>
-                        <tr class="bg-gray-50 border-b border-gray-200">
-                            <th class="text-left px-6 py-4 font-semibold">Resource</th>
-                            <th class="text-left px-6 py-4 font-semibold">Best for</th>
-                            <th class="text-left px-6 py-4 font-semibold">Link</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        <tr>
-                            <td class="px-6 py-4 font-medium">RCFP Open Government Guide</td>
-                            <td class="px-6 py-4 text-gray-600">State-by-state law analysis</td>
-                            <td class="px-6 py-4">
-                                <a href="https://www.rcfp.org/open-government-guide" target="_blank" class="accent-text hover:underline">rcfp.org →</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 font-medium">MuckRock</td>
-                            <td class="px-6 py-4 text-gray-600">Filing and tracking requests, searching previous responses</td>
-                            <td class="px-6 py-4">
-                                <a href="https://www.muckrock.com" target="_blank" class="accent-text hover:underline">muckrock.com →</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 font-medium">National FOI Coalition</td>
-                            <td class="px-6 py-4 text-gray-600">State FOI organization contacts, training</td>
-                            <td class="px-6 py-4">
-                                <a href="https://www.nfoic.org" target="_blank" class="accent-text hover:underline">nfoic.org →</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 font-medium">FOIA.gov</td>
-                            <td class="px-6 py-4 text-gray-600">Federal agency portals, tracking numbers</td>
-                            <td class="px-6 py-4">
-                                <a href="https://www.foia.gov" target="_blank" class="accent-text hover:underline">foia.gov →</a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+        <!-- State laws -->
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">50-state coverage</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">
+                        Every state has public records laws with different deadlines, exemptions, and appeal processes. The skill includes the complete reference.
+                    </p>
+                </div>
 
-        <!-- State law sample -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">State public records laws</h2>
-            <p class="text-gray-600 mb-6">All 50 states have enacted laws requiring government records to be open. The skill includes a complete state-by-state reference table with specific statute citations and legislative exemption notes.</p>
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="overflow-x-auto">
+                <div class="feature-card rounded-xl overflow-hidden">
                     <table class="w-full">
                         <thead>
-                            <tr class="bg-gray-50 border-b border-gray-200">
-                                <th class="text-left px-6 py-4 font-semibold whitespace-nowrap">State</th>
-                                <th class="text-left px-6 py-4 font-semibold whitespace-nowrap">Public records law</th>
-                                <th class="text-left px-6 py-4 font-semibold">Notes</th>
+                            <tr class="bg-ink text-white">
+                                <th class="text-left px-6 py-4 font-semibold">State</th>
+                                <th class="text-left px-6 py-4 font-semibold">Law</th>
+                                <th class="text-left px-6 py-4 font-semibold">Response deadline</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200 text-sm">
+                        <tbody class="divide-y divide-ink/10">
                             <tr>
-                                <td class="px-6 py-3 font-medium">New Jersey</td>
-                                <td class="px-6 py-3 text-gray-600">NJ Rev. Stat. § 47:1A-1 et seq. (OPRA)</td>
-                                <td class="px-6 py-3 text-gray-600">7 business day deadline</td>
+                                <td class="px-6 py-4 font-medium">New Jersey</td>
+                                <td class="px-6 py-4 text-mist">OPRA (NJ Rev. Stat. § 47:1A-1)</td>
+                                <td class="px-6 py-4">7 business days</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-3 font-medium">New York</td>
-                                <td class="px-6 py-3 text-gray-600">NY PBO Article 6 § 84 et seq. (FOIL)</td>
-                                <td class="px-6 py-3 text-gray-600">5 business days to acknowledge</td>
+                                <td class="px-6 py-4 font-medium">New York</td>
+                                <td class="px-6 py-4 text-mist">FOIL (NY PBO Article 6 § 84)</td>
+                                <td class="px-6 py-4">5 days to acknowledge</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-3 font-medium">California</td>
-                                <td class="px-6 py-3 text-gray-600">CA Govt. Code § 7920 et seq. (PRA)</td>
-                                <td class="px-6 py-3 text-gray-600">10 days, no admin appeal</td>
+                                <td class="px-6 py-4 font-medium">California</td>
+                                <td class="px-6 py-4 text-mist">PRA (CA Govt. Code § 7920)</td>
+                                <td class="px-6 py-4">10 days</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-3 font-medium">Texas</td>
-                                <td class="px-6 py-3 text-gray-600">TX Stat. Gov. Code § 552.001 et seq.</td>
-                                <td class="px-6 py-3 text-gray-600">10 business days</td>
+                                <td class="px-6 py-4 font-medium">Texas</td>
+                                <td class="px-6 py-4 text-mist">TX Stat. Gov. Code § 552.001</td>
+                                <td class="px-6 py-4">10 business days</td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-3 font-medium">Florida</td>
-                                <td class="px-6 py-3 text-gray-600">FL Stat. § 119.01 et seq.</td>
-                                <td class="px-6 py-3 text-gray-600">"Prompt" response required</td>
+                                <td class="px-6 py-4 font-medium">Florida</td>
+                                <td class="px-6 py-4 text-mist">FL Stat. § 119.01</td>
+                                <td class="px-6 py-4">"Prompt" response</td>
                             </tr>
                         </tbody>
                     </table>
-                </div>
-                <div class="bg-purple-50 px-6 py-3 border-t border-gray-200">
-                    <p class="text-sm text-gray-600">Full 50-state reference table included in the skill, sourced from National Conference of State Legislatures.</p>
+                    <div class="bg-accent/10 px-6 py-4 border-t border-ink/10">
+                        <p class="text-sm text-mist">
+                            Full 50-state reference table included in skill, with statute citations, legislative exemptions, and NCSL source data.
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Appeal deadlines -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">Appeal deadlines by jurisdiction</h2>
-            <div class="grid md:grid-cols-4 gap-4">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-                    <p class="text-3xl font-bold accent-text mb-2">90</p>
-                    <p class="text-sm text-gray-600">days</p>
-                    <p class="font-medium mt-2">Federal FOIA</p>
-                    <p class="text-xs text-gray-500">Agency appeals office</p>
+        <section class="py-24 px-6 bg-ink text-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Know your deadlines</h2>
+                    <p class="text-lg text-white/70 max-w-2xl mx-auto">
+                        Miss an appeal deadline and you lose your right to challenge. The skill tracks these for you.
+                    </p>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-                    <p class="text-3xl font-bold accent-text mb-2">45</p>
-                    <p class="text-sm text-gray-600">days</p>
-                    <p class="font-medium mt-2">New Jersey OPRA</p>
-                    <p class="text-xs text-gray-500">Government Records Council</p>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-                    <p class="text-3xl font-bold accent-text mb-2">30</p>
-                    <p class="text-sm text-gray-600">days</p>
-                    <p class="font-medium mt-2">New York FOIL</p>
-                    <p class="text-xs text-gray-500">Agency appeals officer</p>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-                    <p class="text-3xl font-bold accent-text mb-2">0</p>
-                    <p class="text-sm text-gray-600">admin appeal</p>
-                    <p class="font-medium mt-2">California PRA</p>
-                    <p class="text-xs text-gray-500">Direct to court</p>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div class="text-center p-6 bg-white/5 rounded-xl">
+                        <p class="text-5xl font-display font-black text-accent mb-2">90</p>
+                        <p class="text-white/50 text-sm mb-2">days</p>
+                        <p class="font-semibold">Federal FOIA</p>
+                        <p class="text-xs text-white/50 mt-1">Agency appeals office</p>
+                    </div>
+
+                    <div class="text-center p-6 bg-white/5 rounded-xl">
+                        <p class="text-5xl font-display font-black text-accent mb-2">45</p>
+                        <p class="text-white/50 text-sm mb-2">days</p>
+                        <p class="font-semibold">New Jersey OPRA</p>
+                        <p class="text-xs text-white/50 mt-1">Government Records Council</p>
+                    </div>
+
+                    <div class="text-center p-6 bg-white/5 rounded-xl">
+                        <p class="text-5xl font-display font-black text-accent mb-2">30</p>
+                        <p class="text-white/50 text-sm mb-2">days</p>
+                        <p class="font-semibold">New York FOIL</p>
+                        <p class="text-xs text-white/50 mt-1">Agency appeals officer</p>
+                    </div>
+
+                    <div class="text-center p-6 bg-white/5 rounded-xl">
+                        <p class="text-5xl font-display font-black text-accent mb-2">0</p>
+                        <p class="text-white/50 text-sm mb-2">admin appeal</p>
+                        <p class="font-semibold">California PRA</p>
+                        <p class="text-xs text-white/50 mt-1">Direct to court</p>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Installation -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">Installation</h2>
-            <div class="bg-gray-900 rounded-xl p-6 text-gray-100 font-mono text-sm">
-                <p class="text-gray-400 mb-2"># Clone the repository</p>
-                <p class="mb-4">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
-                <p class="text-gray-400 mb-2"># Copy the skill to your Claude config</p>
-                <p>cp -r claude-skills-journalism/foia-requests ~/.claude/skills/</p>
-            </div>
-            <p class="mt-4 text-gray-600">
-                Or download just this skill from the
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/foia-requests" class="accent-text hover:underline" target="_blank">GitHub repository</a>.
-            </p>
-        </section>
+        <section id="install" class="py-24 px-6">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-16">Get started</h2>
 
-        <!-- Includes -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6">What's included</h2>
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h3 class="font-semibold mb-4">Templates</h3>
-                    <ul class="space-y-2 text-gray-600">
-                        <li class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Federal FOIA request template
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Fee waiver request language
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Status inquiry template
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Administrative appeal template
-                        </li>
-                    </ul>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h3 class="font-semibold mb-4">Reference materials</h3>
-                    <ul class="space-y-2 text-gray-600">
-                        <li class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            50-state public records law table
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Response review checklist
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Redaction analysis guide
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Document production workflow
-                        </li>
-                    </ul>
+                <div class="space-y-8">
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">1</span>
+                            <h3 class="font-display text-xl font-bold">Clone the repository</h3>
+                        </div>
+                        <pre><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">2</span>
+                            <h3 class="font-display text-xl font-bold">Copy the skill to your Claude config</h3>
+                        </div>
+                        <pre><code>cp -r claude-skills-journalism/foia-requests ~/.claude/skills/</code></pre>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">3</span>
+                            <h3 class="font-display text-xl font-bold">Start making requests</h3>
+                        </div>
+                        <p class="text-mist">Ask Claude to help you draft a FOIA request, track a submission, analyze a response, or prepare an appeal.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- CTA -->
-        <section class="text-center">
-            <div class="bg-gradient-to-br from-purple-600 to-purple-800 rounded-xl p-8 text-white">
-                <h2 class="text-2xl font-bold mb-4">Start making records requests</h2>
-                <p class="text-purple-100 mb-6 max-w-xl mx-auto">
-                    Get the complete skill with templates, state-by-state reference tables, and tracking tools.
+        <!-- Documentation -->
+        <section id="docs" class="py-24 px-6 bg-ink text-white">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-16">What's included</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <i data-lucide="file-text" class="w-8 h-8 mb-4 text-accent"></i>
+                        <h3 class="font-display text-xl font-bold mb-2">Request templates</h3>
+                        <p class="text-white/70 text-sm">Federal FOIA template, fee waiver language, status inquiry, and appeal letters.</p>
+                    </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <i data-lucide="database" class="w-8 h-8 mb-4 text-accent"></i>
+                        <h3 class="font-display text-xl font-bold mb-2">Tracking system</h3>
+                        <p class="text-white/70 text-sm">Python data classes for managing requests, deadlines, and multi-agency coordination.</p>
+                    </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <i data-lucide="book-open" class="w-8 h-8 mb-4 text-accent"></i>
+                        <h3 class="font-display text-xl font-bold mb-2">Reference guides</h3>
+                        <p class="text-white/70 text-sm">50-state law table, exemption analysis, redaction review checklists, document organization.</p>
+                    </div>
+                </div>
+
+                <div class="mt-12 text-center">
+                    <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/foia-requests" class="inline-flex items-center gap-2 bg-accent text-white font-semibold px-6 py-3 rounded-lg hover:bg-accentDark transition-colors">
+                        <i data-lucide="github" class="w-5 h-5"></i>
+                        View full skill on GitHub
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resources -->
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-16">Essential resources</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <a href="https://www.rcfp.org/open-government-guide" target="_blank" class="feature-card p-6 rounded-xl group">
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">RCFP Open Government Guide</h3>
+                        <p class="text-mist text-sm">State-by-state analysis of public records laws and sample request letters.</p>
+                    </a>
+
+                    <a href="https://www.muckrock.com" target="_blank" class="feature-card p-6 rounded-xl group">
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">MuckRock</h3>
+                        <p class="text-mist text-sm">File requests through platform, search previous responses, agency data.</p>
+                    </a>
+
+                    <a href="https://www.nfoic.org" target="_blank" class="feature-card p-6 rounded-xl group">
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">National FOI Coalition</h3>
+                        <p class="text-mist text-sm">State FOI organization contacts, training, and resources.</p>
+                    </a>
+
+                    <a href="https://www.foia.gov" target="_blank" class="feature-card p-6 rounded-xl group">
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">FOIA.gov</h3>
+                        <p class="text-mist text-sm">Federal agency portals, online submission, tracking numbers.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Credits -->
+        <section class="py-16 px-6 border-t border-ink/10">
+            <div class="max-w-6xl mx-auto text-center">
+                <p class="text-mist text-sm mb-4">
+                    Created by <a href="https://github.com/jamditis" class="text-accent hover:underline">Joe Amditis</a> at the
+                    <a href="https://centerforcooperativemedia.org" class="text-accent hover:underline">Center for Cooperative Media</a>
                 </p>
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/foia-requests" target="_blank" class="inline-flex items-center gap-2 bg-white text-purple-700 px-6 py-3 rounded-lg font-semibold hover:bg-purple-50 transition-colors">
-                    View on GitHub
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                    </svg>
-                </a>
+                <p class="text-mist/60 text-xs">
+                    Part of <a href="../" class="hover:underline">Claude Skills for Journalism</a> • MIT License
+                </p>
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="border-t border-gray-200 mt-16">
-        <div class="max-w-6xl mx-auto px-4 py-8">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-gray-600 text-sm">
-                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="accent-text hover:underline">Center for Cooperative Media</a>
-                </p>
-                <div class="flex items-center gap-6">
-                    <a href="../" class="text-gray-600 hover:text-gray-900 text-sm">All skills</a>
-                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-gray-600 hover:text-gray-900 text-sm">GitHub</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>
