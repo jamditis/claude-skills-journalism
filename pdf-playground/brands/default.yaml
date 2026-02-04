@@ -1,0 +1,43 @@
+# Default brand configuration
+# Copy this to .claude/pdf-playground.local.md and customize
+
+---
+brand:
+  name: "Your Organization"
+  tagline: "Your mission or tagline"
+  website: "https://yourorg.com"
+  email: "contact@yourorg.com"
+
+colors:
+  primary: "#CA3553"      # Main accent color (buttons, highlights)
+  secondary: "#000000"    # Secondary color (headers, borders)
+  background: "#FFFFFF"   # Page background
+  text: "#2d2a28"        # Body text color
+  muted: "#666666"       # Secondary/helper text
+
+fonts:
+  heading: "Playfair Display"  # Google Font for headings
+  body: "Source Sans 3"        # Google Font for body text
+
+style:
+  headingCase: "sentence"      # "sentence" or "title"
+  useOxfordComma: true        # Include Oxford comma in lists
+---
+
+# Brand notes
+
+Add any additional brand guidelines or notes here that should be followed when creating documents.
+
+## Logo usage
+
+Describe when and how to use your logo.
+
+## Voice and tone
+
+Describe your organization's voice (formal, casual, authoritative, friendly, etc.)
+
+## Specific requirements
+
+- Any specific formatting requirements
+- Colors to avoid
+- Required disclaimers or footers

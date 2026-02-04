@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Playground | Professional document design for newsrooms</title>
+    <meta name="description" content="Create professional, print-ready PDF documents with customizable branding. Perfect for proposals, reports, one-pagers, newsletters, slides, and event materials.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="PDF Playground">
+    <meta property="og:description" content="Professional document design for newsrooms. Create proposals, reports, and more with your own branding.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jamditis.github.io/claude-skills-journalism/pdf-playground/">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Fraunces', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        canvas: '#ede6d4',
+                        ink: '#121212',
+                        clay: '#d6cdb7',
+                        mist: '#6b6b6b',
+                        accent: '#CA3553',
+                        accentDark: '#a82a44',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #ede6d4;
+            color: #121212;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("https://www.transparenttextures.com/patterns/natural-paper.png"),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #CA3553 0%, #a82a44 50%, #8a2038 100%);
+        }
+
+        .doc-preview {
+            background: white;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border-radius: 4px;
+        }
+
+        .feature-card {
+            background: white;
+            border: 1px solid rgba(18, 18, 18, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+        }
+
+        code {
+            background: rgba(18, 18, 18, 0.06);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #1a1a1a;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="paper-overlay"></div>
+
+    <!-- Nav -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">
+                ← Back to all skills
+            </a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/main/pdf-playground" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">
+                View on GitHub →
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero-gradient text-white pt-32 pb-24 px-6 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/>
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+        </div>
+
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide uppercase mb-6">
+                Claude Code Plugin
+            </div>
+            <h1 class="font-display text-5xl md:text-7xl font-black leading-[0.9] mb-6">
+                PDF<br>Playground
+            </h1>
+            <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-10 font-light">
+                Create professional, print-ready documents with your own branding. Perfect for newsrooms, nonprofits, and organizations.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <a href="#install" class="inline-flex items-center gap-2 bg-white text-accent font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    Install Plugin
+                </a>
+                <a href="#docs" class="inline-flex items-center gap-2 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/20 transition-colors border border-white/20">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                    Documentation
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+        <!-- Document Types -->
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">6 document types</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">
+                        From multi-page funding proposals to event flyers. Each template is designed for professional output.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="file-text" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Proposals</h3>
+                        <p class="text-mist text-sm">Multi-page funding proposals with cover pages, content sections, budgets, and appendices.</p>
+                        <code class="text-xs mt-3 inline-block">/proposal</code>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="bar-chart-2" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Reports</h3>
+                        <p class="text-mist text-sm">Program reports, annual reports, and impact summaries with metrics and visualizations.</p>
+                        <code class="text-xs mt-3 inline-block">/report</code>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="file" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">One-pagers</h3>
+                        <p class="text-mist text-sm">Single-page fact sheets with sidebar layouts, key highlights, and statistics.</p>
+                        <code class="text-xs mt-3 inline-block">/onepager</code>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="mail" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Newsletters</h3>
+                        <p class="text-mist text-sm">Email-safe HTML newsletters with featured stories, news items, and events.</p>
+                        <code class="text-xs mt-3 inline-block">/newsletter</code>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="presentation" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Slides</h3>
+                        <p class="text-mist text-sm">HTML presentation slides with title, content, quote, and stat slide types.</p>
+                        <code class="text-xs mt-3 inline-block">/slides</code>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="calendar" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Events</h3>
+                        <p class="text-mist text-sm">Flyers, posters, and signage with bold titles, event details, and CTAs.</p>
+                        <code class="text-xs mt-3 inline-block">/event</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Brand Customization -->
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <h2 class="font-display text-4xl md:text-5xl font-light italic mb-6">Your brand,<br><span class="font-black">your documents.</span></h2>
+                        <p class="text-lg text-mist mb-8">
+                            Configure your organization's colors, fonts, and style guide once. Every document you create will automatically follow your brand guidelines.
+                        </p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5"></i>
+                                <span>Custom colors (primary, secondary, accent)</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5"></i>
+                                <span>Any Google Font for headings and body</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5"></i>
+                                <span>Style preferences (sentence case, Oxford comma)</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5"></i>
+                                <span>Organization info auto-populated</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <pre><code class="text-sm">---
+brand:
+  name: "Your Organization"
+  website: "https://yourorg.com"
+
+colors:
+  primary: "#CA3553"
+  secondary: "#000000"
+
+fonts:
+  heading: "Playfair Display"
+  body: "Source Sans 3"
+
+style:
+  headingCase: "sentence"
+  useOxfordComma: true
+---</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section id="install" class="py-24 px-6">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-16">Get started</h2>
+
+                <div class="space-y-8">
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">1</span>
+                            <h3 class="font-display text-xl font-bold">Clone the repository</h3>
+                        </div>
+                        <pre><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">2</span>
+                            <h3 class="font-display text-xl font-bold">Run Claude Code with the plugin</h3>
+                        </div>
+                        <pre><code>cc --plugin-dir /path/to/claude-skills-journalism/pdf-playground</code></pre>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">3</span>
+                            <h3 class="font-display text-xl font-bold">Configure your brand (optional)</h3>
+                        </div>
+                        <p class="text-mist mb-4">Create <code>.claude/pdf-playground.local.md</code> in your project with your brand settings.</p>
+                        <a href="https://github.com/jamditis/claude-skills-journalism/tree/main/pdf-playground/brands" class="text-accent font-semibold hover:underline">
+                            See example brand configs →
+                        </a>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">4</span>
+                            <h3 class="font-display text-xl font-bold">Create documents</h3>
+                        </div>
+                        <p class="text-mist">Use commands like <code>/proposal</code>, <code>/report</code>, or <code>/onepager</code> to generate documents.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Documentation -->
+        <section id="docs" class="py-24 px-6 bg-ink text-white">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-16">Documentation</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <a href="https://github.com/jamditis/claude-skills-journalism/tree/main/pdf-playground#readme" class="block p-6 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                        <i data-lucide="book" class="w-8 h-8 mb-4 text-accent"></i>
+                        <h3 class="font-display text-xl font-bold mb-2">README</h3>
+                        <p class="text-white/70 text-sm">Full installation instructions and usage guide.</p>
+                    </a>
+
+                    <a href="https://github.com/jamditis/claude-skills-journalism/tree/main/pdf-playground/brands" class="block p-6 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                        <i data-lucide="palette" class="w-8 h-8 mb-4 text-accent"></i>
+                        <h3 class="font-display text-xl font-bold mb-2">Brand configs</h3>
+                        <p class="text-white/70 text-sm">Example brand configurations to copy and customize.</p>
+                    </a>
+
+                    <a href="https://github.com/jamditis/claude-skills-journalism/tree/main/pdf-playground/templates" class="block p-6 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                        <i data-lucide="layout-template" class="w-8 h-8 mb-4 text-accent"></i>
+                        <h3 class="font-display text-xl font-bold mb-2">Templates</h3>
+                        <p class="text-white/70 text-sm">HTML templates for all document types.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Credits -->
+        <section class="py-16 px-6 border-t border-ink/10">
+            <div class="max-w-6xl mx-auto text-center">
+                <p class="text-mist text-sm mb-4">
+                    Created by <a href="https://github.com/jamditis" class="text-accent hover:underline">Joe Amditis</a> at the
+                    <a href="https://centerforcooperativemedia.org" class="text-accent hover:underline">Center for Cooperative Media</a>
+                </p>
+                <p class="text-mist/60 text-xs">
+                    Part of <a href="../" class="hover:underline">Claude Skills for Journalism</a> • MIT License
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

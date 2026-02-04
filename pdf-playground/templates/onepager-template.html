@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[Topic] — One-Pager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #CA3553;
+            --black: #000000;
+            --white: #ffffff;
+            --gray-100: #f5f4f2;
+            --gray-200: #e8e6e3;
+            --gray-400: #9a9590;
+            --gray-600: #5c5754;
+            --gray-800: #2d2a28;
+        }
+
+        @page {
+            size: letter;
+            margin: 0;
+        }
+
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans 3', Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: var(--gray-800);
+            background: var(--gray-200);
+        }
+
+        .page {
+            width: 8.5in;
+            height: 11in;
+            background: var(--white);
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+        }
+
+        @media print {
+            .page { box-shadow: none; }
+            body { background: white; }
+        }
+
+        /* Header */
+        .header {
+            background: var(--red);
+            padding: 0.4in 0.6in;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            color: var(--white);
+        }
+
+        .eyebrow {
+            font-size: 8pt;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0.8;
+            margin-bottom: 0.05in;
+        }
+
+        .header-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 24pt;
+            font-weight: 700;
+        }
+
+        .header-logo {
+            text-align: right;
+            color: var(--white);
+        }
+
+        .logo-name {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 9pt;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .logo-sub {
+            font-size: 6pt;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        /* Content */
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 2.5in;
+            gap: 0.4in;
+            padding: 0.5in 0.6in;
+            height: calc(11in - 1.4in - 0.8in);
+        }
+
+        .main-content h2 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 16pt;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 0.2in;
+            padding-bottom: 0.1in;
+            border-bottom: 2px solid var(--red);
+        }
+
+        .main-content p {
+            font-size: 11pt;
+            line-height: 1.6;
+            margin-bottom: 0.2in;
+        }
+
+        .key-points {
+            margin: 0.25in 0;
+        }
+
+        .key-points h3 {
+            font-size: 10pt;
+            font-weight: 700;
+            color: var(--red);
+            margin-bottom: 0.1in;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .key-points ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .key-points li {
+            padding: 0.1in 0;
+            padding-left: 0.2in;
+            border-left: 3px solid var(--red);
+            margin-bottom: 0.1in;
+            font-size: 10.5pt;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--gray-100);
+            padding: 0.3in;
+        }
+
+        .sidebar h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 12pt;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 0.15in;
+            padding-bottom: 0.08in;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .stat-item {
+            margin-bottom: 0.2in;
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 24pt;
+            font-weight: 700;
+            color: var(--red);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 9pt;
+            color: var(--gray-600);
+        }
+
+        .sidebar-section {
+            margin-top: 0.25in;
+            padding-top: 0.15in;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .sidebar-section h4 {
+            font-size: 9pt;
+            font-weight: 700;
+            color: var(--red);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.08in;
+        }
+
+        .sidebar-section p {
+            font-size: 9pt;
+            color: var(--gray-600);
+            line-height: 1.4;
+        }
+
+        /* Footer */
+        .footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--black);
+            color: var(--white);
+            padding: 0.25in 0.6in;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-left {
+            font-size: 8pt;
+        }
+
+        .footer-left a {
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .footer-right {
+            font-size: 8pt;
+            opacity: 0.7;
+        }
+
+        .cta {
+            background: var(--red);
+            color: var(--white);
+            padding: 0.08in 0.2in;
+            font-size: 8pt;
+            font-weight: 700;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header class="header">
+            <div class="header-left">
+                <div class="eyebrow">[Category]</div>
+                <h1 class="header-title">[Document title in sentence case]</h1>
+            </div>
+            <div class="header-logo">
+                <div class="logo-name">Center for Cooperative Media</div>
+                <div class="logo-sub">Montclair State University</div>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="main-content">
+                <h2>Overview</h2>
+                <p>
+                    [Opening paragraph that explains what this is about. Keep it concise and impactful.]
+                </p>
+                <p>
+                    [Second paragraph with additional context or supporting information.]
+                </p>
+
+                <div class="key-points">
+                    <h3>Key highlights</h3>
+                    <ul>
+                        <li>[Key point 1 - keep each point to 1-2 lines]</li>
+                        <li>[Key point 2 - focus on impact and outcomes]</li>
+                        <li>[Key point 3 - use concrete numbers when possible]</li>
+                        <li>[Key point 4 - end with a forward-looking statement]</li>
+                    </ul>
+                </div>
+
+                <h2>How it works</h2>
+                <p>
+                    [Brief explanation of the process, approach, or methodology.]
+                </p>
+            </div>
+
+            <div class="sidebar">
+                <h3>Quick facts</h3>
+
+                <div class="stat-item">
+                    <div class="stat-number">[Number]</div>
+                    <div class="stat-label">[What this number represents]</div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-number">[Number]</div>
+                    <div class="stat-label">[What this number represents]</div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-number">[Number]</div>
+                    <div class="stat-label">[What this number represents]</div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h4>Contact</h4>
+                    <p>
+                        [Contact name]<br>
+                        [email@example.org]<br>
+                        [Phone number]
+                    </p>
+                </div>
+
+                <div class="sidebar-section">
+                    <h4>Learn more</h4>
+                    <p>[website-url.org]</p>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-left">
+                <a href="https://centerforcooperativemedia.org">centerforcooperativemedia.org</a> •
+                <a href="mailto:info@centerforcooperativemedia.org">info@centerforcooperativemedia.org</a>
+            </div>
+            <a href="[action-url]" class="cta">Get Involved</a>
+        </footer>
+    </div>
+</body>
+</html>

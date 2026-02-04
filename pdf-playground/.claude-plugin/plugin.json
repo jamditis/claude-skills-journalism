@@ -1,0 +1,13 @@
+{
+  "name": "pdf-playground",
+  "version": "1.0.0",
+  "description": "Create print-ready HTML documents for PDF export with customizable branding. Perfect for newsrooms creating proposals, reports, one-pagers, newsletters, slides, and event materials.",
+  "author": {
+    "name": "Joe Amditis",
+    "email": "jamditis@gmail.com",
+    "url": "https://github.com/jamditis"
+  },
+  "repository": "https://github.com/jamditis/claude-skills-journalism",
+  "license": "MIT",
+  "keywords": ["pdf", "design", "templates", "proposals", "reports", "newsroom", "journalism", "print"]
+}
