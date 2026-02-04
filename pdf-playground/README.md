@@ -17,11 +17,13 @@ A Claude Code plugin for creating professional, print-ready HTML documents that 
 ### 1. Install the plugin
 
 ```bash
-# Clone the repo
-git clone https://github.com/jamditis/claude-skills-journalism.git
+# Add the marketplace
+claude plugin marketplace add https://github.com/jamditis/claude-skills-journalism
 
-# Use with Claude Code
-cc --plugin-dir /path/to/claude-skills-journalism/pdf-playground
+# Install the plugin
+claude plugin install pdf-playground@claude-skills-journalism
+
+# Restart Claude Code to load the plugin
 ```
 
 ### 2. Configure your brand
@@ -61,13 +63,13 @@ Add any specific brand guidelines or notes here that Claude should follow when c
 
 | Command | Description |
 |---------|-------------|
-| `/proposal` | Multi-page funding proposals with budgets |
-| `/report` | Program reports and annual reports |
-| `/onepager` | Single-page fact sheets |
-| `/newsletter` | HTML email newsletters |
-| `/slides` | HTML presentation slides |
-| `/event` | Flyers, posters, event materials |
-| `/preview` | Interactive browser preview |
+| `/pdf-playground:proposal` | Multi-page funding proposals with budgets |
+| `/pdf-playground:report` | Program reports and annual reports |
+| `/pdf-playground:onepager` | Single-page fact sheets |
+| `/pdf-playground:newsletter` | HTML email newsletters |
+| `/pdf-playground:slides` | HTML presentation slides |
+| `/pdf-playground:event` | Flyers, posters, event materials |
+| `/pdf-playground:preview` | Interactive browser preview |
 
 ### 4. Export to PDF
 
@@ -127,7 +129,7 @@ style:
 
 ## Document types
 
-### Proposals (`/proposal`)
+### Proposals (`/pdf-playground:proposal`)
 
 Multi-page funding proposals with:
 - Cover page with organization branding
@@ -137,7 +139,7 @@ Multi-page funding proposals with:
 - Budget tables with totals
 - Contact information
 
-### Reports (`/report`)
+### Reports (`/pdf-playground:report`)
 
 Program reports and annual reports with:
 - Branded cover page
@@ -146,7 +148,7 @@ Program reports and annual reports with:
 - Pull quotes and testimonials
 - Data visualizations
 
-### One-pagers (`/onepager`)
+### One-pagers (`/pdf-playground:onepager`)
 
 Single-page fact sheets with:
 - Header with organization branding
@@ -155,7 +157,7 @@ Single-page fact sheets with:
 - Quick facts and statistics
 - Contact information and CTA
 
-### Newsletters (`/newsletter`)
+### Newsletters (`/pdf-playground:newsletter`)
 
 HTML email newsletters with:
 - Email-safe table-based layout
@@ -164,7 +166,7 @@ HTML email newsletters with:
 - Upcoming events
 - Social links and footer
 
-### Slides (`/slides`)
+### Slides (`/pdf-playground:slides`)
 
 HTML presentation slides with:
 - Title slides
@@ -175,7 +177,7 @@ HTML presentation slides with:
 - Big stat slides
 - End slide with contact info
 
-### Event materials (`/event`)
+### Event materials (`/pdf-playground:event`)
 
 Flyers and posters with:
 - Bold event title
