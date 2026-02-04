@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "Interactive playground for creating and testing PDF reports and proposals",
   "author": "Joe Amditis",
-  "repository": "https://github.com/jamditis/claude-skills-journalism",
-  "license": "MIT",
-  "skills": ["../skills/*.md"],
+  "skills": ["skills/*.md"],
   "hooks": [],
-  "commands": ["../commands/*"]
+  "commands": ["commands/*"]
 }
