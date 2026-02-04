@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility compliance - Claude skills for journalism</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Source Sans 3', sans-serif; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        .accent-gradient { background: linear-gradient(135deg, #0891b2 0%, #0d9488 100%); }
+        .accent-text { color: #0891b2; }
+        .accent-border { border-color: #0891b2; }
+        .wcag-card { transition: all 0.2s ease; }
+        .wcag-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(8, 145, 178, 0.2); }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <!-- Header -->
+    <header class="accent-gradient text-white">
+        <nav class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="../" class="text-white/80 hover:text-white flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                Back to all skills
+            </a>
+            <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-white/80 hover:text-white">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+                </svg>
+            </a>
+        </nav>
+
+        <div class="max-w-6xl mx-auto px-4 py-16 text-center">
+            <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-6">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+                Web development skill
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Accessibility compliance</h1>
+            <p class="text-xl text-white/90 max-w-2xl mx-auto">
+                Web accessibility patterns for news sites, journalism tools, and academic platforms. Ensure your content reaches all readers.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-12">
+        <!-- WCAG Principles -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">The four WCAG principles (POUR)</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 wcag-card">
+                    <div class="w-12 h-12 rounded-lg bg-cyan-100 flex items-center justify-center mb-4">
+                        <span class="text-2xl font-bold text-cyan-700">P</span>
+                    </div>
+                    <h3 class="font-semibold mb-2">Perceivable</h3>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• Images have alt text</li>
+                        <li>• Videos have captions</li>
+                        <li>• Audio has transcripts</li>
+                        <li>• Color isn't the only way to convey info</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 wcag-card">
+                    <div class="w-12 h-12 rounded-lg bg-cyan-100 flex items-center justify-center mb-4">
+                        <span class="text-2xl font-bold text-cyan-700">O</span>
+                    </div>
+                    <h3 class="font-semibold mb-2">Operable</h3>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• All functions work with keyboard</li>
+                        <li>• No keyboard traps</li>
+                        <li>• Skip links to main content</li>
+                        <li>• Focus visible on all elements</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 wcag-card">
+                    <div class="w-12 h-12 rounded-lg bg-cyan-100 flex items-center justify-center mb-4">
+                        <span class="text-2xl font-bold text-cyan-700">U</span>
+                    </div>
+                    <h3 class="font-semibold mb-2">Understandable</h3>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• Language declared in HTML</li>
+                        <li>• Navigation is consistent</li>
+                        <li>• Error messages are clear</li>
+                        <li>• Labels describe form fields</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 wcag-card">
+                    <div class="w-12 h-12 rounded-lg bg-cyan-100 flex items-center justify-center mb-4">
+                        <span class="text-2xl font-bold text-cyan-700">R</span>
+                    </div>
+                    <h3 class="font-semibold mb-2">Robust</h3>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• Valid HTML</li>
+                        <li>• ARIA used correctly</li>
+                        <li>• Works with screen readers</li>
+                        <li>• Doesn't break with zoom</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Alt text for journalism -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Alt text for journalism</h2>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="font-semibold mb-4">News photo alt text decision tree</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-2">Include:</p>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start gap-2">
+                                    <span class="accent-text font-bold">WHO</span>
+                                    <span>is in the image (if identifiable and relevant)</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="accent-text font-bold">WHAT</span>
+                                    <span>is happening (the action or situation)</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="accent-text font-bold">WHERE</span>
+                                    <span>(if location matters to story)</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 mb-2">Avoid:</p>
+                            <ul class="space-y-2 text-gray-600">
+                                <li>• Repeating caption text verbatim</li>
+                                <li>• Starting with "Image of" or "Photo of"</li>
+                                <li>• Purely decorative descriptions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6 bg-gray-50">
+                    <h4 class="font-semibold mb-4">Examples</h4>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Photo: Protesters holding signs outside courthouse</p>
+                            <p class="text-red-600 text-sm mb-1"><strong>Bad:</strong> "Protesters"</p>
+                            <p class="text-green-700 text-sm"><strong>Good:</strong> "Approximately 50 protesters hold signs reading 'Justice Now' outside the federal courthouse in downtown Seattle"</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Photo: Headshot of interview subject</p>
+                            <p class="text-red-600 text-sm mb-1"><strong>Bad:</strong> "Photo"</p>
+                            <p class="text-green-700 text-sm"><strong>Good:</strong> "Dr. Sarah Chen, epidemiologist at Johns Hopkins"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Accessible data visualization -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Accessible data visualization</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="font-semibold mb-4">Chart accessibility checklist</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center gap-2">
+                            <input type="checkbox" class="w-4 h-4 accent-cyan-600" disabled>
+                            <span class="text-gray-700">Text alternative describing the key insight</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <input type="checkbox" class="w-4 h-4 accent-cyan-600" disabled>
+                            <span class="text-gray-700">Data table available (visible or linked)</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <input type="checkbox" class="w-4 h-4 accent-cyan-600" disabled>
+                            <span class="text-gray-700">Colors have sufficient contrast</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <input type="checkbox" class="w-4 h-4 accent-cyan-600" disabled>
+                            <span class="text-gray-700">Patterns/textures supplement color coding</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <input type="checkbox" class="w-4 h-4 accent-cyan-600" disabled>
+                            <span class="text-gray-700">Labels directly on chart (not legend-only)</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <input type="checkbox" class="w-4 h-4 accent-cyan-600" disabled>
+                            <span class="text-gray-700">Title describes what chart shows</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="font-semibold mb-4">Color-blind safe palettes</h3>
+                    <p class="text-sm text-gray-600 mb-4">Paul Tol's color schemes - tested for accessibility:</p>
+                    <div class="space-y-3">
+                        <div>
+                            <p class="text-xs text-gray-500 mb-1">Bright palette</p>
+                            <div class="flex gap-1">
+                                <div class="w-8 h-8 rounded" style="background: #4477AA" title="#4477AA"></div>
+                                <div class="w-8 h-8 rounded" style="background: #EE6677" title="#EE6677"></div>
+                                <div class="w-8 h-8 rounded" style="background: #228833" title="#228833"></div>
+                                <div class="w-8 h-8 rounded" style="background: #CCBB44" title="#CCBB44"></div>
+                                <div class="w-8 h-8 rounded" style="background: #66CCEE" title="#66CCEE"></div>
+                                <div class="w-8 h-8 rounded" style="background: #AA3377" title="#AA3377"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 mb-1">Categorical palette</p>
+                            <div class="flex gap-1">
+                                <div class="w-8 h-8 rounded" style="background: #332288" title="#332288"></div>
+                                <div class="w-8 h-8 rounded" style="background: #88CCEE" title="#88CCEE"></div>
+                                <div class="w-8 h-8 rounded" style="background: #44AA99" title="#44AA99"></div>
+                                <div class="w-8 h-8 rounded" style="background: #117733" title="#117733"></div>
+                                <div class="w-8 h-8 rounded" style="background: #999933" title="#999933"></div>
+                                <div class="w-8 h-8 rounded" style="background: #CC6677" title="#CC6677"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contrast requirements -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Contrast requirements (WCAG 2.1)</h2>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-200">
+                            <th class="text-left px-6 py-4 font-semibold">Element type</th>
+                            <th class="text-left px-6 py-4 font-semibold">AA (minimum)</th>
+                            <th class="text-left px-6 py-4 font-semibold">AAA (enhanced)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-6 py-4">Normal text</td>
+                            <td class="px-6 py-4"><span class="bg-cyan-100 text-cyan-800 px-2 py-1 rounded font-mono text-sm">4.5:1</span></td>
+                            <td class="px-6 py-4"><span class="bg-cyan-100 text-cyan-800 px-2 py-1 rounded font-mono text-sm">7:1</span></td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4">Large text (18pt+)</td>
+                            <td class="px-6 py-4"><span class="bg-cyan-100 text-cyan-800 px-2 py-1 rounded font-mono text-sm">3:1</span></td>
+                            <td class="px-6 py-4"><span class="bg-cyan-100 text-cyan-800 px-2 py-1 rounded font-mono text-sm">4.5:1</span></td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4">UI components</td>
+                            <td class="px-6 py-4"><span class="bg-cyan-100 text-cyan-800 px-2 py-1 rounded font-mono text-sm">3:1</span></td>
+                            <td class="px-6 py-4 text-gray-500">—</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Video/audio requirements -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Video and audio accessibility</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="font-semibold mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
+                        </svg>
+                        Caption requirements
+                    </h3>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li>• 99%+ accuracy</li>
+                        <li>• Synchronized within 1 second</li>
+                        <li>• Speaker identification for multiple speakers</li>
+                        <li>• Sound effects described [applause]</li>
+                        <li>• Can be toggled on/off</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="font-semibold mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+                        </svg>
+                        Audio description
+                    </h3>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li>• Key visual info not in dialogue</li>
+                        <li>• Actions crucial to understanding</li>
+                        <li>• Text on screen not read aloud</li>
+                        <li>• Identifying info for speakers</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Manual testing checklist -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Manual testing checklist</h2>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="font-semibold mb-4">Keyboard navigation</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-center gap-2">
+                                <input type="checkbox" class="w-4 h-4 accent-cyan-600" disabled>
+                                <span class="text-gray-700">Tab through entire page</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <input type="checkbox" class="w-4 h-4 accent-cyan-600" disabled>
+                                <span class="text-gray-700">Can reach all interactive elements</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <input type="checkbox" class="w-4 h-4 accent-cyan-600" disabled>
+                                <span class="text-gray-700">Focus order makes sense</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <input type="checkbox" class="w-4 h-4 accent-cyan-600" disabled>
+                                <span class="text-gray-700">No keyboard traps</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <input type="checkbox" class="w-4 h-4 accent-cyan-600" disabled>
+                                <span class="text-gray-700">Skip link works</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-4">Zoom testing</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-center gap-2">
+                                <input type="checkbox" class="w-4 h-4 accent-cyan-600" disabled>
+                                <span class="text-gray-700">200% zoom, no horizontal scroll</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <input type="checkbox" class="w-4 h-4 accent-cyan-600" disabled>
+                                <span class="text-gray-700">400% zoom, content still usable</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <input type="checkbox" class="w-4 h-4 accent-cyan-600" disabled>
+                                <span class="text-gray-700">Text spacing adjustments don't break layout</span>
+                            </li>
+                        </ul>
+                        <h3 class="font-semibold mb-4 mt-6">Color testing</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-center gap-2">
+                                <input type="checkbox" class="w-4 h-4 accent-cyan-600" disabled>
+                                <span class="text-gray-700">Works in grayscale</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <input type="checkbox" class="w-4 h-4 accent-cyan-600" disabled>
+                                <span class="text-gray-700">Links distinguishable from text</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Legal requirements -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Legal requirements</h2>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-2xl">🇺🇸</span>
+                        <h3 class="font-semibold">United States</h3>
+                    </div>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li><strong>Section 508:</strong> Federal agencies</li>
+                        <li><strong>ADA:</strong> Increasingly applied to websites</li>
+                        <li><strong>State laws:</strong> Many have additional requirements</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-2xl">🇪🇺</span>
+                        <h3 class="font-semibold">European Union</h3>
+                    </div>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li><strong>European Accessibility Act:</strong> From 2025</li>
+                        <li><strong>EN 301 549:</strong> Technical standard</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-2xl">🌍</span>
+                        <h3 class="font-semibold">Best practice</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">
+                        <strong>WCAG 2.1 AA</strong> is the global standard. Meet this and you'll likely satisfy most legal requirements.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- What's included -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">What's included</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="font-semibold mb-4">Code patterns</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Accessible chart HTML pattern
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Skip link implementation (JS)
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Modal keyboard trap prevention
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Accessible form field pattern
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Error message handling
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="font-semibold mb-4">Python utilities</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Alt text prompt generator
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Color contrast validator
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Color-blind safe palettes
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Axe-core audit runner (Playwright)
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Installation</h2>
+            <div class="bg-gray-900 rounded-xl p-6 text-gray-100 font-mono text-sm">
+                <p class="text-gray-400 mb-2"># Clone the repository</p>
+                <p class="mb-4">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
+                <p class="text-gray-400 mb-2"># Copy the skill to your Claude config</p>
+                <p>cp -r claude-skills-journalism/accessibility-compliance ~/.claude/skills/</p>
+            </div>
+            <p class="mt-4 text-gray-600">
+                Or download just this skill from the
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/accessibility-compliance" class="accent-text hover:underline" target="_blank">GitHub repository</a>.
+            </p>
+        </section>
+
+        <!-- CTA -->
+        <section class="text-center">
+            <div class="bg-gradient-to-br from-cyan-600 to-teal-600 rounded-xl p-8 text-white">
+                <h2 class="text-2xl font-bold mb-4">Make your content accessible</h2>
+                <p class="text-cyan-100 mb-6 max-w-xl mx-auto">
+                    Ensure your journalism reaches all readers, including those using assistive technologies.
+                </p>
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/accessibility-compliance" target="_blank" class="inline-flex items-center gap-2 bg-white text-cyan-700 px-6 py-3 rounded-lg font-semibold hover:bg-cyan-50 transition-colors">
+                    View on GitHub
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 mt-16">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-gray-600 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="accent-text hover:underline">Center for Cooperative Media</a>
+                </p>
+                <div class="flex items-center gap-6">
+                    <a href="../" class="text-gray-600 hover:text-gray-900 text-sm">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-gray-600 hover:text-gray-900 text-sm">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

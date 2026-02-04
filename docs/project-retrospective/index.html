@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project retrospective - Claude skills for journalism</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Source Sans 3', sans-serif; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        .accent-gradient { background: linear-gradient(135deg, #d97706 0%, #ea580c 100%); }
+        .accent-text { color: #d97706; }
+        .accent-border { border-color: #d97706; }
+        .lesson-card { transition: all 0.2s ease; }
+        .lesson-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(217, 119, 6, 0.2); }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <!-- Header -->
+    <header class="accent-gradient text-white">
+        <nav class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="../" class="text-white/80 hover:text-white flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                Back to all skills
+            </a>
+            <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-white/80 hover:text-white">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+                </svg>
+            </a>
+        </nav>
+
+        <div class="max-w-6xl mx-auto px-4 py-16 text-center">
+            <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-6">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                </svg>
+                Knowledge capture skill
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Project retrospective</h1>
+            <p class="text-xl text-white/90 max-w-2xl mx-auto">
+                Generate LESSONS.md files that capture institutional knowledge, especially failures. Think like a journalist writing about your own project.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-12">
+        <!-- Overview -->
+        <section class="mb-16">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                <h2 class="text-2xl font-bold mb-4">What this skill does</h2>
+                <p class="text-gray-600 text-lg mb-6">
+                    Creates structured retrospective documents that capture what worked, what didn't, and—most importantly—what you thought you were building versus what was actually needed. The goal is honest, specific documentation that saves others from the same mistakes.
+                </p>
+                <div class="grid md:grid-cols-4 gap-4">
+                    <div class="text-center">
+                        <div class="text-3xl mb-2">📋</div>
+                        <p class="font-medium">Investigations</p>
+                        <p class="text-sm text-gray-500">Research projects</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl mb-2">📅</div>
+                        <p class="font-medium">Events</p>
+                        <p class="text-sm text-gray-500">Conferences, workshops</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl mb-2">📰</div>
+                        <p class="font-medium">Publications</p>
+                        <p class="text-sm text-gray-500">Newsletters, podcasts</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl mb-2">🛠️</div>
+                        <p class="font-medium">Tools</p>
+                        <p class="text-sm text-gray-500">Newsroom software</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The critical section -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">The most important section: "The real problem"</h2>
+            <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-8">
+                <p class="text-lg text-amber-900 mb-6">
+                    This is the most valuable part of any retrospective. It answers:
+                </p>
+                <blockquote class="text-2xl font-medium text-amber-800 border-l-4 border-amber-400 pl-6 mb-8">
+                    "What did we THINK we were building vs. what was ACTUALLY needed?"
+                </blockquote>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-lg p-6 border border-amber-200">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2 text-green-700">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Good example
+                        </h3>
+                        <p class="text-gray-700 italic">
+                            "We built a comprehensive tagging system when users just needed full-text search. Three weeks on features no one used."
+                        </p>
+                    </div>
+                    <div class="bg-white rounded-lg p-6 border border-amber-200">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2 text-red-700">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                            Bad example (too generic)
+                        </h3>
+                        <p class="text-gray-700 italic">
+                            "We learned the importance of user research."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Template structure -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">LESSONS.md template structure</h2>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded bg-amber-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
+                                <div>
+                                    <p class="font-medium">Project metadata</p>
+                                    <p class="text-sm text-gray-500">Name, dates, status, author</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded bg-amber-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">2</span>
+                                <div>
+                                    <p class="font-medium">Summary</p>
+                                    <p class="text-sm text-gray-500">What it did, impact, why it matters</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded bg-amber-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">3</span>
+                                <div>
+                                    <p class="font-medium">What worked</p>
+                                    <p class="text-sm text-gray-500">Technical wins, process wins</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded bg-amber-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">4</span>
+                                <div>
+                                    <p class="font-medium">What didn't work</p>
+                                    <p class="text-sm text-gray-500">Critical failures, technical debt, external factors</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded bg-amber-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">5</span>
+                                <div>
+                                    <p class="font-medium">The real problem</p>
+                                    <p class="text-sm text-gray-500">What you thought vs. what was needed</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded bg-amber-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">6</span>
+                                <div>
+                                    <p class="font-medium">Recommendations</p>
+                                    <p class="text-sm text-gray-500">If continuing, if starting fresh, tech stack verdict</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded bg-amber-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">7</span>
+                                <div>
+                                    <p class="font-medium">Reusable artifacts</p>
+                                    <p class="text-sm text-gray-500">Components others can use</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded bg-amber-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">8</span>
+                                <div>
+                                    <p class="font-medium">Questions for next time</p>
+                                    <p class="text-sm text-gray-500">Unanswered questions worth investigating</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Good vs bad examples -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">The specificity test</h2>
+            <p class="text-gray-600 mb-6">For each item in "What didn't work," ask: Can I name the specific decision? Can I quantify the impact? Would this help someone avoid the same mistake?</p>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="font-semibold mb-4 flex items-center gap-2 text-red-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        Too vague
+                    </h3>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex items-start gap-2">
+                            <span class="text-red-400">•</span>
+                            Communication could have been better
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-red-400">•</span>
+                            We underestimated the complexity
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-red-400">•</span>
+                            Testing was insufficient
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="font-semibold mb-4 flex items-center gap-2 text-green-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Specific and actionable
+                    </h3>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-500">•</span>
+                            Skipped schema validation on data files. Cost: 3 hours debugging a typo that caused silent failures.
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-500">•</span>
+                            Built custom date picker when browser native input would have worked. 2 days wasted.
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-500">•</span>
+                            No error messages when data fails to load—users just see blank screen.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Red flags -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Red flags in your writing</h2>
+            <p class="text-gray-600 mb-6">If you find yourself writing these, stop and be more specific. These are placeholders for real insights:</p>
+            <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span class="text-red-800">"Communication is key"</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span class="text-red-800">"We learned the importance of..."</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span class="text-red-800">"Going forward, we should..."</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span class="text-red-800">"Challenges included..."</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span class="text-red-800">"There were some issues with..."</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Strong example -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">A strong "real problem" example</h2>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="bg-gray-50 px-6 py-3 border-b border-gray-200">
+                    <span class="text-sm font-medium text-gray-500">The gap between assumption and reality</span>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-700 text-lg leading-relaxed">
+                        "We built an admin dashboard for editors when they actually needed a Slack bot. They live in Slack—forcing them to open a web app was friction they'd never accept. <strong class="text-amber-700">The dashboard has 2 monthly active users; the Slack bot prototype we built in a day has 47.</strong>"
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Templates -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Journalism-specific templates</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lesson-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold">research-project.md</h3>
+                            <p class="text-sm text-gray-500">Investigations, data journalism</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm">For deep-dive investigative projects with data analysis, source management, and publication timelines.</p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lesson-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold">event.md</h3>
+                            <p class="text-sm text-gray-500">Conferences, workshops</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm">For in-person and virtual events with attendance metrics, speaker feedback, and logistics lessons.</p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lesson-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold">publication.md</h3>
+                            <p class="text-sm text-gray-500">Newsletters, podcasts</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm">For ongoing content series with audience growth, production workflows, and sustainability considerations.</p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lesson-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold">editorial-tool.md</h3>
+                            <p class="text-sm text-gray-500">Newsroom software, AI tools</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm">For internal tools with adoption metrics, integration challenges, and user feedback tracking.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Voice guidelines -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Voice guidelines</h2>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <ul class="space-y-4 text-gray-600">
+                    <li class="flex items-start gap-3">
+                        <span class="accent-text font-bold">•</span>
+                        <span><strong>Honest, specific, slightly self-deprecating</strong> — Like explaining to a friend why the project took twice as long</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="accent-text font-bold">•</span>
+                        <span><strong>No corporate speak or blame-shifting</strong> — Name specific mistakes, not vague "challenges"</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="accent-text font-bold">•</span>
+                        <span><strong>Quantify when possible</strong> — "2 days wasted" is better than "some time lost"</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="accent-text font-bold">•</span>
+                        <span><strong>Focus on decisions, not people</strong> — Include failures with context, exclude blame for individuals</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Installation</h2>
+            <div class="bg-gray-900 rounded-xl p-6 text-gray-100 font-mono text-sm">
+                <p class="text-gray-400 mb-2"># Clone the repository</p>
+                <p class="mb-4">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
+                <p class="text-gray-400 mb-2"># Copy the skill to your Claude config</p>
+                <p>cp -r claude-skills-journalism/project-retrospective ~/.claude/skills/</p>
+            </div>
+            <p class="mt-4 text-gray-600">
+                Or download just this skill from the
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/project-retrospective" class="accent-text hover:underline" target="_blank">GitHub repository</a>.
+            </p>
+        </section>
+
+        <!-- CTA -->
+        <section class="text-center">
+            <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl p-8 text-white">
+                <h2 class="text-2xl font-bold mb-4">Start capturing lessons</h2>
+                <p class="text-amber-100 mb-6 max-w-xl mx-auto">
+                    The best retrospectives are written by people who got burned and want to save others from the same fate.
+                </p>
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/project-retrospective" target="_blank" class="inline-flex items-center gap-2 bg-white text-amber-700 px-6 py-3 rounded-lg font-semibold hover:bg-amber-50 transition-colors">
+                    View on GitHub
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 mt-16">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-gray-600 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="accent-text hover:underline">Center for Cooperative Media</a>
+                </p>
+                <div class="flex items-center gap-6">
+                    <a href="../" class="text-gray-600 hover:text-gray-900 text-sm">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-gray-600 hover:text-gray-900 text-sm">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

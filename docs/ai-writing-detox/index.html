@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI writing detox - Claude skills for journalism</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Source Sans 3', sans-serif; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        .accent-gradient { background: linear-gradient(135deg, #475569 0%, #1e293b 100%); }
+        .accent-text { color: #475569; }
+        .accent-border { border-color: #475569; }
+        .banned-word {
+            display: inline-block;
+            text-decoration: line-through;
+            color: #ef4444;
+            background: #fef2f2;
+            padding: 0 4px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <!-- Header -->
+    <header class="accent-gradient text-white">
+        <nav class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="../" class="text-white/80 hover:text-white flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                Back to all skills
+            </a>
+            <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-white/80 hover:text-white">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+                </svg>
+            </a>
+        </nav>
+
+        <div class="max-w-6xl mx-auto px-4 py-16 text-center">
+            <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-6">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                Editorial skill
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">AI writing detox</h1>
+            <p class="text-xl text-white/90 max-w-2xl mx-auto">
+                Eliminate AI-generated writing patterns that erode reader trust. Essential for journalists using AI assistance who need human-sounding output.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-12">
+        <!-- Core principle -->
+        <section class="mb-16">
+            <div class="bg-slate-900 text-white rounded-xl p-8 text-center">
+                <p class="text-2xl font-medium mb-2">Good writing is invisible.</p>
+                <p class="text-slate-400">If readers notice the writing style, it's distracting from the content. AI patterns are noticeable—they break trust.</p>
+            </div>
+        </section>
+
+        <!-- Banned words -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Banned words (delete or replace)</h2>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200">
+                                <th class="text-left px-6 py-4 font-semibold">Word</th>
+                                <th class="text-left px-6 py-4 font-semibold">Why it's bad</th>
+                                <th class="text-left px-6 py-4 font-semibold">Alternative</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-3"><span class="banned-word">delve</span></td>
+                                <td class="px-6 py-3 text-gray-600">AI signature word</td>
+                                <td class="px-6 py-3 text-green-700">explore, examine, look at</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3"><span class="banned-word">realm</span></td>
+                                <td class="px-6 py-3 text-gray-600">Pretentious</td>
+                                <td class="px-6 py-3 text-green-700">area, field</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3"><span class="banned-word">tapestry</span></td>
+                                <td class="px-6 py-3 text-gray-600">Purple prose</td>
+                                <td class="px-6 py-3 text-green-700">(delete entirely)</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3"><span class="banned-word">landscape</span></td>
+                                <td class="px-6 py-3 text-gray-600">Corporate speak</td>
+                                <td class="px-6 py-3 text-green-700">situation, environment</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3"><span class="banned-word">leverage</span></td>
+                                <td class="px-6 py-3 text-gray-600">Jargon</td>
+                                <td class="px-6 py-3 text-green-700">use</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3"><span class="banned-word">robust</span></td>
+                                <td class="px-6 py-3 text-gray-600">Meaningless</td>
+                                <td class="px-6 py-3 text-green-700">strong, reliable</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3"><span class="banned-word">seamless</span></td>
+                                <td class="px-6 py-3 text-gray-600">Almost always false</td>
+                                <td class="px-6 py-3 text-green-700">smooth, easy</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3"><span class="banned-word">comprehensive</span></td>
+                                <td class="px-6 py-3 text-gray-600">Rarely necessary</td>
+                                <td class="px-6 py-3 text-green-700">full, complete</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3"><span class="banned-word">transformative</span></td>
+                                <td class="px-6 py-3 text-gray-600">Hyperbolic</td>
+                                <td class="px-6 py-3 text-green-700">changed, improved</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-3"><span class="banned-word">innovative</span></td>
+                                <td class="px-6 py-3 text-gray-600">Empty praise</td>
+                                <td class="px-6 py-3 text-green-700">(describe what's new)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Banned phrases -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Banned phrases</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="font-semibold mb-4 text-red-700">Throat-clearing (delete entirely)</h3>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li>"It's important to note that..."</li>
+                        <li>"In today's [X] landscape..."</li>
+                        <li>"Let's dive/delve into..."</li>
+                        <li>"Without further ado..."</li>
+                        <li>"In this article, we will..."</li>
+                        <li>"It's worth mentioning that..."</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="font-semibold mb-4 text-red-700">AI enthusiasm</h3>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li>"This is a game-changer"</li>
+                        <li>"...and that's a good thing!"</li>
+                        <li>"Here's the thing:"</li>
+                        <li>"...and that's okay!"</li>
+                        <li>"...and I'm here for it"</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="font-semibold mb-4 text-red-700">Corporate buzzwords</h3>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li>"Moving forward..."</li>
+                        <li>"Going forward..."</li>
+                        <li>"At this point in time..."</li>
+                        <li>"Due to the fact that..."</li>
+                        <li>"In order to..."</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Before and after -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Before and after</h2>
+            <div class="space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-red-50 px-6 py-3 border-b border-red-100">
+                        <span class="text-sm font-medium text-red-700">AI slop</span>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 italic">
+                            "In today's rapidly evolving media landscape, it's crucial to understand the multifaceted nature of AI tools. Let's delve into how these robust solutions can help journalists leverage cutting-edge technology."
+                        </p>
+                    </div>
+                    <div class="bg-green-50 px-6 py-3 border-t border-green-100">
+                        <span class="text-sm font-medium text-green-700">Human writing</span>
+                    </div>
+                    <div class="p-6 border-t border-gray-100">
+                        <p class="text-gray-900 font-medium">
+                            "AI tools do three things well: drafting, research, and analysis. Here's when to use each."
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-red-50 px-6 py-3 border-b border-red-100">
+                        <span class="text-sm font-medium text-red-700">AI slop (news lede)</span>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 italic">
+                            "The city council meeting was a comprehensive and transformative discussion that fundamentally addressed key issues affecting residents in a meaningful way."
+                        </p>
+                    </div>
+                    <div class="bg-green-50 px-6 py-3 border-t border-green-100">
+                        <span class="text-sm font-medium text-green-700">Human writing</span>
+                    </div>
+                    <div class="p-6 border-t border-gray-100">
+                        <p class="text-gray-900 font-medium">
+                            "The city council voted 5-2 Tuesday to raise property taxes by 3 percent."
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-red-50 px-6 py-3 border-b border-red-100">
+                        <span class="text-sm font-medium text-red-700">AI slop (feature intro)</span>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 italic">
+                            "In the rich tapestry of American journalism, few stories are as compelling as the one about to unfold. This isn't just a profile—it's a journey into the heart of what makes local news truly matter."
+                        </p>
+                    </div>
+                    <div class="bg-green-50 px-6 py-3 border-t border-green-100">
+                        <span class="text-sm font-medium text-green-700">Human writing</span>
+                    </div>
+                    <div class="p-6 border-t border-gray-100">
+                        <p class="text-gray-900 font-medium">
+                            "Maria Rodriguez has published a newspaper for 47 years. She's never missed an issue."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The substitution table -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Quick substitutions</h2>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="grid md:grid-cols-2 gap-x-12 gap-y-2">
+                    <div class="flex justify-between py-2 border-b border-gray-100">
+                        <span class="text-gray-500">utilize</span>
+                        <span class="font-medium">→ use</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-100">
+                        <span class="text-gray-500">facilitate</span>
+                        <span class="font-medium">→ help</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-100">
+                        <span class="text-gray-500">implement</span>
+                        <span class="font-medium">→ build, add, create</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-100">
+                        <span class="text-gray-500">functionality</span>
+                        <span class="font-medium">→ feature</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-100">
+                        <span class="text-gray-500">methodology</span>
+                        <span class="font-medium">→ method</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-100">
+                        <span class="text-gray-500">in order to</span>
+                        <span class="font-medium">→ to</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-100">
+                        <span class="text-gray-500">due to the fact that</span>
+                        <span class="font-medium">→ because</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-100">
+                        <span class="text-gray-500">at this point in time</span>
+                        <span class="font-medium">→ now</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-100">
+                        <span class="text-gray-500">a large number of</span>
+                        <span class="font-medium">→ many</span>
+                    </div>
+                    <div class="flex justify-between py-2 border-b border-gray-100">
+                        <span class="text-gray-500">has the ability to</span>
+                        <span class="font-medium">→ can</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The verbal tic test -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">The verbal tic test</h2>
+            <p class="text-gray-600 mb-6">Read your text aloud. Does it sound like:</p>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+                    <svg class="w-6 h-6 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    <span>A TED talk introduction? <strong>Rewrite.</strong></span>
+                </div>
+                <div class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+                    <svg class="w-6 h-6 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    <span>A LinkedIn post? <strong>Rewrite.</strong></span>
+                </div>
+                <div class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+                    <svg class="w-6 h-6 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    <span>A press release? <strong>Rewrite.</strong></span>
+                </div>
+                <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
+                    <svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    <span>How you'd explain it to a colleague? <strong>Keep it.</strong></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick self-check -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Quick self-check before publishing</h2>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <p class="text-gray-600 mb-4">Search your text for these. Found any? Your writing needs another pass:</p>
+                <div class="grid md:grid-cols-4 gap-3">
+                    <div class="bg-gray-100 rounded-lg px-4 py-2 text-center">
+                        <code class="text-red-600">"delve"</code>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg px-4 py-2 text-center">
+                        <code class="text-red-600">"landscape"</code>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg px-4 py-2 text-center">
+                        <code class="text-red-600">"crucial"</code>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg px-4 py-2 text-center">
+                        <code class="text-red-600">"robust"</code>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg px-4 py-2 text-center">
+                        <code class="text-red-600">"leverage"</code>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg px-4 py-2 text-center">
+                        <code class="text-red-600">"comprehensive"</code>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg px-4 py-2 text-center">
+                        <code class="text-red-600">Starting "So,"</code>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg px-4 py-2 text-center">
+                        <code class="text-red-600">"rich" (modifier)</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The ultimate test -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">The ultimate test</h2>
+            <div class="bg-slate-100 rounded-xl p-8">
+                <p class="text-lg text-gray-700 mb-6">Before accepting any AI-assisted text, ask:</p>
+                <ol class="space-y-4">
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-slate-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">1</span>
+                        <span>Can I delete this word/phrase without losing meaning? <strong>→ Delete it</strong></span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-slate-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">2</span>
+                        <span>Is this the simplest way to say this? <strong>→ Simplify</strong></span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-slate-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">3</span>
+                        <span>Would I say this out loud to a colleague? <strong>→ If not, rewrite</strong></span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-slate-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">4</span>
+                        <span>Does this add information or just sound impressive? <strong>→ If the latter, cut it</strong></span>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Headline case -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Case sensitivity</h2>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <p class="text-gray-600 mb-4"><strong>Always use sentence case for headings, not title case.</strong></p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-red-600 mb-2">Wrong (Title Case)</p>
+                        <p class="text-gray-600">Getting Started With Your Project</p>
+                        <p class="text-gray-600">How To Use The Tool</p>
+                        <p class="text-gray-600">Best Practices For Journalism</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-green-600 mb-2">Right (sentence case)</p>
+                        <p class="text-gray-900 font-medium">Getting started with your project</p>
+                        <p class="text-gray-900 font-medium">How to use the tool</p>
+                        <p class="text-gray-900 font-medium">Best practices for journalism</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6">Installation</h2>
+            <div class="bg-gray-900 rounded-xl p-6 text-gray-100 font-mono text-sm">
+                <p class="text-gray-400 mb-2"># Clone the repository</p>
+                <p class="mb-4">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
+                <p class="text-gray-400 mb-2"># Copy the skill to your Claude config</p>
+                <p>cp -r claude-skills-journalism/ai-writing-detox ~/.claude/skills/</p>
+            </div>
+            <p class="mt-4 text-gray-600">
+                Or download just this skill from the
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/ai-writing-detox" class="accent-text hover:underline" target="_blank">GitHub repository</a>.
+            </p>
+        </section>
+
+        <!-- CTA -->
+        <section class="text-center">
+            <div class="bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl p-8 text-white">
+                <h2 class="text-2xl font-bold mb-4">Write like a human</h2>
+                <p class="text-slate-300 mb-6 max-w-xl mx-auto">
+                    If readers think "AI wrote this," you've already lost their trust.
+                </p>
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/ai-writing-detox" target="_blank" class="inline-flex items-center gap-2 bg-white text-slate-800 px-6 py-3 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
+                    View on GitHub
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 mt-16">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-gray-600 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="accent-text hover:underline">Center for Cooperative Media</a>
+                </p>
+                <div class="flex items-center gap-6">
+                    <a href="../" class="text-gray-600 hover:text-gray-900 text-sm">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-gray-600 hover:text-gray-900 text-sm">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

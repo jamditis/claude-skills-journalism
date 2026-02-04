@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Source Verification | Claude Skills for Journalism</title>
+    <meta name="description" content="Systematic source verification and fact-checking workflows for journalists. SIFT method, reverse image search, social media analysis, and building verification trails.">
+
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Fraunces', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        canvas: '#ede6d4',
+                        ink: '#121212',
+                        clay: '#d6cdb7',
+                        mist: '#6b6b6b',
+                        accent: '#1e40af',
+                        accentDark: '#1e3a8a',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #ede6d4; color: #121212; line-height: 1.7; }
+        .paper-overlay {
+            position: fixed; inset: 0;
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+            opacity: 0.5; pointer-events: none; z-index: 1;
+        }
+        .hero-gradient { background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 50%, #172554 100%); }
+        .feature-card {
+            background: white; border: 1px solid rgba(18, 18, 18, 0.08);
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15); }
+        .sift-step { transition: all 0.3s ease; }
+        .sift-step:hover { transform: scale(1.02); }
+        .sift-step.active { border-color: #1e40af; background: rgba(30, 64, 175, 0.05); }
+        pre { background: #1a1a1a; color: #e2e8f0; padding: 1.5rem; border-radius: 8px; overflow-x: auto; }
+        code { background: rgba(18, 18, 18, 0.06); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
+        pre code { background: none; padding: 0; }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="paper-overlay"></div>
+
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">
+                ← Back to all skills
+            </a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/source-verification" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">
+                View on GitHub →
+            </a>
+        </div>
+    </nav>
+
+    <header class="hero-gradient text-white pt-32 pb-24 px-6 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/>
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+        </div>
+
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide uppercase mb-6">
+                Core Journalism Skill
+            </div>
+            <h1 class="font-display text-5xl md:text-7xl font-black leading-[0.9] mb-6">
+                Source<br>Verification
+            </h1>
+            <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-10 font-light">
+                Systematic approaches for verifying sources, claims, and digital content. Essential for reporters, fact-checkers, and researchers.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <a href="#sift" class="inline-flex items-center gap-2 bg-white text-accent font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                    Learn SIFT Method
+                </a>
+                <a href="#install" class="inline-flex items-center gap-2 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/20 transition-colors border border-white/20">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    Install Skill
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+        <!-- SIFT Method -->
+        <section id="sift" class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">The SIFT method</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">
+                        A simple, effective framework for evaluating information before sharing or using it.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="sift-step feature-card p-6 rounded-xl border-2 border-transparent cursor-pointer" data-step="stop">
+                        <div class="w-16 h-16 bg-red-500 rounded-2xl flex items-center justify-center mb-4 text-white text-2xl font-black">S</div>
+                        <h3 class="font-display text-xl font-bold mb-2">Stop</h3>
+                        <p class="text-mist text-sm">Don't immediately share or use unverified information. Pause and assess before acting.</p>
+                    </div>
+
+                    <div class="sift-step feature-card p-6 rounded-xl border-2 border-transparent cursor-pointer" data-step="investigate">
+                        <div class="w-16 h-16 bg-amber-500 rounded-2xl flex items-center justify-center mb-4 text-white text-2xl font-black">I</div>
+                        <h3 class="font-display text-xl font-bold mb-2">Investigate</h3>
+                        <p class="text-mist text-sm">Who is behind the information? Check the source's credibility and potential motivations.</p>
+                    </div>
+
+                    <div class="sift-step feature-card p-6 rounded-xl border-2 border-transparent cursor-pointer" data-step="find">
+                        <div class="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center mb-4 text-white text-2xl font-black">F</div>
+                        <h3 class="font-display text-xl font-bold mb-2">Find</h3>
+                        <p class="text-mist text-sm">Find better coverage. What do other reliable sources say about this claim?</p>
+                    </div>
+
+                    <div class="sift-step feature-card p-6 rounded-xl border-2 border-transparent cursor-pointer" data-step="trace">
+                        <div class="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mb-4 text-white text-2xl font-black">T</div>
+                        <h3 class="font-display text-xl font-bold mb-2">Trace</h3>
+                        <p class="text-mist text-sm">Trace claims back to their original source. Find the primary evidence.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Verification Techniques -->
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Verification techniques</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">
+                        Specialized workflows for different types of digital content.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="image" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Reverse image search</h3>
+                        <ul class="text-sm text-mist space-y-2">
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Google, TinEye, Yandex search</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>EXIF metadata extraction</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Forensic analysis tools</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Original source identification</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="video" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Video verification</h3>
+                        <ul class="text-sm text-mist space-y-2">
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>InVID/WeVerify plugin</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Frame-by-frame analysis</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Geolocation from visuals</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Timeline verification</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="user-check" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Social media analysis</h3>
+                        <ul class="text-sm text-mist space-y-2">
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Account age and history</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Network and follower analysis</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Bot detection patterns</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Coordination detection</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="file-text" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Document verification</h3>
+                        <ul class="text-sm text-mist space-y-2">
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Metadata examination</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Visual consistency checks</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Provenance tracking</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Signature analysis</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="archive" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Evidence archiving</h3>
+                        <ul class="text-sm text-mist space-y-2">
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Multi-archive redundancy</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Wayback Machine, Archive.today</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Screenshot documentation</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Verification trail templates</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="mic" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Interview verification</h3>
+                        <ul class="text-sm text-mist space-y-2">
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Pre-interview background checks</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Real-time verification techniques</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Consistency checking</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>
+                                <span>Document request protocols</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tools -->
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Essential tools</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">
+                        The skill includes references to these trusted verification resources.
+                    </p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full bg-white rounded-xl overflow-hidden shadow-sm">
+                        <thead class="bg-ink text-white">
+                            <tr>
+                                <th class="text-left px-6 py-4 font-semibold">Tool</th>
+                                <th class="text-left px-6 py-4 font-semibold">Purpose</th>
+                                <th class="text-left px-6 py-4 font-semibold">URL</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr><td class="px-6 py-3 font-medium">InVID/WeVerify</td><td class="px-6 py-3 text-mist">Video verification plugin</td><td class="px-6 py-3"><a href="https://weverify.eu" class="text-accent hover:underline">weverify.eu</a></td></tr>
+                            <tr><td class="px-6 py-3 font-medium">TinEye</td><td class="px-6 py-3 text-mist">Reverse image search</td><td class="px-6 py-3"><a href="https://tineye.com" class="text-accent hover:underline">tineye.com</a></td></tr>
+                            <tr><td class="px-6 py-3 font-medium">Wayback Machine</td><td class="px-6 py-3 text-mist">Web archives</td><td class="px-6 py-3"><a href="https://web.archive.org" class="text-accent hover:underline">web.archive.org</a></td></tr>
+                            <tr><td class="px-6 py-3 font-medium">FotoForensics</td><td class="px-6 py-3 text-mist">Image forensic analysis</td><td class="px-6 py-3"><a href="https://fotoforensics.com" class="text-accent hover:underline">fotoforensics.com</a></td></tr>
+                            <tr><td class="px-6 py-3 font-medium">OCCRP Aleph</td><td class="px-6 py-3 text-mist">Document search</td><td class="px-6 py-3"><a href="https://aleph.occrp.org" class="text-accent hover:underline">aleph.occrp.org</a></td></tr>
+                            <tr><td class="px-6 py-3 font-medium">Media Bias/Fact Check</td><td class="px-6 py-3 text-mist">Source reliability</td><td class="px-6 py-3"><a href="https://mediabiasfactcheck.com" class="text-accent hover:underline">mediabiasfactcheck.com</a></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section id="install" class="py-24 px-6 bg-ink text-white">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-16">Install the skill</h2>
+
+                <div class="space-y-6">
+                    <div class="bg-white/5 p-6 rounded-xl">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">1</span>
+                            Clone the repository
+                        </h3>
+                        <pre><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
+                    </div>
+
+                    <div class="bg-white/5 p-6 rounded-xl">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">2</span>
+                            Copy skill to Claude skills directory
+                        </h3>
+                        <pre><code>cp -r source-verification ~/.claude/skills/</code></pre>
+                    </div>
+
+                    <div class="bg-white/5 p-6 rounded-xl">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">3</span>
+                            Start verifying
+                        </h3>
+                        <p class="text-white/70">Ask Claude to help verify a source, check an image, or build a verification trail.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Credits -->
+        <section class="py-16 px-6 border-t border-ink/10">
+            <div class="max-w-6xl mx-auto text-center">
+                <p class="text-mist text-sm mb-4">
+                    Created by <a href="https://github.com/jamditis" class="text-accent hover:underline">Joe Amditis</a> at the
+                    <a href="https://centerforcooperativemedia.org" class="text-accent hover:underline">Center for Cooperative Media</a>
+                </p>
+                <p class="text-mist/60 text-xs">
+                    Part of <a href="../" class="hover:underline">Claude Skills for Journalism</a> • MIT License
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        // SIFT step interactivity
+        document.querySelectorAll('.sift-step').forEach(step => {
+            step.addEventListener('click', () => {
+                document.querySelectorAll('.sift-step').forEach(s => s.classList.remove('active'));
+                step.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
