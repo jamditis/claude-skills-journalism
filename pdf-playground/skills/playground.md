@@ -1,5 +1,5 @@
 ---
-name: playground
+name: pdf-playground
 description: Interactive PDF design playground - create and refine reports with live preview
 user_invocable: true
 ---
