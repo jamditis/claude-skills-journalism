@@ -265,69 +265,86 @@
 
                     <!-- Document Preview -->
                     <div class="relative">
-                        <div id="doc-preview" class="doc-preview aspect-[8.5/11] w-full max-w-md mx-auto transition-all duration-500 opacity-30 overflow-hidden">
-                            <!-- Document Header -->
-                            <div id="doc-header" class="h-16 bg-gradient-to-r from-gray-200 to-gray-100 flex items-center justify-between px-6 border-b border-gray-200">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded bg-gray-300"></div>
-                                    <div class="h-3 w-20 bg-gray-300 rounded"></div>
-                                </div>
-                                <div class="text-[8px] text-gray-400 uppercase tracking-wide">Proposal</div>
+                        <div id="doc-preview" class="doc-preview aspect-[8.5/11] w-full max-w-sm mx-auto transition-all duration-500 opacity-40 overflow-hidden text-gray-800">
+                            <!-- Initial empty state -->
+                            <div id="empty-state" class="h-full flex flex-col items-center justify-center text-gray-400 p-8">
+                                <i data-lucide="file-text" class="w-16 h-16 mb-4 opacity-30"></i>
+                                <p class="text-sm font-medium">Document preview</p>
+                                <p class="text-xs opacity-60">Start the demo to see it build</p>
                             </div>
 
-                            <!-- Document Body -->
-                            <div class="p-6 h-[calc(100%-4rem-2rem)] flex flex-col">
-                                <!-- Title Block -->
-                                <div id="doc-title-block" class="text-center mb-6 pb-4 border-b border-gray-100">
-                                    <div class="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Document preview</div>
-                                    <div id="preview-title" class="text-lg font-bold text-gray-300 leading-tight">Your document</div>
-                                    <div id="preview-subtitle" class="text-xs text-gray-400 mt-1">will appear here</div>
-                                </div>
-
-                                <!-- Content Area -->
-                                <div id="preview-content" class="flex-1 space-y-4 opacity-50">
-                                    <!-- Section 1 -->
-                                    <div class="space-y-2">
-                                        <div class="h-2 bg-gray-200 rounded w-1/3"></div>
-                                        <div class="h-2 bg-gray-100 rounded w-full"></div>
-                                        <div class="h-2 bg-gray-100 rounded w-5/6"></div>
-                                        <div class="h-2 bg-gray-100 rounded w-4/5"></div>
+                            <!-- Actual document content (hidden initially) -->
+                            <div id="doc-content" class="hidden h-full flex flex-col">
+                                <!-- Cover/Header area -->
+                                <div id="doc-header" class="px-6 pt-6 pb-4">
+                                    <div class="flex items-center justify-between mb-6">
+                                        <div class="flex items-center gap-2">
+                                            <div id="logo-box" class="w-6 h-6 rounded bg-gray-300"></div>
+                                            <span id="org-name" class="text-[9px] font-semibold text-gray-400 tracking-wide">YOUR ORG</span>
+                                        </div>
+                                        <span id="doc-type-label" class="text-[8px] text-gray-400 uppercase tracking-widest">Proposal</span>
                                     </div>
-                                    <!-- Section 2 -->
-                                    <div class="space-y-2 pt-2">
-                                        <div class="h-2 bg-gray-200 rounded w-2/5"></div>
-                                        <div class="h-2 bg-gray-100 rounded w-full"></div>
-                                        <div class="h-2 bg-gray-100 rounded w-3/4"></div>
+                                    <div id="title-block">
+                                        <p id="doc-eyebrow" class="text-[8px] uppercase tracking-widest text-gray-400 mb-1">Funding proposal • 2025</p>
+                                        <h1 id="doc-title" class="text-xl font-bold leading-tight text-gray-800">2025 Community News Initiative</h1>
+                                        <div id="title-accent" class="w-10 h-1 bg-gray-300 mt-2 rounded"></div>
                                     </div>
                                 </div>
 
-                                <!-- Budget Table Area (hidden initially) -->
-                                <div id="budget-table" class="hidden mt-4 border border-gray-200 rounded overflow-hidden">
-                                    <div class="bg-gray-800 text-white text-[8px] font-bold px-3 py-1.5 flex justify-between">
-                                        <span>Budget item</span>
-                                        <span>Amount</span>
+                                <!-- Body content -->
+                                <div id="doc-body" class="flex-1 px-6 py-4 overflow-hidden">
+                                    <!-- Executive Summary section -->
+                                    <div id="section-1" class="mb-4">
+                                        <h2 class="text-[10px] font-bold text-gray-700 mb-2 uppercase tracking-wide">Executive summary</h2>
+                                        <div class="space-y-1.5">
+                                            <div class="h-1.5 bg-gray-200 rounded w-full"></div>
+                                            <div class="h-1.5 bg-gray-200 rounded w-11/12"></div>
+                                            <div class="h-1.5 bg-gray-200 rounded w-4/5"></div>
+                                        </div>
                                     </div>
-                                    <div class="text-[8px] divide-y divide-gray-100">
-                                        <div class="px-3 py-1 flex justify-between"><span class="text-gray-600">Personnel</span><span>$85,000</span></div>
-                                        <div class="px-3 py-1 flex justify-between"><span class="text-gray-600">Operations</span><span>$45,000</span></div>
-                                        <div class="px-3 py-1 flex justify-between"><span class="text-gray-600">Technology</span><span>$20,000</span></div>
+
+                                    <!-- Project Goals section -->
+                                    <div id="section-2" class="mb-4">
+                                        <h2 class="text-[10px] font-bold text-gray-700 mb-2 uppercase tracking-wide">Project goals</h2>
+                                        <div class="space-y-1.5">
+                                            <div class="h-1.5 bg-gray-200 rounded w-full"></div>
+                                            <div class="h-1.5 bg-gray-200 rounded w-5/6"></div>
+                                        </div>
                                     </div>
-                                    <div id="budget-total" class="bg-[#CA3553] text-white text-[8px] font-bold px-3 py-1.5 flex justify-between">
-                                        <span>Total</span>
-                                        <span>$150,000</span>
+
+                                    <!-- Budget section (hidden initially) -->
+                                    <div id="budget-section" class="hidden">
+                                        <h2 class="text-[10px] font-bold text-gray-700 mb-2 uppercase tracking-wide">Budget overview</h2>
+                                        <div class="border border-gray-200 rounded overflow-hidden text-[8px]">
+                                            <div id="budget-header" class="bg-gray-800 text-white font-semibold px-2 py-1 flex">
+                                                <span class="flex-1">Category</span>
+                                                <span class="w-16 text-right">Year 1</span>
+                                                <span class="w-16 text-right">Year 2</span>
+                                            </div>
+                                            <div class="divide-y divide-gray-100 bg-white">
+                                                <div class="px-2 py-1 flex"><span class="flex-1 text-gray-600">Personnel</span><span class="w-16 text-right">$85,000</span><span class="w-16 text-right">$95,000</span></div>
+                                                <div class="px-2 py-1 flex"><span class="flex-1 text-gray-600">Operations</span><span class="w-16 text-right">$45,000</span><span class="w-16 text-right">$55,000</span></div>
+                                                <div class="px-2 py-1 flex"><span class="flex-1 text-gray-600">Technology</span><span class="w-16 text-right">$20,000</span><span class="w-16 text-right">$25,000</span></div>
+                                            </div>
+                                            <div id="budget-total" class="bg-[#CA3553] text-white font-bold px-2 py-1 flex">
+                                                <span class="flex-1">Total</span>
+                                                <span class="w-16 text-right">$150,000</span>
+                                                <span class="w-16 text-right">$175,000</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Document Footer -->
-                            <div id="doc-footer" class="h-8 border-t border-gray-200 flex items-center justify-between px-6 text-[8px] text-gray-400 bg-gray-50">
-                                <span id="footer-title">Document title</span>
-                                <span id="footer-page">Page 1</span>
+                                <!-- Footer -->
+                                <div id="doc-footer" class="px-6 py-2 border-t border-gray-200 flex items-center justify-between text-[8px] text-gray-400">
+                                    <span id="footer-org">Your Organization</span>
+                                    <span id="footer-page">Page 1 of 4</span>
+                                </div>
                             </div>
                         </div>
 
-                        <button id="start-demo" class="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg cursor-pointer hover:bg-black/40 transition-colors">
-                            <span class="bg-accent text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 shadow-lg">
+                        <button id="start-demo" class="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-lg cursor-pointer hover:bg-black/50 transition-colors">
+                            <span class="bg-accent text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 shadow-lg hover:bg-accentDark transition-colors">
                                 <i data-lucide="play" class="w-5 h-5"></i>
                                 Start demo
                             </span>
@@ -503,12 +520,14 @@ style:
         const demoInput = document.getElementById('demo-input');
         const demoBtn = document.getElementById('demo-btn');
         const docPreview = document.getElementById('doc-preview');
-        const docHeader = document.getElementById('doc-header');
-        const previewTitle = document.getElementById('preview-title');
-        const previewSubtitle = document.getElementById('preview-subtitle');
-        const previewContent = document.getElementById('preview-content');
-        const budgetTable = document.getElementById('budget-table');
-        const footerTitle = document.getElementById('footer-title');
+        const emptyState = document.getElementById('empty-state');
+        const docContent = document.getElementById('doc-content');
+        const logoBox = document.getElementById('logo-box');
+        const orgName = document.getElementById('org-name');
+        const titleAccent = document.getElementById('title-accent');
+        const budgetSection = document.getElementById('budget-section');
+        const budgetHeader = document.getElementById('budget-header');
+        const footerOrg = document.getElementById('footer-org');
         const footerPage = document.getElementById('footer-page');
 
         // Typing animation for input field
@@ -559,53 +578,38 @@ style:
 
         function updatePreview(preview) {
             // Activate the document preview
-            docPreview.classList.remove('opacity-30');
+            docPreview.classList.remove('opacity-40');
             docPreview.classList.add('opacity-100');
 
-            // Update header with brand color
-            docHeader.className = 'h-16 bg-gradient-to-r from-[#CA3553] to-[#a82a44] flex items-center justify-between px-6 border-b border-[#CA3553]/20';
-            const logoBox = docHeader.querySelector('div > div:first-child');
-            if (logoBox) logoBox.className = 'w-8 h-8 rounded bg-white/20';
-            const logoText = docHeader.querySelector('div > div:last-child');
-            if (logoText) logoText.className = 'h-3 w-20 bg-white/30 rounded';
-            const docType = docHeader.querySelector(':scope > div:last-child');
-            if (docType) {
-                docType.className = 'text-[8px] text-white/80 uppercase tracking-wide font-semibold';
-                docType.textContent = 'Funding Proposal';
-            }
-
-            // Update title area
-            previewTitle.textContent = preview.title;
-            previewTitle.className = 'text-lg font-bold text-gray-800 leading-tight';
-            previewSubtitle.textContent = preview.subtitle;
-            previewSubtitle.className = 'text-xs text-gray-500 mt-1';
-
-            // Update content based on stage
-            previewContent.classList.remove('opacity-50');
+            // Hide empty state, show document
+            emptyState.classList.add('hidden');
+            docContent.classList.remove('hidden');
 
             if (preview.style === 'accent') {
-                // Initial document created - show styled content
-                previewContent.querySelectorAll('div > div:first-child').forEach(el => {
-                    el.style.backgroundColor = '#CA3553';
-                });
-                budgetTable.classList.add('hidden');
-                footerTitle.textContent = preview.title;
+                // Initial document created - apply brand colors
+                logoBox.className = 'w-6 h-6 rounded bg-[#CA3553]';
+                orgName.className = 'text-[9px] font-semibold text-[#CA3553] tracking-wide';
+                orgName.textContent = 'NEWS COMMONS';
+                titleAccent.className = 'w-10 h-1 bg-[#CA3553] mt-2 rounded';
+                budgetHeader.className = 'bg-black text-white font-semibold px-2 py-1 flex';
+                footerOrg.textContent = 'NJ News Commons';
+                footerPage.textContent = 'Page 1 of 4';
             }
             else if (preview.style === 'complete') {
-                // Budget table added
-                budgetTable.classList.remove('hidden');
-                footerPage.textContent = 'Page 3';
+                // Budget table added - show budget section
+                budgetSection.classList.remove('hidden');
+                footerPage.textContent = 'Page 3 of 4';
             }
             else if (preview.style === 'final') {
-                // Preview mode - add visual indicator
-                docPreview.style.boxShadow = '0 0 0 3px rgba(202, 53, 83, 0.3), 0 25px 50px -12px rgba(0, 0, 0, 0.25)';
+                // Preview mode - add visual glow and ready indicator
+                docPreview.style.boxShadow = '0 0 0 3px rgba(34, 197, 94, 0.4), 0 25px 50px -12px rgba(0, 0, 0, 0.25)';
 
-                // Add a "ready" indicator
-                const readyBadge = document.createElement('div');
-                readyBadge.className = 'absolute -top-3 -right-3 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg';
-                readyBadge.textContent = '✓ Ready';
-                docPreview.style.position = 'relative';
-                if (!docPreview.querySelector('.absolute.-top-3')) {
+                // Add a "ready" badge
+                if (!docPreview.querySelector('.ready-badge')) {
+                    const readyBadge = document.createElement('div');
+                    readyBadge.className = 'ready-badge absolute -top-2 -right-2 bg-green-500 text-white text-[9px] font-bold px-2 py-1 rounded-full shadow-lg flex items-center gap-1';
+                    readyBadge.textContent = '✓ Ready';
+                    docPreview.style.position = 'relative';
                     docPreview.appendChild(readyBadge);
                 }
             }
@@ -616,11 +620,18 @@ style:
             chatMessages.textContent = '';
 
             // Reset preview state
-            docPreview.classList.add('opacity-30');
+            docPreview.classList.remove('opacity-100');
+            docPreview.classList.add('opacity-40');
             docPreview.style.boxShadow = '';
-            budgetTable.classList.add('hidden');
-            footerPage.textContent = 'Page 1';
-            const existingBadge = docPreview.querySelector('.absolute.-top-3');
+            emptyState.classList.remove('hidden');
+            docContent.classList.add('hidden');
+            budgetSection.classList.add('hidden');
+            logoBox.className = 'w-6 h-6 rounded bg-gray-300';
+            orgName.className = 'text-[9px] font-semibold text-gray-400 tracking-wide';
+            orgName.textContent = 'YOUR ORG';
+            titleAccent.className = 'w-10 h-1 bg-gray-300 mt-2 rounded';
+            footerPage.textContent = 'Page 1 of 4';
+            const existingBadge = docPreview.querySelector('.ready-badge');
             if (existingBadge) existingBadge.remove();
 
             for (const msg of demoConversation) {
