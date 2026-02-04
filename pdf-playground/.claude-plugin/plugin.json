@@ -2,8 +2,8 @@
   "name": "pdf-playground",
   "version": "1.0.0",
   "description": "Interactive playground for creating and testing PDF reports and proposals",
-  "author": "Joe Amditis",
-  "skills": ["skills/*.md"],
-  "hooks": [],
-  "commands": ["commands/*"]
+  "author": {
+    "name": "Joe Amditis",
+    "email": "jamditis@gmail.com"
+  }
 }

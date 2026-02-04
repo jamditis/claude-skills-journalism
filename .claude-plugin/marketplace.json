@@ -1,0 +1,22 @@
+{
+  "name": "claude-skills-journalism",
+  "version": "1.0.0",
+  "description": "Claude Code plugins for journalism and media organizations",
+  "owner": {
+    "name": "Joe Amditis",
+    "email": "jamditis@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "pdf-playground",
+      "description": "Interactive playground for creating and testing PDF reports and proposals",
+      "version": "1.0.0",
+      "author": {
+        "name": "Joe Amditis",
+        "email": "jamditis@gmail.com"
+      },
+      "source": "./pdf-playground",
+      "category": "Productivity"
+    }
+  ]
+}
