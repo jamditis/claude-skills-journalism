@@ -25,7 +25,7 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 
 | Plugin | Description | Commands |
 |--------|-------------|----------|
-| [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` |
+| [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials with an interactive control panel for live design editing (colors, fonts, spacing, sections) and a guided wizard for proposals | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` |
 
 ### Skills (manual installation)
 
@@ -73,7 +73,7 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 
 | Skill | Description |
 |-------|-------------|
-| [pdf-design](./pdf-design/) | Professional PDF reports and proposals with interactive editing, CCM brand system, budget tables, multi-page layouts |
+| [pdf-design](./pdf-design/) | Professional PDF reports and proposals with brand system, budget tables, and multi-page layouts. For the full interactive experience, use [pdf-playground](./pdf-playground/) instead |
 
 ### Writing quality
 
