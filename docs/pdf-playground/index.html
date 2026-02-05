@@ -416,42 +416,72 @@ style:
         <!-- Installation -->
         <section id="install" class="py-24 px-6">
             <div class="max-w-4xl mx-auto">
-                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-16">Get started</h2>
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-6">Get started</h2>
+                <p class="text-center text-mist text-lg mb-16 max-w-2xl mx-auto">
+                    You need <strong><a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accent hover:underline">Claude Code</a></strong> installed on your computer.
+                    Open your terminal and run <code>claude --version</code> to check. If you get "command not found," <a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accent hover:underline">install Claude Code first</a>.
+                </p>
 
                 <div class="space-y-8">
                     <div class="feature-card p-8 rounded-xl">
                         <div class="flex items-center gap-4 mb-4">
                             <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">1</span>
-                            <h3 class="font-display text-xl font-bold">Clone the repository</h3>
+                            <h3 class="font-display text-xl font-bold">Add the plugin source</h3>
                         </div>
-                        <pre><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
+                        <p class="text-mist mb-4">Open your terminal and run this command exactly as shown. This tells Claude Code where to find the plugin (you only need to do this once).</p>
+                        <pre><code>claude plugin marketplace add https://github.com/jamditis/claude-skills-journalism</code></pre>
                     </div>
 
                     <div class="feature-card p-8 rounded-xl">
                         <div class="flex items-center gap-4 mb-4">
                             <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">2</span>
-                            <h3 class="font-display text-xl font-bold">Run Claude Code with the plugin</h3>
+                            <h3 class="font-display text-xl font-bold">Install the plugin</h3>
                         </div>
-                        <pre><code>cc --plugin-dir /path/to/claude-skills-journalism/pdf-playground</code></pre>
+                        <p class="text-mist mb-4">Run this command to download and install PDF Playground. Type the whole thing as one line, no spaces around the <code>@</code> sign.</p>
+                        <pre><code>claude plugin install pdf-playground@claude-skills-journalism</code></pre>
                     </div>
 
                     <div class="feature-card p-8 rounded-xl">
                         <div class="flex items-center gap-4 mb-4">
                             <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">3</span>
-                            <h3 class="font-display text-xl font-bold">Configure your brand (optional)</h3>
+                            <h3 class="font-display text-xl font-bold">Restart Claude Code</h3>
                         </div>
-                        <p class="text-mist mb-4">Create <code>.claude/pdf-playground.local.md</code> in your project with your brand settings.</p>
-                        <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-playground/brands" class="text-accent font-semibold hover:underline">
-                            See example brand configs →
-                        </a>
+                        <p class="text-mist">Close your Claude Code session and open a new one. The plugin loads when Claude Code starts, so you need a fresh session. After that, you're ready — type <code>/pdf-playground:proposal</code> to create your first document.</p>
                     </div>
 
-                    <div class="feature-card p-8 rounded-xl">
+                    <div class="feature-card p-8 rounded-xl border-2 border-dashed border-ink/10">
                         <div class="flex items-center gap-4 mb-4">
-                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">4</span>
-                            <h3 class="font-display text-xl font-bold">Create documents</h3>
+                            <span class="w-8 h-8 bg-clay text-ink rounded-full flex items-center justify-center font-bold text-sm">+</span>
+                            <h3 class="font-display text-xl font-bold">Configure your brand (optional)</h3>
                         </div>
-                        <p class="text-mist">Use commands like <code>/proposal</code>, <code>/report</code>, or <code>/onepager</code> to generate documents.</p>
+                        <p class="text-mist mb-4">By default, documents use generic styling. To add your organization's name, colors, and fonts, the easiest way is to tell Claude Code:</p>
+                        <div class="bg-ink/5 border border-ink/10 rounded-lg p-4 mb-4">
+                            <p class="text-sm italic text-ink/80">"Create a brand config for PDF Playground. My organization is called [your org name] and our main color is [your color]."</p>
+                        </div>
+                        <p class="text-mist text-sm mb-4">Claude will create the config file in the right place. Or you can create the file manually — see the <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-playground#customizing-your-brand-optional" class="text-accent font-semibold hover:underline">full setup guide</a> for details.</p>
+                    </div>
+                </div>
+
+                <!-- Troubleshooting -->
+                <div class="mt-16">
+                    <h3 class="font-display text-2xl font-bold mb-6">Something not working?</h3>
+                    <div class="space-y-4">
+                        <details class="feature-card rounded-xl overflow-hidden">
+                            <summary class="p-6 cursor-pointer hover:bg-ink/5 transition-colors font-semibold">"command not found" when running <code>claude</code></summary>
+                            <div class="px-6 pb-6 text-mist text-sm">Claude Code isn't installed yet. Follow the <a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accent hover:underline">installation guide</a>, then come back here.</div>
+                        </details>
+                        <details class="feature-card rounded-xl overflow-hidden">
+                            <summary class="p-6 cursor-pointer hover:bg-ink/5 transition-colors font-semibold">The install command gives an error</summary>
+                            <div class="px-6 pb-6 text-mist text-sm">Make sure step 1 completed without errors first. If you see a message about the marketplace not being found, re-run the <code>claude plugin marketplace add</code> command. Check that the URL is typed exactly — no extra spaces or missing letters.</div>
+                        </details>
+                        <details class="feature-card rounded-xl overflow-hidden">
+                            <summary class="p-6 cursor-pointer hover:bg-ink/5 transition-colors font-semibold">Plugin installed but commands don't show up</summary>
+                            <div class="px-6 pb-6 text-mist text-sm">Did you restart Claude Code? Close your current session and open a new one. The plugin loads at startup, so it won't appear until you start a fresh session.</div>
+                        </details>
+                        <details class="feature-card rounded-xl overflow-hidden">
+                            <summary class="p-6 cursor-pointer hover:bg-ink/5 transition-colors font-semibold">Documents look generic (no branding)</summary>
+                            <div class="px-6 pb-6 text-mist text-sm">That's normal if you haven't set up a brand config. Inside Claude Code, just say: "Create a brand config for PDF Playground for [your org name]" and Claude will create it for you.</div>
+                        </details>
                     </div>
                 </div>
             </div>

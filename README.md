@@ -8,35 +8,36 @@ Skills are modular instruction sets that extend Claude's capabilities for specia
 
 ## Installation
 
+**Prerequisite:** You need [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) installed. Run `claude --version` in your terminal to check.
+
 ### Plugins (recommended)
 
-This repo includes full Claude Code plugins that can be installed via the plugin marketplace:
+Plugins give you slash commands you can run directly inside Claude Code. Run these two commands in your terminal:
 
-```bash
-# Add this repo as a plugin marketplace
-claude plugin marketplace add https://github.com/jamditis/claude-skills-journalism
-
-# Install the pdf-playground plugin
-claude plugin install pdf-playground@claude-skills-journalism
-
-# Restart Claude Code to load the plugin
 ```
+claude plugin marketplace add https://github.com/jamditis/claude-skills-journalism
+claude plugin install pdf-playground@claude-skills-journalism
+```
+
+Then restart Claude Code (close and reopen). See the [PDF Playground README](./pdf-playground/) for detailed setup instructions and troubleshooting.
 
 **Available plugins:**
 
 | Plugin | Description | Commands |
 |--------|-------------|----------|
-| [pdf-playground](./pdf-playground/) | Interactive PDF report and proposal design | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` |
+| [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` |
 
 ### Skills (manual installation)
 
-For individual skills without the plugin system:
+Skills load automatically when relevant to your work. To install them, clone this repo into your Claude skills directory:
 
-```bash
-# Clone to your Claude skills directory
+```
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/.claude/skills/journalism-skills
+```
 
-# Or install individual skills
+Or copy individual skills:
+
+```
 cp -r source-verification ~/.claude/skills/
 ```
 

@@ -760,15 +760,34 @@
                     <span class="section-label">Get Started</span>
                 </div>
 
+                <p class="text-mist mb-8">You need <strong><a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accent hover:underline">Claude Code</a></strong> installed. Run <code class="bg-ink/5 px-2 py-0.5 rounded text-sm">claude --version</code> in your terminal to check.</p>
+
+                <!-- Plugins (recommended) -->
+                <div class="deckle-card-solid p-8 mb-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-[9px] font-bold tracking-widest text-white uppercase bg-accent px-2 py-1">Recommended</span>
+                        <h3 class="font-display text-xl font-bold">Install as a plugin</h3>
+                    </div>
+                    <p class="text-sm text-mist mb-4">Plugins give you slash commands inside Claude Code. Run these two commands in your terminal:</p>
+                    <div class="bg-ink text-canvas p-6 font-mono text-sm mb-4 overflow-x-auto space-y-1">
+                        <div>claude plugin marketplace add https://github.com/jamditis/claude-skills-journalism</div>
+                        <div>claude plugin install pdf-playground@claude-skills-journalism</div>
+                    </div>
+                    <p class="text-sm text-mist">Then restart Claude Code (close and reopen). See the <a href="pdf-playground/" class="text-accent font-semibold hover:underline">PDF Playground page</a> for detailed instructions, troubleshooting, and brand setup.</p>
+                </div>
+
+                <!-- Skills (manual) -->
                 <div class="deckle-card p-8">
-                    <h3 class="font-display text-xl font-bold mb-4">For Claude Code users</h3>
-                    <div class="bg-ink text-canvas p-6 font-mono text-sm mb-6 overflow-x-auto">
-                        <div class="text-mist mb-2"># Clone to your Claude skills directory</div>
+                    <h3 class="font-display text-xl font-bold mb-4">Install individual skills</h3>
+                    <p class="text-sm text-mist mb-4">Skills load automatically when relevant to your work. Clone the full collection to your Claude skills directory:</p>
+                    <div class="bg-ink text-canvas p-6 font-mono text-sm mb-4 overflow-x-auto space-y-1">
                         <div>git clone https://github.com/jamditis/claude-skills-journalism.git ~/.claude/skills/journalism-skills</div>
-                        <div class="text-mist mt-4 mb-2"># Or install individual skills</div>
+                    </div>
+                    <p class="text-sm text-mist">Or copy just the skills you want:</p>
+                    <div class="bg-ink text-canvas p-6 font-mono text-sm mb-4 overflow-x-auto space-y-1">
                         <div>cp -r source-verification ~/.claude/skills/</div>
                     </div>
-                    <p class="text-sm text-mist">Skills load automatically when relevant to your work. For example, asking Claude to verify a source will activate the source-verification skill.</p>
+                    <p class="text-sm text-mist">Skills activate automatically. For example, asking Claude to verify a source will use the source-verification skill.</p>
                 </div>
             </section>
 
