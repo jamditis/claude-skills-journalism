@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-02-05
+
+Rewrote installation docs based on user feedback. The GitHub Pages site had a broken install command (`cc --plugin-dir`) that never worked, and the instructions assumed too much prior knowledge of Claude Code and the terminal.
+
+### Fixed
+- Replaced broken `cc --plugin-dir /path/to/...` command on the PDF Playground page with the correct `claude plugin marketplace add` workflow
+- Synced installation instructions across all four documentation surfaces (pdf-playground README, pdf-playground page, main site, tools repo)
+
+### Changed
+- Rewrote `pdf-playground/README.md` for beginners: added prerequisites, step-by-step explanations, and a troubleshooting section
+- Rewrote the "Get started" section on the PDF Playground GitHub Pages site with correct commands, plain-language explanations, and a collapsible troubleshooting FAQ
+- Updated the main site install section to show the plugin approach (recommended) alongside manual skills installation
+- Made brand configuration clearly optional with an "ask Claude to create it" shortcut
+- Reduced minimum brand config from 20+ lines to 3 lines (name + color)
+
+---
+
 ## [1.0.0] - 2026-02-04
 
 First stable release with 34 skills, 13 hooks, and full GitHub Pages documentation.
@@ -147,6 +164,7 @@ Initial commit with foundational skills.
 
 ---
 
+[1.0.1]: https://github.com/jamditis/claude-skills-journalism/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/jamditis/claude-skills-journalism/releases/tag/v1.0.0
 [0.9.0]: https://github.com/jamditis/claude-skills-journalism/compare/a8dc4ff...4a9ed8d
 [0.8.0]: https://github.com/jamditis/claude-skills-journalism/compare/43a5558...a8dc4ff
