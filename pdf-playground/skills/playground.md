@@ -124,6 +124,9 @@ Claude: [Saves file, cleans up server]
 
 ## Technical details
 
+### Version
+The current version is 1.1.1. To check your installed version, run `/pdf-playground:update`. To update, run `claude plugin update pdf-playground@claude-skills-journalism` in your terminal.
+
 ### Preview system
 - Uses a local HTTP server (Python) to serve HTML files
 - A wrapper page (`playground-wrapper.html`) loads your document in an iframe alongside the control panel sidebar

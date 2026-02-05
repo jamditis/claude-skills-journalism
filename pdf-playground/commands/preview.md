@@ -14,6 +14,22 @@ Launch an interactive preview session for iterating on a document design.
 4. Set up the playground wrapper and controls
 5. Open the wrapper in the Playwright browser
 
+## Pre-flight check
+
+Before proceeding, verify the control panel files exist:
+
+1. Check if the controls directory exists:
+   ```bash
+   ls "${CLAUDE_PLUGIN_ROOT}/controls/control-panel.js" 2>/dev/null && echo "OK" || echo "MISSING"
+   ```
+2. If MISSING, tell the user:
+   > Your PDF Playground plugin is outdated and missing the interactive control panel.
+   > Run this command to update, then restart Claude Code:
+   > ```
+   > claude plugin update pdf-playground@claude-skills-journalism
+   > ```
+   Then STOP — do not continue with the preview workflow.
+
 ## Preview workflow
 
 **Step 1: Start local server**

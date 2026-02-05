@@ -6,6 +6,10 @@ allowed-tools: Read, Write, Edit, Glob, mcp__plugin_playwright_playwright__*
 
 Create a print-ready HTML program report document.
 
+## Version check
+
+Read the plugin version from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` and note it. If the file doesn't exist or the read fails, warn the user that the plugin may not be properly installed.
+
 ## Setup
 
 1. Check for brand configuration at `.claude/pdf-playground.local.md`

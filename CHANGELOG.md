@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-02-05
+
+Update awareness and version checking for PDF Playground.
+
+### Added
+- **`/pdf-playground:update` command** — checks the installed version and runs the update
+- **Pre-flight check in preview** — verifies control panel files exist before starting; warns if the plugin is outdated
+- **Version check in all document commands** — reads `plugin.json` at startup to detect installation problems
+- **Updating section in README** — instructions for updating the plugin and signs you need an update
+
+### Changed
+- Bumped `plugin.json` version from 1.0.0 to 1.1.1
+- Bumped `marketplace.json` version from 1.0.0 to 1.1.1
+- Added version info to `playground.md` skill
+
+---
+
 ## [1.1.0] - 2026-02-05
 
 Interactive control panel and guided wizard for PDF Playground.
@@ -206,6 +223,7 @@ Initial commit with foundational skills.
 
 ---
 
+[1.1.1]: https://github.com/jamditis/claude-skills-journalism/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.0.0...v1.1.0
 [1.0.1]: https://github.com/jamditis/claude-skills-journalism/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/jamditis/claude-skills-journalism/releases/tag/v1.0.0

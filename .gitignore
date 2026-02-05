@@ -23,3 +23,7 @@ node_modules/
 # Temporary files
 *.tmp
 *.bak
+
+# Screenshots from playground testing
+*.png
+*.jpeg

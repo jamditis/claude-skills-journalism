@@ -53,6 +53,27 @@ That's it — you can start creating documents now. Brand customization (below) 
 
 ---
 
+## Updating
+
+To get the latest features and fixes:
+
+```
+claude plugin update pdf-playground@claude-skills-journalism
+```
+
+Then restart Claude Code (close and reopen).
+
+You can also run `/pdf-playground:update` inside Claude Code to check your version and update automatically.
+
+### How to tell if you need an update
+
+If you see any of these, you probably need to update:
+- The preview opens without a control panel sidebar
+- Commands reference features that don't seem to work
+- Claude mentions your plugin version is outdated
+
+---
+
 ## Creating documents
 
 Once the plugin is installed, open Claude Code and type any of these commands:
