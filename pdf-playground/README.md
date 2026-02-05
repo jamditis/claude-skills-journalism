@@ -78,6 +78,44 @@ After Claude generates your document, it saves an HTML file in your current fold
 
 ---
 
+## Guided wizard (proposals)
+
+The proposal command (`/pdf-playground:proposal`) includes a step-by-step wizard that walks you through setup:
+
+**Phase 1 — Content:** Choose the proposal type, sections to include, page count, and budget line items. Each question appears as a multiple-choice prompt you can click through.
+
+**Phase 2 — Design:** Pick a color scheme, typography style, and visual style. Presets are available (brand colors, professional blue, bold red/black) or go fully custom.
+
+**Phase 3 — Review:** The proposal generates and opens in a live preview with an interactive control panel on the right side. You can tweak colors, fonts, spacing, and toggle sections on or off in real time. Click "Copy all changes" in the panel, paste the prompt back into the conversation, and the changes get applied to the HTML source.
+
+**Phase 4 — Finalization:** Save the file, get PDF export instructions, or go back for more tweaks.
+
+The wizard is currently available for proposals. Other templates will get wizard support in future updates.
+
+---
+
+## Interactive control panel
+
+When you use `/pdf-playground:preview` to open a document, a wrapper page opens with your document in an iframe on the left and a control panel sidebar on the right. The panel includes:
+
+- **Presets** — One-click theme buttons (CCM brand, Professional blue, Modern green, Warm earth, Elegant purple) that apply coordinated colors and fonts
+- **Colors** — Color pickers for all CSS variables (primary, dark, text, background, accent)
+- **Typography** — Font dropdowns (heading and body) with Google Fonts, plus sliders for body size, heading scale, and line height
+- **Spacing** — Slider for page padding
+- **Sections** — Toggles to show or hide individual content blocks (stat grid, case studies, budget table, etc.)
+- **Layout** — Button groups for stat columns, dropdown for heading case
+- **Undo/Redo** — Step backward and forward through your changes
+
+Every change you make applies instantly in the preview. A "Pending changes" list at the bottom tracks your adjustments. When you're ready, click **Copy changes** — it puts a formatted prompt on your clipboard that you can paste back into the conversation. Claude applies those changes to the actual HTML source file.
+
+The panel collapses to a thin sidebar tab when you don't need it. It's hidden during print, so it won't appear if you print to PDF. Your document HTML stays completely unchanged — the controls live in the wrapper page, separate from your document.
+
+### Adding control panel support for other templates
+
+The control panel is driven by template maps — data files that describe which CSS variables, selectors, and sections exist in each template. Currently only the proposal template has a map. To add support for another template, create a new map file in `controls/template-maps/`. See the README in that directory for the format.
+
+---
+
 ## Customizing your brand (optional)
 
 By default, PDF Playground uses generic styling. To use your organization's colors, fonts, and name, you create a small config file.
