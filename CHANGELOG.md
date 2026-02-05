@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-02-05
+
+Interactive control panel and guided wizard for PDF Playground.
+
+### Added
+- **Interactive control panel** — a sidebar that sits alongside your document for live design editing
+  - 5 color theme presets (CCM brand, Professional blue, Modern green, Warm earth, Elegant purple)
+  - 7 color pickers for CSS variables (primary, dark, text, heading, background, accent, gray)
+  - Font dropdowns for heading and body (any Google Font, loaded dynamically)
+  - Sliders for body font size, heading scale, line height, and page padding
+  - Toggles to show/hide sections (stat grid, highlight boxes, case studies, budget table, mission block)
+  - Layout controls (stat columns 2/3/4, heading case)
+  - Undo/redo for all changes
+  - "Copy changes" button generates a prompt you can paste back into Claude Code
+  - Collapsible sidebar with vertical tab when minimized
+- **Iframe-based preview architecture** — document lives in an iframe, controls in a wrapper page
+  - Scales with browser window via CSS `clamp()` and flexbox
+  - No script injection needed — the wrapper handles everything
+  - Document HTML stays completely unchanged for clean PDF export
+  - No re-injection after page refresh
+- **Guided proposal wizard** — AskUserQuestion-driven setup with 4 phases
+  - Phase 1 (Content): proposal type, sections, page count, budget items
+  - Phase 2 (Design): color scheme, typography, visual style
+  - Phase 3 (Review): live preview with control panel, screenshot, iterate
+  - Phase 4 (Finalization): save, export, or continue editing
+- **Prompt generator** — tracks changes and generates copyable prompts
+  - Deduplicates by type+label (same slider moved twice = one change)
+  - Skips no-op changes (e.g. background #ffffff to #ffffff)
+  - Generates numbered lists for multiple changes
+- **Template map system** — data-driven control panel configuration
+  - `proposal.js` maps all CSS variables and selectors for the proposal template
+  - New templates just need a map file (see `controls/template-maps/README.md`)
+- New files: `controls/control-panel.js`, `controls/control-panel.css`, `controls/playground-wrapper.html`, `controls/prompt-generator.js`, `controls/template-maps/proposal.js`, `controls/template-maps/README.md`
+
+### Changed
+- Rewrote `commands/preview.md` for the wrapper approach (no more script injection)
+- Updated `commands/proposal.md` with the full AskUserQuestion wizard
+- Updated `skills/playground.md` with new architecture docs and preset list
+- Updated `pdf-playground/README.md` with control panel and wrapper docs
+
+---
+
 ## [1.0.1] - 2026-02-05
 
 Rewrote installation docs based on user feedback. The GitHub Pages site had a broken install command (`cc --plugin-dir`) that never worked, and the instructions assumed too much prior knowledge of Claude Code and the terminal.
@@ -164,6 +206,7 @@ Initial commit with foundational skills.
 
 ---
 
+[1.1.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.0.0...v1.1.0
 [1.0.1]: https://github.com/jamditis/claude-skills-journalism/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/jamditis/claude-skills-journalism/releases/tag/v1.0.0
 [0.9.0]: https://github.com/jamditis/claude-skills-journalism/compare/a8dc4ff...4a9ed8d

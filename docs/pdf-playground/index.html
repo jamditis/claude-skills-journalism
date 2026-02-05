@@ -232,7 +232,7 @@
                 <div class="text-center mb-16">
                     <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">See it in action</h2>
                     <p class="text-lg text-white/70 max-w-2xl mx-auto">
-                        PDF Playground works through natural conversation. Describe what you need, iterate with feedback, and export when ready.
+                        A guided wizard walks you through setup, then you fine-tune the design live with an interactive control panel.
                     </p>
                 </div>
 
@@ -246,7 +246,7 @@
                             <span class="ml-3 text-white/50 text-sm font-mono">claude</span>
                         </div>
 
-                        <div id="chat-messages" class="p-4 space-y-4 h-[420px] overflow-y-auto">
+                        <div id="chat-messages" class="p-4 space-y-4 h-[480px] overflow-y-auto">
                             <!-- Messages will be inserted here -->
                         </div>
 
@@ -259,91 +259,158 @@
                                     Send
                                 </button>
                             </div>
-                            <p class="text-white/40 text-xs mt-2">Demo mode — press "Start demo" to see the workflow</p>
+                            <p class="text-white/40 text-xs mt-2">Demo mode — press "Start demo" to see the full workflow</p>
                         </div>
                     </div>
 
-                    <!-- Document Preview -->
+                    <!-- Preview Area -->
                     <div class="relative">
-                        <div id="doc-preview" class="doc-preview aspect-[8.5/11] w-full max-w-sm mx-auto transition-all duration-500 opacity-40 overflow-hidden text-gray-800">
-                            <!-- Initial empty state -->
-                            <div id="empty-state" class="h-full flex flex-col items-center justify-center text-gray-400 p-8">
-                                <i data-lucide="file-text" class="w-16 h-16 mb-4 opacity-30"></i>
-                                <p class="text-sm font-medium">Document preview</p>
-                                <p class="text-xs opacity-60">Start the demo to see it build</p>
-                            </div>
-
-                            <!-- Actual document content (hidden initially) -->
-                            <div id="doc-content" class="hidden h-full flex flex-col">
-                                <!-- Cover/Header area -->
-                                <div id="doc-header" class="px-6 pt-6 pb-4">
-                                    <div class="flex items-center justify-between mb-6">
-                                        <div class="flex items-center gap-2">
-                                            <div id="logo-box" class="w-6 h-6 rounded bg-gray-300"></div>
-                                            <span id="org-name" class="text-[9px] font-semibold text-gray-400 tracking-wide">YOUR ORG</span>
-                                        </div>
-                                        <span id="doc-type-label" class="text-[8px] text-gray-400 uppercase tracking-widest">Proposal</span>
+                        <!-- Wrapper view: iframe + control panel side by side -->
+                        <div id="preview-wrapper" class="rounded-xl overflow-hidden shadow-2xl transition-all duration-500 opacity-40">
+                            <div class="flex h-[540px]">
+                                <!-- Document iframe area -->
+                                <div id="doc-preview" class="flex-1 bg-white overflow-hidden text-gray-800">
+                                    <!-- Initial empty state -->
+                                    <div id="empty-state" class="h-full flex flex-col items-center justify-center text-gray-400 p-8">
+                                        <i data-lucide="file-text" class="w-16 h-16 mb-4 opacity-30"></i>
+                                        <p class="text-sm font-medium">Document preview</p>
+                                        <p class="text-xs opacity-60">Start the demo to see it build</p>
                                     </div>
-                                    <div id="title-block">
-                                        <p id="doc-eyebrow" class="text-[8px] uppercase tracking-widest text-gray-400 mb-1">Funding proposal • 2025</p>
-                                        <h1 id="doc-title" class="text-xl font-bold leading-tight text-gray-800">2025 Community News Initiative</h1>
-                                        <div id="title-accent" class="w-10 h-1 bg-gray-300 mt-2 rounded"></div>
+
+                                    <!-- Document content (hidden initially) -->
+                                    <div id="doc-content" class="hidden h-full flex flex-col">
+                                        <div id="doc-header" class="px-5 pt-5 pb-3">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center gap-2">
+                                                    <div id="logo-box" class="w-5 h-5 rounded bg-gray-300"></div>
+                                                    <span id="org-name" class="text-[8px] font-semibold text-gray-400 tracking-wide">YOUR ORG</span>
+                                                </div>
+                                                <span id="doc-type-label" class="text-[7px] text-gray-400 uppercase tracking-widest">Proposal</span>
+                                            </div>
+                                            <div id="title-block">
+                                                <p id="doc-eyebrow" class="text-[7px] uppercase tracking-widest text-gray-400 mb-1">Funding proposal</p>
+                                                <h1 id="doc-title" class="text-lg font-bold leading-tight text-gray-800">AI for newsrooms</h1>
+                                                <div id="title-accent" class="w-8 h-0.5 bg-gray-300 mt-1.5 rounded"></div>
+                                            </div>
+                                        </div>
+
+                                        <div id="doc-body" class="flex-1 px-5 py-3 overflow-hidden">
+                                            <!-- Stat grid -->
+                                            <div id="stat-grid" class="grid grid-cols-3 gap-2 mb-3">
+                                                <div class="text-center">
+                                                    <div id="stat-1" class="text-base font-bold text-gray-700">330+</div>
+                                                    <div class="text-[6px] text-gray-400">Newsrooms</div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <div id="stat-2" class="text-base font-bold text-gray-700">78%</div>
+                                                    <div class="text-[6px] text-gray-400">Need training</div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <div id="stat-3" class="text-base font-bold text-gray-700">12</div>
+                                                    <div class="text-[6px] text-gray-400">Pilot cohort</div>
+                                                </div>
+                                            </div>
+                                            <div id="section-1" class="mb-3">
+                                                <h2 class="text-[9px] font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Background</h2>
+                                                <div class="space-y-1">
+                                                    <div class="h-1 bg-gray-200 rounded w-full"></div>
+                                                    <div class="h-1 bg-gray-200 rounded w-11/12"></div>
+                                                    <div class="h-1 bg-gray-200 rounded w-4/5"></div>
+                                                </div>
+                                            </div>
+                                            <div id="section-2" class="mb-3">
+                                                <h2 class="text-[9px] font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Proposed work</h2>
+                                                <div class="space-y-1">
+                                                    <div class="h-1 bg-gray-200 rounded w-full"></div>
+                                                    <div class="h-1 bg-gray-200 rounded w-5/6"></div>
+                                                </div>
+                                            </div>
+                                            <div id="budget-section" class="hidden">
+                                                <h2 class="text-[9px] font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Budget</h2>
+                                                <div class="border border-gray-200 rounded overflow-hidden text-[7px]">
+                                                    <div id="budget-header" class="bg-gray-800 text-white font-semibold px-1.5 py-0.5 flex">
+                                                        <span class="flex-1">Item</span>
+                                                        <span class="w-12 text-right">Year 1</span>
+                                                        <span class="w-12 text-right">Year 2</span>
+                                                    </div>
+                                                    <div class="divide-y divide-gray-100">
+                                                        <div class="px-1.5 py-0.5 flex"><span class="flex-1 text-gray-500">Personnel</span><span class="w-12 text-right">$85K</span><span class="w-12 text-right">$95K</span></div>
+                                                        <div class="px-1.5 py-0.5 flex"><span class="flex-1 text-gray-500">Technology</span><span class="w-12 text-right">$20K</span><span class="w-12 text-right">$25K</span></div>
+                                                        <div class="px-1.5 py-0.5 flex"><span class="flex-1 text-gray-500">Training</span><span class="w-12 text-right">$45K</span><span class="w-12 text-right">$55K</span></div>
+                                                    </div>
+                                                    <div id="budget-total" class="bg-[#CA3553] text-white font-bold px-1.5 py-0.5 flex">
+                                                        <span class="flex-1">Total</span>
+                                                        <span class="w-12 text-right">$150K</span>
+                                                        <span class="w-12 text-right">$175K</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="doc-footer" class="px-5 py-1.5 border-t border-gray-200 flex items-center justify-between text-[7px] text-gray-400">
+                                            <span id="footer-org">Your Organization</span>
+                                            <span id="footer-page">1</span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- Body content -->
-                                <div id="doc-body" class="flex-1 px-6 py-4 overflow-hidden">
-                                    <!-- Executive Summary section -->
-                                    <div id="section-1" class="mb-4">
-                                        <h2 class="text-[10px] font-bold text-gray-700 mb-2 uppercase tracking-wide">Executive summary</h2>
-                                        <div class="space-y-1.5">
-                                            <div class="h-1.5 bg-gray-200 rounded w-full"></div>
-                                            <div class="h-1.5 bg-gray-200 rounded w-11/12"></div>
-                                            <div class="h-1.5 bg-gray-200 rounded w-4/5"></div>
-                                        </div>
+                                <!-- Control panel sidebar (hidden initially) -->
+                                <div id="control-panel" class="hidden w-[180px] flex-shrink-0 bg-[#1e1e2e] text-[#cdd6f4] text-[9px] flex flex-col border-l border-[#313244]">
+                                    <div class="px-2 py-2 bg-[#181825] border-b border-[#313244] flex items-center justify-between">
+                                        <span class="text-[10px] font-bold text-[#cba6f7]">PDF Playground</span>
                                     </div>
-
-                                    <!-- Project Goals section -->
-                                    <div id="section-2" class="mb-4">
-                                        <h2 class="text-[10px] font-bold text-gray-700 mb-2 uppercase tracking-wide">Project goals</h2>
-                                        <div class="space-y-1.5">
-                                            <div class="h-1.5 bg-gray-200 rounded w-full"></div>
-                                            <div class="h-1.5 bg-gray-200 rounded w-5/6"></div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Budget section (hidden initially) -->
-                                    <div id="budget-section" class="hidden">
-                                        <h2 class="text-[10px] font-bold text-gray-700 mb-2 uppercase tracking-wide">Budget overview</h2>
-                                        <div class="border border-gray-200 rounded overflow-hidden text-[8px]">
-                                            <div id="budget-header" class="bg-gray-800 text-white font-semibold px-2 py-1 flex">
-                                                <span class="flex-1">Category</span>
-                                                <span class="w-16 text-right">Year 1</span>
-                                                <span class="w-16 text-right">Year 2</span>
-                                            </div>
-                                            <div class="divide-y divide-gray-100 bg-white">
-                                                <div class="px-2 py-1 flex"><span class="flex-1 text-gray-600">Personnel</span><span class="w-16 text-right">$85,000</span><span class="w-16 text-right">$95,000</span></div>
-                                                <div class="px-2 py-1 flex"><span class="flex-1 text-gray-600">Operations</span><span class="w-16 text-right">$45,000</span><span class="w-16 text-right">$55,000</span></div>
-                                                <div class="px-2 py-1 flex"><span class="flex-1 text-gray-600">Technology</span><span class="w-16 text-right">$20,000</span><span class="w-16 text-right">$25,000</span></div>
-                                            </div>
-                                            <div id="budget-total" class="bg-[#CA3553] text-white font-bold px-2 py-1 flex">
-                                                <span class="flex-1">Total</span>
-                                                <span class="w-16 text-right">$150,000</span>
-                                                <span class="w-16 text-right">$175,000</span>
+                                    <div class="flex-1 overflow-hidden px-2 py-1.5 space-y-2">
+                                        <!-- Presets row -->
+                                        <div>
+                                            <div class="text-[8px] font-bold text-[#a6adc8] uppercase tracking-widest mb-1">Presets</div>
+                                            <div id="preset-grid" class="flex flex-wrap gap-1">
+                                                <button class="preset-btn px-1.5 py-0.5 bg-[#313244] rounded text-[7px] text-[#cdd6f4] border border-[#45475a] flex items-center gap-1 hover:border-[#cba6f7] transition-colors" data-preset="ccm"><span class="w-2 h-2 rounded-sm bg-[#CA3553] inline-block"></span>CCM</button>
+                                                <button class="preset-btn px-1.5 py-0.5 bg-[#313244] rounded text-[7px] text-[#cdd6f4] border border-[#45475a] flex items-center gap-1 hover:border-[#cba6f7] transition-colors" data-preset="blue"><span class="w-2 h-2 rounded-sm bg-[#1a5f7a] inline-block"></span>Blue</button>
+                                                <button class="preset-btn px-1.5 py-0.5 bg-[#313244] rounded text-[7px] text-[#cdd6f4] border border-[#45475a] flex items-center gap-1 hover:border-[#cba6f7] transition-colors" data-preset="green"><span class="w-2 h-2 rounded-sm bg-[#2d8659] inline-block"></span>Green</button>
+                                                <button class="preset-btn px-1.5 py-0.5 bg-[#313244] rounded text-[7px] text-[#cdd6f4] border border-[#45475a] flex items-center gap-1 hover:border-[#cba6f7] transition-colors" data-preset="earth"><span class="w-2 h-2 rounded-sm bg-[#b5651d] inline-block"></span>Earth</button>
+                                                <button class="preset-btn px-1.5 py-0.5 bg-[#313244] rounded text-[7px] text-[#cdd6f4] border border-[#45475a] flex items-center gap-1 hover:border-[#cba6f7] transition-colors" data-preset="purple"><span class="w-2 h-2 rounded-sm bg-[#6b3fa0] inline-block"></span>Purple</button>
                                             </div>
                                         </div>
+                                        <!-- Colors -->
+                                        <div>
+                                            <div class="text-[8px] font-bold text-[#a6adc8] uppercase tracking-widest mb-1">Colors</div>
+                                            <div class="space-y-1">
+                                                <div class="flex items-center justify-between"><span class="text-[#bac2de]">Primary</span><div class="flex items-center gap-1"><span id="cp-swatch" class="w-3 h-3 rounded bg-[#CA3553] border border-[#45475a]"></span><span id="cp-hex" class="text-[7px] text-[#a6adc8] font-mono">#CA3553</span></div></div>
+                                                <div class="flex items-center justify-between"><span class="text-[#bac2de]">Text</span><span class="text-[7px] text-[#a6adc8] font-mono">#2d2a28</span></div>
+                                            </div>
+                                        </div>
+                                        <!-- Typography -->
+                                        <div>
+                                            <div class="text-[8px] font-bold text-[#a6adc8] uppercase tracking-widest mb-1">Typography</div>
+                                            <div class="space-y-1">
+                                                <div class="flex items-center justify-between"><span class="text-[#bac2de]">Heading</span><span id="cp-heading-font" class="text-[7px] text-[#a6adc8]">Playfair</span></div>
+                                                <div class="flex items-center justify-between"><span class="text-[#bac2de]">Body size</span><div class="flex items-center gap-1"><div class="w-12 h-1 bg-[#45475a] rounded relative"><div id="cp-size-thumb" class="absolute w-2 h-2 bg-[#cba6f7] rounded-full -top-0.5" style="left: 30%"></div></div><span class="text-[7px] text-[#a6adc8]">11pt</span></div></div>
+                                            </div>
+                                        </div>
+                                        <!-- Sections -->
+                                        <div>
+                                            <div class="text-[8px] font-bold text-[#a6adc8] uppercase tracking-widest mb-1">Sections</div>
+                                            <div class="space-y-0.5">
+                                                <div class="flex items-center justify-between"><span class="text-[#bac2de]">Stats</span><div class="w-5 h-2.5 bg-[#cba6f7] rounded-full relative"><div class="absolute w-2 h-2 bg-[#1e1e2e] rounded-full top-[1px] right-[1px]"></div></div></div>
+                                                <div class="flex items-center justify-between"><span class="text-[#bac2de]">Budget</span><div class="w-5 h-2.5 bg-[#cba6f7] rounded-full relative"><div class="absolute w-2 h-2 bg-[#1e1e2e] rounded-full top-[1px] right-[1px]"></div></div></div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-
-                                <!-- Footer -->
-                                <div id="doc-footer" class="px-6 py-2 border-t border-gray-200 flex items-center justify-between text-[8px] text-gray-400">
-                                    <span id="footer-org">Your Organization</span>
-                                    <span id="footer-page">Page 1 of 4</span>
+                                    <!-- Footer -->
+                                    <div id="cp-footer" class="px-2 py-1.5 bg-[#181825] border-t border-[#313244]">
+                                        <div class="flex items-center gap-1 mb-1">
+                                            <span id="cp-changes-label" class="text-[8px] font-bold text-[#f9e2af] uppercase">Changes</span>
+                                            <span id="cp-changes-count" class="text-[7px] font-bold bg-[#f9e2af] text-[#1e1e2e] px-1 rounded-full">0</span>
+                                        </div>
+                                        <div class="flex gap-1">
+                                            <button id="cp-copy-btn" class="flex-1 bg-[#cba6f7] text-[#1e1e2e] text-[8px] font-semibold py-1 rounded">Copy changes</button>
+                                            <button class="bg-[#45475a] text-[#cdd6f4] text-[8px] py-1 px-2 rounded">Reset</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <button id="start-demo" class="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-lg cursor-pointer hover:bg-black/50 transition-colors">
+                        <button id="start-demo" class="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-xl cursor-pointer hover:bg-black/50 transition-colors">
                             <span class="bg-accent text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 shadow-lg hover:bg-accentDark transition-colors">
                                 <i data-lucide="play" class="w-5 h-5"></i>
                                 Start demo
@@ -531,169 +598,250 @@ style:
     <script>
         lucide.createIcons();
 
-        // Interactive demo
-        const demoConversation = [
-            { role: 'user', text: '/proposal 2025 Community News Initiative' },
-            { role: 'assistant', text: 'I\'ll create a funding proposal for the 2025 Community News Initiative. Let me check your brand configuration...' },
-            { role: 'assistant', text: 'Found your brand settings. Creating a multi-page proposal with your colors (#CA3553) and fonts (Playfair Display).' },
-            { role: 'system', text: '📄 Created: community-news-initiative-proposal.html', preview: { title: '2025 Community News Initiative', subtitle: 'Funding proposal', style: 'accent' } },
-            { role: 'user', text: 'Can you add a budget table on page 3?' },
-            { role: 'assistant', text: 'Adding a budget table to page 3. I\'ll use your brand colors for the header and total row.' },
-            { role: 'system', text: '✅ Updated: Added budget table with Year 1 and Year 2 totals.', preview: { title: '2025 Community News Initiative', subtitle: 'Funding proposal • Budget added', style: 'complete' } },
-            { role: 'user', text: '/preview' },
-            { role: 'assistant', text: 'Opening the document in the browser for preview...' },
-            { role: 'system', text: '🖥️ Preview opened. What changes would you like to make?', preview: { title: '2025 Community News Initiative', subtitle: 'Ready for PDF export', style: 'final' } },
-        ];
-
+        // Demo elements
         const chatMessages = document.getElementById('chat-messages');
         const startBtn = document.getElementById('start-demo');
         const demoInput = document.getElementById('demo-input');
         const demoBtn = document.getElementById('demo-btn');
+        const previewWrapper = document.getElementById('preview-wrapper');
         const docPreview = document.getElementById('doc-preview');
         const emptyState = document.getElementById('empty-state');
         const docContent = document.getElementById('doc-content');
+        const controlPanel = document.getElementById('control-panel');
         const logoBox = document.getElementById('logo-box');
         const orgName = document.getElementById('org-name');
         const titleAccent = document.getElementById('title-accent');
         const budgetSection = document.getElementById('budget-section');
         const budgetHeader = document.getElementById('budget-header');
+        const budgetTotal = document.getElementById('budget-total');
         const footerOrg = document.getElementById('footer-org');
         const footerPage = document.getElementById('footer-page');
+        const cpSwatch = document.getElementById('cp-swatch');
+        const cpHex = document.getElementById('cp-hex');
+        const cpHeadingFont = document.getElementById('cp-heading-font');
+        const cpChangesCount = document.getElementById('cp-changes-count');
+        const cpCopyBtn = document.getElementById('cp-copy-btn');
 
-        // Typing animation for input field
+        // Typing animation
         async function typeInInput(text) {
             demoInput.value = '';
             demoInput.classList.add('border-accent');
             for (let i = 0; i < text.length; i++) {
                 demoInput.value = text.substring(0, i + 1);
-                await new Promise(r => setTimeout(r, 35 + Math.random() * 25));
+                await new Promise(r => setTimeout(r, 30 + Math.random() * 20));
             }
             await new Promise(r => setTimeout(r, 300));
-
-            // Flash the send button
             demoBtn.classList.add('bg-accentDark', 'scale-95');
             await new Promise(r => setTimeout(r, 150));
             demoBtn.classList.remove('bg-accentDark', 'scale-95');
-
-            // Clear input after "sending"
             await new Promise(r => setTimeout(r, 100));
             demoInput.value = '';
             demoInput.classList.remove('border-accent');
         }
 
-        function createMessageElement(msg) {
+        function addMessage(role, text) {
             const div = document.createElement('div');
             const bubble = document.createElement('div');
-            const text = document.createElement('p');
-            text.className = 'text-sm';
-            text.textContent = msg.text;
+            const p = document.createElement('p');
+            p.className = 'text-sm';
+            p.textContent = text;
 
-            if (msg.role === 'user') {
+            if (role === 'user') {
                 div.className = 'flex justify-end';
                 bubble.className = 'bg-accent text-white px-4 py-2 rounded-2xl rounded-br-md max-w-[80%]';
-            } else if (msg.role === 'assistant') {
+            } else if (role === 'assistant') {
                 div.className = 'flex justify-start';
                 bubble.className = 'bg-[#252525] text-white/90 px-4 py-2 rounded-2xl rounded-bl-md max-w-[80%]';
-            } else if (msg.role === 'system') {
+            } else if (role === 'system') {
                 div.className = 'flex justify-start';
                 bubble.className = 'bg-green-900/30 text-green-400 px-4 py-2 rounded-lg max-w-[80%] border border-green-500/20';
-                text.className = 'text-sm font-mono';
-                if (msg.preview) updatePreview(msg.preview);
+                p.className = 'text-sm font-mono';
             }
 
-            bubble.appendChild(text);
+            bubble.appendChild(p);
             div.appendChild(bubble);
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
             return div;
         }
 
-        function updatePreview(preview) {
-            // Activate the document preview
-            docPreview.classList.remove('opacity-40');
-            docPreview.classList.add('opacity-100');
+        function addWizardQuestion(question, options, selectedIndex) {
+            const div = document.createElement('div');
+            div.className = 'flex justify-start';
+            const bubble = document.createElement('div');
+            bubble.className = 'bg-[#252525] text-white/90 px-4 py-3 rounded-2xl rounded-bl-md max-w-[85%]';
 
-            // Hide empty state, show document
-            emptyState.classList.add('hidden');
-            docContent.classList.remove('hidden');
+            const q = document.createElement('p');
+            q.className = 'text-sm mb-2 font-medium';
+            q.textContent = question;
+            bubble.appendChild(q);
 
-            if (preview.style === 'accent') {
-                // Initial document created - apply brand colors
-                logoBox.className = 'w-6 h-6 rounded bg-[#CA3553]';
-                orgName.className = 'text-[9px] font-semibold text-[#CA3553] tracking-wide';
-                orgName.textContent = 'NEWS COMMONS';
-                titleAccent.className = 'w-10 h-1 bg-[#CA3553] mt-2 rounded';
-                budgetHeader.className = 'bg-black text-white font-semibold px-2 py-1 flex';
-                footerOrg.textContent = 'NJ News Commons';
-                footerPage.textContent = 'Page 1 of 4';
-            }
-            else if (preview.style === 'complete') {
-                // Budget table added - show budget section
-                budgetSection.classList.remove('hidden');
-                footerPage.textContent = 'Page 3 of 4';
-            }
-            else if (preview.style === 'final') {
-                // Preview mode - add visual glow and ready indicator
-                docPreview.style.boxShadow = '0 0 0 3px rgba(34, 197, 94, 0.4), 0 25px 50px -12px rgba(0, 0, 0, 0.25)';
+            const grid = document.createElement('div');
+            grid.className = 'flex flex-wrap gap-1.5';
 
-                // Add a "ready" badge
-                if (!docPreview.querySelector('.ready-badge')) {
-                    const readyBadge = document.createElement('div');
-                    readyBadge.className = 'ready-badge absolute -top-2 -right-2 bg-green-500 text-white text-[9px] font-bold px-2 py-1 rounded-full shadow-lg flex items-center gap-1';
-                    readyBadge.textContent = '✓ Ready';
-                    docPreview.style.position = 'relative';
-                    docPreview.appendChild(readyBadge);
-                }
-            }
+            options.forEach((opt, i) => {
+                const btn = document.createElement('span');
+                btn.className = i === selectedIndex
+                    ? 'bg-accent text-white text-xs px-3 py-1.5 rounded-lg font-medium'
+                    : 'bg-[#333] text-white/60 text-xs px-3 py-1.5 rounded-lg';
+                btn.textContent = opt;
+                grid.appendChild(btn);
+            });
+
+            bubble.appendChild(grid);
+            div.appendChild(bubble);
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function applyPreset(color, hex, headingFont) {
+            // Update document
+            logoBox.style.backgroundColor = color;
+            orgName.style.color = color;
+            titleAccent.style.backgroundColor = color;
+            budgetTotal.style.backgroundColor = color;
+            document.querySelectorAll('#stat-grid div.text-base').forEach(s => s.style.color = color);
+            document.querySelectorAll('#doc-body h2').forEach(h => h.style.color = color);
+
+            // Update control panel
+            cpSwatch.style.backgroundColor = color;
+            cpHex.textContent = hex;
+            cpHeadingFont.textContent = headingFont;
+
+            // Highlight active preset
+            document.querySelectorAll('.preset-btn').forEach(b => {
+                b.style.borderColor = b.dataset.preset === hex ? '#cba6f7' : '#45475a';
+                b.style.backgroundColor = b.dataset.preset === hex ? '#45475a' : '#313244';
+            });
         }
 
         async function runDemo() {
             startBtn.style.display = 'none';
             chatMessages.textContent = '';
 
-            // Reset preview state
-            docPreview.classList.remove('opacity-100');
-            docPreview.classList.add('opacity-40');
-            docPreview.style.boxShadow = '';
+            // Reset state
+            previewWrapper.classList.remove('opacity-100');
+            previewWrapper.classList.add('opacity-40');
             emptyState.classList.remove('hidden');
             docContent.classList.add('hidden');
+            controlPanel.classList.add('hidden');
             budgetSection.classList.add('hidden');
-            logoBox.className = 'w-6 h-6 rounded bg-gray-300';
-            orgName.className = 'text-[9px] font-semibold text-gray-400 tracking-wide';
+            logoBox.style.backgroundColor = '';
+            logoBox.className = 'w-5 h-5 rounded bg-gray-300';
+            orgName.style.color = '';
             orgName.textContent = 'YOUR ORG';
-            titleAccent.className = 'w-10 h-1 bg-gray-300 mt-2 rounded';
-            footerPage.textContent = 'Page 1 of 4';
-            const existingBadge = docPreview.querySelector('.ready-badge');
-            if (existingBadge) existingBadge.remove();
+            titleAccent.style.backgroundColor = '';
+            budgetTotal.style.backgroundColor = '#CA3553';
+            footerPage.textContent = '1';
+            cpChangesCount.textContent = '0';
+            document.querySelectorAll('#stat-grid div.text-base').forEach(s => s.style.color = '');
+            document.querySelectorAll('#doc-body h2').forEach(h => h.style.color = '');
+            document.querySelectorAll('.preset-btn').forEach(b => { b.style.borderColor = '#45475a'; b.style.backgroundColor = '#313244'; });
+            cpSwatch.style.backgroundColor = '#CA3553';
+            cpHex.textContent = '#CA3553';
+            cpHeadingFont.textContent = 'Playfair';
 
-            for (const msg of demoConversation) {
-                if (msg.role === 'user') {
-                    // Type the message into the input field first
-                    await typeInInput(msg.text);
-                    await new Promise(r => setTimeout(r, 200));
-                }
+            // === Phase 1: Command ===
+            await typeInInput('/pdf-playground:proposal');
+            await new Promise(r => setTimeout(r, 400));
+            addMessage('user', '/pdf-playground:proposal');
+            await new Promise(r => setTimeout(r, 800));
 
-                // Add the message to chat
-                chatMessages.appendChild(createMessageElement(msg));
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+            addMessage('assistant', 'Starting the proposal wizard. Let me walk you through the setup.');
+            await new Promise(r => setTimeout(r, 1200));
 
-                // Delay before next message
-                if (msg.role === 'user') {
-                    await new Promise(r => setTimeout(r, 600));
-                } else if (msg.role === 'assistant') {
-                    await new Promise(r => setTimeout(r, 1400));
-                } else {
-                    await new Promise(r => setTimeout(r, 800));
-                }
-            }
+            // === Phase 1: Wizard questions ===
+            addWizardQuestion('What type of proposal is this?', ['Funding proposal', 'Partnership pitch', 'Program overview'], 0);
+            await new Promise(r => setTimeout(r, 1400));
 
-            // Show replay option after demo
+            addWizardQuestion('Which sections should be included?', ['Background', 'Proposed work', 'Case studies', 'Budget'], 3);
+            await new Promise(r => setTimeout(r, 1200));
+
+            // === Phase 2: Design ===
+            addWizardQuestion('Color scheme?', ['Brand colors', 'Professional blue', 'Custom'], 0);
+            await new Promise(r => setTimeout(r, 1200));
+
+            addMessage('assistant', 'Generating your proposal with brand colors and 4 pages including budget...');
+            await new Promise(r => setTimeout(r, 1000));
+
+            // Show document
+            previewWrapper.classList.remove('opacity-40');
+            previewWrapper.classList.add('opacity-100');
+            emptyState.classList.add('hidden');
+            docContent.classList.remove('hidden');
+
+            // Apply brand styling
+            logoBox.className = 'w-5 h-5 rounded';
+            logoBox.style.backgroundColor = '#CA3553';
+            orgName.style.color = '#CA3553';
+            orgName.textContent = 'CCM';
+            titleAccent.style.backgroundColor = '#CA3553';
+            budgetSection.classList.remove('hidden');
+            budgetTotal.style.backgroundColor = '#CA3553';
+            footerOrg.textContent = 'Center for Cooperative Media';
+            document.querySelectorAll('#stat-grid div.text-base').forEach(s => s.style.color = '#CA3553');
+            document.querySelectorAll('#doc-body h2').forEach(h => h.style.color = '#CA3553');
+
+            addMessage('system', 'Created: ai-for-newsrooms-proposal.html (4 pages)');
+            await new Promise(r => setTimeout(r, 1200));
+
+            // === Phase 3: Live preview with control panel ===
+            addMessage('assistant', 'Opening live preview with the interactive control panel...');
+            await new Promise(r => setTimeout(r, 800));
+
+            // Reveal control panel sidebar
+            controlPanel.classList.remove('hidden');
+            await new Promise(r => setTimeout(r, 600));
+
+            addMessage('system', 'Preview opened with control panel. Try the presets or adjust individual settings.');
+            await new Promise(r => setTimeout(r, 1800));
+
+            // === Simulate clicking "Professional blue" preset ===
+            addMessage('assistant', 'The control panel is loaded. You can try different presets, tweak colors, or adjust typography in real time.');
+            await new Promise(r => setTimeout(r, 1500));
+
+            // Animate the preset click
+            const blueBtn = document.querySelector('[data-preset="blue"]');
+            blueBtn.style.borderColor = '#cba6f7';
+            blueBtn.style.backgroundColor = '#45475a';
+            await new Promise(r => setTimeout(r, 400));
+
+            applyPreset('#1a5f7a', '#1a5f7a', 'Merriweather');
+            cpChangesCount.textContent = '7';
+            await new Promise(r => setTimeout(r, 1200));
+
+            // Flash the copy button
+            cpCopyBtn.style.transform = 'scale(1.05)';
+            cpCopyBtn.style.backgroundColor = '#b4befe';
+            await new Promise(r => setTimeout(r, 600));
+            cpCopyBtn.style.transform = '';
+            cpCopyBtn.style.backgroundColor = '';
+
+            addMessage('system', 'Copied 7 changes to clipboard.');
+            await new Promise(r => setTimeout(r, 800));
+
+            // === User pastes the prompt back ===
+            await typeInInput('Apply the following changes to the proposal:');
+            addMessage('user', 'Apply the following changes to the proposal:\n1. Change primary color to #1a5f7a\n2. Switch heading font to Merriweather\n3. Switch body font to Open Sans');
+            await new Promise(r => setTimeout(r, 1000));
+
+            addMessage('assistant', 'Applied all 7 changes to the HTML source. Refreshing the preview...');
+            await new Promise(r => setTimeout(r, 1200));
+
+            // Add green glow to preview
+            previewWrapper.style.boxShadow = '0 0 0 2px rgba(34, 197, 94, 0.5), 0 25px 50px -12px rgba(0, 0, 0, 0.25)';
+            addMessage('system', 'Changes applied. The document is ready for PDF export.');
             await new Promise(r => setTimeout(r, 2000));
+
+            // Replay button
             const replayDiv = document.createElement('div');
             replayDiv.className = 'flex justify-center mt-4';
             const replayBtn = document.createElement('button');
             replayBtn.className = 'text-white/50 text-xs hover:text-white transition-colors flex items-center gap-1';
-            replayBtn.textContent = '↻ Replay demo';
+            replayBtn.textContent = '\u21BB Replay demo';
             replayBtn.onclick = () => {
                 replayDiv.remove();
+                previewWrapper.style.boxShadow = '';
                 runDemo();
             };
             replayDiv.appendChild(replayBtn);
