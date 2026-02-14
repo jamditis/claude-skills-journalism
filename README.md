@@ -111,6 +111,7 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 | [zero-build-frontend](./zero-build-frontend/) | Static web apps without build tools, CDN-loaded frameworks |
 | [mobile-debugging](./mobile-debugging/) | Eruda, vConsole, remote debugging, iOS debugging, console capture |
 | [accessibility-compliance](./accessibility-compliance/) | WCAG compliance, alt text, accessible charts, keyboard navigation |
+| [one-way-door](./one-way-door/) | Flag irreversible architectural decisions (data models, infra, auth, APIs) before committing |
 
 ### Security (ship without getting sued)
 
@@ -155,10 +156,11 @@ Hooks are automated checks that run at specific points in your workflow. All hoo
 |------|-------|-------------|
 | [archive-reminder](./hooks/archive-reminder.md) | PostToolUse | Remind to archive URLs when citing sources |
 
-### Bug fixing hooks
+### Development hooks
 
 | Hook | Event | Description |
 |------|-------|-------------|
+| [one-way-door-check](./hooks/one-way-door-check.md) | PreToolUse | Block creation of files representing irreversible architectural decisions |
 | [bug-report-detector](./hooks/bug-report-detector.md) | UserPromptSubmit | Detect bug reports and remind to follow test-first workflow |
 | [enforce-test-first](./hooks/enforce-test-first.md) | PreToolUse | Block source code edits until a test file has been written |
 

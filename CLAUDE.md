@@ -36,8 +36,9 @@ claude-skills-journalism/
 │   ├── pre-publish-checklist.md # Editorial: Pre-publish reminder
 │   ├── deadline-tracker.md      # Editorial: Deadline surfacing
 │   ├── archive-reminder.md      # Preservation: Archive URLs
-│   ├── bug-report-detector.md   # Bug fixing: Detect bug reports
-│   └── enforce-test-first.md    # Bug fixing: Enforce test-first workflow
+│   ├── one-way-door-check.md    # Development: Block irreversible decisions
+│   ├── bug-report-detector.md   # Development: Detect bug reports
+│   └── enforce-test-first.md    # Development: Enforce test-first workflow
 │
 ├── # Core journalism skills (11)
 ├── source-verification/         # SIFT method, verification trails
@@ -76,9 +77,10 @@ claude-skills-journalism/
 ├── content-access/              # Unpaywall, CORE, library access
 ├── page-monitoring/             # Change detection, alerts
 │
-├── # Development (8)
+├── # Development (9)
 ├── test-first-bugs/             # Test-driven bug fixing workflow
 ├── vibe-coding/                 # AI-assisted development
+├── one-way-door/                # Flag irreversible architectural decisions
 ├── electron-dev/                # Electron patterns
 ├── python-pipeline/             # Data pipelines
 ├── web-scraping/                # Content extraction
@@ -137,6 +139,13 @@ Hooks run automatically at specific workflow events. All are **non-blocking warn
 | Hook | Event | Purpose |
 |------|-------|---------|
 | archive-reminder | PostToolUse(Write,Edit) | Remind to archive URLs |
+
+### Development
+| Hook | Event | Purpose |
+|------|-------|---------|
+| one-way-door-check | PreToolUse(Write) | Block irreversible architectural decisions |
+| bug-report-detector | UserPromptSubmit | Detect bug reports |
+| enforce-test-first | PreToolUse(Edit,Write) | Block source edits until test written |
 
 ## Installation
 

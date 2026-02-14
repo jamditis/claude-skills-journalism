@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-02-14
+
+Added the one-way door check skill and hook, plus a flagship documentation page. Set up custom domain `skills.amditis.tech`.
+
+### Added
+- `one-way-door` skill — flag irreversible architectural decisions (data models, infra, auth, APIs, events, CI/CD, dependencies, cloud configs) before committing
+- `one-way-door-check` hook — PreToolUse hook that blocks Write calls for one-way-door file patterns and forces a trade-off discussion
+- Flagship page at `skills.amditis.tech/one-way-door/` with amber/gold design, SVG grid hero, 8-category grid, workflow phases, and hook code
+- Custom domain `skills.amditis.tech` via Cloudflare CNAME
+- Development hooks category on the homepage (one-way-door-check, bug-report-detector, enforce-test-first)
+
+### Changed
+- Updated skill and hook counts on homepage
+- Reorganized hooks section on homepage to include development category
+
+---
+
 ## [1.1.1] - 2026-02-05
 
 Update awareness and version checking for PDF Playground.
@@ -223,6 +240,7 @@ Initial commit with foundational skills.
 
 ---
 
+[1.2.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/jamditis/claude-skills-journalism/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.0.0...v1.1.0
 [1.0.1]: https://github.com/jamditis/claude-skills-journalism/compare/v1.0.0...v1.0.1

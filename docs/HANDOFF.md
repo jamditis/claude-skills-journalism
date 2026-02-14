@@ -9,7 +9,7 @@
 ## Completed pages
 
 ### Flagship pages (rich design with SVG grid patterns)
-8 pages with full flagship treatment:
+9 pages with full flagship treatment:
 1. `docs/pdf-playground/index.html` - Red accent (#CA3553) - Original template
 2. `docs/foia-requests/index.html` - Purple accent (#7c3aed)
 3. `docs/vibe-coding/index.html` - Indigo accent (#4f46e5)
@@ -18,6 +18,7 @@
 6. `docs/accessibility-compliance/index.html` - Cyan accent (#0891b2)
 7. `docs/source-verification/index.html` - Teal accent
 8. `docs/data-journalism/index.html` - Blue accent
+9. `docs/one-way-door/index.html` - Amber/gold accent (#b45309)
 
 ### Standard pages (simpler template)
 26 pages with simpler, professional template:
@@ -99,7 +100,7 @@ docs/
 ├── index.html                    # Main site
 ├── HANDOFF.md                    # This file
 │
-├── # Flagship pages (8)
+├── # Flagship pages (9)
 ├── pdf-playground/index.html
 ├── foia-requests/index.html
 ├── vibe-coding/index.html
@@ -108,6 +109,7 @@ docs/
 ├── accessibility-compliance/index.html
 ├── source-verification/index.html
 ├── data-journalism/index.html
+├── one-way-door/index.html
 │
 ├── # Standard pages (26)
 ├── academic-writing/index.html
@@ -149,4 +151,4 @@ docs/
 
 ---
 
-*Updated: 2026-02-04*
+*Updated: 2026-02-14*

@@ -242,7 +242,7 @@
             <!-- Hero -->
             <header class="mb-32 md:mb-44 animate-page-in">
                 <div class="inline-block px-4 py-1 border border-ink/10 mb-6">
-                    <span class="text-[9px] font-bold tracking-[0.4em] uppercase opacity-50">32 Skills // 11 Hooks</span>
+                    <span class="text-[9px] font-bold tracking-[0.4em] uppercase opacity-50">34 Skills // 14 Hooks</span>
                 </div>
                 <h1 class="font-display fluid-title text-[11vw] md:text-[8.5vw] font-light leading-[0.85] tracking-tight mb-12 text-ink">
                     Skills for <br> <span class="italic font-black">journalism.</span>
@@ -538,7 +538,7 @@
             <section class="reveal-section mb-32">
                 <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <h2 class="font-display text-4xl font-light italic">07 / Development</h2>
-                    <span class="section-label">7 Skills</span>
+                    <span class="section-label">8 Skills</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -549,6 +549,15 @@
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#4f46e5] transition-colors">vibe-coding</h3>
                         <p class="text-sm text-mist leading-relaxed">AI-assisted software development methodology based on YC best practices.</p>
+                    </a>
+
+                    <a href="one-way-door/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group" style="background: linear-gradient(135deg, rgba(180, 83, 9, 0.08) 0%, rgba(255, 255, 255, 0.5) 100%); border: 2px solid rgba(180, 83, 9, 0.3);">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="door-open" class="w-5 h-5 text-[#b45309]"></i>
+                            <span class="featured-badge" style="background: linear-gradient(135deg, #b45309 0%, #92400e 100%);">Featured</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#b45309] transition-colors">one-way-door</h3>
+                        <p class="text-sm text-mist leading-relaxed">Flag irreversible architectural decisions before you commit. Includes PreToolUse hook for automated enforcement.</p>
                     </a>
 
                     <a href="electron-dev/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -648,7 +657,7 @@
             <section id="hooks" class="reveal-section mb-32">
                 <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <h2 class="font-display text-4xl font-light italic">08 / Hooks</h2>
-                    <span class="section-label">11 Automated Checks</span>
+                    <span class="section-label">14 Automated Checks</span>
                 </div>
 
                 <p class="text-mist mb-8 max-w-3xl">Hooks run automatically at specific workflow events. All are <strong>non-blocking warnings</strong>—they provide guidance but don't prevent actions.</p>
@@ -741,13 +750,39 @@
 
                     <!-- Preservation Hooks -->
                     <h3 class="text-[11px] font-bold uppercase tracking-widest text-mist mb-4">Preservation</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                         <div class="border border-ink/10 p-4 bg-white/20">
                             <div class="flex items-center gap-2 mb-2">
                                 <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
                             </div>
                             <h4 class="font-display font-bold mb-1">archive-reminder</h4>
                             <p class="text-xs text-mist">Remind to archive URLs when citing sources.</p>
+                        </div>
+                    </div>
+
+                    <!-- Development Hooks -->
+                    <h3 class="text-[11px] font-bold uppercase tracking-widest text-mist mb-4">Development</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="border border-ink/10 p-4 bg-white/20" style="border-color: rgba(180, 83, 9, 0.3);">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-[#b45309]/10 text-[#b45309] font-bold">PreToolUse</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">one-way-door-check</h4>
+                            <p class="text-xs text-mist">Block irreversible architectural decisions until discussed.</p>
+                        </div>
+                        <div class="border border-ink/10 p-4 bg-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-ink/10 text-ink font-bold">UserPromptSubmit</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">bug-report-detector</h4>
+                            <p class="text-xs text-mist">Detect bug reports and apply test-first workflow.</p>
+                        </div>
+                        <div class="border border-ink/10 p-4 bg-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-accent/10 text-accent font-bold">PreToolUse</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">enforce-test-first</h4>
+                            <p class="text-xs text-mist">Block source edits until test is written.</p>
                         </div>
                     </div>
                 </div>
