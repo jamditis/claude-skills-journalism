@@ -865,7 +865,33 @@
                 </div>
             </div>
         </div>
-    </footer>
+                <!-- Support -->
+            <div style="text-align:center;padding:1.5rem 1rem;">
+              <style>
+                .support-strip{display:flex;align-items:center;justify-content:center;gap:.75rem;flex-wrap:wrap;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+                .support-strip a{display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;border-radius:2rem;font-size:.8rem;font-weight:600;text-decoration:none;color:#fff;transition:transform .15s,box-shadow .15s}
+                .support-strip a:hover{transform:translateY(-1px)}
+                .support-strip .s-venmo{background:#008CFF}.support-strip .s-venmo:hover{box-shadow:0 4px 14px rgba(0,140,255,.4)}
+                .support-strip .s-paypal{background:#003087}.support-strip .s-paypal:hover{box-shadow:0 4px 14px rgba(0,48,135,.4)}
+                .support-strip .s-github{background:#333}.support-strip .s-github:hover{box-shadow:0 4px 14px rgba(51,51,51,.4)}
+                .support-strip svg{width:16px;height:16px;fill:currentColor}
+              </style>
+              <div class="support-strip">
+                <a href="https://venmo.com/jamditis" class="s-venmo" target="_blank" rel="noopener">
+                  <svg viewBox="0 0 24 24"><path d="M19.5 1.5c.9 1.5 1.3 3 1.3 4.9 0 6.1-5.2 14-9.4 19.6H4.4L1.5 2.1l6.2-.6 1.7 13.4c1.5-2.5 3.4-6.4 3.4-9.1 0-1.8-.3-3-.8-4z"/></svg>
+                  Venmo
+                </a>
+                <a href="https://paypal.me/jamditis" class="s-paypal" target="_blank" rel="noopener">
+                  <svg viewBox="0 0 24 24"><path d="M7.02 21.5L7.8 17h-2L8.6 2.5h5.4c2.6 0 4.4 1.8 4 4.4-.6 3.4-3.2 5.1-6.2 5.1H9.7l-1 5.5H6.6zm10-15.1c.3-2-1-3.4-3.4-3.4h-1L11.4 10h1.2c2.2 0 4-1.2 4.4-3.6zm-1.6 8.1c.3-2-1-3.4-3.4-3.4h-1L9.8 18h1.2c2.2 0 4-1.2 4.4-3.5z"/></svg>
+                  PayPal
+                </a>
+                <a href="https://github.com/sponsors/jamditis" class="s-github" target="_blank" rel="noopener">
+                  <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                  Sponsor
+                </a>
+              </div>
+            </div>
+</footer>
 
     <script>
         // Init Icons
@@ -898,33 +924,5 @@
         document.querySelectorAll('.reveal-section').forEach(section => {
             observer.observe(section);
         });
-    </script>
-
-<!-- Support -->
-<div style="text-align:center;padding:1.5rem 1rem;">
-  <style>
-    .support-strip{display:flex;align-items:center;justify-content:center;gap:.75rem;flex-wrap:wrap;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
-    .support-strip a{display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;border-radius:2rem;font-size:.8rem;font-weight:600;text-decoration:none;color:#fff;transition:transform .15s,box-shadow .15s}
-    .support-strip a:hover{transform:translateY(-1px)}
-    .support-strip .s-venmo{background:#008CFF}.support-strip .s-venmo:hover{box-shadow:0 4px 14px rgba(0,140,255,.4)}
-    .support-strip .s-paypal{background:#003087}.support-strip .s-paypal:hover{box-shadow:0 4px 14px rgba(0,48,135,.4)}
-    .support-strip .s-github{background:#333}.support-strip .s-github:hover{box-shadow:0 4px 14px rgba(51,51,51,.4)}
-    .support-strip svg{width:16px;height:16px;fill:currentColor}
-  </style>
-  <div class="support-strip">
-    <a href="https://venmo.com/jamditis" class="s-venmo" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24"><path d="M19.5 1.5c.9 1.5 1.3 3 1.3 4.9 0 6.1-5.2 14-9.4 19.6H4.4L1.5 2.1l6.2-.6 1.7 13.4c1.5-2.5 3.4-6.4 3.4-9.1 0-1.8-.3-3-.8-4z"/></svg>
-      Venmo
-    </a>
-    <a href="https://paypal.me/jamditis" class="s-paypal" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24"><path d="M7.02 21.5L7.8 17h-2L8.6 2.5h5.4c2.6 0 4.4 1.8 4 4.4-.6 3.4-3.2 5.1-6.2 5.1H9.7l-1 5.5H6.6zm10-15.1c.3-2-1-3.4-3.4-3.4h-1L11.4 10h1.2c2.2 0 4-1.2 4.4-3.6zm-1.6 8.1c.3-2-1-3.4-3.4-3.4h-1L9.8 18h1.2c2.2 0 4-1.2 4.4-3.5z"/></svg>
-      PayPal
-    </a>
-    <a href="https://github.com/sponsors/jamditis" class="s-github" target="_blank" rel="noopener">
-      <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-      Sponsor
-    </a>
-  </div>
-</div>
-</body>
+    </script></body>
 </html>
