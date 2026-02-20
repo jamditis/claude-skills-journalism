@@ -74,6 +74,7 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 | Skill | Description |
 |-------|-------------|
 | [pdf-design](./pdf-design/) | Professional PDF reports and proposals with brand system, budget tables, and multi-page layouts. For the full interactive experience, use [pdf-playground](./pdf-playground/) instead |
+| [visual-explainer](./visual-explainer/) | Turn complex data into styled HTML pages — architecture diagrams, data tables, flowcharts, timelines, source maps, and dashboards with dark/light theme support |
 
 ### Writing quality
 
