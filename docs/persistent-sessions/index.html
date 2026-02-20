@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Persistent Claude sessions - Claude skills for journalism</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <meta name="description" content="Keep Claude Code running while you switch devices, close your laptop, or step away. Set up persistent tmux sessions on a headless server.">
+    <meta property="og:title" content="Persistent Claude sessions - Claude skills for journalism">
+    <meta property="og:description" content="Keep Claude Code running while you switch devices, close your laptop, or step away.">
+    <meta property="og:type" content="website">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'display': ['Fraunces', 'serif'],
+                        'body': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'canvas': '#ede6d4',
+                        'ink': '#121212',
+                        'clay': '#2d2a26',
+                        'mist': '#c4bfb4',
+                        'accent': '#059669',
+                        'accentDark': '#047857',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Fraunces', serif; }
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("https://www.transparenttextures.com/patterns/natural-paper.png"),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .content-section h2 { margin-top: 2.5rem; margin-bottom: 1rem; }
+        .content-section h3 { margin-top: 2rem; margin-bottom: 0.75rem; }
+        .content-section p { margin-bottom: 1rem; }
+        .content-section ul, .content-section ol { margin-bottom: 1rem; margin-left: 1.5rem; }
+        .content-section li { margin-bottom: 0.5rem; }
+        .content-section code {
+            background: rgba(0,0,0,0.06);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+        .content-section pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        .content-section pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        .step-number {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            background: #059669;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+        .kbd {
+            display: inline-flex;
+            align-items: center;
+            background: #1e1e1e;
+            color: #e0e0e0;
+            border-radius: 0.375rem;
+            padding: 0.2rem 0.6rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            border: 1px solid #444;
+            box-shadow: 0 2px 0 #111;
+            white-space: nowrap;
+        }
+        .terminal-bar {
+            background: #1e1e1e;
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+        .terminal-titlebar {
+            background: #2d2d2d;
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .terminal-dot {
+            width: 0.7rem;
+            height: 0.7rem;
+            border-radius: 9999px;
+        }
+        .terminal-body {
+            padding: 1rem 1.2rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #d4d4d4;
+            line-height: 1.6;
+        }
+        .terminal-green { color: #3fb950; }
+        .terminal-dim { color: #888; }
+        .terminal-status {
+            background: #0d1117;
+            color: #8b949e;
+            padding: 0.3rem 0.8rem;
+            font-family: monospace;
+            font-size: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #30363d;
+        }
+    </style>
+</head>
+<body class="bg-canvas text-ink">
+    <div class="paper-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="../" class="text-clay/70 hover:text-ink flex items-center gap-2 text-sm font-medium transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                All skills
+            </a>
+            <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+                </svg>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="bg-gradient-to-br from-accent to-accentDark text-white pt-24 pb-16">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1 text-sm mb-4">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+                Infrastructure skill
+            </div>
+            <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">Persistent Claude sessions</h1>
+            <p class="text-xl text-white/90 max-w-2xl">
+                Keep Claude running while you switch devices, close your laptop, or step away. Start a session from your desktop, check in from your phone, and pick up right where you left off.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 py-12 relative z-10">
+
+        <!-- The problem -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">The problem</h2>
+            <p class="text-clay/80 mb-6">If you run Claude Code in a browser-based terminal (like Cockpit), your session lives inside a WebSocket connection. When that connection drops — browser tab closed, laptop lid shut, phone screen locked, network hiccup — everything dies. Claude stops mid-task. Your context is gone. You start over.</p>
+
+            <div class="terminal-bar mb-6">
+                <div class="terminal-titlebar">
+                    <div class="terminal-dot bg-red-400"></div>
+                    <div class="terminal-dot bg-yellow-400"></div>
+                    <div class="terminal-dot bg-green-400"></div>
+                    <span class="text-white/40 text-xs ml-2">dashboard.yourdomain.com — terminal</span>
+                </div>
+                <div class="terminal-body">
+                    <span class="terminal-green">$</span> claude<br>
+                    <span class="terminal-dim"># 20 minutes into a research task...</span><br>
+                    <span class="terminal-dim"># Browser tab closes</span><br>
+                    <span class="terminal-dim"># Session gone. Context lost. Start over.</span>
+                </div>
+            </div>
+
+            <p class="text-clay/80">Cockpit compounds this with a 15-minute idle session timeout. If Claude is thinking quietly — running tools, processing files — and you're not clicking around in the Cockpit UI, your session gets terminated automatically, taking Claude with it.</p>
+        </section>
+
+        <!-- The solution -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">The solution</h2>
+            <p class="text-clay/80 mb-6">
+                <strong>tmux</strong> is a terminal multiplexer that runs on the server, not in your browser. Your Claude session runs inside tmux. The browser terminal just shows you a view of it — like a window into a room that exists independently of whether you're looking.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-4 mb-6">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="text-red-500 mb-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-1">Without tmux</h3>
+                    <p class="text-sm text-clay/70">Claude process is a child of the browser terminal. Close the tab → kill the process. One device, one session, no recovery.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="text-accent mb-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-1">With tmux</h3>
+                    <p class="text-sm text-clay/70">Claude runs inside a server-side tmux session. Close the tab, switch devices, lose network — tmux keeps running. Reconnect and attach.</p>
+                </div>
+            </div>
+
+            <div class="terminal-bar">
+                <div class="terminal-titlebar">
+                    <div class="terminal-dot bg-red-400"></div>
+                    <div class="terminal-dot bg-yellow-400"></div>
+                    <div class="terminal-dot bg-green-400"></div>
+                    <span class="text-white/40 text-xs ml-2">dashboard.yourdomain.com — main (tmux)</span>
+                </div>
+                <div class="terminal-body">
+                    <span class="terminal-green">$</span> claude<br>
+                    <span class="terminal-dim"># Claude is mid-task. Close the tab.</span><br><br>
+                    <span class="terminal-dim"># Later, on your phone...</span><br>
+                    <span class="terminal-green">$</span> <span class="terminal-dim"># .bashrc auto-attaches to the same tmux session</span><br>
+                    <span class="terminal-dim"># Claude is still running. Exactly where you left it.</span>
+                </div>
+                <div class="terminal-status">
+                    <span class="terminal-green" style="color:#3fb950">[main]  0:claude*  1:logs  2:bash</span>
+                    <span>14:23  Feb 20</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Setup -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-6">Setup</h2>
+
+            <!-- Step 1 -->
+            <div class="flex gap-4 mb-8">
+                <div class="step-number mt-1">1</div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-lg mb-3">Configure tmux</h3>
+                    <p class="text-clay/80 mb-3">Create <code>~/.tmux.conf</code> on your server. This sets up mouse support, better scrollback, a readable status bar, and a built-in help popup at <span class="kbd">Ctrl+B H</span>.</p>
+                    <div class="terminal-bar">
+                        <div class="terminal-titlebar">
+                            <div class="terminal-dot bg-red-400"></div>
+                            <div class="terminal-dot bg-yellow-400"></div>
+                            <div class="terminal-dot bg-green-400"></div>
+                            <span class="text-white/40 text-xs ml-2">~/.tmux.conf</span>
+                        </div>
+                        <div class="terminal-body text-xs leading-relaxed">
+                            <span class="terminal-dim"># True color support</span><br>
+                            set -g default-terminal "screen-256color"<br><br>
+                            <span class="terminal-dim"># Mouse support — click to switch, scroll with wheel</span><br>
+                            set -g mouse on<br><br>
+                            <span class="terminal-dim"># Start window numbering at 1</span><br>
+                            set -g base-index 1<br>
+                            set -g pane-base-index 1<br>
+                            set-option -g renumber-windows on<br><br>
+                            <span class="terminal-dim"># More scrollback</span><br>
+                            set -g history-limit 10000<br><br>
+                            <span class="terminal-dim"># Status bar</span><br>
+                            set -g status-style "bg=#0d1117,fg=#8b949e"<br>
+                            set -g status-left "#[fg=#3fb950,bold] [#S] "<br>
+                            set -g status-right "#[fg=#484f58]Ctrl+B H for help  #[fg=#3fb950]%H:%M #[fg=#484f58]%b %d"<br>
+                            set -g window-status-current-style "fg=#3fb950,bold"<br>
+                            set -g pane-active-border-style "fg=#3fb950"<br><br>
+                            <span class="terminal-dim"># Ctrl+B H — help popup</span><br>
+                            bind H display-popup -E -w 62 -h 26 "cat &lt;&lt; 'EOF'<br>
+                            &nbsp;&nbsp;tmux quick reference<br>
+                            &nbsp;&nbsp;...<br>
+                            EOF<br>
+                            read -n1 -s -r -p '  press any key to close'"
+                        </div>
+                    </div>
+                    <p class="text-clay/60 text-sm mt-2">Full config available in the <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/persistent-sessions" class="text-accent hover:text-accentDark underline underline-offset-2" target="_blank">GitHub repository</a>.</p>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="flex gap-4 mb-8">
+                <div class="step-number mt-1">2</div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-lg mb-3">Auto-attach on terminal open</h3>
+                    <p class="text-clay/80 mb-3">Add this to <code>~/.bashrc</code>. It detects when you're in a Cockpit terminal (<code>XDG_SESSION_TYPE=web</code>) and immediately attaches to (or creates) a tmux session named <code>main</code>.</p>
+                    <div class="terminal-bar">
+                        <div class="terminal-titlebar">
+                            <div class="terminal-dot bg-red-400"></div>
+                            <div class="terminal-dot bg-yellow-400"></div>
+                            <div class="terminal-dot bg-green-400"></div>
+                            <span class="text-white/40 text-xs ml-2">~/.bashrc</span>
+                        </div>
+                        <div class="terminal-body text-xs leading-relaxed">
+                            <span class="terminal-dim"># Auto-attach to persistent tmux session in cockpit terminals.</span><br>
+                            <span class="terminal-dim"># XDG_SESSION_TYPE=web is set by cockpit (not SSH, not console).</span><br>
+                            if [ -z "$TMUX" ] &amp;&amp; [ "$XDG_SESSION_TYPE" = "web" ]; then<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;exec tmux new-session -A -s main<br>
+                            fi
+                        </div>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-3">
+                        <p class="text-sm text-amber-800"><strong>SSH instead of Cockpit?</strong> Use <code>SSH_TTY</code> instead of <code>XDG_SESSION_TYPE</code>. Replace the condition with <code>[ -n "$SSH_TTY" ]</code> — this fires only on interactive SSH logins, not on automated <code>ssh host "command"</code> calls.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="flex gap-4 mb-8">
+                <div class="step-number mt-1">3</div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-lg mb-3">Fix the Cockpit idle timeout</h3>
+                    <p class="text-clay/80 mb-3">By default, Cockpit terminates idle web sessions after 15 minutes — exactly long enough to time out while Claude is working quietly. Disable it:</p>
+                    <div class="terminal-bar">
+                        <div class="terminal-titlebar">
+                            <div class="terminal-dot bg-red-400"></div>
+                            <div class="terminal-dot bg-yellow-400"></div>
+                            <div class="terminal-dot bg-green-400"></div>
+                            <span class="text-white/40 text-xs ml-2">/etc/cockpit/cockpit.conf</span>
+                        </div>
+                        <div class="terminal-body text-xs leading-relaxed">
+                            [Session]<br>
+                            IdleTimeout=0
+                        </div>
+                    </div>
+                    <p class="text-clay/80 mt-3 text-sm">Then restart Cockpit: <code>sudo systemctl restart cockpit.service</code></p>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Key bindings -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-2">Key bindings</h2>
+            <p class="text-clay/70 mb-6">All tmux commands start with the prefix <span class="kbd">Ctrl+B</span> — press and release it, then press the next key. <span class="kbd">Ctrl+B H</span> shows this as a popup in your terminal.</p>
+
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden mb-4">
+                <div class="bg-mist/10 border-b border-mist/30 px-5 py-3 font-semibold text-sm">Windows</div>
+                <table class="w-full">
+                    <tbody class="divide-y divide-mist/20">
+                        <tr>
+                            <td class="px-5 py-3 w-48"><span class="kbd">Ctrl+B</span> then <span class="kbd">C</span></td>
+                            <td class="px-5 py-3 text-clay/70">New window</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3"><span class="kbd">Ctrl+B</span> then <span class="kbd">,</span></td>
+                            <td class="px-5 py-3 text-clay/70">Rename current window</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3"><span class="kbd">Ctrl+B</span> then <span class="kbd">W</span></td>
+                            <td class="px-5 py-3 text-clay/70">List all windows (interactive)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3"><span class="kbd">Ctrl+B</span> then <span class="kbd">1</span>–<span class="kbd">9</span></td>
+                            <td class="px-5 py-3 text-clay/70">Switch to window by number</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3"><span class="kbd">Ctrl+B</span> then <span class="kbd">N</span> / <span class="kbd">P</span></td>
+                            <td class="px-5 py-3 text-clay/70">Next / previous window</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden mb-4">
+                <div class="bg-mist/10 border-b border-mist/30 px-5 py-3 font-semibold text-sm">Panes (split a window)</div>
+                <table class="w-full">
+                    <tbody class="divide-y divide-mist/20">
+                        <tr>
+                            <td class="px-5 py-3 w-48"><span class="kbd">Ctrl+B</span> then <span class="kbd">%</span></td>
+                            <td class="px-5 py-3 text-clay/70">Split left/right</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3"><span class="kbd">Ctrl+B</span> then <span class="kbd">"</span></td>
+                            <td class="px-5 py-3 text-clay/70">Split top/bottom</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3"><span class="kbd">Ctrl+B</span> then <span class="kbd">↑↓←→</span></td>
+                            <td class="px-5 py-3 text-clay/70">Move between panes</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3"><span class="kbd">Ctrl+B</span> then <span class="kbd">Z</span></td>
+                            <td class="px-5 py-3 text-clay/70">Zoom pane to full screen (toggle)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden">
+                <div class="bg-mist/10 border-b border-mist/30 px-5 py-3 font-semibold text-sm">Scroll &amp; session</div>
+                <table class="w-full">
+                    <tbody class="divide-y divide-mist/20">
+                        <tr>
+                            <td class="px-5 py-3 w-48"><span class="kbd">Ctrl+B</span> then <span class="kbd">[</span></td>
+                            <td class="px-5 py-3 text-clay/70">Enter scroll mode (use arrows/PgUp, Q to exit)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3"><span class="kbd">Ctrl+B</span> then <span class="kbd">D</span></td>
+                            <td class="px-5 py-3 text-clay/70">Detach — session keeps running</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3"><span class="kbd">Ctrl+B</span> then <span class="kbd">H</span></td>
+                            <td class="px-5 py-3 text-clay/70">Help popup (from this config)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3"><span class="kbd">Ctrl+B</span> then <span class="kbd">?</span></td>
+                            <td class="px-5 py-3 text-clay/70">Full built-in keybinding list</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Suggested window layout -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Suggested window layout</h2>
+            <p class="text-clay/80 mb-4">Name your windows so the status bar tells you what's running at a glance. Use <span class="kbd">Ctrl+B ,</span> to rename.</p>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="terminal-bar mb-3" style="font-size:0.7rem">
+                        <div class="terminal-status" style="border-top:none; padding: 0.4rem 0.6rem; border-radius:0.5rem;">
+                            <span style="color:#3fb950">[main] 1:claude*</span>
+                        </div>
+                    </div>
+                    <h3 class="font-semibold mb-1">1: claude</h3>
+                    <p class="text-sm text-clay/70">Your active Claude Code session. This is where you work.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="terminal-bar mb-3" style="font-size:0.7rem">
+                        <div class="terminal-status" style="border-top:none; padding: 0.4rem 0.6rem; border-radius:0.5rem;">
+                            <span style="color:#3fb950">[main] 2:logs*</span>
+                        </div>
+                    </div>
+                    <h3 class="font-semibold mb-1">2: logs</h3>
+                    <p class="text-sm text-clay/70"><code>journalctl -f</code> or <code>tail -f</code> on scheduler or app logs.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="terminal-bar mb-3" style="font-size:0.7rem">
+                        <div class="terminal-status" style="border-top:none; padding: 0.4rem 0.6rem; border-radius:0.5rem;">
+                            <span style="color:#3fb950">[main] 3:shell*</span>
+                        </div>
+                    </div>
+                    <h3 class="font-semibold mb-1">3: shell</h3>
+                    <p class="text-sm text-clay/70">Free shell for quick commands, file checks, or running builds.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bonus: scheduler coexistence -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Coexisting with scheduled Claude sessions</h2>
+            <p class="text-clay/80 mb-4">If you run automated Claude sessions (cron-based check-ins, email processing, transcript analysis), they can conflict with your interactive session — competing for CPU and trying to process the same data at the same time.</p>
+            <p class="text-clay/80 mb-4">Add this function to your scheduler to detect an active interactive session and skip the automated wake:</p>
+            <div class="terminal-bar">
+                <div class="terminal-titlebar">
+                    <div class="terminal-dot bg-red-400"></div>
+                    <div class="terminal-dot bg-yellow-400"></div>
+                    <div class="terminal-dot bg-green-400"></div>
+                    <span class="text-white/40 text-xs ml-2">claude-scheduler.py</span>
+                </div>
+                <div class="terminal-body text-xs leading-relaxed">
+                    def is_interactive_session_active():<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="terminal-dim">"""Check if there's an active interactive Claude session in 'main' tmux."""</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;result = subprocess.run(<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;['tmux', 'has-session', '-t', 'main'], capture_output=True<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;if result.returncode != 0:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return False<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;result = subprocess.run(<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;['tmux', 'list-panes', '-t', 'main', '-F', '#{pane_current_command}'],<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;capture_output=True, text=True<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;return 'claude' in result.stdout.lower()<br><br>
+                    <span class="terminal-dim"># In your run_task() function, before spawning:</span><br>
+                    if is_interactive_session_active():<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;print("Skipping: interactive session active")<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;return False
+                </div>
+            </div>
+            <p class="text-clay/60 text-sm mt-2">The <code>pane_current_command</code> tmux format string returns the name of the running process — no need to parse <code>ps aux</code>.</p>
+        </section>
+
+        <!-- Pitfalls -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Common pitfalls</h2>
+            <div class="space-y-3">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-1 rounded mt-0.5">Watch out</span>
+                        <div>
+                            <h3 class="font-semibold">The first session after setup won't be in tmux</h3>
+                            <p class="text-sm text-clay/70 mt-1">The <code>.bashrc</code> change only applies to new terminal sessions opened after saving the file. Close your current terminal tab and open a fresh one to get tmux.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-1 rounded mt-0.5">Watch out</span>
+                        <div>
+                            <h3 class="font-semibold">display-popup requires tmux 3.2+</h3>
+                            <p class="text-sm text-clay/70 mt-1">Check your version with <code>tmux -V</code>. If you're on an older version, remove the <code>bind H display-popup ...</code> block from <code>.tmux.conf</code> and use <code>Ctrl+B ?</code> for help instead.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-1 rounded mt-0.5">Best practice</span>
+                        <div>
+                            <h3 class="font-semibold">Name your windows</h3>
+                            <p class="text-sm text-clay/70 mt-1">Use <span class="kbd">Ctrl+B ,</span> to name each window. The status bar shows all window names at once — without names, you'll end up with a row of identical <code>bash</code> entries.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-1 rounded mt-0.5">Best practice</span>
+                        <div>
+                            <h3 class="font-semibold">tmux survives, but the server has to stay on</h3>
+                            <p class="text-sm text-clay/70 mt-1">Sessions persist across browser disconnects, not server reboots. A Pi or always-on server works perfectly for this; a laptop that gets shut down does not.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related skills -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Related skills</h2>
+            <div class="flex flex-wrap gap-2">
+                <a href="../python-pipeline/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Python pipeline</a>
+                <a href="../editorial-workflow/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Editorial workflow</a>
+                <a href="../project-memory/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Project memory</a>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="text-center">
+            <div class="bg-gradient-to-br from-accent to-accentDark rounded-xl p-8 text-white">
+                <h2 class="font-display text-xl font-bold mb-3">Claude that keeps working after you close the tab</h2>
+                <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
+                    Three config changes. Runs on any headless Linux server with tmux and Cockpit.
+                </p>
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/persistent-sessions" target="_blank" class="inline-flex items-center gap-2 bg-white text-accent px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors">
+                    View on GitHub
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-mist/30 mt-12 relative z-10">
+        <div class="max-w-4xl mx-auto px-6 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-clay/60 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accent hover:text-accentDark underline underline-offset-2">Center for Cooperative Media</a>
+                </p>
+                <div class="flex items-center gap-6">
+                    <a href="../" class="text-clay/60 hover:text-ink text-sm transition-colors">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/60 hover:text-ink text-sm transition-colors">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
