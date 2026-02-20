@@ -492,6 +492,36 @@
             <p class="text-clay/60 text-sm mt-2">The <code>pane_current_command</code> tmux format string returns the name of the running process — no need to parse <code>ps aux</code>.</p>
         </section>
 
+        <!-- Activity notifications -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Getting notified when a session needs input</h2>
+            <p class="text-clay/80 mb-4">tmux can highlight a tab when the process in it goes quiet — a reliable signal that something has finished and is waiting for you. This uses <code>monitor-silence</code>, which fires after a window has produced no output for a set number of seconds.</p>
+            <p class="text-clay/80 mb-4">Add these lines to your <code>~/.tmux.conf</code>:</p>
+            <div class="terminal-bar">
+                <div class="terminal-titlebar">
+                    <div class="terminal-dot bg-red-400"></div>
+                    <div class="terminal-dot bg-yellow-400"></div>
+                    <div class="terminal-dot bg-green-400"></div>
+                    <span class="text-white/40 text-xs ml-2">~/.tmux.conf</span>
+                </div>
+                <div class="terminal-body text-xs leading-relaxed">
+                    <span class="terminal-dim"># Light up tabs that have gone quiet (waiting for input)</span><br>
+                    set-window-option -g monitor-silence 20<br>
+                    set -g visual-silence on<br>
+                    <span class="terminal-dim"># Also pass terminal bell alerts through</span><br>
+                    set -g monitor-bell on<br>
+                    set -g visual-bell on<br>
+                    set -g bell-action any<br><br>
+                    <span class="terminal-dim"># Show ~ in tab name when silent, ! on bell</span><br>
+                    set -g window-status-format "  #I:#W#{?window_silence_flag, ~,}#{?window_bell_flag, !,}  "
+                </div>
+            </div>
+            <p class="text-clay/60 text-sm mt-3 mb-4">The <code>monitor-silence 20</code> value is seconds. Bump it up if it fires too often during normal processing pauses.</p>
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <p class="text-sm text-amber-800"><strong>Why silence, not activity?</strong> <code>monitor-activity</code> fires on every byte of output — too noisy for Claude sessions that stream continuously. <code>monitor-silence</code> fires only when output <em>stops</em>, which is a much better proxy for "waiting for you." While a session is running it outputs constantly; when it hits a prompt or finishes, it goes quiet.</p>
+            </div>
+        </section>
+
         <!-- Pitfalls -->
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Common pitfalls</h2>
