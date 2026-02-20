@@ -2,6 +2,16 @@
 
 A curated collection of Claude Code skills designed for journalists, researchers, academics, media professionals, and communications practitioners.
 
+**Docs site:** [jamditis.github.io/claude-skills-journalism](https://jamditis.github.io/claude-skills-journalism/) — interactive skill browser, setup guides, and full documentation.
+
+## Guides
+
+Setup and workflow guides, separate from the skills themselves:
+
+| Guide | Description |
+|-------|-------------|
+| [Persistent sessions](https://jamditis.github.io/claude-skills-journalism/persistent-sessions/) | Keep Claude Code sessions alive through disconnects using tmux — setup, key bindings, activity notifications, and scheduler coexistence |
+
 ## What are Claude skills?
 
 Skills are modular instruction sets that extend Claude's capabilities for specialized tasks. Each skill contains domain-specific knowledge, workflows, templates, and best practices that Claude loads automatically when relevant to your work.
