@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editorial workflow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700&family=Fragment+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    /* --- Theme --- */
+    :root {
+      --bg: #0d1219;
+      --surface: #141c28;
+      --surface-raised: #1a2536;
+      --border: rgba(255, 255, 255, 0.06);
+      --text: #dce4f0;
+      --text-dim: #6d7d96;
+      --text-muted: #3d4d66;
+      --font-body: 'Bricolage Grotesque', system-ui, sans-serif;
+      --font-mono: 'Fragment Mono', 'Menlo', monospace;
+
+      /* Teal + cyan palette */
+      --accent-a: #3cc4b8;
+      --accent-a-dim: rgba(60, 196, 184, 0.10);
+      --accent-b: #5b9fe6;
+      --accent-b-dim: rgba(91, 159, 230, 0.10);
+      --accent-c: #e6a55b;
+      --accent-c-dim: rgba(230, 165, 91, 0.10);
+      --accent-d: #e65b7a;
+      --accent-d-dim: rgba(230, 91, 122, 0.10);
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f0f4f8;
+        --surface: #ffffff;
+        --surface-raised: #e8eef4;
+        --border: rgba(0, 0, 0, 0.08);
+        --text: #141c28;
+        --text-dim: #5a6878;
+        --text-muted: #8a98a8;
+
+        --accent-a: #2a9a90;
+        --accent-a-dim: rgba(42, 154, 144, 0.08);
+        --accent-b: #4080c4;
+        --accent-b-dim: rgba(64, 128, 196, 0.08);
+        --accent-c: #c48040;
+        --accent-c-dim: rgba(196, 128, 64, 0.08);
+        --accent-d: #c44060;
+        --accent-d-dim: rgba(196, 64, 96, 0.08);
+      }
+    }
+
+    /* --- Reset & base --- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; min-width: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.3rem;
+    }
+
+    .subtitle {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+
+    /* --- Mermaid container --- */
+    .mermaid-wrap {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.5s ease forwards;
+      animation-delay: 200ms;
+    }
+
+    .zoom-controls {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      display: flex;
+      gap: 0.25rem;
+      z-index: 10;
+    }
+
+    .zoom-controls button {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1rem;
+      display: grid;
+      place-items: center;
+      transition: background 0.15s;
+    }
+    .zoom-controls button:hover {
+      background: var(--surface-raised);
+    }
+
+    .mermaid-viewport {
+      cursor: grab;
+      transform-origin: 0 0;
+      transition: transform 0.1s ease;
+    }
+    .mermaid-viewport.dragging {
+      cursor: grabbing;
+      transition: none;
+    }
+
+    /* --- Legend --- */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1rem 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      opacity: 0;
+      animation: fadeUp 0.4s ease forwards;
+      animation-delay: 400ms;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* --- Animations --- */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mermaid-wrap, .legend {
+        opacity: 1;
+        animation: none;
+      }
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 768px) {
+      body { padding: 1.5rem; }
+      h1 { font-size: 1.4rem; }
+      .mermaid-wrap { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Editorial workflow</h1>
+  <p class="subtitle">Story lifecycle from pitch to publication and distribution</p>
+
+  <div class="mermaid-wrap">
+    <div class="zoom-controls">
+      <button title="Zoom in">+</button>
+      <button title="Zoom out">−</button>
+      <button title="Reset zoom">⟳</button>
+    </div>
+    <div class="mermaid-viewport">
+      <pre class="mermaid">
+flowchart TD
+    pitch["Pitch submitted"]
+    triage{"Editorial triage"}
+    assign["Assign reporter"]
+    research["Research & reporting"]
+    draft["Draft written"]
+    edit["Editor review"]
+    revise["Revisions needed"]
+    legal{"Legal review?"}
+    legalCheck["Legal desk review"]
+    copyedit["Copy edit"]
+    layout["Layout & media"]
+    final["Final approval"]
+    publish["Publish"]
+    distribute["Distribute"]
+
+    pitch --> triage
+    triage -->|Approved| assign
+    triage -->|Killed| killed["Story killed"]
+    assign --> research
+    research --> draft
+    draft --> edit
+    edit -->|Changes needed| revise
+    revise --> edit
+    edit -->|Approved| legal
+    legal -->|Yes| legalCheck
+    legal -->|No| copyedit
+    legalCheck -->|Cleared| copyedit
+    legalCheck -->|Issues| revise
+    copyedit --> layout
+    layout --> final
+    final -->|Published| publish
+    publish --> distribute
+
+    classDef start fill:#3cc4b833,stroke:#3cc4b8
+    classDef decision fill:#e6a55b33,stroke:#e6a55b
+    classDef action fill:#5b9fe633,stroke:#5b9fe6
+    classDef end fill:#3cc4b833,stroke:#3cc4b8
+    classDef killed fill:#e65b7a33,stroke:#e65b7a
+
+    class pitch start
+    class triage,legal decision
+    class assign,research,draft,edit,revise,legalCheck,copyedit,layout,final action
+    class publish,distribute end
+    class killed killed
+      </pre>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background: var(--accent-a);"></div>
+      Start / end
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background: var(--accent-c);"></div>
+      Decision gate
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background: var(--accent-b);"></div>
+      Action step
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background: var(--accent-d);"></div>
+      Killed / blocked
+    </div>
+  </div>
+
+  <!-- Mermaid -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      look: 'handDrawn',
+      themeVariables: isDark ? {
+        fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
+        fontSize: '16px',
+        primaryColor: '#3cc4b8',
+        primaryTextColor: '#dce4f0',
+        primaryBorderColor: '#2a9a90',
+        secondaryColor: '#5b9fe6',
+        tertiaryColor: '#e6a55b',
+        lineColor: '#3d4d66',
+        background: '#141c28',
+        mainBkg: '#1a2536',
+        nodeBorder: '#2a3a50',
+      } : {
+        fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
+        fontSize: '16px',
+        primaryColor: '#2a9a90',
+        primaryTextColor: '#141c28',
+        primaryBorderColor: '#2a9a90',
+        secondaryColor: '#4080c4',
+        tertiaryColor: '#c48040',
+        lineColor: '#8a98a8',
+        background: '#ffffff',
+        mainBkg: '#f0f4f8',
+        nodeBorder: '#c0c8d4',
+      }
+    });
+  </script>
+
+  <!-- Zoom controls -->
+  <script>
+    document.querySelectorAll('.mermaid-wrap').forEach(wrap => {
+      const vp = wrap.querySelector('.mermaid-viewport');
+      let scale = 1, panX = 0, panY = 0, dragging = false, startX, startY;
+
+      function apply() {
+        vp.style.transform = `translate(${panX}px,${panY}px) scale(${scale})`;
+      }
+
+      wrap.querySelector('[title="Zoom in"]').onclick = () => { scale = Math.min(scale * 1.2, 5); apply(); };
+      wrap.querySelector('[title="Zoom out"]').onclick = () => { scale = Math.max(scale / 1.2, 0.3); apply(); };
+      wrap.querySelector('[title="Reset zoom"]').onclick = () => { scale = 1; panX = 0; panY = 0; apply(); };
+
+      wrap.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          scale *= e.deltaY < 0 ? 1.08 : 1 / 1.08;
+          scale = Math.max(0.3, Math.min(5, scale));
+          apply();
+        }
+      }, { passive: false });
+
+      vp.addEventListener('mousedown', (e) => {
+        if (scale <= 1) return;
+        dragging = true;
+        startX = e.clientX - panX;
+        startY = e.clientY - panY;
+        vp.classList.add('dragging');
+      });
+      window.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        panX = e.clientX - startX;
+        panY = e.clientY - startY;
+        apply();
+      });
+      window.addEventListener('mouseup', () => {
+        dragging = false;
+        vp.classList.remove('dragging');
+      });
+    });
+  </script>
+
+</body>
+</html>

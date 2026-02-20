@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Newsroom CMS Architecture</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* --- Theme --- */
+    :root {
+      --bg: #0e1118;
+      --surface: #171b26;
+      --surface-raised: #1c2132;
+      --border: rgba(255, 255, 255, 0.07);
+      --text: #e4e6ec;
+      --text-dim: #7f8499;
+      --text-muted: #4e5265;
+      --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'Menlo', monospace;
+
+      /* Warm terracotta + sage palette */
+      --accent-a: #d4845a;  /* terracotta */
+      --accent-a-dim: rgba(212, 132, 90, 0.10);
+      --accent-b: #6bab7b;  /* sage */
+      --accent-b-dim: rgba(107, 171, 123, 0.10);
+      --accent-c: #7b9ec4;  /* slate blue */
+      --accent-c-dim: rgba(123, 158, 196, 0.10);
+      --accent-d: #c47ba0;  /* plum */
+      --accent-d-dim: rgba(196, 123, 160, 0.10);
+      --accent-e: #a0a47b;  /* olive */
+      --accent-e-dim: rgba(160, 164, 123, 0.10);
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f4f1ed;
+        --surface: #ffffff;
+        --surface-raised: #f8f6f2;
+        --border: rgba(0, 0, 0, 0.08);
+        --text: #1c1a17;
+        --text-dim: #6b6560;
+        --text-muted: #9c9590;
+
+        --accent-a: #b86a3e;
+        --accent-a-dim: rgba(184, 106, 62, 0.08);
+        --accent-b: #4d8a5e;
+        --accent-b-dim: rgba(77, 138, 94, 0.08);
+        --accent-c: #5a7ea6;
+        --accent-c-dim: rgba(90, 126, 166, 0.08);
+        --accent-d: #a65a82;
+        --accent-d-dim: rgba(166, 90, 130, 0.08);
+        --accent-e: #7a7e52;
+        --accent-e-dim: rgba(122, 126, 82, 0.08);
+      }
+    }
+
+    /* --- Reset & base --- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; min-width: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2.5rem;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.3rem;
+    }
+
+    .subtitle {
+      color: var(--text-dim);
+      font-size: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    /* --- Cards --- */
+    .node {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.4s ease forwards;
+      animation-delay: calc(var(--i, 0) * 60ms);
+    }
+
+    .node--hero {
+      background: var(--surface-raised);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+      border-left: 3px solid var(--accent-a);
+    }
+
+    .label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .label::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .label.a::before { background: var(--accent-a); }
+    .label.b::before { background: var(--accent-b); }
+    .label.c::before { background: var(--accent-c); }
+    .label.d::before { background: var(--accent-d); }
+    .label.e::before { background: var(--accent-e); }
+
+    .node h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .node p, .node li {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .node ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .node li {
+      position: relative;
+      padding-left: 1.2em;
+      margin-top: 0.25rem;
+    }
+
+    .node li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--text-muted);
+    }
+
+    /* --- Layout --- */
+    .section-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-grid.three {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .full-width { grid-column: 1 / -1; }
+
+    /* --- Arrow --- */
+    .arrow {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      padding: 0.5rem 0;
+    }
+
+    /* --- Pipeline --- */
+    .pipeline {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .pipeline .step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      opacity: 0;
+      animation: fadeUp 0.4s ease forwards;
+      animation-delay: calc(var(--i, 0) * 60ms);
+    }
+
+    .pipeline .step-num {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .pipeline .step h4 {
+      font-size: 0.85rem;
+      margin-top: 0.2rem;
+    }
+
+    .pipeline .pipe-arrow {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    /* --- Animations --- */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .node, .pipeline .step {
+        opacity: 1;
+        animation: none;
+      }
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 768px) {
+      body { padding: 1.5rem; }
+      h1 { font-size: 1.5rem; }
+      .section-grid, .section-grid.three { grid-template-columns: 1fr; }
+      .pipeline {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+      .pipeline .pipe-arrow { transform: rotate(90deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Newsroom CMS architecture</h1>
+  <p class="subtitle">Content management system — input sources to distribution channels</p>
+
+  <!-- Hero: Input sources -->
+  <div class="section-grid" style="--i: 0;">
+    <div class="node node--hero full-width" style="--i: 1;">
+      <div class="label a">Input sources</div>
+      <h3>Content ingestion</h3>
+      <div class="section-grid" style="margin-top: 0.75rem; margin-bottom: 0;">
+        <div>
+          <p><strong>Wire services</strong></p>
+          <ul>
+            <li>AP News API</li>
+            <li>Reuters Connect</li>
+            <li>Custom RSS feeds</li>
+          </ul>
+        </div>
+        <div>
+          <p><strong>Staff contributions</strong></p>
+          <ul>
+            <li>Reporter submissions</li>
+            <li>Photo desk uploads</li>
+            <li>Freelance portal</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- Processing pipeline -->
+  <div class="pipeline">
+    <div class="step" style="--i: 3;">
+      <div class="step-num">Step 1</div>
+      <h4>Ingest</h4>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="step" style="--i: 4;">
+      <div class="step-num">Step 2</div>
+      <h4>Normalize</h4>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="step" style="--i: 5;">
+      <div class="step-num">Step 3</div>
+      <h4>Enrich</h4>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="step" style="--i: 6;">
+      <div class="step-num">Step 4</div>
+      <h4>Publish</h4>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- Core systems -->
+  <div class="section-grid" style="--i: 7;">
+    <div class="node" style="--i: 7;">
+      <div class="label b">Editorial layer</div>
+      <h3>Story management</h3>
+      <ul>
+        <li>Assignment desk</li>
+        <li>Draft editing</li>
+        <li>Version control</li>
+        <li>Legal review queue</li>
+      </ul>
+    </div>
+    <div class="node" style="--i: 8;">
+      <div class="label c">Data layer</div>
+      <h3>Storage</h3>
+      <ul>
+        <li>PostgreSQL (content)</li>
+        <li>S3 (media assets)</li>
+        <li>Redis (caching)</li>
+        <li>Elasticsearch (search)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- Output -->
+  <div class="section-grid three" style="--i: 9;">
+    <div class="node" style="--i: 9;">
+      <div class="label d">Distribution</div>
+      <h3>Website</h3>
+      <p>Next.js SSR, CDN-cached, AMP pages for mobile</p>
+    </div>
+    <div class="node" style="--i: 10;">
+      <div class="label d">Distribution</div>
+      <h3>Newsletter</h3>
+      <p>Daily digest, breaking alerts, weekly roundup</p>
+    </div>
+    <div class="node" style="--i: 11;">
+      <div class="label d">Distribution</div>
+      <h3>Social / API</h3>
+      <p>Auto-posting, syndication feeds, partner API</p>
+    </div>
+  </div>
+
+</body>
+</html>

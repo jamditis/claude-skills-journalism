@@ -56,9 +56,13 @@ claude-skills-journalism/
 ├── # Communications and publishing (1)
 ├── newsletter-publishing/       # Email newsletters, subscribers
 │
-├── # Design and production (1)
+├── # Design and production (2)
 ├── pdf-design/                  # PDF reports, proposals, brand system
 │   └── templates/               # HTML templates (Democracy Day, etc.)
+├── visual-explainer/            # HTML diagrams, data tables, architecture views
+│   ├── references/              # CSS patterns, library guides, nav patterns
+│   ├── templates/               # Architecture, flowchart, data table templates
+│   └── prompts/                 # Slash command templates
 │
 ├── # Writing quality (1)
 ├── ai-writing-detox/            # Eliminate AI writing patterns
