@@ -27,3 +27,6 @@ node_modules/
 # Windows artifacts
 desktop.ini
 nul
+# Screenshots from playground testing
+*.png
+*.jpeg

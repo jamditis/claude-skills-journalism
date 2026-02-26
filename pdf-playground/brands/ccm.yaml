@@ -1,0 +1,57 @@
+# Center for Cooperative Media brand configuration
+# Example of a complete brand setup
+
+---
+brand:
+  name: "Center for Cooperative Media"
+  tagline: "Growing and strengthening local journalism"
+  website: "https://centerforcooperativemedia.org"
+  email: "info@centerforcooperativemedia.org"
+  parent: "Montclair State University • College of Communication and Media"
+
+colors:
+  primary: "#CA3553"      # CCM Red
+  secondary: "#000000"    # Black
+  background: "#FFFFFF"   # White
+  text: "#2d2a28"        # Dark gray for body text
+  muted: "#666666"       # Medium gray
+  cream: "#faf9f7"       # Off-white for backgrounds
+  lightGray: "#f5f4f2"   # Light gray for cards
+
+fonts:
+  heading: "Playfair Display"
+  body: "Source Sans 3"
+
+style:
+  headingCase: "sentence"
+  useOxfordComma: true
+---
+
+# CCM brand notes
+
+## Writing style
+
+- Always use sentence case for headings (never title case)
+- Use the Oxford comma
+- Prefer em dashes (—) with spaces on both sides
+- First reference: "Center for Cooperative Media"
+- Subsequent references: "the Center" (external) or "CCM" (internal only)
+
+## Color usage
+
+- Use CCM Red (#CA3553) as primary accent
+- Black (#000000) for headlines and primary text
+- Avoid pure white backgrounds on cover pages - use cream (#faf9f7)
+- Red is for accents, highlights, and CTAs - not for large text blocks
+
+## Logo placement
+
+- Logo appears in top right of cover pages
+- Include parent organization (Montclair State University) on formal documents
+- Use text-based logo mark when image logo unavailable
+
+## Document footers
+
+Always include:
+- "Center for Cooperative Media • Montclair State University"
+- Page numbers on multi-page documents

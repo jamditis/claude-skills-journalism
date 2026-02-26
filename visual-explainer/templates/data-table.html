@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Source verification audit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* --- Theme --- */
+    :root {
+      --bg: #120e14;
+      --surface: #1a1520;
+      --surface-raised: #22192c;
+      --border: rgba(255, 255, 255, 0.06);
+      --text: #e8e2ec;
+      --text-dim: #8a7e94;
+      --text-muted: #5a4e64;
+      --font-body: 'Instrument Serif', Georgia, serif;
+      --font-mono: 'JetBrains Mono', 'Menlo', monospace;
+
+      /* Rose + cranberry palette */
+      --accent-a: #d4627a;
+      --accent-a-dim: rgba(212, 98, 122, 0.10);
+      --accent-b: #7ab86e;
+      --accent-b-dim: rgba(122, 184, 110, 0.10);
+      --accent-c: #d4a04e;
+      --accent-c-dim: rgba(212, 160, 78, 0.10);
+      --accent-d: #6e8ab8;
+      --accent-d-dim: rgba(110, 138, 184, 0.10);
+
+      --pass: #7ab86e;
+      --fail: #d4627a;
+      --warn: #d4a04e;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f6f2f4;
+        --surface: #ffffff;
+        --surface-raised: #f0eaee;
+        --border: rgba(0, 0, 0, 0.08);
+        --text: #1a1520;
+        --text-dim: #6a5e74;
+        --text-muted: #9a8ea4;
+
+        --accent-a: #b84460;
+        --accent-a-dim: rgba(184, 68, 96, 0.08);
+        --accent-b: #5a964e;
+        --accent-b-dim: rgba(90, 150, 78, 0.08);
+        --accent-c: #b88030;
+        --accent-c-dim: rgba(184, 128, 48, 0.08);
+        --accent-d: #4e6a96;
+        --accent-d-dim: rgba(78, 106, 150, 0.08);
+
+        --pass: #5a964e;
+        --fail: #b84460;
+        --warn: #b88030;
+      }
+    }
+
+    /* --- Reset & base --- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; min-width: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      background-image: radial-gradient(ellipse at 30% 20%, var(--accent-a-dim), transparent 50%);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2.5rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.3rem;
+    }
+
+    .subtitle {
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      margin-bottom: 2.5rem;
+    }
+
+    /* --- KPI row --- */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1rem;
+      text-align: center;
+      opacity: 0;
+      animation: fadeScale 0.4s ease forwards;
+      animation-delay: calc(var(--i, 0) * 80ms);
+    }
+
+    .kpi-value {
+      font-size: 2rem;
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    .kpi-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      margin-top: 0.4rem;
+    }
+
+    /* --- Table --- */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.4s ease forwards;
+      animation-delay: 400ms;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    caption {
+      text-align: left;
+      padding: 1rem 1.25rem 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--surface-raised);
+    }
+
+    th {
+      padding: 0.75rem 1.25rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.7rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background: rgba(128, 128, 128, 0.025);
+    }
+
+    tr:hover td {
+      background: var(--accent-a-dim);
+    }
+
+    /* Status badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.15rem 0.55rem;
+      border-radius: 100px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .badge--verified {
+      background: var(--accent-b-dim);
+      color: var(--pass);
+    }
+    .badge--verified::before { content: '✓'; font-weight: 700; }
+
+    .badge--unverified {
+      background: var(--accent-a-dim);
+      color: var(--fail);
+    }
+    .badge--unverified::before { content: '✗'; font-weight: 700; }
+
+    .badge--partial {
+      background: var(--accent-c-dim);
+      color: var(--warn);
+    }
+    .badge--partial::before { content: '!'; font-weight: 700; }
+
+    /* Cell helpers */
+    .cell-detail {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 0.2rem;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.8em;
+      background: var(--surface-raised);
+      padding: 0.1em 0.35em;
+      border-radius: 4px;
+    }
+
+    /* --- Footer row --- */
+    tfoot td {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      background: var(--surface-raised);
+      border-top: 2px solid var(--border);
+    }
+
+    /* --- Gap detail --- */
+    details {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      background: var(--surface);
+      opacity: 0;
+      animation: fadeUp 0.4s ease forwards;
+      animation-delay: 500ms;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 400;
+      color: var(--fail);
+      list-style: none;
+      font-size: 0.9rem;
+    }
+    summary::before { content: '▸ '; }
+    details[open] summary::before { content: '▾ '; }
+
+    details p {
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+
+    /* --- Animations --- */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeScale {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .kpi, .table-wrap, details {
+        opacity: 1;
+        animation: none;
+      }
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 768px) {
+      body { padding: 1.5rem; }
+      h1 { font-size: 1.5rem; }
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .kpi-value { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Source verification audit</h1>
+  <p class="subtitle">Verification status for 12 claims in draft — City council investigation</p>
+
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi" style="--i: 0;">
+      <div class="kpi-value">12</div>
+      <div class="kpi-label">Claims checked</div>
+    </div>
+    <div class="kpi" style="--i: 1;">
+      <div class="kpi-value" style="color: var(--pass);">9</div>
+      <div class="kpi-label">Verified</div>
+    </div>
+    <div class="kpi" style="--i: 2;">
+      <div class="kpi-value" style="color: var(--warn);">2</div>
+      <div class="kpi-label">Partial</div>
+    </div>
+    <div class="kpi" style="--i: 3;">
+      <div class="kpi-value" style="color: var(--fail);">1</div>
+      <div class="kpi-label">Unverified</div>
+    </div>
+  </div>
+
+  <!-- Data table -->
+  <div class="table-wrap">
+    <table>
+      <caption>Claim-by-claim verification results</caption>
+      <thead>
+        <tr>
+          <th scope="col">Claim</th>
+          <th scope="col">Source</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            Council approved $2.4M contract
+            <small class="cell-detail">Paragraph 2, line 3</small>
+          </td>
+          <td>Meeting minutes, Jan 15</td>
+          <td><span class="badge badge--verified">Verified</span></td>
+        </tr>
+        <tr>
+          <td>
+            Vote was 5-2
+            <small class="cell-detail">Paragraph 2, line 4</small>
+          </td>
+          <td>Meeting minutes, Jan 15</td>
+          <td><span class="badge badge--verified">Verified</span></td>
+        </tr>
+        <tr>
+          <td>
+            Contractor has prior violations
+            <small class="cell-detail">Paragraph 4, line 1</small>
+          </td>
+          <td>State licensing board records</td>
+          <td><span class="badge badge--verified">Verified</span></td>
+        </tr>
+        <tr>
+          <td>
+            Three violations in past 5 years
+            <small class="cell-detail">Paragraph 4, line 2</small>
+          </td>
+          <td>
+            State records show 2 violations
+            <small class="cell-detail">Third may be county-level</small>
+          </td>
+          <td><span class="badge badge--partial">Partial</span></td>
+        </tr>
+        <tr>
+          <td>
+            Mayor's office declined to comment
+            <small class="cell-detail">Paragraph 6</small>
+          </td>
+          <td>Reporter's call log, Jan 18</td>
+          <td><span class="badge badge--verified">Verified</span></td>
+        </tr>
+        <tr>
+          <td>
+            Community petition had 500+ signatures
+            <small class="cell-detail">Paragraph 7, line 1</small>
+          </td>
+          <td>
+            Petition document on file
+            <small class="cell-detail">Count shows 487 verified</small>
+          </td>
+          <td><span class="badge badge--partial">Partial</span></td>
+        </tr>
+        <tr>
+          <td>
+            Similar project in Newark cost $1.8M
+            <small class="cell-detail">Paragraph 8</small>
+          </td>
+          <td>Newark city budget FY2024</td>
+          <td><span class="badge badge--verified">Verified</span></td>
+        </tr>
+        <tr>
+          <td>
+            Council member Smith recused herself
+            <small class="cell-detail">Paragraph 3, line 2</small>
+          </td>
+          <td>Meeting minutes, Jan 15</td>
+          <td><span class="badge badge--verified">Verified</span></td>
+        </tr>
+        <tr>
+          <td>
+            Contractor donated to campaign
+            <small class="cell-detail">Paragraph 5, line 1</small>
+          </td>
+          <td>FEC records, ELEC filings</td>
+          <td><span class="badge badge--verified">Verified</span></td>
+        </tr>
+        <tr>
+          <td>
+            Donation was $10,000
+            <small class="cell-detail">Paragraph 5, line 2</small>
+          </td>
+          <td>ELEC filing #2024-1847</td>
+          <td><span class="badge badge--verified">Verified</span></td>
+        </tr>
+        <tr>
+          <td>
+            Project completion deadline is June 2026
+            <small class="cell-detail">Paragraph 9</small>
+          </td>
+          <td>Contract document, Section 4.2</td>
+          <td><span class="badge badge--verified">Verified</span></td>
+        </tr>
+        <tr>
+          <td>
+            Inspector general opened investigation
+            <small class="cell-detail">Paragraph 10</small>
+          </td>
+          <td>
+            No public record found
+            <small class="cell-detail">Based on anonymous tip only</small>
+          </td>
+          <td><span class="badge badge--unverified">Unverified</span></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3">9 verified · 2 partial · 1 unverified</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- Gap detail -->
+  <details>
+    <summary>1 unverified claim requires attention</summary>
+    <p>
+      The claim that the inspector general opened an investigation (paragraph 10) is based solely
+      on an anonymous tip with no corroborating documentation. The IG's office has not confirmed or
+      denied. Options: remove the claim, attribute it as an allegation from an unnamed source, or
+      hold the paragraph until the IG's office responds to the formal records request filed Jan 20.
+    </p>
+  </details>
+
+</body>
+</html>

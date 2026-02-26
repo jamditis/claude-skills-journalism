@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[Project Name] — Funding Proposal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #CA3553;
+            --red-dark: #a82a44;
+            --black: #000000;
+            --white: #ffffff;
+            --cream: #faf9f7;
+            --gray-100: #f5f4f2;
+            --gray-200: #e8e6e3;
+            --gray-400: #9a9590;
+            --gray-600: #5c5754;
+            --gray-700: #3d3a38;
+            --gray-800: #2d2a28;
+        }
+
+        @page {
+            size: letter;
+            margin: 0;
+        }
+
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .page {
+                page-break-after: always;
+                page-break-inside: avoid;
+            }
+            .page:last-child {
+                page-break-after: auto;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background: var(--gray-200);
+        }
+
+        .page {
+            width: 8.5in;
+            min-height: 11in;
+            background: var(--white);
+            margin: 0 auto 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+        }
+
+        @media print {
+            .page {
+                box-shadow: none;
+                margin: 0;
+            }
+            body {
+                background: white;
+            }
+        }
+
+        /* ========== COVER PAGE ========== */
+        .cover {
+            height: 11in;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cover-header {
+            background: var(--red);
+            height: 4.5in;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 0.5in 0.75in;
+            padding-top: 1.4in;
+            overflow: hidden;
+        }
+
+        .cover-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(ellipse 120% 80% at 80% 120%, rgba(0,0,0,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 100% 60% at 20% 0%, rgba(255,255,255,0.08) 0%, transparent 50%);
+        }
+
+        .cover-header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(to right,
+                var(--black) 0%,
+                var(--black) 15%,
+                transparent 15%,
+                transparent 17%,
+                var(--black) 17%,
+                var(--black) 100%
+            );
+        }
+
+        .logo-bar {
+            position: absolute;
+            top: 0.4in;
+            left: 0.75in;
+            right: 0.75in;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 2;
+        }
+
+        .logo-primary {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 800;
+            font-size: 14pt;
+            color: var(--white);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .logo-primary span {
+            display: block;
+            font-size: 8pt;
+            font-weight: 400;
+            letter-spacing: 0.3em;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+
+        .logo-ccm {
+            text-align: right;
+            color: var(--white);
+        }
+
+        .logo-ccm-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 700;
+            font-size: 10pt;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255,255,255,0.4);
+            padding-bottom: 4px;
+            margin-bottom: 3px;
+        }
+
+        .logo-ccm-sub {
+            font-size: 6.5pt;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .cover-title-block {
+            position: relative;
+            z-index: 2;
+            margin-top: auto;
+        }
+
+        .cover-eyebrow {
+            font-size: 9pt;
+            font-weight: 600;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.75);
+            margin-bottom: 0.12in;
+        }
+
+        .cover-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 42pt;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1.05;
+            max-width: 5.5in;
+        }
+
+        .cover-content {
+            flex: 1;
+            padding: 0.65in 0.75in;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cover-intro {
+            font-size: 13pt;
+            line-height: 1.55;
+            color: var(--gray-800);
+            max-width: 6in;
+            margin-bottom: 0.4in;
+        }
+
+        .cover-intro strong {
+            color: var(--black);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.35in;
+            margin-bottom: auto;
+        }
+
+        .stat-card {
+            padding: 0.25in 0;
+            border-top: 3px solid var(--black);
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 36pt;
+            font-weight: 700;
+            color: var(--red);
+            line-height: 1;
+            margin-bottom: 0.08in;
+        }
+
+        .stat-label {
+            font-size: 9.5pt;
+            font-weight: 500;
+            color: var(--gray-600);
+            line-height: 1.35;
+        }
+
+        .cover-mission {
+            background: var(--gray-100);
+            margin: 0 -0.75in;
+            padding: 0.4in 0.75in;
+            margin-top: 0.4in;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .mission-label {
+            font-size: 7pt;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 0.1in;
+        }
+
+        .mission-text {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 14pt;
+            font-style: italic;
+            color: var(--gray-800);
+            line-height: 1.45;
+        }
+
+        /* ========== CONTENT PAGES ========== */
+        .content-page {
+            padding: 0.5in 0.75in;
+            padding-bottom: 1in;
+            min-height: 11in;
+            height: 11in;
+            position: relative;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.3in;
+            padding-bottom: 0.12in;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .page-header-left {
+            font-size: 8pt;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--gray-400);
+        }
+
+        .page-header-right {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 8pt;
+            color: var(--red);
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 26pt;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 0.25in;
+            line-height: 1.1;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 0.5in;
+            height: 3px;
+            background: var(--red);
+            margin-top: 0.12in;
+        }
+
+        .body-text {
+            font-size: 10.5pt;
+            line-height: 1.55;
+            color: var(--gray-800);
+            margin-bottom: 0.15in;
+        }
+
+        .body-text strong {
+            font-weight: 600;
+            color: var(--black);
+        }
+
+        /* Highlight box */
+        .highlight-box {
+            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+            color: var(--white);
+            padding: 0.3in;
+            margin: 0.25in 0;
+            position: relative;
+        }
+
+        .highlight-box::before {
+            content: '"';
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 72pt;
+            position: absolute;
+            top: 0.1in;
+            left: 0.25in;
+            opacity: 0.2;
+            line-height: 1;
+        }
+
+        .highlight-text {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 14pt;
+            font-style: italic;
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Two column layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.25in;
+            margin-top: 0.2in;
+        }
+
+        .data-callout {
+            background: var(--gray-100);
+            padding: 0.2in;
+            border-left: 3px solid var(--red);
+        }
+
+        .data-callout-label {
+            font-size: 7pt;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 0.06in;
+        }
+
+        .data-callout-stat {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 18pt;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 0.05in;
+        }
+
+        .data-callout-desc {
+            font-size: 9pt;
+            color: var(--gray-600);
+            line-height: 1.35;
+        }
+
+        /* Priority list */
+        .priority-list {
+            margin: 0.25in 0;
+        }
+
+        .priority-item {
+            display: grid;
+            grid-template-columns: 0.4in 1fr;
+            gap: 0.15in;
+            margin-bottom: 0.2in;
+            padding-bottom: 0.2in;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .priority-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .priority-number {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 28pt;
+            font-weight: 700;
+            color: var(--red);
+            line-height: 1;
+        }
+
+        .priority-content h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 12pt;
+            font-weight: 600;
+            color: var(--black);
+            margin-bottom: 0.06in;
+            line-height: 1.25;
+        }
+
+        .priority-content p {
+            font-size: 10pt;
+            line-height: 1.5;
+            color: var(--gray-600);
+        }
+
+        /* Case study */
+        .case-study {
+            background: var(--cream);
+            padding: 0.25in 0.3in;
+            margin: 0.2in 0;
+            position: relative;
+        }
+
+        .case-study::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--red);
+        }
+
+        .case-study-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.15in;
+        }
+
+        .case-study-org {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 14pt;
+            font-weight: 700;
+            color: var(--black);
+        }
+
+        .case-study-location {
+            font-size: 9pt;
+            font-weight: 500;
+            color: var(--red);
+            letter-spacing: 0.05em;
+        }
+
+        .case-study-text {
+            font-size: 10pt;
+            line-height: 1.5;
+            color: var(--gray-700);
+        }
+
+        .case-study-highlight {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-style: italic;
+            font-size: 11pt;
+            color: var(--gray-800);
+            margin-top: 0.1in;
+            padding-top: 0.1in;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* Budget table */
+        .budget-intro {
+            font-size: 10.5pt;
+            line-height: 1.5;
+            color: var(--gray-700);
+            margin-bottom: 0.2in;
+        }
+
+        .budget-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.15in 0;
+        }
+
+        .budget-table thead {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .budget-table th {
+            font-size: 7.5pt;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.12in 0.15in;
+            text-align: left;
+        }
+
+        .budget-table th:not(:first-child) {
+            text-align: right;
+        }
+
+        .budget-table td {
+            padding: 0.12in 0.15in;
+            font-size: 10pt;
+            border-bottom: 1px solid var(--gray-200);
+            vertical-align: top;
+        }
+
+        .budget-table td:not(:first-child) {
+            text-align: right;
+            font-family: 'Source Sans 3', sans-serif;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .budget-table tbody tr:nth-child(even) {
+            background: var(--gray-100);
+        }
+
+        .budget-table tbody tr:last-child {
+            background: var(--red);
+            color: var(--white);
+        }
+
+        .budget-table tbody tr:last-child td {
+            font-weight: 700;
+            font-size: 11pt;
+            border-bottom: none;
+        }
+
+        .expense-desc {
+            font-size: 9pt;
+            color: var(--gray-500);
+            display: block;
+            margin-top: 0.05in;
+            font-weight: 400;
+        }
+
+        .total-callout {
+            background: linear-gradient(135deg, var(--black) 0%, var(--gray-800) 100%);
+            color: var(--white);
+            padding: 0.2in 0.25in;
+            margin-top: 0.15in;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-label {
+            font-size: 8pt;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .total-label span {
+            display: block;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 11pt;
+            font-weight: 400;
+            letter-spacing: 0;
+            text-transform: none;
+            margin-top: 0.02in;
+            opacity: 1;
+        }
+
+        .total-amount {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 26pt;
+            font-weight: 700;
+            color: var(--red);
+        }
+
+        /* Footer */
+        .page-footer {
+            position: absolute;
+            bottom: 0.4in;
+            left: 0.75in;
+            right: 0.75in;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.1in;
+            border-top: 1px solid var(--gray-200);
+            background: var(--white);
+        }
+
+        .footer-left {
+            font-size: 7.5pt;
+            color: var(--gray-400);
+        }
+
+        .footer-right {
+            font-size: 7.5pt;
+            color: var(--gray-400);
+        }
+
+        .footer-page {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 9pt;
+            font-weight: 700;
+            color: var(--red);
+        }
+
+        /* Contact block */
+        .contact-block {
+            background: var(--cream);
+            padding: 0.15in 0.2in;
+            margin-top: 0.15in;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 0.2in;
+            align-items: center;
+        }
+
+        .contact-info h4 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 10pt;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 0.03in;
+        }
+
+        .contact-info p {
+            font-size: 8.5pt;
+            color: var(--gray-600);
+            line-height: 1.3;
+        }
+
+        .contact-info a {
+            color: var(--red);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .cta-button {
+            background: var(--red);
+            color: var(--white);
+            padding: 0.1in 0.25in;
+            font-size: 7.5pt;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PAGE 1: COVER -->
+    <div class="page cover">
+        <header class="cover-header">
+            <div class="logo-bar">
+                <div class="logo-primary">
+                    [Project Name]
+                    <span>[project-website.org]</span>
+                </div>
+                <div class="logo-ccm">
+                    <div class="logo-ccm-title">Center for Cooperative Media</div>
+                    <div class="logo-ccm-sub">Montclair State University • College of Communication and Media</div>
+                </div>
+            </div>
+            <div class="cover-title-block">
+                <div class="cover-eyebrow">Funding Proposal • [Year Range]</div>
+                <h1 class="cover-title">[Main title in sentence case]</h1>
+            </div>
+        </header>
+
+        <div class="cover-content">
+            <p class="cover-intro">
+                <strong>[Project name]</strong> is [brief description of the project and its impact].
+            </p>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-number">[Stat 1]</div>
+                    <div class="stat-label">[Description of stat 1]</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">[Stat 2]</div>
+                    <div class="stat-label">[Description of stat 2]</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">[Stat 3]</div>
+                    <div class="stat-label">[Description of stat 3]</div>
+                </div>
+            </div>
+
+            <div class="cover-mission">
+                <div class="mission-label">The Challenge</div>
+                <div class="mission-text">
+                    [Key challenge or problem statement that the project addresses.]
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 2: BACKGROUND -->
+    <div class="page content-page">
+        <header class="page-header">
+            <div class="page-header-left">[Project Name]</div>
+            <div class="page-header-right">Funding Proposal</div>
+        </header>
+
+        <h2 class="section-title">Background</h2>
+
+        <p class="body-text">
+            [Opening paragraph describing the context and history of the project.]
+        </p>
+
+        <p class="body-text">
+            [Second paragraph with key findings or research that supports the need.]
+        </p>
+
+        <div class="highlight-box">
+            <p class="highlight-text">
+                [Key quote or statistic that emphasizes the importance of the work.]
+            </p>
+        </div>
+
+        <p class="body-text">
+            [Additional context or supporting information.]
+        </p>
+
+        <div class="two-column">
+            <div class="data-callout">
+                <div class="data-callout-label">[Data Label 1]</div>
+                <div class="data-callout-stat">[Key Stat]</div>
+                <div class="data-callout-desc">
+                    [Description and context for this statistic.]
+                </div>
+            </div>
+            <div class="data-callout">
+                <div class="data-callout-label">[Data Label 2]</div>
+                <div class="data-callout-stat">[Key Stat]</div>
+                <div class="data-callout-desc">
+                    [Description and context for this statistic.]
+                </div>
+            </div>
+        </div>
+
+        <footer class="page-footer">
+            <div class="footer-left">Center for Cooperative Media • Montclair State University</div>
+            <div class="footer-right"><span class="footer-page">2</span></div>
+        </footer>
+    </div>
+
+    <!-- PAGE 3: PROPOSED WORK -->
+    <div class="page content-page">
+        <header class="page-header">
+            <div class="page-header-left">[Project Name]</div>
+            <div class="page-header-right">Funding Proposal</div>
+        </header>
+
+        <h2 class="section-title">Proposed work</h2>
+
+        <p class="body-text">
+            [Introduction to what the project will accomplish with funding.]
+        </p>
+
+        <p class="body-text" style="font-weight: 600; color: var(--black); margin-top: 0.3in;">
+            [Project name] is seeking funding to:
+        </p>
+
+        <div class="priority-list">
+            <div class="priority-item">
+                <div class="priority-number">1</div>
+                <div class="priority-content">
+                    <h3>[Priority 1 title in sentence case]</h3>
+                    <p>[Description of what this priority involves and why it matters.]</p>
+                </div>
+            </div>
+
+            <div class="priority-item">
+                <div class="priority-number">2</div>
+                <div class="priority-content">
+                    <h3>[Priority 2 title in sentence case]</h3>
+                    <p>[Description of what this priority involves and why it matters.]</p>
+                </div>
+            </div>
+
+            <div class="priority-item">
+                <div class="priority-number">3</div>
+                <div class="priority-content">
+                    <h3>[Priority 3 title in sentence case]</h3>
+                    <p>[Description of what this priority involves and why it matters.]</p>
+                </div>
+            </div>
+        </div>
+
+        <footer class="page-footer">
+            <div class="footer-left">Center for Cooperative Media • Montclair State University</div>
+            <div class="footer-right"><span class="footer-page">3</span></div>
+        </footer>
+    </div>
+
+    <!-- PAGE 4: EVIDENCE/CASE STUDIES -->
+    <div class="page content-page">
+        <header class="page-header">
+            <div class="page-header-left">[Project Name]</div>
+            <div class="page-header-right">Funding Proposal</div>
+        </header>
+
+        <h2 class="section-title">Proven impact</h2>
+
+        <p class="body-text">
+            [Introduction to evidence or case studies that demonstrate success.]
+        </p>
+
+        <div class="case-study">
+            <div class="case-study-header">
+                <div class="case-study-org">[Organization Name]</div>
+                <div class="case-study-location">[Location]</div>
+            </div>
+            <p class="case-study-text">
+                [Description of what this partner accomplished with support from the project.]
+            </p>
+            <p class="case-study-highlight">
+                "[Key quote or outcome from this case study.]"
+            </p>
+        </div>
+
+        <div class="case-study">
+            <div class="case-study-header">
+                <div class="case-study-org">[Organization Name]</div>
+                <div class="case-study-location">[Location]</div>
+            </div>
+            <p class="case-study-text">
+                [Description of what this partner accomplished with support from the project.]
+            </p>
+            <p class="case-study-highlight">
+                "[Key quote or outcome from this case study.]"
+            </p>
+        </div>
+
+        <p class="body-text" style="margin-top: 0.3in;">
+            [Closing statement about the need for continued or expanded funding.]
+        </p>
+
+        <footer class="page-footer">
+            <div class="footer-left">Center for Cooperative Media • Montclair State University</div>
+            <div class="footer-right"><span class="footer-page">4</span></div>
+        </footer>
+    </div>
+
+    <!-- PAGE 5: BUDGET -->
+    <div class="page content-page">
+        <header class="page-header">
+            <div class="page-header-left">[Project Name]</div>
+            <div class="page-header-right">Funding Proposal</div>
+        </header>
+
+        <h2 class="section-title">The ask</h2>
+
+        <p class="budget-intro">
+            [Brief explanation of the budget and what the funding will support.]
+        </p>
+
+        <table class="budget-table">
+            <thead>
+                <tr>
+                    <th>Expense item</th>
+                    <th>Amount per year</th>
+                    <th>Total for 2 years</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        [Expense item 1]
+                        <span class="expense-desc">[Details about this expense]</span>
+                    </td>
+                    <td>$XX,XXX</td>
+                    <td>$XX,XXX</td>
+                </tr>
+                <tr>
+                    <td>
+                        [Expense item 2]
+                        <span class="expense-desc">[Details about this expense]</span>
+                    </td>
+                    <td>$XX,XXX</td>
+                    <td>$XX,XXX</td>
+                </tr>
+                <tr>
+                    <td>
+                        [Expense item 3]
+                        <span class="expense-desc">[Details about this expense]</span>
+                    </td>
+                    <td>$XX,XXX</td>
+                    <td>$XX,XXX</td>
+                </tr>
+                <tr>
+                    <td>[Expense item 4]</td>
+                    <td>$XX,XXX</td>
+                    <td>$XX,XXX</td>
+                </tr>
+                <tr>
+                    <td><strong>Total</strong></td>
+                    <td><strong>$XXX,XXX</strong></td>
+                    <td><strong>$XXX,XXX</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="total-callout">
+            <div class="total-label">
+                Two-year investment
+                <span>[Description of what this investment supports]</span>
+            </div>
+            <div class="total-amount">$XXX,XXX</div>
+        </div>
+
+        <div class="contact-block">
+            <div class="contact-info">
+                <h4>Center for Cooperative Media</h4>
+                <p>
+                    Montclair State University • College of Communication and Media<br>
+                    <a href="mailto:info@centerforcooperativemedia.org">info@centerforcooperativemedia.org</a> • <a href="https://centerforcooperativemedia.org">centerforcooperativemedia.org</a>
+                </p>
+            </div>
+            <a href="[project-url]" class="cta-button">Learn More</a>
+        </div>
+
+        <footer class="page-footer">
+            <div class="footer-left">Center for Cooperative Media • Montclair State University</div>
+            <div class="footer-right"><span class="footer-page">5</span></div>
+        </footer>
+    </div>
+
+</body>
+</html>

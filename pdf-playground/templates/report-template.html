@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[Report Name] — Center for Cooperative Media</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #CA3553;
+            --black: #000000;
+            --white: #ffffff;
+            --cream: #faf9f7;
+            --gray-100: #f5f4f2;
+            --gray-200: #e8e6e3;
+            --gray-400: #9a9590;
+            --gray-600: #5c5754;
+            --gray-800: #2d2a28;
+        }
+
+        @page { size: letter; margin: 0; }
+
+        @media print {
+            body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .page { page-break-after: always; page-break-inside: avoid; }
+            .page:last-child { page-break-after: auto; }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Source Sans 3', Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background: var(--gray-200);
+        }
+
+        .page {
+            width: 8.5in;
+            min-height: 11in;
+            background: var(--white);
+            margin: 0 auto 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+        }
+
+        @media print {
+            .page { box-shadow: none; margin: 0; }
+            body { background: white; }
+        }
+
+        /* Cover */
+        .cover {
+            height: 11in;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, var(--red) 0%, #8a2038 100%);
+            color: var(--white);
+        }
+
+        .cover-header {
+            padding: 0.5in 0.75in;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .cover-logo {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 700;
+            font-size: 10pt;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .cover-date {
+            font-size: 9pt;
+            opacity: 0.8;
+        }
+
+        .cover-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 0.75in;
+        }
+
+        .cover-eyebrow {
+            font-size: 10pt;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-bottom: 0.2in;
+        }
+
+        .cover-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 48pt;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 0.3in;
+        }
+
+        .cover-subtitle {
+            font-size: 16pt;
+            opacity: 0.9;
+            max-width: 5in;
+        }
+
+        .cover-footer {
+            padding: 0.5in 0.75in;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .cover-org {
+            font-size: 9pt;
+            opacity: 0.8;
+        }
+
+        /* Content pages */
+        .content-page {
+            padding: 0.5in 0.75in;
+            padding-bottom: 1in;
+            min-height: 11in;
+            height: 11in;
+            position: relative;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3in;
+            padding-bottom: 0.1in;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .page-header-left {
+            font-size: 8pt;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--gray-400);
+        }
+
+        .page-header-right {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 8pt;
+            color: var(--red);
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 24pt;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 0.2in;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 0.5in;
+            height: 3px;
+            background: var(--red);
+            margin-top: 0.1in;
+        }
+
+        .body-text {
+            font-size: 10.5pt;
+            line-height: 1.6;
+            margin-bottom: 0.15in;
+        }
+
+        .lead-text {
+            font-size: 13pt;
+            line-height: 1.5;
+            color: var(--gray-600);
+            margin-bottom: 0.25in;
+        }
+
+        /* Metrics grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.2in;
+            margin: 0.3in 0;
+        }
+
+        .metric-card {
+            background: var(--gray-100);
+            padding: 0.25in;
+            text-align: center;
+        }
+
+        .metric-number {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 32pt;
+            font-weight: 700;
+            color: var(--red);
+            line-height: 1;
+        }
+
+        .metric-label {
+            font-size: 9pt;
+            color: var(--gray-600);
+            margin-top: 0.05in;
+        }
+
+        /* Quote */
+        .pullquote {
+            border-left: 4px solid var(--red);
+            padding: 0.2in 0.3in;
+            margin: 0.3in 0;
+            background: var(--cream);
+        }
+
+        .pullquote-text {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 14pt;
+            font-style: italic;
+            color: var(--gray-800);
+            line-height: 1.5;
+        }
+
+        .pullquote-cite {
+            font-size: 9pt;
+            color: var(--gray-600);
+            margin-top: 0.1in;
+        }
+
+        /* Footer */
+        .page-footer {
+            position: absolute;
+            bottom: 0.4in;
+            left: 0.75in;
+            right: 0.75in;
+            display: flex;
+            justify-content: space-between;
+            padding-top: 0.1in;
+            border-top: 1px solid var(--gray-200);
+            background: var(--white);
+        }
+
+        .footer-left { font-size: 7.5pt; color: var(--gray-400); }
+        .footer-page {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 9pt;
+            font-weight: 700;
+            color: var(--red);
+        }
+    </style>
+</head>
+<body>
+    <!-- COVER -->
+    <div class="page cover">
+        <header class="cover-header">
+            <div class="cover-logo">Center for Cooperative Media</div>
+            <div class="cover-date">[Month Year]</div>
+        </header>
+        <div class="cover-main">
+            <div class="cover-eyebrow">[Report Type]</div>
+            <h1 class="cover-title">[Report title in sentence case]</h1>
+            <p class="cover-subtitle">[Subtitle or brief description of what this report covers]</p>
+        </div>
+        <footer class="cover-footer">
+            <div class="cover-org">Montclair State University • College of Communication and Media</div>
+        </footer>
+    </div>
+
+    <!-- EXECUTIVE SUMMARY -->
+    <div class="page content-page">
+        <header class="page-header">
+            <div class="page-header-left">[Report Name]</div>
+            <div class="page-header-right">[Year]</div>
+        </header>
+
+        <h2 class="section-title">Executive summary</h2>
+
+        <p class="lead-text">
+            [Opening statement that captures the key message of the report in 2-3 sentences.]
+        </p>
+
+        <p class="body-text">
+            [More detailed summary of findings, outcomes, or key takeaways.]
+        </p>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-number">[Number]</div>
+                <div class="metric-label">[Metric label]</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">[Number]</div>
+                <div class="metric-label">[Metric label]</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">[Number]</div>
+                <div class="metric-label">[Metric label]</div>
+            </div>
+        </div>
+
+        <div class="pullquote">
+            <p class="pullquote-text">"[Key quote that captures the essence of the report's findings or mission.]"</p>
+            <p class="pullquote-cite">— [Name], [Title]</p>
+        </div>
+
+        <p class="body-text">
+            [Additional context or forward-looking statement.]
+        </p>
+
+        <footer class="page-footer">
+            <div class="footer-left">Center for Cooperative Media • Montclair State University</div>
+            <div class="footer-page">2</div>
+        </footer>
+    </div>
+
+    <!-- DETAILED FINDINGS -->
+    <div class="page content-page">
+        <header class="page-header">
+            <div class="page-header-left">[Report Name]</div>
+            <div class="page-header-right">[Year]</div>
+        </header>
+
+        <h2 class="section-title">Key findings</h2>
+
+        <p class="body-text">
+            [Introduction to the findings section.]
+        </p>
+
+        <p class="body-text">
+            <strong>[Finding 1 title]:</strong> [Description of the first key finding with supporting data or context.]
+        </p>
+
+        <p class="body-text">
+            <strong>[Finding 2 title]:</strong> [Description of the second key finding with supporting data or context.]
+        </p>
+
+        <p class="body-text">
+            <strong>[Finding 3 title]:</strong> [Description of the third key finding with supporting data or context.]
+        </p>
+
+        <div class="pullquote">
+            <p class="pullquote-text">"[Quote from a partner, participant, or stakeholder that illustrates the impact.]"</p>
+            <p class="pullquote-cite">— [Name], [Organization]</p>
+        </div>
+
+        <p class="body-text">
+            [Closing paragraph for this section.]
+        </p>
+
+        <footer class="page-footer">
+            <div class="footer-left">Center for Cooperative Media • Montclair State University</div>
+            <div class="footer-page">3</div>
+        </footer>
+    </div>
+</body>
+</html>

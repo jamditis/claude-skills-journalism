@@ -1,0 +1,609 @@
+/* PDF Playground — Control panel styles
+   Designed to work as a flex child alongside an iframe preview.
+   Hidden during print so they never appear in exported PDFs. */
+
+@media print {
+  #pdf-playground-controls,
+  #pdf-playground-toast {
+    display: none !important;
+  }
+}
+
+/* ===== Panel container (flex child of body) ===== */
+
+#pdf-playground-controls {
+  width: clamp(240px, 22vw, 360px);
+  height: 100vh;
+  height: 100dvh;
+  background: #1e1e2e;
+  color: #cdd6f4;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: visible;
+  border-left: 1px solid #313244;
+  transition: width 0.25s ease, min-width 0.25s ease;
+}
+
+#pdf-playground-controls.collapsed {
+  width: 40px;
+  min-width: 40px;
+}
+
+#pdf-playground-controls.collapsed .panel-body,
+#pdf-playground-controls.collapsed .panel-footer,
+#pdf-playground-controls.collapsed .panel-title,
+#pdf-playground-controls.collapsed .panel-actions {
+  display: none;
+}
+
+#pdf-playground-controls.collapsed .panel-header {
+  flex-direction: column;
+  padding: 12px 8px;
+  gap: 8px;
+}
+
+#pdf-playground-controls.collapsed .panel-expand-label {
+  writing-mode: vertical-rl;
+  font-size: 11px;
+  font-weight: 700;
+  color: #cba6f7;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+}
+
+#pdf-playground-controls * {
+  box-sizing: border-box;
+}
+
+/* ===== Header ===== */
+
+#pdf-playground-controls .panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #181825;
+  border-bottom: 1px solid #313244;
+  flex-shrink: 0;
+}
+
+#pdf-playground-controls .panel-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #cba6f7;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+#pdf-playground-controls .panel-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+#pdf-playground-controls .panel-btn {
+  background: none;
+  border: 1px solid #45475a;
+  color: #a6adc8;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+
+#pdf-playground-controls .panel-btn:hover {
+  background: #313244;
+  color: #cdd6f4;
+}
+
+#pdf-playground-controls .panel-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+#pdf-playground-controls .panel-btn:disabled:hover {
+  background: none;
+  color: #a6adc8;
+}
+
+/* ===== Preset grid ===== */
+
+#pdf-playground-controls .ctrl-preset-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+#pdf-playground-controls .ctrl-preset-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #313244;
+  border: 1px solid #45475a;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  color: #cdd6f4;
+  font-size: 10px;
+}
+
+#pdf-playground-controls .ctrl-preset-btn:hover {
+  border-color: #cba6f7;
+  background: #3b3b52;
+}
+
+#pdf-playground-controls .ctrl-preset-btn.active {
+  border-color: #cba6f7;
+  background: #45475a;
+}
+
+#pdf-playground-controls .ctrl-preset-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+#pdf-playground-controls .ctrl-preset-label {
+  white-space: nowrap;
+}
+
+/* ===== Scrollable body ===== */
+
+#pdf-playground-controls .panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+  min-height: 0;
+}
+
+#pdf-playground-controls .panel-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+#pdf-playground-controls .panel-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#pdf-playground-controls .panel-body::-webkit-scrollbar-thumb {
+  background: #45475a;
+  border-radius: 3px;
+}
+
+/* ===== Collapsible sections ===== */
+
+#pdf-playground-controls .ctrl-section {
+  border-bottom: 1px solid #313244;
+}
+
+#pdf-playground-controls .ctrl-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+#pdf-playground-controls .ctrl-section-header:hover {
+  background: #313244;
+}
+
+#pdf-playground-controls .ctrl-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #a6adc8;
+}
+
+#pdf-playground-controls .ctrl-section-chevron {
+  color: #585b70;
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+
+#pdf-playground-controls .ctrl-section.open .ctrl-section-chevron {
+  transform: rotate(180deg);
+}
+
+#pdf-playground-controls .ctrl-section-body {
+  display: none;
+  padding: 4px 12px 10px;
+}
+
+#pdf-playground-controls .ctrl-section.open .ctrl-section-body {
+  display: block;
+}
+
+/* ===== Control rows ===== */
+
+#pdf-playground-controls .ctrl-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 0;
+  gap: 6px;
+  min-width: 0;
+}
+
+#pdf-playground-controls .ctrl-label {
+  font-size: 11px;
+  color: #bac2de;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ===== Color picker ===== */
+
+#pdf-playground-controls .ctrl-color-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+#pdf-playground-controls .ctrl-color-input {
+  width: 28px;
+  height: 22px;
+  border: 1px solid #45475a;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+  flex-shrink: 0;
+}
+
+#pdf-playground-controls .ctrl-color-input::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+#pdf-playground-controls .ctrl-color-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 2px;
+}
+
+#pdf-playground-controls .ctrl-color-hex {
+  font-family: "Cascadia Code", "Fira Code", monospace;
+  font-size: 10px;
+  color: #a6adc8;
+  background: #313244;
+  border: 1px solid #45475a;
+  border-radius: 4px;
+  padding: 2px 4px;
+  width: 64px;
+  min-width: 50px;
+  text-align: center;
+}
+
+#pdf-playground-controls .ctrl-color-hex:focus {
+  outline: none;
+  border-color: #cba6f7;
+}
+
+/* ===== Font dropdown ===== */
+
+#pdf-playground-controls .ctrl-font-select {
+  background: #313244;
+  color: #cdd6f4;
+  border: 1px solid #45475a;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: 11px;
+  flex: 1;
+  min-width: 0;
+  max-width: 180px;
+  cursor: pointer;
+}
+
+#pdf-playground-controls .ctrl-font-select:focus {
+  outline: none;
+  border-color: #cba6f7;
+}
+
+/* ===== Sliders ===== */
+
+#pdf-playground-controls .ctrl-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+#pdf-playground-controls .ctrl-slider {
+  flex: 1;
+  min-width: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: #45475a;
+  border-radius: 2px;
+  outline: none;
+}
+
+#pdf-playground-controls .ctrl-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #cba6f7;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #1e1e2e;
+}
+
+#pdf-playground-controls .ctrl-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #cba6f7;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #1e1e2e;
+}
+
+#pdf-playground-controls .ctrl-slider-value {
+  font-family: "Cascadia Code", "Fira Code", monospace;
+  font-size: 10px;
+  color: #a6adc8;
+  min-width: 36px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ===== Toggles ===== */
+
+#pdf-playground-controls .ctrl-toggle {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+#pdf-playground-controls .ctrl-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+#pdf-playground-controls .ctrl-toggle-track {
+  position: absolute;
+  inset: 0;
+  background: #45475a;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#pdf-playground-controls .ctrl-toggle input:checked + .ctrl-toggle-track {
+  background: #cba6f7;
+}
+
+#pdf-playground-controls .ctrl-toggle-track::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #1e1e2e;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+#pdf-playground-controls .ctrl-toggle input:checked + .ctrl-toggle-track::after {
+  transform: translateX(16px);
+}
+
+/* ===== Button group (stat columns, etc.) ===== */
+
+#pdf-playground-controls .ctrl-btn-group {
+  display: flex;
+  gap: 0;
+  border: 1px solid #45475a;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+#pdf-playground-controls .ctrl-btn-option {
+  background: #313244;
+  color: #a6adc8;
+  border: none;
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  border-right: 1px solid #45475a;
+}
+
+#pdf-playground-controls .ctrl-btn-option:last-child {
+  border-right: none;
+}
+
+#pdf-playground-controls .ctrl-btn-option.active {
+  background: #cba6f7;
+  color: #1e1e2e;
+  font-weight: 600;
+}
+
+/* ===== Panel footer (pending changes + actions, inside panel) ===== */
+
+#pdf-playground-controls .panel-footer {
+  flex-shrink: 0;
+  position: relative;
+  background: #181825;
+  border-top: 1px solid #313244;
+}
+
+#pdf-playground-controls .pending-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+#pdf-playground-controls .pending-header:hover {
+  background: #313244;
+}
+
+#pdf-playground-controls .pending-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f9e2af;
+}
+
+#pdf-playground-controls .pending-count {
+  background: #f9e2af;
+  color: #1e1e2e;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 8px;
+}
+
+#pdf-playground-controls .pending-chevron {
+  margin-left: auto;
+  color: #585b70;
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+#pdf-playground-controls .pending-chevron.open {
+  transform: rotate(180deg);
+}
+
+/* Pending list expands UPWARD as an overlay */
+#pdf-playground-controls .pending-list {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  max-height: 40vh;
+  overflow-y: auto;
+  background: #181825;
+  border-top: 1px solid #313244;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.4);
+  padding: 8px 12px;
+  display: none;
+}
+
+#pdf-playground-controls .pending-list.open {
+  display: block;
+}
+
+#pdf-playground-controls .pending-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 0;
+  font-size: 11px;
+  color: #a6adc8;
+  border-bottom: 1px solid #313244;
+}
+
+#pdf-playground-controls .pending-item:last-child {
+  border-bottom: none;
+}
+
+#pdf-playground-controls .pending-item-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+#pdf-playground-controls .pending-item-remove {
+  background: none;
+  border: none;
+  color: #585b70;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 6px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+#pdf-playground-controls .pending-item-remove:hover {
+  color: #f38ba8;
+}
+
+/* ===== Action buttons ===== */
+
+#pdf-playground-controls .panel-actions-bar {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px 12px;
+}
+
+#pdf-playground-controls .action-btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+
+#pdf-playground-controls .action-btn:hover {
+  opacity: 0.85;
+}
+
+#pdf-playground-controls .action-btn-primary {
+  background: #cba6f7;
+  color: #1e1e2e;
+}
+
+#pdf-playground-controls .action-btn-secondary {
+  background: #45475a;
+  color: #cdd6f4;
+}
+
+/* ===== Toast notification ===== */
+
+#pdf-playground-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: #1e1e2e;
+  color: #a6e3a1;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  z-index: 100000;
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  pointer-events: none;
+}
+
+#pdf-playground-toast.visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}

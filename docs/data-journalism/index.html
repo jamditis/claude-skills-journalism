@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Journalism | Claude Skills for Journalism</title>
+    <meta name="description" content="Data journalism workflows for analysis, visualization, and storytelling. Data acquisition, cleaning, statistical analysis, and publication-ready charts.">
+
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Fraunces', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        canvas: '#ede6d4',
+                        ink: '#121212',
+                        clay: '#d6cdb7',
+                        mist: '#6b6b6b',
+                        accent: '#059669',
+                        accentDark: '#047857',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #ede6d4; color: #121212; line-height: 1.7; }
+        .paper-overlay {
+            position: fixed; inset: 0;
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+            opacity: 0.5; pointer-events: none; z-index: 1;
+        }
+        .hero-gradient { background: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%); }
+        .feature-card {
+            background: white; border: 1px solid rgba(18, 18, 18, 0.08);
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15); }
+        .workflow-step { position: relative; }
+        .workflow-step:not(:last-child)::after {
+            content: ''; position: absolute; left: 1.5rem; top: 4rem; bottom: -1rem;
+            width: 2px; background: linear-gradient(to bottom, #059669, transparent);
+        }
+        pre { background: #1a1a1a; color: #e2e8f0; padding: 1.5rem; border-radius: 8px; overflow-x: auto; font-size: 0.85em; }
+        code { background: rgba(18, 18, 18, 0.06); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
+        pre code { background: none; padding: 0; }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="paper-overlay"></div>
+
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">← Back to all skills</a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/data-journalism" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">View on GitHub →</a>
+        </div>
+    </nav>
+
+    <header class="hero-gradient text-white pt-32 pb-24 px-6 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/></pattern></defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+        </div>
+
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide uppercase mb-6">Core Journalism Skill</div>
+            <h1 class="font-display text-5xl md:text-7xl font-black leading-[0.9] mb-6">Data<br>Journalism</h1>
+            <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-10 font-light">
+                Find, analyze, and present data to tell compelling stories. From acquisition to publication-ready visualizations.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <a href="#workflow" class="inline-flex items-center gap-2 bg-white text-accent font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                    See the Workflow
+                </a>
+                <a href="#install" class="inline-flex items-center gap-2 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/20 transition-colors border border-white/20">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    Install Skill
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+        <!-- Story Arc Framework -->
+        <section id="workflow" class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">The data story arc</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">Based on Philip Meyer's precision journalism framework, adapted for modern newsrooms.</p>
+                </div>
+
+                <div class="space-y-8">
+                    <div class="workflow-step flex gap-6">
+                        <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">1</div>
+                        <div class="feature-card p-6 rounded-xl flex-1">
+                            <h3 class="font-display text-xl font-bold mb-2">The hook (nut graf)</h3>
+                            <p class="text-mist">What's the key finding? Why should readers care? What's the human impact?</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step flex gap-6">
+                        <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">2</div>
+                        <div class="feature-card p-6 rounded-xl flex-1">
+                            <h3 class="font-display text-xl font-bold mb-2">The evidence</h3>
+                            <p class="text-mist">Show the data. Explain the methodology. Acknowledge limitations.</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step flex gap-6">
+                        <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">3</div>
+                        <div class="feature-card p-6 rounded-xl flex-1">
+                            <h3 class="font-display text-xl font-bold mb-2">The context</h3>
+                            <p class="text-mist">Historical comparisons. Geographic comparisons. Trend analysis.</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step flex gap-6">
+                        <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">4</div>
+                        <div class="feature-card p-6 rounded-xl flex-1">
+                            <h3 class="font-display text-xl font-bold mb-2">The human element</h3>
+                            <p class="text-mist">Individual examples that illustrate the data. Expert interpretation. Affected voices.</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step flex gap-6">
+                        <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">5</div>
+                        <div class="feature-card p-6 rounded-xl flex-1">
+                            <h3 class="font-display text-xl font-bold mb-2">The implications</h3>
+                            <p class="text-mist">What does this mean going forward? What questions remain? What actions could result?</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step flex gap-6">
+                        <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">6</div>
+                        <div class="feature-card p-6 rounded-xl flex-1">
+                            <h3 class="font-display text-xl font-bold mb-2">The methodology box</h3>
+                            <p class="text-mist">Where did data come from? How was it analyzed? What are the limitations?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Capabilities Grid -->
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">What's included</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="database" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Data acquisition</h3>
+                        <p class="text-mist text-sm mb-4">Federal and state data sources, FOIA strategies for datasets, building your own databases.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Data.gov</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Census</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">BLS</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="sparkles" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Data cleaning</h3>
+                        <p class="text-mist text-sm mb-4">Python patterns for standardizing names, parsing dates, handling duplicates, flagging outliers.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">pandas</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">rapidfuzz</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="calculator" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Statistical analysis</h3>
+                        <p class="text-mist text-sm mb-4">Journalist-friendly statistics, per capita calculations, inflation adjustment, change metrics.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">cpi</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">wbdata</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="bar-chart-2" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Data visualization</h3>
+                        <p class="text-mist text-sm mb-4">Chart selection guide, Plotly for exploration, Datawrapper for publication-ready charts.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Plotly</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Datawrapper</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="map" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Geospatial analysis</h3>
+                        <p class="text-mist text-sm mb-4">Geocoding with Census and Google APIs, GeoPandas workflows, choropleth maps.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">geopandas</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">lonboard</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="alert-triangle" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Responsible reporting</h3>
+                        <p class="text-mist text-sm mb-4">Correlation vs causation, avoiding misleading visualizations, chart integrity checklists.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Ethics</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Accuracy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Code Example -->
+        <section class="py-24 px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Ready-to-use code</h2>
+                    <p class="text-lg text-mist">The skill includes Python patterns you can use immediately.</p>
+                </div>
+
+                <div class="feature-card p-6 rounded-xl">
+                    <h3 class="font-semibold mb-4">Inflation adjustment example</h3>
+                    <pre><code># Adjust dollar amounts for inflation
+from cpi import inflate
+
+# Compare salaries across years
+salary_2010 = 50000
+salary_2024_dollars = inflate(salary_2010, 2010, to=2024)
+
+print(f"${salary_2010:,} in 2010 = ${salary_2024_dollars:,.0f} in 2024")
+# $50,000 in 2010 = $70,147 in 2024</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section id="install" class="py-24 px-6 bg-ink text-white">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-16">Install the skill</h2>
+
+                <div class="space-y-6">
+                    <div class="bg-white/5 p-6 rounded-xl">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">1</span>
+                            Clone the repository
+                        </h3>
+                        <pre><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
+                    </div>
+
+                    <div class="bg-white/5 p-6 rounded-xl">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">2</span>
+                            Copy skill to Claude skills directory
+                        </h3>
+                        <pre><code>cp -r data-journalism ~/.claude/skills/</code></pre>
+                    </div>
+
+                    <div class="bg-white/5 p-6 rounded-xl">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">3</span>
+                            Start analyzing
+                        </h3>
+                        <p class="text-white/70">Ask Claude to help clean your dataset, create visualizations, or structure your data story.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Credits -->
+        <section class="py-16 px-6 border-t border-ink/10">
+            <div class="max-w-6xl mx-auto text-center">
+                <p class="text-mist text-sm mb-4">
+                    Created by <a href="https://github.com/jamditis" class="text-accent hover:underline">Joe Amditis</a> at the
+                    <a href="https://centerforcooperativemedia.org" class="text-accent hover:underline">Center for Cooperative Media</a>
+                </p>
+                <p class="text-mist/60 text-xs">Part of <a href="../" class="hover:underline">Claude Skills for Journalism</a> • MIT License</p>
+            </div>
+        </section>
+    </main>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>

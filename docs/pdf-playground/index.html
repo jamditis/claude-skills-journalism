@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Playground | Professional document design for newsrooms</title>
+    <meta name="description" content="Create professional, print-ready PDF documents with customizable branding. Perfect for proposals, reports, one-pagers, newsletters, slides, and event materials.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="PDF Playground">
+    <meta property="og:description" content="Professional document design for newsrooms. Create proposals, reports, and more with your own branding.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/pdf-playground/">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Fraunces', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        canvas: '#ede6d4',
+                        ink: '#121212',
+                        clay: '#d6cdb7',
+                        mist: '#6b6b6b',
+                        accent: '#CA3553',
+                        accentDark: '#a82a44',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #ede6d4;
+            color: #121212;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("https://www.transparenttextures.com/patterns/natural-paper.png"),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #CA3553 0%, #a82a44 50%, #8a2038 100%);
+        }
+
+        .doc-preview {
+            background: white;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border-radius: 4px;
+        }
+
+        .feature-card {
+            background: white;
+            border: 1px solid rgba(18, 18, 18, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+        }
+
+        code {
+            background: rgba(18, 18, 18, 0.06);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #1a1a1a;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="paper-overlay"></div>
+
+    <!-- Nav -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">
+                ← Back to all skills
+            </a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-playground" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">
+                View on GitHub →
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero-gradient text-white pt-32 pb-24 px-6 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/>
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+        </div>
+
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide uppercase mb-6">
+                Claude Code Plugin
+            </div>
+            <h1 class="font-display text-5xl md:text-7xl font-black leading-[0.9] mb-6">
+                PDF<br>Playground
+            </h1>
+            <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-10 font-light">
+                Create professional, print-ready documents with your own branding. Perfect for newsrooms, nonprofits, and organizations.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <a href="#install" class="inline-flex items-center gap-2 bg-white text-accent font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    Install Plugin
+                </a>
+                <a href="#docs" class="inline-flex items-center gap-2 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/20 transition-colors border border-white/20">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                    Documentation
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+        <!-- Document Types -->
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">6 document types</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">
+                        From multi-page funding proposals to event flyers. Each template is designed for professional output.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="file-text" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Proposals</h3>
+                        <p class="text-mist text-sm">Multi-page funding proposals with cover pages, content sections, budgets, and appendices.</p>
+                        <code class="text-xs mt-3 inline-block">/proposal</code>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="bar-chart-2" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Reports</h3>
+                        <p class="text-mist text-sm">Program reports, annual reports, and impact summaries with metrics and visualizations.</p>
+                        <code class="text-xs mt-3 inline-block">/report</code>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="file" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">One-pagers</h3>
+                        <p class="text-mist text-sm">Single-page fact sheets with sidebar layouts, key highlights, and statistics.</p>
+                        <code class="text-xs mt-3 inline-block">/onepager</code>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="mail" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Newsletters</h3>
+                        <p class="text-mist text-sm">Email-safe HTML newsletters with featured stories, news items, and events.</p>
+                        <code class="text-xs mt-3 inline-block">/newsletter</code>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="presentation" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Slides</h3>
+                        <p class="text-mist text-sm">HTML presentation slides with title, content, quote, and stat slide types.</p>
+                        <code class="text-xs mt-3 inline-block">/slides</code>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="calendar" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Events</h3>
+                        <p class="text-mist text-sm">Flyers, posters, and signage with bold titles, event details, and CTAs.</p>
+                        <code class="text-xs mt-3 inline-block">/event</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Demo -->
+        <section id="demo" class="py-24 px-6 bg-ink text-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">See it in action</h2>
+                    <p class="text-lg text-white/70 max-w-2xl mx-auto">
+                        A guided wizard walks you through setup, then you fine-tune the design live with an interactive control panel.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                    <!-- Chat Interface -->
+                    <div class="bg-[#1a1a1a] rounded-xl overflow-hidden shadow-2xl">
+                        <div class="bg-[#252525] px-4 py-3 flex items-center gap-2 border-b border-white/10">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            <span class="ml-3 text-white/50 text-sm font-mono">claude</span>
+                        </div>
+
+                        <div id="chat-messages" class="p-4 space-y-4 h-[480px] overflow-y-auto">
+                            <!-- Messages will be inserted here -->
+                        </div>
+
+                        <div class="border-t border-white/10 p-4">
+                            <div class="flex gap-2">
+                                <input type="text" id="demo-input" placeholder="Type a message..."
+                                    class="flex-1 bg-[#252525] text-white px-4 py-2 rounded-lg border border-white/10 focus:border-accent focus:outline-none text-sm"
+                                    disabled>
+                                <button id="demo-btn" class="bg-accent hover:bg-accentDark text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                    Send
+                                </button>
+                            </div>
+                            <p class="text-white/40 text-xs mt-2">Demo mode — press "Start demo" to see the full workflow</p>
+                        </div>
+                    </div>
+
+                    <!-- Preview Area -->
+                    <div class="relative">
+                        <!-- Wrapper view: iframe + control panel side by side -->
+                        <div id="preview-wrapper" class="rounded-xl overflow-hidden shadow-2xl transition-all duration-500 opacity-40">
+                            <div class="flex h-[540px]">
+                                <!-- Document iframe area -->
+                                <div id="doc-preview" class="flex-1 bg-white overflow-hidden text-gray-800">
+                                    <!-- Initial empty state -->
+                                    <div id="empty-state" class="h-full flex flex-col items-center justify-center text-gray-400 p-8">
+                                        <i data-lucide="file-text" class="w-16 h-16 mb-4 opacity-30"></i>
+                                        <p class="text-sm font-medium">Document preview</p>
+                                        <p class="text-xs opacity-60">Start the demo to see it build</p>
+                                    </div>
+
+                                    <!-- Document content (hidden initially) -->
+                                    <div id="doc-content" class="hidden h-full flex flex-col">
+                                        <div id="doc-header" class="px-5 pt-5 pb-3">
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center gap-2">
+                                                    <div id="logo-box" class="w-5 h-5 rounded bg-gray-300"></div>
+                                                    <span id="org-name" class="text-[8px] font-semibold text-gray-400 tracking-wide">YOUR ORG</span>
+                                                </div>
+                                                <span id="doc-type-label" class="text-[7px] text-gray-400 uppercase tracking-widest">Proposal</span>
+                                            </div>
+                                            <div id="title-block">
+                                                <p id="doc-eyebrow" class="text-[7px] uppercase tracking-widest text-gray-400 mb-1">Funding proposal</p>
+                                                <h1 id="doc-title" class="text-lg font-bold leading-tight text-gray-800">AI for newsrooms</h1>
+                                                <div id="title-accent" class="w-8 h-0.5 bg-gray-300 mt-1.5 rounded"></div>
+                                            </div>
+                                        </div>
+
+                                        <div id="doc-body" class="flex-1 px-5 py-3 overflow-hidden">
+                                            <!-- Stat grid -->
+                                            <div id="stat-grid" class="grid grid-cols-3 gap-2 mb-3">
+                                                <div class="text-center">
+                                                    <div id="stat-1" class="text-base font-bold text-gray-700">330+</div>
+                                                    <div class="text-[6px] text-gray-400">Newsrooms</div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <div id="stat-2" class="text-base font-bold text-gray-700">78%</div>
+                                                    <div class="text-[6px] text-gray-400">Need training</div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <div id="stat-3" class="text-base font-bold text-gray-700">12</div>
+                                                    <div class="text-[6px] text-gray-400">Pilot cohort</div>
+                                                </div>
+                                            </div>
+                                            <div id="section-1" class="mb-3">
+                                                <h2 class="text-[9px] font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Background</h2>
+                                                <div class="space-y-1">
+                                                    <div class="h-1 bg-gray-200 rounded w-full"></div>
+                                                    <div class="h-1 bg-gray-200 rounded w-11/12"></div>
+                                                    <div class="h-1 bg-gray-200 rounded w-4/5"></div>
+                                                </div>
+                                            </div>
+                                            <div id="section-2" class="mb-3">
+                                                <h2 class="text-[9px] font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Proposed work</h2>
+                                                <div class="space-y-1">
+                                                    <div class="h-1 bg-gray-200 rounded w-full"></div>
+                                                    <div class="h-1 bg-gray-200 rounded w-5/6"></div>
+                                                </div>
+                                            </div>
+                                            <div id="budget-section" class="hidden">
+                                                <h2 class="text-[9px] font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Budget</h2>
+                                                <div class="border border-gray-200 rounded overflow-hidden text-[7px]">
+                                                    <div id="budget-header" class="bg-gray-800 text-white font-semibold px-1.5 py-0.5 flex">
+                                                        <span class="flex-1">Item</span>
+                                                        <span class="w-12 text-right">Year 1</span>
+                                                        <span class="w-12 text-right">Year 2</span>
+                                                    </div>
+                                                    <div class="divide-y divide-gray-100">
+                                                        <div class="px-1.5 py-0.5 flex"><span class="flex-1 text-gray-500">Personnel</span><span class="w-12 text-right">$85K</span><span class="w-12 text-right">$95K</span></div>
+                                                        <div class="px-1.5 py-0.5 flex"><span class="flex-1 text-gray-500">Technology</span><span class="w-12 text-right">$20K</span><span class="w-12 text-right">$25K</span></div>
+                                                        <div class="px-1.5 py-0.5 flex"><span class="flex-1 text-gray-500">Training</span><span class="w-12 text-right">$45K</span><span class="w-12 text-right">$55K</span></div>
+                                                    </div>
+                                                    <div id="budget-total" class="bg-[#CA3553] text-white font-bold px-1.5 py-0.5 flex">
+                                                        <span class="flex-1">Total</span>
+                                                        <span class="w-12 text-right">$150K</span>
+                                                        <span class="w-12 text-right">$175K</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="doc-footer" class="px-5 py-1.5 border-t border-gray-200 flex items-center justify-between text-[7px] text-gray-400">
+                                            <span id="footer-org">Your Organization</span>
+                                            <span id="footer-page">1</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Control panel sidebar (hidden initially) -->
+                                <div id="control-panel" class="hidden w-[180px] flex-shrink-0 bg-[#1e1e2e] text-[#cdd6f4] text-[9px] flex flex-col border-l border-[#313244]">
+                                    <div class="px-2 py-2 bg-[#181825] border-b border-[#313244] flex items-center justify-between">
+                                        <span class="text-[10px] font-bold text-[#cba6f7]">PDF Playground</span>
+                                    </div>
+                                    <div class="flex-1 overflow-hidden px-2 py-1.5 space-y-2">
+                                        <!-- Presets row -->
+                                        <div>
+                                            <div class="text-[8px] font-bold text-[#a6adc8] uppercase tracking-widest mb-1">Presets</div>
+                                            <div id="preset-grid" class="flex flex-wrap gap-1">
+                                                <button class="preset-btn px-1.5 py-0.5 bg-[#313244] rounded text-[7px] text-[#cdd6f4] border border-[#45475a] flex items-center gap-1 hover:border-[#cba6f7] transition-colors" data-preset="ccm"><span class="w-2 h-2 rounded-sm bg-[#CA3553] inline-block"></span>CCM</button>
+                                                <button class="preset-btn px-1.5 py-0.5 bg-[#313244] rounded text-[7px] text-[#cdd6f4] border border-[#45475a] flex items-center gap-1 hover:border-[#cba6f7] transition-colors" data-preset="blue"><span class="w-2 h-2 rounded-sm bg-[#1a5f7a] inline-block"></span>Blue</button>
+                                                <button class="preset-btn px-1.5 py-0.5 bg-[#313244] rounded text-[7px] text-[#cdd6f4] border border-[#45475a] flex items-center gap-1 hover:border-[#cba6f7] transition-colors" data-preset="green"><span class="w-2 h-2 rounded-sm bg-[#2d8659] inline-block"></span>Green</button>
+                                                <button class="preset-btn px-1.5 py-0.5 bg-[#313244] rounded text-[7px] text-[#cdd6f4] border border-[#45475a] flex items-center gap-1 hover:border-[#cba6f7] transition-colors" data-preset="earth"><span class="w-2 h-2 rounded-sm bg-[#b5651d] inline-block"></span>Earth</button>
+                                                <button class="preset-btn px-1.5 py-0.5 bg-[#313244] rounded text-[7px] text-[#cdd6f4] border border-[#45475a] flex items-center gap-1 hover:border-[#cba6f7] transition-colors" data-preset="purple"><span class="w-2 h-2 rounded-sm bg-[#6b3fa0] inline-block"></span>Purple</button>
+                                            </div>
+                                        </div>
+                                        <!-- Colors -->
+                                        <div>
+                                            <div class="text-[8px] font-bold text-[#a6adc8] uppercase tracking-widest mb-1">Colors</div>
+                                            <div class="space-y-1">
+                                                <div class="flex items-center justify-between"><span class="text-[#bac2de]">Primary</span><div class="flex items-center gap-1"><span id="cp-swatch" class="w-3 h-3 rounded bg-[#CA3553] border border-[#45475a]"></span><span id="cp-hex" class="text-[7px] text-[#a6adc8] font-mono">#CA3553</span></div></div>
+                                                <div class="flex items-center justify-between"><span class="text-[#bac2de]">Text</span><span class="text-[7px] text-[#a6adc8] font-mono">#2d2a28</span></div>
+                                            </div>
+                                        </div>
+                                        <!-- Typography -->
+                                        <div>
+                                            <div class="text-[8px] font-bold text-[#a6adc8] uppercase tracking-widest mb-1">Typography</div>
+                                            <div class="space-y-1">
+                                                <div class="flex items-center justify-between"><span class="text-[#bac2de]">Heading</span><span id="cp-heading-font" class="text-[7px] text-[#a6adc8]">Playfair</span></div>
+                                                <div class="flex items-center justify-between"><span class="text-[#bac2de]">Body size</span><div class="flex items-center gap-1"><div class="w-12 h-1 bg-[#45475a] rounded relative"><div id="cp-size-thumb" class="absolute w-2 h-2 bg-[#cba6f7] rounded-full -top-0.5" style="left: 30%"></div></div><span class="text-[7px] text-[#a6adc8]">11pt</span></div></div>
+                                            </div>
+                                        </div>
+                                        <!-- Sections -->
+                                        <div>
+                                            <div class="text-[8px] font-bold text-[#a6adc8] uppercase tracking-widest mb-1">Sections</div>
+                                            <div class="space-y-0.5">
+                                                <div class="flex items-center justify-between"><span class="text-[#bac2de]">Stats</span><div class="w-5 h-2.5 bg-[#cba6f7] rounded-full relative"><div class="absolute w-2 h-2 bg-[#1e1e2e] rounded-full top-[1px] right-[1px]"></div></div></div>
+                                                <div class="flex items-center justify-between"><span class="text-[#bac2de]">Budget</span><div class="w-5 h-2.5 bg-[#cba6f7] rounded-full relative"><div class="absolute w-2 h-2 bg-[#1e1e2e] rounded-full top-[1px] right-[1px]"></div></div></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Footer -->
+                                    <div id="cp-footer" class="px-2 py-1.5 bg-[#181825] border-t border-[#313244]">
+                                        <div class="flex items-center gap-1 mb-1">
+                                            <span id="cp-changes-label" class="text-[8px] font-bold text-[#f9e2af] uppercase">Changes</span>
+                                            <span id="cp-changes-count" class="text-[7px] font-bold bg-[#f9e2af] text-[#1e1e2e] px-1 rounded-full">0</span>
+                                        </div>
+                                        <div class="flex gap-1">
+                                            <button id="cp-copy-btn" class="flex-1 bg-[#cba6f7] text-[#1e1e2e] text-[8px] font-semibold py-1 rounded">Copy changes</button>
+                                            <button class="bg-[#45475a] text-[#cdd6f4] text-[8px] py-1 px-2 rounded">Reset</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button id="start-demo" class="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-xl cursor-pointer hover:bg-black/50 transition-colors">
+                            <span class="bg-accent text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 shadow-lg hover:bg-accentDark transition-colors">
+                                <i data-lucide="play" class="w-5 h-5"></i>
+                                Start demo
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-12 text-center">
+                    <p class="text-white/50 text-sm mb-4">Ready to try it yourself?</p>
+                    <a href="#install" class="inline-flex items-center gap-2 bg-accent text-white font-semibold px-6 py-3 rounded-lg hover:bg-accentDark transition-colors">
+                        <i data-lucide="download" class="w-5 h-5"></i>
+                        Install PDF Playground
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Brand Customization -->
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <h2 class="font-display text-4xl md:text-5xl font-light italic mb-6">Your brand,<br><span class="font-black">your documents.</span></h2>
+                        <p class="text-lg text-mist mb-8">
+                            Configure your organization's colors, fonts, and style guide once. Every document you create will automatically follow your brand guidelines.
+                        </p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5"></i>
+                                <span>Custom colors (primary, secondary, accent)</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5"></i>
+                                <span>Any Google Font for headings and body</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5"></i>
+                                <span>Style preferences (sentence case, Oxford comma)</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5"></i>
+                                <span>Organization info auto-populated</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <pre><code class="text-sm">---
+brand:
+  name: "Your Organization"
+  website: "https://yourorg.com"
+
+colors:
+  primary: "#CA3553"
+  secondary: "#000000"
+
+fonts:
+  heading: "Playfair Display"
+  body: "Source Sans 3"
+
+style:
+  headingCase: "sentence"
+  useOxfordComma: true
+---</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section id="install" class="py-24 px-6">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-6">Get started</h2>
+                <p class="text-center text-mist text-lg mb-16 max-w-2xl mx-auto">
+                    You need <strong><a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accent hover:underline">Claude Code</a></strong> installed on your computer.
+                    Open your terminal and run <code>claude --version</code> to check. If you get "command not found," <a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accent hover:underline">install Claude Code first</a>.
+                </p>
+
+                <div class="space-y-8">
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">1</span>
+                            <h3 class="font-display text-xl font-bold">Add the plugin source</h3>
+                        </div>
+                        <p class="text-mist mb-4">Open your terminal and run this command exactly as shown. This tells Claude Code where to find the plugin (you only need to do this once).</p>
+                        <pre><code>claude plugin marketplace add https://github.com/jamditis/claude-skills-journalism</code></pre>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">2</span>
+                            <h3 class="font-display text-xl font-bold">Install the plugin</h3>
+                        </div>
+                        <p class="text-mist mb-4">Run this command to download and install PDF Playground. Type the whole thing as one line, no spaces around the <code>@</code> sign.</p>
+                        <pre><code>claude plugin install pdf-playground@claude-skills-journalism</code></pre>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">3</span>
+                            <h3 class="font-display text-xl font-bold">Restart Claude Code</h3>
+                        </div>
+                        <p class="text-mist">Close your Claude Code session and open a new one. The plugin loads when Claude Code starts, so you need a fresh session. After that, you're ready — type <code>/pdf-playground:proposal</code> to create your first document.</p>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl border-2 border-dashed border-ink/10">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-clay text-ink rounded-full flex items-center justify-center font-bold text-sm">+</span>
+                            <h3 class="font-display text-xl font-bold">Configure your brand (optional)</h3>
+                        </div>
+                        <p class="text-mist mb-4">By default, documents use generic styling. To add your organization's name, colors, and fonts, the easiest way is to tell Claude Code:</p>
+                        <div class="bg-ink/5 border border-ink/10 rounded-lg p-4 mb-4">
+                            <p class="text-sm italic text-ink/80">"Create a brand config for PDF Playground. My organization is called [your org name] and our main color is [your color]."</p>
+                        </div>
+                        <p class="text-mist text-sm mb-4">Claude will create the config file in the right place. Or you can create the file manually — see the <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-playground#customizing-your-brand-optional" class="text-accent font-semibold hover:underline">full setup guide</a> for details.</p>
+                    </div>
+                </div>
+
+                <!-- Troubleshooting -->
+                <div class="mt-16">
+                    <h3 class="font-display text-2xl font-bold mb-6">Something not working?</h3>
+                    <div class="space-y-4">
+                        <details class="feature-card rounded-xl overflow-hidden">
+                            <summary class="p-6 cursor-pointer hover:bg-ink/5 transition-colors font-semibold">"command not found" when running <code>claude</code></summary>
+                            <div class="px-6 pb-6 text-mist text-sm">Claude Code isn't installed yet. Follow the <a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accent hover:underline">installation guide</a>, then come back here.</div>
+                        </details>
+                        <details class="feature-card rounded-xl overflow-hidden">
+                            <summary class="p-6 cursor-pointer hover:bg-ink/5 transition-colors font-semibold">The install command gives an error</summary>
+                            <div class="px-6 pb-6 text-mist text-sm">Make sure step 1 completed without errors first. If you see a message about the marketplace not being found, re-run the <code>claude plugin marketplace add</code> command. Check that the URL is typed exactly — no extra spaces or missing letters.</div>
+                        </details>
+                        <details class="feature-card rounded-xl overflow-hidden">
+                            <summary class="p-6 cursor-pointer hover:bg-ink/5 transition-colors font-semibold">Plugin installed but commands don't show up</summary>
+                            <div class="px-6 pb-6 text-mist text-sm">Did you restart Claude Code? Close your current session and open a new one. The plugin loads at startup, so it won't appear until you start a fresh session.</div>
+                        </details>
+                        <details class="feature-card rounded-xl overflow-hidden">
+                            <summary class="p-6 cursor-pointer hover:bg-ink/5 transition-colors font-semibold">Documents look generic (no branding)</summary>
+                            <div class="px-6 pb-6 text-mist text-sm">That's normal if you haven't set up a brand config. Inside Claude Code, just say: "Create a brand config for PDF Playground for [your org name]" and Claude will create it for you.</div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Documentation -->
+        <section id="docs" class="py-24 px-6 bg-ink text-white">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-16">Documentation</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-playground#readme" class="block p-6 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                        <i data-lucide="book" class="w-8 h-8 mb-4 text-accent"></i>
+                        <h3 class="font-display text-xl font-bold mb-2">README</h3>
+                        <p class="text-white/70 text-sm">Full installation instructions and usage guide.</p>
+                    </a>
+
+                    <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-playground/brands" class="block p-6 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                        <i data-lucide="palette" class="w-8 h-8 mb-4 text-accent"></i>
+                        <h3 class="font-display text-xl font-bold mb-2">Brand configs</h3>
+                        <p class="text-white/70 text-sm">Example brand configurations to copy and customize.</p>
+                    </a>
+
+                    <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-playground/templates" class="block p-6 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                        <i data-lucide="layout-template" class="w-8 h-8 mb-4 text-accent"></i>
+                        <h3 class="font-display text-xl font-bold mb-2">Templates</h3>
+                        <p class="text-white/70 text-sm">HTML templates for all document types.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Credits -->
+        <section class="py-16 px-6 border-t border-ink/10">
+            <div class="max-w-6xl mx-auto text-center">
+                <p class="text-mist text-sm mb-4">
+                    Created by <a href="https://github.com/jamditis" class="text-accent hover:underline">Joe Amditis</a> at the
+                    <a href="https://centerforcooperativemedia.org" class="text-accent hover:underline">Center for Cooperative Media</a>
+                </p>
+                <p class="text-mist/60 text-xs">
+                    Part of <a href="../" class="hover:underline">Claude Skills for Journalism</a> • MIT License
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        // Demo elements
+        const chatMessages = document.getElementById('chat-messages');
+        const startBtn = document.getElementById('start-demo');
+        const demoInput = document.getElementById('demo-input');
+        const demoBtn = document.getElementById('demo-btn');
+        const previewWrapper = document.getElementById('preview-wrapper');
+        const docPreview = document.getElementById('doc-preview');
+        const emptyState = document.getElementById('empty-state');
+        const docContent = document.getElementById('doc-content');
+        const controlPanel = document.getElementById('control-panel');
+        const logoBox = document.getElementById('logo-box');
+        const orgName = document.getElementById('org-name');
+        const titleAccent = document.getElementById('title-accent');
+        const budgetSection = document.getElementById('budget-section');
+        const budgetHeader = document.getElementById('budget-header');
+        const budgetTotal = document.getElementById('budget-total');
+        const footerOrg = document.getElementById('footer-org');
+        const footerPage = document.getElementById('footer-page');
+        const cpSwatch = document.getElementById('cp-swatch');
+        const cpHex = document.getElementById('cp-hex');
+        const cpHeadingFont = document.getElementById('cp-heading-font');
+        const cpChangesCount = document.getElementById('cp-changes-count');
+        const cpCopyBtn = document.getElementById('cp-copy-btn');
+
+        // Typing animation
+        async function typeInInput(text) {
+            demoInput.value = '';
+            demoInput.classList.add('border-accent');
+            for (let i = 0; i < text.length; i++) {
+                demoInput.value = text.substring(0, i + 1);
+                await new Promise(r => setTimeout(r, 30 + Math.random() * 20));
+            }
+            await new Promise(r => setTimeout(r, 300));
+            demoBtn.classList.add('bg-accentDark', 'scale-95');
+            await new Promise(r => setTimeout(r, 150));
+            demoBtn.classList.remove('bg-accentDark', 'scale-95');
+            await new Promise(r => setTimeout(r, 100));
+            demoInput.value = '';
+            demoInput.classList.remove('border-accent');
+        }
+
+        function addMessage(role, text) {
+            const div = document.createElement('div');
+            const bubble = document.createElement('div');
+            const p = document.createElement('p');
+            p.className = 'text-sm';
+            p.textContent = text;
+
+            if (role === 'user') {
+                div.className = 'flex justify-end';
+                bubble.className = 'bg-accent text-white px-4 py-2 rounded-2xl rounded-br-md max-w-[80%]';
+            } else if (role === 'assistant') {
+                div.className = 'flex justify-start';
+                bubble.className = 'bg-[#252525] text-white/90 px-4 py-2 rounded-2xl rounded-bl-md max-w-[80%]';
+            } else if (role === 'system') {
+                div.className = 'flex justify-start';
+                bubble.className = 'bg-green-900/30 text-green-400 px-4 py-2 rounded-lg max-w-[80%] border border-green-500/20';
+                p.className = 'text-sm font-mono';
+            }
+
+            bubble.appendChild(p);
+            div.appendChild(bubble);
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return div;
+        }
+
+        function addWizardQuestion(question, options, selectedIndex) {
+            const div = document.createElement('div');
+            div.className = 'flex justify-start';
+            const bubble = document.createElement('div');
+            bubble.className = 'bg-[#252525] text-white/90 px-4 py-3 rounded-2xl rounded-bl-md max-w-[85%]';
+
+            const q = document.createElement('p');
+            q.className = 'text-sm mb-2 font-medium';
+            q.textContent = question;
+            bubble.appendChild(q);
+
+            const grid = document.createElement('div');
+            grid.className = 'flex flex-wrap gap-1.5';
+
+            options.forEach((opt, i) => {
+                const btn = document.createElement('span');
+                btn.className = i === selectedIndex
+                    ? 'bg-accent text-white text-xs px-3 py-1.5 rounded-lg font-medium'
+                    : 'bg-[#333] text-white/60 text-xs px-3 py-1.5 rounded-lg';
+                btn.textContent = opt;
+                grid.appendChild(btn);
+            });
+
+            bubble.appendChild(grid);
+            div.appendChild(bubble);
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function applyPreset(color, hex, headingFont) {
+            // Update document
+            logoBox.style.backgroundColor = color;
+            orgName.style.color = color;
+            titleAccent.style.backgroundColor = color;
+            budgetTotal.style.backgroundColor = color;
+            document.querySelectorAll('#stat-grid div.text-base').forEach(s => s.style.color = color);
+            document.querySelectorAll('#doc-body h2').forEach(h => h.style.color = color);
+
+            // Update control panel
+            cpSwatch.style.backgroundColor = color;
+            cpHex.textContent = hex;
+            cpHeadingFont.textContent = headingFont;
+
+            // Highlight active preset
+            document.querySelectorAll('.preset-btn').forEach(b => {
+                b.style.borderColor = b.dataset.preset === hex ? '#cba6f7' : '#45475a';
+                b.style.backgroundColor = b.dataset.preset === hex ? '#45475a' : '#313244';
+            });
+        }
+
+        async function runDemo() {
+            startBtn.style.display = 'none';
+            chatMessages.textContent = '';
+
+            // Reset state
+            previewWrapper.classList.remove('opacity-100');
+            previewWrapper.classList.add('opacity-40');
+            emptyState.classList.remove('hidden');
+            docContent.classList.add('hidden');
+            controlPanel.classList.add('hidden');
+            budgetSection.classList.add('hidden');
+            logoBox.style.backgroundColor = '';
+            logoBox.className = 'w-5 h-5 rounded bg-gray-300';
+            orgName.style.color = '';
+            orgName.textContent = 'YOUR ORG';
+            titleAccent.style.backgroundColor = '';
+            budgetTotal.style.backgroundColor = '#CA3553';
+            footerPage.textContent = '1';
+            cpChangesCount.textContent = '0';
+            document.querySelectorAll('#stat-grid div.text-base').forEach(s => s.style.color = '');
+            document.querySelectorAll('#doc-body h2').forEach(h => h.style.color = '');
+            document.querySelectorAll('.preset-btn').forEach(b => { b.style.borderColor = '#45475a'; b.style.backgroundColor = '#313244'; });
+            cpSwatch.style.backgroundColor = '#CA3553';
+            cpHex.textContent = '#CA3553';
+            cpHeadingFont.textContent = 'Playfair';
+
+            // === Phase 1: Command ===
+            await typeInInput('/pdf-playground:proposal');
+            await new Promise(r => setTimeout(r, 400));
+            addMessage('user', '/pdf-playground:proposal');
+            await new Promise(r => setTimeout(r, 800));
+
+            addMessage('assistant', 'Starting the proposal wizard. Let me walk you through the setup.');
+            await new Promise(r => setTimeout(r, 1200));
+
+            // === Phase 1: Wizard questions ===
+            addWizardQuestion('What type of proposal is this?', ['Funding proposal', 'Partnership pitch', 'Program overview'], 0);
+            await new Promise(r => setTimeout(r, 1400));
+
+            addWizardQuestion('Which sections should be included?', ['Background', 'Proposed work', 'Case studies', 'Budget'], 3);
+            await new Promise(r => setTimeout(r, 1200));
+
+            // === Phase 2: Design ===
+            addWizardQuestion('Color scheme?', ['Brand colors', 'Professional blue', 'Custom'], 0);
+            await new Promise(r => setTimeout(r, 1200));
+
+            addMessage('assistant', 'Generating your proposal with brand colors and 4 pages including budget...');
+            await new Promise(r => setTimeout(r, 1000));
+
+            // Show document
+            previewWrapper.classList.remove('opacity-40');
+            previewWrapper.classList.add('opacity-100');
+            emptyState.classList.add('hidden');
+            docContent.classList.remove('hidden');
+
+            // Apply brand styling
+            logoBox.className = 'w-5 h-5 rounded';
+            logoBox.style.backgroundColor = '#CA3553';
+            orgName.style.color = '#CA3553';
+            orgName.textContent = 'CCM';
+            titleAccent.style.backgroundColor = '#CA3553';
+            budgetSection.classList.remove('hidden');
+            budgetTotal.style.backgroundColor = '#CA3553';
+            footerOrg.textContent = 'Center for Cooperative Media';
+            document.querySelectorAll('#stat-grid div.text-base').forEach(s => s.style.color = '#CA3553');
+            document.querySelectorAll('#doc-body h2').forEach(h => h.style.color = '#CA3553');
+
+            addMessage('system', 'Created: ai-for-newsrooms-proposal.html (4 pages)');
+            await new Promise(r => setTimeout(r, 1200));
+
+            // === Phase 3: Live preview with control panel ===
+            addMessage('assistant', 'Opening live preview with the interactive control panel...');
+            await new Promise(r => setTimeout(r, 800));
+
+            // Reveal control panel sidebar
+            controlPanel.classList.remove('hidden');
+            await new Promise(r => setTimeout(r, 600));
+
+            addMessage('system', 'Preview opened with control panel. Try the presets or adjust individual settings.');
+            await new Promise(r => setTimeout(r, 1800));
+
+            // === Simulate clicking "Professional blue" preset ===
+            addMessage('assistant', 'The control panel is loaded. You can try different presets, tweak colors, or adjust typography in real time.');
+            await new Promise(r => setTimeout(r, 1500));
+
+            // Animate the preset click
+            const blueBtn = document.querySelector('[data-preset="blue"]');
+            blueBtn.style.borderColor = '#cba6f7';
+            blueBtn.style.backgroundColor = '#45475a';
+            await new Promise(r => setTimeout(r, 400));
+
+            applyPreset('#1a5f7a', '#1a5f7a', 'Merriweather');
+            cpChangesCount.textContent = '7';
+            await new Promise(r => setTimeout(r, 1200));
+
+            // Flash the copy button
+            cpCopyBtn.style.transform = 'scale(1.05)';
+            cpCopyBtn.style.backgroundColor = '#b4befe';
+            await new Promise(r => setTimeout(r, 600));
+            cpCopyBtn.style.transform = '';
+            cpCopyBtn.style.backgroundColor = '';
+
+            addMessage('system', 'Copied 7 changes to clipboard.');
+            await new Promise(r => setTimeout(r, 800));
+
+            // === User pastes the prompt back ===
+            await typeInInput('Apply the following changes to the proposal:');
+            addMessage('user', 'Apply the following changes to the proposal:\n1. Change primary color to #1a5f7a\n2. Switch heading font to Merriweather\n3. Switch body font to Open Sans');
+            await new Promise(r => setTimeout(r, 1000));
+
+            addMessage('assistant', 'Applied all 7 changes to the HTML source. Refreshing the preview...');
+            await new Promise(r => setTimeout(r, 1200));
+
+            // Add green glow to preview
+            previewWrapper.style.boxShadow = '0 0 0 2px rgba(34, 197, 94, 0.5), 0 25px 50px -12px rgba(0, 0, 0, 0.25)';
+            addMessage('system', 'Changes applied. The document is ready for PDF export.');
+            await new Promise(r => setTimeout(r, 2000));
+
+            // Replay button
+            const replayDiv = document.createElement('div');
+            replayDiv.className = 'flex justify-center mt-4';
+            const replayBtn = document.createElement('button');
+            replayBtn.className = 'text-white/50 text-xs hover:text-white transition-colors flex items-center gap-1';
+            replayBtn.textContent = '\u21BB Replay demo';
+            replayBtn.onclick = () => {
+                replayDiv.remove();
+                previewWrapper.style.boxShadow = '';
+                runDemo();
+            };
+            replayDiv.appendChild(replayBtn);
+            chatMessages.appendChild(replayDiv);
+        }
+
+        startBtn.addEventListener('click', runDemo);
+    </script>
+</body>
+</html>

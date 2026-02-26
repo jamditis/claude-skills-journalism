@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe coding | AI-assisted development methodology</title>
+    <meta name="description" content="Practical strategies for building software effectively with AI coding assistants like Claude Code, Cursor, and Windsurf.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Vibe coding">
+    <meta property="og:description" content="Methodology for effective AI-assisted software development with planning, testing, and debugging strategies.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/vibe-coding/">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Fraunces', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        canvas: '#ede6d4',
+                        ink: '#121212',
+                        clay: '#d6cdb7',
+                        mist: '#6b6b6b',
+                        accent: '#4f46e5',
+                        accentDark: '#4338ca',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #ede6d4;
+            color: #121212;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("https://www.transparenttextures.com/patterns/natural-paper.png"),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 50%, #3730a3 100%);
+        }
+
+        .feature-card {
+            background: white;
+            border: 1px solid rgba(18, 18, 18, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+        }
+
+        code {
+            background: rgba(18, 18, 18, 0.06);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #1a1a1a;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="paper-overlay"></div>
+
+    <!-- Nav -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">
+                ← Back to all skills
+            </a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/vibe-coding" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">
+                View on GitHub →
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero-gradient text-white pt-32 pb-24 px-6 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/>
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+        </div>
+
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide uppercase mb-6">
+                AI Development Skill
+            </div>
+            <h1 class="font-display text-5xl md:text-7xl font-black leading-[0.9] mb-6">
+                Vibe<br>Coding
+            </h1>
+            <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-10 font-light">
+                Practical strategies for building software effectively with AI coding assistants like Claude Code, Cursor, and Windsurf.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <a href="#install" class="inline-flex items-center gap-2 bg-white text-accent font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    Install Skill
+                </a>
+                <a href="#docs" class="inline-flex items-center gap-2 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/20 transition-colors border border-white/20">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                    Documentation
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+        <!-- Core principles -->
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Four pillars</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">
+                        The methodology that makes AI-assisted development actually work.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="feature-card p-6 rounded-xl text-center">
+                        <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="font-display text-2xl font-black text-accent">Plan</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2">Scope first</h3>
+                        <p class="text-mist text-sm">Write implementation plans in markdown before touching code.</p>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl text-center">
+                        <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="font-display text-2xl font-black text-accent">Git</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2">Safety net</h3>
+                        <p class="text-mist text-sm">Clean slate principle. Reset hard when stuck.</p>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl text-center">
+                        <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="font-display text-2xl font-black text-accent">Test</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2">E2E over unit</h3>
+                        <p class="text-mist text-sm">Simulate user behavior. Catch regressions before they compound.</p>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl text-center">
+                        <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="font-display text-2xl font-black text-accent">Debug</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2">Reset after failures</h3>
+                        <p class="text-mist text-sm">Don't layer fixes. Clean re-implementation beats spaghetti.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core strategies -->
+        <section class="py-24 px-6 bg-ink text-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Core strategies</h2>
+                    <p class="text-lg text-white/70 max-w-2xl mx-auto">
+                        What makes AI-assisted development different from traditional coding.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <i data-lucide="clipboard-list" class="w-8 h-8 text-accent mb-4"></i>
+                        <h3 class="font-display text-xl font-bold mb-3">Plan before coding</h3>
+                        <p class="text-white/70 text-sm mb-4">
+                            Start by working with the AI to write a detailed implementation plan in markdown. Review it, delete unnecessary items, mark complex features as "won't do."
+                        </p>
+                        <div class="p-3 bg-accent/20 rounded-lg border border-accent/30">
+                            <p class="text-sm text-white/90"><strong>Key insight:</strong> Use todo lists so both you and the AI can see what's done and what remains.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <i data-lucide="refresh-cw" class="w-8 h-8 text-accent mb-4"></i>
+                        <h3 class="font-display text-xl font-bold mb-3">Clean slate principle</h3>
+                        <p class="text-white/70 text-sm mb-4">
+                            Begin each feature with a clean git state. When stuck, use <code class="text-accent">git reset --hard HEAD</code> if the AI goes down an unproductive path.
+                        </p>
+                        <div class="p-3 bg-accent/20 rounded-lg border border-accent/30">
+                            <p class="text-sm text-white/90"><strong>Key insight:</strong> Multiple failed attempts create layers of bad code that compound problems.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <i data-lucide="check-circle-2" class="w-8 h-8 text-accent mb-4"></i>
+                        <h3 class="font-display text-xl font-bold mb-3">E2E tests over unit tests</h3>
+                        <p class="text-white/70 text-sm mb-4">
+                            Focus on simulating user behavior—testing features by simulating someone clicking through the site. LLMs often break unrelated logic.
+                        </p>
+                        <div class="p-3 bg-accent/20 rounded-lg border border-accent/30">
+                            <p class="text-sm text-white/90"><strong>Key insight:</strong> Tests catch regressions before they compound. Ensure tests pass before moving on.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <i data-lucide="sparkles" class="w-8 h-8 text-accent mb-4"></i>
+                        <h3 class="font-display text-xl font-bold mb-3">Clean re-implementation</h3>
+                        <p class="text-white/70 text-sm mb-4">
+                            When you finally find a working solution after several attempts, reset to a clean state and implement it fresh. Don't keep the accumulated mess.
+                        </p>
+                        <div class="p-3 bg-accent/20 rounded-lg border border-accent/30">
+                            <p class="text-sm text-white/90"><strong>Key insight:</strong> A clean re-implementation of a known-good solution is faster than untangling spaghetti.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bug fixing -->
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <h2 class="font-display text-4xl md:text-5xl font-light italic mb-6">Effective<br><span class="font-black">bug fixing.</span></h2>
+                        <p class="text-lg text-mist mb-8">
+                            Debugging with AI requires a different approach than traditional debugging. The key is to avoid compounding problems.
+                        </p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">1</span>
+                                <div>
+                                    <strong>Copy error messages</strong>
+                                    <p class="text-mist text-sm">Often enough context for the AI to identify and fix issues.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">2</span>
+                                <div>
+                                    <strong>Analyze before coding</strong>
+                                    <p class="text-mist text-sm">Ask the AI to consider multiple causes before jumping to implementation.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">3</span>
+                                <div>
+                                    <strong>Reset after failures</strong>
+                                    <p class="text-mist text-sm">Clean slate after each unsuccessful fix. Don't layer broken code.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">4</span>
+                                <div>
+                                    <strong>Switch models when stuck</strong>
+                                    <p class="text-mist text-sm">Different AI models excel at different tasks. Experiment.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <pre><code class="text-sm"># The debugging loop
+
+1. Copy the error message
+2. Ask AI: "What could cause this?"
+3. Review multiple hypotheses
+4. Try ONE fix at a time
+5. If it fails: git reset --hard HEAD
+6. Try next hypothesis
+7. Once working: clean re-implement
+
+# Never layer fixes on top of
+# broken code. Start fresh.</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI tool optimization -->
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Optimize your tools</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">
+                        Get more out of your AI coding assistants with these techniques.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="file-text" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Instruction files</h3>
+                        <p class="text-mist text-sm mb-3">Write detailed instructions in config files.</p>
+                        <div class="text-xs text-mist font-mono">
+                            <p>cursor.rules</p>
+                            <p>windsurf.rules</p>
+                            <p>CLAUDE.md</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="book" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Local documentation</h3>
+                        <p class="text-mist text-sm mb-3">Download API docs to your project. AI works better with local docs than training data recall.</p>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="git-compare" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-2">Compare outputs</h3>
+                        <p class="text-mist text-sm mb-3">Generate multiple solutions and pick the best. Different models excel at different tasks.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Beyond coding -->
+        <section class="py-24 px-6 bg-ink text-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Beyond coding</h2>
+                    <p class="text-lg text-white/70 max-w-2xl mx-auto">
+                        AI assistants help with more than just writing code.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="p-4 bg-white/5 rounded-xl text-center">
+                        <i data-lucide="server" class="w-6 h-6 mx-auto mb-2 text-accent"></i>
+                        <p class="font-semibold">DevOps</p>
+                        <p class="text-xs text-white/60">Servers, DNS, hosting</p>
+                    </div>
+                    <div class="p-4 bg-white/5 rounded-xl text-center">
+                        <i data-lucide="palette" class="w-6 h-6 mx-auto mb-2 text-accent"></i>
+                        <p class="font-semibold">Design</p>
+                        <p class="text-xs text-white/60">Favicons, assets</p>
+                    </div>
+                    <div class="p-4 bg-white/5 rounded-xl text-center">
+                        <i data-lucide="file-text" class="w-6 h-6 mx-auto mb-2 text-accent"></i>
+                        <p class="font-semibold">Documentation</p>
+                        <p class="text-xs text-white/60">Docs, marketing</p>
+                    </div>
+                    <div class="p-4 bg-white/5 rounded-xl text-center">
+                        <i data-lucide="graduation-cap" class="w-6 h-6 mx-auto mb-2 text-accent"></i>
+                        <p class="font-semibold">Education</p>
+                        <p class="text-xs text-white/60">Line-by-line explanations</p>
+                    </div>
+                    <div class="p-4 bg-white/5 rounded-xl text-center">
+                        <i data-lucide="image" class="w-6 h-6 mx-auto mb-2 text-accent"></i>
+                        <p class="font-semibold">Visual input</p>
+                        <p class="text-xs text-white/60">Screenshots for UI bugs</p>
+                    </div>
+                    <div class="p-4 bg-white/5 rounded-xl text-center">
+                        <i data-lucide="mic" class="w-6 h-6 mx-auto mb-2 text-accent"></i>
+                        <p class="font-semibold">Voice input</p>
+                        <p class="text-xs text-white/60">140 WPM with Aqua</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section id="install" class="py-24 px-6">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-16">Get started</h2>
+
+                <div class="space-y-8">
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">1</span>
+                            <h3 class="font-display text-xl font-bold">Clone the repository</h3>
+                        </div>
+                        <pre><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">2</span>
+                            <h3 class="font-display text-xl font-bold">Copy the skill to your Claude config</h3>
+                        </div>
+                        <pre><code>cp -r claude-skills-journalism/vibe-coding ~/.claude/skills/</code></pre>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">3</span>
+                            <h3 class="font-display text-xl font-bold">Start building with AI</h3>
+                        </div>
+                        <p class="text-mist">Ask Claude to help you plan features, debug issues, or implement new functionality using the vibe coding methodology.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Documentation -->
+        <section id="docs" class="py-24 px-6 bg-ink text-white">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-16">What's included</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <i data-lucide="map" class="w-8 h-8 mb-4 text-accent"></i>
+                        <h3 class="font-display text-xl font-bold mb-2">Planning process</h3>
+                        <p class="text-white/70 text-sm">Scope management, incremental implementation, progress tracking.</p>
+                    </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <i data-lucide="git-branch" class="w-8 h-8 mb-4 text-accent"></i>
+                        <h3 class="font-display text-xl font-bold mb-2">Version control</h3>
+                        <p class="text-white/70 text-sm">Clean slate principle, git as safety net, when to reset.</p>
+                    </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <i data-lucide="bug" class="w-8 h-8 mb-4 text-accent"></i>
+                        <h3 class="font-display text-xl font-bold mb-2">Debugging</h3>
+                        <p class="text-white/70 text-sm">Error analysis, strategic logging, model switching.</p>
+                    </div>
+                </div>
+
+                <div class="mt-12 text-center">
+                    <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/vibe-coding" class="inline-flex items-center gap-2 bg-accent text-white font-semibold px-6 py-3 rounded-lg hover:bg-accentDark transition-colors">
+                        <i data-lucide="github" class="w-5 h-5"></i>
+                        View full skill on GitHub
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Credits -->
+        <section class="py-16 px-6 border-t border-ink/10">
+            <div class="max-w-6xl mx-auto text-center">
+                <p class="text-mist text-sm mb-4">
+                    Created by <a href="https://github.com/jamditis" class="text-accent hover:underline">Joe Amditis</a> at the
+                    <a href="https://centerforcooperativemedia.org" class="text-accent hover:underline">Center for Cooperative Media</a>
+                </p>
+                <p class="text-mist/60 text-xs">
+                    Part of <a href="../" class="hover:underline">Claude Skills for Journalism</a> • MIT License
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

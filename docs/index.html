@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<!--
+  claude skills for journalism — https://skills.amditis.tech
+  Claude Code skills for journalists, researchers, and newsrooms.
+  A dev/journalism crossover: modular instruction sets that extend
+  Claude's capabilities for verification, data work, FOIA, and more.
+
+  stack: zero-build HTML, Tailwind CDN, Lucide icons, Google Fonts
+  built by: joe amditis  —  jamditis@gmail.com
+-->
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude skills for journalism | Joe Amditis</title>
+    <meta name="description" content="A curated collection of Claude Code skills for journalists, researchers, academics, and media professionals.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,900;1,9..144,300&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Fraunces', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        canvas: '#ede6d4',
+                        ink: '#121212',
+                        clay: '#d6cdb7',
+                        mist: '#6b6b6b',
+                        accent: '#3d4b40',
+                    },
+                    animation: {
+                        'page-in': 'pageIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'drift': 'drift 25s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        pageIn: {
+                            '0%': { opacity: '0', transform: 'translateY(15px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        drift: {
+                            '0%, 100%': { transform: 'translate(0, 0)' },
+                            '50%': { transform: 'translate(-1%, 1%)' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #ede6d4;
+            color: #121212;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("https://www.transparenttextures.com/patterns/natural-paper.png"),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        :focus-visible {
+            outline: 2px solid #3d4b40;
+            outline-offset: 4px;
+        }
+
+        .scrolled-nav {
+            background: rgba(237, 230, 212, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(18, 18, 18, 0.08);
+        }
+
+        .reveal-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #121212;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .deckle-card {
+            background-color: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(18, 18, 18, 0.05);
+            box-shadow: 0 15px 50px -10px rgba(18, 18, 18, 0.05);
+        }
+
+        .deckle-card-solid {
+            background-color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(18, 18, 18, 0.05);
+            box-shadow: 0 15px 50px -10px rgba(18, 18, 18, 0.05);
+        }
+
+        .skill-card:hover {
+            border-color: #3d4b40;
+            transform: translateY(-2px);
+        }
+
+        .hook-badge {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 2px;
+        }
+
+        .featured-badge {
+            background: linear-gradient(135deg, #CA3553 0%, #a82a44 100%);
+            color: white;
+            font-size: 9px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(202, 53, 83, 0.4); }
+            50% { box-shadow: 0 0 8px 2px rgba(202, 53, 83, 0.3); }
+        }
+
+        .skill-card-featured {
+            background: linear-gradient(135deg, rgba(202, 53, 83, 0.08) 0%, rgba(255, 255, 255, 0.5) 100%);
+            border: 2px solid rgba(202, 53, 83, 0.3);
+        }
+
+        .skill-card-featured:hover {
+            border-color: #CA3553;
+            box-shadow: 0 15px 40px -10px rgba(202, 53, 83, 0.2);
+        }
+
+        @media (max-width: 640px) {
+            .fluid-title { font-size: 14vw !important; }
+        }
+
+        .section-header {
+            border-bottom: 1px solid rgba(18, 18, 18, 0.1);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5em;
+            color: #6b6b6b;
+        }
+
+        .btn-primary {
+            background-color: #121212;
+            color: #ede6d4;
+            padding: 0.75rem 1.5rem;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #3d4b40;
+        }
+
+        .btn-outline {
+            border: 1px solid rgba(18, 18, 18, 0.2);
+            padding: 0.75rem 1.5rem;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            transition: all 0.3s ease;
+        }
+        .btn-outline:hover {
+            border-color: #3d4b40;
+            color: #3d4b40;
+        }
+    </style>
+</head>
+<body class="font-sans overflow-x-hidden">
+
+    <div class="paper-overlay"></div>
+
+    <!-- Soft Ambient Light -->
+    <div class="fixed top-[-15%] left-[-10%] w-[50%] h-[50%] bg-accent/5 rounded-full blur-[140px] animate-drift pointer-events-none z-0"></div>
+
+    <div class="relative z-10">
+
+        <!-- Navigation -->
+        <nav id="main-nav" class="fixed top-0 w-full flex justify-between items-center px-6 py-4 md:px-14 md:py-6 z-50 transition-all duration-500 ease-in-out" role="navigation">
+            <div class="flex items-center gap-4">
+                <span class="font-display text-2xl font-black italic tracking-tighter">J.</span>
+                <span class="text-[10px] tracking-[0.3em] font-bold opacity-30 uppercase hidden lg:block">Journalism Skills</span>
+            </div>
+
+            <div class="hidden md:flex gap-8 text-[10px] font-bold uppercase tracking-widest text-ink items-center">
+                <a href="#skills" class="nav-link relative">Skills</a>
+                <a href="#hooks" class="nav-link relative">Hooks</a>
+                <a href="#install" class="nav-link relative">Install</a>
+                <a href="about/" class="nav-link relative">About</a>
+                <a href="https://github.com/jamditis/claude-skills-journalism" class="bg-ink text-canvas px-5 py-2 hover:bg-accent transition-all">
+                    GitHub
+                </a>
+            </div>
+
+            <!-- Mobile Menu -->
+            <a href="https://github.com/jamditis/claude-skills-journalism" class="md:hidden text-[10px] font-bold uppercase tracking-widest">
+                GitHub &rarr;
+            </a>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto pt-32 md:pt-44 pb-32 px-6 md:px-8">
+
+            <!-- Hero -->
+            <header class="mb-32 md:mb-44 animate-page-in">
+                <div class="inline-block px-4 py-1 border border-ink/10 mb-6">
+                    <span class="text-[9px] font-bold tracking-[0.4em] uppercase opacity-50">35 Skills // 14 Hooks</span>
+                </div>
+                <h1 class="font-display fluid-title text-[11vw] md:text-[8.5vw] font-light leading-[0.85] tracking-tight mb-12 text-ink">
+                    Skills for <br> <span class="italic font-black">journalism.</span>
+                </h1>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    <div class="lg:col-start-1 lg:col-span-7 space-y-8">
+                        <p class="text-xl md:text-2xl text-ink/80 font-light leading-relaxed border-l-2 border-accent/20 pl-6 md:pl-10">
+                            A curated collection of Claude Code skills for journalists, researchers, academics, and media professionals. Modular instruction sets that extend Claude's capabilities for specialized tasks.
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <a href="#install" class="btn-primary">Install Now</a>
+                            <a href="https://github.com/jamditis/claude-skills-journalism" class="btn-outline">View on GitHub</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Core Journalism Skills -->
+            <section id="skills" class="reveal-section mb-32">
+                <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <h2 class="font-display text-4xl font-light italic">01 / Core journalism</h2>
+                    <span class="section-label">11 Skills</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                    <a href="source-verification/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="shield-check" class="w-5 h-5 text-[#1e40af]"></i>
+                            <span class="featured-badge">Featured</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#1e40af] transition-colors">source-verification</h3>
+                        <p class="text-sm text-mist leading-relaxed">SIFT method, digital verification, reverse image search, social media account analysis, building verification trails.</p>
+                    </a>
+
+                    <a href="foia-requests/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="file-text" class="w-5 h-5 text-[#7c3aed]"></i>
+                            <span class="featured-badge">Featured</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#7c3aed] transition-colors">foia-requests</h3>
+                        <p class="text-sm text-mist leading-relaxed">Public records request drafting, tracking systems, appeals process, state-specific guidance.</p>
+                    </a>
+
+                    <a href="data-journalism/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="bar-chart-3" class="w-5 h-5 text-[#059669]"></i>
+                            <span class="featured-badge">Featured</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#059669] transition-colors">data-journalism</h3>
+                        <p class="text-sm text-mist leading-relaxed">Data acquisition, cleaning, analysis, visualization, and storytelling for newsrooms.</p>
+                    </a>
+
+                    <a href="newsroom-style/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="type" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Style</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">newsroom-style</h3>
+                        <p class="text-sm text-mist leading-relaxed">AP Style enforcement, attribution rules, headline formatting, number conventions.</p>
+                    </a>
+
+                    <a href="interview-prep/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="mic" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Interviews</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">interview-prep</h3>
+                        <p class="text-sm text-mist leading-relaxed">Pre-interview research, question frameworks, recording consent, attribution guidelines.</p>
+                    </a>
+
+                    <a href="interview-transcription/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="file-audio" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Transcription</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">interview-transcription</h3>
+                        <p class="text-sm text-mist leading-relaxed">Recording workflows, transcription, quote management, source databases.</p>
+                    </a>
+
+                    <a href="story-pitch/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="send" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Pitching</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">story-pitch</h3>
+                        <p class="text-sm text-mist leading-relaxed">Pitch templates for daily news, features, investigations, op-eds, and freelance queries.</p>
+                    </a>
+
+                    <a href="fact-check-workflow/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Fact-check</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">fact-check-workflow</h3>
+                        <p class="text-sm text-mist leading-relaxed">Claim extraction, evidence gathering, rating scales, correction protocols.</p>
+                    </a>
+
+                    <a href="editorial-workflow/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="calendar" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Editorial</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">editorial-workflow</h3>
+                        <p class="text-sm text-mist leading-relaxed">Story assignment tracking, deadline management, editorial calendars, handoff protocols.</p>
+                    </a>
+
+                    <a href="crisis-communications/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="alert-triangle" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Breaking</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">crisis-communications</h3>
+                        <p class="text-sm text-mist leading-relaxed">Breaking news protocol, rapid verification, crisis response, misinformation countering.</p>
+                    </a>
+
+                    <a href="social-media-intelligence/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="search" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">OSINT</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">social-media-intelligence</h3>
+                        <p class="text-sm text-mist leading-relaxed">Social monitoring, narrative tracking, account analysis, coordination detection, OSINT.</p>
+                    </a>
+
+                </div>
+            </section>
+
+            <!-- Communications & Publishing -->
+            <section class="reveal-section mb-32">
+                <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <h2 class="font-display text-4xl font-light italic">02 / Communications</h2>
+                    <span class="section-label">1 Skill</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <a href="newsletter-publishing/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="mail" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Email</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">newsletter-publishing</h3>
+                        <p class="text-sm text-mist leading-relaxed">Email newsletter creation, subscriber management, deliverability, A/B testing.</p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Design & Production -->
+            <section class="reveal-section mb-32">
+                <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <h2 class="font-display text-4xl font-light italic">03 / Design &amp; production</h2>
+                    <span class="section-label">3 Skills</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <a href="pdf-playground/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="layout" class="w-5 h-5 text-[#CA3553]"></i>
+                            <span class="featured-badge">Interactive Plugin</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#CA3553] transition-colors">pdf-playground</h3>
+                        <p class="text-sm text-mist leading-relaxed">Full Claude Code plugin with 6 document types, live preview, brand customization, and conversational editing. Create proposals, reports, slides, and more.</p>
+                        <div class="flex flex-wrap gap-2 mt-3">
+                            <span class="text-[8px] bg-[#CA3553]/10 text-[#CA3553] px-2 py-1 rounded font-semibold">Templates</span>
+                            <span class="text-[8px] bg-[#CA3553]/10 text-[#CA3553] px-2 py-1 rounded font-semibold">Preview</span>
+                            <span class="text-[8px] bg-[#CA3553]/10 text-[#CA3553] px-2 py-1 rounded font-semibold">Branding</span>
+                        </div>
+                    </a>
+
+                    <a href="pdf-design/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="file-text" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Skill</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">pdf-design</h3>
+                        <p class="text-sm text-mist leading-relaxed">Standalone skill for PDF reports and proposals with print-ready CSS patterns and layout guidance.</p>
+                    </a>
+
+                    <a href="visual-explainer/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="layout-dashboard" class="w-5 h-5 text-[#2a9a90]"></i>
+                            <span class="featured-badge">Featured</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#2a9a90] transition-colors">visual-explainer</h3>
+                        <p class="text-sm text-mist leading-relaxed">Turn complex data into styled HTML pages with diagrams, data tables, flowcharts, timelines, and dashboards.</p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Writing Quality -->
+            <section class="reveal-section mb-32">
+                <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <h2 class="font-display text-4xl font-light italic">04 / Writing quality</h2>
+                    <span class="section-label">1 Skill</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <a href="ai-writing-detox/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="eraser" class="w-5 h-5 text-[#475569]"></i>
+                            <span class="featured-badge">Featured</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#475569] transition-colors">ai-writing-detox</h3>
+                        <p class="text-sm text-mist leading-relaxed">Eliminate AI-generated patterns that erode reader trust. Banned words, phrases, and structures with alternatives.</p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Project Documentation -->
+            <section class="reveal-section mb-32">
+                <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <h2 class="font-display text-4xl font-light italic">05 / Project documentation</h2>
+                    <span class="section-label">3 Skills</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <a href="project-memory/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="brain" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Memory</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">project-memory</h3>
+                        <p class="text-sm text-mist leading-relaxed">Generate CLAUDE.md files that capture project-specific knowledge. Includes 6 project type templates.</p>
+                    </a>
+
+                    <a href="project-retrospective/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="history" class="w-5 h-5 text-[#d97706]"></i>
+                            <span class="featured-badge">Featured</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#d97706] transition-colors">project-retrospective</h3>
+                        <p class="text-sm text-mist leading-relaxed">Generate LESSONS.md files that document what worked and what didn't. 4 project type templates.</p>
+                    </a>
+
+                    <a href="template-selector/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="list-tree" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Selector</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">template-selector</h3>
+                        <p class="text-sm text-mist leading-relaxed">Decision tree for choosing the right project documentation template.</p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Academic & Research -->
+            <section class="reveal-section mb-32">
+                <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <h2 class="font-display text-4xl font-light italic">06 / Academic and research</h2>
+                    <span class="section-label">5 Skills</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <a href="academic-writing/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="graduation-cap" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Academic</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">academic-writing</h3>
+                        <p class="text-sm text-mist leading-relaxed">Research design, literature reviews, IMRaD structure, peer review responses, grant proposals.</p>
+                    </a>
+
+                    <a href="digital-archive/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="archive" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Archives</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">digital-archive</h3>
+                        <p class="text-sm text-mist leading-relaxed">Building archives with AI enrichment, entity extraction, knowledge graphs.</p>
+                    </a>
+
+                    <a href="web-archiving/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="globe" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Preservation</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">web-archiving</h3>
+                        <p class="text-sm text-mist leading-relaxed">Wayback Machine, Archive.today, legal evidence preservation, multi-archive redundancy.</p>
+                    </a>
+
+                    <a href="content-access/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="key" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Access</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">content-access</h3>
+                        <p class="text-sm text-mist leading-relaxed">Unpaywall, CORE, Semantic Scholar APIs, library databases, ethical access patterns.</p>
+                    </a>
+
+                    <a href="page-monitoring/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="eye" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Monitoring</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">page-monitoring</h3>
+                        <p class="text-sm text-mist leading-relaxed">Change detection, RSS generation, webhook alerts, automatic archiving on changes.</p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Development -->
+            <section class="reveal-section mb-32">
+                <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <h2 class="font-display text-4xl font-light italic">07 / Development</h2>
+                    <span class="section-label">9 Skills</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <a href="vibe-coding/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="sparkles" class="w-5 h-5 text-[#4f46e5]"></i>
+                            <span class="featured-badge">Featured</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#4f46e5] transition-colors">vibe-coding</h3>
+                        <p class="text-sm text-mist leading-relaxed">AI-assisted software development methodology based on YC best practices.</p>
+                    </a>
+
+                    <a href="one-way-door/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group" style="background: linear-gradient(135deg, rgba(180, 83, 9, 0.08) 0%, rgba(255, 255, 255, 0.5) 100%); border: 2px solid rgba(180, 83, 9, 0.3);">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="door-open" class="w-5 h-5 text-[#b45309]"></i>
+                            <span class="featured-badge" style="background: linear-gradient(135deg, #b45309 0%, #92400e 100%);">Featured</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#b45309] transition-colors">one-way-door</h3>
+                        <p class="text-sm text-mist leading-relaxed">Flag irreversible architectural decisions before you commit. Includes PreToolUse hook for automated enforcement.</p>
+                    </a>
+
+                    <a href="electron-dev/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="monitor" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Desktop</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">electron-dev</h3>
+                        <p class="text-sm text-mist leading-relaxed">Electron + React desktop application development patterns.</p>
+                    </a>
+
+                    <a href="python-pipeline/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="workflow" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Pipeline</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">python-pipeline</h3>
+                        <p class="text-sm text-mist leading-relaxed">Data processing pipelines with modular architecture.</p>
+                    </a>
+
+                    <a href="web-scraping/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="download" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Scraping</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">web-scraping</h3>
+                        <p class="text-sm text-mist leading-relaxed">Content extraction with anti-bot handling and poison pill detection.</p>
+                    </a>
+
+                    <a href="zero-build-frontend/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="package" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">No Build</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">zero-build-frontend</h3>
+                        <p class="text-sm text-mist leading-relaxed">Static web apps without build tools, CDN-loaded frameworks.</p>
+                    </a>
+
+                    <a href="mobile-debugging/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="smartphone" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Mobile</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">mobile-debugging</h3>
+                        <p class="text-sm text-mist leading-relaxed">Eruda, vConsole, remote debugging, iOS debugging, console capture.</p>
+                    </a>
+
+                    <a href="accessibility-compliance/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="accessibility" class="w-5 h-5 text-[#0891b2]"></i>
+                            <span class="featured-badge">Featured</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#0891b2] transition-colors">accessibility-compliance</h3>
+                        <p class="text-sm text-mist leading-relaxed">WCAG compliance, alt text, accessible charts, keyboard navigation.</p>
+                    </a>
+
+                    <a href="persistent-sessions/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="layers" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Setup</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">persistent-sessions</h3>
+                        <p class="text-sm text-mist leading-relaxed">Keep Claude Code sessions alive across disconnects with tmux. Setup, key bindings, and scheduler coexistence.</p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Security -->
+            <section class="reveal-section mb-32">
+                <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <h2 class="font-display text-4xl font-light italic">08 / Security</h2>
+                    <span class="section-label">3 Skills</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <a href="security-checklist/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="shield" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Audit</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">security-checklist</h3>
+                        <p class="text-sm text-mist leading-relaxed">Pre-deployment security audit covering auth, input validation, secrets, and compliance.</p>
+                    </a>
+
+                    <a href="secure-auth/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="lock" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">Auth</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">secure-auth</h3>
+                        <p class="text-sm text-mist leading-relaxed">Production-ready authentication patterns (sessions, JWTs, OAuth, MFA).</p>
+                    </a>
+
+                    <a href="api-hardening/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
+                        <div class="flex items-start justify-between mb-3">
+                            <i data-lucide="server" class="w-5 h-5 text-accent"></i>
+                            <span class="text-[9px] font-bold tracking-widest text-mist uppercase">API</span>
+                        </div>
+                        <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">api-hardening</h3>
+                        <p class="text-sm text-mist leading-relaxed">Rate limiting, input validation, CORS, API key management.</p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Hooks Section -->
+            <section id="hooks" class="reveal-section mb-32">
+                <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <h2 class="font-display text-4xl font-light italic">08 / Hooks</h2>
+                    <span class="section-label">14 Automated Checks</span>
+                </div>
+
+                <p class="text-mist mb-8 max-w-3xl">Hooks run automatically at specific workflow events. All are <strong>non-blocking warnings</strong>—they provide guidance but don't prevent actions.</p>
+
+                <div class="deckle-card-solid p-8">
+                    <!-- Writing Quality Hooks -->
+                    <h3 class="text-[11px] font-bold uppercase tracking-widest text-mist mb-4">Writing quality</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        <div class="border border-ink/10 p-4 bg-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">ap-style-check</h4>
+                            <p class="text-xs text-mist">Flag AP Style violations in written content.</p>
+                        </div>
+                        <div class="border border-ink/10 p-4 bg-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">ai-slop-detector</h4>
+                            <p class="text-xs text-mist">Warn about AI-generated patterns.</p>
+                        </div>
+                        <div class="border border-ink/10 p-4 bg-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">accessibility-check</h4>
+                            <p class="text-xs text-mist">Check alt text, heading structure, link text.</p>
+                        </div>
+                    </div>
+
+                    <!-- Verification Hooks -->
+                    <h3 class="text-[11px] font-bold uppercase tracking-widest text-mist mb-4">Verification</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        <div class="border border-ink/10 p-4 bg-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">source-attribution-check</h4>
+                            <p class="text-xs text-mist">Flag unattributed quotes and claims.</p>
+                        </div>
+                        <div class="border border-ink/10 p-4 bg-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">verification-reminder</h4>
+                            <p class="text-xs text-mist">Prompt to verify facts before including.</p>
+                        </div>
+                        <div class="border border-ink/10 p-4 bg-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">data-methodology-check</h4>
+                            <p class="text-xs text-mist">Ensure data stories include methodology.</p>
+                        </div>
+                    </div>
+
+                    <!-- Editorial Workflow Hooks -->
+                    <h3 class="text-[11px] font-bold uppercase tracking-widest text-mist mb-4">Editorial workflow</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        <div class="border border-ink/10 p-4 bg-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">source-diversity-check</h4>
+                            <p class="text-xs text-mist">Note when sources may lack diversity.</p>
+                        </div>
+                        <div class="border border-ink/10 p-4 bg-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">legal-review-flag</h4>
+                            <p class="text-xs text-mist">Flag potentially defamatory content.</p>
+                        </div>
+                        <div class="border border-ink/10 p-4 bg-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-clay text-ink font-bold">Stop</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">pre-publish-checklist</h4>
+                            <p class="text-xs text-mist">Reminder checklist before completing tasks.</p>
+                        </div>
+                        <div class="border border-ink/10 p-4 bg-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-ink/10 text-ink font-bold">SessionStart</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">deadline-tracker</h4>
+                            <p class="text-xs text-mist">Surface upcoming deadlines.</p>
+                        </div>
+                    </div>
+
+                    <!-- Preservation Hooks -->
+                    <h3 class="text-[11px] font-bold uppercase tracking-widest text-mist mb-4">Preservation</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        <div class="border border-ink/10 p-4 bg-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">archive-reminder</h4>
+                            <p class="text-xs text-mist">Remind to archive URLs when citing sources.</p>
+                        </div>
+                    </div>
+
+                    <!-- Development Hooks -->
+                    <h3 class="text-[11px] font-bold uppercase tracking-widest text-mist mb-4">Development</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="border border-ink/10 p-4 bg-white/20" style="border-color: rgba(180, 83, 9, 0.3);">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-[#b45309]/10 text-[#b45309] font-bold">PreToolUse</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">one-way-door-check</h4>
+                            <p class="text-xs text-mist">Block irreversible architectural decisions until discussed.</p>
+                        </div>
+                        <div class="border border-ink/10 p-4 bg-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-ink/10 text-ink font-bold">UserPromptSubmit</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">bug-report-detector</h4>
+                            <p class="text-xs text-mist">Detect bug reports and apply test-first workflow.</p>
+                        </div>
+                        <div class="border border-ink/10 p-4 bg-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-accent/10 text-accent font-bold">PreToolUse</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1">enforce-test-first</h4>
+                            <p class="text-xs text-mist">Block source edits until test is written.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Installation -->
+            <section id="install" class="reveal-section mb-32">
+                <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <h2 class="font-display text-4xl font-light italic">09 / Installation</h2>
+                    <span class="section-label">Get Started</span>
+                </div>
+
+                <p class="text-mist mb-8">You need <strong><a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accent hover:underline">Claude Code</a></strong> installed. Run <code class="bg-ink/5 px-2 py-0.5 rounded text-sm">claude --version</code> in your terminal to check.</p>
+
+                <!-- Plugins (recommended) -->
+                <div class="deckle-card-solid p-8 mb-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-[9px] font-bold tracking-widest text-white uppercase bg-accent px-2 py-1">Recommended</span>
+                        <h3 class="font-display text-xl font-bold">Install as a plugin</h3>
+                    </div>
+                    <p class="text-sm text-mist mb-4">Plugins give you slash commands inside Claude Code. Run these two commands in your terminal:</p>
+                    <div class="bg-ink text-canvas p-6 font-mono text-sm mb-4 overflow-x-auto space-y-1">
+                        <div>claude plugin marketplace add https://github.com/jamditis/claude-skills-journalism</div>
+                        <div>claude plugin install pdf-playground@claude-skills-journalism</div>
+                    </div>
+                    <p class="text-sm text-mist">Then restart Claude Code (close and reopen). See the <a href="pdf-playground/" class="text-accent font-semibold hover:underline">PDF Playground page</a> for detailed instructions, troubleshooting, and brand setup.</p>
+                </div>
+
+                <!-- Skills (manual) -->
+                <div class="deckle-card p-8">
+                    <h3 class="font-display text-xl font-bold mb-4">Install individual skills</h3>
+                    <p class="text-sm text-mist mb-4">Skills load automatically when relevant to your work. Clone the full collection to your Claude skills directory:</p>
+                    <div class="bg-ink text-canvas p-6 font-mono text-sm mb-4 overflow-x-auto space-y-1">
+                        <div>git clone https://github.com/jamditis/claude-skills-journalism.git ~/.claude/skills/journalism-skills</div>
+                    </div>
+                    <p class="text-sm text-mist">Or copy just the skills you want:</p>
+                    <div class="bg-ink text-canvas p-6 font-mono text-sm mb-4 overflow-x-auto space-y-1">
+                        <div>cp -r source-verification ~/.claude/skills/</div>
+                    </div>
+                    <p class="text-sm text-mist">Skills activate automatically. For example, asking Claude to verify a source will use the source-verification skill.</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-ink text-canvas py-24 relative z-10">
+        <div class="max-w-7xl mx-auto px-6 md:px-8">
+            <div class="flex flex-col lg:flex-row justify-between items-start gap-16 mb-16">
+                <div class="space-y-6">
+                    <h5 class="font-display text-4xl italic font-light tracking-tight text-canvas leading-tight">Skills for <br> <span class="font-black">journalism.</span></h5>
+                    <p class="text-sm text-canvas/60 max-w-md">A curated collection of Claude Code skills for journalists, researchers, academics, and media professionals.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-16 md:gap-24">
+                    <div class="space-y-6">
+                        <h6 class="text-[10px] font-bold tracking-[0.5em] text-canvas/20 uppercase">Resources</h6>
+                        <ul class="space-y-4 text-sm font-semibold tracking-wide">
+                            <li><a href="https://github.com/jamditis/claude-skills-journalism" class="hover:text-accent transition-colors">GitHub</a></li>
+                            <li><a href="https://tools.amditis.tech" class="hover:text-accent transition-colors">AI Tools Kit</a></li>
+                            <li><a href="https://centerforcooperativemedia.org" class="hover:text-accent transition-colors">CCM</a></li>
+                        </ul>
+                    </div>
+                    <div class="space-y-6">
+                        <h6 class="text-[10px] font-bold tracking-[0.5em] text-canvas/20 uppercase">Related</h6>
+                        <ul class="space-y-4 text-sm font-semibold tracking-wide">
+                            <li><a href="https://verificationhandbook.com/" class="hover:text-accent transition-colors">Verification Handbook</a></li>
+                            <li><a href="https://www.bellingcat.com/resources/" class="hover:text-accent transition-colors">Bellingcat OSINT</a></li>
+                            <li><a href="https://www.apstylebook.com/" class="hover:text-accent transition-colors">AP Stylebook</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center pt-12 border-t border-canvas/5 gap-6">
+                <div class="font-display text-2xl italic font-black">AMDITIS.</div>
+                <div class="text-[10px] font-bold tracking-[0.3em] text-canvas/30 uppercase">
+                    <a href="https://github.com/jamditis" class="hover:text-canvas transition-colors">Joe Amditis</a>
+                    <span class="mx-2">//</span>
+                    MIT License
+                </div>
+            </div>
+        </div>
+                <!-- Support -->
+            <div style="text-align:center;padding:1.5rem 1rem;">
+              <style>
+                .support-strip{display:flex;align-items:center;justify-content:center;gap:.75rem;flex-wrap:wrap;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+                .support-strip a{display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;border-radius:2rem;font-size:.8rem;font-weight:600;text-decoration:none;color:#fff;transition:transform .15s,box-shadow .15s}
+                .support-strip a:hover{transform:translateY(-1px)}
+                .support-strip .s-venmo{background:#008CFF}.support-strip .s-venmo:hover{box-shadow:0 4px 14px rgba(0,140,255,.4)}
+                .support-strip .s-paypal{background:#003087}.support-strip .s-paypal:hover{box-shadow:0 4px 14px rgba(0,48,135,.4)}
+                .support-strip .s-github{background:#333}.support-strip .s-github:hover{box-shadow:0 4px 14px rgba(51,51,51,.4)}
+                .support-strip svg{width:16px;height:16px;fill:currentColor}
+              </style>
+              <div class="support-strip">
+                <a href="https://venmo.com/jamditis" class="s-venmo" target="_blank" rel="noopener">
+                  <svg viewBox="0 0 24 24"><path d="M19.5 1.5c.9 1.5 1.3 3 1.3 4.9 0 6.1-5.2 14-9.4 19.6H4.4L1.5 2.1l6.2-.6 1.7 13.4c1.5-2.5 3.4-6.4 3.4-9.1 0-1.8-.3-3-.8-4z"/></svg>
+                  Venmo
+                </a>
+                <a href="https://paypal.me/jamditis" class="s-paypal" target="_blank" rel="noopener">
+                  <svg viewBox="0 0 24 24"><path d="M7.02 21.5L7.8 17h-2L8.6 2.5h5.4c2.6 0 4.4 1.8 4 4.4-.6 3.4-3.2 5.1-6.2 5.1H9.7l-1 5.5H6.6zm10-15.1c.3-2-1-3.4-3.4-3.4h-1L11.4 10h1.2c2.2 0 4-1.2 4.4-3.6zm-1.6 8.1c.3-2-1-3.4-3.4-3.4h-1L9.8 18h1.2c2.2 0 4-1.2 4.4-3.5z"/></svg>
+                  PayPal
+                </a>
+                <a href="https://github.com/sponsors/jamditis" class="s-github" target="_blank" rel="noopener">
+                  <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                  Sponsor
+                </a>
+              </div>
+            </div>
+</footer>
+
+    <script>
+      console.log('%c CLAUDE SKILLS FOR JOURNALISM ', 'background: #3d4b40; color: #ede6d4; font-weight: bold; font-size: 16px; padding: 4px 8px; border-radius: 4px;')
+      console.log('%c Claude Code skills for journalists, researchers, and newsrooms.', 'color: #3d4b40; font-style: italic; font-size: 13px;')
+      console.log('%c stack: zero-build HTML, Tailwind CDN, Lucide icons', 'color: #999; font-size: 11px;')
+      console.log('%c built by joe amditis  —  jamditis@gmail.com', 'color: #999; font-size: 11px;')
+    </script>
+
+    <script>
+        // Init Icons
+        lucide.createIcons();
+
+        // Nav Scroll Logic
+        const nav = document.getElementById('main-nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled-nav');
+            } else {
+                nav.classList.remove('scrolled-nav');
+            }
+        });
+
+        // Reveal Animation on Scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-section').forEach(section => {
+            observer.observe(section);
+        });
+    </script></body>
+</html>

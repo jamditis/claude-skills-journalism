@@ -1,0 +1,21 @@
+{
+  "name": "claude-skills-journalism",
+  "version": "1.0.0",
+  "description": "A curated collection of Claude Code skills designed for journalists, researchers, academics, media professionals, and communications practitioners.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://local_proxy@127.0.0.1:65060/git/jamditis/claude-skills-journalism"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "playwright": "^1.57.0",
+    "puppeteer-core": "^24.34.0",
+    "single-file-cli": "^2.0.83"
+  }
+}

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[Event Name] — Flyer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #CA3553;
+            --black: #000000;
+            --white: #ffffff;
+            --gray-100: #f5f4f2;
+            --gray-600: #5c5754;
+            --gray-800: #2d2a28;
+        }
+
+        @page { size: letter; margin: 0; }
+
+        @media print {
+            body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Source Sans 3', Arial, sans-serif;
+            background: var(--gray-100);
+        }
+
+        /* ========== FLYER (8.5x11) ========== */
+        .flyer {
+            width: 8.5in;
+            height: 11in;
+            background: var(--white);
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+        }
+
+        @media print {
+            .flyer { box-shadow: none; }
+            body { background: white; }
+        }
+
+        .flyer-header {
+            background: var(--red);
+            color: var(--white);
+            padding: 0.6in 0.75in;
+            position: relative;
+        }
+
+        .flyer-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--red);
+            clip-path: polygon(0 0, 100% 0, 100% 50%, 0 100%);
+        }
+
+        .flyer-logo {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 10pt;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.8;
+            margin-bottom: 0.3in;
+        }
+
+        .flyer-eyebrow {
+            font-size: 12pt;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-bottom: 0.1in;
+        }
+
+        .flyer-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 48pt;
+            font-weight: 800;
+            line-height: 1.05;
+        }
+
+        .flyer-content {
+            padding: 0.75in;
+            padding-top: 1in;
+        }
+
+        .event-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.3in;
+            margin-bottom: 0.5in;
+        }
+
+        .detail-item {
+            text-align: center;
+            padding: 0.3in;
+            background: var(--gray-100);
+        }
+
+        .detail-icon {
+            font-size: 24pt;
+            color: var(--red);
+            margin-bottom: 0.1in;
+        }
+
+        .detail-label {
+            font-size: 9pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--gray-600);
+            margin-bottom: 0.05in;
+        }
+
+        .detail-value {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 16pt;
+            font-weight: 700;
+            color: var(--black);
+        }
+
+        .detail-sub {
+            font-size: 11pt;
+            color: var(--gray-600);
+        }
+
+        .flyer-description {
+            font-size: 14pt;
+            line-height: 1.6;
+            color: var(--gray-800);
+            margin-bottom: 0.4in;
+            text-align: center;
+            max-width: 5.5in;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .flyer-highlights {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.25in;
+            margin-bottom: 0.5in;
+        }
+
+        .highlight-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.15in;
+            padding: 0.2in;
+            background: var(--gray-100);
+        }
+
+        .highlight-bullet {
+            width: 0.15in;
+            height: 0.15in;
+            background: var(--red);
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 0.08in;
+        }
+
+        .highlight-text {
+            font-size: 12pt;
+            color: var(--gray-800);
+        }
+
+        .flyer-cta {
+            text-align: center;
+            padding: 0.4in;
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .cta-label {
+            font-size: 10pt;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-bottom: 0.1in;
+        }
+
+        .cta-url {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 20pt;
+            font-weight: 700;
+            color: var(--red);
+        }
+
+        .flyer-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 0.3in 0.75in;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--gray-100);
+        }
+
+        .footer-org {
+            font-size: 9pt;
+            color: var(--gray-600);
+        }
+
+        .footer-contact {
+            font-size: 9pt;
+            color: var(--gray-600);
+        }
+
+        .footer-contact a {
+            color: var(--red);
+            text-decoration: none;
+        }
+
+        /* ========== QR CODE PLACEHOLDER ========== */
+        .qr-placeholder {
+            width: 1in;
+            height: 1in;
+            background: var(--gray-100);
+            border: 2px dashed var(--gray-600);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8pt;
+            color: var(--gray-600);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="flyer">
+        <header class="flyer-header">
+            <div class="flyer-logo">Center for Cooperative Media</div>
+            <div class="flyer-eyebrow">[Event Type]</div>
+            <h1 class="flyer-title">[Event name in sentence case]</h1>
+        </header>
+
+        <div class="flyer-content">
+            <div class="event-details">
+                <div class="detail-item">
+                    <div class="detail-icon">📅</div>
+                    <div class="detail-label">Date</div>
+                    <div class="detail-value">[Month DD]</div>
+                    <div class="detail-sub">[Day of week], [Year]</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-icon">🕐</div>
+                    <div class="detail-label">Time</div>
+                    <div class="detail-value">[Start time]</div>
+                    <div class="detail-sub">to [End time] [Timezone]</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-icon">📍</div>
+                    <div class="detail-label">Location</div>
+                    <div class="detail-value">[Venue name]</div>
+                    <div class="detail-sub">[City, State] or Virtual</div>
+                </div>
+            </div>
+
+            <p class="flyer-description">
+                [Brief description of the event - what it is, who it's for, and why people should attend. Keep it to 2-3 sentences maximum.]
+            </p>
+
+            <div class="flyer-highlights">
+                <div class="highlight-item">
+                    <div class="highlight-bullet"></div>
+                    <div class="highlight-text">[Highlight 1 - key feature or benefit]</div>
+                </div>
+                <div class="highlight-item">
+                    <div class="highlight-bullet"></div>
+                    <div class="highlight-text">[Highlight 2 - speaker or activity]</div>
+                </div>
+                <div class="highlight-item">
+                    <div class="highlight-bullet"></div>
+                    <div class="highlight-text">[Highlight 3 - what attendees will learn]</div>
+                </div>
+                <div class="highlight-item">
+                    <div class="highlight-bullet"></div>
+                    <div class="highlight-text">[Highlight 4 - networking or food]</div>
+                </div>
+            </div>
+
+            <div class="flyer-cta">
+                <div class="cta-label">Register now</div>
+                <div class="cta-url">[registration-url.com]</div>
+            </div>
+        </div>
+
+        <footer class="flyer-footer">
+            <div class="footer-org">
+                Center for Cooperative Media<br>
+                Montclair State University
+            </div>
+            <div class="qr-placeholder">
+                QR Code<br>goes here
+            </div>
+            <div class="footer-contact">
+                Questions? Contact:<br>
+                <a href="mailto:[email]">[email]</a>
+            </div>
+        </footer>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Playground</title>
+  <link rel="stylesheet" href="playground-controls/control-panel.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; background: #11111b; }
+    body { display: flex; }
+    #preview-frame {
+      flex: 1;
+      border: none;
+      height: 100%;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <iframe id="preview-frame"></iframe>
+  <!-- Controls are appended to body by control-panel.js -->
+  <script src="playground-controls/prompt-generator.js"></script>
+  <script>
+    // Load the template map and document from URL parameters
+    // Usage: playground-wrapper.html?doc=file.html&template=proposal
+    var params = new URLSearchParams(window.location.search);
+    var docFile = params.get("doc");
+    var template = params.get("template") || "proposal";
+
+    // Dynamically load the template map, then the control panel
+    var mapScript = document.createElement("script");
+    mapScript.src = "playground-controls/template-maps/" + template + ".js";
+    mapScript.onload = function () {
+      var cpScript = document.createElement("script");
+      cpScript.src = "playground-controls/control-panel.js";
+      document.body.appendChild(cpScript);
+    };
+    document.body.appendChild(mapScript);
+
+    // Load the document into the iframe
+    if (docFile) {
+      document.getElementById("preview-frame").src = docFile;
+    }
+    document.title = "PDF Playground" + (docFile ? " \u2014 " + docFile : "");
+  </script>
+</body>
+</html>

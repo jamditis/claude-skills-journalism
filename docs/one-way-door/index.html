@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One-way door check - Claude skills for journalism</title>
+    <meta name="description" content="A Claude Code skill and hook that flags irreversible architectural decisions before you commit to them.">
+
+    <!-- OG tags -->
+    <meta property="og:title" content="One-way door check - Claude skills for journalism">
+    <meta property="og:description" content="A Claude Code skill and hook that flags irreversible architectural decisions before you commit to them.">
+    <meta property="og:url" content="https://skills.amditis.tech/one-way-door/">
+    <meta property="og:type" content="website">
+
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'display': ['Fraunces', 'serif'],
+                        'body': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'canvas': '#ede6d4',
+                        'ink': '#121212',
+                        'clay': '#2d2a26',
+                        'mist': '#c4bfb4',
+                        'accent': '#b45309',
+                        'accentDark': '#92400e',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Fraunces', serif; }
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("https://www.transparenttextures.com/patterns/natural-paper.png"),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="bg-canvas text-ink">
+    <div class="paper-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="../" class="text-clay/70 hover:text-ink flex items-center gap-2 text-sm font-medium transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                All skills
+            </a>
+            <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+                </svg>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="bg-gradient-to-br from-accent to-accentDark text-white pt-24 pb-16 relative overflow-hidden">
+        <!-- SVG grid pattern -->
+        <div class="absolute inset-0 opacity-10">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/>
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-6 relative z-10">
+            <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1 text-sm mb-4">
+                <i data-lucide="door-open" class="w-4 h-4"></i>
+                Development skill + hook
+            </div>
+            <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">One-way door check</h1>
+            <p class="text-xl text-white/90 max-w-2xl">
+                Flag irreversible architectural decisions before you commit to them. The most expensive mistakes aren't bugs — they're decisions that can't be undone.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 py-12 relative z-10">
+
+        <!-- The concept -->
+        <section class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">The concept</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30 mb-6">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <i data-lucide="lock" class="w-5 h-5 text-accent"></i>
+                            <h3 class="font-semibold text-lg">One-way doors</h3>
+                        </div>
+                        <p class="text-sm text-clay/70 mb-3">
+                            Decisions that create gravity. Once traffic, users, or other code depends on them, changing course gets expensive.
+                        </p>
+                        <ul class="text-sm text-clay/70 space-y-1">
+                            <li>Database schema after launch</li>
+                            <li>API contract with external consumers</li>
+                            <li>Auth model shaping permissions</li>
+                            <li>Infrastructure stack your team learns</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <i data-lucide="door-open" class="w-5 h-5 text-green-600"></i>
+                            <h3 class="font-semibold text-lg">Two-way doors</h3>
+                        </div>
+                        <p class="text-sm text-clay/70 mb-3">
+                            Decisions you can reverse easily. Walk through, and if it's wrong, walk back. No lasting consequences.
+                        </p>
+                        <ul class="text-sm text-clay/70 space-y-1">
+                            <li>UI components and styling</li>
+                            <li>Utility functions and helpers</li>
+                            <li>Test infrastructure</li>
+                            <li>Documentation and logging</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <p class="text-clay/80">
+                This skill teaches Claude to recognize the difference and pause before one-way doors. The companion hook automates enforcement by blocking file creation for known architectural patterns until you've discussed the trade-offs.
+            </p>
+        </section>
+
+        <!-- What gets flagged -->
+        <section class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-6">What gets flagged</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
+                            <i data-lucide="database" class="w-4 h-4 text-accent"></i>
+                        </div>
+                        <h3 class="font-semibold">Data models</h3>
+                    </div>
+                    <p class="text-sm text-clay/70">Schemas, migrations, entity definitions. Once your database has rows, every change requires a migration.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
+                            <i data-lucide="server" class="w-4 h-4 text-accent"></i>
+                        </div>
+                        <h3 class="font-semibold">Infrastructure</h3>
+                    </div>
+                    <p class="text-sm text-clay/70">Docker, Terraform, Kubernetes, Helm. Infrastructure choices constrain everything built on top.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
+                            <i data-lucide="shield" class="w-4 h-4 text-accent"></i>
+                        </div>
+                        <h3 class="font-semibold">Auth boundaries</h3>
+                    </div>
+                    <p class="text-sm text-clay/70">Security rules, RBAC, permissions. Auth boundaries are load-bearing walls in your architecture.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
+                            <i data-lucide="plug" class="w-4 h-4 text-accent"></i>
+                        </div>
+                        <h3 class="font-semibold">API contracts</h3>
+                    </div>
+                    <p class="text-sm text-clay/70">OpenAPI specs, protobuf definitions, route files. Published APIs are promises to consumers.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
+                            <i data-lucide="radio" class="w-4 h-4 text-accent"></i>
+                        </div>
+                        <h3 class="font-semibold">Event systems</h3>
+                    </div>
+                    <p class="text-sm text-clay/70">Pub/sub, message queues, event buses. Event schemas are contracts between producers and consumers.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
+                            <i data-lucide="git-branch" class="w-4 h-4 text-accent"></i>
+                        </div>
+                        <h3 class="font-semibold">CI/CD pipelines</h3>
+                    </div>
+                    <p class="text-sm text-clay/70">GitHub Actions, GitLab CI, Jenkins. Pipelines become the backbone of your release process.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
+                            <i data-lucide="package" class="w-4 h-4 text-accent"></i>
+                        </div>
+                        <h3 class="font-semibold">Dependencies</h3>
+                    </div>
+                    <p class="text-sm text-clay/70">package.json, Cargo.toml, go.mod. Framework choices ripple through your entire codebase.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
+                            <i data-lucide="cloud" class="w-4 h-4 text-accent"></i>
+                        </div>
+                        <h3 class="font-semibold">Cloud configs</h3>
+                    </div>
+                    <p class="text-sm text-clay/70">Firebase, Firestore indexes. Cloud service configs lock you into specific providers and architectures.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How it works -->
+        <section class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-6">How it works</h2>
+            <div class="space-y-4">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded">Detect</span>
+                        <div>
+                            <h3 class="font-semibold">Hook intercepts file creation</h3>
+                            <p class="text-sm text-clay/70 mt-1">The PreToolUse hook fires on every <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">Write</code> call. It extracts the file path and checks it against known one-way-door filename patterns.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-1 rounded">Block</span>
+                        <div>
+                            <h3 class="font-semibold">One-way door detected</h3>
+                            <p class="text-sm text-clay/70 mt-1">If the file matches a one-way-door pattern, the hook exits with code 2 (block) and sends a message to stderr explaining what was caught and why.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded">Ask</span>
+                        <div>
+                            <h3 class="font-semibold">Claude discusses trade-offs</h3>
+                            <p class="text-sm text-clay/70 mt-1">Claude uses <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">AskUserQuestion</code> to present the architectural decision: what it does, alternative approaches, and trade-offs. The user decides how to proceed.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-1 rounded">Proceed</span>
+                        <div>
+                            <h3 class="font-semibold">Write with confidence</h3>
+                            <p class="text-sm text-clay/70 mt-1">After the user makes an informed choice, Claude retries the write. Two-way door files always pass through silently with no interruption.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hook script -->
+        <section class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">The hook script</h2>
+            <p class="text-clay/80 mb-4">A shell script that runs on every <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">Write</code> tool call. It pattern-matches the filename and blocks with exit code 2 if the file is a one-way door.</p>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto">
+                <pre class="text-white"><code>#!/bin/sh
+INPUT=$(cat)
+[ -z "$INPUT" ] && exit 0
+
+FILE_PATH=$(echo "$INPUT" | grep -oP '"file_path"\s*:\s*"[^"]*"' \
+  | head -1 | sed 's/.*"file_path"\s*:\s*"//;s/"//')
+[ -z "$FILE_PATH" ] && exit 0
+
+FILENAME=$(basename "$FILE_PATH")
+FILENAME_LOWER=$(echo "$FILENAME" | tr "[:upper:]" "[:lower:]")
+DIR=$(dirname "$FILE_PATH")
+
+ONE_WAY=0
+REASON=""
+
+# Data models, infra, auth, APIs, events, deps, cloud, CI/CD
+if echo "$FILENAME_LOWER" | grep -qE \
+  "schema\.(prisma|graphql|sql)|migration|\.sql$|models?\.(py|ts|js)$"; then
+    ONE_WAY=1; REASON="data model / database schema"
+fi
+
+if echo "$FILENAME_LOWER" | grep -qE \
+  "^(docker-compose|dockerfile|terraform|pulumi|cdk)|\.tf$"; then
+    ONE_WAY=1; REASON="infrastructure config"
+fi
+
+if echo "$FILENAME_LOWER" | grep -qE \
+  "auth\.(ts|js|py)|\.rules$|rbac|permissions"; then
+    ONE_WAY=1; REASON="auth / security rules"
+fi
+
+# ... (8 categories total)
+
+if [ "$ONE_WAY" = "1" ]; then
+    echo "ONE_WAY_DOOR: $FILENAME ($REASON)" >&2
+    echo "Blocked. Discuss trade-offs first." >&2
+    exit 2  # Block the write
+fi
+
+exit 0  # Allow two-way doors</code></pre>
+            </div>
+            <p class="text-sm text-clay/60 mt-3">
+                Full script with all 8 categories available in the
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/one-way-door" class="text-accent hover:text-accentDark underline underline-offset-2" target="_blank">skill directory</a>.
+            </p>
+        </section>
+
+        <!-- Two-way doors -->
+        <section class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">Two-way doors</h2>
+            <p class="text-clay/80 mb-4">These file types pass through the hook silently. They're safe to decide quickly and change later.</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                    <i data-lucide="layout" class="w-5 h-5 text-green-600 mx-auto mb-1"></i>
+                    <p class="text-sm font-medium text-green-800">UI components</p>
+                </div>
+                <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                    <i data-lucide="wrench" class="w-5 h-5 text-green-600 mx-auto mb-1"></i>
+                    <p class="text-sm font-medium text-green-800">Utilities</p>
+                </div>
+                <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                    <i data-lucide="test-tubes" class="w-5 h-5 text-green-600 mx-auto mb-1"></i>
+                    <p class="text-sm font-medium text-green-800">Test files</p>
+                </div>
+                <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                    <i data-lucide="file-text" class="w-5 h-5 text-green-600 mx-auto mb-1"></i>
+                    <p class="text-sm font-medium text-green-800">Documentation</p>
+                </div>
+                <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                    <i data-lucide="palette" class="w-5 h-5 text-green-600 mx-auto mb-1"></i>
+                    <p class="text-sm font-medium text-green-800">Styling / CSS</p>
+                </div>
+                <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                    <i data-lucide="activity" class="w-5 h-5 text-green-600 mx-auto mb-1"></i>
+                    <p class="text-sm font-medium text-green-800">Logging</p>
+                </div>
+                <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                    <i data-lucide="image" class="w-5 h-5 text-green-600 mx-auto mb-1"></i>
+                    <p class="text-sm font-medium text-green-800">Static assets</p>
+                </div>
+                <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                    <i data-lucide="settings" class="w-5 h-5 text-green-600 mx-auto mb-1"></i>
+                    <p class="text-sm font-medium text-green-800">App config</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">Installation</h2>
+
+            <div class="space-y-6">
+                <div>
+                    <h3 class="font-semibold mb-3">Option 1: Install the skill</h3>
+                    <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto">
+                        <p class="text-white/50 mb-2"># Clone the repository</p>
+                        <p class="text-white mb-4">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
+                        <p class="text-white/50 mb-2"># Copy the skill to your Claude config</p>
+                        <p class="text-white">cp -r claude-skills-journalism/one-way-door ~/.claude/skills/</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold mb-3">Option 2: Add the CLAUDE.md rule</h3>
+                    <p class="text-sm text-clay/70 mb-3">Add this paragraph to your project's CLAUDE.md for prompt-based enforcement (no hook needed):</p>
+                    <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto">
+                        <pre class="text-white"><code>### One-way door check
+Before creating new files that represent architectural
+decisions, ask: "Which of these decisions would be
+difficult to reverse?" One-way doors include data models,
+service communication patterns, auth boundaries, tenancy
+models, and infrastructure configs. If a decision is a
+one-way door, pause and discuss the trade-offs before
+committing.</code></pre>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold mb-3">Option 3: Add the automated hook</h3>
+                    <p class="text-sm text-clay/70 mb-3">For automated enforcement, save the hook script and add this to your <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">settings.json</code>:</p>
+                    <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto">
+                        <pre class="text-white"><code>{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Write",
+      "hooks": [{
+        "type": "command",
+        "command": "/path/to/one-way-door-check.sh"
+      }]
+    }]
+  }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <p class="mt-4 text-clay/70 text-sm">
+                Or download just this skill from the
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/one-way-door" class="text-accent hover:text-accentDark underline underline-offset-2" target="_blank">GitHub repository</a>.
+            </p>
+        </section>
+
+        <!-- Related skills -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Related skills</h2>
+            <div class="flex flex-wrap gap-2">
+                <a href="../test-first-bugs/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Test-first bugs</a>
+                <a href="../vibe-coding/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Vibe coding</a>
+                <a href="../security-checklist/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Security checklist</a>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="text-center">
+            <div class="bg-gradient-to-br from-accent to-accentDark rounded-xl p-8 text-white">
+                <h2 class="font-display text-xl font-bold mb-3">Measure twice, cut once</h2>
+                <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
+                    Pause before irreversible decisions. A five-minute conversation about trade-offs saves weeks of migration pain.
+                </p>
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/one-way-door" target="_blank" class="inline-flex items-center gap-2 bg-white text-accent px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors">
+                    View on GitHub
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-mist/30 mt-12 relative z-10">
+        <div class="max-w-4xl mx-auto px-6 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-clay/60 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accent hover:text-accentDark underline underline-offset-2">Center for Cooperative Media</a>
+                </p>
+                <div class="flex items-center gap-6">
+                    <a href="../" class="text-clay/60 hover:text-ink text-sm transition-colors">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/60 hover:text-ink text-sm transition-colors">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

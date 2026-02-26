@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template selector - Claude skills for journalism</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'display': ['Fraunces', 'serif'],
+                        'body': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'canvas': '#ede6d4',
+                        'ink': '#121212',
+                        'clay': '#2d2a26',
+                        'mist': '#c4bfb4',
+                        'accent': '#7c3aed',
+                        'accentDark': '#6d28d9',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Fraunces', serif; }
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("https://www.transparenttextures.com/patterns/natural-paper.png"),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .content-section h2 { margin-top: 2.5rem; margin-bottom: 1rem; }
+        .content-section h3 { margin-top: 2rem; margin-bottom: 0.75rem; }
+        .content-section p { margin-bottom: 1rem; }
+        .content-section ul, .content-section ol { margin-bottom: 1rem; margin-left: 1.5rem; }
+        .content-section li { margin-bottom: 0.5rem; }
+        .content-section code {
+            background: rgba(0,0,0,0.06);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+        .content-section pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        .content-section pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        .content-section table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        .content-section th, .content-section td {
+            border: 1px solid rgba(0,0,0,0.1);
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+        }
+        .content-section th {
+            background: rgba(0,0,0,0.04);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-canvas text-ink">
+    <div class="paper-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="../" class="text-clay/70 hover:text-ink flex items-center gap-2 text-sm font-medium transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                All skills
+            </a>
+            <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+                </svg>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="bg-gradient-to-br from-accent to-accentDark text-white pt-24 pb-16">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1 text-sm mb-4">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Documentation skill
+            </div>
+            <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">Template selector</h1>
+            <p class="text-xl text-white/90 max-w-2xl">
+                Choose the correct CLAUDE.md or LESSONS.md template for journalism projects. Don't guess - use the decision tree.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 py-12 relative z-10">
+        <!-- When to use -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">When to use</h2>
+            <ul class="space-y-2 text-clay/80">
+                <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Starting a new project and need documentation
+                </li>
+                <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Setting up CLAUDE.md for a project
+                </li>
+                <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Unsure which template category fits your project
+                </li>
+                <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Writing project retrospectives (LESSONS.md)
+                </li>
+            </ul>
+        </section>
+
+        <!-- Quick reference table -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Quick reference</h2>
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-mist/10 border-b border-mist/30">
+                            <th class="text-left px-5 py-3 font-semibold">Project type</th>
+                            <th class="text-left px-5 py-3 font-semibold">Template category</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-mist/20">
+                        <tr>
+                            <td class="px-5 py-3 text-clay/70">Newsroom AI tool, fact-checker</td>
+                            <td class="px-5 py-3 font-medium">editorial-tool</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 text-clay/70">Conference, summit, workshop</td>
+                            <td class="px-5 py-3 font-medium">event-website</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 text-clay/70">Newsletter, podcast, blog</td>
+                            <td class="px-5 py-3 font-medium">publication</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 text-clay/70">Investigation, data journalism</td>
+                            <td class="px-5 py-3 font-medium">research-project</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 text-clay/70">CMS workflow, syndication</td>
+                            <td class="px-5 py-3 font-medium">content-pipeline</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 text-clay/70">Historical collection, archive</td>
+                            <td class="px-5 py-3 font-medium">digital-archive</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Key features -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-6">What's included</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <h3 class="font-semibold mb-2">Decision tree</h3>
+                    <p class="text-sm text-clay/70">Step-by-step logic for matching projects to the correct template category.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <h3 class="font-semibold mb-2">Category descriptions</h3>
+                    <p class="text-sm text-clay/70">Detailed descriptions for each template type: editorial-tool, event-website, publication, research-project, content-pipeline, digital-archive.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <h3 class="font-semibold mb-2">Common mistakes</h3>
+                    <p class="text-sm text-clay/70">Examples of wrong template choices and why they're wrong, with the correct alternatives.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <h3 class="font-semibold mb-2">The litmus test</h3>
+                    <p class="text-sm text-clay/70">Three questions to ask when you're still unsure which template to use.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- The litmus test -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">The litmus test</h2>
+            <p class="text-clay/80 mb-4">If you're still unsure, ask these three questions:</p>
+            <div class="space-y-3">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-accent/10 text-accent text-xs font-semibold px-2.5 py-1 rounded">1</span>
+                        <div>
+                            <h3 class="font-semibold">Is this a tool that helps journalists do X, or is this X itself?</h3>
+                            <p class="text-sm text-clay/70 mt-1">Tool = editorial-tool. The thing itself = other categories.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-accent/10 text-accent text-xs font-semibold px-2.5 py-1 rounded">2</span>
+                        <div>
+                            <h3 class="font-semibold">Does it have a specific end date?</h3>
+                            <p class="text-sm text-clay/70 mt-1">Event dates = event-website. Publication date = research-project. Ongoing = publication, content-pipeline, or digital-archive.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-accent/10 text-accent text-xs font-semibold px-2.5 py-1 rounded">3</span>
+                        <div>
+                            <h3 class="font-semibold">Is preservation the primary goal?</h3>
+                            <p class="text-sm text-clay/70 mt-1">Yes = digital-archive. No = other categories.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Installation</h2>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto">
+                <p class="text-white/50 mb-2"># Clone the repository</p>
+                <p class="text-white mb-4">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
+                <p class="text-white/50 mb-2"># Copy the skill to your Claude config</p>
+                <p class="text-white">cp -r claude-skills-journalism/template-selector ~/.claude/skills/</p>
+            </div>
+            <p class="mt-4 text-clay/70 text-sm">
+                Or download just this skill from the
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/template-selector" class="text-accent hover:text-accentDark underline underline-offset-2" target="_blank">GitHub repository</a>.
+            </p>
+        </section>
+
+        <!-- Related skills -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Related skills</h2>
+            <div class="flex flex-wrap gap-2">
+                <a href="../project-memory/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Project memory</a>
+                <a href="../project-retrospective/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Project retrospective</a>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="text-center">
+            <div class="bg-gradient-to-br from-accent to-accentDark rounded-xl p-8 text-white">
+                <h2 class="font-display text-xl font-bold mb-3">Pick the specific template that fits</h2>
+                <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
+                    Decision trees, category descriptions, and common mistakes in one skill.
+                </p>
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/template-selector" target="_blank" class="inline-flex items-center gap-2 bg-white text-accent px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors">
+                    View on GitHub
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-mist/30 mt-12 relative z-10">
+        <div class="max-w-4xl mx-auto px-6 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-clay/60 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accent hover:text-accentDark underline underline-offset-2">Center for Cooperative Media</a>
+                </p>
+                <div class="flex items-center gap-6">
+                    <a href="../" class="text-clay/60 hover:text-ink text-sm transition-colors">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/60 hover:text-ink text-sm transition-colors">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

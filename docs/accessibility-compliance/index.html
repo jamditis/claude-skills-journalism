@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility compliance - Claude skills for journalism</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'display': ['Fraunces', 'serif'],
+                        'body': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'canvas': '#ede6d4',
+                        'ink': '#121212',
+                        'clay': '#2d2a26',
+                        'mist': '#c4bfb4',
+                        'accent': '#0891b2',
+                        'accentDark': '#0e7490',
+                        'accentDeep': '#155e75',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Fraunces', serif; }
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("https://www.transparenttextures.com/patterns/natural-paper.png"),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .hero-gradient {
+            background:
+                url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0z' fill='none' stroke='%230891b2' stroke-opacity='0.08' stroke-width='1'/%3E%3C/svg%3E"),
+                linear-gradient(135deg, #0891b2 0%, #0d9488 50%, #155e75 100%);
+        }
+        .feature-card {
+            background: white;
+            border: 1px solid rgba(0,0,0,0.08);
+            transition: all 0.2s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+    </style>
+</head>
+<body class="bg-canvas text-ink">
+    <div class="paper-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="../" class="text-clay/70 hover:text-ink flex items-center gap-2 text-sm font-medium transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                All skills
+            </a>
+            <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+                </svg>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero-gradient text-white pt-24 pb-20 relative overflow-hidden">
+        <div class="max-w-5xl mx-auto px-6 relative z-10">
+            <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm mb-6 border border-white/20">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+                Web development skill
+            </div>
+            <h1 class="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight">Accessibility compliance</h1>
+            <p class="text-xl text-white/90 max-w-2xl leading-relaxed">
+                Web accessibility patterns for news sites, journalism tools, and academic platforms. Ensure your content reaches all readers.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 py-16 relative z-10">
+        <!-- WCAG Principles -->
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">The four WCAG principles (POUR)</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="feature-card rounded-2xl p-6">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-accent to-accentDark flex items-center justify-center mb-4">
+                        <span class="text-2xl font-bold text-white">P</span>
+                    </div>
+                    <h3 class="font-semibold mb-3 text-ink">Perceivable</h3>
+                    <ul class="text-sm text-clay/70 space-y-1">
+                        <li>• Images have alt text</li>
+                        <li>• Videos have captions</li>
+                        <li>• Audio has transcripts</li>
+                        <li>• Color isn't the only way to convey info</li>
+                    </ul>
+                </div>
+                <div class="feature-card rounded-2xl p-6">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-accent to-accentDark flex items-center justify-center mb-4">
+                        <span class="text-2xl font-bold text-white">O</span>
+                    </div>
+                    <h3 class="font-semibold mb-3 text-ink">Operable</h3>
+                    <ul class="text-sm text-clay/70 space-y-1">
+                        <li>• All functions work with keyboard</li>
+                        <li>• No keyboard traps</li>
+                        <li>• Skip links to main content</li>
+                        <li>• Focus visible on all elements</li>
+                    </ul>
+                </div>
+                <div class="feature-card rounded-2xl p-6">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-accent to-accentDark flex items-center justify-center mb-4">
+                        <span class="text-2xl font-bold text-white">U</span>
+                    </div>
+                    <h3 class="font-semibold mb-3 text-ink">Understandable</h3>
+                    <ul class="text-sm text-clay/70 space-y-1">
+                        <li>• Language declared in HTML</li>
+                        <li>• Navigation is consistent</li>
+                        <li>• Error messages are clear</li>
+                        <li>• Labels describe form fields</li>
+                    </ul>
+                </div>
+                <div class="feature-card rounded-2xl p-6">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-accent to-accentDark flex items-center justify-center mb-4">
+                        <span class="text-2xl font-bold text-white">R</span>
+                    </div>
+                    <h3 class="font-semibold mb-3 text-ink">Robust</h3>
+                    <ul class="text-sm text-clay/70 space-y-1">
+                        <li>• Valid HTML</li>
+                        <li>• ARIA used correctly</li>
+                        <li>• Works with screen readers</li>
+                        <li>• Doesn't break with zoom</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Alt text for journalism -->
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">Alt text for journalism</h2>
+            <div class="feature-card rounded-2xl overflow-hidden">
+                <div class="p-8 border-b border-mist/20">
+                    <h3 class="font-semibold mb-6 text-ink">News photo alt text decision tree</h3>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <p class="text-sm text-clay/60 mb-3 font-medium">Include:</p>
+                            <ul class="space-y-3 text-clay/80">
+                                <li class="flex items-start gap-3">
+                                    <span class="text-accent font-bold">WHO</span>
+                                    <span>is in the image (if identifiable and relevant)</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="text-accent font-bold">WHAT</span>
+                                    <span>is happening (the action or situation)</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="text-accent font-bold">WHERE</span>
+                                    <span>(if location matters to story)</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="text-sm text-clay/60 mb-3 font-medium">Avoid:</p>
+                            <ul class="space-y-2 text-clay/70">
+                                <li>• Repeating caption text verbatim</li>
+                                <li>• Starting with "Image of" or "Photo of"</li>
+                                <li>• Purely decorative descriptions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-8 bg-mist/10">
+                    <h4 class="font-semibold mb-6 text-ink">Examples</h4>
+                    <div class="space-y-6">
+                        <div>
+                            <p class="text-sm text-clay/60 mb-2">Photo: Protesters holding signs outside courthouse</p>
+                            <p class="text-red-600 text-sm mb-1"><strong>Bad:</strong> "Protesters"</p>
+                            <p class="text-green-700 text-sm"><strong>Good:</strong> "Approximately 50 protesters hold signs reading 'Justice Now' outside the federal courthouse in downtown Seattle"</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-clay/60 mb-2">Photo: Headshot of interview subject</p>
+                            <p class="text-red-600 text-sm mb-1"><strong>Bad:</strong> "Photo"</p>
+                            <p class="text-green-700 text-sm"><strong>Good:</strong> "Dr. Sarah Chen, epidemiologist at Johns Hopkins"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Accessible data visualization -->
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">Accessible data visualization</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="feature-card rounded-2xl p-6">
+                    <h3 class="font-semibold mb-4 text-ink">Chart accessibility checklist</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded border-2 border-accent flex items-center justify-center flex-shrink-0">
+                                <svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <span class="text-clay/80">Text alternative describing the key insight</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded border-2 border-accent flex items-center justify-center flex-shrink-0">
+                                <svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <span class="text-clay/80">Data table available (visible or linked)</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded border-2 border-accent flex items-center justify-center flex-shrink-0">
+                                <svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <span class="text-clay/80">Colors have sufficient contrast</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded border-2 border-accent flex items-center justify-center flex-shrink-0">
+                                <svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <span class="text-clay/80">Patterns/textures supplement color coding</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded border-2 border-accent flex items-center justify-center flex-shrink-0">
+                                <svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <span class="text-clay/80">Labels directly on chart (not legend-only)</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-5 h-5 rounded border-2 border-accent flex items-center justify-center flex-shrink-0">
+                                <svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <span class="text-clay/80">Title describes what chart shows</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="feature-card rounded-2xl p-6">
+                    <h3 class="font-semibold mb-4 text-ink">Color-blind safe palettes</h3>
+                    <p class="text-sm text-clay/70 mb-5">Paul Tol's color schemes - tested for accessibility:</p>
+                    <div class="space-y-5">
+                        <div>
+                            <p class="text-xs text-clay/60 mb-2 font-medium">Bright palette</p>
+                            <div class="flex gap-2">
+                                <div class="w-10 h-10 rounded-lg shadow-sm" style="background: #4477AA" title="#4477AA"></div>
+                                <div class="w-10 h-10 rounded-lg shadow-sm" style="background: #EE6677" title="#EE6677"></div>
+                                <div class="w-10 h-10 rounded-lg shadow-sm" style="background: #228833" title="#228833"></div>
+                                <div class="w-10 h-10 rounded-lg shadow-sm" style="background: #CCBB44" title="#CCBB44"></div>
+                                <div class="w-10 h-10 rounded-lg shadow-sm" style="background: #66CCEE" title="#66CCEE"></div>
+                                <div class="w-10 h-10 rounded-lg shadow-sm" style="background: #AA3377" title="#AA3377"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs text-clay/60 mb-2 font-medium">Categorical palette</p>
+                            <div class="flex gap-2">
+                                <div class="w-10 h-10 rounded-lg shadow-sm" style="background: #332288" title="#332288"></div>
+                                <div class="w-10 h-10 rounded-lg shadow-sm" style="background: #88CCEE" title="#88CCEE"></div>
+                                <div class="w-10 h-10 rounded-lg shadow-sm" style="background: #44AA99" title="#44AA99"></div>
+                                <div class="w-10 h-10 rounded-lg shadow-sm" style="background: #117733" title="#117733"></div>
+                                <div class="w-10 h-10 rounded-lg shadow-sm" style="background: #999933" title="#999933"></div>
+                                <div class="w-10 h-10 rounded-lg shadow-sm" style="background: #CC6677" title="#CC6677"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contrast requirements -->
+        <section class="bg-ink text-white -mx-6 px-6 py-16 mb-20 md:-mx-[calc((100vw-64rem)/2+1.5rem)] md:px-[calc((100vw-64rem)/2+1.5rem)]">
+            <div class="max-w-5xl mx-auto">
+                <h2 class="font-display text-2xl font-semibold mb-6 text-white">Contrast requirements (WCAG 2.1)</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-white/20">
+                                <th class="text-left px-4 py-4 font-semibold text-white/90">Element type</th>
+                                <th class="text-left px-4 py-4 font-semibold text-white/90">AA (minimum)</th>
+                                <th class="text-left px-4 py-4 font-semibold text-white/90">AAA (enhanced)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/10">
+                            <tr>
+                                <td class="px-4 py-4 text-white/80">Normal text</td>
+                                <td class="px-4 py-4"><span class="bg-accent/30 text-white px-3 py-1 rounded-lg font-mono text-sm">4.5:1</span></td>
+                                <td class="px-4 py-4"><span class="bg-accent/30 text-white px-3 py-1 rounded-lg font-mono text-sm">7:1</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-4 text-white/80">Large text (18pt+)</td>
+                                <td class="px-4 py-4"><span class="bg-accent/30 text-white px-3 py-1 rounded-lg font-mono text-sm">3:1</span></td>
+                                <td class="px-4 py-4"><span class="bg-accent/30 text-white px-3 py-1 rounded-lg font-mono text-sm">4.5:1</span></td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-4 text-white/80">UI components</td>
+                                <td class="px-4 py-4"><span class="bg-accent/30 text-white px-3 py-1 rounded-lg font-mono text-sm">3:1</span></td>
+                                <td class="px-4 py-4 text-white/50">—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video/audio requirements -->
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">Video and audio accessibility</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="feature-card rounded-2xl p-6">
+                    <h3 class="font-semibold mb-4 flex items-center gap-3 text-ink">
+                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-accent to-accentDark flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
+                            </svg>
+                        </div>
+                        Caption requirements
+                    </h3>
+                    <ul class="space-y-2 text-sm text-clay/70">
+                        <li>• 99%+ accuracy</li>
+                        <li>• Synchronized within 1 second</li>
+                        <li>• Speaker identification for multiple speakers</li>
+                        <li>• Sound effects described [applause]</li>
+                        <li>• Can be toggled on/off</li>
+                    </ul>
+                </div>
+                <div class="feature-card rounded-2xl p-6">
+                    <h3 class="font-semibold mb-4 flex items-center gap-3 text-ink">
+                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-accent to-accentDark flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+                            </svg>
+                        </div>
+                        Audio description
+                    </h3>
+                    <ul class="space-y-2 text-sm text-clay/70">
+                        <li>• Key visual info not in dialogue</li>
+                        <li>• Actions crucial to understanding</li>
+                        <li>• Text on screen not read aloud</li>
+                        <li>• Identifying info for speakers</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Manual testing checklist -->
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">Manual testing checklist</h2>
+            <div class="feature-card rounded-2xl p-8">
+                <div class="grid md:grid-cols-2 gap-10">
+                    <div>
+                        <h3 class="font-semibold mb-5 text-ink">Keyboard navigation</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3">
+                                <div class="w-5 h-5 rounded border-2 border-mist flex items-center justify-center flex-shrink-0"></div>
+                                <span class="text-clay/80">Tab through entire page</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <div class="w-5 h-5 rounded border-2 border-mist flex items-center justify-center flex-shrink-0"></div>
+                                <span class="text-clay/80">Can reach all interactive elements</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <div class="w-5 h-5 rounded border-2 border-mist flex items-center justify-center flex-shrink-0"></div>
+                                <span class="text-clay/80">Focus order makes sense</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <div class="w-5 h-5 rounded border-2 border-mist flex items-center justify-center flex-shrink-0"></div>
+                                <span class="text-clay/80">No keyboard traps</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <div class="w-5 h-5 rounded border-2 border-mist flex items-center justify-center flex-shrink-0"></div>
+                                <span class="text-clay/80">Skip link works</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-5 text-ink">Zoom testing</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3">
+                                <div class="w-5 h-5 rounded border-2 border-mist flex items-center justify-center flex-shrink-0"></div>
+                                <span class="text-clay/80">200% zoom, no horizontal scroll</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <div class="w-5 h-5 rounded border-2 border-mist flex items-center justify-center flex-shrink-0"></div>
+                                <span class="text-clay/80">400% zoom, content still usable</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <div class="w-5 h-5 rounded border-2 border-mist flex items-center justify-center flex-shrink-0"></div>
+                                <span class="text-clay/80">Text spacing adjustments don't break layout</span>
+                            </li>
+                        </ul>
+                        <h3 class="font-semibold mb-5 mt-8 text-ink">Color testing</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3">
+                                <div class="w-5 h-5 rounded border-2 border-mist flex items-center justify-center flex-shrink-0"></div>
+                                <span class="text-clay/80">Works in grayscale</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <div class="w-5 h-5 rounded border-2 border-mist flex items-center justify-center flex-shrink-0"></div>
+                                <span class="text-clay/80">Links distinguishable from text</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Legal requirements -->
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">Legal requirements</h2>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="feature-card rounded-2xl p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-3xl">🇺🇸</span>
+                        <h3 class="font-semibold text-ink">United States</h3>
+                    </div>
+                    <ul class="text-sm text-clay/70 space-y-2">
+                        <li><strong class="text-ink">Section 508:</strong> Federal agencies</li>
+                        <li><strong class="text-ink">ADA:</strong> Increasingly applied to websites</li>
+                        <li><strong class="text-ink">State laws:</strong> Many have additional requirements</li>
+                    </ul>
+                </div>
+                <div class="feature-card rounded-2xl p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-3xl">🇪🇺</span>
+                        <h3 class="font-semibold text-ink">European Union</h3>
+                    </div>
+                    <ul class="text-sm text-clay/70 space-y-2">
+                        <li><strong class="text-ink">European Accessibility Act:</strong> From 2025</li>
+                        <li><strong class="text-ink">EN 301 549:</strong> Technical standard</li>
+                    </ul>
+                </div>
+                <div class="feature-card rounded-2xl p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-3xl">🌍</span>
+                        <h3 class="font-semibold text-ink">Best practice</h3>
+                    </div>
+                    <p class="text-sm text-clay/70">
+                        <strong class="text-ink">WCAG 2.1 AA</strong> is the global standard. Meet this and you'll likely satisfy most legal requirements.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- What's included -->
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">What's included</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="feature-card rounded-2xl p-6">
+                    <h3 class="font-semibold mb-4 text-ink">Code patterns</h3>
+                    <ul class="space-y-3 text-clay/70">
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Accessible chart HTML pattern
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Skip link implementation (JS)
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Modal keyboard trap prevention
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Accessible form field pattern
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Error message handling
+                        </li>
+                    </ul>
+                </div>
+                <div class="feature-card rounded-2xl p-6">
+                    <h3 class="font-semibold mb-4 text-ink">Python utilities</h3>
+                    <ul class="space-y-3 text-clay/70">
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Alt text prompt generator
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Color contrast validator
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Color-blind safe palettes
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Axe-core audit runner (Playwright)
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">Installation</h2>
+            <div class="bg-ink rounded-2xl p-6 font-mono text-sm overflow-x-auto">
+                <p class="text-white/50 mb-2"># Clone the repository</p>
+                <p class="text-white mb-4">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
+                <p class="text-white/50 mb-2"># Copy the skill to your Claude config</p>
+                <p class="text-white">cp -r claude-skills-journalism/accessibility-compliance ~/.claude/skills/</p>
+            </div>
+            <p class="mt-4 text-clay/70">
+                Or download just this skill from the
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/accessibility-compliance" class="text-accent hover:text-accentDark underline underline-offset-2" target="_blank">GitHub repository</a>.
+            </p>
+        </section>
+
+        <!-- CTA -->
+        <section class="text-center">
+            <div class="hero-gradient rounded-2xl p-10 text-white">
+                <h2 class="font-display text-2xl font-bold mb-4">Make your content accessible</h2>
+                <p class="text-white/80 mb-8 max-w-xl mx-auto">
+                    Ensure your journalism reaches all readers, including those using assistive technologies.
+                </p>
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/accessibility-compliance" target="_blank" class="inline-flex items-center gap-2 bg-white text-accent px-6 py-3 rounded-full font-semibold hover:bg-white/95 transition-colors shadow-lg">
+                    View on GitHub
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-mist/30 mt-16 relative z-10">
+        <div class="max-w-5xl mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-clay/60 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accent hover:text-accentDark underline underline-offset-2">Center for Cooperative Media</a>
+                </p>
+                <div class="flex items-center gap-6">
+                    <a href="../" class="text-clay/60 hover:text-ink text-sm transition-colors">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/60 hover:text-ink text-sm transition-colors">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
