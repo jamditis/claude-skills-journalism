@@ -23,3 +23,7 @@ node_modules/
 # Temporary files
 *.tmp
 *.bak
+
+# Windows artifacts
+desktop.ini
+nul
