@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web UI best practices - Claude skills for journalism</title>
+    <meta name="description" content="Signs of taste in web UI. 100ms interactions, skeleton loading, clean URLs, color restraint, command palette, honest cancellation, optical alignment.">
+
+    <!-- OG tags -->
+    <meta property="og:title" content="Web UI best practices - Claude skills for journalism">
+    <meta property="og:description" content="Signs of taste in web UI. 100ms interactions, skeleton loading, clean URLs, color restraint, command palette, honest cancellation, optical alignment.">
+    <meta property="og:type" content="website">
+
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'display': ['Fraunces', 'serif'],
+                        'body': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'canvas': '#ede6d4',
+                        'ink': '#121212',
+                        'clay': '#2d2a26',
+                        'mist': '#c4bfb4',
+                        'accent': '#0d9488',
+                        'accentDark': '#0f766e',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Fraunces', serif; }
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("https://www.transparenttextures.com/patterns/natural-paper.png"),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 1;
+        }
+        pre { background: #1a1a1a; color: #e2e8f0; padding: 1.25rem; border-radius: 0.5rem; overflow-x: auto; font-size: 0.8125rem; line-height: 1.6; }
+        code { background: rgba(0,0,0,0.06); padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.8125rem; }
+        pre code { background: none; padding: 0; }
+        .principle-card { transition: all 0.3s ease; }
+        .principle-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px -8px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body class="bg-canvas text-ink">
+    <div class="paper-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="../" class="text-clay/70 hover:text-ink flex items-center gap-2 text-sm font-medium transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                All skills
+            </a>
+            <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+                </svg>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="bg-gradient-to-br from-accent to-accentDark text-white pt-24 pb-16 relative overflow-hidden">
+        <!-- SVG grid pattern -->
+        <div class="absolute inset-0 opacity-10">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/>
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-6 relative z-10">
+            <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1 text-sm mb-4">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+                Development skill
+            </div>
+            <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">Web UI best practices</h1>
+            <p class="text-xl text-white/90 max-w-2xl">
+                Signs of taste in web UI. The small details that separate polished products from rough ones — speed, restraint, honesty, and respect for the user's time.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 py-12 relative z-10">
+
+        <!-- 18 principles grid -->
+        <section class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-6">The 18 principles</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <a href="#speed" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="zap" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">100ms interactions</span>
+                    </div>
+                    <p class="text-xs text-clay/60">Every action feels instant</p>
+                </a>
+                <a href="#no-tours" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="x-circle" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">No product tours</span>
+                    </div>
+                    <p class="text-xs text-clay/60">UI explains itself</p>
+                </a>
+                <a href="#urls" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="link" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">Clean URLs</span>
+                    </div>
+                    <p class="text-xs text-clay/60">Short slugs, no UUIDs</p>
+                </a>
+                <a href="#state" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="save" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">Persistent state</span>
+                    </div>
+                    <p class="text-xs text-clay/60">Resume where you left off</p>
+                </a>
+                <a href="#color" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="palette" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">3 colors max</span>
+                    </div>
+                    <p class="text-xs text-clay/60">Plus shades of gray</p>
+                </a>
+                <a href="#scrollbars" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="eye-off" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">No scrollbars</span>
+                    </div>
+                    <p class="text-xs text-clay/60">Hidden until scrolling</p>
+                </a>
+                <a href="#navigation" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="navigation" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">3-step navigation</span>
+                    </div>
+                    <p class="text-xs text-clay/60">Anywhere in 3 clicks</p>
+                </a>
+                <a href="#brand" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="download" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">Copyable brand kit</span>
+                    </div>
+                    <p class="text-xs text-clay/60">SVG logo, colors, fonts</p>
+                </a>
+                <a href="#skeleton" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="loader" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">Skeleton loading</span>
+                    </div>
+                    <p class="text-xs text-clay/60">Layout shape, not spinners</p>
+                </a>
+                <a href="#clipboard" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="clipboard" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">Clipboard support</span>
+                    </div>
+                    <p class="text-xs text-clay/60">Copy codes, keys, URLs</p>
+                </a>
+                <a href="#hit-targets" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="pointer" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">Large hit targets</span>
+                    </div>
+                    <p class="text-xs text-clay/60">44px minimum touch area</p>
+                </a>
+                <a href="#cancel" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="log-out" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">Honest cancel</span>
+                    </div>
+                    <p class="text-xs text-clay/60">One click, no guilt trips</p>
+                </a>
+                <a href="#cmdk" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="command" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">Cmd+K</span>
+                    </div>
+                    <p class="text-xs text-clay/60">Command palette for power users</p>
+                </a>
+                <a href="#tooltips" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="message-square" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">Minimal tooltips</span>
+                    </div>
+                    <p class="text-xs text-clay/60">Only on icon-only buttons</p>
+                </a>
+                <a href="#copy" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="type" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">Active voice copy</span>
+                    </div>
+                    <p class="text-xs text-clay/60">7 words max per sentence</p>
+                </a>
+                <a href="#optical" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="move" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">Optical alignment</span>
+                    </div>
+                    <p class="text-xs text-clay/60">Visual weight, not pixels</p>
+                </a>
+                <a href="#ltr" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="arrow-right" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">L-to-R reading</span>
+                    </div>
+                    <p class="text-xs text-clay/60">F-pattern scan optimized</p>
+                </a>
+                <a href="#reassurance" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-accent"></i>
+                        <span class="font-semibold text-sm">Reassurance</span>
+                    </div>
+                    <p class="text-xs text-clay/60">Auto-save, undo, version history</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Speed -->
+        <section id="speed" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">100ms interactions</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30 mb-4">
+                <p class="text-clay/80 mb-4">Every interaction completes in under 100ms. If it can't, fake it with optimistic updates — show the result before the server confirms.</p>
+                <pre><code>// Optimistic delete — remove immediately, reconcile later
+async function handleDelete(id) {
+  setItems(prev => prev.filter(i => i.id !== id));
+  try {
+    await api.delete(`/items/${id}`);
+  } catch {
+    setItems(prev => [...prev, originalItem]);
+    toast("Couldn't delete. Restored.");
+  }
+}</code></pre>
+            </div>
+            <ul class="text-sm text-clay/70 space-y-1 ml-4">
+                <li>Prefetch likely next routes on hover</li>
+                <li>Use <code>transform</code> for animations, never <code>top</code>/<code>left</code></li>
+                <li>Measure with <code>performance.now()</code>, not gut feel</li>
+            </ul>
+        </section>
+
+        <!-- Skeleton loading -->
+        <section id="skeleton" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">Skeleton loading states</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-4">Never show a spinner when you know the shape of what's coming. Render a skeleton that matches the layout, then swap in real content.</p>
+                <pre><code>.skeleton {
+  background: linear-gradient(
+    90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- No product tours -->
+        <section id="no-tours" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">No product tours</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-4">If you need a tour to explain your UI, the UI is wrong. Instead:</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-canvas/50 rounded-lg p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="plus-circle" class="w-4 h-4 text-accent"></i>
+                            <span class="font-semibold text-sm">Empty states that teach</span>
+                        </div>
+                        <p class="text-xs text-clay/60">"Create your first project"</p>
+                    </div>
+                    <div class="bg-canvas/50 rounded-lg p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="layers" class="w-4 h-4 text-accent"></i>
+                            <span class="font-semibold text-sm">Progressive disclosure</span>
+                        </div>
+                        <p class="text-xs text-clay/60">Show features when relevant</p>
+                    </div>
+                    <div class="bg-canvas/50 rounded-lg p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="info" class="w-4 h-4 text-accent"></i>
+                            <span class="font-semibold text-sm">Inline hints</span>
+                        </div>
+                        <p class="text-xs text-clay/60">Disappear after first use</p>
+                    </div>
+                    <div class="bg-canvas/50 rounded-lg p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="settings" class="w-4 h-4 text-accent"></i>
+                            <span class="font-semibold text-sm">Smart defaults</span>
+                        </div>
+                        <p class="text-xs text-clay/60">Work without configuration</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- URLs -->
+        <section id="urls" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">Clean URLs</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-4">Slugs are short, readable, and human-guessable. No UUIDs, no query param soup.</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-0.5 rounded mb-2">Good</span>
+                        <pre><code>/projects/weather-app
+/settings/billing
+/docs/api/auth</code></pre>
+                    </div>
+                    <div>
+                        <span class="inline-block bg-red-100 text-red-800 text-xs font-semibold px-2 py-0.5 rounded mb-2">Bad</span>
+                        <pre><code>/projects/550e8400-e29b-41d4...
+/app?view=settings&tab=billing
+/dashboard#!/module/list</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Persistent state -->
+        <section id="state" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">Persistent resumable state</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-4">Users leave and come back. Respect that.</p>
+                <ul class="text-sm text-clay/70 space-y-2 mb-4">
+                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>Save draft form state to localStorage or the server</li>
+                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>Restore scroll position on back navigation</li>
+                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>Preserve filter/sort selections across sessions</li>
+                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>URL encodes the view state — sharing reproduces the view</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Color restraint -->
+        <section id="color" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">3 colors max</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-4">One primary, one accent, one for danger. Everything else is shades of gray.</p>
+                <div class="flex gap-3 mb-4">
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-xl bg-blue-600 mb-1"></div>
+                        <span class="text-[10px] text-clay/50">Primary</span>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-xl bg-amber-500 mb-1"></div>
+                        <span class="text-[10px] text-clay/50">Accent</span>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-xl bg-red-500 mb-1"></div>
+                        <span class="text-[10px] text-clay/50">Danger</span>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-xl bg-gray-100 mb-1 border border-gray-200"></div>
+                        <span class="text-[10px] text-clay/50">Gray 100</span>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-xl bg-gray-400 mb-1"></div>
+                        <span class="text-[10px] text-clay/50">Gray 400</span>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-xl bg-gray-900 mb-1"></div>
+                        <span class="text-[10px] text-clay/50">Gray 900</span>
+                    </div>
+                </div>
+                <p class="text-sm text-clay/60">If you reach for a 4th color, you're compensating for weak layout.</p>
+            </div>
+        </section>
+
+        <!-- Scrollbars -->
+        <section id="scrollbars" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">No visible scrollbars</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-4">Hide them unless the user is actively scrolling. Use scroll shadows to hint at overflow without chrome.</p>
+                <pre><code>.scroll-container {
+  overflow-y: auto;
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE/Edge */
+}
+.scroll-container::-webkit-scrollbar {
+  display: none;                  /* Chrome/Safari */
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- Navigation + Cmd+K -->
+        <section id="navigation" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">3-step navigation</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30 mb-4">
+                <p class="text-clay/80 mb-4">Any destination reachable in 3 clicks or fewer. Global nav always visible on desktop, never behind a hamburger.</p>
+                <ul class="text-sm text-clay/70 space-y-2">
+                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>Breadcrumbs for depth, not for navigation</li>
+                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>Cmd+K as the escape hatch for power users</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Cmd+K -->
+        <section id="cmdk" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">Command palette</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-4">Every app with more than one page needs <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">Cmd</kbd> + <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">K</kbd>.</p>
+                <pre><code>useEffect(() => {
+  function handleKeyDown(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      e.preventDefault();
+      setCommandPaletteOpen(true);
+    }
+  }
+  document.addEventListener("keydown", handleKeyDown);
+  return () => document.removeEventListener("keydown", handleKeyDown);
+}, []);</code></pre>
+                <ul class="text-sm text-clay/70 space-y-1 mt-4">
+                    <li>Fuzzy search over pages, recent actions, settings</li>
+                    <li>Show keyboard shortcuts inline</li>
+                    <li>Most recent items first</li>
+                    <li>No categories until 20+ commands</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Clipboard -->
+        <section id="clipboard" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">Clipboard support</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-4">One-click copy on codes, URLs, API keys, IDs. Paste into file uploads and image fields. Brief confirmation that auto-dismisses.</p>
+                <pre><code>async function copyToClipboard(text, label = "Copied") {
+  await navigator.clipboard.writeText(text);
+  toast(label, { duration: 1500 });
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- Hit targets -->
+        <section id="hit-targets" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">Large hit targets</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-4">Minimum 44x44px touch targets (WCAG 2.5.8). On desktop, generous padding is still faster than precise aim.</p>
+                <pre><code>button, .btn, [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 10px 20px;
+}
+input, select, textarea {
+  min-height: 44px;
+  padding: 10px 12px;
+  font-size: 16px;  /* Prevents iOS zoom on focus */
+}</code></pre>
+                <ul class="text-sm text-clay/70 space-y-1 mt-4">
+                    <li>Adjacent clickable elements: 8px gap minimum</li>
+                    <li>Icon-only buttons get larger padding</li>
+                    <li>Don't rely on hover states — they don't exist on touch</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Honest cancel -->
+        <section id="cancel" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">Honest cancellation</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-3">One-click cancel. No guilt trips, no dark patterns.</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-0.5 rounded mb-2">Do</span>
+                        <ul class="text-sm text-clay/70 space-y-1">
+                            <li>Cancel button always visible</li>
+                            <li>Account deletion works first try</li>
+                            <li>Unsubscribe is one click</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="inline-block bg-red-100 text-red-800 text-xs font-semibold px-2 py-0.5 rounded mb-2">Don't</span>
+                        <ul class="text-sm text-clay/70 space-y-1">
+                            <li>"Are you sure you want to miss out?"</li>
+                            <li>Preference center instead of unsubscribe</li>
+                            <li>"Contact support to cancel"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tooltips -->
+        <section id="tooltips" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">Minimal tooltips</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-3">Tooltips are a confession that the UI doesn't speak for itself.</p>
+                <ul class="text-sm text-clay/70 space-y-1">
+                    <li>Only on icon-only buttons (to provide the label)</li>
+                    <li>Never on text that's already readable</li>
+                    <li>Show on hover after 300ms delay</li>
+                    <li>Dismiss on scroll</li>
+                    <li>Never for essential information</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Copy -->
+        <section id="copy" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">Active voice copy</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-4">Max 7 words per sentence. Talk like a person, not a legal document.</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-0.5 rounded mb-2">Good</span>
+                        <ul class="text-sm font-mono text-clay/70 space-y-1">
+                            <li>"Project created"</li>
+                            <li>"Saved 2 minutes ago"</li>
+                            <li>"Delete this file?"</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="inline-block bg-red-100 text-red-800 text-xs font-semibold px-2 py-0.5 rounded mb-2">Bad</span>
+                        <ul class="text-sm font-mono text-clay/70 space-y-1">
+                            <li>"Successfully created!"</li>
+                            <li>"Changes were last saved..."</li>
+                            <li>"This action cannot be undone."</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="text-sm text-clay/60 mt-4">Buttons are verbs: "Save", "Delete", "Send" — not "Submit", "OK", "Confirm". Sentence case everywhere, never Title Case.</p>
+            </div>
+        </section>
+
+        <!-- Optical alignment -->
+        <section id="optical" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">Optical alignment</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-4">The eye doesn't see pixels, it sees weight. Optical alignment over geometric.</p>
+                <pre><code>/* Play icon: shift right to look centered */
+.play-button svg {
+  transform: translateX(2px);
+}
+
+/* Visually balanced card padding */
+.card {
+  padding: 20px 24px 22px 24px;
+}</code></pre>
+                <ul class="text-sm text-clay/70 space-y-1 mt-4">
+                    <li>Icons next to text need 1-2px vertical offset</li>
+                    <li>Bottom padding is often 1-2px more than top</li>
+                    <li>Leading capitals align optically left of bounding box</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- L-to-R -->
+        <section id="ltr" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">L-to-R reading flow</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-3">Optimized for the F-pattern scan.</p>
+                <ul class="text-sm text-clay/70 space-y-2">
+                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>Most important content in top-left quadrant</li>
+                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>Primary actions on the right (where the eye ends a line)</li>
+                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>Labels above inputs, not beside them</li>
+                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>Most-scanned table column is leftmost</li>
+                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>Left-align everything except single-line headings</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Reassurance -->
+        <section id="reassurance" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">Reassurance about loss</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-4">Users fear losing work. Prevent it and prove it.</p>
+                <pre><code>// Warn on unsaved changes
+useEffect(() => {
+  function handleBeforeUnload(e) {
+    if (hasUnsavedChanges) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+  }
+  window.addEventListener("beforeunload", handleBeforeUnload);
+  return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+}, [hasUnsavedChanges]);</code></pre>
+                <ul class="text-sm text-clay/70 space-y-1 mt-4">
+                    <li>Auto-save with visible "Saved" indicator</li>
+                    <li>Undo after destructive actions (soft delete)</li>
+                    <li>Version history for anything longer than a tweet</li>
+                    <li>Confirmation only for irreversible actions</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Brand kit -->
+        <section id="brand" class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">Copyable brand assets</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-3">Ship a <code>/brand</code> or <code>/press</code> page with downloadable assets. Don't make people screenshot your logo.</p>
+                <ul class="text-sm text-clay/70 space-y-1">
+                    <li>SVG logo with transparent background</li>
+                    <li>Color codes (hex, RGB, HSL)</li>
+                    <li>Font names and weights</li>
+                    <li>Usage guidelines and clear space rules</li>
+                    <li>One-click download as ZIP</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Checklist -->
+        <section class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">Review checklist</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-4">Run this against any web UI:</p>
+                <div class="grid md:grid-cols-2 gap-x-6 gap-y-2 text-sm text-clay/70">
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> Every interaction under 100ms</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> No product tour or modal</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> URLs short, readable, no UUIDs</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> State persists across reloads</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> 3 colors max plus grays</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> No visible scrollbars at rest</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> Any destination in 3 steps</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> SVG logo + brand kit available</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> Skeleton loaders, not spinners</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> Clipboard copy on codes/keys</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> Touch targets 44px minimum</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> Cancel is one-click, honest</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> Cmd+K command palette</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> Tooltips only on icon buttons</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> Copy is active voice, 7 words</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> Optical alignment, not geometric</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> L-to-R F-pattern layout</label>
+                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1 accent-accent"> Auto-save with visible status</label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section class="mb-16">
+            <h2 class="font-display text-2xl font-semibold mb-4">Installation</h2>
+            <div class="space-y-6">
+                <div>
+                    <h3 class="font-semibold mb-3">Install the skill</h3>
+                    <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto">
+                        <p class="text-white/50 mb-2"># Clone the repository</p>
+                        <p class="text-white mb-4">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
+                        <p class="text-white/50 mb-2"># Copy the skill to your Claude config</p>
+                        <p class="text-white">cp -r claude-skills-journalism/web-ui-best-practices ~/.claude/skills/</p>
+                    </div>
+                </div>
+            </div>
+            <p class="mt-4 text-clay/70 text-sm">
+                Or download just this skill from the
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/web-ui-best-practices" class="text-accent hover:text-accentDark underline underline-offset-2" target="_blank">GitHub repository</a>.
+            </p>
+        </section>
+
+        <!-- Related skills -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Related skills</h2>
+            <div class="flex flex-wrap gap-2">
+                <a href="../accessibility-compliance/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Accessibility compliance</a>
+                <a href="../zero-build-frontend/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Zero-build frontend</a>
+                <a href="../ai-writing-detox/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">AI writing detox</a>
+                <a href="../vibe-coding/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Vibe coding</a>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="text-center">
+            <div class="bg-gradient-to-br from-accent to-accentDark rounded-xl p-8 text-white">
+                <h2 class="font-display text-xl font-bold mb-3">Taste is in the details</h2>
+                <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
+                    18 principles. Zero tolerance for dark patterns. Every interaction under 100ms.
+                </p>
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/web-ui-best-practices" target="_blank" class="inline-flex items-center gap-2 bg-white text-accent px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors">
+                    View on GitHub
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-mist/30 mt-12 relative z-10">
+        <div class="max-w-4xl mx-auto px-6 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-clay/60 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accent hover:text-accentDark underline underline-offset-2">Center for Cooperative Media</a>
+                </p>
+                <div class="flex items-center gap-6">
+                    <a href="../" class="text-clay/60 hover:text-ink text-sm transition-colors">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/60 hover:text-ink text-sm transition-colors">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
