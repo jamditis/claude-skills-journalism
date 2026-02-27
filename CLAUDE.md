@@ -81,7 +81,7 @@ claude-skills-journalism/
 ├── content-access/              # Unpaywall, CORE, library access
 ├── page-monitoring/             # Change detection, alerts
 │
-├── # Development (9)
+├── # Development (10)
 ├── test-first-bugs/             # Test-driven bug fixing workflow
 ├── vibe-coding/                 # AI-assisted development
 ├── one-way-door/                # Flag irreversible architectural decisions
@@ -91,6 +91,7 @@ claude-skills-journalism/
 ├── zero-build-frontend/         # No-build web apps
 ├── mobile-debugging/            # Eruda, vConsole, remote debug
 ├── accessibility-compliance/    # WCAG, alt text, a11y
+├── web-ui-best-practices/       # Signs of taste in web UI
 │
 └── # Security (3)
     ├── security-checklist/      # Pre-deployment audit

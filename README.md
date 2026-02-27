@@ -122,6 +122,7 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 | [zero-build-frontend](./zero-build-frontend/) | Static web apps without build tools, CDN-loaded frameworks |
 | [mobile-debugging](./mobile-debugging/) | Eruda, vConsole, remote debugging, iOS debugging, console capture |
 | [accessibility-compliance](./accessibility-compliance/) | WCAG compliance, alt text, accessible charts, keyboard navigation |
+| [web-ui-best-practices](./web-ui-best-practices/) | Signs of taste in web UI — 100ms interactions, skeleton loading, minimal color, command palette, honest cancellation, optical alignment |
 | [one-way-door](./one-way-door/) | Flag irreversible architectural decisions (data models, infra, auth, APIs) before committing |
 
 ### Security (ship without getting sued)
