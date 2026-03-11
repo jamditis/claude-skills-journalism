@@ -138,6 +138,7 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 | Skill | Description |
 |-------|-------------|
 | [nano-banana-image-gen](./nano-banana-image-gen/) | Gemini image generation model selection (NB1/NB2/Pro), visual grounding, cost optimization, prompt recipes |
+| [animated-sprite-gen](./animated-sprite-gen/) | Anchor-frame workflow for consistent AI-generated sprite sheets, strip normalization, pose handling |
 
 ### Reference
 

@@ -100,6 +100,7 @@ claude-skills-journalism/
 │
 ├── # AI and creative tools (1)
 ├── nano-banana-image-gen/       # Gemini image gen model selection and prompting
+├── animated-sprite-gen/         # AI-generated animated sprite sheets
 │
 └── # Reference (1)
     └── free-apis-catalog/       # 1000+ free public APIs by category
