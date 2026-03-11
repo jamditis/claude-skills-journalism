@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free APIs catalog | Claude Skills for Journalism</title>
+    <meta name="description" content="1000+ free public APIs organized by category. Weather, news, finance, sports, ML, entertainment — most require no API key.">
+
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Fraunces', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        canvas: '#ede6d4',
+                        ink: '#121212',
+                        clay: '#d6cdb7',
+                        mist: '#6b6b6b',
+                        accent: '#059669',
+                        accentDark: '#047857',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #ede6d4; color: #121212; line-height: 1.7; }
+        .paper-overlay {
+            position: fixed; inset: 0;
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+            opacity: 0.5; pointer-events: none; z-index: 1;
+        }
+        .hero-gradient { background: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%); }
+        .feature-card {
+            background: white; border: 1px solid rgba(18, 18, 18, 0.08);
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15); }
+        .workflow-step { position: relative; }
+        .workflow-step:not(:last-child)::after {
+            content: ''; position: absolute; left: 1.5rem; top: 4rem; bottom: -1rem;
+            width: 2px; background: linear-gradient(to bottom, #059669, transparent);
+        }
+        pre { background: #1a1a1a; color: #e2e8f0; padding: 1.5rem; border-radius: 8px; overflow-x: auto; font-size: 0.85em; }
+        code { background: rgba(18, 18, 18, 0.06); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
+        pre code { background: none; padding: 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-weight: 600; padding: 0.75rem 1rem; border-bottom: 2px solid rgba(18, 18, 18, 0.1); }
+        td { padding: 0.75rem 1rem; border-bottom: 1px solid rgba(18, 18, 18, 0.06); }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="paper-overlay"></div>
+
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">&larr; Back to all skills</a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/free-apis-catalog" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">View on GitHub &rarr;</a>
+        </div>
+    </nav>
+
+    <header class="hero-gradient text-white pt-32 pb-24 px-6 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/></pattern></defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+        </div>
+
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide uppercase mb-6">Developer reference</div>
+            <h1 class="font-display text-5xl md:text-7xl font-black leading-[0.9] mb-6">Free APIs<br>catalog</h1>
+            <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-10 font-light">
+                1000+ free public APIs organized by category. Weather, news, finance, sports, ML, entertainment &mdash; most require no API key.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <a href="#categories" class="inline-flex items-center gap-2 bg-white text-accent font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
+                    <i data-lucide="grid-3x3" class="w-5 h-5"></i>
+                    Browse categories
+                </a>
+                <a href="#install" class="inline-flex items-center gap-2 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/20 transition-colors border border-white/20">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    Install skill
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+        <!-- Category cards -->
+        <section id="categories" class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Browse by category</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">APIs grouped by domain. Each category includes auth requirements, rate limits, and example endpoints.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="trending-up" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Finance and crypto</h3>
+                        <p class="text-mist text-sm mb-4">Stock prices, exchange rates, crypto tickers, and historical market data. Includes CoinGecko, Alpha Vantage, and ExchangeRate-API.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">CoinGecko</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Alpha Vantage</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">ExchangeRate</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="newspaper" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">News</h3>
+                        <p class="text-mist text-sm mb-4">Headlines, article search, and media monitoring. NewsAPI, GNews, and The Guardian Open Platform for structured news data.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">NewsAPI</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">GNews</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Guardian</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="cloud-sun" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Weather</h3>
+                        <p class="text-mist text-sm mb-4">Current conditions, forecasts, and historical weather. Open-Meteo stands out: no API key, no rate limit, 80 years of historical data.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Open-Meteo</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">OpenWeather</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">WeatherAPI</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="trophy" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Sports</h3>
+                        <p class="text-mist text-sm mb-4">Live scores, team rosters, historical stats, and schedules across major leagues. ESPN, NBA, NFL, and soccer APIs.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">ESPN</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Football-Data</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">balldontlie</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="brain" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">ML and text</h3>
+                        <p class="text-mist text-sm mb-4">Sentiment analysis, language detection, summarization, and translation. Hugging Face Inference API, LibreTranslate, and more.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Hugging Face</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">LibreTranslate</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="clapperboard" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Entertainment</h3>
+                        <p class="text-mist text-sm mb-4">Movies, TV, music, books, and games. TMDB, RAWG, Open Library, and Spotify metadata for media-related projects.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">TMDB</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">RAWG</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Open Library</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API evaluation table -->
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">API evaluation at a glance</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">Quick comparison of popular free APIs by authentication, CORS support, and rate limits.</p>
+                </div>
+
+                <div class="feature-card rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table>
+                            <thead class="bg-accent/5">
+                                <tr>
+                                    <th>API</th>
+                                    <th>Auth</th>
+                                    <th>CORS</th>
+                                    <th>Limits</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-semibold">Open-Meteo</td>
+                                    <td class="text-mist text-sm">None</td>
+                                    <td class="text-mist text-sm">Yes</td>
+                                    <td class="text-mist text-sm">No hard limit (fair use)</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">CoinGecko</td>
+                                    <td class="text-mist text-sm">None (free tier)</td>
+                                    <td class="text-mist text-sm">Yes</td>
+                                    <td class="text-mist text-sm">10-30 req/min</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">NewsAPI</td>
+                                    <td class="text-mist text-sm">API key</td>
+                                    <td class="text-mist text-sm">No (server only)</td>
+                                    <td class="text-mist text-sm">100 req/day free</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">TMDB</td>
+                                    <td class="text-mist text-sm">API key</td>
+                                    <td class="text-mist text-sm">Yes</td>
+                                    <td class="text-mist text-sm">~40 req/10s</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Hugging Face</td>
+                                    <td class="text-mist text-sm">Token (free)</td>
+                                    <td class="text-mist text-sm">Yes</td>
+                                    <td class="text-mist text-sm">Rate-limited per model</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Open Library</td>
+                                    <td class="text-mist text-sm">None</td>
+                                    <td class="text-mist text-sm">Yes</td>
+                                    <td class="text-mist text-sm">100 req/5min (search)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Weekend project ideas -->
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Weekend project ideas</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">Combine two or three APIs from the catalog to build something useful in a single session.</p>
+                </div>
+
+                <div class="space-y-8">
+                    <div class="workflow-step flex gap-6">
+                        <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">1</div>
+                        <div class="feature-card p-6 rounded-xl flex-1">
+                            <h3 class="font-display text-xl font-bold mb-2">Local weather dashboard</h3>
+                            <p class="text-mist">Pull 7-day forecasts from Open-Meteo and air quality from OpenAQ. No keys needed. Display in a single-page app with auto-refresh.</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step flex gap-6">
+                        <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">2</div>
+                        <div class="feature-card p-6 rounded-xl flex-1">
+                            <h3 class="font-display text-xl font-bold mb-2">News sentiment tracker</h3>
+                            <p class="text-mist">Fetch headlines from NewsAPI, run them through Hugging Face sentiment analysis, and chart the mood of the news cycle over time.</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step flex gap-6">
+                        <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">3</div>
+                        <div class="feature-card p-6 rounded-xl flex-1">
+                            <h3 class="font-display text-xl font-bold mb-2">Crypto price alert bot</h3>
+                            <p class="text-mist">Poll CoinGecko for price changes, trigger alerts when thresholds are hit. Add historical sparklines with free charting data.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Usage tip -->
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Feed APIs to AI agents</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">The catalog works well as context for AI coding assistants. Point your agent at a category and let it pick the right API for your task.</p>
+                </div>
+
+                <div class="feature-card p-6 rounded-xl">
+                    <h3 class="font-semibold mb-4">Example prompt</h3>
+                    <pre><code># Give Claude the catalog as context, then ask for implementation
+"Using the free APIs catalog, build me a Python script that
+fetches the current weather for Newark, NJ and the top 5
+headlines about New Jersey, then formats both into a single
+Slack message."
+
+# Claude picks Open-Meteo (no key) + GNews (free tier)
+# and writes the integration code for you.</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section id="install" class="py-24 px-6 bg-ink text-white">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-16">Install the skill</h2>
+
+                <div class="space-y-6">
+                    <div class="bg-white/5 p-6 rounded-xl">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">1</span>
+                            Clone the repository
+                        </h3>
+                        <pre><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
+                    </div>
+
+                    <div class="bg-white/5 p-6 rounded-xl">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">2</span>
+                            Copy skill to Claude skills directory
+                        </h3>
+                        <pre><code>cp -r free-apis-catalog ~/.claude/skills/</code></pre>
+                    </div>
+
+                    <div class="bg-white/5 p-6 rounded-xl">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">3</span>
+                            Start building
+                        </h3>
+                        <p class="text-white/70">Ask Claude to find an API for your use case, compare options, or build an integration using free endpoints from the catalog.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Credits -->
+        <section class="py-16 px-6 border-t border-ink/10">
+            <div class="max-w-6xl mx-auto text-center">
+                <p class="text-mist text-sm mb-2">
+                    Based on <a href="https://x.com/qwerty_ytrevvq" class="text-accent hover:underline">@qwerty</a>'s free APIs catalog (Mar 2026)
+                </p>
+                <p class="text-mist text-sm mb-4">
+                    Adapted by <a href="https://github.com/jamditis" class="text-accent hover:underline">Joe Amditis</a> at the
+                    <a href="https://centerforcooperativemedia.org" class="text-accent hover:underline">Center for Cooperative Media</a>
+                </p>
+                <p class="text-mist/60 text-xs">Part of <a href="../" class="hover:underline">Claude Skills for Journalism</a> &bull; MIT License</p>
+            </div>
+        </section>
+    </main>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>

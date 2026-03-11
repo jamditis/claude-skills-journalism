@@ -133,6 +133,18 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 | [secure-auth](./secure-auth/) | Production-ready authentication patterns (sessions, JWTs, OAuth, MFA) |
 | [api-hardening](./api-hardening/) | Rate limiting, input validation, CORS, API key management |
 
+### AI and creative tools
+
+| Skill | Description |
+|-------|-------------|
+| [nano-banana-image-gen](./nano-banana-image-gen/) | Gemini image generation model selection (NB1/NB2/Pro), visual grounding, cost optimization, prompt recipes |
+
+### Reference
+
+| Skill | Description |
+|-------|-------------|
+| [free-apis-catalog](./free-apis-catalog/) | 1000+ free public APIs by category (finance, news, weather, sports, ML, entertainment) with evaluation criteria and project ideas |
+
 ## Hooks
 
 Hooks are automated checks that run at specific points in your workflow. All hooks are **non-blocking warnings**—they provide guidance but don't prevent actions.

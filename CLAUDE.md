@@ -103,10 +103,16 @@ claude-skills-journalism/
 ├── accessibility-compliance/    # WCAG, alt text, a11y
 ├── web-ui-best-practices/       # Signs of taste in web UI
 │
-└── # Security (3)
-    ├── security-checklist/      # Pre-deployment audit
-    ├── secure-auth/             # Authentication patterns
-    └── api-hardening/           # API security
+├── # Security (3)
+├── security-checklist/          # Pre-deployment audit
+├── secure-auth/                 # Authentication patterns
+├── api-hardening/               # API security
+│
+├── # AI and creative tools (1)
+├── nano-banana-image-gen/       # Gemini image gen model selection and prompting
+│
+└── # Reference (1)
+    └── free-apis-catalog/       # 1000+ free public APIs by category
 ```
 
 ## Skill format

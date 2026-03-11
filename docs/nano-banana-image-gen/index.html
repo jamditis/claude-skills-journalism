@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nano Banana image generation | Claude Skills for Journalism</title>
+    <meta name="description" content="Choose the right Gemini image model, optimize costs with batch workflows, and write prompts that use visual grounding for real-world accuracy.">
+
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Fraunces', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        canvas: '#ede6d4',
+                        ink: '#121212',
+                        clay: '#d6cdb7',
+                        mist: '#6b6b6b',
+                        accent: '#7c3aed',
+                        accentDark: '#6d28d9',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #ede6d4; color: #121212; line-height: 1.7; }
+        .paper-overlay {
+            position: fixed; inset: 0;
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+            opacity: 0.5; pointer-events: none; z-index: 1;
+        }
+        .hero-gradient { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%); }
+        .feature-card {
+            background: white; border: 1px solid rgba(18, 18, 18, 0.08);
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15); }
+        .workflow-step { position: relative; }
+        .workflow-step:not(:last-child)::after {
+            content: ''; position: absolute; left: 1.5rem; top: 4rem; bottom: -1rem;
+            width: 2px; background: linear-gradient(to bottom, #7c3aed, transparent);
+        }
+        pre { background: #1a1a1a; color: #e2e8f0; padding: 1.5rem; border-radius: 8px; overflow-x: auto; font-size: 0.85em; }
+        code { background: rgba(18, 18, 18, 0.06); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
+        pre code { background: none; padding: 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-weight: 600; padding: 0.75rem 1rem; border-bottom: 2px solid rgba(18, 18, 18, 0.1); }
+        td { padding: 0.75rem 1rem; border-bottom: 1px solid rgba(18, 18, 18, 0.06); }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="paper-overlay"></div>
+
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">&larr; Back to all skills</a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/nano-banana-image-gen" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">View on GitHub &rarr;</a>
+        </div>
+    </nav>
+
+    <header class="hero-gradient text-white pt-32 pb-24 px-6 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/></pattern></defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+        </div>
+
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide uppercase mb-6">AI and creative tools</div>
+            <h1 class="font-display text-5xl md:text-7xl font-black leading-[0.9] mb-6">Nano Banana<br>image generation</h1>
+            <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-10 font-light">
+                Choose the right Gemini image model, optimize costs with batch workflows, and write prompts that use visual grounding for real-world accuracy.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <a href="#models" class="inline-flex items-center gap-2 bg-white text-accent font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
+                    <i data-lucide="layers" class="w-5 h-5"></i>
+                    Compare models
+                </a>
+                <a href="#install" class="inline-flex items-center gap-2 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/20 transition-colors border border-white/20">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    Install skill
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+        <!-- Model selection -->
+        <section id="models" class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Model selection</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">Pick the right Gemini image model for your use case. Each has distinct strengths and cost profiles.</p>
+                </div>
+
+                <div class="feature-card rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table>
+                            <thead class="bg-accent/5">
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Best for</th>
+                                    <th>Resolution</th>
+                                    <th>Tradeoffs</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-semibold">Nano Banana 1 (NB1)</td>
+                                    <td class="text-mist text-sm">Fast drafts, thumbnails, batch generation, social media assets</td>
+                                    <td class="text-mist text-sm">512px default</td>
+                                    <td class="text-mist text-sm">Fastest and cheapest. Lower detail on faces and text.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Nano Banana 2 (NB2)</td>
+                                    <td class="text-mist text-sm">Editorial illustrations, headshots, text-in-image, brand assets</td>
+                                    <td class="text-mist text-sm">Up to 1024px</td>
+                                    <td class="text-mist text-sm">Better detail and text rendering. 2-3x slower than NB1.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Gemini Pro (image mode)</td>
+                                    <td class="text-mist text-sm">Hero images, print-quality output, complex multi-subject scenes</td>
+                                    <td class="text-mist text-sm">Up to 2048px</td>
+                                    <td class="text-mist text-sm">Highest quality. 5-10x cost of NB1. Rate-limited.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Visual grounding -->
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Visual grounding with Google Search</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">Ground your prompts in real-world references so the model produces images with accurate details instead of hallucinated ones.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="search" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">How it works</h3>
+                        <p class="text-mist text-sm">When you enable Google Search grounding, the model cross-references your prompt against real images and descriptions. This means asking for "the Brooklyn Bridge at sunset" produces the actual bridge, not a generic suspension bridge.</p>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="target" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">When to use it</h3>
+                        <p class="text-mist text-sm">Use grounding for real places, public figures, branded objects, or anything where accuracy matters. Skip it for abstract art, fictional scenes, or stylized illustrations where creative freedom is the point.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cost optimization -->
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Cost optimization</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">The 512px batch-to-upscale workflow cuts costs by 60-80% compared to generating at full resolution.</p>
+                </div>
+
+                <div class="space-y-8">
+                    <div class="workflow-step flex gap-6">
+                        <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">1</div>
+                        <div class="feature-card p-6 rounded-xl flex-1">
+                            <h3 class="font-display text-xl font-bold mb-2">Generate at 512px with NB1</h3>
+                            <p class="text-mist">Run your batch at the cheapest resolution. Review thumbnails and discard the ones that miss the mark.</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step flex gap-6">
+                        <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">2</div>
+                        <div class="feature-card p-6 rounded-xl flex-1">
+                            <h3 class="font-display text-xl font-bold mb-2">Pick your winners</h3>
+                            <p class="text-mist">Select the 2-3 best compositions from your batch. You've spent pennies so far.</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step flex gap-6">
+                        <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0">3</div>
+                        <div class="feature-card p-6 rounded-xl flex-1">
+                            <h3 class="font-display text-xl font-bold mb-2">Upscale with NB2 or Pro</h3>
+                            <p class="text-mist">Regenerate only the winners at full resolution. You pay the higher cost only for images you'll use.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Parameters -->
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Parameters reference</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">Key parameters that control output quality, dimensions, and generation behavior.</p>
+                </div>
+
+                <div class="feature-card rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table>
+                            <thead class="bg-accent/5">
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Options</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-semibold">Resolution</td>
+                                    <td class="text-mist text-sm">512, 768, 1024, 2048</td>
+                                    <td class="text-mist text-sm">Higher = more detail, more cost, slower. 512 is fine for drafts.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Aspect ratio</td>
+                                    <td class="text-mist text-sm">1:1, 16:9, 9:16, 4:3, 3:4</td>
+                                    <td class="text-mist text-sm">Match your output format. 16:9 for headers, 9:16 for stories, 1:1 for avatars.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Thinking mode</td>
+                                    <td class="text-mist text-sm">On / Off</td>
+                                    <td class="text-mist text-sm">When on, the model reasons about composition before generating. Better results for complex scenes.</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Number of images</td>
+                                    <td class="text-mist text-sm">1-4 per request</td>
+                                    <td class="text-mist text-sm">Batch within a single request to reduce overhead. 4 images at 512px costs less than 1 at 2048px.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Prompt recipes -->
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Prompt recipes</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">Tested prompt patterns for common creative tasks. Copy, adapt, and combine.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="user" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">3D selfie</h3>
+                        <p class="text-mist text-sm mb-4">Turn a flat photo into a stylized 3D character render. Works best with clear face shots and simple backgrounds.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">NB2</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">1024px</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="image" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Anime-to-photo</h3>
+                        <p class="text-mist text-sm mb-4">Convert illustrated or anime-style characters into photorealistic portraits. Grounding helps with clothing and hair accuracy.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">NB2</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Grounding</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="map-pin" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Historical street view</h3>
+                        <p class="text-mist text-sm mb-4">Recreate a specific street or location as it looked in a past decade. Grounding + era-specific details in the prompt are key.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Pro</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Grounding</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="pencil" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Crayon filter</h3>
+                        <p class="text-mist text-sm mb-4">Apply a hand-drawn crayon aesthetic to any scene. Good for editorial illustrations and kid-friendly content.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">NB1</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">512px</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="layout-grid" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Comic strip</h3>
+                        <p class="text-mist text-sm mb-4">Generate multi-panel comic layouts with consistent characters. Specify panel count and describe each scene separately in the prompt.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">NB2</span>
+                            <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">16:9</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Known limitations -->
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Known limitations</h2>
+                    <p class="text-lg text-mist max-w-2xl mx-auto">Current constraints to keep in mind when planning image generation workflows.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="type" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Text rendering</h3>
+                        <p class="text-mist text-sm">NB1 struggles with legible text in images. NB2 handles short words and labels. For anything longer than 3-4 words, composite text in post-production.</p>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="hand" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Hands and fingers</h3>
+                        <p class="text-mist text-sm">All models can produce anatomically incorrect hands. Pro is the most reliable. For important shots, generate multiple variants and pick the best.</p>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="users" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Character consistency</h3>
+                        <p class="text-mist text-sm">Maintaining the same character across multiple images is unreliable. Use reference images and detailed descriptions, but expect variation.</p>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i data-lucide="shield" class="w-6 h-6 text-accent"></i>
+                        </div>
+                        <h3 class="font-display text-xl font-bold mb-3">Safety filters</h3>
+                        <p class="text-mist text-sm">Prompts mentioning public figures, violence, or sensitive topics may be blocked. Rephrase with descriptive language instead of proper nouns when this happens.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section id="install" class="py-24 px-6 bg-ink text-white">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-16">Install the skill</h2>
+
+                <div class="space-y-6">
+                    <div class="bg-white/5 p-6 rounded-xl">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">1</span>
+                            Clone the repository
+                        </h3>
+                        <pre><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
+                    </div>
+
+                    <div class="bg-white/5 p-6 rounded-xl">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">2</span>
+                            Copy skill to Claude skills directory
+                        </h3>
+                        <pre><code>cp -r nano-banana-image-gen ~/.claude/skills/</code></pre>
+                    </div>
+
+                    <div class="bg-white/5 p-6 rounded-xl">
+                        <h3 class="font-semibold mb-3 flex items-center gap-2">
+                            <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">3</span>
+                            Start generating
+                        </h3>
+                        <p class="text-white/70">Ask Claude to generate images with Nano Banana, compare models, or optimize your prompt for visual grounding.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Credits -->
+        <section class="py-16 px-6 border-t border-ink/10">
+            <div class="max-w-6xl mx-auto text-center">
+                <p class="text-mist text-sm mb-2">
+                    Based on <a href="https://x.com/AINanoBanana" class="text-accent hover:underline">@NanoBanana</a>'s guide to Gemini image generation (Mar 2026)
+                </p>
+                <p class="text-mist text-sm mb-4">
+                    Adapted by <a href="https://github.com/jamditis" class="text-accent hover:underline">Joe Amditis</a> at the
+                    <a href="https://centerforcooperativemedia.org" class="text-accent hover:underline">Center for Cooperative Media</a>
+                </p>
+                <p class="text-mist/60 text-xs">Part of <a href="../" class="hover:underline">Claude Skills for Journalism</a> &bull; MIT License</p>
+            </div>
+        </section>
+    </main>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>
