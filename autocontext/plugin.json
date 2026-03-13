@@ -2,5 +2,39 @@
   "name": "autocontext",
   "version": "0.1.0",
   "description": "Accumulates project knowledge across sessions and developers through structured lessons and hooks",
-  "author": "jamditis"
+  "author": "jamditis",
+  "skills": [
+    "skills/setup.md",
+    "skills/init.md",
+    "skills/review.md",
+    "skills/status.md"
+  ],
+  "hooks": [
+    {
+      "event": "SessionStart",
+      "type": "command",
+      "command": "hooks/session-start.sh"
+    },
+    {
+      "event": "UserPromptSubmit",
+      "type": "command",
+      "command": "hooks/user-prompt-submit.sh"
+    },
+    {
+      "event": "SessionEnd",
+      "type": "command",
+      "command": "hooks/session-end.sh"
+    },
+    {
+      "event": "PreToolUse",
+      "type": "prompt",
+      "matcher": "Edit|Write|Bash",
+      "prompt": "hooks/pre-tool-use.md"
+    },
+    {
+      "event": "PostToolUse",
+      "type": "command",
+      "command": "hooks/post-tool-use.sh"
+    }
+  ]
 }
