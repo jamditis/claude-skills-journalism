@@ -22,7 +22,7 @@ Claude Code will load skills and hooks from the plugin automatically on next lau
 
 | Command | Description |
 |---------|-------------|
-| `/autocontext-setup` | First-run wizard: set identity, test rules, lesson loading, and persistence mode |
+| `/autocontext-setup` | First-run wizard: identity, test rules, loading, persistence, staleness, injection, sensitivity, baselines, playbook, multi-machine |
 | `/autocontext-init` | Initialize `.autocontext/` in the current project |
 | `/autocontext-review` | Interactively curate accumulated lessons (approve, edit, delete, supersede) |
 | `/autocontext-status` | Show lesson counts, confidence metrics, and pending items for the current project |
@@ -72,7 +72,11 @@ Two config files live in `.autocontext/`:
 | `confidence_threshold` | 0.3 | Minimum confidence to load a lesson |
 | `staleness_days` | 60 | Days before confidence starts decaying |
 | `performance_baselines` | true | Track test/build time regressions |
-| `persistence_mode` | `auto_curated` | How new lessons are saved: `auto_curated`, `ask_before_persist`, or `auto_persist_all` |
+| `pretooluse_hook` | `enabled` | Pre-tool injection mode: `enabled`, `errors_only`, or `disabled` |
+| `persistence_mode` | `auto_curated` | How new lessons are saved: `auto_curated`, `ask_before_persist`, or `auto_all` |
+| `correction_sensitivity` | `medium` | Correction detection tier: `high`, `medium`, or `low` |
+| `playbook_generation` | `auto` | Playbook regeneration: `auto`, `manual`, or `disabled` |
+| `multi_machine` | `{"enabled": false}` | Machine-scoped lessons with hostname list |
 | `builtin_rules` | all true | Toggle individual test quality rules |
 
 **`config.local.json`** (gitignored, per-developer):
@@ -82,3 +86,11 @@ Two config files live in `.autocontext/`:
 | `identity` | Your name or username for lesson attribution |
 
 Machine-specific lessons can be tagged with `machine:<hostname>` to prevent them loading on other machines.
+
+## Inspiration and attribution
+
+This plugin was inspired by two projects:
+
+- **[autocontext](https://github.com/greyhaven-ai/autocontext)** by Greyhaven AI — a closed-loop system for improving agent behavior over repeated runs. Its architecture of persistent playbooks, curator agents, and confidence-scored knowledge directly shaped how this plugin handles lesson persistence and validation cycles.
+
+- **[autoresearch](https://github.com/karpathy/autoresearch)** by Andrej Karpathy — AI agents running autonomous research loops. The pattern of accumulating structured knowledge across sessions and using it to inform future runs was a key influence on the session-start/session-end lifecycle design.
