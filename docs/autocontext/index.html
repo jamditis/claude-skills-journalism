@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>autocontext | Cross-session knowledge persistence for Claude Code</title>
+    <meta name="description" content="A Claude Code plugin that accumulates project knowledge across sessions and developers. Lessons persist, confidence scores track reliability, and corrections feed back automatically.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="autocontext">
+    <meta property="og:description" content="Cross-session knowledge persistence for Claude Code. Your sessions learn from each other.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/autocontext/">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Fraunces', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        canvas: '#ede6d4',
+                        ink: '#121212',
+                        clay: '#d6cdb7',
+                        mist: '#6b6b6b',
+                        accent: '#1a6b5a',
+                        accentDark: '#135346',
+                        accentLight: '#e8f4f0',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #ede6d4; color: #121212; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+        .paper-overlay { position: fixed; inset: 0; background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png"), radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%); opacity: 0.5; pointer-events: none; z-index: 1; }
+        .hero-gradient { background: linear-gradient(135deg, #1a6b5a 0%, #135346 50%, #0e3f35 100%); }
+        .feature-card { background: white; border: 1px solid rgba(18, 18, 18, 0.08); transition: all 0.3s ease; }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15); }
+        code { background: rgba(18, 18, 18, 0.06); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; font-family: 'JetBrains Mono', monospace; }
+        pre { background: #1a1a1a; color: #e2e8f0; padding: 1.5rem; border-radius: 8px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; }
+        pre code { background: none; padding: 0; }
+        @keyframes pulse-node { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+        @keyframes draw-connection { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+        .graph-node { animation: pulse-node 3s ease-in-out infinite; }
+        .graph-node:nth-child(2n) { animation-delay: 0.5s; }
+        .graph-node:nth-child(3n) { animation-delay: 1.2s; }
+        .graph-connection { stroke-dasharray: 100; animation: draw-connection 2s ease-out forwards; }
+        .confidence-bar { transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .lesson-enter { animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="paper-overlay"></div>
+
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">&#8592; Back to all skills</a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/autocontext" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">View on GitHub &#8594;</a>
+        </div>
+    </nav>
+
+    <header class="hero-gradient text-white pt-32 pb-24 px-6 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-15">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <circle class="graph-node" cx="15%" cy="30%" r="4" fill="white"/>
+                <circle class="graph-node" cx="25%" cy="60%" r="3" fill="white"/>
+                <circle class="graph-node" cx="40%" cy="25%" r="5" fill="white"/>
+                <circle class="graph-node" cx="55%" cy="70%" r="3" fill="white"/>
+                <circle class="graph-node" cx="65%" cy="35%" r="4" fill="white"/>
+                <circle class="graph-node" cx="80%" cy="55%" r="5" fill="white"/>
+                <circle class="graph-node" cx="90%" cy="25%" r="3" fill="white"/>
+                <circle class="graph-node" cx="35%" cy="80%" r="4" fill="white"/>
+                <circle class="graph-node" cx="70%" cy="75%" r="3" fill="white"/>
+                <circle class="graph-node" cx="50%" cy="45%" r="6" fill="white"/>
+                <line class="graph-connection" x1="15%" y1="30%" x2="40%" y2="25%" stroke="white" stroke-width="1" opacity="0.3"/>
+                <line class="graph-connection" x1="40%" y1="25%" x2="65%" y2="35%" stroke="white" stroke-width="1" opacity="0.3" style="animation-delay:0.3s"/>
+                <line class="graph-connection" x1="25%" y1="60%" x2="55%" y2="70%" stroke="white" stroke-width="1" opacity="0.3" style="animation-delay:0.6s"/>
+                <line class="graph-connection" x1="65%" y1="35%" x2="80%" y2="55%" stroke="white" stroke-width="1" opacity="0.3" style="animation-delay:0.9s"/>
+                <line class="graph-connection" x1="50%" y1="45%" x2="65%" y2="35%" stroke="white" stroke-width="1.5" opacity="0.5" style="animation-delay:0.4s"/>
+                <line class="graph-connection" x1="50%" y1="45%" x2="25%" y2="60%" stroke="white" stroke-width="1.5" opacity="0.5" style="animation-delay:0.7s"/>
+                <line class="graph-connection" x1="80%" y1="55%" x2="90%" y2="25%" stroke="white" stroke-width="1" opacity="0.3" style="animation-delay:1.1s"/>
+                <line class="graph-connection" x1="35%" y1="80%" x2="55%" y2="70%" stroke="white" stroke-width="1" opacity="0.3" style="animation-delay:1.3s"/>
+                <line class="graph-connection" x1="70%" y1="75%" x2="80%" y2="55%" stroke="white" stroke-width="1" opacity="0.3" style="animation-delay:1.5s"/>
+            </svg>
+        </div>
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide uppercase mb-6">Claude Code Plugin</div>
+            <h1 class="font-display text-5xl md:text-7xl font-black leading-[0.9] mb-6">auto<br>context</h1>
+            <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-10 font-light">Your Claude sessions learn from each other. Corrections persist, knowledge accumulates, and mistakes stop repeating.</p>
+            <div class="flex flex-wrap gap-4">
+                <a href="#install" class="inline-flex items-center gap-2 bg-white text-accent font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors"><i data-lucide="download" class="w-5 h-5"></i> Install plugin</a>
+                <a href="#demo" class="inline-flex items-center gap-2 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/20 transition-colors border border-white/20"><i data-lucide="play" class="w-5 h-5"></i> Try the demo</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">The cold start problem</h2>
+                    <p class="text-lg text-mist max-w-3xl mx-auto">Every new Claude Code session forgets what the last one learned. You correct the same mistakes, re-explain the same patterns, and lose time to errors that should have been caught.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 reveal">
+                    <div class="feature-card p-6 rounded-xl text-center">
+                        <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center mb-4 mx-auto"><i data-lucide="brain" class="w-6 h-6 text-red-400"></i></div>
+                        <h3 class="font-display text-lg font-bold mb-2">Session amnesia</h3>
+                        <p class="text-mist text-sm">Each session starts cold. Schema, conventions, and gotchas &#8212; all forgotten.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl text-center">
+                        <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center mb-4 mx-auto"><i data-lucide="users" class="w-6 h-6 text-red-400"></i></div>
+                        <h3 class="font-display text-lg font-bold mb-2">Developer drift</h3>
+                        <p class="text-mist text-sm">Your Claude and your teammate's Claude learn different things. Changes conflict.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl text-center">
+                        <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center mb-4 mx-auto"><i data-lucide="repeat" class="w-6 h-6 text-red-400"></i></div>
+                        <h3 class="font-display text-lg font-bold mb-2">Repeat mistakes</h3>
+                        <p class="text-mist text-sm">Same API pattern errors, same missing trailing slashes, same wrong assumptions.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl text-center">
+                        <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center mb-4 mx-auto"><i data-lucide="test-tube-diagonal" class="w-6 h-6 text-red-400"></i></div>
+                        <h3 class="font-display text-lg font-bold mb-2">Lazy tests</h3>
+                        <p class="text-mist text-sm">Tests that describe current behavior instead of specifying desired behavior.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Five hooks, <span class="font-black not-italic">one feedback loop</span></h2>
+                    <p class="text-lg text-mist max-w-3xl mx-auto">Knowledge flows through five hook events that capture, validate, and surface lessons automatically.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 reveal">
+                    <div class="feature-card p-5 rounded-xl relative">
+                        <div class="text-xs font-mono font-medium text-accent mb-2 uppercase tracking-wider">SessionStart</div>
+                        <h3 class="font-display text-base font-bold mb-1">Load + curate</h3>
+                        <p class="text-mist text-xs">Loads lessons, curates pending candidates, applies confidence decay.</p>
+                        <div class="hidden md:block absolute top-1/2 -right-3 text-accent">&#8594;</div>
+                    </div>
+                    <div class="feature-card p-5 rounded-xl relative">
+                        <div class="text-xs font-mono font-medium text-accent mb-2 uppercase tracking-wider">PreToolUse</div>
+                        <h3 class="font-display text-base font-bold mb-1">Warn</h3>
+                        <p class="text-mist text-xs">Before edits and commands, checks if relevant lessons exist. Prevents known mistakes.</p>
+                        <div class="hidden md:block absolute top-1/2 -right-3 text-accent">&#8594;</div>
+                    </div>
+                    <div class="feature-card p-5 rounded-xl relative">
+                        <div class="text-xs font-mono font-medium text-accent mb-2 uppercase tracking-wider">UserPromptSubmit</div>
+                        <h3 class="font-display text-base font-bold mb-1">Detect</h3>
+                        <p class="text-mist text-xs">Scans for correction patterns. Captures "no, use X instead" as lesson candidates.</p>
+                        <div class="hidden md:block absolute top-1/2 -right-3 text-accent">&#8594;</div>
+                    </div>
+                    <div class="feature-card p-5 rounded-xl relative">
+                        <div class="text-xs font-mono font-medium text-accent mb-2 uppercase tracking-wider">PostToolUse</div>
+                        <h3 class="font-display text-base font-bold mb-1">Check</h3>
+                        <p class="text-mist text-xs">Tracks performance baselines. Flags tautological tests and missing edge cases.</p>
+                        <div class="hidden md:block absolute top-1/2 -right-3 text-accent">&#8594;</div>
+                    </div>
+                    <div class="feature-card p-5 rounded-xl">
+                        <div class="text-xs font-mono font-medium text-accent mb-2 uppercase tracking-wider">SessionEnd</div>
+                        <h3 class="font-display text-base font-bold mb-1">Persist</h3>
+                        <p class="text-mist text-xs">Bumps confidence on validated lessons. Saves candidates for next session. Pure file I/O.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="demo" class="py-24 px-6 bg-ink text-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4 text-white">Lesson lifecycle</h2>
+                    <p class="text-lg text-white/60 max-w-2xl mx-auto">Watch how lessons are created, validated, and aged. Click the buttons to simulate session events.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 reveal">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-mono text-sm text-white/50 uppercase tracking-wider">lessons.json</h3>
+                            <span id="lesson-count" class="text-xs font-mono text-white/30">0 lessons</span>
+                        </div>
+                        <div id="lesson-list" class="space-y-3 min-h-[300px]">
+                            <div class="text-white/20 text-center py-16 text-sm italic">No lessons yet. Add one below.</div>
+                        </div>
+                        <div class="mt-6 flex flex-wrap gap-2">
+                            <button onclick="addSampleLesson()" class="bg-accent hover:bg-accentDark text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> Add lesson</button>
+                            <button onclick="simulateSessionEnd()" class="bg-white/10 hover:bg-white/20 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4"></i> End session</button>
+                            <button onclick="simulateDecay()" class="bg-white/10 hover:bg-white/20 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4"></i> Age 30 days</button>
+                            <button onclick="simulateCorrection()" class="bg-white/10 hover:bg-white/20 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors flex items-center gap-2"><i data-lucide="message-circle" class="w-4 h-4"></i> Correct a lesson</button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-mono text-sm text-white/50 uppercase tracking-wider">playbook.md</h3>
+                            <span class="text-xs font-mono text-white/30">auto-generated</span>
+                        </div>
+                        <div id="playbook-preview" class="bg-[#0d1117] border border-[#30363d] rounded-xl p-6 min-h-[300px] font-mono text-sm leading-relaxed"></div>
+                        <div class="mt-6 p-4 bg-white/5 rounded-lg border border-white/10">
+                            <div id="event-log" class="font-mono text-xs text-white/40 space-y-1 max-h-32 overflow-y-auto"><div>Ready. Click a button to simulate events.</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16 reveal"><h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">What's included</h2></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 reveal">
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accentLight rounded-lg flex items-center justify-center mb-4"><i data-lucide="shield-check" class="w-6 h-6 text-accent"></i></div>
+                        <h3 class="font-display text-xl font-bold mb-2">Test quality rules</h3>
+                        <p class="text-mist text-sm">Catches tautological tests, missing edge cases, bare assertions, and mock-as-assertion patterns.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accentLight rounded-lg flex items-center justify-center mb-4"><i data-lucide="git-merge" class="w-6 h-6 text-accent"></i></div>
+                        <h3 class="font-display text-xl font-bold mb-2">Cross-developer sharing</h3>
+                        <p class="text-mist text-sm">Lessons sync via git with a custom merge driver. Additive counters, tag union, tombstone deletion.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accentLight rounded-lg flex items-center justify-center mb-4"><i data-lucide="trending-down" class="w-6 h-6 text-accent"></i></div>
+                        <h3 class="font-display text-xl font-bold mb-2">Confidence decay</h3>
+                        <p class="text-mist text-sm">Lessons that aren't validated lose confidence over time. Stale knowledge fades. Fresh knowledge stays.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accentLight rounded-lg flex items-center justify-center mb-4"><i data-lucide="gauge" class="w-6 h-6 text-accent"></i></div>
+                        <h3 class="font-display text-xl font-bold mb-2">Performance baselines</h3>
+                        <p class="text-mist text-sm">Tracks test and build timing. Flags regressions above 10%. Stores baselines per command.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accentLight rounded-lg flex items-center justify-center mb-4"><i data-lucide="user-check" class="w-6 h-6 text-accent"></i></div>
+                        <h3 class="font-display text-xl font-bold mb-2">Guided setup</h3>
+                        <p class="text-mist text-sm">Interactive wizard walks you through identity, rules, and preferences. No config editing required.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accentLight rounded-lg flex items-center justify-center mb-4"><i data-lucide="file-text" class="w-6 h-6 text-accent"></i></div>
+                        <h3 class="font-display text-xl font-bold mb-2">CLAUDE.md seeding</h3>
+                        <p class="text-mist text-sm">Already have a CLAUDE.md full of gotchas? Seed your initial lessons from it automatically.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start reveal">
+                    <div>
+                        <h2 class="font-display text-4xl md:text-5xl font-light italic mb-6">Four commands,<br><span class="font-black not-italic">zero friction.</span></h2>
+                        <p class="text-lg text-mist mb-8">Everything runs through slash commands. The hooks do the heavy lifting in the background.</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext-setup</code><p class="text-mist text-sm mt-2">First-run wizard. Set your identity, choose rules, configure persistence mode.</p></div>
+                        <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext-init</code><p class="text-mist text-sm mt-2">Initialize in a project. Creates <code>.autocontext/</code>, optionally seeds from CLAUDE.md.</p></div>
+                        <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext-review</code><p class="text-mist text-sm mt-2">Curate lessons interactively. Approve, edit, delete, or supersede.</p></div>
+                        <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext-status</code><p class="text-mist text-sm mt-2">Quick stats. Lesson counts, confidence averages, stalest lessons, merge driver status.</p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="install" class="py-24 px-6">
+            <div class="max-w-4xl mx-auto reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-6">Get started</h2>
+                <p class="text-center text-mist text-lg mb-16 max-w-2xl mx-auto">You need <strong><a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accent hover:underline">Claude Code</a></strong> installed. Open your terminal and run <code>claude --version</code> to check.</p>
+                <div class="space-y-8">
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4"><span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">1</span><h3 class="font-display text-xl font-bold">Add the plugin source</h3></div>
+                        <p class="text-mist mb-4">This tells Claude Code where to find the plugin. You only need to do this once.</p>
+                        <pre><code>claude plugin marketplace add https://github.com/jamditis/claude-skills-journalism</code></pre>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4"><span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">2</span><h3 class="font-display text-xl font-bold">Install autocontext</h3></div>
+                        <p class="text-mist mb-4">Install the plugin from the marketplace.</p>
+                        <pre><code>claude plugin install autocontext</code></pre>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4"><span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">3</span><h3 class="font-display text-xl font-bold">Set up and initialize</h3></div>
+                        <p class="text-mist mb-4">Run the setup wizard, then initialize in your project.</p>
+                        <pre><code>/autocontext-setup    # one-time global config
+/autocontext-init     # per-project initialization</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="relative z-10 py-12 px-6 border-t border-ink/5">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-sm text-mist">Built by <a href="https://github.com/jamditis" class="text-accent hover:underline">Joe Amditis</a></div>
+            <div class="flex items-center gap-6 text-sm text-mist">
+                <a href="https://github.com/jamditis/claude-skills-journalism" class="hover:text-ink transition-colors">GitHub</a>
+                <a href="../" class="hover:text-ink transition-colors">All skills</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const sampleLessons = [
+            { text: "POST /api/ideas/ requires trailing slash", category: "efficiency", tags: ["api", "fastapi"] },
+            { text: "DeepL handles 7 languages, Google handles ht/hi/ur", category: "codebase", tags: ["translation"] },
+            { text: "Belt items use distance-offset struct for O(1) updates", category: "codebase", tags: ["game-engine"] },
+            { text: "quality_scores_json is nullable - jobs complete even if scoring times out", category: "efficiency", tags: ["scorer"] },
+            { text: "Graffiti wall sticker resize causes layout thrash - batch DOM updates", category: "optimization", tags: ["rendering"] },
+            { text: "Always use timeout --foreground in tmux sessions", category: "efficiency", tags: ["tmux"] },
+            { text: "ReviewAssignment.diff_json stores human edits but no feedback pipeline exists yet", category: "codebase", tags: ["review"] },
+            { text: "Glossary terms are in DB (terms_json), not a static file", category: "codebase", tags: ["glossary"] },
+        ];
+        let lessons = [];
+        let sampleIndex = 0;
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.textContent;
+        }
+
+        function addSampleLesson() {
+            if (sampleIndex >= sampleLessons.length) sampleIndex = 0;
+            const s = sampleLessons[sampleIndex++];
+            lessons.push({ id: 'l_' + Math.random().toString(36).substr(2, 6), ...s, confidence: 0.5, validated_count: 0, deleted: false });
+            logEvent('+ New lesson added (confidence: 0.5)');
+            renderAll();
+        }
+
+        function simulateSessionEnd() {
+            let n = 0;
+            lessons.forEach(l => { if (!l.deleted) { l.validated_count++; l.confidence = Math.min(1.0, +(l.confidence + 0.1).toFixed(2)); n++; } });
+            logEvent('Session ended. Validated ' + n + ' lessons (+0.1 each).');
+            renderAll();
+        }
+
+        function simulateDecay() {
+            lessons.forEach(l => { if (!l.deleted) l.confidence = Math.max(0, +(l.confidence - 0.1).toFixed(2)); });
+            logEvent('30 days passed. All lessons decayed by -0.1.');
+            renderAll();
+        }
+
+        function simulateCorrection() {
+            const active = lessons.filter(l => !l.deleted);
+            if (!active.length) { logEvent('No lessons to correct.'); return; }
+            const t = active[Math.floor(Math.random() * active.length)];
+            t.confidence = Math.max(0, +(t.confidence - 0.2).toFixed(2));
+            logEvent('Correction detected (-0.2 confidence).');
+            renderAll();
+        }
+
+        function renderAll() { renderLessons(); renderPlaybook(); }
+
+        function renderLessons() {
+            const el = document.getElementById('lesson-list');
+            const cnt = document.getElementById('lesson-count');
+            const active = lessons.filter(l => !l.deleted);
+            cnt.textContent = active.length + ' lesson' + (active.length !== 1 ? 's' : '');
+            if (!active.length) { el.textContent = ''; const p = document.createElement('div'); p.className = 'text-white/20 text-center py-16 text-sm italic'; p.textContent = 'No lessons yet. Add one below.'; el.appendChild(p); return; }
+            el.textContent = '';
+            active.sort((a, b) => b.confidence - a.confidence).forEach(l => {
+                const color = l.confidence >= 0.7 ? '#1a6b5a' : l.confidence >= 0.3 ? '#d97706' : '#dc2626';
+                const card = document.createElement('div');
+                card.className = 'bg-white/5 border border-white/10 rounded-lg p-4 lesson-enter' + (l.confidence < 0.3 ? ' opacity-50' : '');
+                const top = document.createElement('div');
+                top.className = 'flex items-start justify-between gap-3 mb-2';
+                const txt = document.createElement('span');
+                txt.className = 'text-sm text-white/90 flex-1';
+                txt.textContent = l.text;
+                const badge = document.createElement('span');
+                badge.className = 'text-xs font-mono px-2 py-0.5 rounded';
+                badge.style.cssText = 'background:' + color + '20;color:' + color;
+                badge.textContent = l.confidence.toFixed(1);
+                top.appendChild(txt);
+                top.appendChild(badge);
+                const bottom = document.createElement('div');
+                bottom.className = 'flex items-center gap-3';
+                const barBg = document.createElement('div');
+                barBg.className = 'flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden';
+                const bar = document.createElement('div');
+                bar.className = 'confidence-bar h-full rounded-full';
+                bar.style.cssText = 'width:' + (l.confidence * 100) + '%;background:' + color;
+                barBg.appendChild(bar);
+                const cat = document.createElement('span');
+                cat.className = 'text-[10px] font-mono text-white/30';
+                cat.textContent = l.category;
+                const val = document.createElement('span');
+                val.className = 'text-[10px] font-mono text-white/30';
+                val.textContent = 'v' + l.validated_count;
+                bottom.appendChild(barBg);
+                bottom.appendChild(cat);
+                bottom.appendChild(val);
+                card.appendChild(top);
+                card.appendChild(bottom);
+                el.appendChild(card);
+            });
+        }
+
+        function renderPlaybook() {
+            const el = document.getElementById('playbook-preview');
+            const active = lessons.filter(l => !l.deleted && l.confidence > 0);
+            const groups = {};
+            active.forEach(l => { (groups[l.category] = groups[l.category] || []).push(l); });
+            el.textContent = '';
+            const addLine = (text, color) => { const d = document.createElement('div'); d.textContent = text; if (color) d.style.color = color; el.appendChild(d); };
+            addLine('# Project playbook (auto-generated)', '#e6edf3');
+            addLine('Last updated: now | ' + active.length + ' active lessons', '#8b949e');
+            if (!active.length) { const e = document.createElement('div'); e.className = 'mt-4 italic'; e.style.color = '#484f58'; e.textContent = 'Empty.'; el.appendChild(e); return; }
+            ['efficiency', 'codebase', 'optimization'].forEach(cat => {
+                const items = (groups[cat] || []).sort((a, b) => b.confidence - a.confidence);
+                if (!items.length) return;
+                const h = document.createElement('div'); h.className = 'mt-4'; h.style.color = '#e6edf3';
+                h.textContent = '## ' + cat.charAt(0).toUpperCase() + cat.slice(1) + ' (' + items.length + ')';
+                el.appendChild(h);
+                items.forEach(l => {
+                    const c = l.confidence >= 0.7 ? '#3fb950' : l.confidence >= 0.3 ? '#d29922' : '#f85149';
+                    const line = document.createElement('div'); line.style.color = '#8b949e';
+                    const score = document.createElement('span'); score.style.color = c; score.textContent = '[' + l.confidence.toFixed(1) + ']';
+                    line.textContent = '- ';
+                    line.appendChild(score);
+                    line.appendChild(document.createTextNode(' ' + l.text));
+                    el.appendChild(line);
+                });
+            });
+        }
+
+        function logEvent(msg) {
+            const log = document.getElementById('event-log');
+            const t = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const d = document.createElement('div');
+            const ts = document.createElement('span'); ts.style.color = '#1a6b5a'; ts.textContent = t + ' ';
+            d.appendChild(ts);
+            d.appendChild(document.createTextNode(msg));
+            log.appendChild(d);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        renderPlaybook();
+        const observer = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }); }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        lucide.createIcons();
+    </script>
+</body>
+</html>
