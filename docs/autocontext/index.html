@@ -204,6 +204,87 @@
                     </div>
                 </div>
 
+                <!-- Skill evolution workflow -->
+                <div class="max-w-3xl mx-auto mt-28 reveal">
+                    <div class="text-center mb-6">
+                        <div class="inline-block px-3 py-1 bg-accent/10 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase text-accent mb-4">New in v1.1</div>
+                        <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">How skill evolution works</h2>
+                        <p class="text-lg text-mist max-w-2xl mx-auto">The lesson loop above captures project-specific knowledge. Skill evolution takes it further: lessons that apply to a <em>skill itself</em> get folded back into the skill file, so the skill permanently improves.</p>
+                    </div>
+                    <div class="space-y-4 text-lg text-mist mt-10">
+                        <div class="feature-card p-6 rounded-xl flex gap-4 items-start">
+                            <div class="flex-shrink-0 w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center mt-0.5">
+                                <i data-lucide="zap" class="w-5 h-5 text-accent"></i>
+                            </div>
+                            <div>
+                                <p class="text-ink font-medium mb-1">You use a skill and correct Claude</p>
+                                <p class="text-sm">"No, always set a User-Agent header when scraping news sites" &#8212; while using the <code>web-scraping</code> skill.</p>
+                                <p class="text-xs text-accent mt-1">Autocontext tags the correction with the active skill name</p>
+                            </div>
+                        </div>
+                        <div class="feature-card p-6 rounded-xl flex gap-4 items-start">
+                            <div class="flex-shrink-0 w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center mt-0.5">
+                                <i data-lucide="trending-up" class="w-5 h-5 text-accent"></i>
+                            </div>
+                            <div>
+                                <p class="text-ink font-medium mb-1">The lesson gains confidence over multiple sessions</p>
+                                <p class="text-sm">Each session that uses the lesson without contradicting it bumps its confidence score. Across projects, evidence accumulates.</p>
+                                <p class="text-xs text-accent mt-1">Validated 5+ times across 2 projects &#8594; high confidence</p>
+                            </div>
+                        </div>
+                        <div class="feature-card p-6 rounded-xl flex gap-4 items-start">
+                            <div class="flex-shrink-0 w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center mt-0.5">
+                                <i data-lucide="globe" class="w-5 h-5 text-accent"></i>
+                            </div>
+                            <div>
+                                <p class="text-ink font-medium mb-1">You promote it to the global skill store</p>
+                                <p class="text-sm">During <code>/autocontext-review</code>, select "Promote to global" on a high-confidence skill-tagged lesson. It moves from your project's local store to <code>~/.claude/skill-lessons/</code>.</p>
+                                <p class="text-xs text-accent mt-1">Now available across all projects that use this skill</p>
+                            </div>
+                        </div>
+                        <div class="feature-card p-6 rounded-xl flex gap-4 items-start">
+                            <div class="flex-shrink-0 w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center mt-0.5">
+                                <i data-lucide="wand-2" class="w-5 h-5 text-accent"></i>
+                            </div>
+                            <div>
+                                <p class="text-ink font-medium mb-1">Run <code>/autocontext-evolve</code> to rewrite the skill</p>
+                                <p class="text-sm">Claude reads the current skill file and all eligible lessons, then generates an improved version with the lessons woven in naturally. You review a diff and approve, reject, or edit.</p>
+                                <p class="text-xs text-accent mt-1">The skill file itself gets better &#8212; not just a sidecar</p>
+                            </div>
+                        </div>
+                        <div class="feature-card p-6 rounded-xl flex gap-4 items-start">
+                            <div class="flex-shrink-0 w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center mt-0.5">
+                                <i data-lucide="refresh-cw" class="w-5 h-5 text-accent"></i>
+                            </div>
+                            <div>
+                                <p class="text-ink font-medium mb-1">The cycle repeats</p>
+                                <p class="text-sm">New corrections happen, new lessons accumulate, and the skill keeps improving. Each evolution builds on the last. Every backup is timestamped, and <code>--rollback</code> can undo any change.</p>
+                                <p class="text-xs text-accent mt-1">Skills get better every time you use them</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data flow diagram -->
+                    <div class="mt-12 feature-card p-8 rounded-xl">
+                        <h3 class="font-display text-lg font-bold mb-6 text-center">The full data flow</h3>
+                        <div class="font-mono text-xs md:text-sm text-mist space-y-1 overflow-x-auto">
+                            <div class="text-ink font-semibold">Capture</div>
+                            <div class="pl-4">Use skill &#8594; post-tool-use.sh tracks active skill</div>
+                            <div class="pl-4">Correct Claude &#8594; user-prompt-submit.sh tags with skill name</div>
+                            <div class="pl-4">Next session &#8594; session-start.sh curator adds skill/scope fields</div>
+                            <div class="mt-3 text-ink font-semibold">Validate</div>
+                            <div class="pl-4">Each session &#8594; session-end.sh bumps confidence if unchallenged</div>
+                            <div class="pl-4">Multiple sessions &#8594; lesson reaches high confidence (0.85+)</div>
+                            <div class="mt-3 text-ink font-semibold">Promote</div>
+                            <div class="pl-4">/autocontext-review &#8594; "Promote to global" &#8594; ~/.claude/skill-lessons/</div>
+                            <div class="mt-3 text-ink font-semibold">Evolve</div>
+                            <div class="pl-4">/autocontext-evolve &#8594; scan eligible &#8594; claude -p rewrites skill</div>
+                            <div class="pl-4">Review diff &#8594; accept/reject/edit &#8594; skill file updated</div>
+                            <div class="pl-4">Lessons marked as folded &#8594; backup created</div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
 
