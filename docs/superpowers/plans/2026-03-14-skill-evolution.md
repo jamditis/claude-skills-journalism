@@ -296,7 +296,17 @@ pending.append({
 })
 ```
 
-Also add `AUTOCONTEXT_SESSION_ID="$SESSION_ID"` to the environment variables passed to the Python block (alongside AUTOCONTEXT_PENDING_FILE, etc.).
+Update the env var line at line 97 to include SESSION_ID. Change:
+
+```bash
+AUTOCONTEXT_PENDING_FILE="$PENDING_FILE" AUTOCONTEXT_TIMESTAMP="$TIMESTAMP" AUTOCONTEXT_USER_MESSAGE="$USER_MESSAGE" python3 - <<'PYEOF'
+```
+
+To:
+
+```bash
+AUTOCONTEXT_PENDING_FILE="$PENDING_FILE" AUTOCONTEXT_TIMESTAMP="$TIMESTAMP" AUTOCONTEXT_USER_MESSAGE="$USER_MESSAGE" AUTOCONTEXT_SESSION_ID="$SESSION_ID" python3 - <<'PYEOF'
+```
 
 - [ ] **Step 4: Run the test to verify it passes**
 
@@ -815,11 +825,11 @@ git commit -m "feat(skill-evolution): add 'Promote to global' action to /autocon
 ### Task 9: Create the evolution engine scripts
 
 **Files:**
-- Create: `scripts/skill-evolution/evolve.sh`
-- Create: `scripts/skill-evolution/generate-diff.py`
-- Create: `scripts/skill-evolution/apply-edit.py`
+- Create: `scripts/skill-evolution/scan_eligible.sh`
+- Create: `scripts/skill-evolution/generate_diff.py`
+- Create: `scripts/skill-evolution/apply_edit.py`
 
-- [ ] **Step 1: Write generate-diff.py**
+- [ ] **Step 1: Write generate_diff.py**
 
 ```python
 #!/usr/bin/env python3
@@ -910,7 +920,7 @@ def generate_append_fallback(lessons):
     return "\n".join(lines) + "\n"
 ```
 
-- [ ] **Step 2: Write apply-edit.py**
+- [ ] **Step 2: Write apply_edit.py**
 
 ```python
 #!/usr/bin/env python3
@@ -1023,10 +1033,11 @@ def find_skill_path(skill_name):
     except Exception:
         pass
 
-    # Search plugin directories
+    # Search plugin directories and user skill directories
     search_dirs = [
         os.path.expanduser("~/.claude/plugins/marketplaces"),
         os.path.expanduser("~/.claude/plugins/cache"),
+        os.path.expanduser("~/.claude/skills"),
     ]
 
     for search_dir in search_dirs:
@@ -1039,7 +1050,7 @@ def find_skill_path(skill_name):
     return None
 ```
 
-- [ ] **Step 3: Write evolve.sh — the main entry point**
+- [ ] **Step 3: Write scan_eligible.sh — the main entry point**
 
 ```bash
 #!/usr/bin/env bash
@@ -1072,20 +1083,32 @@ ensure_store('$STORE_PATH')
 "
 
 # Scan for eligible skills and output JSON summary
-python3 - <<PYEOF
+export AUTOCONTEXT_SCRIPT_DIR="$SCRIPT_DIR"
+export AUTOCONTEXT_STORE_PATH="$STORE_PATH"
+export AUTOCONTEXT_EVOLUTION_CONFIDENCE="$EVOLUTION_CONFIDENCE"
+export AUTOCONTEXT_EVOLUTION_MIN_VALIDATIONS="$EVOLUTION_MIN_VALIDATIONS"
+
+python3 - <<'PYEOF'
 import sys
 import json
-sys.path.insert(0, "$SCRIPT_DIR")
+import os
+
+script_dir = os.environ["AUTOCONTEXT_SCRIPT_DIR"]
+store_path = os.environ["AUTOCONTEXT_STORE_PATH"]
+min_conf = float(os.environ["AUTOCONTEXT_EVOLUTION_CONFIDENCE"])
+min_vals = int(os.environ["AUTOCONTEXT_EVOLUTION_MIN_VALIDATIONS"])
+
+sys.path.insert(0, script_dir)
 from store import load_index, get_eligible_lessons
 
-index = load_index("$STORE_PATH")
+index = load_index(store_path)
 summary = {}
 for skill_name in index.get("skills", {}):
     eligible = get_eligible_lessons(
         skill_name,
-        min_confidence=float("$EVOLUTION_CONFIDENCE"),
-        min_validations=int("$EVOLUTION_MIN_VALIDATIONS"),
-        store_path="$STORE_PATH",
+        min_confidence=min_conf,
+        min_validations=min_vals,
+        store_path=store_path,
     )
     if eligible:
         avg_conf = sum(l.get("confidence", 0) for l in eligible) / len(eligible)
@@ -1109,9 +1132,9 @@ PYEOF
 - [ ] **Step 4: Make scripts executable**
 
 ```bash
-chmod +x scripts/skill-evolution/evolve.sh
-chmod +x scripts/skill-evolution/generate-diff.py
-chmod +x scripts/skill-evolution/apply-edit.py
+chmod +x scripts/skill-evolution/scan_eligible.sh
+chmod +x scripts/skill-evolution/generate_diff.py
+chmod +x scripts/skill-evolution/apply_edit.py
 ```
 
 - [ ] **Step 5: Write tests for generate-diff and apply-edit**
@@ -1184,7 +1207,7 @@ Expected: All tests pass
 - [ ] **Step 7: Commit**
 
 ```bash
-git add scripts/skill-evolution/evolve.sh scripts/skill-evolution/generate-diff.py scripts/skill-evolution/apply-edit.py tests/test_evolution.py
+git add scripts/skill-evolution/scan_eligible.sh scripts/skill-evolution/generate_diff.py scripts/skill-evolution/apply_edit.py tests/test_evolution.py
 git commit -m "feat(skill-evolution): add evolution engine (generate-diff, apply-edit, evolve entry point)"
 ```
 
@@ -1217,7 +1240,7 @@ Parse the arguments from the user's input. If `--rollback` is present, run the r
 
 1. Run the scan script to find eligible skills:
    ```bash
-   bash "${CLAUDE_PLUGIN_ROOT}/scripts/skill-evolution/evolve.sh"
+   bash "${CLAUDE_PLUGIN_ROOT}/scripts/skill-evolution/scan_eligible.sh"
    ```
 
 2. If no skills are eligible, report that and exit.
@@ -1282,88 +1305,42 @@ else:
 
 ## Export flow
 
+Uses `sync.py` (no inline duplication):
+
 ```bash
 python3 -c "
-import sys, json, os
-from datetime import datetime, timezone
+import sys
 sys.path.insert(0, '${CLAUDE_PLUGIN_ROOT}/scripts/skill-evolution')
-from store import load_index, load_skill_lessons, get_store_path, ensure_store
-
-store = ensure_store()
-index = load_index()
-export = {'exported': datetime.now(timezone.utc).isoformat(), 'skills': {}}
-for skill_name in index.get('skills', {}):
-    lessons = load_skill_lessons(skill_name)
-    if lessons:
-        export['skills'][skill_name] = lessons
-
-date = datetime.now(timezone.utc).strftime('%Y-%m-%d')
-export_path = os.path.join(store, 'exports', f'{date}-export.json')
-with open(export_path, 'w') as f:
-    json.dump(export, f, indent=2)
-print(f'Exported to {export_path}')
+from sync import export_all
+path = export_all()
+print(f'Exported to {path}')
 "
 ```
 
 ## Import flow
 
+Uses `sync.py` (no inline duplication):
+
 ```bash
 python3 -c "
-import sys, json
+import sys
 sys.path.insert(0, '${CLAUDE_PLUGIN_ROOT}/scripts/skill-evolution')
-from store import load_skill_lessons, save_skill_lessons, ensure_store
-
-ensure_store()
-with open('IMPORT_PATH') as f:
-    data = json.load(f)
-
-for skill_name, lessons in data.get('skills', {}).items():
-    existing = load_skill_lessons(skill_name)
-    existing_ids = {l['id'] for l in existing}
-    added = 0
-    for lesson in lessons:
-        if lesson['id'] not in existing_ids:
-            existing.append(lesson)
-            added += 1
-        else:
-            # Merge: additive validated_count, highest confidence, newest timestamp
-            for e in existing:
-                if e['id'] == lesson['id']:
-                    e['validated_count'] = e.get('validated_count', 0) + lesson.get('validated_count', 0)
-                    e['confidence'] = max(e.get('confidence', 0), lesson.get('confidence', 0))
-                    if lesson.get('last_validated', '') > e.get('last_validated', ''):
-                        e['last_validated'] = lesson['last_validated']
-                    if lesson.get('folded'):
-                        e['folded'] = True
-                    break
-    save_skill_lessons(skill_name, existing)
-    print(f'{skill_name}: added {added}, merged {len(lessons) - added}')
+from sync import import_lessons
+summary = import_lessons('IMPORT_PATH')
+for skill, counts in summary.items():
+    print(f'{skill}: added {counts[\"added\"]}, merged {counts[\"merged\"]}')
 "
 ```
 ```
 
-- [ ] **Step 2: Register the command in plugin.json**
+- [ ] **Step 2: Verify command auto-discovery**
 
-Add to `.claude-plugin/plugin.json`:
-
-```json
-{
-  "name": "autocontext",
-  "version": "1.1.0",
-  "description": "Accumulates project knowledge across sessions and developers through structured lessons and hooks",
-  "author": {
-    "name": "Joe Amditis",
-    "email": "jamditis@gmail.com"
-  }
-}
-```
-
-Note: Claude Code auto-discovers commands in the `commands/` directory by convention. No explicit registration is needed in `plugin.json` for commands — just placing `evolve.md` in `commands/` is sufficient.
+Claude Code auto-discovers commands in the `commands/` directory by convention. No explicit `plugin.json` registration is needed — placing `evolve.md` in `commands/` is sufficient. Verify by checking that the existing commands (review.md, setup.md, init.md, status.md) also have no `plugin.json` registration.
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add commands/evolve.md .claude-plugin/plugin.json
+git add commands/evolve.md
 git commit -m "feat(skill-evolution): add /autocontext-evolve command with evolve, rollback, export, import"
 ```
 

@@ -115,7 +115,7 @@ This runs alongside the existing test-quality and performance-baseline checks â€
 
 ### Changes to `hooks/user-prompt-submit.sh`
 
-When a correction is detected, the hook currently writes to `pending-lessons.json` with the user's message and timestamp. New behavior: read `session_id` from the JSON stdin payload, then read `/tmp/claude-skills-{session_id}` (populated by the new `track-active-skill.sh` hook above) and add active skill names to the pending lesson metadata.
+When a correction is detected, the hook currently writes to `pending-lessons.json` with the user's message and timestamp. New behavior: read `session_id` from the JSON stdin payload, then read `/tmp/claude-skills-{session_id}` (populated by the Skill branch in `post-tool-use.sh` above) and add active skill names to the pending lesson metadata.
 
 Pending lesson format gains a new field:
 
@@ -463,9 +463,9 @@ Reports what was added/updated after merge.
 | `commands/review.md` | Modify | Add "Promote to global" action for skill-tagged lessons |
 | `commands/setup.md` | Modify | Add steps 11-12 for skill learning config |
 | `commands/evolve.md` | **New** | The /autocontext-evolve command (handles evolve, rollback, export, import via args) |
-| `scripts/skill-evolution/evolve.sh` | **New** | Evolution engine entry point |
-| `scripts/skill-evolution/generate-diff.py` | **New** | Claude-powered skill rewriting |
-| `scripts/skill-evolution/apply-edit.py` | **New** | Write approved changes + backup |
+| `scripts/skill-evolution/scan_eligible.sh` | **New** | Evolution engine entry point |
+| `scripts/skill-evolution/generate_diff.py` | **New** | Claude-powered skill rewriting |
+| `scripts/skill-evolution/apply_edit.py` | **New** | Write approved changes + backup |
 | `scripts/skill-evolution/sync.py` | **New** | Export/import for cross-machine sharing |
 | `plugin.json` | Modify | Register /autocontext-evolve command |
 
