@@ -1215,7 +1215,6 @@ git commit -m "feat(skill-evolution): add evolution engine (generate-diff, apply
 
 **Files:**
 - Create: `commands/evolve.md`
-- Modify: `.claude-plugin/plugin.json`
 
 - [ ] **Step 1: Write evolve.md command**
 
