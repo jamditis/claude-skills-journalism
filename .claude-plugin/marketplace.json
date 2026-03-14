@@ -8,6 +8,28 @@
   },
   "plugins": [
     {
+      "name": "autocontext",
+      "description": "Accumulates project knowledge across sessions and developers through structured lessons and hooks",
+      "version": "0.1.0",
+      "author": {
+        "name": "Joe Amditis",
+        "email": "jamditis@gmail.com"
+      },
+      "source": "./autocontext",
+      "category": "Productivity"
+    },
+    {
+      "name": "pdf-design",
+      "description": "PDF report and proposal design system with interactive editing",
+      "version": "1.0.0",
+      "author": {
+        "name": "Joe Amditis",
+        "email": "jamditis@gmail.com"
+      },
+      "source": "./pdf-design",
+      "category": "Design"
+    },
+    {
       "name": "pdf-playground",
       "description": "Interactive playground for creating and testing PDF reports and proposals",
       "version": "1.1.1",

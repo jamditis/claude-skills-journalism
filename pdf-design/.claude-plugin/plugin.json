@@ -2,6 +2,9 @@
   "name": "pdf-design",
   "version": "1.0.0",
   "description": "PDF report and proposal design system with interactive editing",
-  "author": "Joe Amditis",
+  "author": {
+    "name": "Joe Amditis",
+    "email": "jamditis@gmail.com"
+  },
   "skills": ["SKILL.md"]
 }

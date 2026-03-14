@@ -2,7 +2,10 @@
   "name": "autocontext",
   "version": "0.1.0",
   "description": "Accumulates project knowledge across sessions and developers through structured lessons and hooks",
-  "author": "jamditis",
+  "author": {
+    "name": "Joe Amditis",
+    "email": "jamditis@gmail.com"
+  },
   "skills": [
     "skills/setup.md",
     "skills/init.md",
