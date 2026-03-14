@@ -69,6 +69,32 @@ Use this when a lesson is correct in spirit but the specific guidance has change
 ### Skip
 Leaves the lesson unchanged and moves to the next one. Use this when you're not sure or want to review later.
 
+### Promote to global (skill-tagged lessons only)
+
+When a lesson has a `skill` field (non-null) and `skill_learning.enabled` is true in config, a sixth action is available:
+
+- **Promote to global** — Copy this lesson to the global skill lesson store using the store module. Update the original lesson's `scope` to `"skill"` in `lessons.json`. Report: "Promoted to global store for [skill name]."
+
+The global store path comes from config: `skill_learning.global_store` (default `~/.claude/skill-lessons/`).
+
+To perform the promotion, run:
+
+```bash
+python3 -c "
+import sys
+sys.path.insert(0, '${CLAUDE_PLUGIN_ROOT}/scripts/skill-evolution')
+from store import promote_lesson, ensure_store
+import json
+
+ensure_store()
+lesson = json.loads('''LESSON_JSON_HERE''')
+result = promote_lesson(lesson, 'SKILL_NAME_HERE', 'PROJECT_NAME_HERE')
+print('promoted' if result else 'already_exists')
+"
+```
+
+Only show this action when `skill_learning.enabled` is true in config and the lesson has a non-null `skill` field.
+
 ## Tombstoned lessons
 
 After reviewing all active lessons, you'll be asked about any tombstoned lessons:
