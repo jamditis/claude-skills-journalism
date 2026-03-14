@@ -45,6 +45,10 @@ Output a JSON array of lesson objects to keep. Each object must have:
 - tags (array of strings): relevant file paths, tools, or concepts
 - confidence (number): 0.6 to 0.8 for new lessons
 
+If a candidate includes an 'active_skills' field with skill names, also include:
+- skill (string or null): the skill name most relevant to this lesson (pick one if multiple), or null if no skills were active
+- scope (string): 'project' if the lesson is specific to this codebase, 'skill' if it would help anyone using this skill
+
 Candidates:
 $PENDING_JSON
 
@@ -122,6 +126,8 @@ for lesson in curated:
         lesson.setdefault("context", "")
         lesson.setdefault("created_by", "curator")
         lesson.setdefault("supersedes", None)
+        lesson.setdefault("skill", None)
+        lesson.setdefault("scope", "project")
         existing.append(lesson)
         existing_texts.add(text.lower())
         added += 1
