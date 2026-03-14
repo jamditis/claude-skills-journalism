@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-03-14
+
+### Added
+- Skill evolution: skills can now self-improve based on accumulated lessons
+- `post-tool-use.sh` tracks which skills are active during a session
+- `user-prompt-submit.sh` tags corrections with active skill names
+- Global skill lesson store at `~/.claude/skill-lessons/`
+- New `/autocontext-evolve` command: scan, evolve, rollback, export, import
+- `skill-lesson-injector.md` hook injects global lessons when skills load
+- "Promote to global" action in `/autocontext-review`
+- Steps 11-12 in `/autocontext-setup` for skill learning configuration
+- Shared `config-utils.sh` for consistent config resolution
+- Export/import sync with union merge for cross-machine sharing
+
 ## [1.4.1] - 2026-03-14
 
 ### Fixed
