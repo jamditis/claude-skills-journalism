@@ -132,8 +132,17 @@ with open(".autocontext/lessons.json", "w") as f:
 sys.stderr.write(f"[autocontext] merged {added} new lessons\n")
 PYEOF
 
-        # Regenerate playbook
-        if [[ -f "$LESSONS_FILE" ]] && [[ -f "$GENERATE_PLAYBOOK" ]]; then
+        # Regenerate playbook (respect playbook_generation setting)
+        PLAYBOOK_MODE=$(python3 -c "
+import json
+try:
+    with open('.autocontext/config.json') as f:
+        cfg = json.load(f)
+    print(cfg.get('playbook_generation', 'auto'))
+except Exception:
+    print('auto')
+")
+        if [[ "$PLAYBOOK_MODE" == "auto" ]] && [[ -f "$LESSONS_FILE" ]] && [[ -f "$GENERATE_PLAYBOOK" ]]; then
           python3 "$GENERATE_PLAYBOOK" "$LESSONS_FILE" "$PLAYBOOK_FILE" 2>/dev/null || true
         fi
       fi

@@ -109,8 +109,17 @@ except Exception as e:
 sys.stderr.write(f"[autocontext] session end: validated {updated_count} lessons\n")
 PYEOF
 
-# Regenerate playbook (no LLM, pure file I/O)
-if [[ -f "$LESSONS_FILE" ]] && [[ -f "$GENERATE_PLAYBOOK" ]]; then
+# Regenerate playbook (respect playbook_generation setting, no LLM, pure file I/O)
+PLAYBOOK_MODE=$(python3 -c "
+import json
+try:
+    with open('.autocontext/config.json') as f:
+        cfg = json.load(f)
+    print(cfg.get('playbook_generation', 'auto'))
+except Exception:
+    print('auto')
+")
+if [[ "$PLAYBOOK_MODE" == "auto" ]] && [[ -f "$LESSONS_FILE" ]] && [[ -f "$GENERATE_PLAYBOOK" ]]; then
   python3 "$GENERATE_PLAYBOOK" "$LESSONS_FILE" "$PLAYBOOK_FILE" 2>/dev/null || true
 fi
 

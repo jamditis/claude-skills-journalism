@@ -81,6 +81,24 @@ The script copies template files from `${CLAUDE_PLUGIN_ROOT}/templates/`:
 
 The `project_name` in config.json will be set to the git repository name or directory basename if not in a git repo.
 
+## Global config inheritance
+
+After copying the config template, merge values from `~/.claude/autocontext.json` (if it exists) into the project's `config.json`. Global settings provide defaults; per-project config can override them later.
+
+Mapping from global to project config:
+- `lesson_loading.max_lessons` → `max_session_lessons`
+- `lesson_loading.min_confidence` → `confidence_threshold`
+- `staleness.days` → `staleness_days`
+- `performance_baselines.enabled` → `performance_baselines`
+- `performance_baselines.baseline_commands` → `baseline_commands` (only if user chose custom commands)
+- `pretooluse_injection.mode` → `pretooluse_hook`
+- `lesson_persistence.strategy` → `persistence_mode` (`auto_persist_with_review` → `auto_curated`, `ask_before_persist` → `ask_before_persist`, `auto_persist_all` → `auto_all`)
+- `correction_sensitivity` → `correction_sensitivity`
+- `playbook.generation` → `playbook_generation`
+- `multi_machine` → `multi_machine`
+- `test_quality_rules` → `builtin_rules`
+- `identity` → written to `config.local.json`
+
 ## Cross-developer merge driver
 
 If you selected cross-developer sharing, the script will:

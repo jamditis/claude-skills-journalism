@@ -25,26 +25,57 @@ if [[ -z "$USER_MESSAGE" ]]; then
   exit 0
 fi
 
+# Read correction sensitivity from global config
+CORRECTION_SENSITIVITY=$(python3 -c "
+import json, sys
+try:
+    with open('$HOME/.claude/autocontext.json') as f:
+        cfg = json.load(f)
+    print(cfg.get('correction_sensitivity', 'medium'))
+except Exception:
+    print('medium')
+")
+
 # Pattern match for correction phrases (case-insensitive)
-IS_CORRECTION=$(python3 -c "
-import re, sys
+# Patterns are tiered by sensitivity level
+IS_CORRECTION=$(SENSITIVITY="$CORRECTION_SENSITIVITY" python3 -c "
+import re, sys, os
 
 msg = sys.stdin.read()
-patterns = [
+sensitivity = os.environ.get('SENSITIVITY', 'medium')
+
+# Low: only strong rejections
+low_patterns = [
     r'no,?\s+use\s+\S+\s+instead',
     r\"that'?s?\s+wrong\",
     r\"don'?t\s+do\s+that\",
-    r'\bactually\b',
-    r'remember\s+that\b',
-    r'remember\s+this\b',
-    r'keep\s+in\s+mind\b',
+    r'stop\s+doing\b',
+]
+
+# Medium: add explicit corrections
+medium_patterns = low_patterns + [
     r'the\s+correct\s+way\b',
     r'you\s+forgot\b',
-    r'stop\s+doing\b',
     r'instead,?\s+use\b',
     r'instead,?\s+do\b',
     r'instead,?\s+try\b',
 ]
+
+# High: add soft redirects
+high_patterns = medium_patterns + [
+    r'\bactually\b',
+    r'remember\s+that\b',
+    r'remember\s+this\b',
+    r'keep\s+in\s+mind\b',
+]
+
+if sensitivity == 'low':
+    patterns = low_patterns
+elif sensitivity == 'high':
+    patterns = high_patterns
+else:
+    patterns = medium_patterns
+
 for p in patterns:
     if re.search(p, msg, re.IGNORECASE):
         print('yes')

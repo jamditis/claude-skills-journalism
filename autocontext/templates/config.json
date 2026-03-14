@@ -4,8 +4,14 @@
   "confidence_threshold": 0.3,
   "staleness_days": 60,
   "performance_baselines": true,
-  "pretooluse_hook": true,
+  "pretooluse_hook": "enabled",
   "persistence_mode": "auto_curated",
+  "correction_sensitivity": "medium",
+  "playbook_generation": "auto",
+  "multi_machine": {
+    "enabled": false,
+    "machines": []
+  },
   "baseline_commands": [
     "pytest", "npm test", "npm run test", "npm run build",
     "cargo test", "go test", "vitest", "jest", "make test"
