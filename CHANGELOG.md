@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-03-13
+
+New skills, new plugin, and new docs pages added since v1.2.0.
+
+### Added
+- **`autocontext` plugin** — cross-session knowledge persistence for Claude Code
+  - 5 hooks: SessionStart (load + curate), PreToolUse (warn on mistakes), UserPromptSubmit (detect corrections), PostToolUse (performance + test quality), SessionEnd (persist)
+  - 4 slash commands: `/autocontext-setup`, `/autocontext-init`, `/autocontext-review`, `/autocontext-status`
+  - Curator agent for lesson validation
+  - Three Python scripts: `generate-playbook.py`, `merge-driver.py`, `seed-from-claude-md.py`
+  - 16 unit tests
+  - Cross-developer sharing via git with custom merge driver
+  - Built-in test quality rules (tautological tests, bare assertions, happy-path-only, mock-as-assertion)
+  - Landing page at `skills.amditis.tech/autocontext/` with interactive lesson lifecycle demo
+- `visual-explainer` skill — HTML diagrams, data tables, architecture views (adapted from nicobailon/visual-explainer)
+- `web-ui-best-practices` skill — signs of taste in web UI design
+- `nano-banana-image-gen` skill — Gemini image generation model selection, visual grounding, cost optimization
+- `free-apis-catalog` skill — 1000+ categorized free public APIs
+- `animated-sprite-gen` skill — AI-generated animated sprite sheets for 2D games
+- `persistent-sessions` guide — tmux configuration for long-running Claude Code sessions
+- Docs pages for visual-explainer, web-ui-best-practices, animated-sprite-gen
+- Support/sponsor buttons in site footer
+
+### Fixed
+- Removed debugging scripts with hardcoded paths and disabled security checks
+- Fixed nested anchor tags breaking skill card layout on docs site
+
+### Changed
+- Updated skill counts on homepage (development section: 10 → 11)
+
+---
+
 ## [1.2.0] - 2026-02-14
 
 Added the one-way door check skill and hook, plus a flagship documentation page. Set up custom domain `skills.amditis.tech`.
@@ -240,6 +272,7 @@ Initial commit with foundational skills.
 
 ---
 
+[1.3.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/jamditis/claude-skills-journalism/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.0.0...v1.1.0
