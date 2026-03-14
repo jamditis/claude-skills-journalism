@@ -6,6 +6,17 @@ Outputs merged JSON to stdout. Exit 0 on success.
 """
 import json
 import sys
+from datetime import datetime
+
+
+def parse_ts(ts_str):
+    if not ts_str:
+        return ""
+    try:
+        datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+        return ts_str
+    except Exception:
+        return ""
 
 
 def merge_lesson(ancestor, ours, theirs):
@@ -22,9 +33,12 @@ def merge_lesson(ancestor, ours, theirs):
     result["confidence"] = max(ours.get("confidence", 0), theirs.get("confidence", 0))
 
     # Most recent last_validated
-    ours_lv = ours.get("last_validated", "")
-    theirs_lv = theirs.get("last_validated", "")
-    result["last_validated"] = max(ours_lv, theirs_lv)
+    ours_lv = parse_ts(ours.get("last_validated", ""))
+    theirs_lv = parse_ts(theirs.get("last_validated", ""))
+    if ours_lv and theirs_lv:
+        result["last_validated"] = ours_lv if ours_lv >= theirs_lv else theirs_lv
+    else:
+        result["last_validated"] = ours_lv or theirs_lv
 
     # Deleted wins
     if ours.get("deleted") or theirs.get("deleted"):

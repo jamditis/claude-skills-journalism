@@ -51,10 +51,10 @@ Respond with ONLY the JSON array, no explanation."
     CURATED=$(echo "$CURATOR_PROMPT" | timeout --foreground 45 claude -p 2>/dev/null || echo "[]")
 
     # Validate curated output is a JSON array
-    IS_VALID=$(python3 - <<PYEOF
+    IS_VALID=$(echo "$CURATED" | python3 - <<'PYEOF'
 import json, sys
 try:
-    data = json.loads("""$CURATED""")
+    data = json.loads(sys.stdin.read())
     print("yes" if isinstance(data, list) else "no")
 except Exception:
     print("no")
@@ -83,12 +83,12 @@ PYEOF
           EXISTING_LESSONS=$(cat "$LESSONS_FILE")
         fi
 
-        python3 - <<PYEOF
-import json
+        CURATED_JSON="$CURATED" EXISTING_JSON="$EXISTING_LESSONS" python3 - <<'PYEOF'
+import json, os, uuid
 from datetime import datetime, timezone
 
-curated_raw = """$CURATED"""
-existing_raw = """$EXISTING_LESSONS"""
+curated_raw = os.environ.get("CURATED_JSON", "[]")
+existing_raw = os.environ.get("EXISTING_JSON", "[]")
 
 try:
     curated = json.loads(curated_raw)
@@ -103,10 +103,13 @@ except Exception:
 existing_texts = {l.get("text", "").strip().lower() for l in existing}
 now = datetime.now(timezone.utc).isoformat()
 
+import sys
 added = 0
 for lesson in curated:
     text = lesson.get("text", "").strip()
     if text.lower() not in existing_texts:
+        lesson.setdefault("id", "lesson_" + uuid.uuid4().hex[:8])
+        lesson.setdefault("schema_version", 1)
         lesson.setdefault("confidence", 0.7)
         lesson.setdefault("created", now)
         lesson.setdefault("last_validated", now)
@@ -114,6 +117,9 @@ for lesson in curated:
         lesson.setdefault("deleted", False)
         lesson.setdefault("tags", [])
         lesson.setdefault("category", "workflow")
+        lesson.setdefault("context", "")
+        lesson.setdefault("created_by", "curator")
+        lesson.setdefault("supersedes", None)
         existing.append(lesson)
         existing_texts.add(text.lower())
         added += 1
@@ -121,7 +127,6 @@ for lesson in curated:
 with open(".autocontext/lessons.json", "w") as f:
     json.dump(existing, f, indent=2)
 
-import sys
 sys.stderr.write(f"[autocontext] merged {added} new lessons\n")
 PYEOF
 
@@ -262,12 +267,12 @@ if os.path.exists(gitattributes_path):
     try:
         with open(gitattributes_path) as f:
             content = f.read()
-        merge_driver_ok = "autocontext-merge" in content or "lessons.json" in content
+        merge_driver_ok = "autocontext-union" in content or "lessons.json" in content
     except Exception:
         pass
 
 if not merge_driver_ok:
-    sys.stderr.write("[autocontext] warning: merge driver not configured. Run: git config merge.autocontext-merge.driver '...'\n")
+    sys.stderr.write("[autocontext] warning: merge driver not configured. Run: git config merge.autocontext-union.driver '...'\n")
 
 # Build hookResponse message
 count = len(top_lessons)

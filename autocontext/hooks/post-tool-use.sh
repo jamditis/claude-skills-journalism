@@ -19,7 +19,8 @@ is_test_file_edit() {
         return 1
     fi
 
-    local file=$(echo "$input" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path','') if isinstance(d.get('tool_input'),dict) else '')" 2>/dev/null || echo "")
+    local file
+    file=$(echo "$input" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path','') if isinstance(d.get('tool_input'),dict) else '')" 2>/dev/null || echo "")
 
     if [[ -z "$file" ]]; then
         return 1
@@ -47,7 +48,8 @@ check_test_quality() {
 
     # Check: no_happy_path_only
     # Extract all test method names
-    local test_methods=$(echo "$content" | grep -oE 'def (test_[a-zA-Z_0-9]+|it\(['\''"][^'\''\"]*' | sed "s/def test_\|it('//" | sed "s/['\''\"]//" | grep -v '^$')
+    local test_methods
+    test_methods=$(echo "$content" | grep -oE 'def (test_[a-zA-Z_0-9]+|it\(['\''"][^'\''\"]*' | sed "s/def test_\|it('//" | sed "s/['\''\"]//" | grep -v '^$')
 
     if [[ -n "$test_methods" ]]; then
         local happy_count=0
@@ -78,83 +80,98 @@ check_test_quality() {
     return 1
 }
 
-# Check performance baseline
+# Check performance baseline — all matching, timing, and comparison done in Python
 check_performance_baseline() {
-    local cmd="$1"
-    local output="$2"
+    local input="$1"
     local config_file="$CWD/.autocontext/config.json"
 
     if [[ ! -f "$config_file" ]]; then
         return 1
     fi
 
-    # Check if config has performance_baselines enabled
-    local perf_enabled=$(python3 -c "import json; c=json.load(open('$config_file')); print(c.get('performance_baselines', False))" 2>/dev/null || echo "false")
-
-    if [[ "$perf_enabled" != "True" ]]; then
-        return 1
-    fi
-
-    # Check if command matches a baseline command
-    local baseline_commands=$(python3 -c "import json; c=json.load(open('$config_file')); print(' '.join(c.get('baseline_commands', [])))" 2>/dev/null || echo "")
-
-    local matched=0
-    for baseline_cmd in $baseline_commands; do
-        if [[ "$cmd" == *"$baseline_cmd"* ]]; then
-            matched=1
-            break
-        fi
-    done
-
-    if [[ $matched -eq 0 ]]; then
-        return 1
-    fi
-
-    # Extract timing from output (look for seconds)
-    local timing=$(echo "$output" | grep -oE '[0-9]+\.[0-9]+s' | head -1 | sed 's/s$//')
-
-    if [[ -z "$timing" ]]; then
-        return 1
-    fi
-
-    # Compare against baseline
-    local baseline=$(python3 -c "import json; c=json.load(open('$config_file')); b=c.get('baselines',{}); print(b.get('$cmd', 0))" 2>/dev/null || echo "0")
-
-    if [[ -z "$baseline" || "$baseline" == "0" ]]; then
-        # First time, store baseline
-        python3 << EOF
+    export AUTOCONTEXT_CONFIG_FILE="$config_file"
+    echo "$input" | python3 - <<'PYEOF'
 import json
-with open('$config_file', 'r') as f:
-    config = json.load(f)
-if 'baselines' not in config:
-    config['baselines'] = {}
-config['baselines']['$cmd'] = $timing
-with open('$config_file', 'w') as f:
-    json.dump(config, f, indent=2)
-EOF
-        return 1
-    fi
+import os
+import sys
 
-    # Check for regression
-    local threshold=$(python3 -c "print($baseline * 1.1)")
+config_file = os.environ.get("AUTOCONTEXT_CONFIG_FILE", "")
 
-    if (( $(echo "$timing > $threshold" | bc -l) )); then
-        echo "perf_baseline: command '$cmd' took ${timing}s (${threshold}s baseline, 10% regression)"
-        return 0
-    fi
+try:
+    with open(config_file) as f:
+        config = json.load(f)
+except Exception:
+    sys.exit(0)
 
-    return 1
+if not config.get("performance_baselines", False):
+    sys.exit(0)
+
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+
+tool_input = data.get("tool_input", {})
+if not isinstance(tool_input, dict):
+    sys.exit(0)
+
+cmd = tool_input.get("command", "")
+output = data.get("tool_result", "")
+
+if not cmd or not output:
+    sys.exit(0)
+
+baseline_commands = config.get("baseline_commands", [])
+
+# Match cmd against each baseline command (exact substring, no shell word-splitting)
+matched_baseline_cmd = None
+for baseline_cmd in baseline_commands:
+    if baseline_cmd in cmd:
+        matched_baseline_cmd = baseline_cmd
+        break
+
+if matched_baseline_cmd is None:
+    sys.exit(0)
+
+# Extract timing from output
+import re
+m = re.search(r'([0-9]+\.[0-9]+)s', output)
+if not m:
+    sys.exit(0)
+
+timing = float(m.group(1))
+
+baselines = config.get("baselines", {})
+baseline_val = baselines.get(cmd, None)
+
+if baseline_val is None or baseline_val == 0:
+    # First time: store baseline
+    if "baselines" not in config:
+        config["baselines"] = {}
+    config["baselines"][cmd] = timing
+    try:
+        with open(config_file, "w") as f:
+            json.dump(config, f, indent=2)
+    except Exception:
+        pass
+    sys.exit(0)
+
+threshold = float(baseline_val) * 1.1
+
+if timing > threshold:
+    print(f"perf_baseline: command '{cmd}' took {timing}s ({threshold:.4f}s baseline, 10% regression)")
+PYEOF
 }
 
 # Main
 warnings=()
 
 if is_test_file_edit "$TOOL_NAME" "$INPUT"; then
-    local file=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path','') if isinstance(d.get('tool_input'),dict) else '')" 2>/dev/null || echo "")
-    local result=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('tool_result',''))" 2>/dev/null || echo "")
+    file=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path','') if isinstance(d.get('tool_input'),dict) else '')" 2>/dev/null || echo "")
+    result=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('tool_result',''))" 2>/dev/null || echo "")
 
     if [[ -n "$file" && -n "$result" ]]; then
-        local test_warnings=$(check_test_quality "$file" "$result" || true)
+        test_warnings=$(check_test_quality "$file" "$result" || true)
         if [[ -n "$test_warnings" ]]; then
             warnings+=("$test_warnings")
         fi
@@ -163,14 +180,9 @@ fi
 
 # Check performance baseline for Bash commands
 if [[ "$TOOL_NAME" == "Bash" ]]; then
-    local cmd=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('command','') if isinstance(d.get('tool_input'),dict) else '')" 2>/dev/null || echo "")
-    local output=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('tool_result',''))" 2>/dev/null || echo "")
-
-    if [[ -n "$cmd" && -n "$output" ]]; then
-        local perf_warning=$(check_performance_baseline "$cmd" "$output" || true)
-        if [[ -n "$perf_warning" ]]; then
-            warnings+=("$perf_warning")
-        fi
+    perf_warning=$(check_performance_baseline "$INPUT" || true)
+    if [[ -n "$perf_warning" ]]; then
+        warnings+=("$perf_warning")
     fi
 fi
 
@@ -181,7 +193,7 @@ fi
 
 # Output response
 if [[ ${#warnings[@]} -gt 0 ]]; then
-    python3 << EOF
+    python3 - <<PYEOF
 import json
 warnings = [
     $(printf '%s\n' "${warnings[@]}" | sed 's/.*/"&"/' | paste -sd, -)
@@ -192,7 +204,7 @@ response = {
     }
 }
 print(json.dumps(response))
-EOF
+PYEOF
 else
     echo "{}"
 fi

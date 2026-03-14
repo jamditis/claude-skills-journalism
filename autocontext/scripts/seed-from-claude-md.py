@@ -6,6 +6,7 @@ Usage: seed-from-claude-md.py <CLAUDE.md path> <lessons.json path>
 import json
 import subprocess
 import sys
+import uuid
 from datetime import datetime, timezone
 
 
@@ -107,15 +108,21 @@ def try_claude_extraction(content):
 
 def build_lesson(text):
     """Build a lesson record from a text string."""
+    now = datetime.now(timezone.utc).isoformat()
     return {
+        "id": "lesson_" + uuid.uuid4().hex[:8],
+        "schema_version": 1,
         "category": categorize(text),
         "text": text,
         "context": "",
         "tags": [],
         "confidence": 0.6,
-        "created_by": "seed",
         "validated_count": 0,
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "last_validated": now,
+        "created": now,
+        "created_by": "seed",
+        "supersedes": None,
+        "deleted": False,
     }
 
 
@@ -139,7 +146,7 @@ def main():
     with open(lessons_path) as f:
         existing = json.load(f)
 
-    existing_texts = {l["text"] for l in existing}
+    existing_texts = {l.get("text", "") for l in existing if l.get("text")}
 
     new_lessons = []
     seen_texts = set()

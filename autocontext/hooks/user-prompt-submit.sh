@@ -63,13 +63,14 @@ mkdir -p "$CACHE_DIR"
 # Append candidate to pending-lessons.json
 TIMESTAMP=$(python3 -c "from datetime import datetime, timezone; print(datetime.now(timezone.utc).isoformat())")
 
-python3 - <<PYEOF
+AUTOCONTEXT_PENDING_FILE="$PENDING_FILE" AUTOCONTEXT_TIMESTAMP="$TIMESTAMP" AUTOCONTEXT_USER_MESSAGE="$USER_MESSAGE" python3 - <<'PYEOF'
 import json
+import os
 from datetime import datetime, timezone
 
-pending_path = "$PENDING_FILE"
-user_message = """$USER_MESSAGE"""
-timestamp = "$TIMESTAMP"
+pending_path = os.environ.get("AUTOCONTEXT_PENDING_FILE", "")
+user_message = os.environ.get("AUTOCONTEXT_USER_MESSAGE", "")
+timestamp = os.environ.get("AUTOCONTEXT_TIMESTAMP", "")
 
 # Load existing pending list
 try:
