@@ -1,0 +1,21 @@
+{
+  "project_name": "",
+  "max_session_lessons": 15,
+  "confidence_threshold": 0.3,
+  "staleness_days": 60,
+  "performance_baselines": true,
+  "pretooluse_hook": true,
+  "persistence_mode": "auto_curated",
+  "baseline_commands": [
+    "pytest", "npm test", "npm run test", "npm run build",
+    "cargo test", "go test", "vitest", "jest", "make test"
+  ],
+  "baselines": {},
+  "builtin_rules": {
+    "tautological_test_check": true,
+    "no_mock_everything": true,
+    "no_happy_path_only": true,
+    "no_assert_true": true,
+    "test_independence": true
+  }
+}
