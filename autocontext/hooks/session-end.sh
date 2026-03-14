@@ -10,8 +10,9 @@ PENDING_FILE="$CACHE_DIR/pending-lessons.json"
 PLAYBOOK_FILE="$AUTOCONTEXT_DIR/playbook.md"
 GENERATE_PLAYBOOK="$PLUGIN_ROOT/scripts/generate-playbook.py"
 
-# Read stdin (ignored, no LLM calls)
+# Read stdin — extract session_id for skill tracking cleanup
 INPUT=$(cat)
+SESSION_ID=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('session_id',''))" 2>/dev/null || echo "")
 
 if [[ ! -f "$SESSION_LESSONS_FILE" ]]; then
   echo '{}'
@@ -121,6 +122,11 @@ except Exception:
 ")
 if [[ "$PLAYBOOK_MODE" == "auto" ]] && [[ -f "$LESSONS_FILE" ]] && [[ -f "$GENERATE_PLAYBOOK" ]]; then
   python3 "$GENERATE_PLAYBOOK" "$LESSONS_FILE" "$PLAYBOOK_FILE" 2>/dev/null || true
+fi
+
+# Clean up skill tracking temp file
+if [[ -n "$SESSION_ID" ]]; then
+    rm -f "/tmp/claude-skills-${SESSION_ID}"
 fi
 
 echo '{}'

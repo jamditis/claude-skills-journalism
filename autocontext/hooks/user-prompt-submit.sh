@@ -9,6 +9,16 @@ PENDING_FILE="$CACHE_DIR/pending-lessons.json"
 # Read stdin
 INPUT=$(cat)
 
+# Extract session_id for skill tracking
+SESSION_ID=$(python3 -c "
+import json, sys
+try:
+    data = json.loads(sys.stdin.read())
+    print(data.get('session_id', ''))
+except Exception:
+    print('')
+" <<< "$INPUT")
+
 # Extract user message from JSON input
 USER_MESSAGE=$(python3 -c "
 import json, sys
@@ -94,7 +104,7 @@ mkdir -p "$CACHE_DIR"
 # Append candidate to pending-lessons.json
 TIMESTAMP=$(python3 -c "from datetime import datetime, timezone; print(datetime.now(timezone.utc).isoformat())")
 
-AUTOCONTEXT_PENDING_FILE="$PENDING_FILE" AUTOCONTEXT_TIMESTAMP="$TIMESTAMP" AUTOCONTEXT_USER_MESSAGE="$USER_MESSAGE" python3 - <<'PYEOF'
+AUTOCONTEXT_PENDING_FILE="$PENDING_FILE" AUTOCONTEXT_TIMESTAMP="$TIMESTAMP" AUTOCONTEXT_USER_MESSAGE="$USER_MESSAGE" AUTOCONTEXT_SESSION_ID="$SESSION_ID" python3 - <<'PYEOF'
 import json
 import os
 from datetime import datetime, timezone
@@ -112,10 +122,23 @@ try:
 except Exception:
     pending = []
 
+# Read active skills from /tmp/claude-skills-{session_id}
+active_skills = []
+session_id = os.environ.get("AUTOCONTEXT_SESSION_ID", "")
+if session_id:
+    skill_file = f"/tmp/claude-skills-{session_id}"
+    try:
+        with open(skill_file) as f:
+            active_skills = [line.strip() for line in f if line.strip()]
+    except FileNotFoundError:
+        pass
+
 # Append new candidate
 pending.append({
     "user_message": user_message[:2000],
     "timestamp": timestamp,
+    "active_skills": active_skills,
+    "session_id": session_id,
 })
 
 with open(pending_path, "w") as f:
