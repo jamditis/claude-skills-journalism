@@ -1,6 +1,7 @@
 ---
 name: autocontext-review
 description: Interactively review and curate accumulated project lessons
+user_invocable: true
 ---
 
 Review accumulated lessons in `.autocontext/lessons.json`. Use AskUserQuestion to walk through lessons.

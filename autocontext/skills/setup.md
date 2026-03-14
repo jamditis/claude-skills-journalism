@@ -1,6 +1,7 @@
 ---
 name: autocontext-setup
 description: First-run configuration for the autocontext plugin
+user_invocable: true
 ---
 
 Run the autocontext first-run setup wizard. Use AskUserQuestion for each step.
