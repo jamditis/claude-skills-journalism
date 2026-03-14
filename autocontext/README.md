@@ -1,42 +1,61 @@
 # autocontext
 
-A Claude Code plugin that accumulates project knowledge across sessions and developers. It captures corrections, patterns, and hard-won lessons as structured data, loads the most relevant ones at session start, and improves confidence scores over time as lessons are validated or contradicted.
+A Claude Code plugin that gives your AI assistant a memory for each project.
+
+## The problem
+
+Every time you start a new Claude Code session, Claude starts from scratch. It doesn't remember that the database migration broke last time you used mocks, that the deploy script needs a cache clear first, or that the API returns dates in a weird format. You end up correcting the same mistakes across sessions, and those corrections vanish when the conversation ends.
+
+## What autocontext does
+
+Autocontext listens to your conversations and captures the moments where you correct Claude — "no, use the other API", "you forgot to clear the cache", "that's the wrong import path." It saves those corrections as structured lessons in a JSON file inside your project.
+
+The next time you open a session in that project, autocontext loads the relevant lessons and uses them to avoid repeating the same mistakes. Lessons that keep proving useful gain confidence over time. Lessons that go stale lose confidence and eventually fade out.
+
+It's like giving Claude a notebook that it reviews before starting work each day.
+
+## What it looks like in practice
+
+- You tell Claude "no, always use `pytest -x` here, not `pytest`" → autocontext captures that as a lesson candidate
+- Next session, when Claude is about to run `pytest`, autocontext injects a warning: "lesson: always use `pytest -x` in this project"
+- If Claude follows the lesson without you correcting it again, the lesson's confidence goes up
+- If you correct it differently, the old lesson decays
+
+Over weeks of use, your project builds up a curated knowledge base of project-specific patterns, gotchas, and preferences that Claude loads automatically.
 
 ## Install
 
-Clone this repo and install the plugin by pointing Claude Code at the `autocontext/` directory:
-
 ```bash
-# If installed as part of claude-skills-journalism:
+# As part of claude-skills-journalism:
 git clone https://github.com/jamditis/claude-skills-journalism ~/.claude/skills/journalism-skills
 ```
 
-Claude Code will load skills and hooks from the plugin automatically on next launch.
+Claude Code loads the plugin automatically on next launch.
 
 ## Quick start
 
-1. Run `/autocontext-setup` once to configure your identity and preferences globally.
-2. In any project, run `/autocontext-init` to create `.autocontext/` and start accumulating lessons.
+1. Run `/autocontext-setup` to configure your preferences (identity, sensitivity, loading behavior — 10 steps total).
+2. In any project, run `/autocontext-init` to create the `.autocontext/` directory and start accumulating lessons.
+3. Just use Claude Code normally. Autocontext runs in the background.
 
-## Available commands
+## Commands
 
-| Command | Description |
+| Command | What it does |
 |---------|-------------|
-| `/autocontext-setup` | First-run wizard: identity, test rules, loading, persistence, staleness, injection, sensitivity, baselines, playbook, multi-machine |
-| `/autocontext-init` | Initialize `.autocontext/` in the current project |
-| `/autocontext-review` | Interactively curate accumulated lessons (approve, edit, delete, supersede) |
-| `/autocontext-status` | Show lesson counts, confidence metrics, and pending items for the current project |
+| `/autocontext-setup` | One-time setup wizard for global preferences (10 steps covering identity, test rules, loading, persistence, staleness, injection mode, correction sensitivity, baselines, playbook, and multi-machine support) |
+| `/autocontext-init` | Set up autocontext in the current project |
+| `/autocontext-review` | Review accumulated lessons — approve, edit, delete, or mark as superseded |
+| `/autocontext-status` | See how many lessons you have, their confidence levels, and any pending items |
 
-## How it works
+## How it works under the hood
 
-The hook lifecycle runs on every session:
+Autocontext uses Claude Code's hook system to run at five points in every session:
 
-1. **SessionStart** — loads lessons from `.autocontext/lessons.json`, filters by confidence threshold and machine tags, ranks by relevance to recently changed files. If lessons from the previous session were flagged as candidates, a curator LLM call runs first to decide which are worth keeping.
-2. **PreToolUse** — before Edit, Write, or Bash calls, checks whether loaded lessons are relevant to the file or command. Injects targeted warnings (up to 3 per call).
-3. **UserPromptSubmit** — pattern-matches messages for correction phrases ("no, use X instead", "you forgot", "remember that", etc.) and queues them as lesson candidates in `.autocontext/cache/pending-lessons.json`.
-4. **PostToolUse** — after test file edits, runs deterministic quality checks (tautological assertions, happy-path-only tests, etc.) and surfaces warnings. Also tracks performance regressions if baselines are enabled.
-5. **SessionEnd** — lessons that were loaded at the start are validated: confidence increases if they weren't contradicted during the session. The playbook is regenerated.
-6. **Next SessionStart** — pending candidates from step 3 are passed to the curator, approved lessons are merged into `lessons.json`, and the cycle repeats.
+1. **When a session starts** — loads lessons from `.autocontext/lessons.json`, ranked by relevance to the files you've been working on. If there are lesson candidates from your last session, a curator pass decides which ones are worth keeping.
+2. **Before each edit or command** — checks if any loaded lessons are relevant to the file being edited or the command being run. If so, it injects a short warning so Claude doesn't repeat a known mistake.
+3. **When you type a message** — pattern-matches for correction phrases like "no, use X instead" or "you forgot to..." and queues them as lesson candidates.
+4. **After test file edits** — runs quality checks on test code (catches tautological assertions, happy-path-only test suites, and other common test smells). Also tracks build/test times against baselines to flag performance regressions.
+5. **When a session ends** — lessons that were loaded and not contradicted get a confidence boost. The playbook summary file is regenerated.
 
 ## Cross-developer sharing
 
