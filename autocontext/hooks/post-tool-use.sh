@@ -10,6 +10,16 @@ INPUT=$(cat)
 CWD=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('cwd','.'))")
 TOOL_NAME=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('tool_name',''))")
 
+# Track active skills for skill-aware lesson tagging
+if [[ "$TOOL_NAME" == "Skill" ]]; then
+    SESSION_ID=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('session_id',''))" 2>/dev/null || echo "")
+    SKILL_NAME=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('tool_input',{}).get('skill',''))" 2>/dev/null || echo "")
+    if [[ -n "$SESSION_ID" && -n "$SKILL_NAME" ]]; then
+        SKILL_FILE="/tmp/claude-skills-${SESSION_ID}"
+        grep -qxF "$SKILL_NAME" "$SKILL_FILE" 2>/dev/null || echo "$SKILL_NAME" >> "$SKILL_FILE"
+    fi
+fi
+
 # Determine if this is a test file write/edit
 is_test_file_edit() {
     local tool="$1"
