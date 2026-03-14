@@ -1,7 +1,5 @@
 ---
-name: autocontext-init
 description: Initialize .autocontext/ in the current project for knowledge persistence
-user_invocable: true
 ---
 
 Initialize the autocontext knowledge directory in the current project. Use AskUserQuestion for setup decisions.

@@ -10,7 +10,7 @@
     {
       "name": "autocontext",
       "description": "Accumulates project knowledge across sessions and developers through structured lessons and hooks",
-      "version": "0.1.1",
+      "version": "0.2.0",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"

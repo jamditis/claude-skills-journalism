@@ -1,7 +1,5 @@
 ---
-name: autocontext-status
 description: Show knowledge stats for the current project
-user_invocable: true
 ---
 
 Display stats and status for the autocontext in the current project.
