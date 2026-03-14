@@ -177,6 +177,36 @@ If "Multiple machines" is selected, follow up with an open-ended question asking
 
 When `machines` contains `"auto"`, the session-start hook resolves it to `socket.gethostname()` at runtime.
 
+### Batch 6 (steps 11-12)
+
+#### Step 11: Skill learning
+
+Track which skills are active when corrections happen. This enables lessons to accumulate per-skill and eventually improve the skill files via `/autocontext-evolve`.
+
+**Question:** Do you want autocontext to track corrections per-skill?
+
+**Options:**
+- Yes, track all skills (recommended)
+- Only specific skills (will ask which ones)
+- No, skip skill tracking
+
+If "Yes": set `skill_learning.enabled = true`, `skill_learning.scope = "all"`
+If "Only specific skills": ask a follow-up text input for comma-separated skill names, set `skill_learning.scope = ["name1", "name2"]`
+If "No": set `skill_learning.enabled = false`
+
+#### Step 12: Evolution aggressiveness
+
+Controls the minimum evidence threshold for `/autocontext-evolve` to consider a lesson ready.
+
+**Question:** How aggressive should skill evolution be?
+
+**Options:**
+- Conservative (confidence >= 0.9, 5+ validations) — only well-proven lessons
+- Moderate (confidence >= 0.85, 3+ validations) (recommended)
+- Aggressive (confidence >= 0.7, 2+ validations) — faster evolution, more risk
+
+Set `skill_learning.evolution_confidence` and `skill_learning.evolution_min_validations` based on selection.
+
 ## Configuration output
 
 After answering all questions, write `~/.claude/autocontext.json` with the collected values. Structure:
@@ -218,6 +248,12 @@ After answering all questions, write `~/.claude/autocontext.json` with the colle
   "multi_machine": {
     "enabled": true|false,
     "machines": []
+  },
+  "skill_learning": {
+    "enabled": true|false,
+    "scope": "all"|["name1", "name2"],
+    "evolution_confidence": 0.9|0.85|0.7,
+    "evolution_min_validations": 5|3|2
   }
 }
 ```
