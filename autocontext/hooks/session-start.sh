@@ -37,9 +37,11 @@ PYEOF
     PENDING_JSON=$(cat "$PENDING_FILE")
     CURATOR_PROMPT="You are curating lessons for a project knowledge base. Below are candidate lessons extracted from user corrections during a previous session. For each candidate, decide if it contains a clear, actionable, project-specific lesson worth persisting.
 
+NEVER include secrets, API keys, tokens, passwords, or PII in lesson text. Describe patterns without actual credential values.
+
 Output a JSON array of lesson objects to keep. Each object must have:
 - text (string): concise lesson statement
-- category (string): one of: workflow, testing, style, architecture, debugging, tooling, security, performance
+- category (string): one of: efficiency, codebase, optimization
 - tags (array of strings): relevant file paths, tools, or concepts
 - confidence (number): 0.6 to 0.8 for new lessons
 

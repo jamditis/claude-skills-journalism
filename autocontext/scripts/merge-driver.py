@@ -10,13 +10,14 @@ from datetime import datetime
 
 
 def parse_ts(ts_str):
+    """Parse timestamp string, return (datetime_obj, original_str) or (None, "")."""
     if not ts_str:
-        return ""
+        return None, ""
     try:
-        datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
-        return ts_str
+        dt = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+        return dt, ts_str
     except Exception:
-        return ""
+        return None, ""
 
 
 def merge_lesson(ancestor, ours, theirs):
@@ -32,11 +33,11 @@ def merge_lesson(ancestor, ours, theirs):
     # Higher confidence
     result["confidence"] = max(ours.get("confidence", 0), theirs.get("confidence", 0))
 
-    # Most recent last_validated
-    ours_lv = parse_ts(ours.get("last_validated", ""))
-    theirs_lv = parse_ts(theirs.get("last_validated", ""))
-    if ours_lv and theirs_lv:
-        result["last_validated"] = ours_lv if ours_lv >= theirs_lv else theirs_lv
+    # Most recent last_validated (compare as datetime, not string)
+    ours_dt, ours_lv = parse_ts(ours.get("last_validated", ""))
+    theirs_dt, theirs_lv = parse_ts(theirs.get("last_validated", ""))
+    if ours_dt and theirs_dt:
+        result["last_validated"] = ours_lv if ours_dt >= theirs_dt else theirs_lv
     else:
         result["last_validated"] = ours_lv or theirs_lv
 

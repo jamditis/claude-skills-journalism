@@ -49,7 +49,7 @@ check_test_quality() {
     # Check: no_happy_path_only
     # Extract all test method names
     local test_methods
-    test_methods=$(echo "$content" | grep -oE 'def (test_[a-zA-Z_0-9]+|it\(['\''"][^'\''\"]*' | sed "s/def test_\|it('//" | sed "s/['\''\"]//" | grep -v '^$')
+    test_methods=$(echo "$content" | grep -oE 'def test_[a-zA-Z_0-9]+' | sed 's/def //' | grep -v '^$')
 
     if [[ -n "$test_methods" ]]; then
         local happy_count=0
@@ -159,7 +159,7 @@ if baseline_val is None or baseline_val == 0:
 threshold = float(baseline_val) * 1.1
 
 if timing > threshold:
-    print(f"perf_baseline: command '{cmd}' took {timing}s ({threshold:.4f}s baseline, 10% regression)")
+    print(f"perf_baseline: command '{cmd}' took {timing:.1f}s (baseline: {baseline_val:.1f}s, threshold: {threshold:.1f}s, regression detected)")
 PYEOF
 }
 
@@ -193,18 +193,16 @@ fi
 
 # Output response
 if [[ ${#warnings[@]} -gt 0 ]]; then
-    python3 - <<PYEOF
-import json
-warnings = [
-    $(printf '%s\n' "${warnings[@]}" | sed 's/.*/"&"/' | paste -sd, -)
-]
+    printf '%s\n' "${warnings[@]}" | python3 -c "
+import json, sys
+warnings = [line.strip() for line in sys.stdin if line.strip()]
 response = {
-    "hookResponse": {
-        "message": "Quality check warnings:\n" + "\n".join("- " + w for w in warnings)
+    'hookResponse': {
+        'message': '[autocontext] test quality warnings:\n' + '\n'.join('- ' + w for w in warnings)
     }
 }
 print(json.dumps(response))
-PYEOF
+"
 else
     echo "{}"
 fi

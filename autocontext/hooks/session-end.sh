@@ -58,8 +58,8 @@ try:
 except Exception:
     pass
 
-# Build set of session lesson IDs (by text) for fast lookup
-session_texts = {l.get("text", "").strip() for l in session_lessons}
+# Build set of session lesson IDs for fast lookup (match by id, not text)
+session_ids = {l.get("id") for l in session_lessons if l.get("id")}
 
 # Load full lessons.json to update
 try:
@@ -78,8 +78,7 @@ for lesson in all_lessons:
     if lesson.get("deleted"):
         continue
 
-    text = lesson.get("text", "").strip()
-    if text not in session_texts:
+    if lesson.get("id") not in session_ids:
         continue
 
     # Check if any of this lesson's tags appear in correction text
