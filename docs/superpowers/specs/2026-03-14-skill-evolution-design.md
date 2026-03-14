@@ -34,9 +34,8 @@ The `session-end.sh` hook cleans up `/tmp/claude-skills-{session_id}` to prevent
  CAPTURE (during normal work)
  ───────────────────────────
  User invokes skill (e.g., web-scraping)
-     -> PostToolUse(Skill) fires
-     -> track-active-skill.sh reads JSON stdin:
-        { "tool_input": { "skill": "web-scraping" }, "session_id": "abc-123" }
+     -> PostToolUse fires for all tools (post-tool-use.sh)
+     -> Skill branch: reads tool_input.skill + session_id from JSON stdin
      -> appends "web-scraping" to /tmp/claude-skills-abc-123
 
  User corrects Claude: "no, use Selenium for this"
@@ -87,28 +86,32 @@ The `session-end.sh` hook cleans up `/tmp/claude-skills-{session_id}` to prevent
 
 ## Component 1: Skill-aware lesson capture
 
-### New hook: `hooks/track-active-skill.sh`
+### Skill tracking: added to existing `hooks/post-tool-use.sh`
 
-A new PostToolUse hook matched on the `Skill` tool. When Claude loads a skill via the Skill tool, this hook fires and:
+The existing `post-tool-use.sh` already receives all PostToolUse events and dispatches by `TOOL_NAME`. Skill tracking is added as a new branch in this file — **not a separate hook file** — to follow the established convention-based auto-discovery pattern.
 
-1. Reads JSON from stdin, extracts `tool_input.skill` (the skill name) and `session_id`
-2. Checks if the file `/tmp/claude-skills-{session_id}` exists; creates it if not
-3. Appends the skill name if not already present (dedup via `grep -qxF`)
+The existing code already does:
 
-This file is the bridge between skill invocations and lesson tagging. It's read by `user-prompt-submit.sh` and cleaned up by `session-end.sh`.
-
-**Hook registration in `plugin.json`:**
-
-```json
-{
-  "hooks": {
-    "PostToolUse": [{
-      "matcher": "Skill",
-      "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/autocontext/hooks/track-active-skill.sh" }]
-    }]
-  }
-}
+```bash
+INPUT=$(cat)
+TOOL_NAME=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('tool_name',''))")
 ```
+
+New branch added near the top (before the existing `is_test_file_edit` check):
+
+```bash
+# Track active skills for skill-aware lesson tagging
+if [[ "$TOOL_NAME" == "Skill" ]]; then
+    SESSION_ID=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('session_id',''))")
+    SKILL_NAME=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('tool_input',{}).get('skill',''))")
+    if [[ -n "$SESSION_ID" && -n "$SKILL_NAME" ]]; then
+        SKILL_FILE="/tmp/claude-skills-${SESSION_ID}"
+        grep -qxF "$SKILL_NAME" "$SKILL_FILE" 2>/dev/null || echo "$SKILL_NAME" >> "$SKILL_FILE"
+    fi
+fi
+```
+
+This runs alongside the existing test-quality and performance-baseline checks — the `if` block handles the Skill tool, while the existing code handles Edit/Write/Bash. No new file needed, no `plugin.json` changes for this hook.
 
 ### Changes to `hooks/user-prompt-submit.sh`
 
@@ -166,7 +169,25 @@ This hook only fires when `skill_learning.enabled` is true in the nearest `.auto
 
 ### Changes to `hooks/session-end.sh`
 
-No structural changes. Skill-tagged lessons are validated identically to other lessons — confidence bumps on unchallenged usage, no bump on contradiction.
+Two changes:
+
+1. **Parse `session_id` from stdin JSON.** The hook currently reads stdin with `INPUT=$(cat)` but ignores it (comment: `# Read stdin (ignored, no LLM calls)`). Change this to extract `session_id`:
+
+```bash
+INPUT=$(cat)
+SESSION_ID=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('session_id',''))" 2>/dev/null || echo "")
+```
+
+2. **Clean up skill tracking temp file.** After the existing validation logic completes, remove `/tmp/claude-skills-{session_id}` to prevent accumulation:
+
+```bash
+# Clean up skill tracking file
+if [[ -n "$SESSION_ID" ]]; then
+    rm -f "/tmp/claude-skills-${SESSION_ID}"
+fi
+```
+
+Skill-tagged lessons are validated identically to other lessons — confidence bumps on unchallenged usage, no bump on contradiction. No changes to validation logic.
 
 ### Changes to `commands/review.md`
 
@@ -353,7 +374,7 @@ On the next `/autocontext-evolve` run, the command can re-attempt to integrate t
 
 ### Consolidated config schema
 
-The `skill_learning` section in `.autocontext/config.json` is the single source of truth for all skill evolution settings. The full schema (replacing the partial version shown in Component 1):
+The `skill_learning` section lives in `.autocontext/config.json` (per-project) with fallback to `~/.claude/autocontext.json` (global). Full schema:
 
 ```json
 {
@@ -370,7 +391,43 @@ The `skill_learning` section in `.autocontext/config.json` is the single source 
 }
 ```
 
-The global config `~/.claude/autocontext.json` also gains this section as a default. Per-project config overrides global, same as existing autocontext settings.
+### Config resolution order
+
+All hooks that read `skill_learning` settings use this resolution:
+
+1. Read `.autocontext/config.json` in the current project directory
+2. If the `skill_learning` key is missing or the file doesn't exist, fall back to `~/.claude/autocontext.json`
+3. If both are missing, use defaults (`enabled: false`)
+
+This matches the existing pattern where `user-prompt-submit.sh` already reads `~/.claude/autocontext.json` for `correction_sensitivity`. The resolution logic is extracted into a shared helper function in a new file `scripts/config-utils.sh` to avoid duplication across hooks:
+
+```bash
+# scripts/config-utils.sh
+# Reads a config key with project -> global fallback
+# Usage: read_config "skill_learning.enabled" "false"
+read_config() {
+    local key="$1"
+    local default="$2"
+    python3 -c "
+import json, os
+key_parts = '$key'.split('.')
+for path in ['.autocontext/config.json', os.path.expanduser('~/.claude/autocontext.json')]:
+    try:
+        with open(path) as f:
+            cfg = json.load(f)
+        val = cfg
+        for k in key_parts:
+            val = val[k]
+        print(val if not isinstance(val, bool) else str(val).lower())
+        exit(0)
+    except Exception:
+        continue
+print('$default')
+"
+}
+```
+
+Hooks source this file: `. "$PLUGIN_ROOT/scripts/config-utils.sh"`
 
 ## Component 4: Sync mechanism
 
@@ -397,11 +454,12 @@ Reports what was added/updated after merge.
 
 | File | Change | Description |
 |------|--------|-------------|
-| `hooks/track-active-skill.sh` | **New** | PostToolUse(Skill) hook: write active skill name to /tmp/claude-skills-{session_id} |
-| `hooks/skill-lesson-injector.md` | **New** | PreToolUse(Skill) hook: inject global lessons when a skill loads |
+| `hooks/post-tool-use.sh` | Modify | Add Skill tool branch: extract session_id + skill name, write to /tmp/claude-skills-{session_id} |
+| `hooks/skill-lesson-injector.md` | **New** | PreToolUse(Skill) prompt hook: inject global lessons when a skill loads |
 | `hooks/user-prompt-submit.sh` | Modify | Read session_id from stdin JSON, read active skills from /tmp, add to pending lessons |
-| `hooks/session-start.sh` | Modify | Curator prompt includes skill field; global config inherits skill_learning |
-| `hooks/session-end.sh` | Modify | Validate skill-tagged lessons; clean up /tmp/claude-skills-{session_id} |
+| `hooks/session-start.sh` | Modify | Curator prompt includes skill field; use config-utils.sh for fallback chain |
+| `hooks/session-end.sh` | Modify | Parse session_id from stdin; validate skill-tagged lessons; clean up /tmp/claude-skills-{session_id} |
+| `scripts/config-utils.sh` | **New** | Shared config resolution helper (project -> global fallback) |
 | `commands/review.md` | Modify | Add "Promote to global" action for skill-tagged lessons |
 | `commands/setup.md` | Modify | Add steps 11-12 for skill learning config |
 | `commands/evolve.md` | **New** | The /autocontext-evolve command (handles evolve, rollback, export, import via args) |
@@ -409,7 +467,7 @@ Reports what was added/updated after merge.
 | `scripts/skill-evolution/generate-diff.py` | **New** | Claude-powered skill rewriting |
 | `scripts/skill-evolution/apply-edit.py` | **New** | Write approved changes + backup |
 | `scripts/skill-evolution/sync.py` | **New** | Export/import for cross-machine sharing |
-| `plugin.json` | Modify | Register /autocontext-evolve command + track-active-skill + skill-lesson-injector hooks |
+| `plugin.json` | Modify | Register /autocontext-evolve command |
 
 ## Testing strategy
 
