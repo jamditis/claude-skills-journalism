@@ -30,3 +30,7 @@ nul
 # Screenshots from playground testing
 *.png
 *.jpeg
+
+# OG social share images (keep these)
+!docs/og-image.png
+!docs/**/og-image.png
