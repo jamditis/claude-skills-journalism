@@ -116,6 +116,34 @@
     </header>
 
     <main class="relative z-10">
+
+        <!-- Skill evolution callout -->
+        <section class="py-8 px-6 -mt-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="relative overflow-hidden rounded-2xl border-2 border-amber-400/50" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 30%, #fcd34d 100%);">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-amber-300/30 rounded-full blur-3xl -mr-32 -mt-32"></div>
+                    <div class="relative z-10 p-8 md:p-10">
+                        <div class="flex flex-col md:flex-row items-start gap-6">
+                            <div class="flex-shrink-0 w-14 h-14 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                                <i data-lucide="sparkles" class="w-7 h-7 text-amber-700"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="inline-block px-3 py-1 bg-amber-700/10 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase text-amber-800 mb-3">New in v1.1</div>
+                                <h2 class="font-display text-2xl md:text-3xl font-black text-amber-950 leading-tight mb-3">Skill evolution: skills that rewrite themselves</h2>
+                                <p class="text-amber-900/80 text-base md:text-lg max-w-2xl mb-4">AutoContext now tracks which skills are active when corrections happen. Lessons accumulate per-skill with confidence scores. When enough evidence builds up, run <code class="bg-amber-800/10 px-2 py-0.5 rounded text-amber-900 text-sm font-mono">/autocontext-evolve</code> and Claude will rewrite the skill file itself, weaving validated lessons into the existing content.</p>
+                                <div class="flex flex-wrap gap-4 text-sm text-amber-800/70">
+                                    <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-amber-700"></i> Per-skill lesson tracking</span>
+                                    <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-amber-700"></i> Claude-powered skill rewriting</span>
+                                    <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-amber-700"></i> Backup and rollback</span>
+                                    <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-amber-700"></i> Cross-machine sync</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="py-24 px-6">
             <div class="max-w-6xl mx-auto">
 
@@ -280,9 +308,14 @@
                         <p class="text-mist text-sm">Tracks test and build timing. Flags regressions above 10%. Stores baselines per command.</p>
                     </div>
                     <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accentLight rounded-lg flex items-center justify-center mb-4"><i data-lucide="sparkles" class="w-6 h-6 text-accent"></i></div>
+                        <h3 class="font-display text-xl font-bold mb-2">Skill evolution</h3>
+                        <p class="text-mist text-sm">Skills improve themselves. Lessons accumulate per-skill, then get folded back into the skill's markdown via Claude-powered rewriting.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl">
                         <div class="w-12 h-12 bg-accentLight rounded-lg flex items-center justify-center mb-4"><i data-lucide="user-check" class="w-6 h-6 text-accent"></i></div>
-                        <h3 class="font-display text-xl font-bold mb-2">10-step setup wizard</h3>
-                        <p class="text-mist text-sm">Interactive wizard covers identity, test rules, loading, persistence, staleness, injection mode, correction sensitivity, baselines, playbook, and multi-machine support.</p>
+                        <h3 class="font-display text-xl font-bold mb-2">12-step setup wizard</h3>
+                        <p class="text-mist text-sm">Interactive wizard covers identity, test rules, loading, persistence, staleness, injection mode, correction sensitivity, baselines, playbook, multi-machine, skill learning, and evolution settings.</p>
                     </div>
                     <div class="feature-card p-6 rounded-xl">
                         <div class="w-12 h-12 bg-accentLight rounded-lg flex items-center justify-center mb-4"><i data-lucide="file-text" class="w-6 h-6 text-accent"></i></div>
@@ -297,14 +330,18 @@
             <div class="max-w-6xl mx-auto">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start reveal">
                     <div>
-                        <h2 class="font-display text-4xl md:text-5xl font-light italic mb-6">Four commands,<br><span class="font-black not-italic">zero friction.</span></h2>
+                        <h2 class="font-display text-4xl md:text-5xl font-light italic mb-6">Five commands,<br><span class="font-black not-italic">zero friction.</span></h2>
                         <p class="text-lg text-mist mb-8">Everything runs through slash commands. The hooks do the heavy lifting in the background.</p>
                     </div>
                     <div class="space-y-4">
-                        <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext-setup</code><p class="text-mist text-sm mt-2">One-time wizard. 10 steps covering identity, test rules, loading, persistence, staleness, pre-edit warnings, correction sensitivity, performance baselines, playbook generation, and multi-machine support.</p></div>
+                        <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext-setup</code><p class="text-mist text-sm mt-2">One-time wizard. 12 steps covering identity, test rules, loading, persistence, staleness, pre-edit warnings, correction sensitivity, performance baselines, playbook generation, multi-machine support, skill learning, and evolution settings.</p></div>
                         <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext-init</code><p class="text-mist text-sm mt-2">Initialize in a project. Creates <code>.autocontext/</code>, optionally seeds from CLAUDE.md.</p></div>
-                        <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext-review</code><p class="text-mist text-sm mt-2">Curate lessons interactively. Approve, edit, delete, or supersede.</p></div>
+                        <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext-review</code><p class="text-mist text-sm mt-2">Curate lessons interactively. Approve, edit, delete, supersede, or promote to global skill store.</p></div>
                         <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext-status</code><p class="text-mist text-sm mt-2">Quick stats. Lesson counts, confidence averages, stalest lessons, merge driver status.</p></div>
+                        <div class="feature-card p-5 rounded-xl border-2 border-accent/20" style="background: linear-gradient(135deg, rgba(26, 107, 90, 0.05) 0%, white 100%);">
+                            <div class="flex items-center gap-2"><code class="text-accent font-semibold">/autocontext-evolve</code><span class="text-[9px] font-bold tracking-wider uppercase bg-accent/10 text-accent px-2 py-0.5 rounded">new</span></div>
+                            <p class="text-mist text-sm mt-2">Fold validated lessons into skill files. Claude rewrites the skill with lessons woven in naturally. Supports <code>--rollback</code>, <code>--export</code>, and <code>--import</code> for backup and cross-machine sync.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -337,32 +374,32 @@
 
         <section class="py-20 px-6 bg-white/50">
             <div class="max-w-4xl mx-auto reveal">
-                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-6">New in v1.0</h2>
-                <p class="text-center text-mist text-lg mb-12 max-w-2xl mx-auto">The setup wizard now captures 10 preference dimensions, giving you full control over how autocontext behaves.</p>
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-6">New in v1.1 <span class="font-black not-italic">&#8212; skill evolution</span></h2>
+                <p class="text-center text-mist text-lg mb-12 max-w-2xl mx-auto">Skills are no longer static. Corrections accumulate per-skill and get folded back into the skill's actual content.</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="feature-card p-5 rounded-xl">
-                        <h3 class="font-display text-base font-bold mb-1">Staleness and decay</h3>
-                        <p class="text-mist text-sm">Choose how long unused lessons survive before losing confidence (30, 60, 120, or 180 days).</p>
+                        <h3 class="font-display text-base font-bold mb-1">Per-skill lesson tracking</h3>
+                        <p class="text-mist text-sm">When you correct Claude while using a skill, the correction is tagged with which skill was active. Lessons accumulate with context.</p>
                     </div>
                     <div class="feature-card p-5 rounded-xl">
-                        <h3 class="font-display text-base font-bold mb-1">Pre-edit warnings</h3>
-                        <p class="text-mist text-sm">Control whether lesson warnings appear before edits: always, only for errors, or disabled.</p>
+                        <h3 class="font-display text-base font-bold mb-1">Global skill store</h3>
+                        <p class="text-mist text-sm">Lessons are promoted from per-project storage to a global store at <code>~/.claude/skill-lessons/</code>. Knowledge transfers across projects.</p>
                     </div>
                     <div class="feature-card p-5 rounded-xl">
-                        <h3 class="font-display text-base font-bold mb-1">Correction sensitivity</h3>
-                        <p class="text-mist text-sm">Tune how aggressively your messages are scanned for corrections: high, medium, or low.</p>
+                        <h3 class="font-display text-base font-bold mb-1">Claude-powered rewriting</h3>
+                        <p class="text-mist text-sm">Run <code>/autocontext-evolve</code> and Claude rewrites the skill file with validated lessons woven in naturally. Review the diff before accepting.</p>
                     </div>
                     <div class="feature-card p-5 rounded-xl">
-                        <h3 class="font-display text-base font-bold mb-1">Performance baselines</h3>
-                        <p class="text-mist text-sm">Track test and build times. Get warned when a command takes more than 10% longer than baseline.</p>
+                        <h3 class="font-display text-base font-bold mb-1">Backup and rollback</h3>
+                        <p class="text-mist text-sm">Every evolution creates a timestamped backup. Restore any skill with <code>--rollback</code> if the changes don't work out.</p>
                     </div>
                     <div class="feature-card p-5 rounded-xl">
-                        <h3 class="font-display text-base font-bold mb-1">Playbook generation</h3>
-                        <p class="text-mist text-sm">Choose auto, manual, or disabled for the human-readable playbook.md summary file.</p>
+                        <h3 class="font-display text-base font-bold mb-1">Cross-machine sync</h3>
+                        <p class="text-mist text-sm">Export and import skill lessons between machines with <code>--export</code> and <code>--import</code>. Union merge keeps everything consistent.</p>
                     </div>
                     <div class="feature-card p-5 rounded-xl">
-                        <h3 class="font-display text-base font-bold mb-1">Multi-machine support</h3>
-                        <p class="text-mist text-sm">Tag lessons to specific machines. A lesson learned on your Pi won't clutter your Windows GPU box.</p>
+                        <h3 class="font-display text-base font-bold mb-1">Fully opt-in</h3>
+                        <p class="text-mist text-sm">Disabled by default. Enable via <code>/autocontext-setup</code> step 11, or set <code>skill_learning.enabled: true</code> in config. Zero overhead if you don't use it.</p>
                     </div>
                 </div>
             </div>
