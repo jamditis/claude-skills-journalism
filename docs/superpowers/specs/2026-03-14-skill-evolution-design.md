@@ -22,15 +22,27 @@ Skills in claude-skills-journalism are static markdown files. When Claude is cor
 
 ## Architecture overview
 
+### Session ID and skill tracking mechanism
+
+Claude Code hooks receive JSON input via stdin. The `session_id` field is present in all hook event payloads. PostToolUse hooks for the Skill tool receive `tool_input.skill` containing the skill name.
+
+A new `hooks/track-active-skill.sh` PostToolUse hook (matched on `Skill`) extracts `session_id` and `tool_input.skill` from the JSON input and appends the skill name to `/tmp/claude-skills-{session_id}`. This file accumulates all skills loaded during the session.
+
+The `session-end.sh` hook cleans up `/tmp/claude-skills-{session_id}` to prevent temp file accumulation.
+
 ```
  CAPTURE (during normal work)
  ───────────────────────────
  User invokes skill (e.g., web-scraping)
-     -> track-active-skill.sh writes "web-scraping" to /tmp/claude-skills-{session}
+     -> PostToolUse(Skill) fires
+     -> track-active-skill.sh reads JSON stdin:
+        { "tool_input": { "skill": "web-scraping" }, "session_id": "abc-123" }
+     -> appends "web-scraping" to /tmp/claude-skills-abc-123
 
  User corrects Claude: "no, use Selenium for this"
      -> user-prompt-submit.sh detects correction
-     -> reads /tmp/claude-skills-{session} -> finds "web-scraping"
+     -> reads session_id from JSON stdin
+     -> reads /tmp/claude-skills-{session_id} -> finds "web-scraping"
      -> appends to .autocontext/cache/pending-lessons.json:
        { message: "...", active_skills: ["web-scraping"] }
 
@@ -75,9 +87,32 @@ Skills in claude-skills-journalism are static markdown files. When Claude is cor
 
 ## Component 1: Skill-aware lesson capture
 
+### New hook: `hooks/track-active-skill.sh`
+
+A new PostToolUse hook matched on the `Skill` tool. When Claude loads a skill via the Skill tool, this hook fires and:
+
+1. Reads JSON from stdin, extracts `tool_input.skill` (the skill name) and `session_id`
+2. Checks if the file `/tmp/claude-skills-{session_id}` exists; creates it if not
+3. Appends the skill name if not already present (dedup via `grep -qxF`)
+
+This file is the bridge between skill invocations and lesson tagging. It's read by `user-prompt-submit.sh` and cleaned up by `session-end.sh`.
+
+**Hook registration in `plugin.json`:**
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [{
+      "matcher": "Skill",
+      "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/autocontext/hooks/track-active-skill.sh" }]
+    }]
+  }
+}
+```
+
 ### Changes to `hooks/user-prompt-submit.sh`
 
-When a correction is detected, the hook currently writes to `pending-lessons.json` with the user's message and timestamp. New behavior: also read `/tmp/claude-skills-{session_id}` (populated by existing `track-active-skill.sh` PostToolUse hook) and add active skill names to the pending lesson metadata.
+When a correction is detected, the hook currently writes to `pending-lessons.json` with the user's message and timestamp. New behavior: read `session_id` from the JSON stdin payload, then read `/tmp/claude-skills-{session_id}` (populated by the new `track-active-skill.sh` hook above) and add active skill names to the pending lesson metadata.
 
 Pending lesson format gains a new field:
 
@@ -109,9 +144,25 @@ Curated lesson in `lessons.json` gains two new optional fields:
 }
 ```
 
-### Changes to `hooks/pre-tool-use.md`
+### New hook: `hooks/skill-lesson-injector.md`
 
-When the Skill tool fires, check `~/.claude/skill-lessons/<skill>.json` for un-folded global lessons. Inject relevant ones alongside the skill content (same injection pattern as project lessons, but sourced from the global store).
+A new PreToolUse prompt-based hook matched on `Skill`. This is separate from the existing `pre-tool-use.md` (which matches `Edit|Write|Bash`) to avoid complicating the existing hook's file-path-oriented logic.
+
+When the Skill tool is about to fire:
+
+1. Extract the skill name from `tool_input.skill`
+2. Check `~/.claude/skill-lessons/<skill>.json` for un-folded global lessons
+3. If lessons exist with `folded: false`, inject them as additional context alongside the skill content
+
+Injection format:
+
+```
+Note: The following patterns have been learned from real usage of this skill:
+- [lesson text] (confidence: 0.92, from: rosen-frontend, reroute-nj)
+- [lesson text] (confidence: 0.88, from: reroute-nj)
+```
+
+This hook only fires when `skill_learning.enabled` is true in the nearest `.autocontext/config.json` or `~/.claude/autocontext.json`.
 
 ### Changes to `hooks/session-end.sh`
 
@@ -222,7 +273,16 @@ Two new steps added to the wizard:
 Entry point: `commands/evolve.md`
 Engine: `scripts/skill-evolution/`
 
-### Command flow
+The command accepts optional arguments parsed from the user's slash command input. Claude Code passes the full argument string after the command name to the command's markdown prompt, which instructs Claude to interpret it:
+
+- `/autocontext-evolve` — default mode: scan, present, and evolve skills interactively
+- `/autocontext-evolve --rollback <skill>` — restore a skill from its most recent backup
+- `/autocontext-evolve --export` — export global lessons to a JSON file
+- `/autocontext-evolve --import <path>` — import lessons from an export file
+
+The `evolve.md` command prompt includes instructions for Claude to parse these arguments from the user's input and route to the appropriate action. No separate command registrations needed — the single command handles all modes via argument parsing within the markdown prompt.
+
+### Command flow (default mode)
 
 1. **Scan** — read `~/.claude/skill-lessons/` for skills with eligible lessons (confidence >= threshold, validated_count >= min, folded == false)
 2. **Present** — show summary per skill: lesson count, average confidence, source projects
@@ -291,15 +351,17 @@ On the next `/autocontext-evolve` run, the command can re-attempt to integrate t
 3. **Diff review is mandatory** — no silent edits, user always sees what's changing
 4. **Rollback** — `/autocontext-evolve --rollback <skill>` restores from most recent backup
 
-### Additional config
+### Consolidated config schema
+
+The `skill_learning` section in `.autocontext/config.json` is the single source of truth for all skill evolution settings. The full schema (replacing the partial version shown in Component 1):
 
 ```json
 {
   "skill_learning": {
     "enabled": false,
     "scope": "all",
-    "confidence_for_promotion": 0.85,
     "global_store": "~/.claude/skill-lessons/",
+    "confidence_for_promotion": 0.85,
     "evolution_confidence": 0.85,
     "evolution_min_validations": 3,
     "backup_dir": "~/.claude/skill-lessons/backups/",
@@ -307,6 +369,8 @@ On the next `/autocontext-evolve` run, the command can re-attempt to integrate t
   }
 }
 ```
+
+The global config `~/.claude/autocontext.json` also gains this section as a default. Per-project config overrides global, same as existing autocontext settings.
 
 ## Component 4: Sync mechanism
 
@@ -333,18 +397,19 @@ Reports what was added/updated after merge.
 
 | File | Change | Description |
 |------|--------|-------------|
-| `hooks/user-prompt-submit.sh` | Modify | Read active skills from /tmp, add to pending lessons |
-| `hooks/session-start.sh` | Modify | Curator prompt includes skill field; load global lessons |
-| `hooks/pre-tool-use.md` | Modify | Check global store when Skill tool fires |
-| `hooks/session-end.sh` | Modify | Validate skill-tagged lessons (minimal change) |
-| `commands/review.md` | Modify | Add "Promote to global" action |
+| `hooks/track-active-skill.sh` | **New** | PostToolUse(Skill) hook: write active skill name to /tmp/claude-skills-{session_id} |
+| `hooks/skill-lesson-injector.md` | **New** | PreToolUse(Skill) hook: inject global lessons when a skill loads |
+| `hooks/user-prompt-submit.sh` | Modify | Read session_id from stdin JSON, read active skills from /tmp, add to pending lessons |
+| `hooks/session-start.sh` | Modify | Curator prompt includes skill field; global config inherits skill_learning |
+| `hooks/session-end.sh` | Modify | Validate skill-tagged lessons; clean up /tmp/claude-skills-{session_id} |
+| `commands/review.md` | Modify | Add "Promote to global" action for skill-tagged lessons |
 | `commands/setup.md` | Modify | Add steps 11-12 for skill learning config |
-| `commands/evolve.md` | **New** | The /autocontext-evolve command definition |
+| `commands/evolve.md` | **New** | The /autocontext-evolve command (handles evolve, rollback, export, import via args) |
 | `scripts/skill-evolution/evolve.sh` | **New** | Evolution engine entry point |
 | `scripts/skill-evolution/generate-diff.py` | **New** | Claude-powered skill rewriting |
 | `scripts/skill-evolution/apply-edit.py` | **New** | Write approved changes + backup |
 | `scripts/skill-evolution/sync.py` | **New** | Export/import for cross-machine sharing |
-| `plugin.json` | Modify | Register /autocontext-evolve command |
+| `plugin.json` | Modify | Register /autocontext-evolve command + track-active-skill + skill-lesson-injector hooks |
 
 ## Testing strategy
 
@@ -355,8 +420,16 @@ Reports what was added/updated after merge.
 5. **Sync round-trip** — export from machine A, import on machine B, verify union merge semantics
 6. **Backward compatibility** — verify autocontext works identically when `skill_learning.enabled` is false (default)
 
-## Open questions
+## Resolved design decisions
 
-1. **Skill path resolution** — how to reliably find the skill .md file path when the user runs `/autocontext-evolve`? The `index.json` stores it at promotion time, but skills could move. May need a lookup against the plugin registry.
-2. **Multi-skill corrections** — if multiple skills are active during a correction, which skill gets tagged? Current design tags all active skills. The curator should disambiguate during curation.
-3. **Version conflicts** — if the plugin repo updates a skill upstream and the user has local evolutions, the user's changes could be overwritten on update. The backup system mitigates this, but a merge strategy for upstream updates is worth considering in a future iteration.
+1. **Skill path resolution** — at evolve time, the engine resolves skill paths dynamically by searching `CLAUDE_PLUGIN_ROOT` directories and the plugin cache (`~/.claude/plugins/`) for the skill name. The `index.json` `skill_path` is a hint/cache, not authoritative. If the path is stale (file doesn't exist), the engine searches for the skill and updates `index.json`. If the skill can't be found, the evolution is skipped with a warning.
+
+2. **Multi-skill corrections** — if multiple skills are active during a correction, all are tagged in `active_skills`. The curator decides which skill(s) the lesson applies to based on the lesson's content. A lesson about Selenium belongs to `web-scraping` even if `data-journalism` was also active.
+
+3. **Version conflicts** — if the plugin repo updates a skill upstream, the user's local evolutions are overwritten. The backup system at `~/.claude/skill-lessons/backups/` preserves the evolved version. Users can re-apply evolutions after an upstream update by running `/autocontext-evolve` again — the un-folded lessons are still in the global store and will generate a new diff against the updated skill content. This is acceptable because evolved skills should eventually feed improvements back upstream via PRs.
+
+## Future considerations
+
+- A merge strategy for upstream updates (auto-reapply evolved patterns to new upstream content)
+- Collaborative curation UI beyond the CLI
+- Cross-user lesson sharing (plugin marketplace-level evolution)
