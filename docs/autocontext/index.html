@@ -327,16 +327,10 @@
         let lessons = [];
         let sampleIndex = 0;
 
-        function escapeHtml(str) {
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.textContent;
-        }
-
         function addSampleLesson() {
             if (sampleIndex >= sampleLessons.length) sampleIndex = 0;
             const s = sampleLessons[sampleIndex++];
-            lessons.push({ id: 'l_' + Math.random().toString(36).substr(2, 6), ...s, confidence: 0.5, validated_count: 0, deleted: false });
+            lessons.push({ id: 'l_' + crypto.randomUUID().slice(0, 8), ...s, confidence: 0.5, validated_count: 0, deleted: false });
             logEvent('+ New lesson added (confidence: 0.5)');
             renderAll();
         }
