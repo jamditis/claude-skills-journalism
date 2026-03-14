@@ -16,6 +16,9 @@ BULLET_PREFIXES = ("- ", "* ")
 # Minimum character length for a bullet to be considered a lesson
 MIN_LENGTH = 15
 
+# Minimum length for a bullet to be considered standalone (without action keywords)
+MIN_STANDALONE_LENGTH = 40
+
 # Generic phrases that indicate a bullet is not project-specific
 GENERIC_STARTS = (
     "use git",
@@ -26,6 +29,36 @@ GENERIC_STARTS = (
     "check the",
     "read the",
     "refer to",
+)
+
+# Metadata label prefixes that are config/reference data, not lessons
+METADATA_PREFIXES = (
+    "**added:**",
+    "**storage:**",
+    "**display name:**",
+    "**email:**",
+    "**password:**",
+    "**credentials:**",
+    "**purpose:**",
+    "**account:**",
+    "**cli:**",
+    "**workspace:**",
+    "**workspace data:**",
+    "**app id:**",
+    "**service:**",
+    "**handler:**",
+    "**modules:**",
+)
+
+# Cross-reference phrases that point to other content rather than being lessons
+CROSS_REF_PHRASES = (
+    "see whitelist below",
+    "see whitelist above",
+    "lesson below",
+    "lesson above",
+    "see below",
+    "see above",
+    "see the ",  # "see the docs", "see the table below"
 )
 
 # Keywords that map to categories
@@ -56,8 +89,78 @@ def is_generic(text):
     return False
 
 
+def is_heading_fragment(text):
+    """Detect bullets that are just section headings ending with a colon.
+
+    These are parent labels for sub-bullets, not standalone lessons.
+    Examples: "Scheduled check-ins (Mon-Fri only, Eastern time):",
+              "Alerts via Telegram when:", "Event-driven (every 15 min):"
+    """
+    stripped = text.rstrip()
+    return stripped.endswith(":")
+
+
+def is_metadata_label(text):
+    """Detect key-value metadata that is config/reference data, not a lesson.
+
+    These are typically bold-prefixed labels from CLAUDE.md reference sections.
+    Examples: "**Email:** amditisjunk@gmail.com", "**Added:** 2026-02-02"
+    """
+    lower = text.lower()
+    for prefix in METADATA_PREFIXES:
+        if lower.startswith(prefix):
+            return True
+    return False
+
+
+def is_cross_reference(text):
+    """Detect bullets that just point to other content.
+
+    Examples: "See 'Twitter posting via Selenium' lesson below for full pattern",
+              "Email (whitelisted CCM staff): Can respond directly — see whitelist below"
+    """
+    lower = text.lower()
+    for phrase in CROSS_REF_PHRASES:
+        if phrase in lower:
+            return True
+    return False
+
+
+def is_command_reference(text):
+    """Detect bot command documentation that isn't a lesson.
+
+    Examples: "/cjs stats — User counts by registration status",
+              "/tweet <text> — Post a tweet (max 280 chars)"
+    """
+    # Strip markdown formatting to check the actual text
+    clean = text.lstrip("`")
+    return clean.startswith("/") and " — " in text
+
+
+def is_too_short_standalone(text):
+    """Detect fragments that are too short to be meaningful without context.
+
+    Short bullets with action keywords (never, always, must, don't, avoid) are
+    kept because they tend to be genuine rules. Everything else under
+    MIN_STANDALONE_LENGTH is likely a decontextualized sub-bullet.
+    """
+    if len(text) >= MIN_STANDALONE_LENGTH:
+        return False
+    lower = text.lower()
+    action_keywords = ("never", "always", "must", "don't", "avoid", "do not")
+    return not any(kw in lower for kw in action_keywords)
+
+
 def extract_bullets(content):
-    """Extract lesson candidates from bullet points in markdown content."""
+    """Extract lesson candidates from bullet points in markdown content.
+
+    Filters out five noise patterns discovered during real-world seeding:
+    1. Heading fragments ending with colons (parent labels for sub-lists)
+    2. Metadata labels (bold key-value config data)
+    3. Cross-references pointing to other sections
+    4. Bot command documentation
+    5. Short fragments that lose meaning without their parent bullet
+    """
     lessons = []
     for line in content.splitlines():
         stripped = line.strip()
@@ -67,6 +170,16 @@ def extract_bullets(content):
                 if len(text) < MIN_LENGTH:
                     break
                 if is_generic(text):
+                    break
+                if is_heading_fragment(text):
+                    break
+                if is_metadata_label(text):
+                    break
+                if is_cross_reference(text):
+                    break
+                if is_command_reference(text):
+                    break
+                if is_too_short_standalone(text):
                     break
                 lessons.append(text)
                 break
