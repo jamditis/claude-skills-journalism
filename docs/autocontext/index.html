@@ -106,7 +106,8 @@
         <div class="max-w-6xl mx-auto relative z-10">
             <div class="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide uppercase mb-6">Claude Code Plugin</div>
             <h1 class="font-display text-5xl md:text-7xl font-black leading-[0.9] mb-6">AutoContext</h1>
-            <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-10 font-light">Your Claude sessions learn from each other. Corrections persist, knowledge accumulates, and mistakes stop repeating.</p>
+            <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-4 font-light">A Claude Code plugin that gives your AI assistant a memory for each project.</p>
+            <p class="text-base md:text-lg text-white/70 max-w-2xl mb-10">Every time you correct Claude — "no, use the other API", "you forgot to clear the cache" — autocontext saves that as a lesson. Next session, it loads those lessons before Claude starts working, so the same mistakes don't happen twice.</p>
             <div class="flex flex-wrap gap-4">
                 <a href="#install" class="inline-flex items-center gap-2 bg-white text-accent font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors"><i data-lucide="download" class="w-5 h-5"></i> Install plugin</a>
                 <a href="#demo" class="inline-flex items-center gap-2 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/20 transition-colors border border-white/20"><i data-lucide="play" class="w-5 h-5"></i> Try the demo</a>
@@ -117,6 +118,37 @@
     <main class="relative z-10">
         <section class="py-24 px-6">
             <div class="max-w-6xl mx-auto">
+
+                <div class="max-w-3xl mx-auto mb-20 reveal">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-6 text-center">What it looks like in practice</h2>
+                    <div class="space-y-6 text-lg text-mist">
+                        <div class="feature-card p-6 rounded-xl flex gap-4 items-start">
+                            <span class="text-accent font-bold text-xl mt-0.5">1</span>
+                            <div>
+                                <p class="text-ink font-medium mb-1">You correct Claude during a session</p>
+                                <p class="text-sm">"No, always use <code>pytest -x</code> here, not <code>pytest</code>"</p>
+                                <p class="text-xs text-accent mt-1">Autocontext captures this as a lesson candidate</p>
+                            </div>
+                        </div>
+                        <div class="feature-card p-6 rounded-xl flex gap-4 items-start">
+                            <span class="text-accent font-bold text-xl mt-0.5">2</span>
+                            <div>
+                                <p class="text-ink font-medium mb-1">Next session, Claude is about to run <code>pytest</code></p>
+                                <p class="text-sm">Autocontext injects a warning: "lesson: always use <code>pytest -x</code> in this project"</p>
+                                <p class="text-xs text-accent mt-1">Claude follows the lesson instead of repeating the mistake</p>
+                            </div>
+                        </div>
+                        <div class="feature-card p-6 rounded-xl flex gap-4 items-start">
+                            <span class="text-accent font-bold text-xl mt-0.5">3</span>
+                            <div>
+                                <p class="text-ink font-medium mb-1">Over time, lessons gain or lose confidence</p>
+                                <p class="text-sm">Lessons that keep proving useful get stronger. Lessons that go stale or get contradicted fade out.</p>
+                                <p class="text-xs text-accent mt-1">Your project builds a curated knowledge base automatically</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="text-center mb-16 reveal">
                     <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">The cold start problem</h2>
                     <p class="text-lg text-mist max-w-3xl mx-auto">Every new Claude Code session forgets what the last one learned. You correct the same mistakes, re-explain the same patterns, and lose time to errors that should have been caught.</p>
@@ -248,8 +280,8 @@
                     </div>
                     <div class="feature-card p-6 rounded-xl">
                         <div class="w-12 h-12 bg-accentLight rounded-lg flex items-center justify-center mb-4"><i data-lucide="user-check" class="w-6 h-6 text-accent"></i></div>
-                        <h3 class="font-display text-xl font-bold mb-2">Guided setup</h3>
-                        <p class="text-mist text-sm">Interactive wizard walks you through identity, rules, and preferences. No config editing required.</p>
+                        <h3 class="font-display text-xl font-bold mb-2">10-step setup wizard</h3>
+                        <p class="text-mist text-sm">Interactive wizard covers identity, test rules, loading, persistence, staleness, injection mode, correction sensitivity, baselines, playbook, and multi-machine support.</p>
                     </div>
                     <div class="feature-card p-6 rounded-xl">
                         <div class="w-12 h-12 bg-accentLight rounded-lg flex items-center justify-center mb-4"><i data-lucide="file-text" class="w-6 h-6 text-accent"></i></div>
@@ -268,7 +300,7 @@
                         <p class="text-lg text-mist mb-8">Everything runs through slash commands. The hooks do the heavy lifting in the background.</p>
                     </div>
                     <div class="space-y-4">
-                        <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext-setup</code><p class="text-mist text-sm mt-2">First-run wizard. Set your identity, choose rules, configure persistence mode.</p></div>
+                        <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext-setup</code><p class="text-mist text-sm mt-2">One-time wizard. 10 steps covering identity, test rules, loading, persistence, staleness, pre-edit warnings, correction sensitivity, performance baselines, playbook generation, and multi-machine support.</p></div>
                         <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext-init</code><p class="text-mist text-sm mt-2">Initialize in a project. Creates <code>.autocontext/</code>, optionally seeds from CLAUDE.md.</p></div>
                         <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext-review</code><p class="text-mist text-sm mt-2">Curate lessons interactively. Approve, edit, delete, or supersede.</p></div>
                         <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext-status</code><p class="text-mist text-sm mt-2">Quick stats. Lesson counts, confidence averages, stalest lessons, merge driver status.</p></div>
@@ -298,6 +330,55 @@
                         <pre><code>/autocontext-setup    # one-time global config
 /autocontext-init     # per-project initialization</code></pre>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 px-6 bg-white/50">
+            <div class="max-w-4xl mx-auto reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-6">New in v1.0</h2>
+                <p class="text-center text-mist text-lg mb-12 max-w-2xl mx-auto">The setup wizard now captures 10 preference dimensions, giving you full control over how autocontext behaves.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="feature-card p-5 rounded-xl">
+                        <h3 class="font-display text-base font-bold mb-1">Staleness and decay</h3>
+                        <p class="text-mist text-sm">Choose how long unused lessons survive before losing confidence (30, 60, 120, or 180 days).</p>
+                    </div>
+                    <div class="feature-card p-5 rounded-xl">
+                        <h3 class="font-display text-base font-bold mb-1">Pre-edit warnings</h3>
+                        <p class="text-mist text-sm">Control whether lesson warnings appear before edits: always, only for errors, or disabled.</p>
+                    </div>
+                    <div class="feature-card p-5 rounded-xl">
+                        <h3 class="font-display text-base font-bold mb-1">Correction sensitivity</h3>
+                        <p class="text-mist text-sm">Tune how aggressively your messages are scanned for corrections: high, medium, or low.</p>
+                    </div>
+                    <div class="feature-card p-5 rounded-xl">
+                        <h3 class="font-display text-base font-bold mb-1">Performance baselines</h3>
+                        <p class="text-mist text-sm">Track test and build times. Get warned when a command takes more than 10% longer than baseline.</p>
+                    </div>
+                    <div class="feature-card p-5 rounded-xl">
+                        <h3 class="font-display text-base font-bold mb-1">Playbook generation</h3>
+                        <p class="text-mist text-sm">Choose auto, manual, or disabled for the human-readable playbook.md summary file.</p>
+                    </div>
+                    <div class="feature-card p-5 rounded-xl">
+                        <h3 class="font-display text-base font-bold mb-1">Multi-machine support</h3>
+                        <p class="text-mist text-sm">Tag lessons to specific machines. A lesson learned on your Pi won't clutter your Windows GPU box.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-16 px-6">
+            <div class="max-w-4xl mx-auto text-center reveal">
+                <h2 class="font-display text-3xl font-light italic mb-6">Inspired by</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                    <a href="https://github.com/greyhaven-ai/autocontext" class="feature-card p-6 rounded-xl text-left hover:border-accent/30">
+                        <h3 class="font-display text-lg font-bold mb-2">greyhaven-ai/autocontext</h3>
+                        <p class="text-mist text-sm">A closed-loop system for improving agent behavior over repeated runs. Persistent playbooks, curator agents, and confidence-scored knowledge shaped how this plugin handles lesson persistence and validation.</p>
+                    </a>
+                    <a href="https://github.com/karpathy/autoresearch" class="feature-card p-6 rounded-xl text-left hover:border-accent/30">
+                        <h3 class="font-display text-lg font-bold mb-2">karpathy/autoresearch</h3>
+                        <p class="text-mist text-sm">AI agents running autonomous research loops. The pattern of accumulating structured knowledge across sessions and reinforcing successful strategies influenced the session lifecycle design.</p>
+                    </a>
                 </div>
             </div>
         </section>
