@@ -590,6 +590,53 @@ style:
             </div>
         </section>
 
+        <!-- What's new -->
+        <section id="changelog" class="py-24 px-6">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-16">What's new</h2>
+
+                <div class="feature-card p-8 rounded-xl mb-8">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="bg-accent text-white text-xs font-bold px-3 py-1 rounded-full">v1.2.0</span>
+                        <span class="text-mist text-sm">March 2026</span>
+                    </div>
+                    <h3 class="font-display text-2xl font-bold mb-4">Footer clearance overhaul</h3>
+                    <p class="text-mist mb-6">
+                        All document templates now use a structural CSS Grid layout (<code>grid-template-rows: auto 1fr auto</code>) instead of absolute positioning for footers. This eliminates the recurring issue where content would overlap or touch the footer on print-ready documents.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0"></i>
+                            <p class="text-sm"><strong>Structural grid layout</strong> &mdash; Header, content, and footer are now grid rows. The content area automatically fills available space. No more fragile <code>calc()</code> with hardcoded heights.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0"></i>
+                            <p class="text-sm"><strong>Overflow protection</strong> &mdash; Content areas now have <code>overflow: hidden</code> so text can never bleed past the content boundary into the footer zone.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0"></i>
+                            <p class="text-sm"><strong>All templates updated</strong> &mdash; One-pager, report, proposal, slides, and event flyer templates all use the new pattern. Newsletter template unchanged (email table layout).</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0"></i>
+                            <p class="text-sm"><strong>Skill guidance added</strong> &mdash; All document commands now include footer clearance rules so Claude verifies page layout before delivering.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card p-8 rounded-xl opacity-60">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="bg-ink/20 text-ink text-xs font-bold px-3 py-1 rounded-full">v1.1.1</span>
+                        <span class="text-mist text-sm">February 2026</span>
+                    </div>
+                    <h3 class="font-display text-xl font-bold mb-2">Interactive control panel + brand system</h3>
+                    <p class="text-mist text-sm">
+                        Live preview with tweakable controls for colors, fonts, and spacing. Brand configuration via <code>.claude/pdf-playground.local.md</code>. Six document templates.
+                    </p>
+                </div>
+            </div>
+        </section>
+
         <!-- Credits -->
         <section class="py-16 px-6 border-t border-ink/10">
             <div class="max-w-6xl mx-auto text-center">

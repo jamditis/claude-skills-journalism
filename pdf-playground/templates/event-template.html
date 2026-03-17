@@ -36,7 +36,8 @@
             height: 11in;
             background: var(--white);
             margin: 0 auto;
-            position: relative;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
             overflow: hidden;
             box-shadow: 0 4px 24px rgba(0,0,0,0.12);
         }
@@ -91,8 +92,11 @@
         }
 
         .flyer-content {
+            /* Grid body wrapper — fills the 1fr row between header and footer */
             padding: 0.75in;
             padding-top: 1in;
+            padding-bottom: 0.3in;
+            overflow: hidden;
         }
 
         .event-details {
@@ -199,10 +203,6 @@
         }
 
         .flyer-footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
             padding: 0.3in 0.75in;
             display: flex;
             justify-content: space-between;

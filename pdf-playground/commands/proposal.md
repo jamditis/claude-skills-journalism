@@ -311,6 +311,17 @@ Create a multi-page HTML document with:
 - Total row with primary color background
 - Two-year or custom period totals
 
+## Footer clearance (critical)
+
+Content MUST NOT touch or overlap the page footer.
+
+- The `.page` element MUST use `display: grid; grid-template-rows: auto 1fr auto`
+- It MUST have exactly 3 direct children: `<header class="page-header">`, `<div class="page-body">`, `<footer class="page-footer">`
+- The content wrapper (`.page-body`) MUST have `overflow: hidden` to prevent text bleeding
+- Never use `position: absolute` for footers — keep them in normal document flow as the third grid row
+- After generating, always take a screenshot and visually verify the bottom of each page
+- If content is too long, **reduce content** rather than shrinking the footer gap
+
 ## Output
 
 Save the HTML file in the current working directory with a descriptive filename like `proposal-[project-name].html`.

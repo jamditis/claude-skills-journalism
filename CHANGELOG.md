@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2026-03-17
+
+### Changed
+- **pdf-playground v1.2.0**: Footer clearance overhaul across all templates
+  - All document templates (one-pager, report, proposal, slides, event) now use CSS Grid `grid-template-rows: auto 1fr auto` instead of absolute-positioned footers
+  - Footers are in normal document flow as the third grid row — no more fragile `calc()` with hardcoded header/footer heights
+  - Content areas have `overflow: hidden` to prevent text bleeding into the footer zone
+  - All 5 document commands updated with footer clearance verification rules
+  - Document-design skill updated with the grid layout pattern and safeguards
+  - Newsletter template unchanged (email table layout, not affected)
+- Updated GitHub Pages docs with v1.2.0 changelog section
+
 ## [1.5.0] - 2026-03-14
 
 ### Added

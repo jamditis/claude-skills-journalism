@@ -72,6 +72,18 @@ If not provided, ask for:
 - Key topics
 - Aspect ratio preference
 
+## Footer clearance (critical)
+
+Content MUST NOT touch or overlap the slide footer.
+
+- The `.slide` element MUST use `display: grid; grid-template-rows: auto 1fr auto`
+- Content slides MUST have exactly 3 direct children: `<div class="slide-header">`, `<div class="slide-body">`, `<div class="slide-footer">`
+- The content wrapper (`.slide-body`) MUST have `overflow: hidden` to prevent text bleeding
+- Never use `position: absolute` for footers — keep them in normal document flow as the third grid row
+- Title and section slides that don't have footers can use flex layout instead
+- After generating, always take a screenshot and visually verify the bottom of each slide
+- If content is too long, **reduce content** rather than shrinking the footer gap
+
 ## Output
 
 Save HTML file in current working directory.

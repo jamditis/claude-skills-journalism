@@ -43,7 +43,9 @@
             height: 7.5in;
             background: var(--white);
             margin: 20px auto;
-            position: relative;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            position: relative; /* needed for absolutely-positioned children like .presenter */
             overflow: hidden;
             box-shadow: 0 4px 24px rgba(0,0,0,0.2);
         }
@@ -121,12 +123,17 @@
 
         /* ========== CONTENT SLIDE ========== */
         .slide-content {
-            padding: 0.75in 1in;
+            /* Grid child styles only — padding/overflow on .slide-body */
+        }
+
+        .slide-body {
+            padding: 0.3in 1in 0.2in;
+            overflow: hidden;
+            font-size: 24pt;
         }
 
         .slide-header {
-            margin-bottom: 0.5in;
-            padding-bottom: 0.2in;
+            padding: 0.75in 1in 0.2in;
             border-bottom: 3px solid var(--red);
         }
 
@@ -135,10 +142,6 @@
             font-size: 36pt;
             font-weight: 700;
             color: var(--black);
-        }
-
-        .slide-body {
-            font-size: 24pt;
         }
 
         .slide-body ul {
@@ -165,10 +168,7 @@
         }
 
         .slide-footer {
-            position: absolute;
-            bottom: 0.3in;
-            left: 1in;
-            right: 1in;
+            padding: 0 1in 0.4in;
             display: flex;
             justify-content: space-between;
             font-size: 12pt;

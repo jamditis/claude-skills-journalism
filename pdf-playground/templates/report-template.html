@@ -43,7 +43,8 @@
             min-height: 11in;
             background: var(--white);
             margin: 0 auto 20px;
-            position: relative;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
             overflow: hidden;
             box-shadow: 0 4px 24px rgba(0,0,0,0.12);
         }
@@ -125,18 +126,18 @@
 
         /* Content pages */
         .content-page {
-            padding: 0.5in 0.75in;
-            padding-bottom: 1in;
-            min-height: 11in;
-            height: 11in;
-            position: relative;
+            /* Grid child styles only — padding/overflow on .page-body */
+        }
+
+        .page-body {
+            padding: 0.3in 0.75in 0.3in;
+            overflow: hidden;
         }
 
         .page-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 0.3in;
-            padding-bottom: 0.1in;
+            padding: 0.5in 0.75in 0.1in;
             border-bottom: 1px solid var(--gray-200);
         }
 
@@ -236,10 +237,7 @@
 
         /* Footer */
         .page-footer {
-            position: absolute;
-            bottom: 0.4in;
-            left: 0.75in;
-            right: 0.75in;
+            padding: 0 0.75in 0.3in;
             display: flex;
             justify-content: space-between;
             padding-top: 0.1in;
@@ -280,39 +278,41 @@
             <div class="page-header-right">[Year]</div>
         </header>
 
-        <h2 class="section-title">Executive summary</h2>
+        <div class="page-body">
+            <h2 class="section-title">Executive summary</h2>
 
-        <p class="lead-text">
-            [Opening statement that captures the key message of the report in 2-3 sentences.]
-        </p>
+            <p class="lead-text">
+                [Opening statement that captures the key message of the report in 2-3 sentences.]
+            </p>
 
-        <p class="body-text">
-            [More detailed summary of findings, outcomes, or key takeaways.]
-        </p>
+            <p class="body-text">
+                [More detailed summary of findings, outcomes, or key takeaways.]
+            </p>
 
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-number">[Number]</div>
-                <div class="metric-label">[Metric label]</div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-number">[Number]</div>
+                    <div class="metric-label">[Metric label]</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">[Number]</div>
+                    <div class="metric-label">[Metric label]</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">[Number]</div>
+                    <div class="metric-label">[Metric label]</div>
+                </div>
             </div>
-            <div class="metric-card">
-                <div class="metric-number">[Number]</div>
-                <div class="metric-label">[Metric label]</div>
+
+            <div class="pullquote">
+                <p class="pullquote-text">"[Key quote that captures the essence of the report's findings or mission.]"</p>
+                <p class="pullquote-cite">— [Name], [Title]</p>
             </div>
-            <div class="metric-card">
-                <div class="metric-number">[Number]</div>
-                <div class="metric-label">[Metric label]</div>
-            </div>
+
+            <p class="body-text">
+                [Additional context or forward-looking statement.]
+            </p>
         </div>
-
-        <div class="pullquote">
-            <p class="pullquote-text">"[Key quote that captures the essence of the report's findings or mission.]"</p>
-            <p class="pullquote-cite">— [Name], [Title]</p>
-        </div>
-
-        <p class="body-text">
-            [Additional context or forward-looking statement.]
-        </p>
 
         <footer class="page-footer">
             <div class="footer-left">Center for Cooperative Media • Montclair State University</div>
@@ -327,32 +327,34 @@
             <div class="page-header-right">[Year]</div>
         </header>
 
-        <h2 class="section-title">Key findings</h2>
+        <div class="page-body">
+            <h2 class="section-title">Key findings</h2>
 
-        <p class="body-text">
-            [Introduction to the findings section.]
-        </p>
+            <p class="body-text">
+                [Introduction to the findings section.]
+            </p>
 
-        <p class="body-text">
-            <strong>[Finding 1 title]:</strong> [Description of the first key finding with supporting data or context.]
-        </p>
+            <p class="body-text">
+                <strong>[Finding 1 title]:</strong> [Description of the first key finding with supporting data or context.]
+            </p>
 
-        <p class="body-text">
-            <strong>[Finding 2 title]:</strong> [Description of the second key finding with supporting data or context.]
-        </p>
+            <p class="body-text">
+                <strong>[Finding 2 title]:</strong> [Description of the second key finding with supporting data or context.]
+            </p>
 
-        <p class="body-text">
-            <strong>[Finding 3 title]:</strong> [Description of the third key finding with supporting data or context.]
-        </p>
+            <p class="body-text">
+                <strong>[Finding 3 title]:</strong> [Description of the third key finding with supporting data or context.]
+            </p>
 
-        <div class="pullquote">
-            <p class="pullquote-text">"[Quote from a partner, participant, or stakeholder that illustrates the impact.]"</p>
-            <p class="pullquote-cite">— [Name], [Organization]</p>
+            <div class="pullquote">
+                <p class="pullquote-text">"[Quote from a partner, participant, or stakeholder that illustrates the impact.]"</p>
+                <p class="pullquote-cite">— [Name], [Organization]</p>
+            </div>
+
+            <p class="body-text">
+                [Closing paragraph for this section.]
+            </p>
         </div>
-
-        <p class="body-text">
-            [Closing paragraph for this section.]
-        </p>
 
         <footer class="page-footer">
             <div class="footer-left">Center for Cooperative Media • Montclair State University</div>
