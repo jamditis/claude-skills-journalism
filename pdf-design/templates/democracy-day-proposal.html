@@ -44,11 +44,12 @@
         .page {
             width: 8.5in;
             height: 11in;
-            padding: 0.5in 0.65in;
             background: white;
             position: relative;
-            page-break-after: always;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
             overflow: hidden;
+            page-break-after: always;
         }
 
         .page:last-child {
@@ -60,6 +61,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            padding: 0.5in 0.65in;
             background: linear-gradient(165deg, var(--civic-navy) 0%, #243b5c 50%, var(--civic-navy) 100%);
             color: white;
             position: relative;
@@ -190,13 +192,24 @@
             background: white;
         }
 
+        .page-body {
+            padding: 0 0.65in 0.3in;
+            overflow: hidden;
+        }
+
+        .page-footer {
+            padding: 0 0.65in 0.5in;
+            border-top: 1px solid var(--civic-light);
+            font-size: 0.8rem;
+            color: var(--civic-slate);
+        }
+
         .page-header {
             display: flex;
             justify-content: space-between;
             align-items: baseline;
             border-bottom: 2px solid var(--civic-navy);
-            padding-bottom: 0.1in;
-            margin-bottom: 0.3in;
+            padding: 0.5in 0.65in 0.1in;
         }
 
         .page-header-title {
@@ -534,16 +547,9 @@
             opacity: 0.7;
         }
 
-        /* FOOTER NOTE */
+        /* FOOTER NOTE (legacy class, use .page-footer instead) */
         .institution-note {
-            position: absolute;
-            bottom: 0.5in;
-            left: 0.65in;
-            right: 0.65in;
             padding-top: 0.15in;
-            border-top: 1px solid var(--civic-light);
-            font-size: 0.8rem;
-            color: var(--civic-slate);
         }
 
         @media print {
@@ -602,6 +608,7 @@
         <div class="page-header-title">U.S. Democracy Day · Funding Proposal</div>
         <div class="page-number">2</div>
     </div>
+    <div class="page-body">
 
     <h2>What is U.S. Democracy Day?</h2>
 
@@ -652,6 +659,9 @@
     <p class="source-note">
         Source: Pew Research Center. While voter turnout has been growing in recent general and midterm elections, it still often lags behind in local and municipal races.
     </p>
+
+    </div>
+    <footer class="page-footer"></footer>
 </div>
 
 <!-- PAGE 3: WHAT'S NEXT -->
@@ -660,6 +670,7 @@
         <div class="page-header-title">U.S. Democracy Day · Funding Proposal</div>
         <div class="page-number">3</div>
     </div>
+    <div class="page-body">
 
     <h2>What's next</h2>
 
@@ -704,6 +715,9 @@
             </div>
         </div>
     </div>
+
+    </div>
+    <footer class="page-footer"></footer>
 </div>
 
 <!-- PAGE 4: PROVEN STRATEGIES + BUDGET -->
@@ -712,6 +726,7 @@
         <div class="page-header-title">U.S. Democracy Day · Funding Proposal</div>
         <div class="page-number">4</div>
     </div>
+    <div class="page-body">
 
     <h2>Proven strategies</h2>
 
@@ -751,6 +766,9 @@
             It's these strategies to reach underserved communities that require additional funding, support, and coaching. For more information about Democracy Day, read our 2025 report with partner examples, survey information, and key takeaways.
         </p>
     </div>
+
+    </div>
+    <footer class="page-footer"></footer>
 </div>
 
 <!-- PAGE 5: THE ASK -->
@@ -759,6 +777,7 @@
         <div class="page-header-title">U.S. Democracy Day · Funding Proposal</div>
         <div class="page-number">5</div>
     </div>
+    <div class="page-body">
 
     <h2>The ask</h2>
 
@@ -835,12 +854,14 @@
             </div>
         </div>
 
-        <div class="institution-note">
-            <p>
-                <strong>Democracy Day</strong> is a project based at the Center for Cooperative Media at Montclair State University. The Center applies for grants through the Montclair State University Foundation.
-            </p>
-        </div>
     </div>
+
+    </div>
+    <footer class="page-footer">
+        <p>
+            <strong>Democracy Day</strong> is a project based at the Center for Cooperative Media at Montclair State University. The Center applies for grants through the Montclair State University Foundation.
+        </p>
+    </footer>
 </div>
 
 
@@ -850,6 +871,7 @@
         <div class="page-header-title">U.S. Democracy Day · Funding Proposal</div>
         <div class="page-number">Appendix</div>
     </div>
+    <div class="page-body">
 
     <h2 style="color: var(--civic-navy); margin-bottom: 0.3in;">Budget options</h2>
     
@@ -901,6 +923,8 @@
         </tfoot>
     </table>
 
+    </div>
+    <footer class="page-footer"></footer>
 </div>
 
 <!-- APPENDIX PAGE 2: STATEWIDE OPTION -->
@@ -909,6 +933,7 @@
         <div class="page-header-title">U.S. Democracy Day · Funding Proposal</div>
         <div class="page-number">Appendix</div>
     </div>
+    <div class="page-body">
 
     <!-- OPTION 2: STATEWIDE -->
     <h3 style="color: var(--civic-navy); font-size: 1.1rem; margin-top: 0.1in; margin-bottom: 0.1in;">Option B: Statewide (10 newsrooms)</h3>
@@ -956,6 +981,8 @@
         </tfoot>
     </table>
 
+    </div>
+    <footer class="page-footer"></footer>
 </div>
 
 <!-- APPENDIX PAGE 2: LOCAL OPTION -->
@@ -964,6 +991,7 @@
         <div class="page-header-title">U.S. Democracy Day · Funding Proposal</div>
         <div class="page-number">Appendix</div>
     </div>
+    <div class="page-body">
 
     <!-- OPTION 3: LOCAL -->
     <h3 style="color: var(--civic-navy); font-size: 1.1rem; margin-top: 0.1in; margin-bottom: 0.1in;">Option C: Local (6 newsrooms)</h3>
@@ -1011,6 +1039,8 @@
         </tfoot>
     </table>
 
+    </div>
+    <footer class="page-footer"></footer>
 </div>
 
 </body>
