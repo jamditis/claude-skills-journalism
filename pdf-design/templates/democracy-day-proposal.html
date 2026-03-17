@@ -45,7 +45,6 @@
             width: 8.5in;
             height: 11in;
             background: white;
-            position: relative;
             display: grid;
             grid-template-rows: auto 1fr auto;
             overflow: hidden;
@@ -193,7 +192,7 @@
         }
 
         .page-body {
-            padding: 0 0.65in 0.3in;
+            padding: 0.2in 0.65in 0.3in;
             overflow: hidden;
         }
 
@@ -202,6 +201,10 @@
             border-top: 1px solid var(--civic-light);
             font-size: 0.8rem;
             color: var(--civic-slate);
+        }
+
+        .page-footer:empty {
+            display: none;
         }
 
         .page-header {

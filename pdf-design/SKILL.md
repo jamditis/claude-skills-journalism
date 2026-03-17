@@ -182,7 +182,7 @@ h1, h2, h3 {
 ### Page footer
 ```css
 .page-body {
-    padding: 0 0.65in 0.3in;
+    padding: 0.2in 0.65in 0.3in;
     overflow: hidden;
 }
 
@@ -197,12 +197,13 @@ h1, h2, h3 {
 
 ## Footer clearance
 
-Content must not touch or overlap the page footer.
+Content must not touch or overlap the page footer. These rules apply to **content pages** — cover pages and special layouts may use different structures.
 
-- The `.page` element must use `display: grid; grid-template-rows: auto 1fr auto`
-- It must have exactly 3 direct children: header, content wrapper (`.page-body`), footer
+- Content pages must use `display: grid; grid-template-rows: auto 1fr auto` on `.page`
+- Content pages must have exactly 3 direct children: header, content wrapper (`.page-body`), footer
 - The content wrapper must have `overflow: hidden` to prevent text bleeding
 - Never use `position: absolute` for footers — keep them in normal document flow as the third grid row
+- Use `.page-footer:empty { display: none; }` so pages without footer content don't render a blank border
 - If content is too long, reduce content rather than shrinking the footer gap
 
 ---
