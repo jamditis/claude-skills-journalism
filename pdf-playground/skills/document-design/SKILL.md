@@ -128,6 +128,28 @@ Generate CSS variables from brand config:
 }
 ```
 
+### Footer clearance (critical)
+
+Content overlapping or touching the footer is a recurring issue.
+
+**Preferred layout — grid rows `auto 1fr auto`:**
+```css
+.page {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow: hidden;
+}
+```
+This makes the header and footer take their natural height, and the content fills the remaining space. No magic-number `calc()` needed — the footer clearance is structural.
+
+**Required safeguards:**
+1. Use `grid-template-rows: auto 1fr auto` on the page so content automatically gets the space between header and footer
+2. Set `overflow: hidden` on the content container to prevent text bleeding past its bounds
+3. Include `padding-bottom: 0.3in` (minimum) inside the content area as a buffer
+4. Never use hardcoded `height: calc(...)` with magic numbers for header/footer heights — they drift when padding or font sizes change
+5. After rendering, always screenshot and visually verify the bottom of the page before delivering
+6. If content overflows, **reduce content** — never shrink the footer gap. Tighten the header first if you need more room.
+
 ## Typography patterns
 
 ### Font loading
