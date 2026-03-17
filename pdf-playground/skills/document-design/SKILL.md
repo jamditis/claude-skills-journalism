@@ -128,6 +128,17 @@ Generate CSS variables from brand config:
 }
 ```
 
+### Footer clearance (critical)
+
+Content overlapping or touching the footer is a recurring issue. CSS grid/flex containers do NOT clip child overflow by default — setting a `height` on the content area does not stop text from flowing past it into the footer zone.
+
+**Required safeguards:**
+1. Always set `overflow: hidden` on the content container
+2. Always include `padding-bottom: 0.3in` (minimum) inside the content area
+3. For one-pagers with `height: calc(...)`, subtract at least `0.75in` for the footer
+4. After rendering, always screenshot and visually verify the bottom of the page before delivering
+5. If content overflows, **reduce content** — never shrink the footer gap. Tighten the header first if you need more room.
+
 ## Typography patterns
 
 ### Font loading
