@@ -63,6 +63,16 @@ If not provided, ask for:
 - Registration URL
 - Material type needed
 
+## Footer clearance (critical)
+
+Content MUST NOT touch or overlap the footer. This is a common issue.
+
+- The `.flyer` element MUST use `display: grid; grid-template-rows: auto 1fr auto` so the footer takes its natural height and content fills the rest
+- The content area MUST have `overflow: hidden` to prevent text bleeding past its bounds
+- Never use `position: absolute` for footers — keep them in normal document flow as the third grid row
+- After generating, always take a screenshot and visually verify the bottom of the page
+- If content is too long, **reduce content** rather than shrinking the footer gap
+
 ## Output
 
 Save HTML file in current working directory.

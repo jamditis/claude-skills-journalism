@@ -43,7 +43,8 @@
             height: 7.5in;
             background: var(--white);
             margin: 20px auto;
-            position: relative;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
             overflow: hidden;
             box-shadow: 0 4px 24px rgba(0,0,0,0.2);
         }
@@ -122,6 +123,8 @@
         /* ========== CONTENT SLIDE ========== */
         .slide-content {
             padding: 0.75in 1in;
+            overflow: hidden;
+            padding-bottom: 0.2in;
         }
 
         .slide-header {
@@ -165,10 +168,7 @@
         }
 
         .slide-footer {
-            position: absolute;
-            bottom: 0.3in;
-            left: 1in;
-            right: 1in;
+            padding: 0 1in 0.3in;
             display: flex;
             justify-content: space-between;
             font-size: 12pt;
