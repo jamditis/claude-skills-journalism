@@ -119,8 +119,9 @@ h1, h2, h3 {
 .page {
     width: 8.5in;
     height: 11in;
-    padding: 0.5in 0.65in;
-    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow: hidden;
     page-break-after: always;
 }
 ```
@@ -147,10 +148,15 @@ h1, h2, h3 {
 ```html
 <div class="page content-page">
     <div class="page-header">
-        <div class="page-header-title">Document Title</div>
+        <div class="page-header-title">Document title</div>
         <div class="page-number">2</div>
     </div>
-    <!-- Content -->
+    <div class="page-body">
+        <!-- Content goes here -->
+    </div>
+    <footer class="page-footer">
+        <!-- Footer -->
+    </footer>
 </div>
 ```
 
@@ -173,17 +179,32 @@ h1, h2, h3 {
 </table>
 ```
 
-### Page footer (institution note)
+### Page footer
 ```css
-.institution-note {
-    position: absolute;
-    bottom: 0.5in;
-    left: 0.65in;
-    right: 0.65in;
+.page-body {
+    padding: 0.2in 0.65in 0.3in;
+    overflow: hidden;
+}
+
+.page-footer {
+    padding: 0 0.65in 0.5in;
     border-top: 1px solid #e2e8f0;
     font-size: 0.8rem;
 }
 ```
+
+---
+
+## Footer clearance
+
+Content must not touch or overlap the page footer. These rules apply to **content pages** — cover pages and special layouts may use different structures.
+
+- Content pages must use `display: grid; grid-template-rows: auto 1fr auto` on `.page`
+- Content pages must have exactly 3 direct children: header, content wrapper (`.page-body`), footer
+- The content wrapper must have `overflow: hidden` to prevent text bleeding
+- Never use `position: absolute` for footers — keep them in normal document flow as the third grid row
+- Use `.page-footer:empty { display: none; }` so pages without footer content don't render a blank border
+- If content is too long, reduce content rather than shrinking the footer gap
 
 ---
 
