@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Discussions
+    url: https://github.com/jamditis/claude-skills-journalism/discussions
+    about: Ask questions, share ideas, or show what you've built
+  - name: Skill documentation
+    url: https://skills.amditis.tech
+    about: Browse the full skill catalog and setup guides

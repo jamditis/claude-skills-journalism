@@ -1,0 +1,116 @@
+name: Skill linter
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - '*/SKILL.md'
+      - 'hooks/*.md'
+      - '.github/workflows/skill-lint.yml'
+
+jobs:
+  lint-skills:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate skill frontmatter
+        run: |
+          errors=0
+
+          # Check all SKILL.md files
+          for skill_file in */SKILL.md; do
+            [ -f "$skill_file" ] || continue
+            dir=$(dirname "$skill_file")
+
+            # Check frontmatter exists
+            if ! head -1 "$skill_file" | grep -q '^---$'; then
+              echo "ERROR: $skill_file - missing YAML frontmatter"
+              errors=$((errors + 1))
+              continue
+            fi
+
+            # Extract frontmatter
+            frontmatter=$(sed -n '/^---$/,/^---$/p' "$skill_file" | sed '1d;$d')
+
+            # Check required fields
+            if ! echo "$frontmatter" | grep -q '^name:'; then
+              echo "ERROR: $skill_file - missing 'name' in frontmatter"
+              errors=$((errors + 1))
+            fi
+
+            if ! echo "$frontmatter" | grep -q '^description:'; then
+              echo "ERROR: $skill_file - missing 'description' in frontmatter"
+              errors=$((errors + 1))
+            fi
+
+            echo "OK: $skill_file"
+          done
+
+          # Check hook files
+          for hook_file in hooks/*.md; do
+            [ -f "$hook_file" ] || continue
+
+            if ! head -1 "$hook_file" | grep -q '^---$'; then
+              echo "ERROR: $hook_file - missing YAML frontmatter"
+              errors=$((errors + 1))
+              continue
+            fi
+
+            frontmatter=$(sed -n '/^---$/,/^---$/p' "$hook_file" | sed '1d;$d')
+
+            if ! echo "$frontmatter" | grep -q '^name:'; then
+              echo "ERROR: $hook_file - missing 'name' in frontmatter"
+              errors=$((errors + 1))
+            fi
+
+            if ! echo "$frontmatter" | grep -q -E '^(event|events):'; then
+              echo "ERROR: $hook_file - missing 'event' in frontmatter"
+              errors=$((errors + 1))
+            fi
+
+            echo "OK: $hook_file"
+          done
+
+          if [ $errors -gt 0 ]; then
+            echo ""
+            echo "Found $errors error(s)"
+            exit 1
+          fi
+
+          echo ""
+          echo "All skills and hooks validated"
+
+  check-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check new skills are listed in README
+        run: |
+          warnings=0
+
+          for skill_dir in */; do
+            skill_name="${skill_dir%/}"
+
+            # Skip non-skill directories
+            case "$skill_name" in
+              hooks|docs|node_modules|.github|.claude-plugin|pdf-playground|autocontext) continue ;;
+            esac
+
+            [ -f "$skill_dir/SKILL.md" ] || continue
+
+            if ! grep -q "\[$skill_name\]" README.md; then
+              echo "WARNING: $skill_name is not listed in README.md"
+              warnings=$((warnings + 1))
+            fi
+          done
+
+          if [ $warnings -gt 0 ]; then
+            echo ""
+            echo "$warnings skill(s) missing from README.md"
+            echo "Please add them to the appropriate section"
+            exit 1
+          fi
+
+          echo "All skills listed in README.md"

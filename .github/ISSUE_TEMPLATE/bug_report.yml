@@ -1,0 +1,62 @@
+name: Bug report
+description: Something isn't working as expected
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: What part of the project is affected?
+      options:
+        - Skill (core journalism)
+        - Skill (academic/research)
+        - Skill (development)
+        - Skill (security)
+        - Skill (design/production)
+        - Skill (other)
+        - Hook
+        - Plugin (pdf-playground)
+        - Plugin (other)
+        - Installation / setup
+        - Documentation
+    validations:
+      required: true
+  - type: input
+    id: skill-name
+    attributes:
+      label: Skill or hook name
+      description: Which specific skill or hook? (leave blank if not applicable)
+      placeholder: e.g., source-verification, ap-style-check
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the bug clearly
+      placeholder: Tell us what you expected vs. what actually happened
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce this?
+      placeholder: |
+        1. Install skill...
+        2. Run command...
+        3. See error...
+  - type: input
+    id: claude-version
+    attributes:
+      label: Claude Code version
+      description: Run `claude --version` in your terminal
+      placeholder: e.g., 1.0.33
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Linux
+        - Windows (WSL)
+        - Windows
+        - Other

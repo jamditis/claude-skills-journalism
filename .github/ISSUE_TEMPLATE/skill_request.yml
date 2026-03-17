@@ -1,0 +1,58 @@
+name: Skill request
+description: Propose a new skill for the collection
+labels: ["enhancement", "new-skill"]
+body:
+  - type: input
+    id: skill-name
+    attributes:
+      label: Proposed skill name
+      description: Short, kebab-case name for the skill
+      placeholder: e.g., podcast-production, grant-writing
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: Where does this skill fit?
+      options:
+        - Core journalism
+        - Communications and publishing
+        - Design and production
+        - Writing quality
+        - Project documentation
+        - Academic and research
+        - Development
+        - Security
+        - AI and creative tools
+        - Reference
+        - New category (describe below)
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What should this skill do?
+      description: Describe the workflows, templates, or knowledge it should include
+      placeholder: |
+        This skill should help with...
+
+        Key workflows:
+        - ...
+        - ...
+    validations:
+      required: true
+  - type: textarea
+    id: audience
+    attributes:
+      label: Who is this for?
+      description: What role or use case does this serve?
+      placeholder: e.g., investigative reporters working with leaked documents
+  - type: textarea
+    id: references
+    attributes:
+      label: References or prior art
+      description: Links to standards, guides, or tools this skill should draw from
+      placeholder: |
+        - https://...
+        - https://...

@@ -1,0 +1,38 @@
+name: Feature request
+description: Suggest an improvement to an existing skill, hook, or plugin
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: What part of the project would this improve?
+      options:
+        - Existing skill
+        - Existing hook
+        - Plugin (pdf-playground)
+        - Plugin (other)
+        - Documentation / docs site
+        - Installation / setup
+        - CI / tooling
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: which
+    attributes:
+      label: Which skill, hook, or plugin?
+      description: Leave blank if this is a general improvement
+      placeholder: e.g., data-journalism, pre-publish-checklist
+  - type: textarea
+    id: description
+    attributes:
+      label: What would you like to see?
+      description: Describe the improvement
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Why is this useful?
+      description: What problem does this solve or what workflow does it improve?

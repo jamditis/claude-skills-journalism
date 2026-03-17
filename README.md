@@ -288,20 +288,9 @@ When preserving or tracking content:
 
 ## Contributing
 
-Contributions welcome! Please:
+Contributions welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide — skill structure, testing, and style guidelines.
 
-1. Fork the repository
-2. Create a skill following the structure above
-3. Include practical examples and templates
-4. Submit a pull request
-
-### Skill guidelines
-
-- Focus on journalism, media, communications, or academic use cases
-- Include actionable workflows, not just information
-- Provide templates where applicable
-- Cite sources for verification methods and standards
-- Test with Claude Code before submitting
+Quick version: fork, create your skill with a `SKILL.md` frontmatter file, test with Claude Code, submit a PR.
 
 ## Target audiences
 
