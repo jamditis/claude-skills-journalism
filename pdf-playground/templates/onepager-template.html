@@ -50,7 +50,8 @@
             height: 11in;
             background: var(--white);
             margin: 0 auto;
-            position: relative;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
             overflow: hidden;
             box-shadow: 0 4px 24px rgba(0,0,0,0.12);
         }
@@ -114,7 +115,6 @@
             grid-template-columns: 1fr 2.5in;
             gap: 0.4in;
             padding: 0.4in 0.6in 0.3in;
-            height: calc(11in - 1.1in - 0.75in);
             overflow: hidden;
         }
 
@@ -217,10 +217,6 @@
 
         /* Footer */
         .footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
             background: var(--black);
             color: var(--white);
             padding: 0.25in 0.6in;

@@ -63,7 +63,8 @@ If no topic provided, ask for:
 
 Content MUST NOT touch or overlap the footer. This is a common issue.
 
-- The `.content` area MUST have `overflow: hidden` to prevent text bleeding into the footer zone
+- The page MUST use `display: grid; grid-template-rows: auto 1fr auto` so the footer takes its natural height and content fills the rest — no magic-number `calc()` for heights
+- The `.content` area MUST have `overflow: hidden` to prevent text bleeding past its bounds
 - Use `padding-bottom: 0.3in` (minimum) on the content area to create a buffer
 - After generating, always take a screenshot and visually verify the bottom of the page
 - If content is too long, **remove content** rather than shrinking the clearance — the footer gap is non-negotiable
