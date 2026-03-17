@@ -65,10 +65,11 @@ If not provided, ask for:
 
 ## Footer clearance (critical)
 
-Content MUST NOT touch or overlap the footer. This is a common issue.
+Content MUST NOT touch or overlap the footer.
 
-- The `.flyer` element MUST use `display: grid; grid-template-rows: auto 1fr auto` so the footer takes its natural height and content fills the rest
-- The content area MUST have `overflow: hidden` to prevent text bleeding past its bounds
+- The `.flyer` element MUST use `display: grid; grid-template-rows: auto 1fr auto`
+- It MUST have exactly 3 direct children: `<header class="flyer-header">`, `<div class="flyer-content">`, `<footer class="flyer-footer">`
+- The content wrapper (`.flyer-content`) MUST have `overflow: hidden` to prevent text bleeding
 - Never use `position: absolute` for footers — keep them in normal document flow as the third grid row
 - After generating, always take a screenshot and visually verify the bottom of the page
 - If content is too long, **reduce content** rather than shrinking the footer gap
