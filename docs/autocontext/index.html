@@ -77,6 +77,7 @@
     <meta name="twitter:title" content="AutoContext">
     <meta name="twitter:description" content="A Claude Code plugin that accumulates project knowledge across sessions and developers. Lessons persist, confidence scores track reliability, and corrections feed back automatically.">
     <meta name="twitter:image" content="https://skills.amditis.tech/autocontext/og-image.png">
+<script src="../ask-ai.js" defer></script>
 </head>
 <body class="font-sans">
     <div class="paper-overlay"></div>
@@ -375,6 +376,141 @@
 
         <section class="py-24 px-6">
             <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">How confidence works</h2>
+                    <p class="text-lg text-mist max-w-3xl mx-auto">Every lesson has a confidence score from 0.0 to 1.0. The score determines whether a lesson gets loaded, how prominently it appears, and when it fades away.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start reveal">
+                    <div class="space-y-6">
+                        <div class="feature-card p-6 rounded-xl">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-accentLight rounded-lg flex items-center justify-center"><i data-lucide="plus-circle" class="w-5 h-5 text-accent"></i></div>
+                                <h3 class="font-display text-lg font-bold">New lesson: 0.5</h3>
+                            </div>
+                            <p class="text-mist text-sm">Auto-extracted lessons start at 0.5 confidence. Lessons seeded from CLAUDE.md start at 0.6 (slightly higher since they were already documented). This puts new lessons in the "visible but not trusted" range.</p>
+                        </div>
+                        <div class="feature-card p-6 rounded-xl">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center"><i data-lucide="check" class="w-5 h-5 text-green-600"></i></div>
+                                <h3 class="font-display text-lg font-bold">Validation: +0.1</h3>
+                            </div>
+                            <p class="text-mist text-sm">Each session that loads a lesson without contradicting it bumps confidence by 0.1 (capped at 1.0). A lesson validated across 5 sessions reaches 1.0 — the system's highest trust level.</p>
+                        </div>
+                        <div class="feature-card p-6 rounded-xl">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center"><i data-lucide="x" class="w-5 h-5 text-red-500"></i></div>
+                                <h3 class="font-display text-lg font-bold">Contradiction: &minus;0.2</h3>
+                            </div>
+                            <p class="text-mist text-sm">If a session contradicts a lesson (the user corrects the behavior the lesson describes), confidence drops by 0.2. Contradictions carry twice the weight of validations — one correction matters more than two confirmations.</p>
+                        </div>
+                        <div class="feature-card p-6 rounded-xl">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center"><i data-lucide="clock" class="w-5 h-5 text-amber-600"></i></div>
+                                <h3 class="font-display text-lg font-bold">Staleness decay: &minus;0.1 per 30 days</h3>
+                            </div>
+                            <p class="text-mist text-sm">Lessons not validated within the staleness window (default: 60 days) begin decaying. A lesson ignored for 3 months loses 0.1 confidence. This prevents old, possibly-outdated knowledge from cluttering the session.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="feature-card p-6 rounded-xl mb-6">
+                            <h3 class="font-display text-lg font-bold mb-4">Confidence threshold</h3>
+                            <p class="text-mist text-sm mb-4">Lessons below the threshold (default 0.3) aren't loaded at session start. They still exist in <code>lessons.json</code> and can be reviewed with <code>/autocontext-review</code>, but they don't consume session context.</p>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex items-center justify-between text-xs font-mono mb-1"><span class="text-green-600">High confidence</span><span>0.7 – 1.0</span></div>
+                                    <div class="h-3 bg-green-100 rounded-full overflow-hidden"><div class="h-full bg-green-500 rounded-full" style="width:85%"></div></div>
+                                    <p class="text-mist text-xs mt-1">Loaded first, shown prominently in playbook</p>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between text-xs font-mono mb-1"><span class="text-amber-600">Medium confidence</span><span>0.3 – 0.7</span></div>
+                                    <div class="h-3 bg-amber-100 rounded-full overflow-hidden"><div class="h-full bg-amber-500 rounded-full" style="width:50%"></div></div>
+                                    <p class="text-mist text-xs mt-1">Loaded if space permits, ranked below high-confidence</p>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between text-xs font-mono mb-1"><span class="text-red-500">Below threshold</span><span>0.0 – 0.3</span></div>
+                                    <div class="h-3 bg-red-100 rounded-full overflow-hidden"><div class="h-full bg-red-400 rounded-full" style="width:15%"></div></div>
+                                    <p class="text-mist text-xs mt-1">Not loaded — available only via <code>/autocontext-review</code></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="feature-card p-6 rounded-xl">
+                            <h3 class="font-display text-lg font-bold mb-3">Why time-based decay?</h3>
+                            <p class="text-mist text-sm">Session-count-based decay would need a global counter synced across all machines and developers. Time-based decay uses only the <code>last_validated</code> timestamp on each lesson, which merges cleanly across branches. No coordination needed.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">How lessons are captured</h2>
+                    <p class="text-lg text-mist max-w-3xl mx-auto">The <code>UserPromptSubmit</code> hook scans every message for correction patterns. No LLM call — just fast pattern matching on the text you type.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 reveal">
+                    <div>
+                        <h3 class="font-display text-2xl font-bold mb-6">Correction patterns</h3>
+                        <p class="text-mist text-sm mb-6">When you correct Claude mid-session, the hook captures your message as a lesson candidate. These phrases trigger detection:</p>
+                        <div class="space-y-3">
+                            <div class="feature-card p-4 rounded-lg">
+                                <code class="text-accent text-sm">"no, use X instead"</code>
+                                <p class="text-mist text-xs mt-1">Direct correction — Claude did the wrong thing, and you're telling it the right way</p>
+                            </div>
+                            <div class="feature-card p-4 rounded-lg">
+                                <code class="text-accent text-sm">"that's wrong" / "don't do that"</code>
+                                <p class="text-mist text-xs mt-1">Negative feedback — Claude made an error worth remembering</p>
+                            </div>
+                            <div class="feature-card p-4 rounded-lg">
+                                <code class="text-accent text-sm">"actually it should be..."</code>
+                                <p class="text-mist text-xs mt-1">Correction with the right answer inline</p>
+                            </div>
+                            <div class="feature-card p-4 rounded-lg">
+                                <code class="text-accent text-sm">"remember that..." / "keep in mind..."</code>
+                                <p class="text-mist text-xs mt-1">Explicit instruction to retain knowledge</p>
+                            </div>
+                            <div class="feature-card p-4 rounded-lg">
+                                <code class="text-accent text-sm">"the correct way is..." / "you forgot that..."</code>
+                                <p class="text-mist text-xs mt-1">Teaching moment — Claude missed something it should know</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-2xl font-bold mb-6">Three-phase extraction</h3>
+                        <p class="text-mist text-sm mb-6">Lesson extraction is split across three lifecycle events to avoid the SessionEnd timeout constraint (default 1.5 seconds):</p>
+                        <div class="space-y-4">
+                            <div class="feature-card p-5 rounded-xl border-l-4 border-accent">
+                                <div class="text-xs font-mono text-accent mb-1">Phase 1 — During session</div>
+                                <h4 class="font-display font-bold mb-1">Detect and queue</h4>
+                                <p class="text-mist text-sm"><code>UserPromptSubmit</code> pattern-matches your corrections and appends raw candidates to <code>pending-lessons.json</code>. No LLM call — this takes milliseconds.</p>
+                            </div>
+                            <div class="feature-card p-5 rounded-xl border-l-4 border-accent">
+                                <div class="text-xs font-mono text-accent mb-1">Phase 2 — Session end</div>
+                                <h4 class="font-display font-bold mb-1">Save candidates</h4>
+                                <p class="text-mist text-sm"><code>SessionEnd</code> writes the candidates file and bumps <code>validated_count</code> on loaded lessons. Pure file I/O — fits in the 1.5s timeout.</p>
+                            </div>
+                            <div class="feature-card p-5 rounded-xl border-l-4 border-accent">
+                                <div class="text-xs font-mono text-accent mb-1">Phase 3 — Next session start</div>
+                                <h4 class="font-display font-bold mb-1">Curate with LLM</h4>
+                                <p class="text-mist text-sm"><code>SessionStart</code> calls <code>claude -p</code> with the curator prompt. It decides which candidates are project-specific, actionable, and worth keeping. Approved lessons get added to <code>lessons.json</code> at confidence 0.5.</p>
+                            </div>
+                        </div>
+                        <div class="feature-card p-5 rounded-xl mt-4 bg-accent/5 border-accent/20">
+                            <h4 class="font-display font-bold mb-2">What the curator rejects</h4>
+                            <ul class="text-mist text-sm space-y-1 list-disc list-inside">
+                                <li>General programming knowledge ("use git for version control")</li>
+                                <li>Vague advice ("be careful with X")</li>
+                                <li>One-time tasks that won't recur</li>
+                                <li>Anything containing secrets, API keys, or PII</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
                 <div class="text-center mb-16 reveal"><h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">What's included</h2></div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 reveal">
                     <div class="feature-card p-6 rounded-xl">
@@ -432,6 +568,286 @@
                             <div class="flex items-center gap-2"><code class="text-accent font-semibold">/autocontext-evolve</code><span class="text-[9px] font-bold tracking-wider uppercase bg-accent/10 text-accent px-2 py-0.5 rounded">new</span></div>
                             <p class="text-mist text-sm mt-2">Fold validated lessons into skill files. Claude rewrites the skill with lessons woven in naturally. Supports <code>--rollback</code>, <code>--export</code>, and <code>--import</code> for backup and cross-machine sync.</p>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Cross-developer merging</h2>
+                    <p class="text-lg text-mist max-w-3xl mx-auto">When two developers both accumulate lessons independently, <code>git pull</code> triggers a custom merge driver that resolves conflicts field by field — no manual conflict resolution needed.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 reveal">
+                    <div>
+                        <h3 class="font-display text-2xl font-bold mb-6">How the merge driver works</h3>
+                        <p class="text-mist text-sm mb-4">The driver (<code>scripts/merge-driver.py</code>) gets three versions of <code>lessons.json</code>: the common ancestor, yours, and theirs. It merges them with union semantics — both sides' new lessons are kept, and conflicts on shared lessons are resolved per field.</p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead><tr class="border-b border-ink/10"><th class="text-left py-2 pr-3 font-mono text-xs text-accent">Field</th><th class="text-left py-2 pr-3 text-mist">Resolution</th><th class="text-left py-2 text-mist">Rationale</th></tr></thead>
+                                <tbody class="text-mist">
+                                    <tr class="border-b border-ink/5"><td class="py-2 pr-3 font-mono text-xs">validated_count</td><td class="py-2 pr-3">Additive</td><td class="py-2">Both devs may have validated independently</td></tr>
+                                    <tr class="border-b border-ink/5"><td class="py-2 pr-3 font-mono text-xs">confidence</td><td class="py-2 pr-3">Higher value wins</td><td class="py-2">More evidence = more trust</td></tr>
+                                    <tr class="border-b border-ink/5"><td class="py-2 pr-3 font-mono text-xs">last_validated</td><td class="py-2 pr-3">Most recent</td><td class="py-2">Latest validation is most relevant</td></tr>
+                                    <tr class="border-b border-ink/5"><td class="py-2 pr-3 font-mono text-xs">deleted</td><td class="py-2 pr-3"><code>true</code> wins</td><td class="py-2">Deletion is intentional</td></tr>
+                                    <tr class="border-b border-ink/5"><td class="py-2 pr-3 font-mono text-xs">tags</td><td class="py-2 pr-3">Union</td><td class="py-2">Tags are additive, never lost</td></tr>
+                                    <tr class="border-b border-ink/5"><td class="py-2 pr-3 font-mono text-xs">text, context</td><td class="py-2 pr-3">Flag <code>needs_review</code></td><td class="py-2">Content changes need human review</td></tr>
+                                    <tr><td class="py-2 pr-3 font-mono text-xs">supersedes</td><td class="py-2 pr-3">Non-null wins</td><td class="py-2">If both non-null, flags for review</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="feature-card p-6 rounded-xl">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-accentLight rounded-lg flex items-center justify-center"><i data-lucide="archive" class="w-5 h-5 text-accent"></i></div>
+                                <h3 class="font-display text-lg font-bold">Tombstone deletion</h3>
+                            </div>
+                            <p class="text-mist text-sm">Deleted lessons aren't removed from the array — they stay with <code>"deleted": true</code>. This prevents a deleted lesson from being re-added by another developer's stale copy. Tombstones accumulate until you clean them up with <code>/autocontext-review</code>.</p>
+                        </div>
+                        <div class="feature-card p-6 rounded-xl">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-accentLight rounded-lg flex items-center justify-center"><i data-lucide="shield-alert" class="w-5 h-5 text-accent"></i></div>
+                                <h3 class="font-display text-lg font-bold">Safety net</h3>
+                            </div>
+                            <p class="text-mist text-sm">If <code>lessons.json</code> fails to parse after a merge (bad JSON from a manual edit or broken merge), the SessionStart hook warns and skips lesson injection rather than crashing the session. The driver must be installed locally — <code>.gitattributes</code> only declares which files use it. If missing, SessionStart warns you to run <code>/autocontext-init</code>.</p>
+                        </div>
+                        <div class="feature-card p-6 rounded-xl">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-accentLight rounded-lg flex items-center justify-center"><i data-lucide="user" class="w-5 h-5 text-accent"></i></div>
+                                <h3 class="font-display text-lg font-bold">Identity attribution</h3>
+                            </div>
+                            <p class="text-mist text-sm">Each lesson records its <code>created_by</code> identity. Identity comes from <code>config.local.json</code> (gitignored), the global <code>~/.claude/autocontext.json</code>, or falls back to <code>git config user.email</code> + hostname. Never stored in the shared config.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 px-6 bg-ink text-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4 text-white">Lesson anatomy</h2>
+                    <p class="text-lg text-white/60 max-w-2xl mx-auto">Each lesson is a JSON object with fields for content, scoring, attribution, and lifecycle management.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 reveal">
+                    <div>
+                        <pre><code>{
+  "id": "lesson_a1b2c3d4",
+  "schema_version": 1,
+  "category": "efficiency",
+  "text": "POST /api/ideas/ requires trailing slash",
+  "context": "Dashboard Board API, FastAPI routes",
+  "confidence": 0.9,
+  "validated_count": 3,
+  "last_validated": "2026-03-13T22:00:00Z",
+  "created": "2026-03-10T14:00:00Z",
+  "created_by": "joe@officejawn",
+  "supersedes": null,
+  "deleted": false,
+  "tags": ["api", "fastapi", "machine:officejawn"]
+}</code></pre>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-white/5 border border-white/10 rounded-lg">
+                            <code class="text-accent text-sm">id</code>
+                            <p class="text-white/60 text-sm mt-1">Unique identifier. Format: <code>lesson_</code> + 8 hex chars. Used by the merge driver to match lessons across branches.</p>
+                        </div>
+                        <div class="p-4 bg-white/5 border border-white/10 rounded-lg">
+                            <code class="text-accent text-sm">category</code>
+                            <p class="text-white/60 text-sm mt-1">One of <code>efficiency</code> (API patterns, conventions), <code>codebase</code> (schema, architecture), or <code>optimization</code> (performance, benchmarks). Determines playbook grouping.</p>
+                        </div>
+                        <div class="p-4 bg-white/5 border border-white/10 rounded-lg">
+                            <code class="text-accent text-sm">supersedes</code>
+                            <p class="text-white/60 text-sm mt-1">Points to the ID of a lesson this one replaces. The old lesson gets <code>deleted: true</code>. This creates an audit trail — you can trace how knowledge evolved.</p>
+                        </div>
+                        <div class="p-4 bg-white/5 border border-white/10 rounded-lg">
+                            <code class="text-accent text-sm">tags</code>
+                            <p class="text-white/60 text-sm mt-1">Free-form strings for file paths, module names, and concepts. Tags prefixed with <code>machine:</code> are filtered on non-matching machines — <code>machine:officejawn</code> only loads on officejawn.</p>
+                        </div>
+                        <div class="p-4 bg-white/5 border border-white/10 rounded-lg">
+                            <code class="text-accent text-sm">schema_version</code>
+                            <p class="text-white/60 text-sm mt-1">Currently <code>1</code>. Enables future format migrations without breaking existing lesson files.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Test quality rules</h2>
+                    <p class="text-lg text-mist max-w-3xl mx-auto">Five built-in rules catch common test anti-patterns. Two are deterministic (regex-based, no LLM cost). Three are advisory (LLM-based, run as part of the PreToolUse hook).</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 reveal">
+                    <div class="feature-card p-6 rounded-xl border-l-4 border-green-500">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-[10px] font-mono bg-green-50 text-green-700 px-2 py-0.5 rounded">deterministic</span>
+                            <h3 class="font-display text-base font-bold">No bare assertions</h3>
+                        </div>
+                        <p class="text-mist text-sm mb-3">Regex scan for weak assertions: <code>assert True</code>, <code>assert result is not None</code>, <code>assert len(result) > 0</code>, <code>self.assertTrue(True)</code>.</p>
+                        <p class="text-mist text-xs">These assertions prove the code ran without errors, but don't verify it produced the right output.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl border-l-4 border-green-500">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-[10px] font-mono bg-green-50 text-green-700 px-2 py-0.5 rounded">deterministic</span>
+                            <h3 class="font-display text-base font-bold">No happy path only</h3>
+                        </div>
+                        <p class="text-mist text-sm mb-3">Counts test method names. If all start with <code>test_success</code> / <code>test_valid</code> / <code>test_happy</code> and none contain <code>error</code> / <code>fail</code> / <code>invalid</code> / <code>edge</code>, it flags the file.</p>
+                        <p class="text-mist text-xs">Good test suites cover failure modes, not just the golden path. May produce false positives on small test files.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl border-l-4 border-blue-500">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-[10px] font-mono bg-blue-50 text-blue-700 px-2 py-0.5 rounded">advisory</span>
+                            <h3 class="font-display text-base font-bold">Tautological test check</h3>
+                        </div>
+                        <p class="text-mist text-sm mb-3">LLM checks whether assertions are derived from reading the implementation rather than from the task or spec.</p>
+                        <p class="text-mist text-xs">A test that copies the implementation's output as its expected value will always pass — even if the implementation is wrong.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl border-l-4 border-blue-500">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-[10px] font-mono bg-blue-50 text-blue-700 px-2 py-0.5 rounded">advisory</span>
+                            <h3 class="font-display text-base font-bold">No mock everything</h3>
+                        </div>
+                        <p class="text-mist text-sm mb-3">LLM checks if mocked return values are the same values being asserted. If so, the test is verifying the mock, not the code.</p>
+                        <p class="text-mist text-xs">When <code>mock.return_value = X</code> and the assertion is <code>assert result == X</code>, nothing is being tested.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl border-l-4 border-blue-500 md:col-span-2 md:max-w-[calc(50%-0.75rem)]">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-[10px] font-mono bg-blue-50 text-blue-700 px-2 py-0.5 rounded">advisory</span>
+                            <h3 class="font-display text-base font-bold">Test independence</h3>
+                        </div>
+                        <p class="text-mist text-sm mb-3">LLM checks whether the test would still pass if the feature under test didn't exist.</p>
+                        <p class="text-mist text-xs">A test that passes without its feature code is testing infrastructure, not behavior.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Configuration</h2>
+                    <p class="text-lg text-mist max-w-3xl mx-auto">Two config files control behavior — one shared across the team (git-tracked), one local to your machine (gitignored).</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 reveal">
+                    <div>
+                        <h3 class="font-display text-2xl font-bold mb-4"><code>config.json</code> <span class="text-sm font-sans font-normal text-mist">(shared, git-tracked)</span></h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead><tr class="border-b border-ink/10"><th class="text-left py-2 pr-3 font-mono text-xs text-accent">Key</th><th class="text-left py-2 pr-3 text-mist">Default</th><th class="text-left py-2 text-mist">Description</th></tr></thead>
+                                <tbody class="text-mist">
+                                    <tr class="border-b border-ink/5"><td class="py-2 pr-3 font-mono text-xs">max_session_lessons</td><td class="py-2 pr-3">15</td><td class="py-2">Max lessons loaded at session start</td></tr>
+                                    <tr class="border-b border-ink/5"><td class="py-2 pr-3 font-mono text-xs">confidence_threshold</td><td class="py-2 pr-3">0.3</td><td class="py-2">Minimum confidence to load a lesson</td></tr>
+                                    <tr class="border-b border-ink/5"><td class="py-2 pr-3 font-mono text-xs">staleness_days</td><td class="py-2 pr-3">60</td><td class="py-2">Days before confidence decay starts</td></tr>
+                                    <tr class="border-b border-ink/5"><td class="py-2 pr-3 font-mono text-xs">performance_baselines</td><td class="py-2 pr-3">true</td><td class="py-2">Track test/build time regressions</td></tr>
+                                    <tr class="border-b border-ink/5"><td class="py-2 pr-3 font-mono text-xs">persistence_mode</td><td class="py-2 pr-3">auto_curated</td><td class="py-2"><code>auto_curated</code>, <code>ask_before_persist</code>, or <code>auto_persist_all</code></td></tr>
+                                    <tr class="border-b border-ink/5"><td class="py-2 pr-3 font-mono text-xs">baseline_commands</td><td class="py-2 pr-3">[pytest, npm test, ...]</td><td class="py-2">Commands that trigger performance tracking</td></tr>
+                                    <tr><td class="py-2 pr-3 font-mono text-xs">builtin_rules</td><td class="py-2 pr-3">all true</td><td class="py-2">Toggle each of the 5 test quality rules</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-2xl font-bold mb-4"><code>config.local.json</code> <span class="text-sm font-sans font-normal text-mist">(per-machine, gitignored)</span></h3>
+                        <div class="overflow-x-auto mb-6">
+                            <table class="w-full text-sm">
+                                <thead><tr class="border-b border-ink/10"><th class="text-left py-2 pr-3 font-mono text-xs text-accent">Key</th><th class="text-left py-2 text-mist">Description</th></tr></thead>
+                                <tbody class="text-mist">
+                                    <tr><td class="py-2 pr-3 font-mono text-xs">identity</td><td class="py-2">Your name or username for lesson attribution</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="feature-card p-6 rounded-xl">
+                            <h4 class="font-display font-bold mb-3">Directory structure</h4>
+                            <pre class="text-xs"><code>.autocontext/
+├── lessons.json         # All lessons (including tombstones)
+├── playbook.md          # Auto-generated summary
+├── config.json          # Shared settings
+├── config.local.json    # Per-machine (gitignored)
+├── .gitattributes       # Merge driver declaration
+├── .gitignore           # Excludes local + cache
+├── cache/               # Session state (gitignored)
+│   ├── session-lessons.json
+│   └── pending-lessons.json
+└── archive/
+    └── superseded.json  # Pruned lessons (audit trail)</code></pre>
+                        </div>
+                        <div class="feature-card p-5 rounded-xl mt-4">
+                            <h4 class="font-display font-bold mb-2">Persistence modes</h4>
+                            <ul class="text-mist text-sm space-y-2">
+                                <li><code class="text-accent">auto_curated</code> — Lessons go through the curator LLM before being saved. Recommended for most projects.</li>
+                                <li><code class="text-accent">ask_before_persist</code> — Curated lessons are shown via <code>/autocontext-review</code> for manual approval.</li>
+                                <li><code class="text-accent">auto_persist_all</code> — Every correction is saved directly. No curator, no review. Use for fast-moving solo projects.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Use cases</h2>
+                    <p class="text-lg text-mist max-w-3xl mx-auto">The plugin is project-agnostic. Any codebase where Claude Code sessions repeat the same mistakes benefits.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 reveal">
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accentLight rounded-lg flex items-center justify-center mb-4"><i data-lucide="globe" class="w-6 h-6 text-accent"></i></div>
+                        <h3 class="font-display text-xl font-bold mb-2">Content and translation pipelines</h3>
+                        <p class="text-mist text-sm">Lessons accumulate about which content types get mis-scored, terminology patterns, and per-language quirks. Reduces human reviewer corrections over time.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accentLight rounded-lg flex items-center justify-center mb-4"><i data-lucide="gamepad-2" class="w-6 h-6 text-accent"></i></div>
+                        <h3 class="font-display text-xl font-bold mb-2">Multi-developer game projects</h3>
+                        <p class="text-mist text-sm">Schema shapes, authority models, build sequences, and handoff protocols sync via git so both developers' Claude instances share the same understanding of the codebase.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accentLight rounded-lg flex items-center justify-center mb-4"><i data-lucide="server" class="w-6 h-6 text-accent"></i></div>
+                        <h3 class="font-display text-xl font-bold mb-2">Multi-service infrastructure</h3>
+                        <p class="text-mist text-sm">API patterns (auth headers, endpoint quirks), status sync rules, and processing workflows. Prevents repeated mistakes on service integration points.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl">
+                        <div class="w-12 h-12 bg-accentLight rounded-lg flex items-center justify-center mb-4"><i data-lucide="box" class="w-6 h-6 text-accent"></i></div>
+                        <h3 class="font-display text-xl font-bold mb-2">Any large codebase</h3>
+                        <p class="text-mist text-sm">Performance characteristics, architectural decisions, test patterns, and deployment gotchas. The optimization category tracks build/test timing baselines and flags regressions.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">FAQ</h2>
+                </div>
+                <div class="max-w-3xl mx-auto space-y-6 reveal">
+                    <div class="feature-card p-6 rounded-xl">
+                        <h3 class="font-display text-lg font-bold mb-2">Does this require API keys or external services?</h3>
+                        <p class="text-mist text-sm">No. Everything runs locally via Claude Code hooks. Curation uses <code>claude -p</code> (a subprocess call to your existing Claude Code installation), not a direct API call. No tokens, no accounts, no daemons.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl">
+                        <h3 class="font-display text-lg font-bold mb-2">What's the token cost?</h3>
+                        <p class="text-mist text-sm">SessionStart and SessionEnd are command hooks — no LLM cost. UserPromptSubmit is pattern matching — no LLM cost. The PreToolUse hook is prompt-based and has token cost proportional to the number of Edit/Write/Bash calls. If cost is a concern, disable it with <code>pretooluse_hook: false</code> in config.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl">
+                        <h3 class="font-display text-lg font-bold mb-2">Can I use this with an existing CLAUDE.md?</h3>
+                        <p class="text-mist text-sm">Yes. <code>/autocontext-init</code> offers to seed lessons from your CLAUDE.md. It extracts project-specific gotchas (skipping general programming knowledge) and creates lessons at confidence 0.6. You can review each one before saving.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl">
+                        <h3 class="font-display text-lg font-bold mb-2">What happens if lessons.json gets corrupted?</h3>
+                        <p class="text-mist text-sm">The SessionStart hook validates JSON before loading. If parsing fails (from a bad merge, manual edit, or corruption), it warns and skips lesson injection. The session continues normally — you just don't get lessons that time.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl">
+                        <h3 class="font-display text-lg font-bold mb-2">How is this different from just putting everything in CLAUDE.md?</h3>
+                        <p class="text-mist text-sm">CLAUDE.md is static — you write it, it stays forever. Autocontext is dynamic: lessons are captured from corrections automatically, scored by confidence, decayed when stale, and merged across developers without conflicts. A CLAUDE.md entry has no way to know it's outdated.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl">
+                        <h3 class="font-display text-lg font-bold mb-2">What are the non-goals?</h3>
+                        <p class="text-mist text-sm">No semantic search (tag-based matching is simpler). No training or fine-tuning (knowledge is prompt-level, not weight-level). No MCP server (hooks are lighter and always available). No external services or daemons.</p>
                     </div>
                 </div>
             </div>
