@@ -247,18 +247,9 @@
     var prompt = buildPrompt();
     var encoded = encodeURIComponent(prompt);
 
-    // Wrapper — inherits layout from parent <main>, only adds vertical spacing
-    var wrapper = document.createElement('div');
-    wrapper.setAttribute('data-ask-ai', 'true');
-    applyStyles(wrapper, {
-      'padding': '0.75rem 0 0',
-      'position': 'relative',
-      'z-index': '20',
-      'font-family': FONT,
-    });
-
-    // Container for positioning
+    // Container for the button + dropdown (no wrapper — injected directly into a layout row)
     var container = document.createElement('div');
+    container.setAttribute('data-ask-ai', 'true');
     applyStyles(container, {
       'position': 'relative',
       'display': 'inline-block',
@@ -433,9 +424,8 @@
     // Assemble
     container.appendChild(trigger);
     container.appendChild(panel);
-    wrapper.appendChild(container);
 
-    return wrapper;
+    return container;
   }
 
   // -- Inject into page --
@@ -444,10 +434,19 @@
     var mainEl = document.querySelector('main');
     if (!mainEl) return;
     var component = createComponent();
-    // Insert after a direct-child <header> if present, otherwise first child
-    var inMainHeader = mainEl.querySelector(':scope > header');
-    if (inMainHeader) {
-      inMainHeader.parentNode.insertBefore(component, inMainHeader.nextSibling);
+
+    // Inject inline into an existing layout row. Priority:
+    // 1. First .section-header flex row (index page)
+    // 2. The nav/header bar's inner flex row (subpages)
+    var target = mainEl.querySelector('.section-header');
+    if (!target) {
+      var header = document.querySelector('header, nav');
+      if (header) {
+        target = header.querySelector('[class*="flex"][class*="justify-between"], [class*="flex"][class*="items-center"]');
+      }
+    }
+    if (target) {
+      target.appendChild(component);
     } else {
       mainEl.insertBefore(component, mainEl.firstChild);
     }
