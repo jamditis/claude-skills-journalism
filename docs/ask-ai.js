@@ -1,6 +1,6 @@
 // ask-ai.js — "Ask an AI about this" dropdown for skills.amditis.tech
 // Self-contained vanilla JS. No external CSS dependencies.
-// Injected after the last <header> element on each page.
+// Injected as the first child of <main> on each page.
 
 (function () {
   'use strict';
@@ -405,11 +405,10 @@
   // -- Inject into page --
 
   function inject() {
-    var headers = document.querySelectorAll('header');
-    if (!headers.length) return;
-    var lastHeader = headers[headers.length - 1];
+    var mainEl = document.querySelector('main');
+    if (!mainEl) return;
     var component = createComponent();
-    lastHeader.parentNode.insertBefore(component, lastHeader.nextSibling);
+    mainEl.insertBefore(component, mainEl.firstChild);
   }
 
   if (document.readyState === 'loading') {
