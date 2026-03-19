@@ -278,7 +278,11 @@
       'align-self': 'center',
     });
 
-    trigger.appendChild(makeChatIcon());
+    var chatIcon = makeChatIcon();
+    chatIcon.setAttribute('stroke', '#ffffff');
+    chatIcon.setAttribute('width', '16');
+    chatIcon.setAttribute('height', '16');
+    trigger.appendChild(chatIcon);
 
     trigger.addEventListener('mouseenter', function () {
       trigger.style.opacity = '0.85';
@@ -435,21 +439,19 @@
     if (!mainEl) return;
     var component = createComponent();
 
-    // Inject into the header/nav alongside existing nav links
-    var headerNav = document.querySelector('header nav, nav');
-    if (headerNav) {
-      var navFlex = headerNav.querySelector('[class*="flex"]');
-      if (navFlex) {
-        navFlex.appendChild(component);
+    // Inject into the right side of the nav (alongside nav links, not the logo).
+    // Strategy: find all direct-child flex containers in the nav/header,
+    // and append to the LAST one (right side in justify-between layouts).
+    var nav = document.querySelector('header nav, nav[role="navigation"], nav');
+    if (nav) {
+      var flexChildren = nav.querySelectorAll(':scope > [class*="flex"]');
+      if (flexChildren.length > 1) {
+        // Multiple flex children = justify-between layout; use the last (right side)
+        flexChildren[flexChildren.length - 1].appendChild(component);
+      } else if (flexChildren.length === 1) {
+        flexChildren[0].appendChild(component);
       } else {
-        headerNav.appendChild(component);
-      }
-    } else {
-      // Fallback: first header's inner flex row
-      var header = document.querySelector('header');
-      if (header) {
-        var headerFlex = header.querySelector('[class*="flex"]');
-        if (headerFlex) headerFlex.appendChild(component);
+        nav.appendChild(component);
       }
     }
   }
