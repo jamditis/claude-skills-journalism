@@ -180,7 +180,7 @@
     // Trigger — styled as a nav text link with a small icon
     var trigger = document.createElement('button');
     trigger.setAttribute('aria-expanded', 'false');
-    trigger.setAttribute('aria-haspopup', 'dialog');
+    trigger.setAttribute('aria-haspopup', 'menu');
     trigger.setAttribute('type', 'button');
     trigger.title = 'Ask an AI about this page';
 
@@ -218,9 +218,12 @@
       { label: 'Ask Claude', iconFn: makeClaudeIcon, href: 'https://claude.ai/new?q=' + encoded },
       { label: 'Ask ChatGPT', iconFn: function () { return makeChatIcon(20, COLORS.iconColor); }, href: 'https://chatgpt.com/?q=' + encoded },
       { label: 'Ask Gemini (copies prompt)', iconFn: makeGeminiIcon, action: function () {
-        navigator.clipboard.writeText(prompt).then(function () {
-          window.open('https://gemini.google.com/app', '_blank', 'noopener,noreferrer');
-        });
+        var geminiUrl = 'https://gemini.google.com/app';
+        var w = window.open(geminiUrl, '_blank', 'noopener,noreferrer');
+        if (!w) window.location.href = geminiUrl;
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+          navigator.clipboard.writeText(prompt).catch(function () {});
+        }
       }},
       { label: 'Download as markdown', iconFn: makeDownloadIcon, action: downloadMarkdown },
     ];
@@ -251,6 +254,8 @@
       el.appendChild(span);
       el.addEventListener('mouseenter', function () { el.style.background = COLORS.itemHover; });
       el.addEventListener('mouseleave', function () { el.style.background = 'transparent'; });
+      el.addEventListener('focus', function () { el.style.background = COLORS.itemHover; });
+      el.addEventListener('blur', function () { el.style.background = 'transparent'; });
       panel.appendChild(el);
     });
 
@@ -292,29 +297,49 @@
   function inject() {
     var component = createComponent();
 
-    // Strategy: find the right-side nav links container and append there.
-    // Skills index: <nav> with direct-child flex divs — use the last (right side).
-    // Skills subpages: <nav> with inner flex div — append there.
+    // Inject into the right side of the nav.
+    // On subpages with a GitHub link in a justify-between container, group
+    // the widget with the GitHub link so it stays on the right.
+    // On index pages, append to the last flex child (right-side links).
     var nav = document.querySelector('nav[role="navigation"], nav#main-nav, header nav, nav');
     if (!nav) return;
 
-    var flexChildren = nav.querySelectorAll(':scope > [class*="flex"]');
-    if (flexChildren.length > 1) {
-      flexChildren[flexChildren.length - 1].appendChild(component);
-    } else if (flexChildren.length === 1) {
-      flexChildren[0].appendChild(component);
+    var githubLink = nav.querySelector('a[href*="github.com"]');
+    if (githubLink && githubLink.parentElement) {
+      var parent = githubLink.parentElement;
+      var cls = typeof parent.className === 'string' ? parent.className : '';
+      if (cls.indexOf('flex') !== -1 && cls.indexOf('justify-between') !== -1) {
+        // Subpage: wrap GitHub link + Ask AI together on the right
+        var group = document.createElement('span');
+        group.style.cssText = 'display:inline-flex;align-items:center;gap:0.75rem;';
+        parent.replaceChild(group, githubLink);
+        group.appendChild(githubLink);
+        group.appendChild(component);
+      } else {
+        parent.insertBefore(component, githubLink.nextSibling);
+      }
     } else {
-      nav.appendChild(component);
+      var flexChildren = nav.querySelectorAll(':scope > [class*="flex"]');
+      if (flexChildren.length > 1) {
+        flexChildren[flexChildren.length - 1].appendChild(component);
+      } else if (flexChildren.length === 1) {
+        flexChildren[0].appendChild(component);
+      } else {
+        nav.appendChild(component);
+      }
     }
 
-    // Derive trigger color from a sibling link
-    var siblingLink = nav.querySelector('a');
-    if (siblingLink) {
-      var computed = window.getComputedStyle(siblingLink);
-      var btn = component.querySelector('button');
-      if (btn) {
-        btn.style.color = computed.color;
-        COLORS.triggerColor = computed.color;
+    // Derive trigger color from a sibling link in the same container
+    var container = component.parentElement;
+    if (container) {
+      var links = container.querySelectorAll('a');
+      for (var j = 0; j < links.length; j++) {
+        if (!links[j].closest('[data-ask-ai]')) {
+          var computed = window.getComputedStyle(links[j]);
+          var btn = component.querySelector('button');
+          if (btn) { btn.style.color = computed.color; COLORS.triggerColor = computed.color; }
+          break;
+        }
       }
     }
   }
