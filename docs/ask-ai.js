@@ -1,6 +1,6 @@
 // ask-ai.js — "Ask an AI about this" dropdown for skills.amditis.tech
 // Self-contained vanilla JS. No external CSS dependencies.
-// Injected after the last <header> element on each page.
+// Injected as the first child of <main> on each page.
 
 (function () {
   'use strict';
@@ -132,15 +132,49 @@
     return path || 'page';
   }
 
+  function getPageContext() {
+    var parts = [];
+
+    // Meta description
+    var meta = document.querySelector('meta[name="description"]');
+    if (meta && meta.content) {
+      parts.push(meta.content.trim());
+    }
+
+    // Section headings (h2s/h3s) as outline
+    var root = document.querySelector('main') || document.body;
+    var headings = root.querySelectorAll('h2, h3');
+    if (headings.length) {
+      var outline = [];
+      for (var i = 0; i < headings.length && i < 10; i++) {
+        var text = headings[i].textContent.trim();
+        if (text) outline.push('- ' + text);
+      }
+      if (outline.length) {
+        parts.push('Sections covered:\n' + outline.join('\n'));
+      }
+    }
+
+    // First paragraph of main content
+    var firstP = root.querySelector('p');
+    if (firstP && firstP.textContent.trim()) {
+      var pText = firstP.textContent.trim();
+      if (pText.length > 400) pText = pText.substring(0, 400) + '...';
+      parts.push('Intro: ' + pText);
+    }
+
+    return parts.join('\n\n');
+  }
+
   function buildPrompt() {
     var title = getTitle();
-    var hostname = window.location.hostname;
-    var url = window.location.href;
-    return (
-      'I\'m reading about "' + title + '" on ' + hostname + '.\n\n' +
-      'URL: ' + url + '\n\n' +
-      'Can you explain the key concepts and help me apply them?'
-    );
+    var context = getPageContext();
+    var prompt = 'I\'m learning about "' + title + '".';
+    if (context) {
+      prompt += '\n\nHere\'s what the page covers:\n\n' + context;
+    }
+    prompt += '\n\nCan you explain the key concepts and help me understand how to apply them?';
+    return prompt;
   }
 
   // -- Turndown loader (lazy) --
@@ -172,8 +206,11 @@
     loadTurndown()
       .then(function (TurndownService) {
         var td = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced' });
-        var mainEl = document.querySelector('main');
-        var html = mainEl ? mainEl.innerHTML : document.body.innerHTML;
+        var source = document.querySelector('main') || document.body;
+        var clone = source.cloneNode(true);
+        var widget = clone.querySelector('[data-ask-ai]');
+        if (widget) widget.remove();
+        var html = clone.innerHTML;
         var md = td.turndown(html);
         var title = getTitle();
         var url = window.location.href;
@@ -210,12 +247,11 @@
     var prompt = buildPrompt();
     var encoded = encodeURIComponent(prompt);
 
-    // Wrapper — matches max-w-4xl (56rem) with horizontal padding
+    // Wrapper — inherits layout from parent <main>, only adds vertical spacing
     var wrapper = document.createElement('div');
+    wrapper.setAttribute('data-ask-ai', 'true');
     applyStyles(wrapper, {
-      'max-width': '56rem',
-      'margin': '0 auto',
-      'padding': '1rem 1.5rem 0',
+      'padding': '0.75rem 0 0',
       'position': 'relative',
       'z-index': '20',
       'font-family': FONT,
@@ -405,11 +441,16 @@
   // -- Inject into page --
 
   function inject() {
-    var headers = document.querySelectorAll('header');
-    if (!headers.length) return;
-    var lastHeader = headers[headers.length - 1];
+    var mainEl = document.querySelector('main');
+    if (!mainEl) return;
     var component = createComponent();
-    lastHeader.parentNode.insertBefore(component, lastHeader.nextSibling);
+    // Insert after a direct-child <header> if present, otherwise first child
+    var inMainHeader = mainEl.querySelector(':scope > header');
+    if (inMainHeader) {
+      inMainHeader.parentNode.insertBefore(component, inMainHeader.nextSibling);
+    } else {
+      mainEl.insertBefore(component, mainEl.firstChild);
+    }
   }
 
   if (document.readyState === 'loading') {
