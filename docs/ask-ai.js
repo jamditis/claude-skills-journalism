@@ -155,7 +155,7 @@
         return;
       }
       var script = document.createElement('script');
-      script.src = 'https://unpkg.com/turndown/dist/turndown.js';
+      script.src = 'https://unpkg.com/turndown@7.2.0/dist/turndown.js';
       script.onload = function () {
         resolve(window.TurndownService);
       };
@@ -231,7 +231,7 @@
     // Trigger button
     var trigger = document.createElement('button');
     trigger.setAttribute('aria-expanded', 'false');
-    trigger.setAttribute('aria-haspopup', 'true');
+    trigger.setAttribute('aria-haspopup', 'dialog');
     trigger.setAttribute('type', 'button');
     applyStyles(trigger, {
       'background': COLORS.buttonBg,
@@ -264,7 +264,6 @@
 
     // Dropdown panel
     var panel = document.createElement('div');
-    panel.setAttribute('role', 'menu');
     applyStyles(panel, {
       'display': 'none',
       'position': 'absolute',
@@ -316,6 +315,9 @@
         el.href = item.href;
         el.target = '_blank';
         el.rel = 'noopener noreferrer';
+        el.addEventListener('click', function () {
+          closeDropdown();
+        });
       } else {
         el = document.createElement('button');
         el.setAttribute('type', 'button');
@@ -324,7 +326,6 @@
           item.action();
         });
       }
-      el.setAttribute('role', 'menuitem');
       applyStyles(el, ITEM_STYLES);
 
       el.appendChild(item.iconFn());
