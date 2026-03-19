@@ -275,9 +275,10 @@
       'justify-content': 'center',
       'transition': 'opacity 0.15s ease, transform 0.15s ease',
       'flex-shrink': '0',
+      'align-self': 'center',
     });
 
-    trigger.appendChild(makeClaudeIcon());
+    trigger.appendChild(makeChatIcon());
 
     trigger.addEventListener('mouseenter', function () {
       trigger.style.opacity = '0.85';
