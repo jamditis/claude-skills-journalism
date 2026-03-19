@@ -260,33 +260,32 @@
     trigger.setAttribute('aria-expanded', 'false');
     trigger.setAttribute('aria-haspopup', 'dialog');
     trigger.setAttribute('type', 'button');
+    trigger.title = 'Ask an AI about this page';
     applyStyles(trigger, {
       'background': COLORS.buttonBg,
       'color': COLORS.buttonText,
-      'border': '1px solid ' + COLORS.buttonBorder,
-      'border-radius': '0.5rem',
-      'padding': '0.5rem 1rem',
-      'font-family': FONT,
-      'font-size': '0.875rem',
-      'font-weight': '600',
+      'border': 'none',
+      'border-radius': '50%',
+      'width': '2rem',
+      'height': '2rem',
+      'padding': '0',
       'cursor': 'pointer',
       'display': 'inline-flex',
       'align-items': 'center',
-      'gap': '0.5rem',
-      'line-height': '1.4',
-      'transition': 'opacity 0.15s ease',
+      'justify-content': 'center',
+      'transition': 'opacity 0.15s ease, transform 0.15s ease',
+      'flex-shrink': '0',
     });
 
-    var triggerLabel = document.createElement('span');
-    triggerLabel.textContent = 'Ask an AI about this';
-    trigger.appendChild(triggerLabel);
-    trigger.appendChild(makeChevronIcon());
+    trigger.appendChild(makeClaudeIcon());
 
     trigger.addEventListener('mouseenter', function () {
       trigger.style.opacity = '0.85';
+      trigger.style.transform = 'scale(1.1)';
     });
     trigger.addEventListener('mouseleave', function () {
       trigger.style.opacity = '1';
+      trigger.style.transform = 'scale(1)';
     });
 
     // Dropdown panel
@@ -295,7 +294,7 @@
       'display': 'none',
       'position': 'absolute',
       'top': 'calc(100% + 0.5rem)',
-      'left': '0',
+      'right': '0',
       'min-width': '15rem',
       'background': COLORS.panelBg,
       'color': COLORS.panelText,
@@ -435,20 +434,22 @@
     if (!mainEl) return;
     var component = createComponent();
 
-    // Inject inline into an existing layout row. Priority:
-    // 1. First .section-header flex row (index page)
-    // 2. The nav/header bar's inner flex row (subpages)
-    var target = mainEl.querySelector('.section-header');
-    if (!target) {
-      var header = document.querySelector('header, nav');
-      if (header) {
-        target = header.querySelector('[class*="flex"][class*="justify-between"], [class*="flex"][class*="items-center"]');
+    // Inject into the header/nav alongside existing nav links
+    var headerNav = document.querySelector('header nav, nav');
+    if (headerNav) {
+      var navFlex = headerNav.querySelector('[class*="flex"]');
+      if (navFlex) {
+        navFlex.appendChild(component);
+      } else {
+        headerNav.appendChild(component);
       }
-    }
-    if (target) {
-      target.appendChild(component);
     } else {
-      mainEl.insertBefore(component, mainEl.firstChild);
+      // Fallback: first header's inner flex row
+      var header = document.querySelector('header');
+      if (header) {
+        var headerFlex = header.querySelector('[class*="flex"]');
+        if (headerFlex) headerFlex.appendChild(component);
+      }
     }
   }
 
