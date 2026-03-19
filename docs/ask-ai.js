@@ -142,7 +142,8 @@
     }
 
     // Section headings (h2s/h3s) as outline
-    var headings = document.querySelectorAll('main h2, main h3');
+    var root = document.querySelector('main') || document.body;
+    var headings = root.querySelectorAll('h2, h3');
     if (headings.length) {
       var outline = [];
       for (var i = 0; i < headings.length && i < 10; i++) {
@@ -155,7 +156,7 @@
     }
 
     // First paragraph of main content
-    var firstP = document.querySelector('main p');
+    var firstP = root.querySelector('p');
     if (firstP && firstP.textContent.trim()) {
       var pText = firstP.textContent.trim();
       if (pText.length > 400) pText = pText.substring(0, 400) + '...';
@@ -168,7 +169,7 @@
   function buildPrompt() {
     var title = getTitle();
     var context = getPageContext();
-    var prompt = 'I\'m learning about "' + title + '."';
+    var prompt = 'I\'m learning about "' + title + '".';
     if (context) {
       prompt += '\n\nHere\'s what the page covers:\n\n' + context;
     }
@@ -443,7 +444,13 @@
     var mainEl = document.querySelector('main');
     if (!mainEl) return;
     var component = createComponent();
-    mainEl.insertBefore(component, mainEl.firstChild);
+    // Insert after a direct-child <header> if present, otherwise first child
+    var inMainHeader = mainEl.querySelector(':scope > header');
+    if (inMainHeader) {
+      inMainHeader.parentNode.insertBefore(component, inMainHeader.nextSibling);
+    } else {
+      mainEl.insertBefore(component, mainEl.firstChild);
+    }
   }
 
   if (document.readyState === 'loading') {
