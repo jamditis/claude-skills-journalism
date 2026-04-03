@@ -15,7 +15,7 @@ import argparse
 import json
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import datetime
 
 # ── Default signal classification ─────────────────────────────────────────────
 
@@ -65,6 +65,8 @@ def load_config(config_path):
 
 def build_classifiers(overrides):
     """Return (high_tools, medium_tools, high_bash, medium_bash) using overrides where present."""
+    if not isinstance(overrides, dict):
+        overrides = {}
     high_tools = set(overrides.get("high_tool_names", DEFAULT_HIGH_TOOL_NAMES))
     medium_tools = set(overrides.get("medium_tool_names", DEFAULT_MEDIUM_TOOL_NAMES))
     high_bash = overrides.get("high_bash_patterns", DEFAULT_HIGH_BASH_PATTERNS)
@@ -197,10 +199,10 @@ def scan(transcript_path, since_ts, overrides):
 
                 if tier == "high":
                     has_high = True
-                    signals.append({"type": name, "detail": detail, "ts": entry_ts})
+                    signals.append({"type": name, "detail": detail, "ts": entry_ts or 0})
                 elif tier == "medium":
                     has_medium = True
-                    signals.append({"type": name, "detail": detail, "ts": entry_ts})
+                    signals.append({"type": name, "detail": detail, "ts": entry_ts or 0})
 
     # Determine overall level
     if has_high:
