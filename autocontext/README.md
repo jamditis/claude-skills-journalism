@@ -97,6 +97,7 @@ Two config files live in `.autocontext/`:
 | `playbook_generation` | `auto` | Playbook regeneration: `auto`, `manual`, or `disabled` |
 | `multi_machine` | `{"enabled": false}` | Machine-scoped lessons with hostname list |
 | `builtin_rules` | all true | Toggle individual test quality rules |
+| `activity_signals` | (see below) | Override which tools/patterns count as meaningful activity (see Transcript scanner section) |
 
 **`config.local.json`** (gitignored, per-developer):
 
@@ -105,6 +106,50 @@ Two config files live in `.autocontext/`:
 | `identity` | Your name or username for lesson attribution |
 
 Machine-specific lessons can be tagged with `machine:<hostname>` to prevent them loading on other machines.
+
+## Transcript scanner
+
+The plugin includes a transcript scanner utility that detects meaningful activity in Claude Code session transcripts. It powers the activity gate in `session-end.sh` (skipping lesson validation when only research happened) and can be used by custom hooks.
+
+**Usage from a hook script:**
+
+```bash
+RESULT=$(python3 "$PLUGIN_ROOT/scripts/transcript-scanner.py" \
+    --transcript "$TRANSCRIPT_PATH" \
+    --since "$LAST_HANDOFF_MTIME" \
+    --config ".autocontext/config.json")
+
+# Returns JSON:
+# {"meaningful": true, "level": "high", "signals": [...], "tool_counts": {...}}
+```
+
+**Arguments:**
+- `--transcript` — path to the session JSONL file
+- `--since` — Unix timestamp (seconds). Only scan entries after this time. Default: scan all.
+- `--config` — path to config file. Reads `activity_signals` key if present.
+
+**Signal levels:**
+
+| Level | Triggers |
+|-------|----------|
+| High | Write, Edit, Bash with `git commit` / `gh pr create` / `firebase deploy` / `systemctl restart` |
+| Medium | Agent, Bash with `git push` / `npm run build` / `cargo build` |
+| Low | Read, Grep, Glob, unmatched Bash (does not trigger `meaningful: true`) |
+
+**Custom signal config** (optional key in `.autocontext/config.json`):
+
+```json
+{
+  "activity_signals": {
+    "high_tool_names": ["Write", "Edit"],
+    "medium_tool_names": ["Agent"],
+    "high_bash_patterns": ["git commit", "gh pr create", "deploy"],
+    "medium_bash_patterns": ["git push", "npm run build"]
+  }
+}
+```
+
+Each sub-key fully replaces that tier's defaults when present.
 
 ## Inspiration and attribution
 
