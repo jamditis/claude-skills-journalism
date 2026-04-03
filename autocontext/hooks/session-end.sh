@@ -14,6 +14,36 @@ GENERATE_PLAYBOOK="$PLUGIN_ROOT/scripts/generate-playbook.py"
 INPUT=$(cat)
 SESSION_ID=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('session_id',''))" 2>/dev/null || echo "")
 
+# ── Activity gate: skip validation if no meaningful work happened ──────────
+TRANSCRIPT_PATH=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('transcript_path',''))" 2>/dev/null || echo "")
+SCANNER_SCRIPT="$PLUGIN_ROOT/scripts/transcript-scanner.py"
+
+if [[ -n "$TRANSCRIPT_PATH" ]] && [[ -f "$SCANNER_SCRIPT" ]]; then
+    SINCE_TS=0
+    if [[ -f "$SESSION_LESSONS_FILE" ]]; then
+        SINCE_TS=$(stat -c %Y "$SESSION_LESSONS_FILE" 2>/dev/null || echo 0)
+    fi
+
+    SCAN_RESULT=$(python3 "$SCANNER_SCRIPT" \
+        --transcript "$TRANSCRIPT_PATH" \
+        --since "$SINCE_TS" \
+        --config "$AUTOCONTEXT_DIR/config.json" 2>/dev/null || echo '{"meaningful":true}')
+
+    IS_MEANINGFUL=$(echo "$SCAN_RESULT" | python3 -c "import json,sys; print(json.load(sys.stdin).get('meaningful',True))" 2>/dev/null || echo "True")
+
+    if [[ "$IS_MEANINGFUL" == "False" ]]; then
+        # Time fallback: validate anyway if session is 10+ minutes old
+        NOW=$(date +%s)
+        SESSION_START=$(stat -c %Y "$SESSION_LESSONS_FILE" 2>/dev/null || echo "$NOW")
+        SESSION_AGE=$((NOW - SESSION_START))
+        if [[ "$SESSION_AGE" -lt 600 ]]; then
+            echo '{}'
+            exit 0
+        fi
+    fi
+fi
+# ── End activity gate ──────────────────────────────────────────────────────
+
 if [[ ! -f "$SESSION_LESSONS_FILE" ]]; then
   echo '{}'
   exit 0
