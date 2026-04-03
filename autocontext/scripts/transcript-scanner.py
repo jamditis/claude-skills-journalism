@@ -15,6 +15,7 @@ import argparse
 import json
 import os
 import sys
+from datetime import datetime, timezone
 
 # ── Default signal classification ─────────────────────────────────────────────
 
@@ -42,8 +43,6 @@ DEFAULT_MEDIUM_BASH_PATTERNS = [
 # Tools whose names contain these strings are high-signal (email tools)
 HIGH_TOOL_NAME_SUBSTRINGS = ["email", "compose"]
 
-NOT_MEANINGFUL_TOOLS = {"Read", "Grep", "Glob"}
-
 
 def not_meaningful_result():
     return {"meaningful": False, "level": "none", "signals": [], "tool_counts": {}}
@@ -52,6 +51,8 @@ def not_meaningful_result():
 def load_config(config_path):
     """Load optional config file and return activity_signals overrides (or empty dict)."""
     if not config_path:
+        return {}
+    if not os.path.isfile(config_path):
         return {}
     try:
         with open(config_path) as f:
@@ -109,11 +110,32 @@ def classify_tool_use(name, inp, high_tools, medium_tools, high_bash, medium_bas
     return None, ""
 
 
+def resolve_timestamp(raw_ts):
+    """
+    Resolve a raw timestamp value to Unix seconds (float), or None if unparseable.
+    Handles:
+      - int/float: treated as milliseconds, divided by 1000
+      - str: parsed as ISO 8601 (e.g. "2026-04-03T16:17:28.078Z")
+    """
+    if raw_ts is None:
+        return None
+    if isinstance(raw_ts, (int, float)):
+        return raw_ts / 1000
+    if isinstance(raw_ts, str):
+        try:
+            ts_str = raw_ts.replace("Z", "+00:00")
+            dt = datetime.fromisoformat(ts_str)
+            return dt.timestamp()
+        except ValueError:
+            return None
+    return None
+
+
 def scan(transcript_path, since_ts, overrides):
     """
     Parse the JSONL transcript and return the result dict.
-    since_ts: float seconds (epoch). Entries with ts_ms/1000 < since_ts are skipped.
-              Entries with no ts field are always included (fail-open).
+    since_ts: float seconds (epoch). Entries with timestamp < since_ts are skipped.
+              Entries with no timestamp field are always included (fail-open).
     """
     high_tools, medium_tools, high_bash, medium_bash = build_classifiers(overrides)
 
@@ -123,63 +145,62 @@ def scan(transcript_path, since_ts, overrides):
     has_medium = False
 
     try:
-        with open(transcript_path) as f:
-            lines = f.readlines()
+        transcript_file = open(transcript_path)
     except Exception as e:
         sys.stderr.write(f"[transcript-scanner] could not read transcript: {e}\n")
         return not_meaningful_result()
 
-    for raw_line in lines:
-        raw_line = raw_line.strip()
-        if not raw_line:
-            continue
-
-        try:
-            entry = json.loads(raw_line)
-        except json.JSONDecodeError:
-            continue
-
-        # Only process assistant entries
-        if entry.get("type") != "assistant":
-            continue
-
-        # Timestamp filtering (fail-open: no ts = always include)
-        ts_ms = entry.get("ts")
-        if since_ts is not None and ts_ms is not None:
-            if ts_ms / 1000 < since_ts:
-                continue
-        # ts_ms is the entry-level ts we store in signals
-        entry_ts = ts_ms
-
-        # Walk content array for tool_use blocks
-        content = entry.get("message", {}).get("content", [])
-        if not isinstance(content, list):
-            continue
-
-        for block in content:
-            if not isinstance(block, dict):
-                continue
-            if block.get("type") != "tool_use":
+    with transcript_file:
+        for raw_line in transcript_file:
+            raw_line = raw_line.strip()
+            if not raw_line:
                 continue
 
-            name = block.get("name", "")
-            inp = block.get("input", {})
-            if not isinstance(inp, dict):
-                inp = {}
+            try:
+                entry = json.loads(raw_line)
+            except json.JSONDecodeError:
+                continue
 
-            # Count all tool uses
-            tool_counts[name] = tool_counts.get(name, 0) + 1
+            # Only process assistant entries
+            if entry.get("type") != "assistant":
+                continue
 
-            tier, detail = classify_tool_use(
-                name, inp, high_tools, medium_tools, high_bash, medium_bash
-            )
+            # Timestamp filtering (fail-open: no timestamp = always include)
+            raw_ts = entry.get("timestamp")
+            entry_ts = resolve_timestamp(raw_ts)
+            if since_ts is not None and entry_ts is not None:
+                if entry_ts < since_ts:
+                    continue
 
-            if tier == "high":
-                has_high = True
-                signals.append({"type": name, "detail": detail, "ts": entry_ts})
-            elif tier == "medium":
-                has_medium = True
-                signals.append({"type": name, "detail": detail, "ts": entry_ts})
+            # Walk content array for tool_use blocks
+            content = entry.get("message", {}).get("content", [])
+            if not isinstance(content, list):
+                continue
+
+            for block in content:
+                if not isinstance(block, dict):
+                    continue
+                if block.get("type") != "tool_use":
+                    continue
+
+                name = block.get("name", "")
+                inp = block.get("input", {})
+                if not isinstance(inp, dict):
+                    inp = {}
+
+                # Count all tool uses
+                tool_counts[name] = tool_counts.get(name, 0) + 1
+
+                tier, detail = classify_tool_use(
+                    name, inp, high_tools, medium_tools, high_bash, medium_bash
+                )
+
+                if tier == "high":
+                    has_high = True
+                    signals.append({"type": name, "detail": detail, "ts": entry_ts})
+                elif tier == "medium":
+                    has_medium = True
+                    signals.append({"type": name, "detail": detail, "ts": entry_ts})
 
     # Determine overall level
     if has_high:
