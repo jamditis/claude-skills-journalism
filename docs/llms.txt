@@ -1,0 +1,98 @@
+# Claude skills for journalism
+# https://skills.amditis.tech
+
+## What this is
+
+A collection of Claude Code skills and workflow hooks for journalists, researchers, academics, and media professionals. Skills are modular instruction sets that extend Claude's capabilities for specialized tasks — load them into a Claude Code session and get domain-specific tools and workflows.
+
+Source: https://github.com/jamditis/claude-skills-journalism
+
+## Who made it
+
+Joe Amditis — associate director of operations, Center for Cooperative Media, Montclair State University.
+Personal site: https://jamditis.com
+
+## Skills (31 total)
+
+### Journalism and verification
+- source-verification — SIFT method, verification trails, source credibility
+- foia-requests — drafting and tracking public records requests
+- fact-check-workflow — claim verification, evidence chains
+- crisis-communications — breaking news protocols, rapid verification
+- social-media-intelligence — OSINT, account analysis, social media verification
+
+### Reporting and editorial
+- interview-prep — research, question development, background checks
+- interview-transcription — recording notes, quote handling, attribution
+- newsroom-style — AP Style enforcement and editorial standards
+- data-journalism — data analysis and data-driven storytelling
+- editorial-workflow — assignment tracking, story calendars
+- story-pitch — pitch templates and pitch-writing workflows
+
+### Academic and research
+- academic-writing — research writing, citation, lit review
+- digital-archive — archive building and management
+- web-archiving — Wayback, Archive.today, URL preservation
+- content-access — Unpaywall, CORE, open access tools
+- page-monitoring — change detection and alerts
+
+### Writing quality
+- ai-writing-detox — eliminate AI writing patterns from your work
+- newsletter-publishing — email newsletters and subscriber workflows
+
+### Development
+- vibe-coding — AI-assisted development for non-engineers
+- test-first-bugs — test-driven bug fixing
+- one-way-door — flag irreversible architectural decisions
+- electron-dev — Electron app patterns
+- python-pipeline — data pipeline workflows
+- web-scraping — content extraction
+- zero-build-frontend — no-build web apps
+- mobile-debugging — Eruda, vConsole, remote debug
+- accessibility-compliance — WCAG, alt text, a11y
+- web-ui-best-practices — signs of craft in web UI
+
+### Security
+- security-checklist — pre-deployment security audit
+- secure-auth — authentication patterns
+- api-hardening — API security
+
+## Hooks (14 workflow hooks)
+
+Hooks run automatically at specific workflow events. All are non-blocking warnings.
+
+### Writing quality
+- ap-style-check — flags AP Style violations on write/edit
+- ai-slop-detector — warns about AI writing patterns
+- accessibility-check — checks alt text, headings, link text
+
+### Verification
+- source-attribution-check — flags unattributed quotes or claims
+- verification-reminder — prompts fact verification
+- data-methodology-check — ensures methodology is documented
+
+### Editorial workflow
+- source-diversity-check — notes sourcing diversity
+- legal-review-flag — flags potential defamation risk
+- pre-publish-checklist — pre-publication reminder at session end
+- deadline-tracker — surfaces upcoming deadlines at session start
+
+### Preservation
+- archive-reminder — reminds to archive URLs
+
+### Development
+- one-way-door-check — blocks irreversible architectural decisions
+- bug-report-detector — detects when user is describing a bug
+- enforce-test-first — blocks source edits until a test is written
+
+## Installation
+
+```bash
+git clone https://github.com/jamditis/claude-skills-journalism.git ~/.claude/skills/journalism-skills
+```
+
+Skills load automatically when you start a Claude Code session. Use `/skill-name` to invoke a specific skill.
+
+## License
+
+MIT. Use, adapt, and share freely.
