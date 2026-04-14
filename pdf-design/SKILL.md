@@ -278,6 +278,189 @@ PYEOF
 
 ---
 
+## Reusable content blocks
+
+These patterns were proven out in the NJ Public TV walkthrough deck (pdf-playground 1.3.0) and work just as well inside report and proposal pages. Drop them into any `.page-body` or `.cover-footer`.
+
+### Headline with red accent rule
+
+A tight 0.95in × 0.08in red bar under the headline reads cleaner than a full-width border. Use for section headers inside content pages.
+
+```css
+.section-header h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22pt;
+    font-weight: 800;
+    color: var(--ccm-black);
+    line-height: 1.08;
+}
+
+.section-header h2::after {
+    content: '';
+    display: block;
+    width: 0.95in;
+    height: 0.08in;
+    background: var(--ccm-red);
+    margin-top: 0.14in;
+}
+```
+
+### Stats strip (big-number row)
+
+Row of 3–4 big numbers with a short caption and a red left rule. Great for executive-summary numbers on a cover or intro page.
+
+```html
+<div class="stats-strip">
+    <div class="stat"><div class="big">23,000+</div><div class="label">Students enrolled</div></div>
+    <div class="stat"><div class="big">$660M</div><div class="label">Annual operating budget</div></div>
+    <div class="stat"><div class="big">$2.3B</div><div class="label">Economic impact</div></div>
+    <div class="stat"><div class="big">252</div><div class="label">Acre main campus</div></div>
+</div>
+```
+
+```css
+.stats-strip {
+    display: grid;
+    grid-template-columns: repeat(var(--stat-cols, 4), 1fr);
+    gap: 0.3in;
+}
+.stats-strip .stat {
+    padding: 0.05in 0 0.1in 0.24in;
+    border-left: 4px solid var(--ccm-red);
+}
+.stats-strip .big {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 28pt;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--ccm-black);
+    letter-spacing: -0.015em;
+}
+.stats-strip .label {
+    font-size: 9pt;
+    font-weight: 600;
+    margin-top: 0.1in;
+    color: var(--ccm-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+```
+
+### Three-column content
+
+For breaking one topic into three parallel facets with a dashed divider between columns.
+
+```css
+.three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.3in;
+}
+.three-col > div + div {
+    padding-left: 0.3in;
+    border-left: 2px dashed #d9d9d9;
+}
+.three-col h3 {
+    font-size: 10pt;
+    font-weight: 800;
+    color: var(--ccm-red);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.12in;
+}
+```
+
+### Four-tile pillars
+
+Numbered cards with a red top rule — for parallel capabilities, themes, or commitments. Common on proposal executive summary pages.
+
+```html
+<div class="four-col-tiles">
+    <div class="tile">
+        <div class="tile-num">Pillar 01</div>
+        <h3>Proven facilities and expertise</h3>
+        <p>Short 2–3 line description.</p>
+    </div>
+    <!-- 3 more tiles -->
+</div>
+```
+
+```css
+.four-col-tiles {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.15in;
+}
+.four-col-tiles .tile {
+    border-top: 4px solid var(--ccm-red);
+    padding: 0.18in 0.15in 0.15in;
+    background: #f7f6f5;
+}
+.four-col-tiles .tile-num {
+    font-size: 8pt;
+    font-weight: 800;
+    color: var(--ccm-red);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.08in;
+}
+.four-col-tiles .tile h3 {
+    font-size: 12pt;
+    font-weight: 800;
+    color: var(--ccm-black);
+    margin-bottom: 0.08in;
+}
+.four-col-tiles .tile p {
+    font-size: 9pt;
+    line-height: 1.38;
+    color: var(--ccm-gray);
+    margin: 0;
+}
+```
+
+### Partner / label grid
+
+4-column grid of labeled tiles with a red left accent bar. Use for sponsor lists, letters of support, or advisory board rosters.
+
+```css
+.partner-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.12in 0.18in;
+}
+.partner-grid .partner {
+    position: relative;
+    padding: 0.14in 0.15in 0.14in 0.22in;
+    background: #f7f6f5;
+    font-size: 9pt;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--ccm-black);
+}
+.partner-grid .partner::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 0.06in;
+    background: var(--ccm-red);
+}
+```
+
+### Vertical rhythm
+
+Every block above was tightened based on real presentation feedback. Key principles:
+
+- Accent rule sits ~0.14in below the headline, not further
+- Lede paragraph sits ~0.18in below the headline or rule
+- Body content sits ~0.22in below the lede
+- Between body sections, 0.25–0.3in gap is enough — don't add more
+- Between grid cards, use 0.15–0.2in gaps
+- The instinct to "add breathing room" almost always makes pages feel emptier rather than cleaner
+
+If a page feels too crowded, *reduce content*, don't expand spacing.
+
+---
+
 ## Known issues
 
 1. **Base64 images** — Don't read HTML with large base64 using Read tool (API error). Use sed/grep/Python.
