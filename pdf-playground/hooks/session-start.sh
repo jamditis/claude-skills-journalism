@@ -46,16 +46,21 @@ if [ -f "$CACHE_FILE" ]; then
   fi
 fi
 
+# Touch the cache file BEFORE we hit the network so a failing check is also
+# rate-limited. Without this, an offline user or a captive portal would add
+# up to --max-time seconds to every single session start until connectivity
+# returned. If we can't even create the cache file (read-only home, full
+# disk), bail silently — never propagate the error.
+if ! { : > "$CACHE_FILE"; } 2>/dev/null; then
+  exit 0
+fi
+
 # Fetch with a short timeout; bail silently on any network trouble.
 REMOTE_JSON=$(curl -fsSL --max-time 3 "$REMOTE_URL" 2>/dev/null || true)
 [ -n "$REMOTE_JSON" ] || exit 0
 
 REMOTE_VERSION=$(printf '%s' "$REMOTE_JSON" | jq -r '.version // empty' 2>/dev/null || true)
 [ -n "$REMOTE_VERSION" ] || exit 0
-
-# Touch the cache file regardless of whether we print a warning — the point
-# is to rate-limit the *check*, not the warning itself.
-: > "$CACHE_FILE"
 
 # Compare with `sort -V` so 1.10.0 sorts after 1.9.0 the way a human expects.
 # If LOCAL is already >= REMOTE, nothing to say.
@@ -65,5 +70,5 @@ if [ "$LATEST" = "$LOCAL_VERSION" ]; then
 fi
 
 cat <<MSG
-pdf-playground v$REMOTE_VERSION is available (installed: v$LOCAL_VERSION). Run /pdf-playground:update to upgrade, or skip with \`rm $CACHE_FILE\` to recheck later.
+pdf-playground v$REMOTE_VERSION is available (installed: v$LOCAL_VERSION). Run /pdf-playground:update to upgrade, or remove $CACHE_FILE to force a recheck on the next session.
 MSG
