@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2026-04-14
+
+### Added
+- **pdf-playground v1.3.1**: `session-start.sh` hook that checks GitHub for a newer plugin version and prints a one-line warning if the installed copy is behind
+  - Fetches `.claude-plugin/plugin.json` from the repo's `master` branch (raw.githubusercontent.com) and compares with `sort -V` for correct semver ordering
+  - Rate-limited to once per 24 hours via `$XDG_CACHE_HOME/pdf-playground/last-version-check` when set, or `~/.cache/pdf-playground/last-version-check` otherwise. Applies to failed checks too — an offline host gets rate-limited the same way a successful one does
+  - 3-second network timeout and silent failure on any error — a missing curl/jq, offline host, or GitHub outage never delays or pollutes session start
+  - Points users at `/pdf-playground:update` to pull the new version
+  - First proactive update nudge for the plugin — previously users had to remember to run the update command themselves
+
 ## [1.6.0] - 2026-04-14
 
 ### Added
