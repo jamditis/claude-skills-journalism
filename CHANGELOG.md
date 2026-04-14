@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-04-14
+
+### Added
+- **pdf-playground v1.3.0**: Major slide template overhaul based on real presentation feedback from the Montclair State / NJPBA RFP walkthrough deck
+  - New `.slide-hero` layout: full-bleed photo background with right-aligned headline and red branded footer bar. Includes a `.slide-closing` variant with left-aligned headline and tightened subtitle for "Ready on [date]" close slides
+  - New `.slide-section.with-photo` layout: photo-background section divider with a red section chip ("Section 8.1") for decks that mirror numbered documents like RFP responses
+  - New `.three-col` layout: three text columns with dashed dividers for breaking a topic into parallel facets
+  - New `.four-col-tiles` layout: four numbered pillar cards with red top rule and short descriptions — for parallel capabilities or themes
+  - New `.stats-strip` layout: row of big numbers with small captions, each with a red left rule. Column count configurable via `--stat-cols` custom property
+  - New `.slide-table` layout: comparison/budget table with red header row, gray label column, grid rules
+  - New `.partner-grid` layout: 4-column grid of labeled tiles with red left accent bar for sponsor lists and letters of support
+  - New `.slide-footer-red` variant: filled red footer bar with wordmark image for branded decks (alternative to the muted text footer)
+  - Montserrat added to the font stack alongside Playfair Display + Source Sans 3. Switch via `--font-heading` and `--font-body` CSS variables
+- **pdf-design v1.1.0**: Reusable content blocks section added to SKILL.md
+  - Stats strip, three-column, four-tile pillars, and partner grid patterns documented as drop-in blocks for report and proposal pages
+  - Vertical rhythm guidelines added — tighter spacing is a feature, not a bug
+
+### Changed
+- **pdf-playground v1.3.0**: Tighter vertical rhythm throughout content slides
+  - Slide headline padding: 0.75in → 0.55in top
+  - Slide body padding: 0.3in → 0.22in top
+  - Red accent rule under headlines replaces full-width border-bottom for a cleaner visual relationship between title and body
+  - Default aspect ratio: 10×7.5 (4:3) → 13.333×7.5 (16:9). Flip via the `@page` rule if 4:3 is needed
+  - `commands/slides.md` rewritten with layout docs, design rules, content discipline guidance, and the multi-format delivery pattern (HTML → PDF → pptx → Google Slides)
+
 ## [1.5.1] - 2026-03-17
 
 ### Changed

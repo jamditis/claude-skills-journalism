@@ -6,19 +6,34 @@
     <title>[Presentation Title]</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&family=Source+Sans+3:wght@400;600;700&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --red: #CA3553;
+            --red-dark: #8a2038;
+            --red-soft: #faf5f6;
             --black: #000000;
+            --ink: #141414;
+            --ink-soft: #3a3a3a;
+            --muted: #6a6a6a;
             --white: #ffffff;
-            --gray-100: #f5f4f2;
+            --gray-100: #f7f6f5;
+            --gray-200: #e7e5e2;
+            --gray-rule: #d9d9d9;
             --gray-600: #5c5754;
             --gray-800: #2d2a28;
+
+            /* Choose one font family pair by setting --font-heading / --font-body.
+               Defaults are Playfair Display + Source Sans 3 for reports.
+               For modern, sans-only decks (like the Montclair NJ Public TV walkthrough)
+               override both to 'Montserrat'. */
+            --font-heading: 'Playfair Display', Georgia, serif;
+            --font-body: 'Source Sans 3', Arial, sans-serif;
         }
 
+        /* Default 16:9 widescreen. Switch to `size: 10in 7.5in;` for 4:3. */
         @page {
-            size: 10in 7.5in; /* 4:3 aspect ratio */
+            size: 13.333in 7.5in;
             margin: 0;
         }
 
@@ -31,31 +46,33 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Source Sans 3', Arial, sans-serif;
-            font-size: 24pt;
+            font-family: var(--font-body);
+            font-size: 18pt;
             line-height: 1.4;
-            color: var(--gray-800);
+            color: var(--ink);
             background: var(--gray-600);
         }
 
         .slide {
-            width: 10in;
+            width: 13.333in;
             height: 7.5in;
             background: var(--white);
-            margin: 20px auto;
+            margin: 24px auto;
             display: grid;
             grid-template-rows: auto 1fr auto;
-            position: relative; /* needed for absolutely-positioned children like .presenter */
+            position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 28px rgba(0,0,0,0.35);
         }
 
         @media print {
             .slide { box-shadow: none; margin: 0; }
-            body { background: white; }
+            body { background: var(--white); }
         }
 
-        /* ========== TITLE SLIDE ========== */
+        /* ============================================================
+           TITLE SLIDE — gradient background (no photo needed)
+           ============================================================ */
         .slide-title {
             display: flex;
             flex-direction: column;
@@ -63,85 +80,258 @@
             align-items: center;
             text-align: center;
             padding: 1in;
-            background: linear-gradient(135deg, var(--red) 0%, #8a2038 100%);
+            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
             color: var(--white);
         }
 
         .slide-title .logo {
-            font-family: 'Playfair Display', Georgia, serif;
+            font-family: var(--font-heading);
             font-size: 14pt;
             font-weight: 700;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            opacity: 0.8;
-            margin-bottom: 0.5in;
+            opacity: 0.85;
+            margin-bottom: 0.45in;
         }
 
         .slide-title h1 {
-            font-family: 'Playfair Display', Georgia, serif;
-            font-size: 48pt;
+            font-family: var(--font-heading);
+            font-size: 52pt;
             font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 0.3in;
+            line-height: 1.05;
+            margin-bottom: 0.2in;
+            max-width: 11in;
         }
 
         .slide-title .subtitle {
             font-size: 20pt;
-            opacity: 0.9;
+            font-weight: 600;
+            opacity: 0.95;
+            max-width: 10in;
         }
 
         .slide-title .presenter {
             position: absolute;
             bottom: 0.5in;
-            font-size: 14pt;
-            opacity: 0.7;
+            font-size: 13pt;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            opacity: 0.75;
         }
 
-        /* ========== SECTION DIVIDER ========== */
+        /* ============================================================
+           HERO PHOTO SLIDE — full-bleed background photo with overlay.
+           Set the photo via inline style on the child .hero-bg.
+           Headline is right-aligned by default to match the Montclair
+           template look.
+           ============================================================ */
+        .slide-hero {
+            grid-template-rows: 1fr auto;
+            color: var(--white);
+        }
+
+        .slide-hero .hero-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center center;
+            z-index: 0;
+        }
+
+        .slide-hero .hero-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(110deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.20) 45%, rgba(0,0,0,0.58) 100%);
+        }
+
+        .slide-hero .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 0.85in 0.85in 0.4in;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .slide-hero h1 {
+            font-family: var(--font-heading);
+            font-size: 56pt;
+            font-weight: 800;
+            line-height: 1.02;
+            letter-spacing: -0.012em;
+            text-transform: uppercase;
+            max-width: 10.5in;
+            text-shadow: 0 2px 14px rgba(0,0,0,0.35);
+        }
+
+        .slide-hero .subtitle {
+            font-size: 17pt;
+            font-weight: 600;
+            margin-top: 0.35in;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            max-width: 10in;
+            opacity: 0.95;
+        }
+
+        /* Closing hero variant: headline left-aligned, subtitle tight to it.
+           Tightening the subtitle to the headline is a lesson from the
+           Montclair deck — floating it far below read as disconnected. */
+        .slide-hero.slide-closing .hero-content {
+            justify-content: center;
+            align-items: flex-start;
+            text-align: left;
+            padding: 1in 0.9in;
+        }
+
+        .slide-hero.slide-closing h1 {
+            font-size: 68pt;
+            max-width: 11in;
+        }
+
+        .slide-hero.slide-closing .subtitle {
+            margin-top: 0.22in;
+            font-size: 18pt;
+        }
+
+        /* ============================================================
+           SECTION DIVIDER — solid red (original; still works)
+           ============================================================ */
         .slide-section {
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 1in 1.5in;
+            padding: 0.9in 1.2in;
             background: var(--red);
             color: var(--white);
         }
 
         .slide-section .section-number {
-            font-family: 'Playfair Display', Georgia, serif;
-            font-size: 72pt;
+            font-family: var(--font-heading);
+            font-size: 64pt;
             font-weight: 800;
-            opacity: 0.3;
-            margin-bottom: 0.2in;
+            opacity: 0.28;
+            line-height: 1;
+            margin-bottom: 0.12in;
         }
 
         .slide-section h2 {
-            font-family: 'Playfair Display', Georgia, serif;
+            font-family: var(--font-heading);
             font-size: 42pt;
             font-weight: 700;
+            line-height: 1.05;
         }
 
-        /* ========== CONTENT SLIDE ========== */
-        .slide-content {
-            /* Grid child styles only — padding/overflow on .slide-body */
+        /* ============================================================
+           SECTION DIVIDER WITH PHOTO — background image + section chip.
+           Add .with-photo to .slide-section and set the photo inline.
+           ============================================================ */
+        .slide-section.with-photo {
+            padding: 0;
+            grid-template-rows: 1fr auto;
+            display: grid;
+            background: var(--ink);
         }
 
-        .slide-body {
-            padding: 0.3in 1in 0.2in;
-            overflow: hidden;
-            font-size: 24pt;
+        .slide-section.with-photo .photo-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
         }
 
+        .slide-section.with-photo .photo-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.25) 100%);
+        }
+
+        .slide-section.with-photo .section-content {
+            position: relative;
+            z-index: 2;
+            padding: 1.55in 0.85in;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .slide-section.with-photo .section-chip {
+            display: inline-block;
+            font-family: var(--font-body);
+            font-size: 12pt;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            padding: 0.1in 0.28in;
+            background: var(--red);
+            color: var(--white);
+            margin-bottom: 0.28in;
+        }
+
+        .slide-section.with-photo h2 {
+            font-size: 50pt;
+            font-weight: 800;
+            line-height: 1.02;
+            letter-spacing: -0.01em;
+            max-width: 11in;
+            text-shadow: 0 2px 14px rgba(0,0,0,0.35);
+        }
+
+        /* ============================================================
+           CONTENT SLIDE — white background, headline + red accent rule.
+           Spacing tightened based on real presentation feedback.
+           ============================================================ */
         .slide-header {
-            padding: 0.75in 1in 0.2in;
-            border-bottom: 3px solid var(--red);
+            padding: 0.55in 0.85in 0.12in;
         }
 
         .slide-header h2 {
-            font-family: 'Playfair Display', Georgia, serif;
-            font-size: 36pt;
-            font-weight: 700;
-            color: var(--black);
+            font-family: var(--font-heading);
+            font-size: 34pt;
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1.08;
+            letter-spacing: -0.005em;
+        }
+
+        /* Red accent rule under the headline. Sits tight to the title,
+           not across the full body — cleaner than a border-bottom. */
+        .slide-header h2::after {
+            content: '';
+            display: block;
+            width: 0.95in;
+            height: 0.08in;
+            background: var(--red);
+            margin-top: 0.18in;
+        }
+
+        .slide-body {
+            padding: 0.22in 0.85in 0.28in;
+            overflow: hidden;
+            font-size: 18pt;
+        }
+
+        /* Intro paragraph — sits directly under the headline, slightly heavier. */
+        .slide-body .lede {
+            font-size: 19pt;
+            font-weight: 600;
+            line-height: 1.32;
+            color: var(--ink);
+            margin-bottom: 0.28in;
+            max-width: 11.5in;
+        }
+
+        .slide-body p {
+            font-size: 16pt;
+            line-height: 1.45;
+            margin-bottom: 0.18in;
+            color: var(--ink-soft);
         }
 
         .slide-body ul {
@@ -151,57 +341,281 @@
         }
 
         .slide-body li {
-            padding: 0.15in 0;
-            padding-left: 0.4in;
             position: relative;
+            padding-left: 0.42in;
+            margin-bottom: 0.16in;
+            font-size: 16pt;
+            line-height: 1.42;
+            color: var(--ink-soft);
         }
 
         .slide-body li::before {
             content: '';
             position: absolute;
-            left: 0;
-            top: 0.35in;
-            width: 0.15in;
-            height: 0.15in;
+            left: 0.12in;
+            top: 0.16in;
+            width: 0.2in;
+            height: 0.06in;
             background: var(--red);
-            border-radius: 50%;
         }
 
+        .slide-body li strong { color: var(--ink); font-weight: 700; }
+
+        /* ============================================================
+           FOOTER — two variants. Use .slide-footer for a muted text
+           footer, or .slide-footer-red for a filled red bar (branded
+           decks with wordmarks).
+           ============================================================ */
         .slide-footer {
-            padding: 0 1in 0.4in;
+            padding: 0 0.85in 0.35in;
             display: flex;
             justify-content: space-between;
-            font-size: 12pt;
+            align-items: flex-end;
+            font-size: 11pt;
             color: var(--gray-600);
         }
 
-        .slide-number {
-            font-family: 'Playfair Display', Georgia, serif;
+        .slide-footer .slide-number {
+            font-family: var(--font-heading);
             font-weight: 700;
             color: var(--red);
         }
 
-        /* ========== TWO-COLUMN SLIDE ========== */
+        .slide-footer-red {
+            background: var(--red);
+            color: var(--white);
+            height: 0.55in;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 0.55in;
+            font-size: 10pt;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+        }
+
+        .slide-footer-red .wordmark {
+            height: 0.32in;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* ============================================================
+           TWO-COLUMN CONTENT
+           ============================================================ */
         .slide-two-col .slide-body {
+            display: block;
+        }
+
+        .two-col {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0.5in;
         }
 
-        .column h3 {
-            font-family: 'Playfair Display', Georgia, serif;
-            font-size: 24pt;
-            font-weight: 700;
+        .two-col > div + div {
+            padding-left: 0.5in;
+            border-left: 2px dashed var(--gray-rule);
+        }
+
+        .two-col h3,
+        .three-col h3 {
+            font-family: var(--font-body);
+            font-size: 13pt;
+            font-weight: 800;
             color: var(--red);
-            margin-bottom: 0.2in;
+            margin-bottom: 0.18in;
+            line-height: 1.15;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
 
-        .column p {
-            font-size: 20pt;
-            color: var(--gray-600);
+        /* ============================================================
+           THREE-COLUMN CONTENT — for breaking a topic into three
+           related facets with dashed dividers between columns.
+           ============================================================ */
+        .three-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.4in;
         }
 
-        /* ========== QUOTE SLIDE ========== */
+        .three-col > div + div {
+            padding-left: 0.4in;
+            border-left: 2px dashed var(--gray-rule);
+        }
+
+        .three-col p,
+        .three-col li {
+            font-size: 13pt;
+            line-height: 1.4;
+            margin-bottom: 0.1in;
+            color: var(--ink-soft);
+        }
+
+        .three-col li {
+            padding-left: 0.3in;
+        }
+
+        .three-col li::before {
+            top: 0.12in;
+            left: 0.08in;
+            width: 0.16in;
+            height: 0.05in;
+        }
+
+        /* ============================================================
+           FOUR-COLUMN TILES ("pillars") — numbered cards with a
+           short description. Great for pitch-deck capabilities.
+           ============================================================ */
+        .four-col-tiles {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.22in;
+            margin-top: 0.05in;
+        }
+
+        .four-col-tiles .tile {
+            border-top: 5px solid var(--red);
+            padding: 0.22in 0.2in 0.2in;
+            background: var(--gray-100);
+        }
+
+        .four-col-tiles .tile-num {
+            font-size: 10pt;
+            font-weight: 800;
+            color: var(--red);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 0.1in;
+        }
+
+        .four-col-tiles .tile h3 {
+            font-family: var(--font-heading);
+            font-size: 17pt;
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1.15;
+            margin-bottom: 0.12in;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .four-col-tiles .tile p {
+            font-size: 12pt;
+            line-height: 1.38;
+            color: var(--ink-soft);
+            margin: 0;
+        }
+
+        /* ============================================================
+           STATS STRIP — row of big numbers with small labels, each
+           with a red left rule. Best with 3–4 stats.
+           Set --stat-cols on .stats-strip to change column count.
+           ============================================================ */
+        .stats-strip {
+            display: grid;
+            grid-template-columns: repeat(var(--stat-cols, 4), 1fr);
+            gap: 0.35in;
+            margin-top: 0.1in;
+        }
+
+        .stats-strip .stat {
+            padding: 0.04in 0 0.08in 0.26in;
+            border-left: 5px solid var(--red);
+        }
+
+        .stats-strip .big {
+            font-family: var(--font-heading);
+            font-size: 34pt;
+            font-weight: 800;
+            line-height: 1;
+            color: var(--ink);
+            letter-spacing: -0.015em;
+        }
+
+        .stats-strip .label {
+            font-family: var(--font-body);
+            font-size: 11pt;
+            font-weight: 600;
+            margin-top: 0.12in;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            line-height: 1.25;
+        }
+
+        /* ============================================================
+           COMPARISON / BUDGET TABLE — red header row, grid rules.
+           ============================================================ */
+        .slide-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.15in;
+            font-size: 14pt;
+        }
+
+        .slide-table th,
+        .slide-table td {
+            padding: 0.16in 0.22in;
+            border: 1px solid var(--gray-rule);
+            text-align: left;
+            line-height: 1.25;
+            vertical-align: middle;
+        }
+
+        .slide-table thead th {
+            background: var(--red);
+            color: var(--white);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 11pt;
+            padding: 0.13in 0.22in;
+        }
+
+        .slide-table tbody th {
+            background: var(--gray-100);
+            color: var(--ink);
+            font-weight: 700;
+            width: 32%;
+        }
+
+        /* ============================================================
+           PARTNER / LABEL GRID — tiles for lists of sponsors,
+           organizations, or letters of support.
+           ============================================================ */
+        .partner-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.16in 0.22in;
+            margin-top: 0.18in;
+        }
+
+        .partner-grid .partner {
+            position: relative;
+            padding: 0.18in 0.2in 0.18in 0.28in;
+            background: var(--gray-100);
+            font-size: 13pt;
+            font-weight: 600;
+            line-height: 1.25;
+            color: var(--ink);
+        }
+
+        .partner-grid .partner::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0.08in;
+            background: var(--red);
+        }
+
+        /* ============================================================
+           QUOTE SLIDE
+           ============================================================ */
         .slide-quote {
             display: flex;
             flex-direction: column;
@@ -211,27 +625,28 @@
         }
 
         .slide-quote blockquote {
-            font-family: 'Playfair Display', Georgia, serif;
-            font-size: 32pt;
+            font-family: var(--font-heading);
+            font-size: 30pt;
             font-style: italic;
             color: var(--gray-800);
-            line-height: 1.4;
-            position: relative;
+            line-height: 1.35;
             padding-left: 0.5in;
             border-left: 4px solid var(--red);
         }
 
         .slide-quote cite {
             display: block;
-            font-family: 'Source Sans 3', Arial, sans-serif;
-            font-size: 18pt;
+            font-family: var(--font-body);
+            font-size: 16pt;
             font-style: normal;
             color: var(--gray-600);
             margin-top: 0.3in;
             padding-left: 0.5in;
         }
 
-        /* ========== STAT SLIDE ========== */
+        /* ============================================================
+           BIG STAT SLIDE — single huge number centered
+           ============================================================ */
         .slide-stat {
             display: flex;
             flex-direction: column;
@@ -242,20 +657,23 @@
         }
 
         .big-number {
-            font-family: 'Playfair Display', Georgia, serif;
-            font-size: 144pt;
+            font-family: var(--font-heading);
+            font-size: 136pt;
             font-weight: 800;
             color: var(--red);
             line-height: 1;
         }
 
         .stat-label {
-            font-size: 28pt;
+            font-size: 26pt;
             color: var(--gray-600);
             margin-top: 0.3in;
+            max-width: 9in;
         }
 
-        /* ========== END SLIDE ========== */
+        /* ============================================================
+           END SLIDE — dark background "thank you"
+           ============================================================ */
         .slide-end {
             display: flex;
             flex-direction: column;
@@ -268,79 +686,301 @@
         }
 
         .slide-end h2 {
-            font-family: 'Playfair Display', Georgia, serif;
+            font-family: var(--font-heading);
             font-size: 42pt;
             font-weight: 700;
-            margin-bottom: 0.5in;
+            margin-bottom: 0.4in;
         }
 
         .slide-end .contact {
-            font-size: 18pt;
-            opacity: 0.8;
+            font-size: 16pt;
+            opacity: 0.85;
         }
 
         .slide-end .contact a {
             color: var(--red);
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
 
-    <!-- SLIDE 1: Title -->
+    <!-- ==========================================================
+         SLIDE 1 — TITLE (gradient, no photo required)
+         For a photo-backed title slide, use .slide-hero instead.
+         ========================================================== -->
     <div class="slide slide-title">
-        <div class="logo">Center for Cooperative Media</div>
+        <div class="logo">[Organization name]</div>
         <h1>[Presentation title in sentence case]</h1>
         <p class="subtitle">[Subtitle or event name]</p>
-        <p class="presenter">[Presenter Name] • [Date]</p>
+        <p class="presenter">[Presenter name] • [Date]</p>
     </div>
 
-    <!-- SLIDE 2: Section Divider -->
+    <!-- ==========================================================
+         SLIDE 2 — HERO PHOTO (branded pitch-deck style)
+         ========================================================== -->
+    <div class="slide slide-hero">
+        <div class="hero-bg" style="background-image: url('photos/campus-aerial.jpg');"></div>
+        <div class="hero-content">
+            <h1>[Deck title in sentence case]</h1>
+            <div class="subtitle">[Organization] · [Subtitle] · [Date]</div>
+        </div>
+        <div class="slide-footer-red">
+            <span>[Context line]</span>
+            <img class="wordmark" src="photos/wordmark-white.png" alt="[Organization wordmark]">
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         SLIDE 3 — SECTION DIVIDER (solid red)
+         ========================================================== -->
     <div class="slide slide-section">
         <div class="section-number">01</div>
         <h2>[Section title]</h2>
     </div>
 
-    <!-- SLIDE 3: Content with bullets -->
+    <!-- ==========================================================
+         SLIDE 4 — SECTION DIVIDER WITH PHOTO
+         ========================================================== -->
+    <div class="slide slide-section with-photo">
+        <div class="photo-bg" style="background-image: url('photos/campus-detail.jpg');"></div>
+        <div class="section-content">
+            <div class="section-chip">Section 8.X</div>
+            <h2>[Section title]</h2>
+        </div>
+        <div class="slide-footer-red">
+            <span>[Context line]</span>
+            <img class="wordmark" src="photos/wordmark-white.png" alt="[Organization wordmark]">
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         SLIDE 5 — CONTENT WITH BULLETS
+         The headline gets a red accent rule automatically.
+         ========================================================== -->
     <div class="slide slide-content">
         <div class="slide-header">
             <h2>[Slide title in sentence case]</h2>
         </div>
         <div class="slide-body">
+            <p class="lede">[Optional intro paragraph sitting under the headline — keep to two lines.]</p>
             <ul>
-                <li>[Key point 1 - keep it brief]</li>
-                <li>[Key point 2 - one line is ideal]</li>
-                <li>[Key point 3 - avoid paragraphs]</li>
-                <li>[Key point 4 - max 5-6 bullets]</li>
+                <li>[Key point 1 — keep it brief]</li>
+                <li>[Key point 2 — one line is ideal]</li>
+                <li><strong>[Bolded phrase]</strong> [can anchor important points]</li>
+                <li>[Key point 4 — max 5-6 bullets per slide]</li>
             </ul>
         </div>
         <div class="slide-footer">
-            <span>[Presentation Title]</span>
-            <span class="slide-number">3</span>
+            <span>[Presentation title]</span>
+            <span class="slide-number">5</span>
         </div>
     </div>
 
-    <!-- SLIDE 4: Two-column -->
+    <!-- ==========================================================
+         SLIDE 6 — TWO-COLUMN
+         ========================================================== -->
     <div class="slide slide-content slide-two-col">
         <div class="slide-header">
             <h2>[Comparison or dual topic]</h2>
         </div>
         <div class="slide-body">
-            <div class="column">
-                <h3>[Column 1 title]</h3>
-                <p>[Brief content for column 1]</p>
-            </div>
-            <div class="column">
-                <h3>[Column 2 title]</h3>
-                <p>[Brief content for column 2]</p>
+            <p class="lede">[Optional intro paragraph above the two columns.]</p>
+            <div class="two-col">
+                <div>
+                    <h3>[Column 1 heading]</h3>
+                    <ul>
+                        <li>[Point]</li>
+                        <li>[Point]</li>
+                        <li>[Point]</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>[Column 2 heading]</h3>
+                    <ul>
+                        <li>[Point]</li>
+                        <li>[Point]</li>
+                        <li>[Point]</li>
+                    </ul>
+                </div>
             </div>
         </div>
         <div class="slide-footer">
-            <span>[Presentation Title]</span>
-            <span class="slide-number">4</span>
+            <span>[Presentation title]</span>
+            <span class="slide-number">6</span>
         </div>
     </div>
 
-    <!-- SLIDE 5: Quote -->
+    <!-- ==========================================================
+         SLIDE 7 — THREE-COLUMN CONTENT
+         ========================================================== -->
+    <div class="slide slide-content">
+        <div class="slide-header">
+            <h2>[Three-facet topic]</h2>
+        </div>
+        <div class="slide-body">
+            <p class="lede">[Optional intro paragraph.]</p>
+            <div class="three-col">
+                <div>
+                    <h3>[Column 1]</h3>
+                    <p>[Short paragraph describing this facet.]</p>
+                </div>
+                <div>
+                    <h3>[Column 2]</h3>
+                    <p>[Short paragraph describing this facet.]</p>
+                </div>
+                <div>
+                    <h3>[Column 3]</h3>
+                    <p>[Short paragraph describing this facet.]</p>
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>[Presentation title]</span>
+            <span class="slide-number">7</span>
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         SLIDE 8 — FOUR-TILE PILLARS
+         Use for four parallel capabilities, themes, or promises.
+         ========================================================== -->
+    <div class="slide slide-content">
+        <div class="slide-header">
+            <h2>[Pillars or parallel capabilities]</h2>
+        </div>
+        <div class="slide-body">
+            <p class="lede">[Optional intro paragraph.]</p>
+            <div class="four-col-tiles">
+                <div class="tile">
+                    <div class="tile-num">Pillar 01</div>
+                    <h3>[Pillar 1 name]</h3>
+                    <p>[Short description — two or three lines.]</p>
+                </div>
+                <div class="tile">
+                    <div class="tile-num">Pillar 02</div>
+                    <h3>[Pillar 2 name]</h3>
+                    <p>[Short description.]</p>
+                </div>
+                <div class="tile">
+                    <div class="tile-num">Pillar 03</div>
+                    <h3>[Pillar 3 name]</h3>
+                    <p>[Short description.]</p>
+                </div>
+                <div class="tile">
+                    <div class="tile-num">Pillar 04</div>
+                    <h3>[Pillar 4 name]</h3>
+                    <p>[Short description.]</p>
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>[Presentation title]</span>
+            <span class="slide-number">8</span>
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         SLIDE 9 — STATS STRIP
+         ========================================================== -->
+    <div class="slide slide-content">
+        <div class="slide-header">
+            <h2>[Stats headline]</h2>
+        </div>
+        <div class="slide-body">
+            <p class="lede">[Optional intro paragraph framing the numbers.]</p>
+            <div class="stats-strip" style="--stat-cols: 4;">
+                <div class="stat"><div class="big">[Number]</div><div class="label">[Caption]</div></div>
+                <div class="stat"><div class="big">[Number]</div><div class="label">[Caption]</div></div>
+                <div class="stat"><div class="big">[Number]</div><div class="label">[Caption]</div></div>
+                <div class="stat"><div class="big">[Number]</div><div class="label">[Caption]</div></div>
+            </div>
+            <ul style="margin-top: 0.3in;">
+                <li>[Supporting bullet below the numbers]</li>
+                <li>[Another supporting bullet]</li>
+            </ul>
+        </div>
+        <div class="slide-footer">
+            <span>[Presentation title]</span>
+            <span class="slide-number">9</span>
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         SLIDE 10 — COMPARISON TABLE (e.g. budget scenarios)
+         ========================================================== -->
+    <div class="slide slide-content">
+        <div class="slide-header">
+            <h2>[Comparison / budget headline]</h2>
+        </div>
+        <div class="slide-body">
+            <p class="lede">[Intro paragraph explaining the comparison.]</p>
+            <table class="slide-table">
+                <thead>
+                    <tr>
+                        <th>[Row label header]</th>
+                        <th>[Scenario A]</th>
+                        <th>[Scenario B]</th>
+                        <th>[Scenario C]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>[Row 1 label]</th>
+                        <td>[Value]</td>
+                        <td>[Value]</td>
+                        <td>[Value]</td>
+                    </tr>
+                    <tr>
+                        <th>[Row 2 label]</th>
+                        <td>[Value]</td>
+                        <td>[Value]</td>
+                        <td>[Value]</td>
+                    </tr>
+                    <tr>
+                        <th>[Row 3 label]</th>
+                        <td>[Value]</td>
+                        <td>[Value]</td>
+                        <td>[Value]</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="slide-footer">
+            <span>[Presentation title]</span>
+            <span class="slide-number">10</span>
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         SLIDE 11 — PARTNER / LABEL GRID
+         ========================================================== -->
+    <div class="slide slide-content">
+        <div class="slide-header">
+            <h2>[Partners or letters of support]</h2>
+        </div>
+        <div class="slide-body">
+            <p class="lede">[Optional intro paragraph.]</p>
+            <div class="partner-grid">
+                <div class="partner">[Partner name]</div>
+                <div class="partner">[Partner name]</div>
+                <div class="partner">[Partner name]</div>
+                <div class="partner">[Partner name]</div>
+                <div class="partner">[Partner name]</div>
+                <div class="partner">[Partner name]</div>
+                <div class="partner">[Partner name]</div>
+                <div class="partner">[Partner name]</div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>[Presentation title]</span>
+            <span class="slide-number">11</span>
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         SLIDE 12 — QUOTE
+         ========================================================== -->
     <div class="slide slide-quote">
         <blockquote>
             "[Impactful quote that supports your message.]"
@@ -348,18 +988,37 @@
         <cite>— [Name], [Title/Organization]</cite>
     </div>
 
-    <!-- SLIDE 6: Big stat -->
+    <!-- ==========================================================
+         SLIDE 13 — BIG STAT
+         ========================================================== -->
     <div class="slide slide-stat">
         <div class="big-number">[Number]</div>
         <div class="stat-label">[What this number represents]</div>
     </div>
 
-    <!-- SLIDE 7: End slide -->
+    <!-- ==========================================================
+         SLIDE 14 — CLOSING HERO ("Ready on [date]")
+         ========================================================== -->
+    <div class="slide slide-hero slide-closing">
+        <div class="hero-bg" style="background-image: url('photos/closing-photo.jpg');"></div>
+        <div class="hero-content">
+            <h1>[Closing headline]</h1>
+            <div class="subtitle">[One-sentence close or call to action.]</div>
+        </div>
+        <div class="slide-footer-red">
+            <span>[Context line]</span>
+            <img class="wordmark" src="photos/wordmark-white.png" alt="[Organization wordmark]">
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         SLIDE 15 — END / THANK YOU
+         ========================================================== -->
     <div class="slide slide-end">
         <h2>Thank you</h2>
         <div class="contact">
             [Name] • <a href="mailto:[email]">[email]</a><br>
-            <a href="https://centerforcooperativemedia.org">centerforcooperativemedia.org</a>
+            <a href="https://example.org">example.org</a>
         </div>
     </div>
 
