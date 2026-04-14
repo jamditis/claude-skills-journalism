@@ -598,7 +598,36 @@ style:
 
                 <div class="feature-card p-8 rounded-xl mb-8">
                     <div class="flex items-center gap-3 mb-4">
-                        <span class="bg-accent text-white text-xs font-bold px-3 py-1 rounded-full">v1.2.0</span>
+                        <span class="bg-accent text-white text-xs font-bold px-3 py-1 rounded-full">v1.3.0</span>
+                        <span class="text-mist text-sm">April 2026</span>
+                    </div>
+                    <h3 class="font-display text-2xl font-bold mb-4">Slide template overhaul</h3>
+                    <p class="text-mist mb-6">
+                        Nine new slide layouts and tighter typography, pulled from real presentation feedback on the Montclair State walkthrough deck. Default aspect is now 16:9 and Montserrat joins the font stack for modern decks.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0"></i>
+                            <p class="text-sm"><strong>Nine new layouts</strong> &mdash; Hero photo, closing hero, photo section divider, three-column, four-tile pillars, stats strip, budget/comparison table, partner grid, and a branded red footer bar variant.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0"></i>
+                            <p class="text-sm"><strong>Tighter vertical rhythm</strong> &mdash; Headline and body padding cut to sit closer together. A tight red accent rule replaces the full-width border for a cleaner relationship between title and content.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0"></i>
+                            <p class="text-sm"><strong>16:9 default + font switching</strong> &mdash; New decks render at 13.333&times;7.5 by default. Montserrat loads alongside Playfair Display and Source Sans 3 &mdash; switch pairs via <code>--font-heading</code> and <code>--font-body</code>.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0"></i>
+                            <p class="text-sm"><strong>Multi-format delivery pattern</strong> &mdash; The <code>/slides</code> command now documents the HTML &rarr; PDF &rarr; pptx &rarr; Google Slides pipeline so a single source renders pixel-perfect across all three formats.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card p-8 rounded-xl mb-8 opacity-80">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="bg-ink/20 text-ink text-xs font-bold px-3 py-1 rounded-full">v1.2.0</span>
                         <span class="text-mist text-sm">March 2026</span>
                     </div>
                     <h3 class="font-display text-2xl font-bold mb-4">Footer clearance overhaul</h3>

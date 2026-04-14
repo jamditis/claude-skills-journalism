@@ -18,7 +18,12 @@ Read the plugin version from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` 
 
 ## Slide format
 
-Default: 16:9 widescreen (13.333" × 7.5"). Switch the `@page` rule to `10in 7.5in` for 4:3.
+Default: 16:9 widescreen (13.333" × 7.5"). For 4:3, update both places in `templates/slides-template.html`:
+
+1. `--slide-width: 10in` on the `:root` block (drives the `.slide` width)
+2. `@page { size: 10in 7.5in; }` (drives the PDF page size — CSS variables aren't permitted inside `@page`, so it must be edited directly)
+
+If you only change one, the on-screen preview and the rendered PDF will disagree and content will clip.
 
 ## Slide types
 

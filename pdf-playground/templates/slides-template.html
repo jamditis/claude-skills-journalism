@@ -29,11 +29,17 @@
                override both to 'Montserrat'. */
             --font-heading: 'Playfair Display', Georgia, serif;
             --font-body: 'Source Sans 3', Arial, sans-serif;
+
+            /* Slide dimensions — default 16:9 widescreen.
+               For 4:3, set --slide-width: 10in AND update the @page rule below to
+               `size: 10in 7.5in`. CSS custom properties are not permitted inside
+               @page, so the two values must be kept in sync manually. */
+            --slide-width: 13.333in;
+            --slide-height: 7.5in;
         }
 
-        /* Default 16:9 widescreen. Switch to `size: 10in 7.5in;` for 4:3. */
         @page {
-            size: 13.333in 7.5in;
+            size: 13.333in 7.5in; /* keep in sync with --slide-width / --slide-height */
             margin: 0;
         }
 
@@ -54,8 +60,8 @@
         }
 
         .slide {
-            width: 13.333in;
-            height: 7.5in;
+            width: var(--slide-width);
+            height: var(--slide-height);
             background: var(--white);
             margin: 24px auto;
             display: grid;
