@@ -161,11 +161,16 @@ Hooks run automatically at specific workflow events. All are **non-blocking warn
 
 ## Installation
 
-Clone to `~/.claude/skills/` for automatic loading:
+Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep. Clone anywhere, then copy or symlink individual skills into `~/.claude/skills/`:
 
 ```bash
-git clone https://github.com/jamditis/claude-skills-journalism.git ~/.claude/skills/journalism-skills
+git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
+cd ~/projects/claude-skills-journalism
+cp -r source-verification ~/.claude/skills/
+# or: ln -s "$PWD/source-verification" ~/.claude/skills/source-verification
 ```
+
+Cloning the whole repo into `~/.claude/skills/journalism-skills/` nests each `SKILL.md` two levels deep and will not load.
 
 ## Multi-machine workflow
 
