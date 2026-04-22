@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.2] - 2026-04-22
+
+### Fixed
+- **Install instructions** (reported by Marjorie Roswell on the Knight Center MOOC forum): `git clone ... ~/.claude/skills/journalism-skills` nested every `SKILL.md` two levels deep, so Claude Code's skill discovery (which scans `~/.claude/skills/<name>/SKILL.md` one level deep) loaded nothing from the clone. Updated `README.md`, `CLAUDE.md`, `autocontext/README.md`, and `docs/index.html` (skills.amditis.tech) to clone outside `~/.claude/skills/` and copy or symlink individual skills into place.
+- Install commands are now idempotent: added `mkdir -p ~/.claude/skills` and switched symlink examples to `ln -sfn`, so re-running the instructions replaces an existing link instead of erroring.
+
 ## [1.6.1] - 2026-04-14
 
 ### Added
