@@ -39,17 +39,21 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 
 ### Skills (manual installation)
 
-Skills load automatically when relevant to your work. To install them, clone this repo into your Claude skills directory:
+Skills load automatically when relevant to your work. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep. Clone this repo anywhere you like, then copy or symlink the skills you want into `~/.claude/skills/`:
 
 ```
-git clone https://github.com/jamditis/claude-skills-journalism.git ~/.claude/skills/journalism-skills
-```
+git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
+cd ~/projects/claude-skills-journalism
+mkdir -p ~/.claude/skills
 
-Or copy individual skills:
-
-```
+# Copy individual skills you want:
 cp -r source-verification ~/.claude/skills/
+
+# Or symlink so git pull updates them in place (ln -sfn replaces an existing link):
+ln -sfn "$PWD/source-verification" ~/.claude/skills/source-verification
 ```
+
+Do not clone the repo directly into `~/.claude/skills/journalism-skills/` — that nests each `SKILL.md` two levels deep and Claude Code won't find them.
 
 ### For Claude.ai users
 

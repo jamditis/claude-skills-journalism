@@ -26,11 +26,15 @@ Over weeks of use, your project builds up a curated knowledge base of project-sp
 ## Install
 
 ```bash
-# As part of claude-skills-journalism:
-git clone https://github.com/jamditis/claude-skills-journalism ~/.claude/skills/journalism-skills
+# Clone claude-skills-journalism anywhere, then install the autocontext
+# skill into ~/.claude/skills/ (Claude Code discovers skills one level deep):
+git clone https://github.com/jamditis/claude-skills-journalism ~/projects/claude-skills-journalism
+mkdir -p ~/.claude/skills
+cp -r ~/projects/claude-skills-journalism/autocontext ~/.claude/skills/
+# or: ln -sfn ~/projects/claude-skills-journalism/autocontext ~/.claude/skills/autocontext
 ```
 
-Claude Code loads the plugin automatically on next launch.
+Claude Code loads the skill automatically on next launch.
 
 ## Quick start
 
