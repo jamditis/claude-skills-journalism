@@ -970,15 +970,15 @@
                 <!-- Skills (manual) -->
                 <div class="deckle-card p-8">
                     <h3 class="font-display text-xl font-bold mb-4">Install individual skills</h3>
-                    <p class="text-sm text-mist mb-4">Skills load automatically when relevant to your work. Clone the full collection to your Claude skills directory:</p>
+                    <p class="text-sm text-mist mb-4">Skills load automatically when relevant to your work. Claude Code discovers skills at <code>~/.claude/skills/&lt;skill-name&gt;/SKILL.md</code> — one level deep. Clone the repo anywhere, then copy or symlink the skills you want:</p>
                     <div class="bg-ink text-canvas p-6 font-mono text-sm mb-4 overflow-x-auto space-y-1">
-                        <div>git clone https://github.com/jamditis/claude-skills-journalism.git ~/.claude/skills/journalism-skills</div>
-                    </div>
-                    <p class="text-sm text-mist">Or copy just the skills you want:</p>
-                    <div class="bg-ink text-canvas p-6 font-mono text-sm mb-4 overflow-x-auto space-y-1">
+                        <div>git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism</div>
+                        <div>cd ~/projects/claude-skills-journalism</div>
+                        <div>mkdir -p ~/.claude/skills</div>
                         <div>cp -r source-verification ~/.claude/skills/</div>
+                        <div># or: ln -sfn "$PWD/source-verification" ~/.claude/skills/source-verification</div>
                     </div>
-                    <p class="text-sm text-mist">Skills activate automatically. For example, asking Claude to verify a source will use the source-verification skill.</p>
+                    <p class="text-sm text-mist">Skills activate automatically. For example, asking Claude to verify a source will use the source-verification skill. Don't clone the whole repo into <code>~/.claude/skills/journalism-skills/</code> — that nests each <code>SKILL.md</code> two levels deep and Claude Code won't find them.</p>
                 </div>
             </section>
 

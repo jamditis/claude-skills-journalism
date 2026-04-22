@@ -166,8 +166,9 @@ Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one
 ```bash
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
 cd ~/projects/claude-skills-journalism
+mkdir -p ~/.claude/skills
 cp -r source-verification ~/.claude/skills/
-# or: ln -s "$PWD/source-verification" ~/.claude/skills/source-verification
+# or: ln -sfn "$PWD/source-verification" ~/.claude/skills/source-verification
 ```
 
 Cloning the whole repo into `~/.claude/skills/journalism-skills/` nests each `SKILL.md` two levels deep and will not load.

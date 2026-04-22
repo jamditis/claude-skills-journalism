@@ -44,12 +44,13 @@ Skills load automatically when relevant to your work. Claude Code discovers skil
 ```
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
 cd ~/projects/claude-skills-journalism
+mkdir -p ~/.claude/skills
 
 # Copy individual skills you want:
 cp -r source-verification ~/.claude/skills/
 
-# Or symlink so `git pull` updates them in place:
-ln -s "$PWD/source-verification" ~/.claude/skills/source-verification
+# Or symlink so git pull updates them in place (ln -sfn replaces an existing link):
+ln -sfn "$PWD/source-verification" ~/.claude/skills/source-verification
 ```
 
 Do not clone the repo directly into `~/.claude/skills/journalism-skills/` — that nests each `SKILL.md` two levels deep and Claude Code won't find them.
