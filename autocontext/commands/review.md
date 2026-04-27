@@ -140,4 +140,4 @@ This summary confirms what changed and gives you confidence that the curation wa
 - **Low-confidence lessons first** — the review order (lowest confidence first) helps you focus on lessons that need validation
 - **Be liberal with approval** — if a lesson is still correct, approve it. This builds signal about what's truly useful.
 - **Supersede instead of delete** — if a lesson is mostly right but needs an update, supersede it rather than deleting. This preserves the learning path.
-- **Regular curation** — run `/autocontext-review` weekly or after major changes to keep lessons fresh and accurate
+- **Regular curation** — run `/autocontext:review` weekly or after major changes to keep lessons fresh and accurate

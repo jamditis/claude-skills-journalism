@@ -7,10 +7,10 @@ This command improves skill .md files based on lessons accumulated in the global
 ## Argument handling
 
 The user may invoke this command with arguments:
-- `/autocontext-evolve` — default: scan and evolve interactively
-- `/autocontext-evolve --rollback <skill-name>` — restore from backup
-- `/autocontext-evolve --export` — export lessons to JSON
-- `/autocontext-evolve --import <path>` — import lessons from JSON
+- `/autocontext:evolve` — default: scan and evolve interactively
+- `/autocontext:evolve --rollback <skill-name>` — restore from backup
+- `/autocontext:evolve --export` — export lessons to JSON
+- `/autocontext:evolve --import <path>` — import lessons from JSON
 
 Parse the arguments from the user's input. If `--rollback` is present, run the rollback flow. If `--export` or `--import`, run the sync flow. Otherwise, run the default evolution flow.
 
