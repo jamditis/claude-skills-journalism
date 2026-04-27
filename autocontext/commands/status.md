@@ -10,7 +10,7 @@ Before displaying stats, the script checks if `.autocontext/` exists. If it does
 
 ```
 Autocontext not initialized for this project.
-Run '/autocontext-init' to set up knowledge tracking.
+Run '/autocontext:init' to set up knowledge tracking.
 ```
 
 Otherwise, the script reads:
@@ -116,7 +116,7 @@ Or if not configured:
 ```
 Merge driver status:
   ✗ Not configured (single-developer mode)
-  To enable, run: /autocontext-init
+  To enable, run: /autocontext:init
 ```
 
 ### 8. Pending lessons
@@ -126,7 +126,7 @@ Shows if there are lessons awaiting curation:
 ```
 Pending lessons:
   3 lessons in .autocontext/cache/pending-lessons.json (from ask_before_persist mode)
-  Run '/autocontext-review' to approve or reject.
+  Run '/autocontext:review' to approve or reject.
 ```
 
 Or if none:
@@ -152,6 +152,6 @@ This skill is read-only. No AskUserQuestion is used. The report is informational
 ## Next steps
 
 Based on the status output, you might:
-- Run `/autocontext-review` if there are lessons with low confidence or pending approval
+- Run `/autocontext:review` if there are lessons with low confidence or pending approval
 - Check stalest lessons to see if they're still valid or should be updated
 - Share the status report with team members if using cross-developer sharing

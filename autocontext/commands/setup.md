@@ -61,7 +61,7 @@ Choose how new lessons discovered during sessions should be saved.
 **Question:** How should new lessons be persisted at session end?
 
 **Options:**
-- Auto-persist with curator validation (Recommended) — new lessons are automatically added, but marked for review. You can curate them later with `/autocontext-review`.
+- Auto-persist with curator validation (Recommended) — new lessons are automatically added, but marked for review. You can curate them later with `/autocontext:review`.
 - Always ask before persisting — each new lesson prompts for approval before being added.
 - Auto-persist everything — new lessons are immediately added without any review step.
 
@@ -149,7 +149,7 @@ The playbook (`playbook.md`) is a human-readable summary of all active lessons, 
 
 **Options:**
 - Auto-generate (Recommended) — regenerate `playbook.md` on every session start/end. Always up to date.
-- Manual only — only regenerate when you run `/autocontext-review`. Less overhead.
+- Manual only — only regenerate when you run `/autocontext:review`. Less overhead.
 - Disabled — no playbook file generated. Lessons are still loaded but not rendered to markdown.
 
 **Config mapping:**
@@ -181,7 +181,7 @@ When `machines` contains `"auto"`, the session-start hook resolves it to `socket
 
 #### Step 11: Skill learning
 
-Track which skills are active when corrections happen. This enables lessons to accumulate per-skill and eventually improve the skill files via `/autocontext-evolve`.
+Track which skills are active when corrections happen. This enables lessons to accumulate per-skill and eventually improve the skill files via `/autocontext:evolve`.
 
 **Question:** Do you want autocontext to track corrections per-skill?
 
@@ -196,7 +196,7 @@ If "No": set `skill_learning.enabled = false`
 
 #### Step 12: Evolution aggressiveness
 
-Controls the minimum evidence threshold for `/autocontext-evolve` to consider a lesson ready.
+Controls the minimum evidence threshold for `/autocontext:evolve` to consider a lesson ready.
 
 **Question:** How aggressive should skill evolution be?
 
@@ -260,7 +260,7 @@ After answering all questions, write `~/.claude/autocontext.json` with the colle
 
 After writing the config:
 1. Confirm setup is complete with a summary table of all settings
-2. Inform the user they can now run `/autocontext-init` in any project to start using autocontext
-3. Note they can re-run `/autocontext-setup` anytime to change settings
+2. Inform the user they can now run `/autocontext:init` in any project to start using autocontext
+3. Note they can re-run `/autocontext:setup` anytime to change settings
 
-The global config persists across all projects. Per-project `config.json` (created by `/autocontext-init`) inherits from global but can override any value.
+The global config persists across all projects. Per-project `config.json` (created by `/autocontext:init`) inherits from global but can override any value.

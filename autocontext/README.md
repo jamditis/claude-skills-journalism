@@ -38,18 +38,18 @@ Claude Code loads the skill automatically on next launch.
 
 ## Quick start
 
-1. Run `/autocontext-setup` to configure your preferences (identity, sensitivity, loading behavior — 10 steps total).
-2. In any project, run `/autocontext-init` to create the `.autocontext/` directory and start accumulating lessons.
+1. Run `/autocontext:setup` to configure your preferences (identity, sensitivity, loading behavior — 12 steps total).
+2. In any project, run `/autocontext:init` to create the `.autocontext/` directory and start accumulating lessons.
 3. Just use Claude Code normally. Autocontext runs in the background.
 
 ## Commands
 
 | Command | What it does |
 |---------|-------------|
-| `/autocontext-setup` | One-time setup wizard for global preferences (10 steps covering identity, test rules, loading, persistence, staleness, injection mode, correction sensitivity, baselines, playbook, and multi-machine support) |
-| `/autocontext-init` | Set up autocontext in the current project |
-| `/autocontext-review` | Review accumulated lessons — approve, edit, delete, or mark as superseded |
-| `/autocontext-status` | See how many lessons you have, their confidence levels, and any pending items |
+| `/autocontext:setup` | One-time setup wizard for global preferences (12 steps covering identity, test rules, loading, persistence, staleness, injection mode, correction sensitivity, baselines, playbook, multi-machine support, skill learning, and evolution settings) |
+| `/autocontext:init` | Set up autocontext in the current project |
+| `/autocontext:review` | Review accumulated lessons — approve, edit, delete, or mark as superseded |
+| `/autocontext:status` | See how many lessons you have, their confidence levels, and any pending items |
 
 ## How it works under the hood
 
@@ -65,7 +65,7 @@ Autocontext uses Claude Code's hook system to run at five points in every sessio
 
 Lessons are stored in `.autocontext/lessons.json` (git-tracked). When multiple developers use Claude Code on the same repo, their lessons accumulate independently and merge on `git pull`.
 
-The union merge driver (`scripts/merge-driver.py`) handles conflicts by merging lessons from both sides, deduplicating by text, and preserving tombstoned deletions. To set it up, run `/autocontext-init` and select "Yes, set up cross-developer sharing."
+The union merge driver (`scripts/merge-driver.py`) handles conflicts by merging lessons from both sides, deduplicating by text, and preserving tombstoned deletions. To set it up, run `/autocontext:init` and select "Yes, set up cross-developer sharing."
 
 Deleted lessons use a tombstone pattern (`"deleted": true`) rather than hard deletion. This prevents a lesson deleted on one machine from being resurrected by a merge from another.
 

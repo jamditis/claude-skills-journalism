@@ -65,7 +65,7 @@ The script will create the following structure in `.autocontext/`:
 ├── .gitattributes           # (if sharing enabled) Configure merge driver
 ├── cache/                   # Temporary files (not git-tracked)
 │   ├── pending-lessons.json # (if ask_before_persist) Awaiting approval
-│   └── curated-pending.json # From /autocontext-review sessions
+│   └── curated-pending.json # From /autocontext:review sessions
 └── archive/                 # Tombstoned lessons (git-tracked)
     └── superseded.json      # Deleted lessons for reference
 ```
@@ -128,7 +128,7 @@ After all setup is complete, the script generates an initial playbook:
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/generate-playbook.py .autocontext/lessons.json .autocontext/playbook.md
 ```
 
-The playbook is a curated, readable summary of your project's lessons. It's automatically regenerated after each `/autocontext-review` session.
+The playbook is a curated, readable summary of your project's lessons. It's automatically regenerated after each `/autocontext:review` session.
 
 ## Completion summary
 
@@ -137,6 +137,6 @@ Once initialization is complete, you'll see a summary of what was created:
 - Configuration files created
 - Merge driver status (if applicable)
 - Path to playbook.md for reading
-- Next steps: run `/autocontext-review` to curate lessons, or just start coding
+- Next steps: run `/autocontext:review` to curate lessons, or just start coding
 
 You can now use the autocontext plugin in this project. Lessons will automatically accumulate during sessions.
