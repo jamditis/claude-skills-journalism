@@ -1,47 +1,13 @@
-# Copilot review instructions
+# Copilot review instructions — claude-skills-journalism
 
-## Project
+Project context, skill format, hook conventions, and style rules live in [CLAUDE.md](../CLAUDE.md). Read that for everything Copilot needs to understand the repo. This file lists the *journalism-domain* guardrails that benefit from explicit reviewer attention.
 
-Claude skills for journalism — a collection of Claude Code skills for journalists, researchers, and media professionals. Static site at skills.amditis.tech via GitHub Pages from `docs/`.
+## What to flag in reviews
 
-## Style rules
+1. **No hardcoded credentials in skill content.** API keys, tokens, OAuth secrets, or any credential value must never appear in skill markdown, templates, or example code. Reference paths (e.g., `pass show claude/services/X`) and env-var names are fine; values are not.
 
-- Always use sentence case. Never Title Case.
-- No emojis in source code or skill content.
-- Flag banned words: "comprehensive", "robust", "leveraging", "seamlessly", "innovative", "cutting-edge", "holistic", "synergy", "ecosystem", "paradigm", "empower", "transformative", "sophisticated", "state-of-the-art".
-- Skill descriptions should be terse and actionable, not padded with filler.
-- Never include AI attribution ("Generated with Claude Code", etc.) in PRs, commits, code, or docs.
+2. **Web scraping skills must respect robots.txt and rate limits.** Any skill in `web-scraping/`, `digital-archive/`, `web-archiving/`, or `page-monitoring/` that fetches third-party content must document robots.txt compliance and apply rate limiting. Flag scraping examples that don't.
 
-## Skill format
+3. **FOIA/records skills must include privacy considerations.** Skills under `foia-requests/` or that handle personally-identifying information from public records must call out PII redaction, victim/witness identifier protection, and the distinction between *public records* and *public-interest publication*.
 
-Each skill must have YAML frontmatter:
-```yaml
----
-name: skill-name
-description: When this skill activates and what it does
----
-```
-
-Flag skills missing frontmatter or with vague descriptions.
-
-## Website (docs/)
-
-- Zero-build static HTML with Tailwind CDN, Lucide icons, Google Fonts.
-- Uses the Amditis V2 light editorial theme (canvas #ede6d4, ink #121212, accent #3d4b40).
-- Every HTML page needs an SVG favicon and full OG/Twitter meta tags.
-- External links need `rel="noopener noreferrer"`.
-
-## Hooks
-
-All hooks are non-blocking warnings. They follow the pattern:
-- Event-based triggers (PreToolUse, PostToolUse, Stop, SessionStart, UserPromptSubmit)
-- Clear, specific detection criteria
-- Actionable output (not just "be careful")
-
-Flag hooks that silently suppress errors or block without explanation.
-
-## Security
-
-- Skill content should not include hardcoded credentials, API keys, or tokens.
-- Web scraping skills must respect robots.txt and rate limits.
-- FOIA/records skills must include privacy considerations.
+4. **Hooks must be non-blocking warnings, not silent failures.** All hooks in `hooks/` follow the "warn but don't block" pattern. Flag any hook that silently suppresses errors, exits with a blocking status without explanation, or modifies behavior without surfacing what it did.
