@@ -123,7 +123,7 @@ Instructions, templates, and workflows.
 
 ## Hooks
 
-Hooks run automatically at specific workflow events. Most are **non-blocking warnings**, but `one-way-door-check` and `enforce-test-first` block intentionally (exit 2) — see per-hook frontmatter for exact behavior.
+Hooks run automatically at specific workflow events. Most are **non-blocking warnings**, but `one-way-door-check` (shell hook, exits 2) and `enforce-test-first` (prompt-based) block intentionally — see each hook's "Hook behavior" section for details.
 
 ### Writing quality
 | Hook | Event | Purpose |
