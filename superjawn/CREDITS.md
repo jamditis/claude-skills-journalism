@@ -12,7 +12,13 @@ Synced against upstream `obra/superpowers` v5.0.7 (release tag) on 2026-05-05. T
 
 ## Modifications from upstream
 
-**v0.2.0 architecture revision (current).** Research belongs only at entry-point stages where work originates without an upstream artifact. The three foundation skills shipped in v0.1.0 are now categorized:
+**v0.3.0 Batch 2 (current).** Three skills ported under the v0.2.0 architecture:
+- `systematic-debugging` — research category. Research phase inserted between Phase 1 (Root Cause Investigation) and Phase 2 (Pattern Analysis), default-on. Four research kinds (web, codebase prior-bugs, authoritative, user-context) dispatched as 3 parallel subagents + inline memory. Findings at `.superpowers/debug-log-<slug>.md`. Skip protocol byte-identical to Batch 1's locked text.
+- `test-driven-development` — consumer category. Pure port (attribution + cross-refs only). No research phase: TDD is a sub-skill whose triggering spec/plan already encodes research conclusions.
+- `verification-before-completion` — consumer category. Pure port. No research phase: verification is a gate function determined by what was just built.
+- Inherited supporting files in `systematic-debugging/` diverge from upstream v5.0.7 with PR #36 review fixes: test-pressure-1/2/3.md and test-academic.md path references rewritten from `skills/debugging/systematic-debugging` to `superjawn:systematic-debugging` (matches actual plugin path + Claude Code skill-name invocation); CREATION-LOG.md path reference + Jesse's local `CLAUDE.md` path genericized; SKILL.md phase intro clarifies the Phase 1→4 fast path; SKILL.md `.superpowers/` git-ignore note reframed as user instruction; find-polluter.sh `find -path` pattern handling fixed (normalizes leading `./`, collapses `**` to `*`, uses mapfile array so 0 matches exit cleanly instead of silently reporting TOTAL=1); find-polluter.sh header relabeled "sequential test scanner" to match implementation.
+
+**v0.2.0 architecture revision.** Research belongs only at entry-point stages where work originates without an upstream artifact. The three foundation skills shipped in v0.1.0 are now categorized:
 - `brainstorming` — research phase preserved (entry-point skill)
 - `writing-plans` — research phase stripped (consumer of brainstorming spec; trusts the handoff)
 - `executing-plans` — per-task drift check replaced with a one-time default-skip freshness check at execution start, gated on three triggers (cross-session plan, external API/service, main/master branch). Two smoke-test bugs from PR #34 review folded in: the execution-journal location is now defined (`.superpowers/exec-journal-<plan-slug>.md`), and the master-branch guardrail is wired into the freshness check itself (was previously only in Remember).

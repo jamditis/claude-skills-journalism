@@ -9,9 +9,9 @@ Claude Code skills derived from [obra/superpowers](https://github.com/obra/super
 | `brainstorming` | Research | Ported (Batch 1) |
 | `writing-plans` | Consumer | Ported (Batch 1, research stripped in v0.2.0) |
 | `executing-plans` | Freshness check | Ported (Batch 1, freshness check in v0.2.0) |
-| `systematic-debugging` | Research | Pending (Batch 2) |
-| `test-driven-development` | Consumer | Pending (Batch 2) |
-| `verification-before-completion` | Consumer | Pending (Batch 2) |
+| `systematic-debugging` | Research | Ported (Batch 2) |
+| `test-driven-development` | Consumer | Ported (Batch 2) |
+| `verification-before-completion` | Consumer | Ported (Batch 2) |
 | `receiving-code-review` | Consumer | Pending (Batch 3) |
 | `requesting-code-review` | Consumer | Pending (Batch 3) |
 | `subagent-driven-development` | Freshness check | Pending (Batch 4) |
