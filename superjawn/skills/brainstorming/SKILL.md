@@ -109,7 +109,7 @@ digraph brainstorming {
 }
 ```
 
-**The terminal state is invoking superjawn:writing-plans.** Do NOT invoke superpowers:frontend-design, superpowers:mcp-builder, or any other implementation skill. The ONLY skill you invoke after brainstorming is superjawn:writing-plans.
+**The terminal state is invoking superjawn:writing-plans.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill. The ONLY skill you invoke after brainstorming is superjawn:writing-plans.
 
 ## The Process
 
