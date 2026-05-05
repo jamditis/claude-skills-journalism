@@ -19,7 +19,7 @@ Load plan, review critically, execute all tasks, report when complete.
 
 **Announce at start:** "I'm using the executing-plans skill to implement this plan."
 
-**Note:** Tell your human partner that Superpowers works much better with access to subagents. The quality of its work will be significantly higher if run on a platform with subagent support (such as Claude Code or Codex). If subagents are available, use superpowers:subagent-driven-development instead of this skill.
+**Note:** Tell your human partner that superjawn works much better with access to subagents. The quality of its work will be significantly higher if run on a platform with subagent support (such as Claude Code or Codex). If subagents are available, use superpowers:subagent-driven-development instead of this skill.
 
 ## Research phase (per task)
 
@@ -34,7 +34,10 @@ The plan was written at a point in time. Before each task, verify:
 
 ### 2. Dispatch
 
-Inline for single-file or single-API checks. `general-purpose` subagent only when the verification spans multiple sources.
+- Inline for single-file or single-API checks
+- `Explore` subagent for codebase-drift questions spanning multiple files
+- `general-purpose` subagent for verification that spans external sources
+
 
 ### 3. Record findings
 
@@ -48,7 +51,7 @@ If FAIL, escalate before implementing — the plan may need revision.
 
 ### 4. Skip protocol
 
-If skipping per-task research, write one line in the journal: `Task N research skipped because <reason>.`
+If skipping the per-task drift check, write one line in the journal: `Task N drift check skipped because <reason>.`
 
 **Valid reasons:**
 - Task is purely additive within a file the previous task just created (no external state to verify)
@@ -69,7 +72,7 @@ If skipping per-task research, write one line in the journal: `Task N research s
 
 For each task:
 1. Mark as in_progress
-2. Run the per-task research / drift check (see "Research phase (per task)" section above)
+2. Run the drift check (see "Research phase (per task)" above)
 3. Follow each step exactly (plan has bite-sized steps)
 4. Run verifications as specified
 5. Mark as completed
@@ -112,5 +115,5 @@ After all tasks complete and verified:
 
 **Required workflow skills:**
 - **superpowers:using-git-worktrees** - REQUIRED: Set up isolated workspace before starting
-- **superpowers:writing-plans** - Creates the plan this skill executes
+- **superjawn:writing-plans** - Creates the plan this skill executes
 - **superpowers:finishing-a-development-branch** - Complete development after all tasks
