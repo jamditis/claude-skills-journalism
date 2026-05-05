@@ -54,7 +54,7 @@ Inline for trivial plans (single-file edits, mechanical changes).
 
 ### 3. Record findings
 
-Write 3–5 tight bullets into a new `## Research notes` section AT THE TOP of the plan doc, immediately after the plan header. Include load-bearing references and anything considered-but-ruled-out.
+Write 3–5 tight bullets into a new `## Research notes` section placed immediately after the plan header's `---` separator and before Task 1. Include load-bearing references and anything considered-but-ruled-out.
 
 ### 4. Skip protocol
 
