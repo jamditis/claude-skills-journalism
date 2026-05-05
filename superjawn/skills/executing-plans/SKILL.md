@@ -6,9 +6,12 @@ description: Use when you have a written implementation plan to execute in a sep
 <!--
 Adapted from obra/superpowers executing-plans skill (v5.0.7), MIT-licensed,
 copyright 2025 Jesse Vincent. Modifications copyright 2026 Joe Amditis.
-Modifications add a per-task research phase (drift check before
-implementation), plus updates to cross-references.
-See CREDITS.md.
+v0.1.0 added a per-task drift check (default-on research). v0.2.0
+replaced that with a one-time freshness check at execution start,
+default-skip with explicit triggers (cross-session plan, external API,
+main/master branch), fixing the "execution journal undefined" and
+"master-branch guardrail not in drift check" bugs surfaced by smoke
+testing. See CREDITS.md.
 -->
 
 # Executing Plans
@@ -21,60 +24,66 @@ Load plan, review critically, execute all tasks, report when complete.
 
 **Note:** Tell your human partner that superjawn works much better with access to subagents. The quality of its work will be significantly higher if run on a platform with subagent support (such as Claude Code or Codex). If subagents are available, use superpowers:subagent-driven-development instead of this skill.
 
-## Research phase (per task)
+## Freshness check (when artifact is stale)
 
-Before implementing each task in the plan, run a quick drift check. **Default-on**: skip only with explicit, justified statement per task.
+The plan was written at a point in time. **Default-skip.** Run only when one of these triggers fires:
 
-### 1. What to verify
+- **Cross-session execution.** The plan was drafted in a prior session — different cwd, different transcript, or different day. If you wrote the plan yourself in this session, the freshness check is not needed.
+- **External API/service touched.** Any task in the plan calls an external API, service, or file outside the repo (e.g., live HTTP, third-party SDK call, OS-managed config). Internal state can be assumed stable; external contracts cannot.
+- **Working on main/master.** Current branch is `main` or `master`. Heightened drift risk because integration work assumes the branch is in sync, and other people landing commits can invalidate the plan's assumptions silently.
 
-The plan was written at a point in time. Before each task, verify:
-- **Authoritative state:** If the task touches an external API or file the plan references, confirm the API contract or file content hasn't changed. Live curl, file read, version check.
-- **Codebase drift:** If the task assumes a function/module exists at a specific path, grep to confirm it still does.
-- **Repo state:** Has anyone landed conflicting work on the branch since the plan was drafted?
-
-### 2. Dispatch
-
-- Inline for single-file or single-API checks
-- `Explore` subagent for codebase-drift questions spanning multiple files
-- `general-purpose` subagent for verification that spans external sources
-
-### 3. Record findings
-
-Append a short note to the execution journal (or PR description) for each task:
+If none of the triggers fire, write one line into the execution journal and proceed:
 
 ```
-Task N drift check: <PASS / FAIL> — <one-line summary>
+[YYYY-MM-DD HH:MM] Freshness check skipped — none of the triggers fired (current session, no external APIs, on feature branch <name>).
 ```
 
-If FAIL, escalate before implementing — the plan may need revision.
+### When the check fires
 
-### 4. Skip protocol
+Verify, in order, BEFORE running any tasks:
 
-If skipping the per-task drift check, write one line in the journal: `Task N drift check skipped because <reason>.`
+1. **Authoritative state.** For each external API/file the plan references, hit the real source — live curl, file read, version check. Confirm the contract still matches what the plan assumed.
+2. **Codebase drift.** Grep that any function/module/path the plan names still exists at the expected location with the expected shape.
+3. **Repo state.** `git log <plan-write-sha>..HEAD` if you can identify when the plan was written; otherwise `git log --since='1 week ago' --oneline`. Has anyone landed conflicting work since the plan was drafted?
 
-**Valid reasons:**
-- Task is purely additive within a file the previous task just created (no external state to verify)
-- Plan was drafted within the current session and nothing has changed
-- Task is a pure mechanical commit / rebase / push step
+### Findings location: the execution journal
 
-**Invalid reasons:** "I think I know", "seems straightforward", "moving fast", "user wants this done quickly", "already familiar with this codebase". If those are tempting, do the check.
+Findings land in a per-plan execution journal at:
+
+```
+.superpowers/exec-journal-<plan-slug>.md
+```
+
+Where `<plan-slug>` is the kebab-case basename of the plan file with the `.md` extension stripped (e.g., the plan file `2026-05-05-superjawn-batch-1.md` produces the slug `2026-05-05-superjawn-batch-1`, and the journal lands at `.superpowers/exec-journal-2026-05-05-superjawn-batch-1.md`). The journal is created on first run if it doesn't exist; entries are appended in chronological order. The directory `.superpowers/` is git-ignored by upstream convention.
+
+One line per check:
+
+```
+[YYYY-MM-DD HH:MM] Freshness check: <PASS / FAIL> — <one-line summary>
+```
+
+If FAIL on any check, **stop and escalate to your human partner before implementing** — the plan may need revision.
+
+### Master-branch guardrail
+
+If the trigger fired because you're on `main` or `master`, the freshness check ALSO requires explicit user consent before any implementation begins. Per the upstream rule "never start implementation on main/master without explicit user consent," ask first, then proceed. Document the consent in the journal as part of the freshness check entry.
 
 ## The Process
 
 ### Step 1: Load and Review Plan
 1. Read plan file
 2. Review critically - identify any questions or concerns about the plan
-3. If concerns: Raise them with your human partner before starting
-4. If no concerns: Create TodoWrite and proceed
+3. Run the freshness check (see "Freshness check (when artifact is stale)" above) — single decision, write the result line to the execution journal
+4. If concerns or freshness FAIL: Raise them with your human partner before starting
+5. If no concerns and freshness PASS or skipped: Create TodoWrite and proceed
 
 ### Step 2: Execute Tasks
 
 For each task:
 1. Mark as in_progress
-2. Run the drift check (see "Research phase (per task)" above)
-3. Follow each step exactly (plan has bite-sized steps)
-4. Run verifications as specified
-5. Mark as completed
+2. Follow each step exactly (plan has bite-sized steps)
+3. Run verifications as specified
+4. Mark as completed
 
 ### Step 3: Complete Development
 
@@ -104,11 +113,11 @@ After all tasks complete and verified:
 ## Remember
 - Review plan critically first
 - Follow plan steps exactly
-- Drift-check each task against current codebase reality before implementing (see Research phase)
+- Run the freshness check at Step 1 — default-skip, but fires for cross-session plans, external APIs, or main/master branch work
 - Don't skip verifications
 - Reference skills when plan says to
 - Stop when blocked, don't guess
-- Never start implementation on main/master branch without explicit user consent
+- Never start implementation on main/master branch without explicit user consent (the freshness check enforces this when triggered)
 
 ## Integration
 

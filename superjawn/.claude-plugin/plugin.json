@@ -1,7 +1,7 @@
 {
   "name": "superjawn",
-  "version": "0.1.0",
-  "description": "Research-augmented skills derived from obra/superpowers — adds default-on research phases to each skill in the workflow",
+  "version": "0.2.0",
+  "description": "Skills derived from obra/superpowers — research at entry-point stages (brainstorming, debugging, skill-writing), a narrow freshness check on stale-artifact-consumer skills (executing-plans, subagent-driven-development), and pure consumer ports for the rest.",
   "author": {
     "name": "Joe Amditis",
     "email": "jamditis@gmail.com"
