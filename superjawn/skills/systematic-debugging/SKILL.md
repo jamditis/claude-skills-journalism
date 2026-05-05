@@ -55,7 +55,7 @@ Use for ANY technical issue:
 
 ## The Four Phases
 
-You MUST complete each phase before proceeding to the next. Between Phase 1 and Phase 2, run the research phase (default-on, see below) to gather external context that pattern analysis can build on.
+Move through the phases in order. Phase 1 is mandatory; if it produces a clear root cause and a confident fix, you may go directly to Phase 4 (Implementation). Otherwise complete Phase 2 (Pattern Analysis) and Phase 3 (Hypotheses) in order before Phase 4. Between Phase 1 and Phase 2 — when you've decided pattern analysis is needed — run the research phase (default-on, see below) so pattern analysis has external context to build on.
 
 ### Phase 1: Root Cause Investigation
 
@@ -167,7 +167,7 @@ The skill creates the file on first invocation if it doesn't exist; subsequent i
 - Findings: 3-5 bullets per kind that fired, including load-bearing links/refs
 - "Considered but ruled out" notes so future-you knows what was checked
 
-The directory `.superpowers/` is git-ignored by upstream convention.
+Add `.superpowers/` to your project's `.gitignore` so debug logs don't get accidentally committed. The upstream `superpowers` plugin uses this convention; superjawn follows the same pattern.
 
 #### 4. Skip protocol
 

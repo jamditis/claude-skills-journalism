@@ -1,6 +1,6 @@
 # superjawn Batch 2 — debugging triad port
 
-**Status:** design approved, awaiting implementation plan
+**Status:** implemented in PR #36 (v0.3.0). Plan at [`../plans/2026-05-05-superjawn-batch-2.md`](../plans/2026-05-05-superjawn-batch-2.md).
 **Date:** 2026-05-05
 **Author:** Joe Amditis (with brainstorming session)
 **Repo:** `claude-skills-journalism`
@@ -31,7 +31,7 @@ Locked during brainstorming on 2026-05-05:
 
 ### `systematic-debugging` (research category)
 
-**Insertion point.** New top-level section `## Research phase` placed between upstream's `### Phase 1: Root Cause Investigation` and `### Phase 2: Pattern Analysis`. The new section sits at the same heading level as the existing phase sections (i.e., outside any one Phase) so it reads as a discrete step in the four-phase flow rather than a Phase 1 sub-step.
+**Insertion point.** New `### Research phase` section placed between upstream's `### Phase 1: Root Cause Investigation` and `### Phase 2: Pattern Analysis`, at the same heading level as the existing phase sections so it reads as a discrete step in the four-phase flow rather than a Phase 1 sub-step.
 
 **Default research kinds:** all four.
 
