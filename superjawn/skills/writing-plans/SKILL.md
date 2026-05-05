@@ -3,6 +3,14 @@ name: writing-plans
 description: Use when you have a spec or requirements for a multi-step task, before touching code
 ---
 
+<!--
+Adapted from obra/superpowers writing-plans skill (v5.0.7), MIT-licensed,
+copyright 2025 Jesse Vincent. Modifications copyright 2026 Joe Amditis.
+Modifications add a default-on research phase before plan drafting, plus
+updates to cross-references and self-review.
+See CREDITS.md.
+-->
+
 # Writing Plans
 
 ## Overview
@@ -21,6 +29,44 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 ## Scope Check
 
 If the spec covers multiple independent subsystems, it should have been broken into sub-project specs during brainstorming. If it wasn't, suggest breaking this into separate plans — one per subsystem. Each plan should produce working, testable software on its own.
+
+## Research phase
+
+Before drafting plan steps, gather outside context. **Default-on**: skip only with explicit justification.
+
+### 1. Pick research kinds
+
+For writing-plans, the **defaults are:**
+- **Web (pitfalls in chosen approach):** What's gone wrong for others doing this kind of plan? Recent post-mortems, GitHub issues, conference talks?
+- **Codebase (similar features):** Has this codebase done something similar before? What patterns can be reused?
+- **Authoritative verification:** If the plan involves external APIs/services/standards, hit the real source — current docs, live curl, current spec — to confirm the plan's assumptions.
+
+Add user-context if a prior plan or session is relevant.
+
+### 2. Dispatch
+
+Subagent by default:
+- `Explore` for codebase / similar-feature search
+- `general-purpose` for web research and live API verification
+- Run in parallel when independent
+
+Inline for trivial plans (single-file edits, mechanical changes).
+
+### 3. Record findings
+
+Write 3–5 tight bullets into a new `## Research notes` section AT THE TOP of the plan doc, immediately after the plan header. Include load-bearing references and anything considered-but-ruled-out.
+
+### 4. Skip protocol
+
+If skipping, write one line into the plan doc: `Skipped research because <reason>. <Verifiable pointer if applicable>.`
+
+**Valid reasons:**
+- Trivial scope (typo, comment edit, single-line config)
+- Fresh prior research — same topic in current session OR within last 7 days with verifiable spec/plan pointer. **If the pointer doesn't resolve, the skip is invalid.** (Beyond 7 days, repeat the research even if you remember the prior findings — the landscape drifts.)
+- User explicit — **must quote the phrase** that authorized the skip.
+- Repeat of identical task — **must include a pointer** to the prior successful run.
+
+**Invalid reasons:** "I think I know", "seems straightforward", "moving fast", "user wants this done quickly", "already familiar with this codebase". If those are tempting, do the research.
 
 ## File Structure
 
@@ -128,6 +174,8 @@ After writing the complete plan, look at the spec with fresh eyes and check the 
 **2. Placeholder scan:** Search your plan for red flags — any of the patterns from the "No Placeholders" section above. Fix them.
 
 **3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
+
+**4. Research phase check:** Does the plan contain either a `## Research notes` section with findings, or a `Skipped research because <reason>` declaration? If neither, the plan was drafted without the research step — return to the research phase.
 
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
 
