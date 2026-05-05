@@ -236,7 +236,7 @@
                             </div>
                         </div>
                         <div class="mt-4 pt-4 border-t border-ink/5 text-xs text-mist font-mono">
-                            3 parallel subagents + inline memory check
+                            dispatch varies per skill — see each skill's research-phase section
                         </div>
                     </div>
 
@@ -405,7 +405,7 @@
                                 <td><span class="category-badge badge-pending">Pending (Batch 5)</span></td>
                             </tr>
                             <tr style="opacity: 0.6;">
-                                <td><code>using-superjawn</code></td>
+                                <td><code>using-superpowers</code><br><span class="text-[10px] text-mist">→ <code>using-superjawn</code> at port</span></td>
                                 <td><span class="category-badge badge-consumer">Consumer</span></td>
                                 <td><span class="category-badge badge-pending">Pending (Batch 5)</span></td>
                             </tr>
@@ -443,6 +443,7 @@
                         </div>
                         <p class="text-mist mb-4">Install from the marketplace.</p>
                         <pre><code>claude plugin install superjawn</code></pre>
+                        <p class="text-sm text-mist mt-4">After installing, restart Claude Code so the new skills load. Existing sessions can't pick up new plugin versions mid-flight — <code>superjawn:*</code> invocations from a session that started before the install will fall through to upstream.</p>
                     </div>
 
                     <div class="feature-card p-8 rounded-xl border-2 border-accent/20" style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.04) 0%, white 100%);">
@@ -458,6 +459,7 @@
                 <div class="mt-8 feature-card p-6 rounded-xl">
                     <h3 class="font-display text-base font-bold mb-3">Update an existing install</h3>
                     <pre><code>claude plugin update superjawn</code></pre>
+                    <p class="text-sm text-mist mt-4">After installing or updating, restart Claude Code so the new skills load. Existing sessions can't pick up new plugin versions mid-flight — <code>superjawn:*</code> invocations from a session that started before the update will fall through to upstream.</p>
                 </div>
             </div>
         </section>
@@ -466,7 +468,7 @@
         <section class="py-24 px-6">
             <div class="max-w-4xl mx-auto reveal">
                 <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Skip protocol</h2>
-                <p class="text-lg text-mist max-w-2xl mb-12">The research phase is default-on. Skipping is allowed, but requires a written justification. Below is the locked skip-protocol text as it appears in the skill files — all three research-phase skills carry this verbatim.</p>
+                <p class="text-lg text-mist max-w-2xl mb-12">The research phase is default-on. Skipping is allowed, but requires a written justification. Below is the locked skip-protocol text from the two ported research-phase skills (brainstorming and systematic-debugging). The third research-category skill, writing-skills, is pending Batch 5 and will adopt the same locked text when it ports.</p>
 
                 <div class="feature-card rounded-xl overflow-hidden">
                     <div class="px-6 py-4 border-b border-ink/5 flex items-center gap-2">
@@ -474,57 +476,18 @@
                         <span class="font-mono text-xs text-mist">brainstorming/SKILL.md — Skip protocol (canonical)</span>
                     </div>
                     <div class="p-6 space-y-6">
-                        <div class="skip-block">
-                            <p class="text-sm font-medium text-ink mb-2">Skip line format:</p>
-                            <pre><code>Skipped research because &lt;reason&gt;. &lt;Verifiable pointer if applicable&gt;.</code></pre>
+                        <div class="text-xs text-mist mb-4 italic">
+                            Quoted directly from <code class="font-mono">superjawn/skills/brainstorming/SKILL.md</code> (and byte-equivalent in <code class="font-mono">systematic-debugging/SKILL.md</code>).
                         </div>
+                        <pre class="text-sm leading-relaxed whitespace-pre-wrap"><code>If skipping, write one line into the spec doc: <span class="text-blue-300">`Skipped research because &lt;reason&gt;. &lt;Verifiable pointer if applicable&gt;.`</span>
 
-                        <div>
-                            <p class="text-sm font-semibold text-ink mb-3">Valid skip reasons (these four only):</p>
-                            <div class="space-y-3">
-                                <div class="flex gap-3 items-start text-sm">
-                                    <span class="font-mono text-accent font-bold flex-shrink-0">1.</span>
-                                    <div>
-                                        <span class="font-medium text-ink">Trivial scope.</span>
-                                        <span class="text-mist"> Typo fix, log-message wording, comment edit, single-character config change, removing a debug print.</span>
-                                    </div>
-                                </div>
-                                <div class="flex gap-3 items-start text-sm">
-                                    <span class="font-mono text-accent font-bold flex-shrink-0">2.</span>
-                                    <div>
-                                        <span class="font-medium text-ink">Fresh prior research.</span>
-                                        <span class="text-mist"> Same topic researched in a recent session, findings still apply. "Recent" = current session, or within the last 7 calendar days with a verifiable spec/plan/log pointer. Must include the pointer — if it doesn't resolve, the skip is invalid. Beyond 7 days, repeat the research even if you remember the prior findings, because the landscape (codebase, libraries, docs) drifts.</span>
-                                    </div>
-                                </div>
-                                <div class="flex gap-3 items-start text-sm">
-                                    <span class="font-mono text-accent font-bold flex-shrink-0">3.</span>
-                                    <div>
-                                        <span class="font-medium text-ink">User explicit.</span>
-                                        <span class="text-mist"> User said "skip research" or equivalent. Must quote the phrase.</span>
-                                    </div>
-                                </div>
-                                <div class="flex gap-3 items-start text-sm">
-                                    <span class="font-mono text-accent font-bold flex-shrink-0">4.</span>
-                                    <div>
-                                        <span class="font-medium text-ink">Repeat of identical task.</span>
-                                        <span class="text-mist"> Same operation as a previous successful run, with a pointer to the prior instance.</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+<span class="text-blue-300">**Valid reasons:**</span>
+- Trivial scope (typo, comment edit, single-line config)
+- Fresh prior research — same topic in current session OR within last 7 days with verifiable spec/plan pointer. <span class="text-blue-300">**If the pointer doesn't resolve, the skip is invalid.**</span> (Beyond 7 days, repeat the research even if you remember the prior findings — the landscape drifts.)
+- User explicit — <span class="text-blue-300">**must quote the phrase**</span> that authorized the skip.
+- Repeat of identical task — <span class="text-blue-300">**must include a pointer**</span> to the prior successful run.
 
-                        <div>
-                            <p class="text-sm font-semibold text-ink mb-3">Invalid skip reasons (called out explicitly in the skill):</p>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-mist">
-                                <div class="flex items-center gap-2"><i data-lucide="x" class="w-3 h-3 text-red-400 flex-shrink-0"></i> "I think I know" / "I have prior knowledge"</div>
-                                <div class="flex items-center gap-2"><i data-lucide="x" class="w-3 h-3 text-red-400 flex-shrink-0"></i> "Seems straightforward" / "obvious fix"</div>
-                                <div class="flex items-center gap-2"><i data-lucide="x" class="w-3 h-3 text-red-400 flex-shrink-0"></i> "Moving fast" / "tight timeline"</div>
-                                <div class="flex items-center gap-2"><i data-lucide="x" class="w-3 h-3 text-red-400 flex-shrink-0"></i> "User wants this done quickly"</div>
-                                <div class="flex items-center gap-2"><i data-lucide="x" class="w-3 h-3 text-red-400 flex-shrink-0"></i> "Already familiar with this codebase"</div>
-                            </div>
-                        </div>
-
-                        <p class="text-sm text-mist border-t border-ink/5 pt-4">If the user objects to a skip, the skill reverts to step 1 of the research phase. Skip lines written into artifacts make patterns visible during spec/plan review.</p>
+<span class="text-blue-300">**Invalid reasons:**</span> "I think I know", "seems straightforward", "moving fast", "user wants this done quickly", "already familiar with this codebase". If those are tempting, do the research.</code></pre>
                     </div>
                 </div>
             </div>
