@@ -39,6 +39,17 @@
       },
       "source": "./pdf-playground",
       "category": "Productivity"
+    },
+    {
+      "name": "superjawn",
+      "description": "Research-augmented skills derived from obra/superpowers — default-on research phase per skill",
+      "version": "0.1.0",
+      "author": {
+        "name": "Joe Amditis",
+        "email": "jamditis@gmail.com"
+      },
+      "source": "./superjawn",
+      "category": "Productivity"
     }
   ]
 }

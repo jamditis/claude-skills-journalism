@@ -1,0 +1,9 @@
+{
+  "name": "superjawn",
+  "version": "0.1.0",
+  "description": "Research-augmented skills derived from obra/superpowers — adds default-on research phases to each skill in the workflow",
+  "author": {
+    "name": "Joe Amditis",
+    "email": "jamditis@gmail.com"
+  }
+}
