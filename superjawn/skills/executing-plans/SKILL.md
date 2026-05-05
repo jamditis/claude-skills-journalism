@@ -54,7 +54,7 @@ Findings land in a per-plan execution journal at:
 .superpowers/exec-journal-<plan-slug>.md
 ```
 
-Where `<plan-slug>` is the kebab-case basename of the plan file (e.g., `2026-05-05-superjawn-batch-1.md` → `exec-journal-2026-05-05-superjawn-batch-1.md`). The journal is created on first run if it doesn't exist; entries are appended in chronological order. The directory `.superpowers/` is git-ignored by upstream convention.
+Where `<plan-slug>` is the kebab-case basename of the plan file with the `.md` extension stripped (e.g., the plan file `2026-05-05-superjawn-batch-1.md` produces the slug `2026-05-05-superjawn-batch-1`, and the journal lands at `.superpowers/exec-journal-2026-05-05-superjawn-batch-1.md`). The journal is created on first run if it doesn't exist; entries are appended in chronological order. The directory `.superpowers/` is git-ignored by upstream convention.
 
 One line per check:
 

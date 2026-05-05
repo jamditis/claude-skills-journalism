@@ -157,7 +157,7 @@ Verify, in order:
 Write to the execution journal at `.superpowers/exec-journal-<plan-slug>.md` (created on first run if it doesn't exist). One line per check:
 
 ```
-[YYYY-MM-DD HH:MM] Task N freshness check: <PASS / FAIL> — <one-line summary>
+[YYYY-MM-DD HH:MM] Freshness check: <PASS / FAIL> — <one-line summary>
 ```
 
 If FAIL on any check, escalate before implementing — the plan needs revision.

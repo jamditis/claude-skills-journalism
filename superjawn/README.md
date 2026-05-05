@@ -1,6 +1,6 @@
 # superjawn
 
-Claude Code skills derived from [obra/superpowers](https://github.com/obra/superpowers) v5.0.7. Research belongs at entry-point stages where work originates without an upstream artifact (`brainstorming`, `systematic-debugging`, `writing-skills`); stale-artifact-consumer skills get a narrow default-skip freshness check (`executing-plans`, `subagent-driven-development`); the rest port as pure consumers that trust the artifact handoff. See `specs/2026-05-05-superjawn-research-phases-design.md` (in the parent `claude-skills-journalism` repo) for the full architecture.
+Claude Code skills derived from [obra/superpowers](https://github.com/obra/superpowers) v5.0.7. Research belongs at entry-point stages where work originates without an upstream artifact (`brainstorming`, `systematic-debugging`, `writing-skills`); stale-artifact-consumer skills get a narrow default-skip freshness check (`executing-plans`, `subagent-driven-development`); the rest port as pure consumers that trust the artifact handoff. See [`../specs/2026-05-05-superjawn-research-phases-design.md`](../specs/2026-05-05-superjawn-research-phases-design.md) for the full architecture.
 
 ## Skills
 

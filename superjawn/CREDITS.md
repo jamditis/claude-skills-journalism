@@ -17,7 +17,7 @@ Synced against upstream `obra/superpowers` v5.0.7 (release tag) on 2026-05-05. T
 - `writing-plans` — research phase stripped (consumer of brainstorming spec; trusts the handoff)
 - `executing-plans` — per-task drift check replaced with a one-time default-skip freshness check at execution start, gated on three triggers (cross-session plan, external API/service, main/master branch). Two smoke-test bugs from PR #34 review folded in: the execution-journal location is now defined (`.superpowers/exec-journal-<plan-slug>.md`), and the master-branch guardrail is wired into the freshness check itself (was previously only in Remember).
 
-See `specs/2026-05-05-superjawn-research-phases-design.md` (in the parent `claude-skills-journalism` repo) for the full architecture and the categorization across all 14 skills.
+See [`../specs/2026-05-05-superjawn-research-phases-design.md`](../specs/2026-05-05-superjawn-research-phases-design.md) for the full architecture and the categorization across all 14 skills.
 
 **v0.1.0 (foundation triad).** Each ported skill added a `## Research phase` section. Reverted/replaced in v0.2.0 for `writing-plans` and `executing-plans`.
 
