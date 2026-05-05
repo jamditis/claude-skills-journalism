@@ -357,10 +357,11 @@ Expected: no output (files identical at this point — modifications come in nex
 
 ---
 
-## Task 7: Port `brainstorming` — add MIT attribution + research phase
+## Task 7: Port `brainstorming` — add MIT attribution + research phase + visual companion branding
 
 **Files:**
 - Modify: `superjawn/skills/brainstorming/SKILL.md`
+- Modify: `superjawn/skills/brainstorming/scripts/frame-template.html`
 
 The existing brainstorming SKILL.md has a checklist with 9 items at "## Checklist". The research phase fits BETWEEN item 3 ("Ask clarifying questions") and item 4 ("Propose 2-3 approaches"). The skill's process flow `digraph` also needs a new `Research phase` node added between those two.
 
@@ -457,7 +458,23 @@ Find the "**Spec Self-Review:**" subsection. Add a fifth item to the numbered li
 5. **Research phase check:** Does the spec contain either a `## Research notes` section with findings, or a one-line `Skipped research because <reason>` declaration? If neither, the brainstorming flow didn't run correctly — go back to the research phase before continuing.
 ```
 
-- [ ] **Step 6: Verify edits parse as valid markdown**
+- [ ] **Step 6: Update visual companion header to dual-link**
+
+Edit `superjawn/skills/brainstorming/scripts/frame-template.html`. Around line 199 the upstream header reads:
+
+```html
+<h1><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener">Superpowers Brainstorming</a></h1>
+```
+
+Replace with the dual-link form (superjawn-primary, parenthetical upstream attribution):
+
+```html
+<h1><a href="https://github.com/jamditis/claude-skills-journalism/tree/master/superjawn" target="_blank" rel="noopener">superjawn Brainstorming</a> <span style="font-size: 0.7em; opacity: 0.7;">(forked from <a href="https://github.com/obra/superpowers" target="_blank" rel="noopener">superpowers</a>)</span></h1>
+```
+
+This shows "superjawn Brainstorming" linked to your repo as the primary identity, with a smaller parenthetical "forked from superpowers" link pointing at upstream. Best-of-both attribution.
+
+- [ ] **Step 7: Verify edits parse as valid markdown**
 
 ```bash
 # Quick sanity check — confirm SKILL.md still has the expected sections
@@ -472,7 +489,16 @@ grep -c "^## " ~/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7
 
 Compare the two — superjawn should be exactly +1.
 
-- [ ] **Step 7: Commit**
+Also verify the HTML edit didn't break the file:
+
+```bash
+grep -c "<h1>" superjawn/skills/brainstorming/scripts/frame-template.html
+grep "github.com" superjawn/skills/brainstorming/scripts/frame-template.html
+```
+
+Expected: one `<h1>` tag, two GitHub URLs visible (jamditis/claude-skills-journalism and obra/superpowers).
+
+- [ ] **Step 8: Commit**
 
 ```bash
 git add superjawn/skills/brainstorming/
@@ -482,17 +508,28 @@ Adds default-on research phase between clarifying questions and approach
 proposal. Subagent dispatch (Explore + general-purpose). Findings recorded
 in spec doc; skip protocol with valid/invalid reason whitelist.
 
-Process flow digraph updated. Spec self-review check added."
+Process flow digraph updated. Spec self-review check added.
+
+Visual companion header rebranded to dual-link form: superjawn primary,
+parenthetical 'forked from superpowers' attribution."
 ```
 
 ---
 
-## Task 8: Port `brainstorming` — rewrite cross-references
+## Task 8: Port `brainstorming` — rewrite cross-references (with explicit non-renames)
 
 **Files:**
 - Modify: `superjawn/skills/brainstorming/SKILL.md`
 
 Cross-refs from brainstorming go to `writing-plans` (which IS being ported in this batch — rewrite to `superjawn:writing-plans`) and possibly other skills (which are NOT yet ported — keep at `superpowers:` for now per dual-namespace mode).
+
+**EXPLICIT NON-RENAMES** — DO NOT mechanically grep-replace `superpowers` → `superjawn`. The following strings refer to user-data layouts and project conventions that are SHARED across forks, not to skill identifiers, and must remain unchanged:
+
+- `.superpowers/` (runtime directory, e.g. `<project>/.superpowers/brainstorm/<session-id>/`) — referenced in `start-server.sh`, `stop-server.sh`, `visual-companion.md`. Renaming would break any user with existing brainstorm sessions.
+- `docs/superpowers/specs/` (project spec directory) — referenced in `SKILL.md` and `spec-document-reviewer-prompt.md`. Renaming would force every superjawn user to choose a different spec home and break continuity with prior work.
+- `https://github.com/obra/superpowers` (upstream attribution link) — Task 7 already handled the visual-companion header rebranding to dual-link form. Any other occurrences of this URL are pure attribution and stay as-is.
+
+Only the `superpowers:<skill-name>` namespaced references inside SKILL.md get rewritten. Bare-name references to `writing-plans` (skill name, not directory path) also get rewritten. Everything else stays.
 
 - [ ] **Step 1: Inventory existing cross-refs**
 
