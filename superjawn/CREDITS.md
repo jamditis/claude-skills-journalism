@@ -4,7 +4,7 @@
 
 ## Upstream baseline
 
-Synced against upstream `obra/superpowers` v5.0.7 (commit: <fill in upstream commit SHA at first port>) on 2026-05-05.
+Synced against upstream `obra/superpowers` v5.0.7 (release tag) on 2026-05-05. The cached snapshot at `~/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/` is a release tarball, not a git checkout, so no commit SHA is available. Future syncs should pin to whichever upstream tag is current.
 
 ## Upstream changes ported since baseline
 
