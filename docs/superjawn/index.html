@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>superjawn | Research-augmented superpowers for Claude Code</title>
+    <meta name="description" content="A fork of obra/superpowers. Each entry-point skill runs research by default — before brainstorming, before debugging, before writing skills.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Fraunces', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        canvas: '#ede6d4',
+                        ink: '#121212',
+                        clay: '#d6cdb7',
+                        mist: '#6b6b6b',
+                        accent: '#1e3a8a',
+                        accentDark: '#1e40af',
+                        accentLight: '#dbeafe',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #ede6d4; color: #121212; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+        .paper-overlay { position: fixed; inset: 0; background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png"), radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%); opacity: 0.5; pointer-events: none; z-index: 1; }
+        .hero-gradient { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%); }
+        .feature-card { background: white; border: 1px solid rgba(18, 18, 18, 0.08); transition: all 0.3s ease; }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15); }
+        code { background: rgba(18, 18, 18, 0.06); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; font-family: 'JetBrains Mono', monospace; }
+        pre { background: #1a1a1a; color: #e2e8f0; padding: 1.5rem; border-radius: 8px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; line-height: 1.6; }
+        pre code { background: none; padding: 0; font-size: inherit; }
+        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .category-badge { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; font-weight: 500; padding: 0.2em 0.6em; border-radius: 4px; letter-spacing: 0.04em; text-transform: uppercase; }
+        .skip-block { background: rgba(30, 58, 138, 0.04); border-left: 3px solid #1e3a8a; padding: 1.25rem 1.5rem; border-radius: 0 8px 8px 0; font-size: 0.875rem; }
+        .status-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        .status-table th { text-align: left; padding: 0.6rem 1rem; font-weight: 600; font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; border-bottom: 2px solid rgba(18,18,18,0.1); }
+        .status-table td { padding: 0.6rem 1rem; border-bottom: 1px solid rgba(18,18,18,0.05); vertical-align: middle; }
+        .status-table tr:last-child td { border-bottom: none; }
+        .badge-ported { background: rgba(30, 58, 138, 0.1); color: #1e3a8a; }
+        .badge-pending { background: rgba(18,18,18,0.06); color: #6b6b6b; }
+        .badge-research { background: rgba(30, 58, 138, 0.15); color: #1e3a8a; }
+        .badge-freshness { background: rgba(59, 130, 246, 0.12); color: #1e40af; }
+        .badge-consumer { background: rgba(18,18,18,0.06); color: #6b6b6b; }
+    </style>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="superjawn">
+    <meta property="og:description" content="A fork of obra/superpowers. Each entry-point skill runs research by default — before brainstorming, before debugging, before writing skills.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/superjawn/">
+    <meta property="og:image" content="https://skills.amditis.tech/superjawn/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="superjawn">
+    <meta name="twitter:description" content="A fork of obra/superpowers. Each entry-point skill runs research by default — before brainstorming, before debugging, before writing skills.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/superjawn/og-image.png">
+    <script src="../ask-ai.js" defer></script>
+</head>
+<body class="font-sans">
+    <div class="paper-overlay"></div>
+
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">&#8592; Back to all skills</a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/superjawn" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">View on GitHub &#8594;</a>
+        </div>
+    </nav>
+
+    <header class="hero-gradient text-white pt-32 pb-24 px-6 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-15">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <!-- Research phase constellation — nodes and connections -->
+                <circle cx="12%" cy="25%" r="4" fill="white" opacity="0.6"/>
+                <circle cx="28%" cy="55%" r="3" fill="white" opacity="0.4"/>
+                <circle cx="42%" cy="22%" r="5" fill="white" opacity="0.5"/>
+                <circle cx="58%" cy="68%" r="3" fill="white" opacity="0.4"/>
+                <circle cx="67%" cy="32%" r="4" fill="white" opacity="0.6"/>
+                <circle cx="79%" cy="58%" r="5" fill="white" opacity="0.5"/>
+                <circle cx="91%" cy="22%" r="3" fill="white" opacity="0.4"/>
+                <circle cx="36%" cy="78%" r="4" fill="white" opacity="0.5"/>
+                <circle cx="72%" cy="75%" r="3" fill="white" opacity="0.4"/>
+                <circle cx="50%" cy="44%" r="6" fill="white" opacity="0.7"/>
+                <line x1="12%" y1="25%" x2="42%" y2="22%" stroke="white" stroke-width="1" opacity="0.25"/>
+                <line x1="42%" y1="22%" x2="67%" y2="32%" stroke="white" stroke-width="1" opacity="0.25"/>
+                <line x1="28%" y1="55%" x2="58%" y2="68%" stroke="white" stroke-width="1" opacity="0.25"/>
+                <line x1="67%" y1="32%" x2="79%" y2="58%" stroke="white" stroke-width="1" opacity="0.25"/>
+                <line x1="50%" y1="44%" x2="67%" y2="32%" stroke="white" stroke-width="1.5" opacity="0.45"/>
+                <line x1="50%" y1="44%" x2="28%" y2="55%" stroke="white" stroke-width="1.5" opacity="0.45"/>
+                <line x1="79%" y1="58%" x2="91%" y2="22%" stroke="white" stroke-width="1" opacity="0.25"/>
+                <line x1="36%" y1="78%" x2="58%" y2="68%" stroke="white" stroke-width="1" opacity="0.25"/>
+                <line x1="72%" y1="75%" x2="79%" y2="58%" stroke="white" stroke-width="1" opacity="0.25"/>
+            </svg>
+        </div>
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide uppercase">Claude Code Plugin</div>
+                <div class="inline-block px-3 py-1 bg-white/10 rounded-full font-mono text-xs">v0.3.0</div>
+            </div>
+            <h1 class="font-display text-5xl md:text-7xl font-black leading-[0.9] mb-6">superjawn</h1>
+            <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-4 font-light">Skills that research before they act.</p>
+            <p class="text-base md:text-lg text-white/70 max-w-2xl mb-10">A fork of obra/superpowers. Each entry-point skill runs research by default — before brainstorming, before debugging, before writing skills. Stale-artifact consumers get a narrow freshness check. Everything else ports clean.</p>
+            <div class="flex flex-wrap gap-4">
+                <a href="#install" class="inline-flex items-center gap-2 bg-white text-accent font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors"><i data-lucide="download" class="w-5 h-5"></i> Install plugin</a>
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/superjawn" class="inline-flex items-center gap-2 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/20 transition-colors border border-white/20"><i data-lucide="github" class="w-5 h-5"></i> View on GitHub</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+
+        <!-- What this is -->
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start reveal">
+                    <div>
+                        <h2 class="font-display text-4xl md:text-5xl font-light italic mb-6">What this is</h2>
+                        <div class="space-y-4 text-mist leading-relaxed">
+                            <p>superjawn is a research-augmented variant of <a href="https://github.com/obra/superpowers" class="text-accent hover:underline">obra/superpowers</a> (MIT, Jesse Vincent, v5.0.7). The upstream plugin ships 14 skills covering the full development workflow — brainstorming through finishing a branch. superjawn forks those skills and adds structured research at entry-point stages.</p>
+                            <p>The idea: when you start new work without an upstream artifact (a spec, a plan, a test), a brief research phase catches pitfalls, surfaces prior art, and checks your memory before you commit to an approach. When you're consuming an artifact that was already research-baked, re-researching wastes time and risks conflicting conclusions.</p>
+                            <p>So research fires in three places only: <strong>brainstorming</strong>, <strong>systematic-debugging</strong>, and <strong>writing-skills</strong>. Stale-artifact skills get a lighter freshness check. Everything else is a straight port.</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="feature-card p-6 rounded-xl">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-accentLight rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="git-fork" class="w-5 h-5 text-accent"></i>
+                                </div>
+                                <h3 class="font-display text-base font-bold">Forked from obra/superpowers</h3>
+                            </div>
+                            <p class="text-mist text-sm">MIT-licensed. Synced against upstream v5.0.7. Modifications carry the same license. Copyright 2025 Jesse Vincent; modifications copyright 2026 Joe Amditis.</p>
+                        </div>
+                        <div class="feature-card p-6 rounded-xl">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-accentLight rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="layers" class="w-5 h-5 text-accent"></i>
+                                </div>
+                                <h3 class="font-display text-base font-bold">Three categories, 14 skills total</h3>
+                            </div>
+                            <p class="text-mist text-sm">Research phase (3 skills), freshness check (2 skills), consumer/straight port (9 skills). v0.3.0 has 6 of 14 ported across the first two batches.</p>
+                        </div>
+                        <div class="feature-card p-6 rounded-xl">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 bg-accentLight rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="toggle-left" class="w-5 h-5 text-accent"></i>
+                                </div>
+                                <h3 class="font-display text-base font-bold">Coexists with upstream</h3>
+                            </div>
+                            <p class="text-mist text-sm">Keep both <code>superpowers</code> and <code>superjawn</code> installed during rollout. Skills not yet ported resolve via <code>superpowers:&lt;skill&gt;</code>. Upstream disabled at v1.0.0 after all 14 skills land and prove out.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How research works -->
+        <section class="py-24 px-6 bg-white/50">
+            <div class="max-w-6xl mx-auto reveal">
+                <div class="text-center mb-16">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">How research works</h2>
+                    <p class="text-lg text-mist max-w-3xl mx-auto">Three categories, one principle: research belongs where work starts from scratch, not where it inherits a baked-in conclusion.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                    <!-- Research category -->
+                    <div class="feature-card p-8 rounded-xl relative overflow-hidden">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent to-accentDark"></div>
+                        <div class="mb-4">
+                            <span class="category-badge badge-research mb-3 block">Research</span>
+                            <h3 class="font-display text-xl font-bold mb-1">3 entry-point skills</h3>
+                            <p class="text-xs text-mist font-mono">brainstorming, systematic-debugging, writing-skills</p>
+                        </div>
+                        <p class="text-sm text-mist mb-4">Research phase fires by default. Skip only with explicit, written justification per the locked skip protocol.</p>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex gap-3 items-start">
+                                <div class="w-5 h-5 bg-accentLight rounded flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i data-lucide="globe" class="w-3 h-3 text-accent"></i>
+                                </div>
+                                <div>
+                                    <span class="font-medium text-ink">Web</span>
+                                    <span class="text-mist"> — error string searches, GitHub issues, current best practices</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-3 items-start">
+                                <div class="w-5 h-5 bg-accentLight rounded flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i data-lucide="git-commit-horizontal" class="w-3 h-3 text-accent"></i>
+                                </div>
+                                <div>
+                                    <span class="font-medium text-ink">Codebase prior-bugs</span>
+                                    <span class="text-mist"> — <code>git log --grep</code> for prior failures in this area</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-3 items-start">
+                                <div class="w-5 h-5 bg-accentLight rounded flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i data-lucide="book-open" class="w-3 h-3 text-accent"></i>
+                                </div>
+                                <div>
+                                    <span class="font-medium text-ink">Authoritative</span>
+                                    <span class="text-mist"> — current docs for any external APIs in scope</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-3 items-start">
+                                <div class="w-5 h-5 bg-accentLight rounded flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i data-lucide="brain" class="w-3 h-3 text-accent"></i>
+                                </div>
+                                <div>
+                                    <span class="font-medium text-ink">User-context</span>
+                                    <span class="text-mist"> — memory check for relevant prior decisions</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-ink/5 text-xs text-mist font-mono">
+                            dispatch varies per skill — see each skill's research-phase section
+                        </div>
+                    </div>
+
+                    <!-- Freshness check category -->
+                    <div class="feature-card p-8 rounded-xl relative overflow-hidden">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-blue-500"></div>
+                        <div class="mb-4">
+                            <span class="category-badge badge-freshness mb-3 block">Freshness check</span>
+                            <h3 class="font-display text-xl font-bold mb-1">2 stale-artifact skills</h3>
+                            <p class="text-xs text-mist font-mono">executing-plans, subagent-driven-development</p>
+                        </div>
+                        <p class="text-sm text-mist mb-4">Default-skip — the inverse of research. Fires only when a trigger indicates real drift risk.</p>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex gap-3 items-start">
+                                <div class="w-5 h-5 bg-blue-50 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i data-lucide="clock" class="w-3 h-3 text-blue-500"></i>
+                                </div>
+                                <div>
+                                    <span class="font-medium text-ink">Cross-session execution</span>
+                                    <span class="text-mist"> — plan drafted in a prior session</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-3 items-start">
+                                <div class="w-5 h-5 bg-blue-50 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i data-lucide="plug" class="w-3 h-3 text-blue-500"></i>
+                                </div>
+                                <div>
+                                    <span class="font-medium text-ink">External API touched</span>
+                                    <span class="text-mist"> — any task calls a live API or service</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-3 items-start">
+                                <div class="w-5 h-5 bg-blue-50 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i data-lucide="git-branch" class="w-3 h-3 text-blue-500"></i>
+                                </div>
+                                <div>
+                                    <span class="font-medium text-ink">main/master branch</span>
+                                    <span class="text-mist"> — heightened drift risk on integration branches</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-ink/5 text-xs text-mist font-mono">
+                            Findings: .superpowers/exec-journal-&lt;slug&gt;.md
+                        </div>
+                    </div>
+
+                    <!-- Consumer category -->
+                    <div class="feature-card p-8 rounded-xl relative overflow-hidden">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-ink/10"></div>
+                        <div class="mb-4">
+                            <span class="category-badge badge-consumer mb-3 block">Consumer</span>
+                            <h3 class="font-display text-xl font-bold mb-1">9 downstream skills</h3>
+                            <p class="text-xs text-mist font-mono">writing-plans, test-driven-development, + 7 more</p>
+                        </div>
+                        <p class="text-sm text-mist mb-4">No research phase. These skills consume an artifact from an already-researched upstream stage. The handoff carries the conclusions.</p>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex gap-3 items-start">
+                                <div class="w-5 h-5 bg-ink/5 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i data-lucide="check" class="w-3 h-3 text-mist"></i>
+                                </div>
+                                <span class="text-mist">Attribution comment added</span>
+                            </div>
+                            <div class="flex gap-3 items-start">
+                                <div class="w-5 h-5 bg-ink/5 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i data-lucide="check" class="w-3 h-3 text-mist"></i>
+                                </div>
+                                <span class="text-mist">Cross-references rewritten to <code>superjawn:</code></span>
+                            </div>
+                            <div class="flex gap-3 items-start">
+                                <div class="w-5 h-5 bg-ink/5 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i data-lucide="check" class="w-3 h-3 text-mist"></i>
+                                </div>
+                                <span class="text-mist">No flow-diagram edits required</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-ink/5 text-xs text-mist font-mono">
+                            Trust the upstream-artifact handoff
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- What's ported (v0.3.0) -->
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto reveal">
+                <div class="mb-12">
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">What's ported (v0.3.0)</h2>
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2 px-4 py-2 bg-accentLight rounded-lg">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-accent"></i>
+                            <span class="font-mono text-sm font-semibold text-accent">6 of 14 complete</span>
+                        </div>
+                        <span class="text-sm text-mist">Batches 1 + 2 shipped. Batches 3–5 pending.</span>
+                    </div>
+                </div>
+
+                <div class="feature-card rounded-xl overflow-hidden">
+                    <table class="status-table">
+                        <thead>
+                            <tr style="background: rgba(18,18,18,0.03);">
+                                <th>Skill</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>brainstorming</code></td>
+                                <td><span class="category-badge badge-research">Research</span></td>
+                                <td><span class="category-badge badge-ported">Ported (Batch 1)</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>writing-plans</code></td>
+                                <td><span class="category-badge badge-consumer">Consumer</span></td>
+                                <td><span class="category-badge badge-ported">Ported (Batch 1)</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>executing-plans</code></td>
+                                <td><span class="category-badge badge-freshness">Freshness check</span></td>
+                                <td><span class="category-badge badge-ported">Ported (Batch 1)</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>systematic-debugging</code></td>
+                                <td><span class="category-badge badge-research">Research</span></td>
+                                <td><span class="category-badge badge-ported">Ported (Batch 2)</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>test-driven-development</code></td>
+                                <td><span class="category-badge badge-consumer">Consumer</span></td>
+                                <td><span class="category-badge badge-ported">Ported (Batch 2)</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>verification-before-completion</code></td>
+                                <td><span class="category-badge badge-consumer">Consumer</span></td>
+                                <td><span class="category-badge badge-ported">Ported (Batch 2)</span></td>
+                            </tr>
+                            <tr style="opacity: 0.6;">
+                                <td><code>receiving-code-review</code></td>
+                                <td><span class="category-badge badge-consumer">Consumer</span></td>
+                                <td><span class="category-badge badge-pending">Pending (Batch 3)</span></td>
+                            </tr>
+                            <tr style="opacity: 0.6;">
+                                <td><code>requesting-code-review</code></td>
+                                <td><span class="category-badge badge-consumer">Consumer</span></td>
+                                <td><span class="category-badge badge-pending">Pending (Batch 3)</span></td>
+                            </tr>
+                            <tr style="opacity: 0.6;">
+                                <td><code>subagent-driven-development</code></td>
+                                <td><span class="category-badge badge-freshness">Freshness check</span></td>
+                                <td><span class="category-badge badge-pending">Pending (Batch 4)</span></td>
+                            </tr>
+                            <tr style="opacity: 0.6;">
+                                <td><code>dispatching-parallel-agents</code></td>
+                                <td><span class="category-badge badge-consumer">Consumer</span></td>
+                                <td><span class="category-badge badge-pending">Pending (Batch 4)</span></td>
+                            </tr>
+                            <tr style="opacity: 0.6;">
+                                <td><code>using-git-worktrees</code></td>
+                                <td><span class="category-badge badge-consumer">Consumer</span></td>
+                                <td><span class="category-badge badge-pending">Pending (Batch 4)</span></td>
+                            </tr>
+                            <tr style="opacity: 0.6;">
+                                <td><code>finishing-a-development-branch</code></td>
+                                <td><span class="category-badge badge-consumer">Consumer</span></td>
+                                <td><span class="category-badge badge-pending">Pending (Batch 5)</span></td>
+                            </tr>
+                            <tr style="opacity: 0.6;">
+                                <td><code>using-superpowers</code><br><span class="text-[10px] text-mist">→ <code>using-superjawn</code> at port</span></td>
+                                <td><span class="category-badge badge-consumer">Consumer</span></td>
+                                <td><span class="category-badge badge-pending">Pending (Batch 5)</span></td>
+                            </tr>
+                            <tr style="opacity: 0.6;">
+                                <td><code>writing-skills</code></td>
+                                <td><span class="category-badge badge-research">Research</span></td>
+                                <td><span class="category-badge badge-pending">Pending (Batch 5)</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- How to install -->
+        <section id="install" class="py-24 px-6 bg-white/50">
+            <div class="max-w-4xl mx-auto reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-6">How to install</h2>
+                <p class="text-center text-mist text-lg mb-16 max-w-2xl mx-auto">You need <a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accent hover:underline font-medium">Claude Code</a> installed. Run <code>claude --version</code> to check.</p>
+
+                <div class="space-y-8">
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">1</span>
+                            <h3 class="font-display text-xl font-bold">Add the plugin source</h3>
+                        </div>
+                        <p class="text-mist mb-4">Run this once to register the marketplace.</p>
+                        <pre><code>claude plugin marketplace add https://github.com/jamditis/claude-skills-journalism</code></pre>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">2</span>
+                            <h3 class="font-display text-xl font-bold">Install superjawn</h3>
+                        </div>
+                        <p class="text-mist mb-4">Install from the marketplace.</p>
+                        <pre><code>claude plugin install superjawn</code></pre>
+                        <p class="text-sm text-mist mt-4">After installing, restart Claude Code so the new skills load. Existing sessions can't pick up new plugin versions mid-flight — <code>superjawn:*</code> invocations from a session that started before the install will fall through to upstream.</p>
+                    </div>
+
+                    <div class="feature-card p-8 rounded-xl border-2 border-accent/20" style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.04) 0%, white 100%);">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="w-8 h-8 bg-accentDark text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">!</span>
+                            <h3 class="font-display text-xl font-bold">Existing superpowers users</h3>
+                        </div>
+                        <p class="text-mist mb-3">Keep both <code>superpowers</code> and <code>superjawn</code> enabled during the rollout (v0.1.0 through v0.6.0). Skills not yet ported in superjawn still resolve via <code>superpowers:&lt;skill&gt;</code>.</p>
+                        <p class="text-mist text-sm">At v1.0.0 — after all 14 skills land and at least two weeks of real use — disable the upstream <code>superpowers</code> plugin in your Claude Code config.</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 feature-card p-6 rounded-xl">
+                    <h3 class="font-display text-base font-bold mb-3">Update an existing install</h3>
+                    <pre><code>claude plugin update superjawn</code></pre>
+                    <p class="text-sm text-mist mt-4">After installing or updating, restart Claude Code so the new skills load. Existing sessions can't pick up new plugin versions mid-flight — <code>superjawn:*</code> invocations from a session that started before the update will fall through to upstream.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skip protocol -->
+        <section class="py-24 px-6">
+            <div class="max-w-4xl mx-auto reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">Skip protocol</h2>
+                <p class="text-lg text-mist max-w-2xl mb-12">The research phase is default-on. Skipping is allowed, but requires a written justification. Below is the locked skip-protocol text from the two ported research-phase skills (brainstorming and systematic-debugging). The third research-category skill, writing-skills, is pending Batch 5 and will adopt the same locked text when it ports.</p>
+
+                <div class="feature-card rounded-xl overflow-hidden">
+                    <div class="px-6 py-4 border-b border-ink/5 flex items-center gap-2">
+                        <i data-lucide="file-code-2" class="w-4 h-4 text-mist"></i>
+                        <span class="font-mono text-xs text-mist">brainstorming/SKILL.md — Skip protocol (canonical)</span>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        <div class="text-xs text-mist mb-4 italic">
+                            Quoted directly from <code class="font-mono">superjawn/skills/brainstorming/SKILL.md</code> (and byte-equivalent in <code class="font-mono">systematic-debugging/SKILL.md</code>).
+                        </div>
+                        <pre class="text-sm leading-relaxed whitespace-pre-wrap"><code>If skipping, write one line into the spec doc: <span class="text-blue-300">`Skipped research because &lt;reason&gt;. &lt;Verifiable pointer if applicable&gt;.`</span>
+
+<span class="text-blue-300">**Valid reasons:**</span>
+- Trivial scope (typo, comment edit, single-line config)
+- Fresh prior research — same topic in current session OR within last 7 days with verifiable spec/plan pointer. <span class="text-blue-300">**If the pointer doesn't resolve, the skip is invalid.**</span> (Beyond 7 days, repeat the research even if you remember the prior findings — the landscape drifts.)
+- User explicit — <span class="text-blue-300">**must quote the phrase**</span> that authorized the skip.
+- Repeat of identical task — <span class="text-blue-300">**must include a pointer**</span> to the prior successful run.
+
+<span class="text-blue-300">**Invalid reasons:**</span> "I think I know", "seems straightforward", "moving fast", "user wants this done quickly", "already familiar with this codebase". If those are tempting, do the research.</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Credits -->
+        <section class="py-16 px-6 bg-white/50">
+            <div class="max-w-4xl mx-auto text-center reveal">
+                <h2 class="font-display text-3xl font-light italic mb-6">Credits</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                    <a href="https://github.com/obra/superpowers" class="feature-card p-6 rounded-xl text-left hover:border-accent/30 transition-colors">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i data-lucide="github" class="w-5 h-5 text-accent"></i>
+                            <h3 class="font-display text-lg font-bold">obra/superpowers</h3>
+                        </div>
+                        <p class="text-mist text-sm">Original 14-skill plugin by Jesse Vincent. MIT-licensed, v5.0.7 baseline. superjawn forks this work with modifications for research phase insertion.</p>
+                        <div class="mt-3 font-mono text-xs text-mist">Copyright 2025 Jesse Vincent</div>
+                    </a>
+                    <div class="feature-card p-6 rounded-xl text-left">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i data-lucide="wrench" class="w-5 h-5 text-accent"></i>
+                            <h3 class="font-display text-lg font-bold">Modifications</h3>
+                        </div>
+                        <p class="text-mist text-sm">Research phase design, freshness check logic, architecture revision, and all per-skill modifications by Joe Amditis. Carries same MIT license.</p>
+                        <div class="mt-3 font-mono text-xs text-mist">Copyright 2026 Joe Amditis</div>
+                    </div>
+                </div>
+                <p class="text-sm text-mist mt-8">MIT License — see <a href="https://github.com/jamditis/claude-skills-journalism/blob/master/superjawn/LICENSE" class="text-accent hover:underline">superjawn/LICENSE</a> for the full text.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="relative z-10 py-12 px-6 border-t border-ink/5">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-sm text-mist">Built by <a href="https://github.com/jamditis" class="text-accent hover:underline">Joe Amditis</a></div>
+            <div class="flex items-center gap-6 text-sm text-mist">
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/superjawn" class="hover:text-ink transition-colors">GitHub</a>
+                <a href="../" class="hover:text-ink transition-colors">All skills</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        lucide.createIcons();
+    </script>
+</body>
+</html>
