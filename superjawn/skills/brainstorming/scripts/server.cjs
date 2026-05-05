@@ -6,6 +6,7 @@ const path = require('path');
 // ========== WebSocket Protocol (RFC 6455) ==========
 
 const OPCODES = { TEXT: 0x01, CLOSE: 0x08, PING: 0x09, PONG: 0x0A };
+const MAX_FRAME_BYTES = 1 << 20;
 const WS_MAGIC = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
 function computeAcceptKey(clientKey) {
@@ -55,6 +56,10 @@ function decodeFrame(buffer) {
     if (buffer.length < 10) return null;
     payloadLen = Number(buffer.readBigUInt64BE(2));
     offset = 10;
+  }
+
+  if (payloadLen > MAX_FRAME_BYTES) {
+    throw new Error('Frame payload exceeds maximum (' + payloadLen + ' > ' + MAX_FRAME_BYTES + ')');
   }
 
   const maskOffset = offset;

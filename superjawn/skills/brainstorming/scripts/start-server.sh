@@ -108,10 +108,11 @@ if [[ -z "$OWNER_PID" || "$OWNER_PID" == "1" ]]; then
 fi
 
 # Foreground mode for environments that reap detached/background processes.
+# `exec` replaces this bash process with node, preserving PID so the value
+# already written to PID_FILE refers to the actual server process.
 if [[ "$FOREGROUND" == "true" ]]; then
   echo "$$" > "$PID_FILE"
-  env BRAINSTORM_DIR="$SESSION_DIR" BRAINSTORM_HOST="$BIND_HOST" BRAINSTORM_URL_HOST="$URL_HOST" BRAINSTORM_OWNER_PID="$OWNER_PID" node server.cjs
-  exit $?
+  exec env BRAINSTORM_DIR="$SESSION_DIR" BRAINSTORM_HOST="$BIND_HOST" BRAINSTORM_URL_HOST="$URL_HOST" BRAINSTORM_OWNER_PID="$OWNER_PID" node server.cjs
 fi
 
 # Start server, capturing output to log file

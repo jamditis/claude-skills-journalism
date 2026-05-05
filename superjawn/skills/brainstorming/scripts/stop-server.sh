@@ -13,6 +13,16 @@ if [[ -z "$SESSION_DIR" ]]; then
   exit 1
 fi
 
+# Refuse to act on paths outside known brainstorm session locations.
+case "$SESSION_DIR" in
+  /tmp/brainstorm-*) ;;
+  */.superpowers/brainstorm/*) ;;
+  *)
+    echo '{"error": "session_dir must be /tmp/brainstorm-* or .../.superpowers/brainstorm/*"}'
+    exit 1
+    ;;
+esac
+
 STATE_DIR="${SESSION_DIR}/state"
 PID_FILE="${STATE_DIR}/server.pid"
 

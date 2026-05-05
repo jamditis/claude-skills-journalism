@@ -21,7 +21,7 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Announce at start:** "I'm using the superjawn:writing-plans skill to create the implementation plan."
 
-**Context:** This should be run in a dedicated worktree (created by superjawn:brainstorming skill).
+**Context:** This should be run in a dedicated worktree (set up via superpowers:using-git-worktrees).
 
 **Save plans to:** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
 - (User preferences for plan location override this default)
