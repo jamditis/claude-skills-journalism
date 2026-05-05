@@ -1,30 +1,49 @@
-# superjawn — research-phase additions to superpowers skills
+# superjawn — research and freshness phases on superpowers skills
 
-**Status:** design approved, awaiting implementation plan
-**Date:** 2026-05-05
+**Status:** v0.1.0 shipped (foundation triad), v0.2.0 in flight (architecture rework)
+**Date:** 2026-05-05 (v0.1.0 design), revised 2026-05-05 (v0.2.0 architecture)
 **Author:** Joe Amditis (with brainstorming session)
 **Repo:** `claude-skills-journalism`
-**New plugin:** `superjawn/`
+**Plugin:** `superjawn/`
 
 ## Goal
 
-Add a default-on research phase to all 14 skills currently shipped by the upstream `superpowers` plugin (obra/superpowers, MIT, currently v5.0.7), recreated as a new plugin `superjawn` inside the existing `claude-skills-journalism` marketplace.
+Recreate the 14 skills shipped by upstream `superpowers` (obra/superpowers, MIT, currently v5.0.7) as `superjawn` inside the existing `claude-skills-journalism` marketplace, with research phases added only at entry-point stages and a narrow freshness check on stale-artifact-consumer skills.
 
-The research phase realizes the "research-first approach" already documented in `~/.claude/CLAUDE.md` — "let me check the latest trends, possible pitfalls, patterns, and discourse surrounding this topic before we start actually building or proposing solutions." Each skill gets a tailored research step at the right stage of its existing flow, dispatched via subagent by default, with findings written into the skill's existing artifact.
+The research phase realizes the "research-first approach" already documented in `~/.claude/CLAUDE.md` — "let me check the latest trends, possible pitfalls, patterns, and discourse surrounding this topic before we start actually building or proposing solutions." But research belongs only where work originates without an upstream artifact. Skills that consume an artifact from a research-baked-in upstream stage trust the handoff and don't re-research.
+
+## Architecture revision (v0.2.0)
+
+v0.1.0 shipped with research phases on all three foundation skills (`brainstorming`, `writing-plans`, `executing-plans`). Real-use feedback identified the issue: when these skills run in succession (the canonical flow), the research duplicates conclusions already encoded in the upstream artifact. Research at every stage:
+- Costs time (especially with subagent dispatch)
+- Risks conflicting findings (brainstorming concluded X, writing-plans research finds Y, plan is now ambiguous)
+- Bloats skill text and skip-protocol overhead
+- Creates a discipline-skip excuse in rigid skills like `test-driven-development`
+
+The v0.2.0 architecture concentrates research at entry-point stages, adds a narrow freshness check on stale-artifact-consumer skills, and ports the remaining skills as pure consumers (no research insertion).
 
 ## Decision log
 
-Locked during brainstorming on 2026-05-05:
+Locked during brainstorming on 2026-05-05 (v0.1.0):
 
 | Question | Decision |
 |---|---|
 | Kind of research | All four — web/best-practices, codebase/prior-art, authoritative verification, user-context — situational and skill-dependent |
-| Scope | All 14 superpowers skills |
+| Scope | All 14 superpowers skills (revised in v0.2.0 — see below) |
 | Rigidity | Default-on with explicit skip (justified, surfaced) |
 | Mechanism | Subagent dispatch by default; inline only for light-touch |
 | Output destination | Findings written into the skill's existing artifact (spec, plan, debug log) |
 | Delivery approach | Approach D — new plugin `superjawn/` inside `claude-skills-journalism`; copy upstream MIT-licensed skills with attribution; rewrite cross-references; disable upstream `superpowers` once migration complete |
 | Plugin name | `superjawn` |
+
+Revised 2026-05-05 (v0.2.0):
+
+| Question | Decision |
+|---|---|
+| Where does research belong | Only at entry-point stages where work originates without an upstream artifact (3 skills) |
+| Stale-artifact consumers | Get a narrow freshness check (default-skip with explicit triggers) instead of research (2 skills) |
+| Pure consumers | Port without any research/freshness insertion — trust the upstream-artifact handoff (9 skills) |
+| Trigger for the architecture revision | Real-use feedback that research in writing-plans/executing-plans duplicated brainstorming conclusions when the three skills ran in succession |
 
 ## Section 1 — Plugin architecture
 
@@ -38,42 +57,62 @@ Locked during brainstorming on 2026-05-05:
 
 **Versioning:** Track upstream-source version in `CREDITS.md` (currently 5.0.7). Manual diff-and-port pass when upstream ships changes worth pulling in. No automatic rebase.
 
-## Section 2 — Per-skill research taxonomy
+## Section 2 — Per-skill categorization (14 skills, three categories)
+
+The categorization rule: research belongs at **entry-point stages where work originates without an upstream artifact**. Skills that consume an artifact from a research-baked-in upstream stage are consumers and trust the handoff. The narrow exception is **stale-artifact consumers** — skills that consume an artifact that may have aged across a session boundary or external API drift, which get a default-skip freshness check.
+
+### Research (entry points) — 3 skills
+
+These skills begin work from scratch (an idea, a bug report, a behavior to teach). The research phase fires by default with the locked skip protocol from Section 4.
 
 | Skill | Research stage | Default kinds | Subagent | Findings land in |
 |---|---|---|---|---|
 | `brainstorming` | After clarifying questions, before approaches | Web (trends + discourse), codebase (prior art) | general-purpose + Explore (parallel) | Spec doc, new `## Research notes` section |
-| `writing-plans` | Before drafting plan steps | Web (pitfalls in chosen approach), codebase (similar features), authoritative (live API smoke) | general-purpose + Explore | Plan doc, top section |
-| `executing-plans` | Before each step's implementation | Authoritative re-verification (drift check) | general-purpose, scoped to current step | Execution journal entry |
-| `subagent-driven-development` | Per-subagent, before each task starts | Codebase (independence verification), authoritative (per-task) | Each subagent does its own | Subagent's report |
-| `systematic-debugging` | At hypothesis formation | Web (error-string search, GitHub issues), codebase (prior bugs in this area) | general-purpose + Explore | Debug log, hypothesis section |
-| `test-driven-development` | Before writing the red test | Web (testing patterns for this code shape), codebase (existing test conventions) | general-purpose + Explore | Test file header comment + draft notes |
-| `using-git-worktrees` | Before creating worktree | User-context (existing worktrees? unfinished branches?) | Inline | Inline log line |
-| `dispatching-parallel-agents` | Before fan-out | Codebase (verify task independence — no hidden shared state) | Explore | Dispatch plan |
-| `finishing-a-development-branch` | Before integration choice | Codebase (competing PRs on adjacent code), user-context (recent decisions) | Inline | Inline summary |
-| `receiving-code-review` | Per comment, before responding | Authoritative (verify reviewer's claim), codebase (current behavior) | general-purpose | Comment-response draft |
-| `requesting-code-review` | Before requesting | User-context (review-scope conventions, reviewer preferences) | Inline | Inline |
-| `using-superjawn` | Before invoking another skill | User-context (recent feedback memory about this skill) | Inline (memory check) | Inline |
-| `verification-before-completion` | At verification step | Authoritative (what command actually proves this?) | general-purpose | Verification evidence block |
-| `writing-skills` | Before drafting skill | Codebase (overlapping skills in plugin), user-context (description conventions) | Explore | Skill draft metadata |
+| `systematic-debugging` | At hypothesis formation (Phase 1 → Phase 2 boundary) | Web (error-string search, GitHub issues), codebase (prior bugs in this area), user-context (recent regressions in memory) | general-purpose + Explore | Debug log, hypothesis section |
+| `writing-skills` | Before drafting the skill's first version | Codebase (overlapping skills in plugin), user-context (description conventions, naming patterns), web (recent skill-format changes upstream) | Explore | Skill draft notes / RED-phase scenarios |
 
-**Light-touch flags:** `using-superjawn`, `finishing-a-development-branch`, `requesting-code-review`, `using-git-worktrees`, `dispatching-parallel-agents` have thin research fits — research is a brief inline check, not a subagent dispatch. Skill text says so explicitly rather than padding cargo-cult research into the flow.
+### Freshness check (stale-artifact consumers) — 2 skills
+
+These skills consume a plan that may have aged. Default-skip with explicit triggers.
+
+| Skill | Trigger conditions | Verification kinds | Findings land in |
+|---|---|---|---|
+| `executing-plans` | (a) plan drafted in a prior session, OR (b) any task touches an external API/service/file outside the repo, OR (c) current branch is `main`/`master` | Authoritative state (live curl / file read / version check), codebase drift (grep that referenced functions/modules still exist), repo state (no conflicting commits since plan written) | Execution journal at `.superpowers/exec-journal-<plan-name>.md` (defined; see Section 3) |
+| `subagent-driven-development` | Same triggers as executing-plans | Same as executing-plans, but each subagent's dispatched prompt includes the relevant freshness pointer | Subagent dispatch prompt + journal note |
+
+### Consumer (pure port, no research/freshness insertion) — 9 skills
+
+These skills port from upstream with attribution comment + dual-namespace cross-reference rewrites only. No research or freshness phase. The artifact handoff carries the conclusions.
+
+| Skill | Why no research | Notes |
+|---|---|---|
+| `writing-plans` | Consumes spec from brainstorming. Spec encodes research conclusions. | v0.2.0 strips the research phase that v0.1.0 added |
+| `test-driven-development` | Sub-skill called within other workflows. Pure red-green-refactor discipline. Adding research creates a discipline-skip excuse. | |
+| `verification-before-completion` | Gate function. Verification command is determined by what was just built; no external research adds value. | |
+| `receiving-code-review` | "Verify against codebase reality" is already step 3 of the existing skill. No separate research duplicates internal work. | |
+| `requesting-code-review` | Pure dispatch mechanic. Reviewer preferences live in CLAUDE.md/memory. | |
+| `dispatching-parallel-agents` | "Identify independent domains" is step 1 of the existing skill — already inline. | |
+| `using-git-worktrees` | Pure mechanical (directory pick + gitignore + baseline tests). | |
+| `finishing-a-development-branch` | Mechanical 4-option choice (merge/PR/keep/discard). | |
+| `using-superjawn` | Meta-skill about skill discovery itself. | |
 
 **Cross-cutting principles:**
-- All research is default-on with explicit skip
-- Research output is always written into the skill's existing artifact, never to a separate file
-- Subagent-by-default uses existing `Explore` / `general-purpose` agent types only
+- Research findings always land in the skill's existing artifact, never a separate file
+- Subagent dispatch uses existing `Explore` / `general-purpose` agent types only
+- Freshness check defaults to skip with explicit triggers (inverse of research's default-on)
 
-## Section 3 — Common research-step shape
+## Section 3 — Phase shapes
 
-Reusable template inserted into each skill's `## Research phase` section, with skill-specific substitutions (stage trigger, default kinds, subagent recommendation, artifact name).
+Two shapes, one per phase type.
+
+### 3a. Research phase (used by entry-point skills only)
 
 ```
 ## Research phase
 
 [Skill-specific stage: e.g. "After clarifying questions, before proposing approaches"]
 
-This is default-on. Skip only with explicit justification.
+**Default-on.** Skip only with explicit justification per the locked skip protocol (Section 4).
 
 ### 1. Pick research kinds
 From the menu — trends + discourse, patterns, pitfalls, authoritative verification, user-context.
@@ -84,22 +123,53 @@ Subagent by default:
   - Explore for codebase / prior-art
   - general-purpose for web / discourse / verification
   - Parallel when kinds are independent
-Inline only for light-touch research (memory check, single grep).
 
 ### 3. Record findings
 Write 3-5 tight bullets into <skill-specific artifact>. Include load-bearing
 links/refs and anything considered-but-ruled-out so future-you knows it was checked.
 
 ### 4. Skip protocol
-If skipping, write one line: "Skipped research because <reason>."
-Valid reasons: trivial scope, fresh prior research in memory, user said skip.
-Invalid reasons: "I think I know", "seems straightforward", "moving fast" —
-if those are tempting, do the research.
+[Insert the locked Section 4 skip protocol verbatim — bolded enforcement clauses preserved]
 ```
 
-**Integration with existing skill flow:** The `## Research phase` section gets inserted into each skill's existing `## Checklist` or `## Process` block as a new numbered step at the right stage. Existing process flow diagrams (the dot graphs in brainstorming, debugging, etc.) get one new node added — `"Research phase"` — with edges into and out of the right neighbors.
+### 3b. Freshness check (used by stale-artifact consumer skills only)
 
-## Section 4 — Skip-justification protocol
+```
+## Freshness check (when artifact is stale)
+
+**Default-skip.** Run only when one of these triggers fires:
+
+- **Cross-session execution.** The plan was drafted in a prior session (different cwd, different transcript), not the current one.
+- **External API/service touched.** Any task in the plan calls an API, service, or file outside the repo (e.g., live HTTP, third-party SDK call, OS-managed config).
+- **Working on main/master.** Current branch is `main` or `master` — heightened drift risk because integration work assumes the branch is in sync.
+
+If none of the triggers fire, write one line in the journal: "Freshness check skipped — none of the triggers fired (current session, no external APIs, on feature branch <name>)."
+
+### When the check fires
+
+Verify, in order:
+1. **Authoritative state.** For each external API/file the plan references, hit the real source (live curl / file read / version check). Confirm the contract still matches what the plan assumed.
+2. **Codebase drift.** Grep that any function/module/path the plan names still exists at the same path with the same shape.
+3. **Repo state.** `git log <plan-write-sha>..HEAD` — has anyone landed conflicting work?
+
+### Findings location
+
+Write to the execution journal at `.superpowers/exec-journal-<plan-slug>.md` (created on first run if it doesn't exist). One line per check:
+
+```
+[YYYY-MM-DD HH:MM] Task N freshness check: <PASS / FAIL> — <one-line summary>
+```
+
+If FAIL on any check, escalate before implementing — the plan needs revision.
+```
+
+**Integration with existing skill flow:** The `## Research phase` section gets inserted into entry-point skills at the stage from Section 2 (after clarifying questions in brainstorming, between Phase 1 and Phase 2 in systematic-debugging, before drafting in writing-skills). Existing process flow diagrams (the dot graphs) get one new node added with edges into and out of the right neighbors.
+
+The `## Freshness check (when artifact is stale)` section goes into executing-plans and subagent-driven-development between the plan-load step and the per-task implementation step. Default-skip means the check itself is one decision and one line in the journal — not a forcing function.
+
+## Section 4 — Skip-justification protocol (research skills only)
+
+This protocol applies to the three research-phase skills (`brainstorming`, `systematic-debugging`, `writing-skills`). Freshness-check skills (Section 3b) have their own inverse pattern (default-skip with explicit triggers); the protocol below does not apply there.
 
 **Skip line format:**
 
@@ -132,37 +202,38 @@ One line, written into the same artifact where findings would have gone. Audit-t
 
 ## Section 5 — Rollout sequence
 
-**Build batches (5 batches, ~3 skills each, one PR per batch):**
+**Build batches (5 batches, one PR per batch):**
 
-1. **Foundation:** `brainstorming`, `writing-plans`, `executing-plans`
-2. **Debugging + testing:** `systematic-debugging`, `test-driven-development`, `verification-before-completion`
-3. **Code review:** `receiving-code-review`, `requesting-code-review`
-4. **Parallelism + isolation:** `subagent-driven-development`, `dispatching-parallel-agents`, `using-git-worktrees`
-5. **Meta + integration:** `finishing-a-development-branch`, `using-superjawn`, `writing-skills`
+1. **Foundation (shipped v0.1.0; rearchitected v0.2.0):** `brainstorming` (research), `writing-plans` (consumer — strip research), `executing-plans` (freshness check — replace research)
+2. **Debugging + testing:** `systematic-debugging` (research), `test-driven-development` (consumer), `verification-before-completion` (consumer)
+3. **Code review:** `receiving-code-review` (consumer), `requesting-code-review` (consumer)
+4. **Parallelism + isolation:** `subagent-driven-development` (freshness check), `dispatching-parallel-agents` (consumer), `using-git-worktrees` (consumer)
+5. **Meta + integration:** `finishing-a-development-branch` (consumer), `using-superjawn` (consumer), `writing-skills` (research)
 
-**Per-skill build steps:**
+**Per-skill build steps depend on the category:**
 
-1. Copy upstream `SKILL.md` into `superjawn/skills/<name>/SKILL.md`
-2. Add MIT attribution comment at top with original source URL
-3. Insert `## Research phase` section at the stage from Section 2
-4. Rewrite cross-references (`superpowers:` → `superjawn:`)
-5. Update process flow diagram (dot graph) to include the new node
-6. Self-test on a small real task; confirm research phase fires and findings record correctly
+**Research skill:** Copy upstream `SKILL.md` → add MIT attribution comment → insert `## Research phase` section per Section 3a at the stage from Section 2 → rewrite `superpowers:` cross-references → update process flow diagram to include the research node → self-test that research phase fires and skip protocol works.
 
-**Plugin install during build:** Local plugin path for fast iteration. Both upstream and superjawn installed; manually invoke `superjawn:<skill>` to test. After batch 5, disable upstream `superpowers`.
+**Freshness-check skill:** Copy upstream `SKILL.md` → add MIT attribution comment → insert `## Freshness check (when artifact is stale)` section per Section 3b → rewrite `superpowers:` cross-references → ensure execution journal path is defined and reachable → self-test the trigger conditions (cross-session, external API, main/master) and the default-skip path.
+
+**Consumer skill:** Copy upstream `SKILL.md` → add MIT attribution comment → rewrite `superpowers:` cross-references → done. No research/freshness phase, no flow-diagram edits beyond cross-ref text.
+
+**Plugin install during build:** Marketplace cleanup completed 2026-05-05 post-merge of v0.1.0 — local-path registration removed, GitHub-sourced marketplace re-registered. For feature-branch live testing, register the local path under a parallel marketplace name (e.g., `claude-skills-journalism-local`) instead of replacing the canonical GitHub-sourced one.
 
 **Versioning:**
 
-- `v0.1.0` — batch 1 shipped
-- `v0.2.0`–`v0.4.0` — batches 2–4
-- `v0.5.0` — batch 5 (all 14 in place, upstream still enabled)
+- `v0.1.0` — batch 1 shipped (foundation triad with research on all three; rearchitected in v0.2.0)
+- `v0.2.0` — batch 1 architecture rework: strip research from writing-plans, replace executing-plans research with freshness check, fold in smoke-test bug fixes
+- `v0.3.0`–`v0.5.0` — batches 2-4 per the new categorization
+- `v0.6.0` — batch 5 (all 14 in place, upstream still enabled)
 - `v1.0.0` — upstream disabled, 2+ weeks of real use, no critical issues
 
 **Per-batch testing:**
 
-- Cross-ref resolution: every `superjawn:` reference must resolve
-- Research phase fires: pick one small real task per skill, verify findings or skip line appear in the artifact
-- Skip protocol works: deliberately invoke on a trivial task, verify skip line is correct and audit-visible
+- Cross-ref resolution: every `superjawn:` reference must resolve to a real upstream or already-ported skill
+- Research phase fires (entry-point skills only): pick one small real task per skill, verify findings or skip line appear in the artifact
+- Freshness check (executing-plans, subagent-driven-development): deliberately exercise the trigger conditions (cross-session plan, external-API task, main-branch invocation) and the default-skip path on a feature-branch run
+- Pure-port consumers: cross-ref resolution + announce-string namespace correctness only (no phase to test)
 
 ## Section 6 — Upstream drift management
 
