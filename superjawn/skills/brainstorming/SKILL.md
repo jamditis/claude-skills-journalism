@@ -69,9 +69,9 @@ If skipping, write one line into the spec doc: `Skipped research because <reason
 
 **Valid reasons:**
 - Trivial scope (typo, comment edit, single-line config)
-- Fresh prior research — same topic in current session OR within last 7 days with verifiable spec/plan pointer
-- User explicit (quote the phrase)
-- Repeat of identical task (with pointer to prior instance)
+- Fresh prior research — same topic in current session OR within last 7 days with verifiable spec/plan pointer. **If the pointer doesn't resolve, the skip is invalid.** (Beyond 7 days, repeat the research even if you remember the prior findings — the landscape drifts.)
+- User explicit — **must quote the phrase** that authorized the skip.
+- Repeat of identical task — **must include a pointer** to the prior successful run.
 
 **Invalid reasons:** "I think I know", "seems straightforward", "moving fast", "user wants this done quickly", "already familiar with this codebase". If those are tempting, do the research.
 
