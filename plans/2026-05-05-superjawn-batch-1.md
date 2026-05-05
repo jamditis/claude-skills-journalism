@@ -274,41 +274,42 @@ git commit -m "feat(marketplace): register superjawn plugin"
 
 ---
 
-## Task 5: Install superjawn locally and verify it loads
+## Task 5: Validate manifest (live install deferred to post-merge)
 
-**Files:** None (install-only step)
+**Files:** None (validation step)
 
-- [ ] **Step 1: Install plugin from the existing marketplace**
+**Discovery during execution (2026-05-05):** The `claude-skills-journalism` marketplace pulls from the GitHub remote (`https://github.com/jamditis/claude-skills-journalism.git`), cached at `~/.claude/plugins/marketplaces/claude-skills-journalism/`. `claude plugin install` reads only from that cache — it cannot see local feature-branch edits before they're pushed and merged. Live install verification therefore can't run until this PR merges to master and the marketplace cache refreshes.
 
-The `claude-skills-journalism` marketplace is already registered (verifiable via `claude plugin list` showing `autocontext@claude-skills-journalism` and other plugins from this repo). The CLI uses `<plugin>@<marketplace>` form, not a path:
+The substitute is `claude plugin validate <plugin-dir>`, which confirms the manifest would install correctly without actually pulling it through the marketplace.
+
+- [ ] **Step 1: Validate the plugin manifest**
 
 ```bash
+cd /home/jamditis/projects/claude-skills-journalism
+claude plugin validate ./superjawn
+```
+
+Expected: `✔ Validation passed`. Any failure means the manifest has a problem — fix before continuing.
+
+- [ ] **Step 2: Verify the marketplace entry agrees with `plugin.json`**
+
+```bash
+claude plugin tag --dry-run ./superjawn
+```
+
+Expected: success, with no version-mismatch warnings for superjawn (other plugins in the marketplace may have pre-existing drift — see issue #33; ignore those for this task).
+
+- [ ] **Step 3: Defer live install verification until post-merge**
+
+Once this PR merges to master, run on a fresh machine or after a marketplace update:
+
+```bash
+claude plugin marketplace update claude-skills-journalism
 claude plugin install superjawn@claude-skills-journalism
+claude plugin list | grep superjawn      # should show: superjawn 0.1.0
 ```
 
-Expected: success message naming `superjawn` v0.1.0.
-
-If the marketplace isn't registered (e.g. on a fresh machine), add it first:
-
-```bash
-claude plugin marketplace add ~/projects/claude-skills-journalism
-```
-
-Then re-run the install command above.
-
-- [ ] **Step 2: Verify it appears in plugin list**
-
-```bash
-claude plugin list | grep superjawn
-```
-
-Expected: one line showing `superjawn 0.1.0`.
-
-- [ ] **Step 3: Verify zero skills currently registered**
-
-The plugin manifest is loaded but no skills exist yet. The model should not see any `superjawn:<skill>` triggers. To confirm, start a fresh `claude` session and check the available-skills list — `superjawn:` should not appear.
-
-If `superjawn:` skills are listed despite empty `skills/` directory, debug before continuing.
+Then in a fresh `claude` session, confirm `superjawn:` skill triggers DO appear after Tasks 6–17 ship (since skills are populated then). Document the result in the post-merge follow-up.
 
 ---
 
