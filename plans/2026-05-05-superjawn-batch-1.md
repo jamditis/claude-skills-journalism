@@ -548,7 +548,7 @@ For each line found that references `writing-plans`, rewrite to `superjawn:writi
 - "the writing-plans skill" → "the superjawn:writing-plans skill"
 - Any `superpowers:writing-plans` → `superjawn:writing-plans`
 
-Do NOT rewrite refs to `frontend-design`, `mcp-builder`, or other non-superjawn skills.
+**Do NOT add a namespace prefix to `frontend-design` or `mcp-builder` mentions.** These appear in the upstream brainstorming SKILL.md as generic illustrative examples of "implementation skills not to invoke after brainstorming," not as references to specific plugin skills. Verification against upstream `superpowers` v5.0.7 confirms neither name exists in that plugin (`frontend-design` is a separate top-level plugin `frontend-design:frontend-design`; `mcp-builder` doesn't resolve in the current plugin marketplace at all). Leave them bare so the sentence reads as "any of these *kinds* of skills" rather than as fully-qualified references that don't exist.
 
 - [ ] **Step 3: Verify the rewrite**
 
