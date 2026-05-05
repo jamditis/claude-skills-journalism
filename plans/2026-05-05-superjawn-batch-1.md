@@ -278,13 +278,23 @@ git commit -m "feat(marketplace): register superjawn plugin"
 
 **Files:** None (install-only step)
 
-- [ ] **Step 1: Install plugin from local path**
+- [ ] **Step 1: Install plugin from the existing marketplace**
+
+The `claude-skills-journalism` marketplace is already registered (verifiable via `claude plugin list` showing `autocontext@claude-skills-journalism` and other plugins from this repo). The CLI uses `<plugin>@<marketplace>` form, not a path:
 
 ```bash
-claude plugin install ~/projects/claude-skills-journalism/superjawn
+claude plugin install superjawn@claude-skills-journalism
 ```
 
 Expected: success message naming `superjawn` v0.1.0.
+
+If the marketplace isn't registered (e.g. on a fresh machine), add it first:
+
+```bash
+claude plugin marketplace add ~/projects/claude-skills-journalism
+```
+
+Then re-run the install command above.
 
 - [ ] **Step 2: Verify it appears in plugin list**
 
