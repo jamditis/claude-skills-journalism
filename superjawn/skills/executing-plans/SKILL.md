@@ -3,6 +3,14 @@ name: executing-plans
 description: Use when you have a written implementation plan to execute in a separate session with review checkpoints
 ---
 
+<!--
+Adapted from obra/superpowers executing-plans skill (v5.0.7), MIT-licensed,
+copyright 2025 Jesse Vincent. Modifications copyright 2026 Joe Amditis.
+Modifications add a per-task research phase (drift check before
+implementation), plus updates to cross-references.
+See CREDITS.md.
+-->
+
 # Executing Plans
 
 ## Overview
@@ -12,6 +20,42 @@ Load plan, review critically, execute all tasks, report when complete.
 **Announce at start:** "I'm using the executing-plans skill to implement this plan."
 
 **Note:** Tell your human partner that Superpowers works much better with access to subagents. The quality of its work will be significantly higher if run on a platform with subagent support (such as Claude Code or Codex). If subagents are available, use superpowers:subagent-driven-development instead of this skill.
+
+## Research phase (per task)
+
+Before implementing each task in the plan, run a quick drift check. **Default-on**: skip only with explicit, justified statement per task.
+
+### 1. What to verify
+
+The plan was written at a point in time. Before each task, verify:
+- **Authoritative state:** If the task touches an external API or file the plan references, confirm the API contract or file content hasn't changed. Live curl, file read, version check.
+- **Codebase drift:** If the task assumes a function/module exists at a specific path, grep to confirm it still does.
+- **Repo state:** Has anyone landed conflicting work on the branch since the plan was drafted?
+
+### 2. Dispatch
+
+Inline for single-file or single-API checks. `general-purpose` subagent only when the verification spans multiple sources.
+
+### 3. Record findings
+
+Append a short note to the execution journal (or PR description) for each task:
+
+```
+Task N drift check: <PASS / FAIL> — <one-line summary>
+```
+
+If FAIL, escalate before implementing — the plan may need revision.
+
+### 4. Skip protocol
+
+If skipping per-task research, write one line in the journal: `Task N research skipped because <reason>.`
+
+**Valid reasons:**
+- Task is purely additive within a file the previous task just created (no external state to verify)
+- Plan was drafted within the current session and nothing has changed
+- Task is a pure mechanical commit / rebase / push step
+
+**Invalid reasons:** "I think I know", "seems straightforward", "moving fast", "user wants this done quickly", "already familiar with this codebase". If those are tempting, do the check.
 
 ## The Process
 
@@ -25,9 +69,10 @@ Load plan, review critically, execute all tasks, report when complete.
 
 For each task:
 1. Mark as in_progress
-2. Follow each step exactly (plan has bite-sized steps)
-3. Run verifications as specified
-4. Mark as completed
+2. Run the per-task research / drift check (see "Research phase (per task)" section above)
+3. Follow each step exactly (plan has bite-sized steps)
+4. Run verifications as specified
+5. Mark as completed
 
 ### Step 3: Complete Development
 
@@ -57,6 +102,7 @@ After all tasks complete and verified:
 ## Remember
 - Review plan critically first
 - Follow plan steps exactly
+- Drift-check each task against current codebase reality before implementing (see Research phase)
 - Don't skip verifications
 - Reference skills when plan says to
 - Stop when blocked, don't guess
