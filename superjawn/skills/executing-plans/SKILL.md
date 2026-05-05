@@ -38,7 +38,6 @@ The plan was written at a point in time. Before each task, verify:
 - `Explore` subagent for codebase-drift questions spanning multiple files
 - `general-purpose` subagent for verification that spans external sources
 
-
 ### 3. Record findings
 
 Append a short note to the execution journal (or PR description) for each task:
