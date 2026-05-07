@@ -87,8 +87,8 @@ For each task:
 ### Step 3: Complete Development
 
 After all tasks complete and verified:
-- Announce: "I'm using the superpowers:finishing-a-development-branch skill to complete this work."
-- **REQUIRED SUB-SKILL:** Use superpowers:finishing-a-development-branch
+- Announce: "I'm using the superjawn:finishing-a-development-branch skill to complete this work."
+- **REQUIRED SUB-SKILL:** Use superjawn:finishing-a-development-branch
 - Follow that skill to verify tests, present options, execute choice
 
 ## When to Stop and Ask for Help
@@ -123,4 +123,4 @@ After all tasks complete and verified:
 **Required workflow skills:**
 - **superjawn:using-git-worktrees** - REQUIRED: Set up isolated workspace before starting
 - **superjawn:writing-plans** - Creates the plan this skill executes
-- **superpowers:finishing-a-development-branch** - Complete development after all tasks
+- **superjawn:finishing-a-development-branch** - Complete development after all tasks

@@ -68,6 +68,22 @@
       "category": "consumer",
       "skill_md_parity": true,
       "supporting_file_overrides": {}
+    },
+    "finishing-a-development-branch": {
+      "category": "consumer",
+      "skill_md_parity": true,
+      "supporting_file_overrides": {}
+    },
+    "using-superjawn": {
+      "category": "consumer",
+      "skill_md_parity": false,
+      "upstream_name": "using-superpowers",
+      "supporting_file_overrides": {}
+    },
+    "writing-skills": {
+      "category": "research",
+      "skill_md_parity": false,
+      "supporting_file_overrides": {}
     }
   }
 }
