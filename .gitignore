@@ -12,6 +12,10 @@ Thumbs.db
 .codex
 .codex/
 
+# superpowers/superjawn runtime artifacts (debug logs, exec journals, brainstorm notes)
+.superpowers
+.superpowers/
+
 # Python
 __pycache__/
 *.py[cod]

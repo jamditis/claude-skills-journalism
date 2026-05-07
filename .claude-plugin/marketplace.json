@@ -42,8 +42,8 @@
     },
     {
       "name": "superjawn",
-      "description": "Research-augmented fork of obra/superpowers. Default-on research phase at entry-point stages, narrow freshness check on stale-artifact consumers, pure consumer ports for the rest. v0.4.0 ships 8 of 14 skills (foundation + debugging triads + code review pair); 6 more pending across batches 4-5.",
-      "version": "0.4.0",
+      "description": "Research-augmented fork of obra/superpowers. Default-on research phase at entry-point stages, narrow freshness check on stale-artifact consumers, pure consumer ports for the rest. v0.5.0 ships 11 of 14 skills (foundation + debugging triads + code review pair + parallel execution + worktrees); 3 more pending in batch 5.",
+      "version": "0.5.0",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"
