@@ -1,0 +1,58 @@
+{
+  "_comment": "Manifest of ported skills and per-file parity expectations. Maintained alongside CREDITS.md divergence log. The validator at scripts/validate-skill.sh reads this file.",
+  "skills": {
+    "brainstorming": {
+      "category": "research",
+      "skill_md_parity": false,
+      "supporting_file_overrides": {
+        "scripts/frame-template.html": "Branding update: title and footer link updated from obra/superpowers to superjawn",
+        "scripts/helper.js": "PR #34 review: XSS-safe DOM construction",
+        "scripts/server.cjs": "PR #34 review: WebSocket frame size cap",
+        "scripts/start-server.sh": "PR #34 review: exec-based PID preservation",
+        "scripts/stop-server.sh": "PR #34 review: SESSION_DIR validation"
+      }
+    },
+    "writing-plans": {
+      "category": "consumer",
+      "skill_md_parity": false,
+      "supporting_file_overrides": {}
+    },
+    "executing-plans": {
+      "category": "freshness",
+      "skill_md_parity": false,
+      "supporting_file_overrides": {}
+    },
+    "systematic-debugging": {
+      "category": "research",
+      "skill_md_parity": false,
+      "supporting_file_overrides": {
+        "find-polluter.sh": "PR #36 review: pattern normalization, mapfile array, header relabel",
+        "test-pressure-1.md": "PR #36 review: skills/debugging/systematic-debugging path rewritten to superjawn:systematic-debugging",
+        "test-pressure-2.md": "PR #36 review: skills/debugging/systematic-debugging path rewritten to superjawn:systematic-debugging",
+        "test-pressure-3.md": "PR #36 review: skills/debugging/systematic-debugging path rewritten to superjawn:systematic-debugging",
+        "test-academic.md": "PR #36 review: skills/debugging/systematic-debugging path rewritten to superjawn:systematic-debugging",
+        "CREATION-LOG.md": "PR #36 review: path reference + Jesse local CLAUDE.md path genericized"
+      }
+    },
+    "test-driven-development": {
+      "category": "consumer",
+      "skill_md_parity": true,
+      "supporting_file_overrides": {}
+    },
+    "verification-before-completion": {
+      "category": "consumer",
+      "skill_md_parity": true,
+      "supporting_file_overrides": {}
+    },
+    "receiving-code-review": {
+      "category": "consumer",
+      "skill_md_parity": true,
+      "supporting_file_overrides": {}
+    },
+    "requesting-code-review": {
+      "category": "consumer",
+      "skill_md_parity": true,
+      "supporting_file_overrides": {}
+    }
+  }
+}
