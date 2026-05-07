@@ -83,7 +83,9 @@
     "writing-skills": {
       "category": "research",
       "skill_md_parity": false,
-      "supporting_file_overrides": {}
+      "supporting_file_overrides": {
+        "testing-skills-with-subagents.md": "PR #48 review: REQUIRED BACKGROUND ref migrated from superpowers:test-driven-development to superjawn: for consistency with the parent SKILL.md's already-migrated cross-refs"
+      }
     }
   }
 }
