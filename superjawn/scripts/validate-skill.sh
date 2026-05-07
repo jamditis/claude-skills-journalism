@@ -31,6 +31,15 @@ SKILLS_DIR="$SUPERJAWN_DIR/skills"
 MANIFEST="$SCRIPT_DIR/skills-manifest.json"
 UPSTREAM_DIR="${SUPERJAWN_UPSTREAM_DIR:-$HOME/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7}"
 
+# Temp files created during parity checks; cleaned up on exit.
+_tmpfiles=()
+_cleanup_tmpfiles() {
+  for f in "${_tmpfiles[@]:-}"; do
+    [[ -f "$f" ]] && rm -f "$f"
+  done
+}
+trap _cleanup_tmpfiles EXIT
+
 # Verify dependencies.
 if ! command -v jq &>/dev/null; then
   echo "error: jq is required but not found in PATH" >&2
@@ -108,6 +117,19 @@ check_skill() {
   # ------------------------------------------------------------------ #
   if [[ ! -f "$skill_md" ]]; then
     fail "$name" "structure" "SKILL.md missing at $skill_md"
+    return
+  fi
+
+  # ------------------------------------------------------------------ #
+  # Check 1b: Skill must be declared in the manifest.                   #
+  # A skill present in skills/ but absent from the manifest would       #
+  # silently inherit null parity and empty overrides — the manifest is  #
+  # the authoritative registry so an undeclared skill is always a fail. #
+  # ------------------------------------------------------------------ #
+  local in_manifest
+  in_manifest="$(jq -r --arg s "$name" '.skills | has($s)' "$MANIFEST")"
+  if [[ "$in_manifest" != "true" ]]; then
+    fail "$name" "manifest" "skill is in skills/ but not declared in skills-manifest.json"
     return
   fi
 
@@ -215,11 +237,15 @@ check_skill() {
     if [[ ! -f "$upstream_skill_md" ]]; then
       fail "$name" "parity" "upstream SKILL.md not found at $upstream_skill_md"
     else
-      local stripped
-      stripped="$(strip_attribution_block "$skill_md")"
-      local upstream_content
-      upstream_content="$(cat "$upstream_skill_md")"
-      if [[ "$stripped" == "$upstream_content" ]]; then
+      # Write stripped output to a temp file so cmp -s can compare byte-for-byte,
+      # including any trailing newlines. Shell $() substitution strips trailing newlines,
+      # making string comparison a false negative for files that differ only in trailing
+      # newline count.
+      local stripped_tmp
+      stripped_tmp="$(mktemp -t superjawn-validate.XXXXXX)"
+      _tmpfiles+=("$stripped_tmp")
+      strip_attribution_block "$skill_md" > "$stripped_tmp"
+      if cmp -s "$stripped_tmp" "$upstream_skill_md"; then
         pass "$name" "parity" "SKILL.md byte-identical to upstream after block strip"
       else
         fail "$name" "parity" "SKILL.md differs from upstream after stripping MIT block (run diff to inspect)"
@@ -236,7 +262,7 @@ check_skill() {
   local overrides_json
   overrides_json="$(jq -r --arg s "$name" '.skills[$s].supporting_file_overrides // {}' "$MANIFEST")"
 
-  while IFS= read -r -d '' local_file; do
+  while IFS= read -r local_file; do
     local rel_path="${local_file#$SKILLS_DIR/$name/}"
     [[ "$rel_path" == "SKILL.md" ]] && continue
 
@@ -245,11 +271,17 @@ check_skill() {
     in_overrides="$(jq -r --arg f "$rel_path" 'has($f)' <<<"$overrides_json")"
 
     if [[ ! -f "$upstream_file" ]]; then
-      # No upstream counterpart; overrides entry would be a phantom — skip silently.
+      # No upstream counterpart.  The override mechanism now covers two cases:
+      #   - intentional divergence from an upstream file
+      #   - intentional local-only file (no upstream equivalent)
+      # Both require an explicit overrides entry so the manifest stays the authoritative
+      # record of every intentional deviation.
       if [[ "$in_overrides" == "true" ]]; then
         fail "$name" "supporting-files" "override '$rel_path' references a non-existent upstream file (phantom exception)"
-        supporting_ok=false
+      else
+        fail "$name" "supporting-files" "$rel_path has no upstream counterpart and is not declared in supporting_file_overrides; either delete it or add it to supporting_file_overrides with a reason"
       fi
+      supporting_ok=false
       continue
     fi
 
@@ -263,7 +295,10 @@ check_skill() {
         supporting_ok=false
       fi
     fi
-  done < <(find "$SKILLS_DIR/$name" -type f -print0 | sort -z)
+  # find | LC_ALL=C sort is POSIX-safe; sort -z is GNU-only and fails on macOS BSD.
+  # Skill filenames are well-known ASCII paths without embedded newlines, so NUL
+  # separation is not needed for correctness here.
+  done < <(find "$SKILLS_DIR/$name" -type f | LC_ALL=C sort)
 
   if [[ "$supporting_ok" == true ]]; then
     pass "$name" "supporting-files" "all supporting files ok"
