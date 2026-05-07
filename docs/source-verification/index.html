@@ -25,7 +25,7 @@
                         canvas: '#ede6d4',
                         ink: '#121212',
                         clay: '#d6cdb7',
-                        mist: '#6b6b6b',
+                        mist: '#525252',
                         accent: '#1e40af',
                         accentDark: '#1e3a8a',
                     },
@@ -53,7 +53,65 @@
         pre { background: #1a1a1a; color: #e2e8f0; padding: 1.5rem; border-radius: 8px; overflow-x: auto; }
         code { background: rgba(18, 18, 18, 0.06); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
         pre code { background: none; padding: 0; }
-    </style>
+    
+/* a11y-patch-v1 */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+.skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #121212; color: #ede6d4; font-weight: 700; text-decoration: none; }
+:focus-visible { outline: 2px solid #3d4b40; outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+p a:not(.btn-primary):not(.btn-outline):not(.skill-card):not(.deckle-card):not(.feature-card),
+li a:not(.btn-primary):not(.btn-outline),
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDeep"]:not(.btn-primary):not(.btn-outline) { color: #1e293b !important; }
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline):hover,
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline):hover { color: #0f172a !important; }
+strong[class~="text-accent"], em[class~="text-accent"], code[class~="text-accent"],
+strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b !important; }
+.bg-canvas [class~="text-mist"], main [class~="text-mist"], [class~="text-mist"] { color: #3a3a3a !important; }
+.bg-ink [class~="text-accent"], [class~="bg-ink"] [class~="text-accent"],
+.bg-zinc-900 [class~="text-accent"], .bg-gray-900 [class~="text-accent"],
+[class*="bg-zinc-9"] [class~="text-accent"], [class*="bg-gray-9"] [class~="text-accent"],
+[class*="text-white"] [class~="text-accent"],
+[style*="background:#1"] [class~="text-accent"], [style*="background-color:#1"] [class~="text-accent"] {
+  color: #ddd6fe !important;
+}
+.bg-ink [class~="text-mist"], [class~="bg-ink"] [class~="text-mist"],
+[class*="text-white"] [class~="text-mist"] {
+  color: #d4d4d4 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-section, .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+.hero-gradient { position: relative; }
+.hero-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  z-index: 1;
+}
+.hero-gradient > * { position: relative; z-index: 2; }
+
+/* stat-on-dark-fix */
+.bg-ink .text-accent, .bg-zinc-900 .text-accent, .bg-gray-900 .text-accent,
+.bg-ink .text-accentDark, .bg-zinc-900 .text-accentDark, .bg-gray-900 .text-accentDark {
+  filter: brightness(1.6) saturate(0.85);
+}
+</style>
 
     <!-- Open Graph -->
     <meta property="og:title" content="Source Verification">
@@ -70,16 +128,18 @@
     <meta name="twitter:description" content="Systematic source verification and fact-checking workflows for journalists. SIFT method, reverse image search, social media analysis, and building verification trails.">
     <meta name="twitter:image" content="https://skills.amditis.tech/source-verification/og-image.png">
 <script src="../ask-ai.js" defer></script>
+    <!-- a11y-patch-v1 -->
 </head>
 <body class="font-sans">
+    <a href="#main" class="skip-link">Skip to main content</a>
     <div class="paper-overlay"></div>
 
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
+    <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
         <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
             <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">
                 ← Back to all skills
             </a>
-            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/source-verification" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/source-verification" class="text-sm font-semibold text-accentDark hover:text-accentDark transition-colors">
                 View on GitHub →
             </a>
         </div>
@@ -87,7 +147,7 @@
 
     <header class="hero-gradient text-white pt-32 pb-24 px-6 relative overflow-hidden">
         <div class="absolute inset-0 opacity-10">
-            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <svg aria-hidden="true" focusable="false" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
                         <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/>
@@ -108,7 +168,7 @@
                 Systematic approaches for verifying sources, claims, and digital content. Essential for reporters, fact-checkers, and researchers.
             </p>
             <div class="flex flex-wrap gap-4">
-                <a href="#sift" class="inline-flex items-center gap-2 bg-white text-accent font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
+                <a href="#sift" class="inline-flex items-center gap-2 bg-white text-accentDark font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
                     <i data-lucide="shield-check" class="w-5 h-5"></i>
                     Learn SIFT Method
                 </a>
@@ -120,7 +180,7 @@
         </div>
     </header>
 
-    <main class="relative z-10">
+    <main id="main" class="relative z-10">
         <!-- SIFT Method -->
         <section id="sift" class="py-24 px-6">
             <div class="max-w-6xl mx-auto">
@@ -333,7 +393,7 @@
                     </p>
                 </div>
 
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                     <table class="w-full bg-white rounded-xl overflow-hidden shadow-sm">
                         <thead class="bg-ink text-white">
                             <tr>
@@ -343,12 +403,12 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            <tr><td class="px-6 py-3 font-medium">InVID/WeVerify</td><td class="px-6 py-3 text-mist">Video verification plugin</td><td class="px-6 py-3"><a href="https://weverify.eu" class="text-accent hover:underline">weverify.eu</a></td></tr>
-                            <tr><td class="px-6 py-3 font-medium">TinEye</td><td class="px-6 py-3 text-mist">Reverse image search</td><td class="px-6 py-3"><a href="https://tineye.com" class="text-accent hover:underline">tineye.com</a></td></tr>
-                            <tr><td class="px-6 py-3 font-medium">Wayback Machine</td><td class="px-6 py-3 text-mist">Web archives</td><td class="px-6 py-3"><a href="https://web.archive.org" class="text-accent hover:underline">web.archive.org</a></td></tr>
-                            <tr><td class="px-6 py-3 font-medium">FotoForensics</td><td class="px-6 py-3 text-mist">Image forensic analysis</td><td class="px-6 py-3"><a href="https://fotoforensics.com" class="text-accent hover:underline">fotoforensics.com</a></td></tr>
-                            <tr><td class="px-6 py-3 font-medium">OCCRP Aleph</td><td class="px-6 py-3 text-mist">Document search</td><td class="px-6 py-3"><a href="https://aleph.occrp.org" class="text-accent hover:underline">aleph.occrp.org</a></td></tr>
-                            <tr><td class="px-6 py-3 font-medium">Media Bias/Fact Check</td><td class="px-6 py-3 text-mist">Source reliability</td><td class="px-6 py-3"><a href="https://mediabiasfactcheck.com" class="text-accent hover:underline">mediabiasfactcheck.com</a></td></tr>
+                            <tr><td class="px-6 py-3 font-medium">InVID/WeVerify</td><td class="px-6 py-3 text-mist">Video verification plugin</td><td class="px-6 py-3"><a href="https://weverify.eu" class="text-accentDark hover:underline">weverify.eu</a></td></tr>
+                            <tr><td class="px-6 py-3 font-medium">TinEye</td><td class="px-6 py-3 text-mist">Reverse image search</td><td class="px-6 py-3"><a href="https://tineye.com" class="text-accentDark hover:underline">tineye.com</a></td></tr>
+                            <tr><td class="px-6 py-3 font-medium">Wayback Machine</td><td class="px-6 py-3 text-mist">Web archives</td><td class="px-6 py-3"><a href="https://web.archive.org" class="text-accentDark hover:underline">web.archive.org</a></td></tr>
+                            <tr><td class="px-6 py-3 font-medium">FotoForensics</td><td class="px-6 py-3 text-mist">Image forensic analysis</td><td class="px-6 py-3"><a href="https://fotoforensics.com" class="text-accentDark hover:underline">fotoforensics.com</a></td></tr>
+                            <tr><td class="px-6 py-3 font-medium">OCCRP Aleph</td><td class="px-6 py-3 text-mist">Document search</td><td class="px-6 py-3"><a href="https://aleph.occrp.org" class="text-accentDark hover:underline">aleph.occrp.org</a></td></tr>
+                            <tr><td class="px-6 py-3 font-medium">Media Bias/Fact Check</td><td class="px-6 py-3 text-mist">Source reliability</td><td class="px-6 py-3"><a href="https://mediabiasfactcheck.com" class="text-accentDark hover:underline">mediabiasfactcheck.com</a></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -366,7 +426,7 @@
                             <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">1</span>
                             Clone the repository
                         </h3>
-                        <pre><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
+                        <pre tabindex="0"><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
                     </div>
 
                     <div class="bg-white/5 p-6 rounded-xl">
@@ -374,7 +434,7 @@
                             <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">2</span>
                             Copy skill to Claude skills directory
                         </h3>
-                        <pre><code>cp -r source-verification ~/.claude/skills/</code></pre>
+                        <pre tabindex="0"><code>cp -r source-verification ~/.claude/skills/</code></pre>
                     </div>
 
                     <div class="bg-white/5 p-6 rounded-xl">
@@ -392,10 +452,10 @@
         <section class="py-16 px-6 border-t border-ink/10">
             <div class="max-w-6xl mx-auto text-center">
                 <p class="text-mist text-sm mb-4">
-                    Created by <a href="https://github.com/jamditis" class="text-accent hover:underline">Joe Amditis</a> at the
-                    <a href="https://centerforcooperativemedia.org" class="text-accent hover:underline">Center for Cooperative Media</a>
+                    Created by <a href="https://github.com/jamditis" class="text-accentDark hover:underline">Joe Amditis</a> at the
+                    <a href="https://centerforcooperativemedia.org" class="text-accentDark hover:underline">Center for Cooperative Media</a>
                 </p>
-                <p class="text-mist/60 text-xs">
+                <p class="text-mist text-xs">
                     Part of <a href="../" class="hover:underline">Claude Skills for Journalism</a> • MIT License
                 </p>
             </div>

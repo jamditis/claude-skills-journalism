@@ -45,7 +45,54 @@
             pointer-events: none;
             z-index: 1;
         }
-    </style>
+    
+/* a11y-patch-v1 */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+.skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #121212; color: #ede6d4; font-weight: 700; text-decoration: none; }
+:focus-visible { outline: 2px solid #3d4b40; outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+p a:not(.btn-primary):not(.btn-outline):not(.skill-card):not(.deckle-card):not(.feature-card),
+li a:not(.btn-primary):not(.btn-outline),
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDeep"]:not(.btn-primary):not(.btn-outline) { color: #1e293b !important; }
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline):hover,
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline):hover { color: #0f172a !important; }
+strong[class~="text-accent"], em[class~="text-accent"], code[class~="text-accent"],
+strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b !important; }
+.bg-canvas [class~="text-mist"], main [class~="text-mist"], [class~="text-mist"] { color: #3a3a3a !important; }
+.bg-ink [class~="text-accent"], [class~="bg-ink"] [class~="text-accent"],
+.bg-zinc-900 [class~="text-accent"], .bg-gray-900 [class~="text-accent"],
+[class*="bg-zinc-9"] [class~="text-accent"], [class*="bg-gray-9"] [class~="text-accent"],
+[class*="text-white"] [class~="text-accent"],
+[style*="background:#1"] [class~="text-accent"], [style*="background-color:#1"] [class~="text-accent"] {
+  color: #ddd6fe !important;
+}
+.bg-ink [class~="text-mist"], [class~="bg-ink"] [class~="text-mist"],
+[class*="text-white"] [class~="text-mist"] {
+  color: #d4d4d4 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-section, .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+/* stat-on-dark-fix */
+.bg-ink .text-accent, .bg-zinc-900 .text-accent, .bg-gray-900 .text-accent,
+.bg-ink .text-accentDark, .bg-zinc-900 .text-accentDark, .bg-gray-900 .text-accentDark {
+  filter: brightness(1.6) saturate(0.85);
+}
+</style>
 
     <!-- Open Graph -->
     <meta property="og:title" content="One-way door check - Claude skills for journalism">
@@ -62,21 +109,23 @@
     <meta name="twitter:description" content="A Claude Code skill and hook that flags irreversible architectural decisions before you commit to them.">
     <meta name="twitter:image" content="https://skills.amditis.tech/one-way-door/og-image.png">
 <script src="../ask-ai.js" defer></script>
+    <!-- a11y-patch-v1 -->
 </head>
 <body class="bg-canvas text-ink">
+    <a href="#main" class="skip-link">Skip to main content</a>
     <div class="paper-overlay"></div>
 
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
+    <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
         <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
             <a href="../" class="text-clay/70 hover:text-ink flex items-center gap-2 text-sm font-medium transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
                 All skills
             </a>
-            <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <a aria-label="GitHub" href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors" rel="noopener noreferrer">
+                <svg aria-hidden="true" focusable="false" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
                 </svg>
             </a>
@@ -87,7 +136,7 @@
     <header class="bg-gradient-to-br from-accent to-accentDark text-white pt-24 pb-16 relative overflow-hidden">
         <!-- SVG grid pattern -->
         <div class="absolute inset-0 opacity-10">
-            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <svg aria-hidden="true" focusable="false" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
                         <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/>
@@ -109,7 +158,7 @@
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-6 py-12 relative z-10">
+    <main id="main" class="max-w-4xl mx-auto px-6 py-12 relative z-10">
 
         <!-- The concept -->
         <section class="mb-16">
@@ -133,7 +182,7 @@
                     </div>
                     <div>
                         <div class="flex items-center gap-2 mb-3">
-                            <i data-lucide="door-open" class="w-5 h-5 text-green-600"></i>
+                            <i data-lucide="door-open" class="w-5 h-5 text-green-700"></i>
                             <h3 class="font-semibold text-lg">Two-way doors</h3>
                         </div>
                         <p class="text-sm text-clay/70 mb-3">
@@ -279,8 +328,8 @@
         <section class="mb-16">
             <h2 class="font-display text-2xl font-semibold mb-4">The hook script</h2>
             <p class="text-clay/80 mb-4">A shell script that runs on every <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">Write</code> tool call. It pattern-matches the filename and blocks with exit code 2 if the file is a one-way door.</p>
-            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto">
-                <pre class="text-white"><code>#!/bin/sh
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
+                <pre tabindex="0" class="text-white"><code>#!/bin/sh
 INPUT=$(cat)
 [ -z "$INPUT" ] && exit 0
 
@@ -321,9 +370,9 @@ fi
 
 exit 0  # Allow two-way doors</code></pre>
             </div>
-            <p class="text-sm text-clay/60 mt-3">
+            <p class="text-sm text-clay/80 mt-3">
                 Full script with all 8 categories available in the
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/one-way-door" class="text-accent hover:text-accentDark underline underline-offset-2" target="_blank">skill directory</a>.
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/one-way-door" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">skill directory</a>.
             </p>
         </section>
 
@@ -333,35 +382,35 @@ exit 0  # Allow two-way doors</code></pre>
             <p class="text-clay/80 mb-4">These file types pass through the hook silently. They're safe to decide quickly and change later.</p>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-                    <i data-lucide="layout" class="w-5 h-5 text-green-600 mx-auto mb-1"></i>
+                    <i data-lucide="layout" class="w-5 h-5 text-green-700 mx-auto mb-1"></i>
                     <p class="text-sm font-medium text-green-800">UI components</p>
                 </div>
                 <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-                    <i data-lucide="wrench" class="w-5 h-5 text-green-600 mx-auto mb-1"></i>
+                    <i data-lucide="wrench" class="w-5 h-5 text-green-700 mx-auto mb-1"></i>
                     <p class="text-sm font-medium text-green-800">Utilities</p>
                 </div>
                 <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-                    <i data-lucide="test-tubes" class="w-5 h-5 text-green-600 mx-auto mb-1"></i>
+                    <i data-lucide="test-tubes" class="w-5 h-5 text-green-700 mx-auto mb-1"></i>
                     <p class="text-sm font-medium text-green-800">Test files</p>
                 </div>
                 <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-                    <i data-lucide="file-text" class="w-5 h-5 text-green-600 mx-auto mb-1"></i>
+                    <i data-lucide="file-text" class="w-5 h-5 text-green-700 mx-auto mb-1"></i>
                     <p class="text-sm font-medium text-green-800">Documentation</p>
                 </div>
                 <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-                    <i data-lucide="palette" class="w-5 h-5 text-green-600 mx-auto mb-1"></i>
+                    <i data-lucide="palette" class="w-5 h-5 text-green-700 mx-auto mb-1"></i>
                     <p class="text-sm font-medium text-green-800">Styling / CSS</p>
                 </div>
                 <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-                    <i data-lucide="activity" class="w-5 h-5 text-green-600 mx-auto mb-1"></i>
+                    <i data-lucide="activity" class="w-5 h-5 text-green-700 mx-auto mb-1"></i>
                     <p class="text-sm font-medium text-green-800">Logging</p>
                 </div>
                 <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-                    <i data-lucide="image" class="w-5 h-5 text-green-600 mx-auto mb-1"></i>
+                    <i data-lucide="image" class="w-5 h-5 text-green-700 mx-auto mb-1"></i>
                     <p class="text-sm font-medium text-green-800">Static assets</p>
                 </div>
                 <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-                    <i data-lucide="settings" class="w-5 h-5 text-green-600 mx-auto mb-1"></i>
+                    <i data-lucide="settings" class="w-5 h-5 text-green-700 mx-auto mb-1"></i>
                     <p class="text-sm font-medium text-green-800">App config</p>
                 </div>
             </div>
@@ -374,7 +423,7 @@ exit 0  # Allow two-way doors</code></pre>
             <div class="space-y-6">
                 <div>
                     <h3 class="font-semibold mb-3">Option 1: Install the skill</h3>
-                    <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto">
+                    <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                         <p class="text-white/50 mb-2"># Clone the repository</p>
                         <p class="text-white mb-4">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
                         <p class="text-white/50 mb-2"># Copy the skill to your Claude config</p>
@@ -385,8 +434,8 @@ exit 0  # Allow two-way doors</code></pre>
                 <div>
                     <h3 class="font-semibold mb-3">Option 2: Add the CLAUDE.md rule</h3>
                     <p class="text-sm text-clay/70 mb-3">Add this paragraph to your project's CLAUDE.md for prompt-based enforcement (no hook needed):</p>
-                    <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto">
-                        <pre class="text-white"><code>### One-way door check
+                    <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
+                        <pre tabindex="0" class="text-white"><code>### One-way door check
 Before creating new files that represent architectural
 decisions, ask: "Which of these decisions would be
 difficult to reverse?" One-way doors include data models,
@@ -400,8 +449,8 @@ committing.</code></pre>
                 <div>
                     <h3 class="font-semibold mb-3">Option 3: Add the automated hook</h3>
                     <p class="text-sm text-clay/70 mb-3">For automated enforcement, save the hook script and add this to your <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">settings.json</code>:</p>
-                    <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto">
-                        <pre class="text-white"><code>{
+                    <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
+                        <pre tabindex="0" class="text-white"><code>{
   "hooks": {
     "PreToolUse": [{
       "matcher": "Write",
@@ -418,7 +467,7 @@ committing.</code></pre>
 
             <p class="mt-4 text-clay/70 text-sm">
                 Or download just this skill from the
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/one-way-door" class="text-accent hover:text-accentDark underline underline-offset-2" target="_blank">GitHub repository</a>.
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/one-way-door" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
             </p>
         </section>
 
@@ -439,9 +488,9 @@ committing.</code></pre>
                 <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
                     Pause before irreversible decisions. A five-minute conversation about trade-offs saves weeks of migration pain.
                 </p>
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/one-way-door" target="_blank" class="inline-flex items-center gap-2 bg-white text-accent px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors">
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/one-way-door" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors" rel="noopener noreferrer">
                     View on GitHub
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                     </svg>
                 </a>
@@ -453,12 +502,12 @@ committing.</code></pre>
     <footer class="border-t border-mist/30 mt-12 relative z-10">
         <div class="max-w-4xl mx-auto px-6 py-6">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-clay/60 text-sm">
-                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accent hover:text-accentDark underline underline-offset-2">Center for Cooperative Media</a>
+                <p class="text-clay/80 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accentDark hover:text-accentDark underline underline-offset-2" rel="noopener noreferrer">Center for Cooperative Media</a>
                 </p>
                 <div class="flex items-center gap-6">
-                    <a href="../" class="text-clay/60 hover:text-ink text-sm transition-colors">All skills</a>
-                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/60 hover:text-ink text-sm transition-colors">GitHub</a>
+                    <a href="../" class="text-clay/80 hover:text-ink text-sm transition-colors">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/80 hover:text-ink text-sm transition-colors" rel="noopener noreferrer">GitHub</a>
                 </div>
             </div>
         </div>

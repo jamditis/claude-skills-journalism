@@ -30,7 +30,7 @@
                         canvas: '#ede6d4',
                         ink: '#121212',
                         clay: '#d6cdb7',
-                        mist: '#6b6b6b',
+                        mist: '#525252',
                         accent: '#CA3553',
                         accentDark: '#a82a44',
                     },
@@ -98,7 +98,69 @@
             background: none;
             padding: 0;
         }
-    </style>
+    
+/* a11y-patch-v1 */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+.skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #121212; color: #ede6d4; font-weight: 700; text-decoration: none; }
+:focus-visible { outline: 2px solid #3d4b40; outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+p a:not(.btn-primary):not(.btn-outline):not(.skill-card):not(.deckle-card):not(.feature-card),
+li a:not(.btn-primary):not(.btn-outline),
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDeep"]:not(.btn-primary):not(.btn-outline) { color: #1e293b !important; }
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline):hover,
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline):hover { color: #0f172a !important; }
+strong[class~="text-accent"], em[class~="text-accent"], code[class~="text-accent"],
+strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b !important; }
+.bg-canvas [class~="text-mist"], main [class~="text-mist"], [class~="text-mist"] { color: #3a3a3a !important; }
+.bg-ink [class~="text-accent"], [class~="bg-ink"] [class~="text-accent"],
+.bg-zinc-900 [class~="text-accent"], .bg-gray-900 [class~="text-accent"],
+[class*="bg-zinc-9"] [class~="text-accent"], [class*="bg-gray-9"] [class~="text-accent"],
+[class*="text-white"] [class~="text-accent"],
+[style*="background:#1"] [class~="text-accent"], [style*="background-color:#1"] [class~="text-accent"] {
+  color: #ddd6fe !important;
+}
+.bg-ink [class~="text-mist"], [class~="bg-ink"] [class~="text-mist"],
+[class*="text-white"] [class~="text-mist"] {
+  color: #d4d4d4 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-section, .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+.hero-gradient { position: relative; }
+.hero-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  z-index: 1;
+}
+.hero-gradient > * { position: relative; z-index: 2; }
+
+/* pdf-mockup-fix */
+.bg-ink\/20.text-ink, span.bg-ink\/20.text-ink { background-color: rgba(18,18,18,0.85) !important; color: #ffffff !important; }
+[class*="bg-canvas"] [class~="text-mist"], [class*="bg-cream"] [class~="text-mist"], [style*="background:#f8"] [class~="text-mist"], [style*="background-color:#f8"] [class~="text-mist"] { color: #2d2d2d !important; }
+
+/* stat-on-dark-fix */
+.bg-ink .text-accent, .bg-zinc-900 .text-accent, .bg-gray-900 .text-accent,
+.bg-ink .text-accentDark, .bg-zinc-900 .text-accentDark, .bg-gray-900 .text-accentDark {
+  filter: brightness(1.6) saturate(0.85);
+}
+</style>
 
     <!-- Open Graph -->
     <meta property="og:title" content="PDF Playground">
@@ -115,17 +177,19 @@
     <meta name="twitter:description" content="Create professional, print-ready PDF documents with customizable branding. Perfect for proposals, reports, one-pagers, newsletters, slides, and event materials.">
     <meta name="twitter:image" content="https://skills.amditis.tech/pdf-playground/og-image.png">
 <script src="../ask-ai.js" defer></script>
+    <!-- a11y-patch-v1 -->
 </head>
 <body class="font-sans">
+    <a href="#main" class="skip-link">Skip to main content</a>
     <div class="paper-overlay"></div>
 
     <!-- Nav -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
+    <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
         <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
             <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">
                 ← Back to all skills
             </a>
-            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-playground" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-playground" class="text-sm font-semibold text-accentDark hover:text-accentDark transition-colors">
                 View on GitHub →
             </a>
         </div>
@@ -134,7 +198,7 @@
     <!-- Hero -->
     <header class="hero-gradient text-white pt-32 pb-24 px-6 relative overflow-hidden">
         <div class="absolute inset-0 opacity-10">
-            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <svg aria-hidden="true" focusable="false" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
                         <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/>
@@ -155,7 +219,7 @@
                 Create professional, print-ready documents with your own branding. Perfect for newsrooms, nonprofits, and organizations.
             </p>
             <div class="flex flex-wrap gap-4">
-                <a href="#install" class="inline-flex items-center gap-2 bg-white text-accent font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
+                <a href="#install" class="inline-flex items-center gap-2 bg-white text-accentDark font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
                     <i data-lucide="download" class="w-5 h-5"></i>
                     Install Plugin
                 </a>
@@ -167,7 +231,7 @@
         </div>
     </header>
 
-    <main class="relative z-10">
+    <main id="main" class="relative z-10">
         <!-- Document Types -->
         <section class="py-24 px-6">
             <div class="max-w-6xl mx-auto">
@@ -269,7 +333,7 @@
                                     Send
                                 </button>
                             </div>
-                            <p class="text-white/40 text-xs mt-2">Demo mode — press "Start demo" to see the full workflow</p>
+                            <p class="text-white/70 text-xs mt-2">Demo mode — press "Start demo" to see the full workflow</p>
                         </div>
                     </div>
 
@@ -299,7 +363,7 @@
                                             </div>
                                             <div id="title-block">
                                                 <p id="doc-eyebrow" class="text-[7px] uppercase tracking-widest text-gray-400 mb-1">Funding proposal</p>
-                                                <h1 id="doc-title" class="text-lg font-bold leading-tight text-gray-800">AI for newsrooms</h1>
+                                                <div role="heading" aria-level="2" id="doc-title" class="text-lg font-bold leading-tight text-gray-800">AI for newsrooms</div>
                                                 <div id="title-accent" class="w-8 h-0.5 bg-gray-300 mt-1.5 rounded"></div>
                                             </div>
                                         </div>
@@ -468,7 +532,7 @@
                         </ul>
                     </div>
                     <div>
-                        <pre><code class="text-sm">---
+                        <pre tabindex="0"><code class="text-sm">---
 brand:
   name: "Your Organization"
   website: "https://yourorg.com"
@@ -495,8 +559,8 @@ style:
             <div class="max-w-4xl mx-auto">
                 <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-6">Get started</h2>
                 <p class="text-center text-mist text-lg mb-16 max-w-2xl mx-auto">
-                    You need <strong><a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accent hover:underline">Claude Code</a></strong> installed on your computer.
-                    Open your terminal and run <code>claude --version</code> to check. If you get "command not found," <a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accent hover:underline">install Claude Code first</a>.
+                    You need <strong><a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accentDark hover:underline">Claude Code</a></strong> installed on your computer.
+                    Open your terminal and run <code>claude --version</code> to check. If you get "command not found," <a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accentDark hover:underline">install Claude Code first</a>.
                 </p>
 
                 <div class="space-y-8">
@@ -506,7 +570,7 @@ style:
                             <h3 class="font-display text-xl font-bold">Add the plugin source</h3>
                         </div>
                         <p class="text-mist mb-4">Open your terminal and run this command exactly as shown. This tells Claude Code where to find the plugin (you only need to do this once).</p>
-                        <pre><code>claude plugin marketplace add https://github.com/jamditis/claude-skills-journalism</code></pre>
+                        <pre tabindex="0"><code>claude plugin marketplace add https://github.com/jamditis/claude-skills-journalism</code></pre>
                     </div>
 
                     <div class="feature-card p-8 rounded-xl">
@@ -515,7 +579,7 @@ style:
                             <h3 class="font-display text-xl font-bold">Install the plugin</h3>
                         </div>
                         <p class="text-mist mb-4">Run this command to download and install PDF Playground. Type the whole thing as one line, no spaces around the <code>@</code> sign.</p>
-                        <pre><code>claude plugin install pdf-playground@claude-skills-journalism</code></pre>
+                        <pre tabindex="0"><code>claude plugin install pdf-playground@claude-skills-journalism</code></pre>
                     </div>
 
                     <div class="feature-card p-8 rounded-xl">
@@ -535,7 +599,7 @@ style:
                         <div class="bg-ink/5 border border-ink/10 rounded-lg p-4 mb-4">
                             <p class="text-sm italic text-ink/80">"Create a brand config for PDF Playground. My organization is called [your org name] and our main color is [your color]."</p>
                         </div>
-                        <p class="text-mist text-sm mb-4">Claude will create the config file in the right place. Or you can create the file manually — see the <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-playground#customizing-your-brand-optional" class="text-accent font-semibold hover:underline">full setup guide</a> for details.</p>
+                        <p class="text-mist text-sm mb-4">Claude will create the config file in the right place. Or you can create the file manually — see the <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/pdf-playground#customizing-your-brand-optional" class="text-accentDark font-semibold hover:underline">full setup guide</a> for details.</p>
                     </div>
                 </div>
 
@@ -545,7 +609,7 @@ style:
                     <div class="space-y-4">
                         <details class="feature-card rounded-xl overflow-hidden">
                             <summary class="p-6 cursor-pointer hover:bg-ink/5 transition-colors font-semibold">"command not found" when running <code>claude</code></summary>
-                            <div class="px-6 pb-6 text-mist text-sm">Claude Code isn't installed yet. Follow the <a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accent hover:underline">installation guide</a>, then come back here.</div>
+                            <div class="px-6 pb-6 text-mist text-sm">Claude Code isn't installed yet. Follow the <a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accentDark hover:underline">installation guide</a>, then come back here.</div>
                         </details>
                         <details class="feature-card rounded-xl overflow-hidden">
                             <summary class="p-6 cursor-pointer hover:bg-ink/5 transition-colors font-semibold">The install command gives an error</summary>
@@ -654,7 +718,7 @@ style:
                     </div>
                 </div>
 
-                <div class="feature-card p-8 rounded-xl opacity-60">
+                <div class="feature-card p-8 rounded-xl opacity-90">
                     <div class="flex items-center gap-3 mb-4">
                         <span class="bg-ink/20 text-ink text-xs font-bold px-3 py-1 rounded-full">v1.1.1</span>
                         <span class="text-mist text-sm">February 2026</span>
@@ -671,10 +735,10 @@ style:
         <section class="py-16 px-6 border-t border-ink/10">
             <div class="max-w-6xl mx-auto text-center">
                 <p class="text-mist text-sm mb-4">
-                    Created by <a href="https://github.com/jamditis" class="text-accent hover:underline">Joe Amditis</a> at the
-                    <a href="https://centerforcooperativemedia.org" class="text-accent hover:underline">Center for Cooperative Media</a>
+                    Created by <a href="https://github.com/jamditis" class="text-accentDark hover:underline">Joe Amditis</a> at the
+                    <a href="https://centerforcooperativemedia.org" class="text-accentDark hover:underline">Center for Cooperative Media</a>
                 </p>
-                <p class="text-mist/60 text-xs">
+                <p class="text-mist text-xs">
                     Part of <a href="../" class="hover:underline">Claude Skills for Journalism</a> • MIT License
                 </p>
             </div>

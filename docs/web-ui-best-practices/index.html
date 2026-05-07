@@ -50,7 +50,54 @@
         pre code { background: none; padding: 0; }
         .principle-card { transition: all 0.3s ease; }
         .principle-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px -8px rgba(0,0,0,0.1); }
-    </style>
+    
+/* a11y-patch-v1 */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+.skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #121212; color: #ede6d4; font-weight: 700; text-decoration: none; }
+:focus-visible { outline: 2px solid #3d4b40; outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+p a:not(.btn-primary):not(.btn-outline):not(.skill-card):not(.deckle-card):not(.feature-card),
+li a:not(.btn-primary):not(.btn-outline),
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDeep"]:not(.btn-primary):not(.btn-outline) { color: #1e293b !important; }
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline):hover,
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline):hover { color: #0f172a !important; }
+strong[class~="text-accent"], em[class~="text-accent"], code[class~="text-accent"],
+strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b !important; }
+.bg-canvas [class~="text-mist"], main [class~="text-mist"], [class~="text-mist"] { color: #3a3a3a !important; }
+.bg-ink [class~="text-accent"], [class~="bg-ink"] [class~="text-accent"],
+.bg-zinc-900 [class~="text-accent"], .bg-gray-900 [class~="text-accent"],
+[class*="bg-zinc-9"] [class~="text-accent"], [class*="bg-gray-9"] [class~="text-accent"],
+[class*="text-white"] [class~="text-accent"],
+[style*="background:#1"] [class~="text-accent"], [style*="background-color:#1"] [class~="text-accent"] {
+  color: #ddd6fe !important;
+}
+.bg-ink [class~="text-mist"], [class~="bg-ink"] [class~="text-mist"],
+[class*="text-white"] [class~="text-mist"] {
+  color: #d4d4d4 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-section, .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+/* stat-on-dark-fix */
+.bg-ink .text-accent, .bg-zinc-900 .text-accent, .bg-gray-900 .text-accent,
+.bg-ink .text-accentDark, .bg-zinc-900 .text-accentDark, .bg-gray-900 .text-accentDark {
+  filter: brightness(1.6) saturate(0.85);
+}
+</style>
 
     <!-- Open Graph -->
     <meta property="og:title" content="Web UI best practices - Claude skills for journalism">
@@ -67,21 +114,23 @@
     <meta name="twitter:description" content="Signs of taste in web UI. 100ms interactions, skeleton loading, clean URLs, color restraint, command palette, honest cancellation, optical alignment.">
     <meta name="twitter:image" content="https://skills.amditis.tech/web-ui-best-practices/og-image.png">
 <script src="../ask-ai.js" defer></script>
+    <!-- a11y-patch-v1 -->
 </head>
 <body class="bg-canvas text-ink">
+    <a href="#main" class="skip-link">Skip to main content</a>
     <div class="paper-overlay"></div>
 
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
+    <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
         <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
             <a href="../" class="text-clay/70 hover:text-ink flex items-center gap-2 text-sm font-medium transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
                 All skills
             </a>
-            <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <a aria-label="GitHub" href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors" rel="noopener noreferrer">
+                <svg aria-hidden="true" focusable="false" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
                 </svg>
             </a>
@@ -92,7 +141,7 @@
     <header class="bg-gradient-to-br from-accent to-accentDark text-white pt-24 pb-16 relative overflow-hidden">
         <!-- SVG grid pattern -->
         <div class="absolute inset-0 opacity-10">
-            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <svg aria-hidden="true" focusable="false" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
                         <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/>
@@ -114,7 +163,7 @@
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-6 py-12 relative z-10">
+    <main id="main" class="max-w-4xl mx-auto px-6 py-12 relative z-10">
 
         <!-- 18 principles grid -->
         <section class="mb-16">
@@ -125,126 +174,126 @@
                         <i data-lucide="zap" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">100ms interactions</span>
                     </div>
-                    <p class="text-xs text-clay/60">Every action feels instant</p>
+                    <p class="text-xs text-clay/80">Every action feels instant</p>
                 </a>
                 <a href="#no-tours" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="x-circle" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">No product tours</span>
                     </div>
-                    <p class="text-xs text-clay/60">UI explains itself</p>
+                    <p class="text-xs text-clay/80">UI explains itself</p>
                 </a>
                 <a href="#urls" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="link" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">Clean URLs</span>
                     </div>
-                    <p class="text-xs text-clay/60">Short slugs, no UUIDs</p>
+                    <p class="text-xs text-clay/80">Short slugs, no UUIDs</p>
                 </a>
                 <a href="#state" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="save" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">Persistent state</span>
                     </div>
-                    <p class="text-xs text-clay/60">Resume where you left off</p>
+                    <p class="text-xs text-clay/80">Resume where you left off</p>
                 </a>
                 <a href="#color" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="palette" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">3 colors max</span>
                     </div>
-                    <p class="text-xs text-clay/60">Plus shades of gray</p>
+                    <p class="text-xs text-clay/80">Plus shades of gray</p>
                 </a>
                 <a href="#scrollbars" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="eye-off" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">No scrollbars</span>
                     </div>
-                    <p class="text-xs text-clay/60">Hidden until scrolling</p>
+                    <p class="text-xs text-clay/80">Hidden until scrolling</p>
                 </a>
                 <a href="#navigation" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="navigation" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">3-step navigation</span>
                     </div>
-                    <p class="text-xs text-clay/60">Anywhere in 3 clicks</p>
+                    <p class="text-xs text-clay/80">Anywhere in 3 clicks</p>
                 </a>
                 <a href="#brand" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="download" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">Copyable brand kit</span>
                     </div>
-                    <p class="text-xs text-clay/60">SVG logo, colors, fonts</p>
+                    <p class="text-xs text-clay/80">SVG logo, colors, fonts</p>
                 </a>
                 <a href="#skeleton" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="loader" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">Skeleton loading</span>
                     </div>
-                    <p class="text-xs text-clay/60">Layout shape, not spinners</p>
+                    <p class="text-xs text-clay/80">Layout shape, not spinners</p>
                 </a>
                 <a href="#clipboard" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="clipboard" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">Clipboard support</span>
                     </div>
-                    <p class="text-xs text-clay/60">Copy codes, keys, URLs</p>
+                    <p class="text-xs text-clay/80">Copy codes, keys, URLs</p>
                 </a>
                 <a href="#hit-targets" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="pointer" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">Large hit targets</span>
                     </div>
-                    <p class="text-xs text-clay/60">44px minimum touch area</p>
+                    <p class="text-xs text-clay/80">44px minimum touch area</p>
                 </a>
                 <a href="#cancel" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="log-out" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">Honest cancel</span>
                     </div>
-                    <p class="text-xs text-clay/60">One click, no guilt trips</p>
+                    <p class="text-xs text-clay/80">One click, no guilt trips</p>
                 </a>
                 <a href="#cmdk" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="command" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">Cmd+K</span>
                     </div>
-                    <p class="text-xs text-clay/60">Command palette for power users</p>
+                    <p class="text-xs text-clay/80">Command palette for power users</p>
                 </a>
                 <a href="#tooltips" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="message-square" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">Minimal tooltips</span>
                     </div>
-                    <p class="text-xs text-clay/60">Only on icon-only buttons</p>
+                    <p class="text-xs text-clay/80">Only on icon-only buttons</p>
                 </a>
                 <a href="#copy" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="type" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">Active voice copy</span>
                     </div>
-                    <p class="text-xs text-clay/60">7 words max per sentence</p>
+                    <p class="text-xs text-clay/80">7 words max per sentence</p>
                 </a>
                 <a href="#optical" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="move" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">Optical alignment</span>
                     </div>
-                    <p class="text-xs text-clay/60">Visual weight, not pixels</p>
+                    <p class="text-xs text-clay/80">Visual weight, not pixels</p>
                 </a>
                 <a href="#ltr" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="arrow-right" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">L-to-R reading</span>
                     </div>
-                    <p class="text-xs text-clay/60">F-pattern scan optimized</p>
+                    <p class="text-xs text-clay/80">F-pattern scan optimized</p>
                 </a>
                 <a href="#reassurance" class="principle-card bg-white rounded-xl p-4 border border-mist/30 block">
                     <div class="flex items-center gap-2 mb-2">
                         <i data-lucide="shield-check" class="w-4 h-4 text-accent"></i>
                         <span class="font-semibold text-sm">Reassurance</span>
                     </div>
-                    <p class="text-xs text-clay/60">Auto-save, undo, version history</p>
+                    <p class="text-xs text-clay/80">Auto-save, undo, version history</p>
                 </a>
             </div>
         </section>
@@ -254,7 +303,7 @@
             <h2 class="font-display text-2xl font-semibold mb-4">100ms interactions</h2>
             <div class="bg-white rounded-xl p-6 border border-mist/30 mb-4">
                 <p class="text-clay/80 mb-4">Every interaction completes in under 100ms. If it can't, fake it with optimistic updates — show the result before the server confirms.</p>
-                <pre><code>// Optimistic delete — remove immediately, reconcile later
+                <pre tabindex="0"><code>// Optimistic delete — remove immediately, reconcile later
 async function handleDelete(id) {
   setItems(prev => prev.filter(i => i.id !== id));
   try {
@@ -277,7 +326,7 @@ async function handleDelete(id) {
             <h2 class="font-display text-2xl font-semibold mb-4">Skeleton loading states</h2>
             <div class="bg-white rounded-xl p-6 border border-mist/30">
                 <p class="text-clay/80 mb-4">Never show a spinner when you know the shape of what's coming. Render a skeleton that matches the layout, then swap in real content.</p>
-                <pre><code>.skeleton {
+                <pre tabindex="0"><code>.skeleton {
   background: linear-gradient(
     90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%
   );
@@ -303,28 +352,28 @@ async function handleDelete(id) {
                             <i data-lucide="plus-circle" class="w-4 h-4 text-accent"></i>
                             <span class="font-semibold text-sm">Empty states that teach</span>
                         </div>
-                        <p class="text-xs text-clay/60">"Create your first project"</p>
+                        <p class="text-xs text-clay/80">"Create your first project"</p>
                     </div>
                     <div class="bg-canvas/50 rounded-lg p-4">
                         <div class="flex items-center gap-2 mb-2">
                             <i data-lucide="layers" class="w-4 h-4 text-accent"></i>
                             <span class="font-semibold text-sm">Progressive disclosure</span>
                         </div>
-                        <p class="text-xs text-clay/60">Show features when relevant</p>
+                        <p class="text-xs text-clay/80">Show features when relevant</p>
                     </div>
                     <div class="bg-canvas/50 rounded-lg p-4">
                         <div class="flex items-center gap-2 mb-2">
                             <i data-lucide="info" class="w-4 h-4 text-accent"></i>
                             <span class="font-semibold text-sm">Inline hints</span>
                         </div>
-                        <p class="text-xs text-clay/60">Disappear after first use</p>
+                        <p class="text-xs text-clay/80">Disappear after first use</p>
                     </div>
                     <div class="bg-canvas/50 rounded-lg p-4">
                         <div class="flex items-center gap-2 mb-2">
                             <i data-lucide="settings" class="w-4 h-4 text-accent"></i>
                             <span class="font-semibold text-sm">Smart defaults</span>
                         </div>
-                        <p class="text-xs text-clay/60">Work without configuration</p>
+                        <p class="text-xs text-clay/80">Work without configuration</p>
                     </div>
                 </div>
             </div>
@@ -338,13 +387,13 @@ async function handleDelete(id) {
                 <div class="grid md:grid-cols-2 gap-4">
                     <div>
                         <span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-0.5 rounded mb-2">Good</span>
-                        <pre><code>/projects/weather-app
+                        <pre tabindex="0"><code>/projects/weather-app
 /settings/billing
 /docs/api/auth</code></pre>
                     </div>
                     <div>
                         <span class="inline-block bg-red-100 text-red-800 text-xs font-semibold px-2 py-0.5 rounded mb-2">Bad</span>
-                        <pre><code>/projects/550e8400-e29b-41d4...
+                        <pre tabindex="0"><code>/projects/550e8400-e29b-41d4...
 /app?view=settings&tab=billing
 /dashboard#!/module/list</code></pre>
                     </div>
@@ -374,30 +423,30 @@ async function handleDelete(id) {
                 <div class="flex gap-3 mb-4">
                     <div class="text-center">
                         <div class="w-12 h-12 rounded-xl bg-blue-600 mb-1"></div>
-                        <span class="text-[10px] text-clay/50">Primary</span>
+                        <span class="text-[10px] text-clay/80">Primary</span>
                     </div>
                     <div class="text-center">
                         <div class="w-12 h-12 rounded-xl bg-amber-500 mb-1"></div>
-                        <span class="text-[10px] text-clay/50">Accent</span>
+                        <span class="text-[10px] text-clay/80">Accent</span>
                     </div>
                     <div class="text-center">
                         <div class="w-12 h-12 rounded-xl bg-red-500 mb-1"></div>
-                        <span class="text-[10px] text-clay/50">Danger</span>
+                        <span class="text-[10px] text-clay/80">Danger</span>
                     </div>
                     <div class="text-center">
                         <div class="w-12 h-12 rounded-xl bg-gray-100 mb-1 border border-gray-200"></div>
-                        <span class="text-[10px] text-clay/50">Gray 100</span>
+                        <span class="text-[10px] text-clay/80">Gray 100</span>
                     </div>
                     <div class="text-center">
                         <div class="w-12 h-12 rounded-xl bg-gray-400 mb-1"></div>
-                        <span class="text-[10px] text-clay/50">Gray 400</span>
+                        <span class="text-[10px] text-clay/80">Gray 400</span>
                     </div>
                     <div class="text-center">
                         <div class="w-12 h-12 rounded-xl bg-gray-900 mb-1"></div>
-                        <span class="text-[10px] text-clay/50">Gray 900</span>
+                        <span class="text-[10px] text-clay/80">Gray 900</span>
                     </div>
                 </div>
-                <p class="text-sm text-clay/60">If you reach for a 4th color, you're compensating for weak layout.</p>
+                <p class="text-sm text-clay/80">If you reach for a 4th color, you're compensating for weak layout.</p>
             </div>
         </section>
 
@@ -406,7 +455,7 @@ async function handleDelete(id) {
             <h2 class="font-display text-2xl font-semibold mb-4">No visible scrollbars</h2>
             <div class="bg-white rounded-xl p-6 border border-mist/30">
                 <p class="text-clay/80 mb-4">Hide them unless the user is actively scrolling. Use scroll shadows to hint at overflow without chrome.</p>
-                <pre><code>.scroll-container {
+                <pre tabindex="0"><code>.scroll-container {
   overflow-y: auto;
   scrollbar-width: none;          /* Firefox */
   -ms-overflow-style: none;       /* IE/Edge */
@@ -434,7 +483,7 @@ async function handleDelete(id) {
             <h2 class="font-display text-2xl font-semibold mb-4">Command palette</h2>
             <div class="bg-white rounded-xl p-6 border border-mist/30">
                 <p class="text-clay/80 mb-4">Every app with more than one page needs <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">Cmd</kbd> + <kbd class="bg-gray-100 border border-gray-300 rounded px-1.5 py-0.5 text-xs font-mono">K</kbd>.</p>
-                <pre><code>useEffect(() => {
+                <pre tabindex="0"><code>useEffect(() => {
   function handleKeyDown(e) {
     if ((e.metaKey || e.ctrlKey) && e.key === "k") {
       e.preventDefault();
@@ -458,7 +507,7 @@ async function handleDelete(id) {
             <h2 class="font-display text-2xl font-semibold mb-4">Clipboard support</h2>
             <div class="bg-white rounded-xl p-6 border border-mist/30">
                 <p class="text-clay/80 mb-4">One-click copy on codes, URLs, API keys, IDs. Paste into file uploads and image fields. Brief confirmation that auto-dismisses.</p>
-                <pre><code>async function copyToClipboard(text, label = "Copied") {
+                <pre tabindex="0"><code>async function copyToClipboard(text, label = "Copied") {
   await navigator.clipboard.writeText(text);
   toast(label, { duration: 1500 });
 }</code></pre>
@@ -470,7 +519,7 @@ async function handleDelete(id) {
             <h2 class="font-display text-2xl font-semibold mb-4">Large hit targets</h2>
             <div class="bg-white rounded-xl p-6 border border-mist/30">
                 <p class="text-clay/80 mb-4">Minimum 44x44px touch targets (WCAG 2.5.8). On desktop, generous padding is still faster than precise aim.</p>
-                <pre><code>button, .btn, [role="button"] {
+                <pre tabindex="0"><code>button, .btn, [role="button"] {
   min-height: 44px;
   min-width: 44px;
   padding: 10px 20px;
@@ -552,7 +601,7 @@ input, select, textarea {
                         </ul>
                     </div>
                 </div>
-                <p class="text-sm text-clay/60 mt-4">Buttons are verbs: "Save", "Delete", "Send" — not "Submit", "OK", "Confirm". Sentence case everywhere, never Title Case.</p>
+                <p class="text-sm text-clay/80 mt-4">Buttons are verbs: "Save", "Delete", "Send" — not "Submit", "OK", "Confirm". Sentence case everywhere, never Title Case.</p>
             </div>
         </section>
 
@@ -561,7 +610,7 @@ input, select, textarea {
             <h2 class="font-display text-2xl font-semibold mb-4">Optical alignment</h2>
             <div class="bg-white rounded-xl p-6 border border-mist/30">
                 <p class="text-clay/80 mb-4">The eye doesn't see pixels, it sees weight. Optical alignment over geometric.</p>
-                <pre><code>/* Play icon: shift right to look centered */
+                <pre tabindex="0"><code>/* Play icon: shift right to look centered */
 .play-button svg {
   transform: translateX(2px);
 }
@@ -598,7 +647,7 @@ input, select, textarea {
             <h2 class="font-display text-2xl font-semibold mb-4">Reassurance about loss</h2>
             <div class="bg-white rounded-xl p-6 border border-mist/30">
                 <p class="text-clay/80 mb-4">Users fear losing work. Prevent it and prove it.</p>
-                <pre><code>// Warn on unsaved changes
+                <pre tabindex="0"><code>// Warn on unsaved changes
 useEffect(() => {
   function handleBeforeUnload(e) {
     if (hasUnsavedChanges) {
@@ -667,7 +716,7 @@ useEffect(() => {
             <div class="space-y-6">
                 <div>
                     <h3 class="font-semibold mb-3">Install the skill</h3>
-                    <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto">
+                    <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                         <p class="text-white/50 mb-2"># Clone the repository</p>
                         <p class="text-white mb-4">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
                         <p class="text-white/50 mb-2"># Copy the skill to your Claude config</p>
@@ -677,7 +726,7 @@ useEffect(() => {
             </div>
             <p class="mt-4 text-clay/70 text-sm">
                 Or download just this skill from the
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/web-ui-best-practices" class="text-accent hover:text-accentDark underline underline-offset-2" target="_blank">GitHub repository</a>.
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/web-ui-best-practices" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
             </p>
         </section>
 
@@ -699,9 +748,9 @@ useEffect(() => {
                 <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
                     18 principles. Zero tolerance for dark patterns. Every interaction under 100ms.
                 </p>
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/web-ui-best-practices" target="_blank" class="inline-flex items-center gap-2 bg-white text-accent px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors">
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/web-ui-best-practices" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors" rel="noopener noreferrer">
                     View on GitHub
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                     </svg>
                 </a>
@@ -713,12 +762,12 @@ useEffect(() => {
     <footer class="border-t border-mist/30 mt-12 relative z-10">
         <div class="max-w-4xl mx-auto px-6 py-6">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-clay/60 text-sm">
-                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accent hover:text-accentDark underline underline-offset-2">Center for Cooperative Media</a>
+                <p class="text-clay/80 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accentDark hover:text-accentDark underline underline-offset-2" rel="noopener noreferrer">Center for Cooperative Media</a>
                 </p>
                 <div class="flex items-center gap-6">
-                    <a href="../" class="text-clay/60 hover:text-ink text-sm transition-colors">All skills</a>
-                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/60 hover:text-ink text-sm transition-colors">GitHub</a>
+                    <a href="../" class="text-clay/80 hover:text-ink text-sm transition-colors">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/80 hover:text-ink text-sm transition-colors" rel="noopener noreferrer">GitHub</a>
                 </div>
             </div>
         </div>

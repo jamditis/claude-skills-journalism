@@ -30,7 +30,7 @@
                         canvas: '#ede6d4',
                         ink: '#121212',
                         clay: '#d6cdb7',
-                        mist: '#6b6b6b',
+                        mist: '#525252',
                         accent: '#4f46e5',
                         accentDark: '#4338ca',
                     },
@@ -92,7 +92,65 @@
             background: none;
             padding: 0;
         }
-    </style>
+    
+/* a11y-patch-v1 */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+.skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #121212; color: #ede6d4; font-weight: 700; text-decoration: none; }
+:focus-visible { outline: 2px solid #3d4b40; outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+p a:not(.btn-primary):not(.btn-outline):not(.skill-card):not(.deckle-card):not(.feature-card),
+li a:not(.btn-primary):not(.btn-outline),
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDeep"]:not(.btn-primary):not(.btn-outline) { color: #1e293b !important; }
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline):hover,
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline):hover { color: #0f172a !important; }
+strong[class~="text-accent"], em[class~="text-accent"], code[class~="text-accent"],
+strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b !important; }
+.bg-canvas [class~="text-mist"], main [class~="text-mist"], [class~="text-mist"] { color: #3a3a3a !important; }
+.bg-ink [class~="text-accent"], [class~="bg-ink"] [class~="text-accent"],
+.bg-zinc-900 [class~="text-accent"], .bg-gray-900 [class~="text-accent"],
+[class*="bg-zinc-9"] [class~="text-accent"], [class*="bg-gray-9"] [class~="text-accent"],
+[class*="text-white"] [class~="text-accent"],
+[style*="background:#1"] [class~="text-accent"], [style*="background-color:#1"] [class~="text-accent"] {
+  color: #ddd6fe !important;
+}
+.bg-ink [class~="text-mist"], [class~="bg-ink"] [class~="text-mist"],
+[class*="text-white"] [class~="text-mist"] {
+  color: #d4d4d4 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-section, .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+.hero-gradient { position: relative; }
+.hero-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  z-index: 1;
+}
+.hero-gradient > * { position: relative; z-index: 2; }
+
+/* stat-on-dark-fix */
+.bg-ink .text-accent, .bg-zinc-900 .text-accent, .bg-gray-900 .text-accent,
+.bg-ink .text-accentDark, .bg-zinc-900 .text-accentDark, .bg-gray-900 .text-accentDark {
+  filter: brightness(1.6) saturate(0.85);
+}
+</style>
 
     <!-- Open Graph -->
     <meta property="og:title" content="Vibe coding">
@@ -109,17 +167,19 @@
     <meta name="twitter:description" content="Practical strategies for building software effectively with AI coding assistants like Claude Code, Cursor, and Windsurf.">
     <meta name="twitter:image" content="https://skills.amditis.tech/vibe-coding/og-image.png">
 <script src="../ask-ai.js" defer></script>
+    <!-- a11y-patch-v1 -->
 </head>
 <body class="font-sans">
+    <a href="#main" class="skip-link">Skip to main content</a>
     <div class="paper-overlay"></div>
 
     <!-- Nav -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
+    <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
         <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
             <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">
                 ← Back to all skills
             </a>
-            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/vibe-coding" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/vibe-coding" class="text-sm font-semibold text-accentDark hover:text-accentDark transition-colors">
                 View on GitHub →
             </a>
         </div>
@@ -128,7 +188,7 @@
     <!-- Hero -->
     <header class="hero-gradient text-white pt-32 pb-24 px-6 relative overflow-hidden">
         <div class="absolute inset-0 opacity-10">
-            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <svg aria-hidden="true" focusable="false" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
                         <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/>
@@ -149,7 +209,7 @@
                 Practical strategies for building software effectively with AI coding assistants like Claude Code, Cursor, and Windsurf.
             </p>
             <div class="flex flex-wrap gap-4">
-                <a href="#install" class="inline-flex items-center gap-2 bg-white text-accent font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
+                <a href="#install" class="inline-flex items-center gap-2 bg-white text-accentDark font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
                     <i data-lucide="download" class="w-5 h-5"></i>
                     Install Skill
                 </a>
@@ -161,7 +221,7 @@
         </div>
     </header>
 
-    <main class="relative z-10">
+    <main id="main" class="relative z-10">
         <!-- Core principles -->
         <section class="py-24 px-6">
             <div class="max-w-6xl mx-auto">
@@ -307,7 +367,7 @@
                         </ul>
                     </div>
                     <div>
-                        <pre><code class="text-sm"># The debugging loop
+                        <pre tabindex="0"><code class="text-sm"># The debugging loop
 
 1. Copy the error message
 2. Ask AI: "What could cause this?"
@@ -423,7 +483,7 @@
                             <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">1</span>
                             <h3 class="font-display text-xl font-bold">Clone the repository</h3>
                         </div>
-                        <pre><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
+                        <pre tabindex="0"><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
                     </div>
 
                     <div class="feature-card p-8 rounded-xl">
@@ -431,7 +491,7 @@
                             <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">2</span>
                             <h3 class="font-display text-xl font-bold">Copy the skill to your Claude config</h3>
                         </div>
-                        <pre><code>cp -r claude-skills-journalism/vibe-coding ~/.claude/skills/</code></pre>
+                        <pre tabindex="0"><code>cp -r claude-skills-journalism/vibe-coding ~/.claude/skills/</code></pre>
                     </div>
 
                     <div class="feature-card p-8 rounded-xl">
@@ -483,10 +543,10 @@
         <section class="py-16 px-6 border-t border-ink/10">
             <div class="max-w-6xl mx-auto text-center">
                 <p class="text-mist text-sm mb-4">
-                    Created by <a href="https://github.com/jamditis" class="text-accent hover:underline">Joe Amditis</a> at the
-                    <a href="https://centerforcooperativemedia.org" class="text-accent hover:underline">Center for Cooperative Media</a>
+                    Created by <a href="https://github.com/jamditis" class="text-accentDark hover:underline">Joe Amditis</a> at the
+                    <a href="https://centerforcooperativemedia.org" class="text-accentDark hover:underline">Center for Cooperative Media</a>
                 </p>
-                <p class="text-mist/60 text-xs">
+                <p class="text-mist text-xs">
                     Part of <a href="../" class="hover:underline">Claude Skills for Journalism</a> • MIT License
                 </p>
             </div>

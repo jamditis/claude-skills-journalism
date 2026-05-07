@@ -23,7 +23,7 @@
                         canvas: '#ede6d4',
                         ink: '#121212',
                         clay: '#d6cdb7',
-                        mist: '#6b6b6b',
+                        mist: '#525252',
                         accent: '#ea580c',
                         accentDark: '#c2410c',
                     },
@@ -56,7 +56,65 @@
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; font-weight: 600; padding: 0.75rem 1rem; border-bottom: 2px solid rgba(18, 18, 18, 0.1); }
         td { padding: 0.75rem 1rem; border-bottom: 1px solid rgba(18, 18, 18, 0.06); }
-    </style>
+    
+/* a11y-patch-v1 */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+.skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #121212; color: #ede6d4; font-weight: 700; text-decoration: none; }
+:focus-visible { outline: 2px solid #3d4b40; outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+p a:not(.btn-primary):not(.btn-outline):not(.skill-card):not(.deckle-card):not(.feature-card),
+li a:not(.btn-primary):not(.btn-outline),
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDeep"]:not(.btn-primary):not(.btn-outline) { color: #1e293b !important; }
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline):hover,
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline):hover { color: #0f172a !important; }
+strong[class~="text-accent"], em[class~="text-accent"], code[class~="text-accent"],
+strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b !important; }
+.bg-canvas [class~="text-mist"], main [class~="text-mist"], [class~="text-mist"] { color: #3a3a3a !important; }
+.bg-ink [class~="text-accent"], [class~="bg-ink"] [class~="text-accent"],
+.bg-zinc-900 [class~="text-accent"], .bg-gray-900 [class~="text-accent"],
+[class*="bg-zinc-9"] [class~="text-accent"], [class*="bg-gray-9"] [class~="text-accent"],
+[class*="text-white"] [class~="text-accent"],
+[style*="background:#1"] [class~="text-accent"], [style*="background-color:#1"] [class~="text-accent"] {
+  color: #ddd6fe !important;
+}
+.bg-ink [class~="text-mist"], [class~="bg-ink"] [class~="text-mist"],
+[class*="text-white"] [class~="text-mist"] {
+  color: #d4d4d4 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-section, .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+.hero-gradient { position: relative; }
+.hero-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  z-index: 1;
+}
+.hero-gradient > * { position: relative; z-index: 2; }
+
+/* stat-on-dark-fix */
+.bg-ink .text-accent, .bg-zinc-900 .text-accent, .bg-gray-900 .text-accent,
+.bg-ink .text-accentDark, .bg-zinc-900 .text-accentDark, .bg-gray-900 .text-accentDark {
+  filter: brightness(1.6) saturate(0.85);
+}
+</style>
 
     <!-- Open Graph -->
     <meta property="og:title" content="Animated sprite generation">
@@ -73,20 +131,22 @@
     <meta name="twitter:description" content="Generate consistent animated sprite sheets from a single anchor frame using AI image models. Covers the strip workflow, model comparison, and normalization pipeline.">
     <meta name="twitter:image" content="https://skills.amditis.tech/animated-sprite-gen/og-image.png">
 <script src="../ask-ai.js" defer></script>
+    <!-- a11y-patch-v1 -->
 </head>
 <body class="font-sans">
+    <a href="#main" class="skip-link">Skip to main content</a>
     <div class="paper-overlay"></div>
 
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
+    <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
         <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
             <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">&larr; Back to all skills</a>
-            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/animated-sprite-gen" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">View on GitHub &rarr;</a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/animated-sprite-gen" class="text-sm font-semibold text-accentDark hover:text-accentDark transition-colors">View on GitHub &rarr;</a>
         </div>
     </nav>
 
     <header class="hero-gradient text-white pt-32 pb-24 px-6 relative overflow-hidden">
         <div class="absolute inset-0 opacity-10">
-            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <svg aria-hidden="true" focusable="false" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                 <defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/></pattern></defs>
                 <rect width="100%" height="100%" fill="url(#grid)" />
             </svg>
@@ -99,7 +159,7 @@
                 Generate consistent animated sprite sheets from a single anchor frame. Full strips, not frame-by-frame &mdash; with normalization for game-ready output.
             </p>
             <div class="flex flex-wrap gap-4">
-                <a href="#workflow" class="inline-flex items-center gap-2 bg-white text-accent font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
+                <a href="#workflow" class="inline-flex items-center gap-2 bg-white text-accentDark font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
                     <i data-lucide="film" class="w-5 h-5"></i>
                     Core workflow
                 </a>
@@ -111,7 +171,7 @@
         </div>
     </header>
 
-    <main class="relative z-10">
+    <main id="main" class="relative z-10">
         <!-- Core workflow -->
         <section id="workflow" class="py-24 px-6">
             <div class="max-w-6xl mx-auto">
@@ -142,7 +202,7 @@
                         <div class="feature-card p-6 rounded-xl flex-1">
                             <h3 class="font-display text-xl font-bold mb-2">Generate full strips, not individual frames</h3>
                             <p class="text-mist mb-4">Frame-by-frame generation causes character drift. Request the entire animation strip in one prompt for much better consistency.</p>
-                            <pre><code>Generate a [N]-frame [animation_type] animation strip of this character.
+                            <pre tabindex="0"><code>Generate a [N]-frame [animation_type] animation strip of this character.
 Keep the character consistent across all frames.
 Arrange frames left-to-right in a single row.
 Maintain the same art style, proportions, and color palette.</code></pre>
@@ -177,7 +237,7 @@ Maintain the same art style, proportions, and color palette.</code></pre>
                 </div>
 
                 <div class="feature-card rounded-xl overflow-hidden">
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                         <table>
                             <thead class="bg-accent/5">
                                 <tr>
@@ -268,7 +328,7 @@ Maintain the same art style, proportions, and color palette.</code></pre>
                 <div class="max-w-2xl mx-auto space-y-4">
                     <div class="feature-card p-5 rounded-xl flex items-start gap-4">
                         <div class="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span class="text-accent font-bold text-sm">1</span>
+                            <span class="text-accentDark font-bold text-sm">1</span>
                         </div>
                         <div>
                             <h3 class="font-semibold mb-1">Anchor frame matches shipped production sprite exactly</h3>
@@ -278,7 +338,7 @@ Maintain the same art style, proportions, and color palette.</code></pre>
 
                     <div class="feature-card p-5 rounded-xl flex items-start gap-4">
                         <div class="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span class="text-accent font-bold text-sm">2</span>
+                            <span class="text-accentDark font-bold text-sm">2</span>
                         </div>
                         <div>
                             <h3 class="font-semibold mb-1">All frames share the same global scale</h3>
@@ -288,7 +348,7 @@ Maintain the same art style, proportions, and color palette.</code></pre>
 
                     <div class="feature-card p-5 rounded-xl flex items-start gap-4">
                         <div class="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span class="text-accent font-bold text-sm">3</span>
+                            <span class="text-accentDark font-bold text-sm">3</span>
                         </div>
                         <div>
                             <h3 class="font-semibold mb-1">Frame 1 is locked to the original idle sprite</h3>
@@ -298,7 +358,7 @@ Maintain the same art style, proportions, and color palette.</code></pre>
 
                     <div class="feature-card p-5 rounded-xl flex items-start gap-4">
                         <div class="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span class="text-accent font-bold text-sm">4</span>
+                            <span class="text-accentDark font-bold text-sm">4</span>
                         </div>
                         <div>
                             <h3 class="font-semibold mb-1">Preview in-engine before marking as production-ready</h3>
@@ -308,7 +368,7 @@ Maintain the same art style, proportions, and color palette.</code></pre>
 
                     <div class="feature-card p-5 rounded-xl flex items-start gap-4">
                         <div class="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span class="text-accent font-bold text-sm">5</span>
+                            <span class="text-accentDark font-bold text-sm">5</span>
                         </div>
                         <div>
                             <h3 class="font-semibold mb-1">Check for palette drift between first and last frames</h3>
@@ -330,7 +390,7 @@ Maintain the same art style, proportions, and color palette.</code></pre>
                             <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">1</span>
                             Clone the repository
                         </h3>
-                        <pre><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
+                        <pre tabindex="0"><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
                     </div>
 
                     <div class="bg-white/5 p-6 rounded-xl">
@@ -338,7 +398,7 @@ Maintain the same art style, proportions, and color palette.</code></pre>
                             <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">2</span>
                             Copy skill to Claude skills directory
                         </h3>
-                        <pre><code>cp -r animated-sprite-gen ~/.claude/skills/</code></pre>
+                        <pre tabindex="0"><code>cp -r animated-sprite-gen ~/.claude/skills/</code></pre>
                     </div>
 
                     <div class="bg-white/5 p-6 rounded-xl">
@@ -356,13 +416,13 @@ Maintain the same art style, proportions, and color palette.</code></pre>
         <section class="py-16 px-6 border-t border-ink/10">
             <div class="max-w-6xl mx-auto text-center">
                 <p class="text-mist text-sm mb-2">
-                    Based on <a href="https://x.com/chongdashu" class="text-accent hover:underline">@chongdashu</a>'s guide to generating animated game sprites (Mar 2026)
+                    Based on <a href="https://x.com/chongdashu" class="text-accentDark hover:underline">@chongdashu</a>'s guide to generating animated game sprites (Mar 2026)
                 </p>
                 <p class="text-mist text-sm mb-4">
-                    Adapted by <a href="https://github.com/jamditis" class="text-accent hover:underline">Joe Amditis</a> at the
-                    <a href="https://centerforcooperativemedia.org" class="text-accent hover:underline">Center for Cooperative Media</a>
+                    Adapted by <a href="https://github.com/jamditis" class="text-accentDark hover:underline">Joe Amditis</a> at the
+                    <a href="https://centerforcooperativemedia.org" class="text-accentDark hover:underline">Center for Cooperative Media</a>
                 </p>
-                <p class="text-mist/60 text-xs">Part of <a href="../" class="hover:underline">Claude Skills for Journalism</a> &bull; MIT License</p>
+                <p class="text-mist text-xs">Part of <a href="../" class="hover:underline">Claude Skills for Journalism</a> &bull; MIT License</p>
             </div>
         </section>
     </main>

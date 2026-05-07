@@ -57,7 +57,65 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 30px rgba(0,0,0,0.08);
         }
-    </style>
+    
+/* a11y-patch-v1 */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+.skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #121212; color: #ede6d4; font-weight: 700; text-decoration: none; }
+:focus-visible { outline: 2px solid #3d4b40; outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+p a:not(.btn-primary):not(.btn-outline):not(.skill-card):not(.deckle-card):not(.feature-card),
+li a:not(.btn-primary):not(.btn-outline),
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDeep"]:not(.btn-primary):not(.btn-outline) { color: #1e293b !important; }
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline):hover,
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline):hover { color: #0f172a !important; }
+strong[class~="text-accent"], em[class~="text-accent"], code[class~="text-accent"],
+strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b !important; }
+.bg-canvas [class~="text-mist"], main [class~="text-mist"], [class~="text-mist"] { color: #3a3a3a !important; }
+.bg-ink [class~="text-accent"], [class~="bg-ink"] [class~="text-accent"],
+.bg-zinc-900 [class~="text-accent"], .bg-gray-900 [class~="text-accent"],
+[class*="bg-zinc-9"] [class~="text-accent"], [class*="bg-gray-9"] [class~="text-accent"],
+[class*="text-white"] [class~="text-accent"],
+[style*="background:#1"] [class~="text-accent"], [style*="background-color:#1"] [class~="text-accent"] {
+  color: #ddd6fe !important;
+}
+.bg-ink [class~="text-mist"], [class~="bg-ink"] [class~="text-mist"],
+[class*="text-white"] [class~="text-mist"] {
+  color: #d4d4d4 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-section, .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+.hero-gradient { position: relative; }
+.hero-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  z-index: 1;
+}
+.hero-gradient > * { position: relative; z-index: 2; }
+
+/* stat-on-dark-fix */
+.bg-ink .text-accent, .bg-zinc-900 .text-accent, .bg-gray-900 .text-accent,
+.bg-ink .text-accentDark, .bg-zinc-900 .text-accentDark, .bg-gray-900 .text-accentDark {
+  filter: brightness(1.6) saturate(0.85);
+}
+</style>
 
     <!-- Open Graph -->
     <meta property="og:title" content="Accessibility compliance - Claude skills for journalism">
@@ -74,21 +132,23 @@
     <meta name="twitter:description" content="# Clone the repository">
     <meta name="twitter:image" content="https://skills.amditis.tech/accessibility-compliance/og-image.png">
 <script src="../ask-ai.js" defer></script>
+    <!-- a11y-patch-v1 -->
 </head>
 <body class="bg-canvas text-ink">
+    <a href="#main" class="skip-link">Skip to main content</a>
     <div class="paper-overlay"></div>
 
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
+    <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
         <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
             <a href="../" class="text-clay/70 hover:text-ink flex items-center gap-2 text-sm font-medium transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
                 All skills
             </a>
-            <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <a aria-label="GitHub" href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors" rel="noopener noreferrer">
+                <svg aria-hidden="true" focusable="false" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
                 </svg>
             </a>
@@ -99,7 +159,7 @@
     <header class="hero-gradient text-white pt-24 pb-20 relative overflow-hidden">
         <div class="max-w-5xl mx-auto px-6 relative z-10">
             <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm mb-6 border border-white/20">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                 </svg>
@@ -112,7 +172,7 @@
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-6 py-16 relative z-10">
+    <main id="main" class="max-w-5xl mx-auto px-6 py-16 relative z-10">
         <!-- WCAG Principles -->
         <section class="mb-20">
             <h2 class="font-display text-2xl font-semibold mb-6">The four WCAG principles (POUR)</h2>
@@ -176,24 +236,24 @@
                     <h3 class="font-semibold mb-6 text-ink">News photo alt text decision tree</h3>
                     <div class="grid md:grid-cols-2 gap-8">
                         <div>
-                            <p class="text-sm text-clay/60 mb-3 font-medium">Include:</p>
+                            <p class="text-sm text-clay/80 mb-3 font-medium">Include:</p>
                             <ul class="space-y-3 text-clay/80">
                                 <li class="flex items-start gap-3">
-                                    <span class="text-accent font-bold">WHO</span>
+                                    <span class="text-accentDark font-bold">WHO</span>
                                     <span>is in the image (if identifiable and relevant)</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    <span class="text-accent font-bold">WHAT</span>
+                                    <span class="text-accentDark font-bold">WHAT</span>
                                     <span>is happening (the action or situation)</span>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    <span class="text-accent font-bold">WHERE</span>
+                                    <span class="text-accentDark font-bold">WHERE</span>
                                     <span>(if location matters to story)</span>
                                 </li>
                             </ul>
                         </div>
                         <div>
-                            <p class="text-sm text-clay/60 mb-3 font-medium">Avoid:</p>
+                            <p class="text-sm text-clay/80 mb-3 font-medium">Avoid:</p>
                             <ul class="space-y-2 text-clay/70">
                                 <li>• Repeating caption text verbatim</li>
                                 <li>• Starting with "Image of" or "Photo of"</li>
@@ -206,12 +266,12 @@
                     <h4 class="font-semibold mb-6 text-ink">Examples</h4>
                     <div class="space-y-6">
                         <div>
-                            <p class="text-sm text-clay/60 mb-2">Photo: Protesters holding signs outside courthouse</p>
+                            <p class="text-sm text-clay/80 mb-2">Photo: Protesters holding signs outside courthouse</p>
                             <p class="text-red-600 text-sm mb-1"><strong>Bad:</strong> "Protesters"</p>
                             <p class="text-green-700 text-sm"><strong>Good:</strong> "Approximately 50 protesters hold signs reading 'Justice Now' outside the federal courthouse in downtown Seattle"</p>
                         </div>
                         <div>
-                            <p class="text-sm text-clay/60 mb-2">Photo: Headshot of interview subject</p>
+                            <p class="text-sm text-clay/80 mb-2">Photo: Headshot of interview subject</p>
                             <p class="text-red-600 text-sm mb-1"><strong>Bad:</strong> "Photo"</p>
                             <p class="text-green-700 text-sm"><strong>Good:</strong> "Dr. Sarah Chen, epidemiologist at Johns Hopkins"</p>
                         </div>
@@ -229,7 +289,7 @@
                     <ul class="space-y-3">
                         <li class="flex items-center gap-3">
                             <div class="w-5 h-5 rounded border-2 border-accent flex items-center justify-center flex-shrink-0">
-                                <svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg aria-hidden="true" focusable="false" class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                                 </svg>
                             </div>
@@ -237,7 +297,7 @@
                         </li>
                         <li class="flex items-center gap-3">
                             <div class="w-5 h-5 rounded border-2 border-accent flex items-center justify-center flex-shrink-0">
-                                <svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg aria-hidden="true" focusable="false" class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                                 </svg>
                             </div>
@@ -245,7 +305,7 @@
                         </li>
                         <li class="flex items-center gap-3">
                             <div class="w-5 h-5 rounded border-2 border-accent flex items-center justify-center flex-shrink-0">
-                                <svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg aria-hidden="true" focusable="false" class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                                 </svg>
                             </div>
@@ -253,7 +313,7 @@
                         </li>
                         <li class="flex items-center gap-3">
                             <div class="w-5 h-5 rounded border-2 border-accent flex items-center justify-center flex-shrink-0">
-                                <svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg aria-hidden="true" focusable="false" class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                                 </svg>
                             </div>
@@ -261,7 +321,7 @@
                         </li>
                         <li class="flex items-center gap-3">
                             <div class="w-5 h-5 rounded border-2 border-accent flex items-center justify-center flex-shrink-0">
-                                <svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg aria-hidden="true" focusable="false" class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                                 </svg>
                             </div>
@@ -269,7 +329,7 @@
                         </li>
                         <li class="flex items-center gap-3">
                             <div class="w-5 h-5 rounded border-2 border-accent flex items-center justify-center flex-shrink-0">
-                                <svg class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg aria-hidden="true" focusable="false" class="w-3 h-3 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                                 </svg>
                             </div>
@@ -282,7 +342,7 @@
                     <p class="text-sm text-clay/70 mb-5">Paul Tol's color schemes - tested for accessibility:</p>
                     <div class="space-y-5">
                         <div>
-                            <p class="text-xs text-clay/60 mb-2 font-medium">Bright palette</p>
+                            <p class="text-xs text-clay/80 mb-2 font-medium">Bright palette</p>
                             <div class="flex gap-2">
                                 <div class="w-10 h-10 rounded-lg shadow-sm" style="background: #4477AA" title="#4477AA"></div>
                                 <div class="w-10 h-10 rounded-lg shadow-sm" style="background: #EE6677" title="#EE6677"></div>
@@ -293,7 +353,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-xs text-clay/60 mb-2 font-medium">Categorical palette</p>
+                            <p class="text-xs text-clay/80 mb-2 font-medium">Categorical palette</p>
                             <div class="flex gap-2">
                                 <div class="w-10 h-10 rounded-lg shadow-sm" style="background: #332288" title="#332288"></div>
                                 <div class="w-10 h-10 rounded-lg shadow-sm" style="background: #88CCEE" title="#88CCEE"></div>
@@ -312,7 +372,7 @@
         <section class="bg-ink text-white -mx-6 px-6 py-16 mb-20 md:-mx-[calc((100vw-64rem)/2+1.5rem)] md:px-[calc((100vw-64rem)/2+1.5rem)]">
             <div class="max-w-5xl mx-auto">
                 <h2 class="font-display text-2xl font-semibold mb-6 text-white">Contrast requirements (WCAG 2.1)</h2>
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                     <table class="w-full">
                         <thead>
                             <tr class="border-b border-white/20">
@@ -350,7 +410,7 @@
                 <div class="feature-card rounded-2xl p-6">
                     <h3 class="font-semibold mb-4 flex items-center gap-3 text-ink">
                         <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-accent to-accentDark flex items-center justify-center">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
                             </svg>
                         </div>
@@ -367,7 +427,7 @@
                 <div class="feature-card rounded-2xl p-6">
                     <h3 class="font-semibold mb-4 flex items-center gap-3 text-ink">
                         <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-accent to-accentDark flex items-center justify-center">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
                             </svg>
                         </div>
@@ -490,31 +550,31 @@
                     <h3 class="font-semibold mb-4 text-ink">Code patterns</h3>
                     <ul class="space-y-3 text-clay/70">
                         <li class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             Accessible chart HTML pattern
                         </li>
                         <li class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             Skip link implementation (JS)
                         </li>
                         <li class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             Modal keyboard trap prevention
                         </li>
                         <li class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             Accessible form field pattern
                         </li>
                         <li class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             Error message handling
@@ -525,25 +585,25 @@
                     <h3 class="font-semibold mb-4 text-ink">Python utilities</h3>
                     <ul class="space-y-3 text-clay/70">
                         <li class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             Alt text prompt generator
                         </li>
                         <li class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             Color contrast validator
                         </li>
                         <li class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             Color-blind safe palettes
                         </li>
                         <li class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             Axe-core audit runner (Playwright)
@@ -556,7 +616,7 @@
         <!-- Installation -->
         <section class="mb-20">
             <h2 class="font-display text-2xl font-semibold mb-6">Installation</h2>
-            <div class="bg-ink rounded-2xl p-6 font-mono text-sm overflow-x-auto">
+            <div class="bg-ink rounded-2xl p-6 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                 <p class="text-white/50 mb-2"># Clone the repository</p>
                 <p class="text-white mb-4">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
                 <p class="text-white/50 mb-2"># Copy the skill to your Claude config</p>
@@ -564,7 +624,7 @@
             </div>
             <p class="mt-4 text-clay/70">
                 Or download just this skill from the
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/accessibility-compliance" class="text-accent hover:text-accentDark underline underline-offset-2" target="_blank">GitHub repository</a>.
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/accessibility-compliance" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
             </p>
         </section>
 
@@ -575,9 +635,9 @@
                 <p class="text-white/80 mb-8 max-w-xl mx-auto">
                     Ensure your journalism reaches all readers, including those using assistive technologies.
                 </p>
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/accessibility-compliance" target="_blank" class="inline-flex items-center gap-2 bg-white text-accent px-6 py-3 rounded-full font-semibold hover:bg-white/95 transition-colors shadow-lg">
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/accessibility-compliance" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-6 py-3 rounded-full font-semibold hover:bg-white/95 transition-colors shadow-lg" rel="noopener noreferrer">
                     View on GitHub
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" focusable="false" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                     </svg>
                 </a>
@@ -589,12 +649,12 @@
     <footer class="border-t border-mist/30 mt-16 relative z-10">
         <div class="max-w-5xl mx-auto px-6 py-8">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-clay/60 text-sm">
-                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accent hover:text-accentDark underline underline-offset-2">Center for Cooperative Media</a>
+                <p class="text-clay/80 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accentDark hover:text-accentDark underline underline-offset-2" rel="noopener noreferrer">Center for Cooperative Media</a>
                 </p>
                 <div class="flex items-center gap-6">
-                    <a href="../" class="text-clay/60 hover:text-ink text-sm transition-colors">All skills</a>
-                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/60 hover:text-ink text-sm transition-colors">GitHub</a>
+                    <a href="../" class="text-clay/80 hover:text-ink text-sm transition-colors">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/80 hover:text-ink text-sm transition-colors" rel="noopener noreferrer">GitHub</a>
                 </div>
             </div>
         </div>
