@@ -39,7 +39,7 @@
                         canvas: '#ede6d4',
                         ink: '#121212',
                         clay: '#d6cdb7',
-                        mist: '#6b6b6b',
+                        mist: '#525252',
                         accent: '#3d4b40',
                     },
                     animation: {
@@ -211,7 +211,52 @@
             border-color: #3d4b40;
             color: #3d4b40;
         }
-    </style>
+    
+/* a11y-patch-v1 */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+.skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #121212; color: #ede6d4; font-weight: 700; text-decoration: none; }
+:focus-visible { outline: 2px solid #3d4b40; outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+p a:not(.btn-primary):not(.btn-outline):not(.skill-card):not(.deckle-card):not(.feature-card),
+li a:not(.btn-primary):not(.btn-outline),
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDeep"]:not(.btn-primary):not(.btn-outline) { color: #1e293b !important; }
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline):hover,
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline):hover { color: #0f172a !important; }
+strong[class~="text-accent"], em[class~="text-accent"], code[class~="text-accent"],
+strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b !important; }
+.bg-canvas [class~="text-mist"], main [class~="text-mist"], [class~="text-mist"] { color: #3a3a3a !important; }
+.bg-ink [class~="text-accent"], [class~="bg-ink"] [class~="text-accent"],
+.bg-zinc-900 [class~="text-accent"], .bg-gray-900 [class~="text-accent"],
+[class*="bg-zinc-9"] [class~="text-accent"], [class*="bg-gray-9"] [class~="text-accent"],
+[class*="text-white"] [class~="text-accent"],
+[style*="background:#1"] [class~="text-accent"], [style*="background-color:#1"] [class~="text-accent"] {
+  color: #ddd6fe !important;
+}
+.bg-ink [class~="text-mist"], [class~="bg-ink"] [class~="text-mist"],
+[class*="text-white"] [class~="text-mist"] {
+  color: #d4d4d4 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-section, .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+/* pdf-mockup-fix */
+.bg-ink\/20.text-ink, span.bg-ink\/20.text-ink { background-color: rgba(18,18,18,0.85) !important; color: #ffffff !important; }
+[class*="bg-canvas"] [class~="text-mist"], [class*="bg-cream"] [class~="text-mist"], [style*="background:#f8"] [class~="text-mist"], [style*="background-color:#f8"] [class~="text-mist"] { color: #2d2d2d !important; }
+</style>
 
     <!-- Open Graph -->
     <meta property="og:title" content="Claude skills for journalism">
@@ -246,8 +291,13 @@
   }
 }
     </script>
+<noscript id="noscript-reveal-fallback"><style>
+.reveal-section, .reveal { opacity: 1; transform: none; }
+</style></noscript>
+    <!-- a11y-patch-v1 -->
 </head>
 <body class="font-sans overflow-x-hidden">
+    <a href="#main" class="skip-link">Skip to main content</a>
 
     <div class="paper-overlay"></div>
 
@@ -257,7 +307,7 @@
     <div class="relative z-10">
 
         <!-- Navigation -->
-        <nav id="main-nav" class="fixed top-0 w-full flex justify-between items-center px-6 py-4 md:px-14 md:py-6 z-50 transition-all duration-500 ease-in-out" role="navigation">
+        <nav aria-label="Primary" id="main-nav" class="fixed top-0 w-full flex justify-between items-center px-6 py-4 md:px-14 md:py-6 z-50 transition-all duration-500 ease-in-out" role="navigation">
             <div class="flex items-center gap-4">
                 <span class="font-display text-2xl font-black italic tracking-tighter">J.</span>
                 <span class="text-[10px] tracking-[0.3em] font-bold opacity-30 uppercase hidden lg:block">Journalism Skills</span>
@@ -280,7 +330,7 @@
         </nav>
 
         <!-- Main Content -->
-        <main class="max-w-7xl mx-auto pt-32 md:pt-44 pb-32 px-6 md:px-8">
+        <main id="main" class="max-w-7xl mx-auto pt-32 md:pt-44 pb-32 px-6 md:px-8">
 
             <!-- Hero -->
             <header class="mb-32 md:mb-44 animate-page-in">
@@ -308,7 +358,7 @@
                 <a href="autocontext/" class="block group">
                     <div class="relative overflow-hidden rounded-2xl" style="background: linear-gradient(135deg, #1a6b5a 0%, #135346 50%, #0e3f35 100%);">
                         <div class="absolute inset-0 opacity-10">
-                            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                            <svg aria-hidden="true" focusable="false" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                                 <circle cx="15%" cy="30%" r="4" fill="white" opacity="0.6"/>
                                 <circle cx="40%" cy="60%" r="3" fill="white" opacity="0.4"/>
                                 <circle cx="65%" cy="25%" r="5" fill="white" opacity="0.5"/>
@@ -857,21 +907,21 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                         <div class="border border-ink/10 p-4 bg-white/20">
                             <div class="flex items-center gap-2 mb-2">
-                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                                <span class="hook-badge bg-accent/10 text-accentDark font-bold">PostToolUse</span>
                             </div>
                             <h4 class="font-display font-bold mb-1">ap-style-check</h4>
                             <p class="text-xs text-mist">Flag AP Style violations in written content.</p>
                         </div>
                         <div class="border border-ink/10 p-4 bg-white/20">
                             <div class="flex items-center gap-2 mb-2">
-                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                                <span class="hook-badge bg-accent/10 text-accentDark font-bold">PostToolUse</span>
                             </div>
                             <h4 class="font-display font-bold mb-1">ai-slop-detector</h4>
                             <p class="text-xs text-mist">Warn about AI-generated patterns.</p>
                         </div>
                         <div class="border border-ink/10 p-4 bg-white/20">
                             <div class="flex items-center gap-2 mb-2">
-                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                                <span class="hook-badge bg-accent/10 text-accentDark font-bold">PostToolUse</span>
                             </div>
                             <h4 class="font-display font-bold mb-1">accessibility-check</h4>
                             <p class="text-xs text-mist">Check alt text, heading structure, link text.</p>
@@ -883,21 +933,21 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                         <div class="border border-ink/10 p-4 bg-white/20">
                             <div class="flex items-center gap-2 mb-2">
-                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                                <span class="hook-badge bg-accent/10 text-accentDark font-bold">PostToolUse</span>
                             </div>
                             <h4 class="font-display font-bold mb-1">source-attribution-check</h4>
                             <p class="text-xs text-mist">Flag unattributed quotes and claims.</p>
                         </div>
                         <div class="border border-ink/10 p-4 bg-white/20">
                             <div class="flex items-center gap-2 mb-2">
-                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                                <span class="hook-badge bg-accent/10 text-accentDark font-bold">PostToolUse</span>
                             </div>
                             <h4 class="font-display font-bold mb-1">verification-reminder</h4>
                             <p class="text-xs text-mist">Prompt to verify facts before including.</p>
                         </div>
                         <div class="border border-ink/10 p-4 bg-white/20">
                             <div class="flex items-center gap-2 mb-2">
-                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                                <span class="hook-badge bg-accent/10 text-accentDark font-bold">PostToolUse</span>
                             </div>
                             <h4 class="font-display font-bold mb-1">data-methodology-check</h4>
                             <p class="text-xs text-mist">Ensure data stories include methodology.</p>
@@ -909,14 +959,14 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                         <div class="border border-ink/10 p-4 bg-white/20">
                             <div class="flex items-center gap-2 mb-2">
-                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                                <span class="hook-badge bg-accent/10 text-accentDark font-bold">PostToolUse</span>
                             </div>
                             <h4 class="font-display font-bold mb-1">source-diversity-check</h4>
                             <p class="text-xs text-mist">Note when sources may lack diversity.</p>
                         </div>
                         <div class="border border-ink/10 p-4 bg-white/20">
                             <div class="flex items-center gap-2 mb-2">
-                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                                <span class="hook-badge bg-accent/10 text-accentDark font-bold">PostToolUse</span>
                             </div>
                             <h4 class="font-display font-bold mb-1">legal-review-flag</h4>
                             <p class="text-xs text-mist">Flag potentially defamatory content.</p>
@@ -942,7 +992,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                         <div class="border border-ink/10 p-4 bg-white/20">
                             <div class="flex items-center gap-2 mb-2">
-                                <span class="hook-badge bg-accent/10 text-accent font-bold">PostToolUse</span>
+                                <span class="hook-badge bg-accent/10 text-accentDark font-bold">PostToolUse</span>
                             </div>
                             <h4 class="font-display font-bold mb-1">archive-reminder</h4>
                             <p class="text-xs text-mist">Remind to archive URLs when citing sources.</p>
@@ -968,7 +1018,7 @@
                         </div>
                         <div class="border border-ink/10 p-4 bg-white/20">
                             <div class="flex items-center gap-2 mb-2">
-                                <span class="hook-badge bg-accent/10 text-accent font-bold">PreToolUse</span>
+                                <span class="hook-badge bg-accent/10 text-accentDark font-bold">PreToolUse</span>
                             </div>
                             <h4 class="font-display font-bold mb-1">enforce-test-first</h4>
                             <p class="text-xs text-mist">Block source edits until test is written.</p>
@@ -984,7 +1034,7 @@
                     <span class="section-label">Get Started</span>
                 </div>
 
-                <p class="text-mist mb-8">You need <strong><a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accent hover:underline">Claude Code</a></strong> installed. Run <code class="bg-ink/5 px-2 py-0.5 rounded text-sm">claude --version</code> in your terminal to check.</p>
+                <p class="text-mist mb-8">You need <strong><a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accentDark hover:underline">Claude Code</a></strong> installed. Run <code class="bg-ink/5 px-2 py-0.5 rounded text-sm">claude --version</code> in your terminal to check.</p>
 
                 <!-- Plugins (recommended) -->
                 <div class="deckle-card-solid p-8 mb-6">
@@ -993,18 +1043,18 @@
                         <h3 class="font-display text-xl font-bold">Install as a plugin</h3>
                     </div>
                     <p class="text-sm text-mist mb-4">Plugins give you slash commands inside Claude Code. Run these two commands in your terminal:</p>
-                    <div class="bg-ink text-canvas p-6 font-mono text-sm mb-4 overflow-x-auto space-y-1">
+                    <div class="bg-ink text-canvas p-6 font-mono text-sm mb-4 overflow-x-auto space-y-1" tabindex="0" role="region" aria-label="Scrollable content">
                         <div>claude plugin marketplace add https://github.com/jamditis/claude-skills-journalism</div>
                         <div>claude plugin install pdf-playground@claude-skills-journalism</div>
                     </div>
-                    <p class="text-sm text-mist">Then restart Claude Code (close and reopen). See the <a href="pdf-playground/" class="text-accent font-semibold hover:underline">PDF Playground page</a> for detailed instructions, troubleshooting, and brand setup.</p>
+                    <p class="text-sm text-mist">Then restart Claude Code (close and reopen). See the <a href="pdf-playground/" class="text-accentDark font-semibold hover:underline">PDF Playground page</a> for detailed instructions, troubleshooting, and brand setup.</p>
                 </div>
 
                 <!-- Skills (manual) -->
                 <div class="deckle-card p-8">
                     <h3 class="font-display text-xl font-bold mb-4">Install individual skills</h3>
                     <p class="text-sm text-mist mb-4">Skills load automatically when relevant to your work. Claude Code discovers skills at <code>~/.claude/skills/&lt;skill-name&gt;/SKILL.md</code> — one level deep. Clone the repo anywhere, then copy or symlink the skills you want:</p>
-                    <div class="bg-ink text-canvas p-6 font-mono text-sm mb-4 overflow-x-auto space-y-1">
+                    <div class="bg-ink text-canvas p-6 font-mono text-sm mb-4 overflow-x-auto space-y-1" tabindex="0" role="region" aria-label="Scrollable content">
                         <div>git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism</div>
                         <div>cd ~/projects/claude-skills-journalism</div>
                         <div>mkdir -p ~/.claude/skills</div>
@@ -1028,7 +1078,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-16 md:gap-24">
                     <div class="space-y-6">
-                        <h6 class="text-[10px] font-bold tracking-[0.5em] text-canvas/20 uppercase">Resources</h6>
+                        <h6 class="text-[10px] font-bold tracking-[0.5em] text-canvas/70 uppercase">Resources</h6>
                         <ul class="space-y-4 text-sm font-semibold tracking-wide">
                             <li><a href="https://github.com/jamditis/claude-skills-journalism" class="hover:text-accent transition-colors">GitHub</a></li>
                             <li><a href="https://tools.amditis.tech" class="hover:text-accent transition-colors">AI Tools Kit</a></li>
@@ -1036,7 +1086,7 @@
                         </ul>
                     </div>
                     <div class="space-y-6">
-                        <h6 class="text-[10px] font-bold tracking-[0.5em] text-canvas/20 uppercase">Related</h6>
+                        <h6 class="text-[10px] font-bold tracking-[0.5em] text-canvas/70 uppercase">Related</h6>
                         <ul class="space-y-4 text-sm font-semibold tracking-wide">
                             <li><a href="https://verificationhandbook.com/" class="hover:text-accent transition-colors">Verification Handbook</a></li>
                             <li><a href="https://www.bellingcat.com/resources/" class="hover:text-accent transition-colors">Bellingcat OSINT</a></li>
@@ -1047,7 +1097,7 @@
             </div>
             <div class="flex flex-col md:flex-row justify-between items-center pt-12 border-t border-canvas/5 gap-6">
                 <div class="font-display text-2xl italic font-black">AMDITIS.</div>
-                <div class="text-[10px] font-bold tracking-[0.3em] text-canvas/30 uppercase">
+                <div class="text-[10px] font-bold tracking-[0.3em] text-canvas/70 uppercase">
                     <a href="https://github.com/jamditis" class="hover:text-canvas transition-colors">Joe Amditis</a>
                     <span class="mx-2">//</span>
                     MIT License
@@ -1060,22 +1110,22 @@
                 .support-strip{display:flex;align-items:center;justify-content:center;gap:.75rem;flex-wrap:wrap;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
                 .support-strip a{display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;border-radius:2rem;font-size:.8rem;font-weight:600;text-decoration:none;color:#fff;transition:transform .15s,box-shadow .15s}
                 .support-strip a:hover{transform:translateY(-1px)}
-                .support-strip .s-venmo{background:#008CFF}.support-strip .s-venmo:hover{box-shadow:0 4px 14px rgba(0,140,255,.4)}
+                .support-strip .s-venmo{background:#006bbf}.support-strip .s-venmo:hover{box-shadow:0 4px 14px rgba(0,140,255,.4)}
                 .support-strip .s-paypal{background:#003087}.support-strip .s-paypal:hover{box-shadow:0 4px 14px rgba(0,48,135,.4)}
                 .support-strip .s-github{background:#333}.support-strip .s-github:hover{box-shadow:0 4px 14px rgba(51,51,51,.4)}
                 .support-strip svg{width:16px;height:16px;fill:currentColor}
               </style>
               <div class="support-strip">
-                <a href="https://venmo.com/jamditis" class="s-venmo" target="_blank" rel="noopener">
-                  <svg viewBox="0 0 24 24"><path d="M19.5 1.5c.9 1.5 1.3 3 1.3 4.9 0 6.1-5.2 14-9.4 19.6H4.4L1.5 2.1l6.2-.6 1.7 13.4c1.5-2.5 3.4-6.4 3.4-9.1 0-1.8-.3-3-.8-4z"/></svg>
+                <a href="https://venmo.com/jamditis" class="s-venmo" target="_blank" rel="noopener noreferrer">
+                  <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M19.5 1.5c.9 1.5 1.3 3 1.3 4.9 0 6.1-5.2 14-9.4 19.6H4.4L1.5 2.1l6.2-.6 1.7 13.4c1.5-2.5 3.4-6.4 3.4-9.1 0-1.8-.3-3-.8-4z"/></svg>
                   Venmo
                 </a>
-                <a href="https://paypal.me/jamditis" class="s-paypal" target="_blank" rel="noopener">
-                  <svg viewBox="0 0 24 24"><path d="M7.02 21.5L7.8 17h-2L8.6 2.5h5.4c2.6 0 4.4 1.8 4 4.4-.6 3.4-3.2 5.1-6.2 5.1H9.7l-1 5.5H6.6zm10-15.1c.3-2-1-3.4-3.4-3.4h-1L11.4 10h1.2c2.2 0 4-1.2 4.4-3.6zm-1.6 8.1c.3-2-1-3.4-3.4-3.4h-1L9.8 18h1.2c2.2 0 4-1.2 4.4-3.5z"/></svg>
+                <a href="https://paypal.me/jamditis" class="s-paypal" target="_blank" rel="noopener noreferrer">
+                  <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M7.02 21.5L7.8 17h-2L8.6 2.5h5.4c2.6 0 4.4 1.8 4 4.4-.6 3.4-3.2 5.1-6.2 5.1H9.7l-1 5.5H6.6zm10-15.1c.3-2-1-3.4-3.4-3.4h-1L11.4 10h1.2c2.2 0 4-1.2 4.4-3.6zm-1.6 8.1c.3-2-1-3.4-3.4-3.4h-1L9.8 18h1.2c2.2 0 4-1.2 4.4-3.5z"/></svg>
                   PayPal
                 </a>
-                <a href="https://github.com/sponsors/jamditis" class="s-github" target="_blank" rel="noopener">
-                  <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                <a href="https://github.com/sponsors/jamditis" class="s-github" target="_blank" rel="noopener noreferrer">
+                  <svg aria-hidden="true" focusable="false" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
                   Sponsor
                 </a>
               </div>

@@ -128,7 +128,54 @@
             justify-content: space-between;
             border-top: 1px solid #30363d;
         }
-    </style>
+    
+/* a11y-patch-v1 */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+.skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #121212; color: #ede6d4; font-weight: 700; text-decoration: none; }
+:focus-visible { outline: 2px solid #3d4b40; outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+p a:not(.btn-primary):not(.btn-outline):not(.skill-card):not(.deckle-card):not(.feature-card),
+li a:not(.btn-primary):not(.btn-outline),
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDeep"]:not(.btn-primary):not(.btn-outline) { color: #1e293b !important; }
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline):hover,
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline):hover { color: #0f172a !important; }
+strong[class~="text-accent"], em[class~="text-accent"], code[class~="text-accent"],
+strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b !important; }
+.bg-canvas [class~="text-mist"], main [class~="text-mist"], [class~="text-mist"] { color: #3a3a3a !important; }
+.bg-ink [class~="text-accent"], [class~="bg-ink"] [class~="text-accent"],
+.bg-zinc-900 [class~="text-accent"], .bg-gray-900 [class~="text-accent"],
+[class*="bg-zinc-9"] [class~="text-accent"], [class*="bg-gray-9"] [class~="text-accent"],
+[class*="text-white"] [class~="text-accent"],
+[style*="background:#1"] [class~="text-accent"], [style*="background-color:#1"] [class~="text-accent"] {
+  color: #ddd6fe !important;
+}
+.bg-ink [class~="text-mist"], [class~="bg-ink"] [class~="text-mist"],
+[class*="text-white"] [class~="text-mist"] {
+  color: #d4d4d4 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-section, .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+/* stat-on-dark-fix */
+.bg-ink .text-accent, .bg-zinc-900 .text-accent, .bg-gray-900 .text-accent,
+.bg-ink .text-accentDark, .bg-zinc-900 .text-accentDark, .bg-gray-900 .text-accentDark {
+  filter: brightness(1.6) saturate(0.85);
+}
+</style>
 
     <!-- Open Graph -->
     <meta property="og:title" content="Persistent Claude sessions - Claude skills for journalism">
@@ -145,21 +192,23 @@
     <meta name="twitter:description" content="Keep Claude Code running while you switch devices, close your laptop, or step away. Set up persistent tmux sessions on a headless server.">
     <meta name="twitter:image" content="https://skills.amditis.tech/persistent-sessions/og-image.png">
 <script src="../ask-ai.js" defer></script>
+    <!-- a11y-patch-v1 -->
 </head>
 <body class="bg-canvas text-ink">
+    <a href="#main" class="skip-link">Skip to main content</a>
     <div class="paper-overlay"></div>
 
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
+    <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
         <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
             <a href="../" class="text-clay/70 hover:text-ink flex items-center gap-2 text-sm font-medium transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
                 All skills
             </a>
-            <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <a aria-label="GitHub" href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors" rel="noopener noreferrer">
+                <svg aria-hidden="true" focusable="false" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
                 </svg>
             </a>
@@ -170,7 +219,7 @@
     <header class="bg-gradient-to-br from-accent to-accentDark text-white pt-24 pb-16">
         <div class="max-w-4xl mx-auto px-6">
             <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1 text-sm mb-4">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/>
                 </svg>
                 Infrastructure skill
@@ -182,7 +231,7 @@
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-6 py-12 relative z-10">
+    <main id="main" class="max-w-4xl mx-auto px-6 py-12 relative z-10">
 
         <!-- The problem -->
         <section class="mb-12">
@@ -194,7 +243,7 @@
                     <div class="terminal-dot bg-red-400"></div>
                     <div class="terminal-dot bg-yellow-400"></div>
                     <div class="terminal-dot bg-green-400"></div>
-                    <span class="text-white/40 text-xs ml-2">dashboard.yourdomain.com — terminal</span>
+                    <span class="text-white/70 text-xs ml-2">dashboard.yourdomain.com — terminal</span>
                 </div>
                 <div class="terminal-body">
                     <span class="terminal-green">$</span> claude<br>
@@ -217,7 +266,7 @@
             <div class="grid md:grid-cols-2 gap-4 mb-6">
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <div class="text-red-500 mb-2">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg aria-hidden="true" focusable="false" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </div>
@@ -226,7 +275,7 @@
                 </div>
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <div class="text-accent mb-2">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg aria-hidden="true" focusable="false" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                         </svg>
                     </div>
@@ -240,7 +289,7 @@
                     <div class="terminal-dot bg-red-400"></div>
                     <div class="terminal-dot bg-yellow-400"></div>
                     <div class="terminal-dot bg-green-400"></div>
-                    <span class="text-white/40 text-xs ml-2">dashboard.yourdomain.com — main (tmux)</span>
+                    <span class="text-white/70 text-xs ml-2">dashboard.yourdomain.com — main (tmux)</span>
                 </div>
                 <div class="terminal-body">
                     <span class="terminal-green">$</span> claude<br>
@@ -271,7 +320,7 @@
                             <div class="terminal-dot bg-red-400"></div>
                             <div class="terminal-dot bg-yellow-400"></div>
                             <div class="terminal-dot bg-green-400"></div>
-                            <span class="text-white/40 text-xs ml-2">~/.tmux.conf</span>
+                            <span class="text-white/70 text-xs ml-2">~/.tmux.conf</span>
                         </div>
                         <div class="terminal-body text-xs leading-relaxed">
                             <span class="terminal-dim"># True color support</span><br>
@@ -298,7 +347,7 @@
                             read -n1 -s -r -p '  press any key to close'"
                         </div>
                     </div>
-                    <p class="text-clay/60 text-sm mt-2">Full config available in the <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/persistent-sessions" class="text-accent hover:text-accentDark underline underline-offset-2" target="_blank">GitHub repository</a>.</p>
+                    <p class="text-clay/80 text-sm mt-2">Full config available in the <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/persistent-sessions" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">GitHub repository</a>.</p>
                 </div>
             </div>
 
@@ -313,7 +362,7 @@
                             <div class="terminal-dot bg-red-400"></div>
                             <div class="terminal-dot bg-yellow-400"></div>
                             <div class="terminal-dot bg-green-400"></div>
-                            <span class="text-white/40 text-xs ml-2">~/.bashrc</span>
+                            <span class="text-white/70 text-xs ml-2">~/.bashrc</span>
                         </div>
                         <div class="terminal-body text-xs leading-relaxed">
                             <span class="terminal-dim"># Auto-attach to persistent tmux session in cockpit terminals.</span><br>
@@ -340,7 +389,7 @@
                             <div class="terminal-dot bg-red-400"></div>
                             <div class="terminal-dot bg-yellow-400"></div>
                             <div class="terminal-dot bg-green-400"></div>
-                            <span class="text-white/40 text-xs ml-2">/etc/cockpit/cockpit.conf</span>
+                            <span class="text-white/70 text-xs ml-2">/etc/cockpit/cockpit.conf</span>
                         </div>
                         <div class="terminal-body text-xs leading-relaxed">
                             [Session]<br>
@@ -480,7 +529,7 @@
                     <div class="terminal-dot bg-red-400"></div>
                     <div class="terminal-dot bg-yellow-400"></div>
                     <div class="terminal-dot bg-green-400"></div>
-                    <span class="text-white/40 text-xs ml-2">claude-scheduler.py</span>
+                    <span class="text-white/70 text-xs ml-2">claude-scheduler.py</span>
                 </div>
                 <div class="terminal-body text-xs leading-relaxed">
                     def is_interactive_session_active():<br>
@@ -501,7 +550,7 @@
                     &nbsp;&nbsp;&nbsp;&nbsp;return False
                 </div>
             </div>
-            <p class="text-clay/60 text-sm mt-2">The <code>pane_current_command</code> tmux format string returns the name of the running process — no need to parse <code>ps aux</code>.</p>
+            <p class="text-clay/80 text-sm mt-2">The <code>pane_current_command</code> tmux format string returns the name of the running process — no need to parse <code>ps aux</code>.</p>
         </section>
 
         <!-- Activity notifications -->
@@ -514,7 +563,7 @@
                     <div class="terminal-dot bg-red-400"></div>
                     <div class="terminal-dot bg-yellow-400"></div>
                     <div class="terminal-dot bg-green-400"></div>
-                    <span class="text-white/40 text-xs ml-2">~/.tmux.conf</span>
+                    <span class="text-white/70 text-xs ml-2">~/.tmux.conf</span>
                 </div>
                 <div class="terminal-body text-xs leading-relaxed">
                     <span class="terminal-dim"># Light up tabs that have gone quiet (waiting for input)</span><br>
@@ -528,7 +577,7 @@
                     set -g window-status-format "  #I:#W#{?window_silence_flag, ~,}#{?window_bell_flag, !,}  "
                 </div>
             </div>
-            <p class="text-clay/60 text-sm mt-3 mb-4">The <code>monitor-silence 20</code> value is seconds. Bump it up if it fires too often during normal processing pauses.</p>
+            <p class="text-clay/80 text-sm mt-3 mb-4">The <code>monitor-silence 20</code> value is seconds. Bump it up if it fires too often during normal processing pauses.</p>
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
                 <p class="text-sm text-amber-800"><strong>Why silence, not activity?</strong> <code>monitor-activity</code> fires on every byte of output — too noisy for Claude sessions that stream continuously. <code>monitor-silence</code> fires only when output <em>stops</em>, which is a much better proxy for "waiting for you." While a session is running it outputs constantly; when it hits a prompt or finishes, it goes quiet.</p>
             </div>
@@ -594,9 +643,9 @@
                 <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
                     Three config changes. Runs on any headless Linux server with tmux and Cockpit.
                 </p>
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/persistent-sessions" target="_blank" class="inline-flex items-center gap-2 bg-white text-accent px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors">
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/persistent-sessions" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors" rel="noopener noreferrer">
                     View on GitHub
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                     </svg>
                 </a>
@@ -608,12 +657,12 @@
     <footer class="border-t border-mist/30 mt-12 relative z-10">
         <div class="max-w-4xl mx-auto px-6 py-6">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-clay/60 text-sm">
-                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accent hover:text-accentDark underline underline-offset-2">Center for Cooperative Media</a>
+                <p class="text-clay/80 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accentDark hover:text-accentDark underline underline-offset-2" rel="noopener noreferrer">Center for Cooperative Media</a>
                 </p>
                 <div class="flex items-center gap-6">
-                    <a href="../" class="text-clay/60 hover:text-ink text-sm transition-colors">All skills</a>
-                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/60 hover:text-ink text-sm transition-colors">GitHub</a>
+                    <a href="../" class="text-clay/80 hover:text-ink text-sm transition-colors">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/80 hover:text-ink text-sm transition-colors" rel="noopener noreferrer">GitHub</a>
                 </div>
             </div>
         </div>

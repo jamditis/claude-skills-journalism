@@ -57,7 +57,65 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 30px rgba(0,0,0,0.08);
         }
-    </style>
+    
+/* a11y-patch-v1 */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+.skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #121212; color: #ede6d4; font-weight: 700; text-decoration: none; }
+:focus-visible { outline: 2px solid #3d4b40; outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+p a:not(.btn-primary):not(.btn-outline):not(.skill-card):not(.deckle-card):not(.feature-card),
+li a:not(.btn-primary):not(.btn-outline),
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDeep"]:not(.btn-primary):not(.btn-outline) { color: #1e293b !important; }
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline):hover,
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline):hover { color: #0f172a !important; }
+strong[class~="text-accent"], em[class~="text-accent"], code[class~="text-accent"],
+strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b !important; }
+.bg-canvas [class~="text-mist"], main [class~="text-mist"], [class~="text-mist"] { color: #3a3a3a !important; }
+.bg-ink [class~="text-accent"], [class~="bg-ink"] [class~="text-accent"],
+.bg-zinc-900 [class~="text-accent"], .bg-gray-900 [class~="text-accent"],
+[class*="bg-zinc-9"] [class~="text-accent"], [class*="bg-gray-9"] [class~="text-accent"],
+[class*="text-white"] [class~="text-accent"],
+[style*="background:#1"] [class~="text-accent"], [style*="background-color:#1"] [class~="text-accent"] {
+  color: #ddd6fe !important;
+}
+.bg-ink [class~="text-mist"], [class~="bg-ink"] [class~="text-mist"],
+[class*="text-white"] [class~="text-mist"] {
+  color: #d4d4d4 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-section, .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+.hero-gradient { position: relative; }
+.hero-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  z-index: 1;
+}
+.hero-gradient > * { position: relative; z-index: 2; }
+
+/* stat-on-dark-fix */
+.bg-ink .text-accent, .bg-zinc-900 .text-accent, .bg-gray-900 .text-accent,
+.bg-ink .text-accentDark, .bg-zinc-900 .text-accentDark, .bg-gray-900 .text-accentDark {
+  filter: brightness(1.6) saturate(0.85);
+}
+</style>
 
     <!-- Open Graph -->
     <meta property="og:title" content="Project retrospective - Claude skills for journalism">
@@ -74,21 +132,23 @@
     <meta name="twitter:description" content="If you find yourself writing these, stop and be more specific. These are placeholders for real insights:">
     <meta name="twitter:image" content="https://skills.amditis.tech/project-retrospective/og-image.png">
 <script src="../ask-ai.js" defer></script>
+    <!-- a11y-patch-v1 -->
 </head>
 <body class="bg-canvas text-ink">
+    <a href="#main" class="skip-link">Skip to main content</a>
     <div class="paper-overlay"></div>
 
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
+    <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
         <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
             <a href="../" class="text-clay/70 hover:text-ink flex items-center gap-2 text-sm font-medium transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
                 All skills
             </a>
-            <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <a aria-label="GitHub" href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors" rel="noopener noreferrer">
+                <svg aria-hidden="true" focusable="false" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
                 </svg>
             </a>
@@ -99,7 +159,7 @@
     <header class="hero-gradient text-white pt-24 pb-20 relative overflow-hidden">
         <div class="max-w-5xl mx-auto px-6 relative z-10">
             <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm mb-6 border border-white/20">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                 </svg>
                 Knowledge capture skill
@@ -111,7 +171,7 @@
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-6 py-16 relative z-10">
+    <main id="main" class="max-w-5xl mx-auto px-6 py-16 relative z-10">
         <!-- Overview -->
         <section class="mb-20">
             <div class="feature-card rounded-2xl p-8">
@@ -123,22 +183,22 @@
                     <div class="text-center p-4">
                         <div class="text-3xl mb-3">📋</div>
                         <p class="font-semibold text-ink">Investigations</p>
-                        <p class="text-sm text-clay/60">Research projects</p>
+                        <p class="text-sm text-clay/80">Research projects</p>
                     </div>
                     <div class="text-center p-4">
                         <div class="text-3xl mb-3">📅</div>
                         <p class="font-semibold text-ink">Events</p>
-                        <p class="text-sm text-clay/60">Conferences, workshops</p>
+                        <p class="text-sm text-clay/80">Conferences, workshops</p>
                     </div>
                     <div class="text-center p-4">
                         <div class="text-3xl mb-3">📰</div>
                         <p class="font-semibold text-ink">Publications</p>
-                        <p class="text-sm text-clay/60">Newsletters, podcasts</p>
+                        <p class="text-sm text-clay/80">Newsletters, podcasts</p>
                     </div>
                     <div class="text-center p-4">
                         <div class="text-3xl mb-3">🛠️</div>
                         <p class="font-semibold text-ink">Tools</p>
-                        <p class="text-sm text-clay/60">Newsroom software</p>
+                        <p class="text-sm text-clay/80">Newsroom software</p>
                     </div>
                 </div>
             </div>
@@ -157,7 +217,7 @@
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="bg-white rounded-xl p-6 border border-amber-200">
                         <h3 class="font-semibold mb-3 flex items-center gap-2 text-green-700">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
                             Good example
@@ -168,7 +228,7 @@
                     </div>
                     <div class="bg-white rounded-xl p-6 border border-amber-200">
                         <h3 class="font-semibold mb-3 flex items-center gap-2 text-red-700">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                             Bad example (too generic)
@@ -192,28 +252,28 @@
                                 <span class="w-7 h-7 rounded-lg bg-accent text-white text-sm font-bold flex items-center justify-center flex-shrink-0">1</span>
                                 <div>
                                     <p class="font-semibold text-ink">Project metadata</p>
-                                    <p class="text-sm text-clay/60">Name, dates, status, author</p>
+                                    <p class="text-sm text-clay/80">Name, dates, status, author</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-4">
                                 <span class="w-7 h-7 rounded-lg bg-accent text-white text-sm font-bold flex items-center justify-center flex-shrink-0">2</span>
                                 <div>
                                     <p class="font-semibold text-ink">Summary</p>
-                                    <p class="text-sm text-clay/60">What it did, impact, why it matters</p>
+                                    <p class="text-sm text-clay/80">What it did, impact, why it matters</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-4">
                                 <span class="w-7 h-7 rounded-lg bg-accent text-white text-sm font-bold flex items-center justify-center flex-shrink-0">3</span>
                                 <div>
                                     <p class="font-semibold text-ink">What worked</p>
-                                    <p class="text-sm text-clay/60">Technical wins, process wins</p>
+                                    <p class="text-sm text-clay/80">Technical wins, process wins</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-4">
                                 <span class="w-7 h-7 rounded-lg bg-accent text-white text-sm font-bold flex items-center justify-center flex-shrink-0">4</span>
                                 <div>
                                     <p class="font-semibold text-ink">What didn't work</p>
-                                    <p class="text-sm text-clay/60">Critical failures, technical debt, external factors</p>
+                                    <p class="text-sm text-clay/80">Critical failures, technical debt, external factors</p>
                                 </div>
                             </div>
                         </div>
@@ -224,28 +284,28 @@
                                 <span class="w-7 h-7 rounded-lg bg-accent text-white text-sm font-bold flex items-center justify-center flex-shrink-0">5</span>
                                 <div>
                                     <p class="font-semibold text-ink">The real problem</p>
-                                    <p class="text-sm text-clay/60">What you thought vs. what was needed</p>
+                                    <p class="text-sm text-clay/80">What you thought vs. what was needed</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-4">
                                 <span class="w-7 h-7 rounded-lg bg-accent text-white text-sm font-bold flex items-center justify-center flex-shrink-0">6</span>
                                 <div>
                                     <p class="font-semibold text-ink">Recommendations</p>
-                                    <p class="text-sm text-clay/60">If continuing, if starting fresh, tech stack verdict</p>
+                                    <p class="text-sm text-clay/80">If continuing, if starting fresh, tech stack verdict</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-4">
                                 <span class="w-7 h-7 rounded-lg bg-accent text-white text-sm font-bold flex items-center justify-center flex-shrink-0">7</span>
                                 <div>
                                     <p class="font-semibold text-ink">Reusable artifacts</p>
-                                    <p class="text-sm text-clay/60">Components others can use</p>
+                                    <p class="text-sm text-clay/80">Components others can use</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-4">
                                 <span class="w-7 h-7 rounded-lg bg-accent text-white text-sm font-bold flex items-center justify-center flex-shrink-0">8</span>
                                 <div>
                                     <p class="font-semibold text-ink">Questions for next time</p>
-                                    <p class="text-sm text-clay/60">Unanswered questions worth investigating</p>
+                                    <p class="text-sm text-clay/80">Unanswered questions worth investigating</p>
                                 </div>
                             </div>
                         </div>
@@ -261,7 +321,7 @@
             <div class="grid md:grid-cols-2 gap-6">
                 <div class="feature-card rounded-2xl p-6">
                     <h3 class="font-semibold mb-4 flex items-center gap-2 text-red-700">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg aria-hidden="true" focusable="false" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                         Too vague
@@ -283,7 +343,7 @@
                 </div>
                 <div class="feature-card rounded-2xl p-6">
                     <h3 class="font-semibold mb-4 flex items-center gap-2 text-green-700">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg aria-hidden="true" focusable="false" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                         </svg>
                         Specific and actionable
@@ -313,31 +373,31 @@
                 <p class="text-white/70 mb-8">If you find yourself writing these, stop and be more specific. These are placeholders for real insights:</p>
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div class="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-3 border border-white/10">
-                        <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
                         <span class="text-white/80">"Communication is key"</span>
                     </div>
                     <div class="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-3 border border-white/10">
-                        <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
                         <span class="text-white/80">"We learned the importance of..."</span>
                     </div>
                     <div class="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-3 border border-white/10">
-                        <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
                         <span class="text-white/80">"Going forward, we should..."</span>
                     </div>
                     <div class="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-3 border border-white/10">
-                        <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
                         <span class="text-white/80">"Challenges included..."</span>
                     </div>
                     <div class="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-3 border border-white/10">
-                        <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
                         <span class="text-white/80">"There were some issues with..."</span>
@@ -351,7 +411,7 @@
             <h2 class="font-display text-2xl font-semibold mb-6">A strong "real problem" example</h2>
             <div class="feature-card rounded-2xl overflow-hidden">
                 <div class="bg-mist/20 px-6 py-3 border-b border-mist/30">
-                    <span class="text-sm font-medium text-clay/60">The gap between assumption and reality</span>
+                    <span class="text-sm font-medium text-clay/80">The gap between assumption and reality</span>
                 </div>
                 <div class="p-8">
                     <p class="text-clay/80 text-lg leading-relaxed">
@@ -368,13 +428,13 @@
                 <div class="feature-card rounded-2xl p-6">
                     <div class="flex items-center gap-4 mb-4">
                         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-accentDark flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                             </svg>
                         </div>
                         <div>
                             <h3 class="font-semibold text-ink">research-project.md</h3>
-                            <p class="text-sm text-clay/60">Investigations, data journalism</p>
+                            <p class="text-sm text-clay/80">Investigations, data journalism</p>
                         </div>
                     </div>
                     <p class="text-clay/70 text-sm">For deep-dive investigative projects with data analysis, source management, and publication timelines.</p>
@@ -382,13 +442,13 @@
                 <div class="feature-card rounded-2xl p-6">
                     <div class="flex items-center gap-4 mb-4">
                         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-accentDark flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
                         </div>
                         <div>
                             <h3 class="font-semibold text-ink">event.md</h3>
-                            <p class="text-sm text-clay/60">Conferences, workshops</p>
+                            <p class="text-sm text-clay/80">Conferences, workshops</p>
                         </div>
                     </div>
                     <p class="text-clay/70 text-sm">For in-person and virtual events with attendance metrics, speaker feedback, and logistics lessons.</p>
@@ -396,13 +456,13 @@
                 <div class="feature-card rounded-2xl p-6">
                     <div class="flex items-center gap-4 mb-4">
                         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-accentDark flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
                             </svg>
                         </div>
                         <div>
                             <h3 class="font-semibold text-ink">publication.md</h3>
-                            <p class="text-sm text-clay/60">Newsletters, podcasts</p>
+                            <p class="text-sm text-clay/80">Newsletters, podcasts</p>
                         </div>
                     </div>
                     <p class="text-clay/70 text-sm">For ongoing content series with audience growth, production workflows, and sustainability considerations.</p>
@@ -410,14 +470,14 @@
                 <div class="feature-card rounded-2xl p-6">
                     <div class="flex items-center gap-4 mb-4">
                         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent to-accentDark flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
                         </div>
                         <div>
                             <h3 class="font-semibold text-ink">editorial-tool.md</h3>
-                            <p class="text-sm text-clay/60">Newsroom software, AI tools</p>
+                            <p class="text-sm text-clay/80">Newsroom software, AI tools</p>
                         </div>
                     </div>
                     <p class="text-clay/70 text-sm">For internal tools with adoption metrics, integration challenges, and user feedback tracking.</p>
@@ -431,19 +491,19 @@
             <div class="feature-card rounded-2xl p-8">
                 <ul class="space-y-4 text-clay/80">
                     <li class="flex items-start gap-3">
-                        <span class="text-accent font-bold text-lg">•</span>
+                        <span class="text-accentDark font-bold text-lg">•</span>
                         <span><strong class="text-ink">Honest, specific, slightly self-deprecating</strong> — Like explaining to a friend why the project took twice as long</span>
                     </li>
                     <li class="flex items-start gap-3">
-                        <span class="text-accent font-bold text-lg">•</span>
+                        <span class="text-accentDark font-bold text-lg">•</span>
                         <span><strong class="text-ink">No corporate speak or blame-shifting</strong> — Name specific mistakes, not vague "challenges"</span>
                     </li>
                     <li class="flex items-start gap-3">
-                        <span class="text-accent font-bold text-lg">•</span>
+                        <span class="text-accentDark font-bold text-lg">•</span>
                         <span><strong class="text-ink">Quantify when possible</strong> — "2 days wasted" is better than "some time lost"</span>
                     </li>
                     <li class="flex items-start gap-3">
-                        <span class="text-accent font-bold text-lg">•</span>
+                        <span class="text-accentDark font-bold text-lg">•</span>
                         <span><strong class="text-ink">Focus on decisions, not people</strong> — Include failures with context, exclude blame for individuals</span>
                     </li>
                 </ul>
@@ -453,7 +513,7 @@
         <!-- Installation -->
         <section class="mb-20">
             <h2 class="font-display text-2xl font-semibold mb-6">Installation</h2>
-            <div class="bg-ink rounded-2xl p-6 font-mono text-sm overflow-x-auto">
+            <div class="bg-ink rounded-2xl p-6 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                 <p class="text-white/50 mb-2"># Clone the repository</p>
                 <p class="text-white mb-4">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
                 <p class="text-white/50 mb-2"># Copy the skill to your Claude config</p>
@@ -461,7 +521,7 @@
             </div>
             <p class="mt-4 text-clay/70">
                 Or download just this skill from the
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/project-retrospective" class="text-accent hover:text-accentDark underline underline-offset-2" target="_blank">GitHub repository</a>.
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/project-retrospective" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
             </p>
         </section>
 
@@ -472,9 +532,9 @@
                 <p class="text-white/80 mb-8 max-w-xl mx-auto">
                     The best retrospectives are written by people who got burned and want to save others from the same fate.
                 </p>
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/project-retrospective" target="_blank" class="inline-flex items-center gap-2 bg-white text-accent px-6 py-3 rounded-full font-semibold hover:bg-white/95 transition-colors shadow-lg">
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/project-retrospective" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-6 py-3 rounded-full font-semibold hover:bg-white/95 transition-colors shadow-lg" rel="noopener noreferrer">
                     View on GitHub
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" focusable="false" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                     </svg>
                 </a>
@@ -486,12 +546,12 @@
     <footer class="border-t border-mist/30 mt-16 relative z-10">
         <div class="max-w-5xl mx-auto px-6 py-8">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-clay/60 text-sm">
-                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accent hover:text-accentDark underline underline-offset-2">Center for Cooperative Media</a>
+                <p class="text-clay/80 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accentDark hover:text-accentDark underline underline-offset-2" rel="noopener noreferrer">Center for Cooperative Media</a>
                 </p>
                 <div class="flex items-center gap-6">
-                    <a href="../" class="text-clay/60 hover:text-ink text-sm transition-colors">All skills</a>
-                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/60 hover:text-ink text-sm transition-colors">GitHub</a>
+                    <a href="../" class="text-clay/80 hover:text-ink text-sm transition-colors">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/80 hover:text-ink text-sm transition-colors" rel="noopener noreferrer">GitHub</a>
                 </div>
             </div>
         </div>

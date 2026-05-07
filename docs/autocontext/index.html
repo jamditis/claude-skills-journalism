@@ -31,7 +31,7 @@
                         canvas: '#ede6d4',
                         ink: '#121212',
                         clay: '#d6cdb7',
-                        mist: '#6b6b6b',
+                        mist: '#525252',
                         accent: '#1a6b5a',
                         accentDark: '#135346',
                         accentLight: '#e8f4f0',
@@ -61,7 +61,65 @@
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
         .reveal.visible { opacity: 1; transform: translateY(0); }
-    </style>
+    
+/* a11y-patch-v1 */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+.skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #121212; color: #ede6d4; font-weight: 700; text-decoration: none; }
+:focus-visible { outline: 2px solid #3d4b40; outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+p a:not(.btn-primary):not(.btn-outline):not(.skill-card):not(.deckle-card):not(.feature-card),
+li a:not(.btn-primary):not(.btn-outline),
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDeep"]:not(.btn-primary):not(.btn-outline) { color: #1e293b !important; }
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline):hover,
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline):hover { color: #0f172a !important; }
+strong[class~="text-accent"], em[class~="text-accent"], code[class~="text-accent"],
+strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b !important; }
+.bg-canvas [class~="text-mist"], main [class~="text-mist"], [class~="text-mist"] { color: #3a3a3a !important; }
+.bg-ink [class~="text-accent"], [class~="bg-ink"] [class~="text-accent"],
+.bg-zinc-900 [class~="text-accent"], .bg-gray-900 [class~="text-accent"],
+[class*="bg-zinc-9"] [class~="text-accent"], [class*="bg-gray-9"] [class~="text-accent"],
+[class*="text-white"] [class~="text-accent"],
+[style*="background:#1"] [class~="text-accent"], [style*="background-color:#1"] [class~="text-accent"] {
+  color: #ddd6fe !important;
+}
+.bg-ink [class~="text-mist"], [class~="bg-ink"] [class~="text-mist"],
+[class*="text-white"] [class~="text-mist"] {
+  color: #d4d4d4 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-section, .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+.hero-gradient { position: relative; }
+.hero-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  z-index: 1;
+}
+.hero-gradient > * { position: relative; z-index: 2; }
+
+/* stat-on-dark-fix */
+.bg-ink .text-accent, .bg-zinc-900 .text-accent, .bg-gray-900 .text-accent,
+.bg-ink .text-accentDark, .bg-zinc-900 .text-accentDark, .bg-gray-900 .text-accentDark {
+  filter: brightness(1.6) saturate(0.85);
+}
+</style>
 
     <!-- Open Graph -->
     <meta property="og:title" content="AutoContext">
@@ -78,20 +136,25 @@
     <meta name="twitter:description" content="A Claude Code plugin that accumulates project knowledge across sessions and developers. Lessons persist, confidence scores track reliability, and corrections feed back automatically.">
     <meta name="twitter:image" content="https://skills.amditis.tech/autocontext/og-image.png">
     <script src="../ask-ai.js" defer></script>
+<noscript id="noscript-reveal-fallback"><style>
+.reveal-section, .reveal { opacity: 1; transform: none; }
+</style></noscript>
+    <!-- a11y-patch-v1 -->
 </head>
 <body class="font-sans">
+    <a href="#main" class="skip-link">Skip to main content</a>
     <div class="paper-overlay"></div>
 
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
+    <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
         <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
             <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">&#8592; Back to all skills</a>
-            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/autocontext" class="text-sm font-semibold text-accent hover:text-accentDark transition-colors">View on GitHub &#8594;</a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/autocontext" class="text-sm font-semibold text-accentDark hover:text-accentDark transition-colors">View on GitHub &#8594;</a>
         </div>
     </nav>
 
     <header class="hero-gradient text-white pt-32 pb-24 px-6 relative overflow-hidden">
         <div class="absolute inset-0 opacity-15">
-            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <svg aria-hidden="true" focusable="false" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                 <circle class="graph-node" cx="15%" cy="30%" r="4" fill="white"/>
                 <circle class="graph-node" cx="25%" cy="60%" r="3" fill="white"/>
                 <circle class="graph-node" cx="40%" cy="25%" r="5" fill="white"/>
@@ -119,13 +182,13 @@
             <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-4 font-light">A Claude Code plugin that gives your AI assistant a memory for each project.</p>
             <p class="text-base md:text-lg text-white/70 max-w-2xl mb-10">Every time you correct Claude — "no, use the other API", "you forgot to clear the cache" — autocontext saves that as a lesson. Next session, it loads those lessons before Claude starts working, so the same mistakes don't happen twice.</p>
             <div class="flex flex-wrap gap-4">
-                <a href="#install" class="inline-flex items-center gap-2 bg-white text-accent font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors"><i data-lucide="download" class="w-5 h-5"></i> Install plugin</a>
+                <a href="#install" class="inline-flex items-center gap-2 bg-white text-accentDark font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors"><i data-lucide="download" class="w-5 h-5"></i> Install plugin</a>
                 <a href="#demo" class="inline-flex items-center gap-2 bg-white/10 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white/20 transition-colors border border-white/20"><i data-lucide="play" class="w-5 h-5"></i> Try the demo</a>
             </div>
         </div>
     </header>
 
-    <main class="relative z-10">
+    <main id="main" class="relative z-10">
 
         <!-- Skill evolution callout -->
         <section class="py-8 px-6 -mt-4">
@@ -188,7 +251,7 @@
                     <h2 class="font-display text-4xl md:text-5xl font-light italic mb-6 text-center">What it looks like in practice</h2>
                     <div class="space-y-6 text-lg text-mist">
                         <div class="feature-card p-6 rounded-xl flex gap-4 items-start">
-                            <span class="text-accent font-bold text-xl mt-0.5">1</span>
+                            <span class="text-accentDark font-bold text-xl mt-0.5">1</span>
                             <div>
                                 <p class="text-ink font-medium mb-1">You correct Claude during a session</p>
                                 <p class="text-sm">"No, always use <code>pytest -x</code> here, not <code>pytest</code>"</p>
@@ -196,7 +259,7 @@
                             </div>
                         </div>
                         <div class="feature-card p-6 rounded-xl flex gap-4 items-start">
-                            <span class="text-accent font-bold text-xl mt-0.5">2</span>
+                            <span class="text-accentDark font-bold text-xl mt-0.5">2</span>
                             <div>
                                 <p class="text-ink font-medium mb-1">Next session, Claude is about to run <code>pytest</code></p>
                                 <p class="text-sm">Autocontext injects a warning: "lesson: always use <code>pytest -x</code> in this project"</p>
@@ -204,7 +267,7 @@
                             </div>
                         </div>
                         <div class="feature-card p-6 rounded-xl flex gap-4 items-start">
-                            <span class="text-accent font-bold text-xl mt-0.5">3</span>
+                            <span class="text-accentDark font-bold text-xl mt-0.5">3</span>
                             <div>
                                 <p class="text-ink font-medium mb-1">Over time, lessons gain or lose confidence</p>
                                 <p class="text-sm">Lessons that keep proving useful get stronger. Lessons that go stale or get contradicted fade out.</p>
@@ -277,7 +340,7 @@
                     <!-- Data flow diagram -->
                     <div class="mt-12 feature-card p-8 rounded-xl">
                         <h3 class="font-display text-lg font-bold mb-6 text-center">The full data flow</h3>
-                        <div class="font-mono text-xs md:text-sm text-mist space-y-1 overflow-x-auto">
+                        <div class="font-mono text-xs md:text-sm text-mist space-y-1 overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                             <div class="text-ink font-semibold">Capture</div>
                             <div class="pl-4">Use skill &#8594; post-tool-use.sh tracks active skill</div>
                             <div class="pl-4">Correct Claude &#8594; user-prompt-submit.sh tags with skill name</div>
@@ -367,7 +430,7 @@
                         </div>
                         <div id="playbook-preview" class="bg-[#0d1117] border border-[#30363d] rounded-xl p-6 min-h-[300px] font-mono text-sm leading-relaxed"></div>
                         <div class="mt-6 p-4 bg-white/5 rounded-lg border border-white/10">
-                            <div id="event-log" class="font-mono text-xs text-white/40 space-y-1 max-h-32 overflow-y-auto"><div>Ready. Click a button to simulate events.</div></div>
+                            <div id="event-log" class="font-mono text-xs text-white/70 space-y-1 max-h-32 overflow-y-auto"><div>Ready. Click a button to simulate events.</div></div>
                         </div>
                     </div>
                 </div>
@@ -430,7 +493,7 @@
                         <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext:review</code><p class="text-mist text-sm mt-2">Curate lessons interactively. Approve, edit, delete, supersede, or promote to global skill store.</p></div>
                         <div class="feature-card p-5 rounded-xl"><code class="text-accent font-semibold">/autocontext:status</code><p class="text-mist text-sm mt-2">Quick stats. Lesson counts, confidence averages, stalest lessons, merge driver status.</p></div>
                         <div class="feature-card p-5 rounded-xl border-2 border-accent/20" style="background: linear-gradient(135deg, rgba(26, 107, 90, 0.05) 0%, white 100%);">
-                            <div class="flex items-center gap-2"><code class="text-accent font-semibold">/autocontext:evolve</code><span class="text-[9px] font-bold tracking-wider uppercase bg-accent/10 text-accent px-2 py-0.5 rounded">new</span></div>
+                            <div class="flex items-center gap-2"><code class="text-accent font-semibold">/autocontext:evolve</code><span class="text-[9px] font-bold tracking-wider uppercase bg-accent/10 text-accentDark px-2 py-0.5 rounded">new</span></div>
                             <p class="text-mist text-sm mt-2">Fold validated lessons into skill files. Claude rewrites the skill with lessons woven in naturally. Supports <code>--rollback</code>, <code>--export</code>, and <code>--import</code> for backup and cross-machine sync.</p>
                         </div>
                     </div>
@@ -441,22 +504,22 @@
         <section id="install" class="py-24 px-6">
             <div class="max-w-4xl mx-auto reveal">
                 <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-6">Get started</h2>
-                <p class="text-center text-mist text-lg mb-16 max-w-2xl mx-auto">You need <strong><a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accent hover:underline">Claude Code</a></strong> installed. Open your terminal and run <code>claude --version</code> to check.</p>
+                <p class="text-center text-mist text-lg mb-16 max-w-2xl mx-auto">You need <strong><a href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accentDark hover:underline">Claude Code</a></strong> installed. Open your terminal and run <code>claude --version</code> to check.</p>
                 <div class="space-y-8">
                     <div class="feature-card p-8 rounded-xl">
                         <div class="flex items-center gap-4 mb-4"><span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">1</span><h3 class="font-display text-xl font-bold">Add the plugin source</h3></div>
                         <p class="text-mist mb-4">This tells Claude Code where to find the plugin. You only need to do this once.</p>
-                        <pre><code>claude plugin marketplace add https://github.com/jamditis/claude-skills-journalism</code></pre>
+                        <pre tabindex="0"><code>claude plugin marketplace add https://github.com/jamditis/claude-skills-journalism</code></pre>
                     </div>
                     <div class="feature-card p-8 rounded-xl">
                         <div class="flex items-center gap-4 mb-4"><span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">2</span><h3 class="font-display text-xl font-bold">Install autocontext</h3></div>
                         <p class="text-mist mb-4">Install the plugin from the marketplace.</p>
-                        <pre><code>claude plugin install autocontext</code></pre>
+                        <pre tabindex="0"><code>claude plugin install autocontext</code></pre>
                     </div>
                     <div class="feature-card p-8 rounded-xl">
                         <div class="flex items-center gap-4 mb-4"><span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">3</span><h3 class="font-display text-xl font-bold">Set up and initialize</h3></div>
                         <p class="text-mist mb-4">Run the setup wizard, then initialize in your project.</p>
-                        <pre><code>/autocontext:setup    # one-time global config
+                        <pre tabindex="0"><code>/autocontext:setup    # one-time global config
 /autocontext:init     # per-project initialization</code></pre>
                     </div>
                 </div>
@@ -515,7 +578,7 @@
 
     <footer class="relative z-10 py-12 px-6 border-t border-ink/5">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="text-sm text-mist">Built by <a href="https://github.com/jamditis" class="text-accent hover:underline">Joe Amditis</a></div>
+            <div class="text-sm text-mist">Built by <a href="https://github.com/jamditis" class="text-accentDark hover:underline">Joe Amditis</a></div>
             <div class="flex items-center gap-6 text-sm text-mist">
                 <a href="https://github.com/jamditis/claude-skills-journalism" class="hover:text-ink transition-colors">GitHub</a>
                 <a href="../" class="hover:text-ink transition-colors">All skills</a>
