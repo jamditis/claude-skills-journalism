@@ -8,6 +8,10 @@ Thumbs.db
 *.swp
 *.swo
 
+# Codex CLI session-state artifact (created when codex runs against this repo)
+.codex
+.codex/
+
 # Python
 __pycache__/
 *.py[cod]
