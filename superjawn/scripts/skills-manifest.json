@@ -53,6 +53,21 @@
       "category": "consumer",
       "skill_md_parity": true,
       "supporting_file_overrides": {}
+    },
+    "subagent-driven-development": {
+      "category": "consumer",
+      "skill_md_parity": false,
+      "supporting_file_overrides": {}
+    },
+    "dispatching-parallel-agents": {
+      "category": "consumer",
+      "skill_md_parity": true,
+      "supporting_file_overrides": {}
+    },
+    "using-git-worktrees": {
+      "category": "consumer",
+      "skill_md_parity": true,
+      "supporting_file_overrides": {}
     }
   }
 }
