@@ -17,5 +17,8 @@
     "playwright": "^1.57.0",
     "puppeteer-core": "^24.34.0",
     "single-file-cli": "^2.0.83"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.11.3"
   }
 }
