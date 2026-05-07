@@ -68,6 +68,24 @@
       "category": "consumer",
       "skill_md_parity": true,
       "supporting_file_overrides": {}
+    },
+    "finishing-a-development-branch": {
+      "category": "consumer",
+      "skill_md_parity": true,
+      "supporting_file_overrides": {}
+    },
+    "using-superjawn": {
+      "category": "consumer",
+      "skill_md_parity": false,
+      "upstream_name": "using-superpowers",
+      "supporting_file_overrides": {}
+    },
+    "writing-skills": {
+      "category": "research",
+      "skill_md_parity": false,
+      "supporting_file_overrides": {
+        "testing-skills-with-subagents.md": "PR #48 review: REQUIRED BACKGROUND ref migrated from superpowers:test-driven-development to superjawn: for consistency with the parent SKILL.md's already-migrated cross-refs"
+      }
     }
   }
 }

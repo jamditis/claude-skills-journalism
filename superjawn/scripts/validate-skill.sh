@@ -20,6 +20,11 @@
 #      against upstream; if it differs and is NOT in supporting_file_overrides, fail;
 #      if it IS in overrides, verify the upstream counterpart exists (no phantom exceptions)
 #
+# Skill-rename support: when a port renames the local skill from its upstream name
+# (e.g. using-superpowers → using-superjawn), set `upstream_name` in the manifest
+# entry so checks 5 and 6 resolve upstream files at $UPSTREAM_DIR/skills/$upstream_name/
+# instead of $UPSTREAM_DIR/skills/$name/. Defaults to the local name when absent.
+#
 # Reads superjawn/scripts/skills-manifest.json for per-skill configuration.
 # Exits with the number of failures (capped at 255 per shell convention).
 
@@ -133,6 +138,13 @@ check_skill() {
     return
   fi
 
+  # Resolve the upstream skill directory name. Local name and upstream name match
+  # by default, but a port that renames (e.g. using-superpowers → using-superjawn)
+  # sets `upstream_name` in the manifest so parity + supporting-file lookups still
+  # find the right upstream files.
+  local upstream_name
+  upstream_name="$(jq -r --arg s "$name" '.skills[$s].upstream_name // $s' "$MANIFEST")"
+
   # ------------------------------------------------------------------ #
   # Check 2: Frontmatter shape.                                         #
   # ------------------------------------------------------------------ #
@@ -233,7 +245,7 @@ check_skill() {
   parity_flag="$(jq -r --arg s "$name" '.skills[$s].skill_md_parity // "null"' "$MANIFEST")"
 
   if [[ "$parity_flag" == "true" ]]; then
-    local upstream_skill_md="$UPSTREAM_DIR/skills/$name/SKILL.md"
+    local upstream_skill_md="$UPSTREAM_DIR/skills/$upstream_name/SKILL.md"
     if [[ ! -f "$upstream_skill_md" ]]; then
       fail "$name" "parity" "upstream SKILL.md not found at $upstream_skill_md"
     else
@@ -266,7 +278,7 @@ check_skill() {
     local rel_path="${local_file#$SKILLS_DIR/$name/}"
     [[ "$rel_path" == "SKILL.md" ]] && continue
 
-    local upstream_file="$UPSTREAM_DIR/skills/$name/$rel_path"
+    local upstream_file="$UPSTREAM_DIR/skills/$upstream_name/$rel_path"
     local in_overrides
     in_overrides="$(jq -r --arg f "$rel_path" 'has($f)' <<<"$overrides_json")"
 
