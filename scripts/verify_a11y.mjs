@@ -64,13 +64,21 @@ async function main() {
   const server = spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1'], {
     cwd: DOCS_DIR, detached: true, stdio: 'ignore',
   });
-  server.unref();
   let killed = false;
   const cleanup = () => {
     if (killed) return;
     killed = true;
     try { process.kill(-server.pid, 'SIGTERM'); } catch {}
   };
+  // ENOENT or other spawn failures fire 'error' asynchronously. Without this listener,
+  // node terminates with an unhandled error and the rest of the script never runs.
+  server.on('error', (err) => {
+    cleanup();
+    console.error(`fatal: failed to spawn python3 (${err.code || 'ERR'}): ${err.message}`);
+    console.error('Ensure python3 is installed and on PATH (used to serve docs/ for axe scanning).');
+    process.exit(2);
+  });
+  server.unref();
   process.on('exit', cleanup);
   process.on('SIGINT', () => { cleanup(); process.exit(130); });
 
@@ -120,32 +128,46 @@ async function main() {
 
     writeFileSync(RESULTS_PATH, JSON.stringify(results, null, 2));
 
-    const totals = { total: 0, critical: 0, serious: 0, moderate: 0, minor: 0 };
+    const totals = { total: 0, critical: 0, serious: 0, moderate: 0, minor: 0, errors: 0 };
+    const errored = [];
     for (const r of results) {
       totals.total += r.violationCount;
       totals.critical += r.byImpact.critical;
       totals.serious += r.byImpact.serious;
       totals.moderate += r.byImpact.moderate;
       totals.minor += r.byImpact.minor;
+      if (r.error) {
+        totals.errors += 1;
+        errored.push(r);
+      }
     }
 
     if (!QUIET) {
-      const sorted = [...results].sort((a, b) => b.violationCount - a.violationCount);
+      const sorted = [...results].sort((a, b) => (b.error ? 1 : 0) - (a.error ? 1 : 0) || b.violationCount - a.violationCount);
       const widths = { p: Math.max(4, ...sorted.map((r) => r.path.length)), n: 6 };
-      console.log(pad('PATH', widths.p) + ' | ' + pad('TOTAL', widths.n) + ' | ' + pad('CRIT', widths.n) + ' | ' + pad('SERIOUS', widths.n) + ' | ' + pad('MOD', widths.n) + ' | ' + pad('MINOR', widths.n));
-      console.log('-'.repeat(widths.p) + '-+-' + '-'.repeat(widths.n) + '-+-' + '-'.repeat(widths.n) + '-+-' + '-'.repeat(widths.n) + '-+-' + '-'.repeat(widths.n) + '-+-' + '-'.repeat(widths.n));
+      console.log(pad('PATH', widths.p) + ' | ' + pad('TOTAL', widths.n) + ' | ' + pad('CRIT', widths.n) + ' | ' + pad('SERIOUS', widths.n) + ' | ' + pad('MOD', widths.n) + ' | ' + pad('MINOR', widths.n) + ' | ' + pad('ERR', widths.n));
+      console.log('-'.repeat(widths.p) + '-+-' + '-'.repeat(widths.n) + '-+-' + '-'.repeat(widths.n) + '-+-' + '-'.repeat(widths.n) + '-+-' + '-'.repeat(widths.n) + '-+-' + '-'.repeat(widths.n) + '-+-' + '-'.repeat(widths.n));
       for (const r of sorted) {
-        console.log(pad(r.path, widths.p) + ' | ' + pad(r.violationCount, widths.n) + ' | ' + pad(r.byImpact.critical, widths.n) + ' | ' + pad(r.byImpact.serious, widths.n) + ' | ' + pad(r.byImpact.moderate, widths.n) + ' | ' + pad(r.byImpact.minor, widths.n));
+        console.log(pad(r.path, widths.p) + ' | ' + pad(r.violationCount, widths.n) + ' | ' + pad(r.byImpact.critical, widths.n) + ' | ' + pad(r.byImpact.serious, widths.n) + ' | ' + pad(r.byImpact.moderate, widths.n) + ' | ' + pad(r.byImpact.minor, widths.n) + ' | ' + pad(r.error ? 'YES' : '0', widths.n));
       }
       console.log();
     }
 
+    if (errored.length) {
+      console.error(`scan errors on ${errored.length} page${errored.length === 1 ? '' : 's'}:`);
+      for (const r of errored) console.error(`  ${r.path}: ${r.error}`);
+    }
+
     console.log(`pages scanned: ${results.length}`);
-    console.log(`TOTAL | CRIT | SERIOUS | MOD | MINOR`);
-    console.log(`${totals.total} | ${totals.critical} | ${totals.serious} | ${totals.moderate} | ${totals.minor}`);
+    console.log(`TOTAL | CRIT | SERIOUS | MOD | MINOR | ERR`);
+    console.log(`${totals.total} | ${totals.critical} | ${totals.serious} | ${totals.moderate} | ${totals.minor} | ${totals.errors}`);
 
     const severe = results.some((r) => r.byImpact.critical + r.byImpact.serious + r.byImpact.moderate > 0);
     cleanup();
+    // Exit 2 when any page failed to scan (a clean a11y report on the others is not
+    // a pass — we don't know about the failed pages). Exit 1 for real violations.
+    // Exit 0 only when every page scanned cleanly.
+    if (errored.length) process.exit(2);
     process.exit(severe ? 1 : 0);
   } catch (err) {
     cleanup();
