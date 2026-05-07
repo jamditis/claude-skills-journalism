@@ -2,11 +2,9 @@
 name: requesting-code-review
 description: Use when completing tasks, implementing major features, or before merging to verify work meets requirements
 ---
-
 <!--
 Adapted from obra/superpowers requesting-code-review skill (v5.0.7),
-MIT-licensed, copyright 2025 Jesse Vincent. Modifications copyright
-2026 Joe Amditis. v0.4.0 ports as a consumer category — no research
+MIT-licensed, copyright 2025 Jesse Vincent. Modifications copyright 2026 Joe Amditis. v0.4.0 ports as a consumer category — no research
 phase per the v0.2.0 architecture, since dispatch mechanic; reviewer
 preferences live in CLAUDE.md and memory rather than a research phase.
 See CREDITS.md.
