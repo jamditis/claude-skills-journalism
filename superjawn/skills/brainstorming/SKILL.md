@@ -2,7 +2,6 @@
 name: brainstorming
 description: "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
 ---
-
 <!--
 Adapted from obra/superpowers brainstorming skill (v5.0.7), MIT-licensed,
 copyright 2025 Jesse Vincent. Modifications copyright 2026 Joe Amditis.

@@ -2,7 +2,6 @@
 name: writing-plans
 description: Use when you have a spec or requirements for a multi-step task, before touching code
 ---
-
 <!--
 Adapted from obra/superpowers writing-plans skill (v5.0.7), MIT-licensed,
 copyright 2025 Jesse Vincent. Modifications copyright 2026 Joe Amditis.

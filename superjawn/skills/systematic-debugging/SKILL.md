@@ -2,7 +2,6 @@
 name: systematic-debugging
 description: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes
 ---
-
 <!--
 Adapted from obra/superpowers systematic-debugging skill (v5.0.7), MIT-licensed,
 copyright 2025 Jesse Vincent. Modifications copyright 2026 Joe Amditis.
