@@ -24,7 +24,7 @@ claude-skills-journalism/
 ├── README.md                    # User documentation
 ├── LICENSE
 │
-├── hooks/                       # Automated workflow checks (13 hooks)
+├── hooks/                       # Automated workflow checks (14 hooks)
 │   ├── ap-style-check.md        # Writing: AP Style violations
 │   ├── ai-slop-detector.md      # Writing: AI patterns
 │   ├── accessibility-check.md   # Writing: Alt text, headings
