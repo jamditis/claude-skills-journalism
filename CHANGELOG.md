@@ -5,6 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-05-07
+
+### Added
+
+- **superjawn v0.6.0 — feature-complete (#46, #48)**: all 14 skills now ported across five batches. Final batch (Batch 5) brings `finishing-a-development-branch`, the `bootstrap` skill (renamed from `using-superpowers` to avoid main-thread skill-loading collisions), and the writing-skills triad. Earlier in the window: Batch 3 added the `code-review` pair plus the structural validator (`#36` series), Batch 4 added parallel execution and `using-git-worktrees` (`#46`).
+- **Validator support for renamed ports (#48)**: `using-superjawn` validator now accepts an `upstream_name:` manifest field so renamed ports (`bootstrap` ← `using-superpowers`) pass parity checks.
+
+### Fixed
+
+- **CVE chain cleared by removing `puppeteer-core` (#41, #50)**: the dependency was never imported anywhere in the repo. Removing it eliminated GHSA-5rq4-664w-9x2c (path traversal) and GHSA-6v7q-wjvx-w8wg (CRLF injection) and shrank the install footprint substantially. `playwright` remains for the small number of scripts that actually use a browser.
+- **`single-file-cli` removed (#51, #53)**: same pattern — declared but unused. Its removal dropped the dependency tree from ~80 packages to 5 and cleared GHSA-rp42-5vxx-qpwr, GHSA-rpmf-866q-6p89 (DoS), and GHSA-v2v4-37r5-5v8g (XSS). `npm audit` now reports zero vulnerabilities.
+
+### Changed
+
+- **CI: `actions/checkout` v4 → v6 (#27, #54)**: aligns with GitHub Actions runner deprecations around Node.js 20 (warnings 2026-06-02, hard fail 2026-09-16). Both `lint-skills` and `check-readme` jobs run under v6. The workflow's `paths:` filter includes itself, so the bump verified itself on the PR under the new pin — no separate dispatch needed.
+- **Featured plugin on the landing page: autocontext → superjawn (#52)**: the hero slot now showcases superjawn v0.6.0 with a "New in v0.6.0" pill, headline "Skills that do their homework first.", and a copy block pitching the research-augmented fork plus the default-on research phase. autocontext stays in the plugin grid below — only the hero rotates.
+- **README: plugin table expanded** to list all four marketplace plugins (`autocontext`, `pdf-design`, `pdf-playground`, `superjawn`). Previously listed only `pdf-playground`.
+- **Docs: skill and hook counts corrected.** Landing page hero badge, OG/Twitter descriptions, and JSON-LD schema now report 39 skills + 14 hooks (was a mix of 31/37 skills and 11/14 hooks across stale fields). `CLAUDE.md` directory tree now reads "14 hooks" instead of "13."
+
+## [1.7.0] - 2026-05-05
+
+### Added
+
+- **superjawn plugin (#34, #35, #36, #37)** — new plugin at v0.3.0. Research-augmented fork of [obra/superpowers](https://github.com/obra/superpowers) v5.0.7 (MIT, dual-copyright Vincent 2025 / Amditis 2026) with a default-on research phase at entry-point stages: web search, codebase prior-bugs (`git log --grep`), authoritative docs, and memory check before Claude commits to a direction. Three categories:
+  - **Research** (entry points where work originates without an upstream artifact): `brainstorming`, `systematic-debugging`. Research phase fires by default.
+  - **Freshness check** (stale-artifact consumers): `executing-plans`. Default-skip; fires only when a trigger indicates real drift risk (cross-session execution, external API touched, working on master/main).
+  - **Consumer** (trust the upstream-artifact handoff): `writing-plans`, `test-driven-development`, `verification-before-completion`.
+
+  v0.3.0 ships 6 of 14 ported skills (foundation + debugging triads). Eight more pending across batches 3–5.
+
+  Landing page: https://skills.amditis.tech/superjawn/
+
+### Fixed
+
+- **autocontext slash commands (#26)**: Claude Code's plugin-namespaced commands use colons (`/autocontext:review`), not hyphens. INSTALL.md, CLAUDE.md, and the docs site updated to match actual invocation.
+- **WCAG 2.2 AA pass across all 45 docs/ pages (#40)**: 86 violations to 0 — alt text, heading order, color contrast, focus-visible, link purpose. Validated with axe-core via Playwright.
+- **Plugin grid layout (#38)**: docs landing page plugin grid bumped from 3 columns to 4 so the fourth card (superjawn) doesn't strand on its own row.
+- **Marketplace version sync (#33, #39)**: `marketplace.json` plugin entries are now kept in sync with each plugin's individual `plugin.json` version. Closes the drift surfaced by issue #33.
+
+### Changed
+
+- **Global instructions cleanup (#28, #30, #31, #32)**: slimmed `.github/copilot-instructions.md` from 47 lines to 13 (Copilot's 4k char cap was being burned on prose conventions Copilot doesn't enforce); narrowed `CLAUDE.md` to the bot-enforceable subset; corrected hook-mechanism wording so the "blocking hooks" claim accurately reflects which hooks block (`one-way-door-check` shell hook + `enforce-test-first` prompt-based) versus which are advisory.
+
 ## [1.6.2] - 2026-04-22
 
 ### Fixed
