@@ -12,7 +12,12 @@ Synced against upstream `obra/superpowers` v5.0.7 (release tag) on 2026-05-05. T
 
 ## Modifications from upstream
 
-**v0.3.0 Batch 2 (current).** Three skills ported under the v0.2.0 architecture:
+**v0.4.0 Batch 3 (current).** Two skills ported under the v0.2.0 architecture:
+- `receiving-code-review` — consumer category. Pure port (attribution only; zero cross-references in upstream content).
+- `requesting-code-review` — consumer category. Pure port (attribution only; supporting `code-reviewer.md` template copied verbatim). The `superpowers:code-reviewer` agent reference at lines 8 and 34 is intentionally preserved — agents are not in the 5-batch skills port plan. v1.0.0 readiness will decide whether to port the agent into superjawn, rewrite the reference, or accept the soft dependency on the upstream `superpowers` plugin.
+- Validator added at `superjawn/scripts/validate-skill.sh` (structural assertions for any consumer port — frontmatter shape, MIT attribution, cross-reference resolution). Passes on all 8 ported skills.
+
+**v0.3.0 Batch 2.** Three skills ported under the v0.2.0 architecture:
 - `systematic-debugging` — research category. Research phase inserted between Phase 1 (Root Cause Investigation) and Phase 2 (Pattern Analysis), default-on. Four research kinds (web, codebase prior-bugs, authoritative, user-context) dispatched as 3 parallel subagents + inline memory. Findings at `.superpowers/debug-log-<slug>.md`. Skip protocol byte-identical to Batch 1's locked text.
 - `test-driven-development` — consumer category. Pure port (attribution + cross-refs only). No research phase: TDD is a sub-skill whose triggering spec/plan already encodes research conclusions.
 - `verification-before-completion` — consumer category. Pure port. No research phase: verification is a gate function determined by what was just built.
