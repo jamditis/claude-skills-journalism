@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **superjawn v0.6.0 — feature-complete (#46, #48)**: all 14 skills now ported across five batches. Final batch (Batch 5) brings `finishing-a-development-branch`, the `bootstrap` skill (renamed from `using-superpowers` to avoid main-thread skill-loading collisions), and the writing-skills triad. Earlier in the window: Batch 3 added the `code-review` pair plus the structural validator (`#36` series), Batch 4 added parallel execution and `using-git-worktrees` (`#46`).
-- **Validator support for renamed ports (#48)**: `using-superjawn` validator now accepts an `upstream_name:` manifest field so renamed ports (`bootstrap` ← `using-superpowers`) pass parity checks.
+- **superjawn v0.6.0 — feature-complete (#46, #48)**: all 14 skills now ported across five batches. Final batch (Batch 5) brings `finishing-a-development-branch`, `using-superjawn` (the bootstrap skill, ported from upstream `using-superpowers` so the directory + frontmatter `name:` field match the local plugin's identity), and the writing-skills triad. Earlier in the window: Batch 3 added the `code-review` pair plus the validator script (`#36` series), Batch 4 added parallel execution and `using-git-worktrees` (`#46`).
+- **Validator support for renamed ports (#48)**: `superjawn/scripts/validate-skill.sh` now reads an optional `upstream_name:` field from `superjawn/skills-manifest.json` so renamed ports (`using-superjawn` ← `using-superpowers`) pass parity checks against the upstream skill of record.
 
 ### Fixed
 
