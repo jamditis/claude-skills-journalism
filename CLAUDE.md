@@ -40,26 +40,24 @@ claude-skills-journalism/
 │   ├── bug-report-detector.md   # Development: Detect bug reports
 │   └── enforce-test-first.md    # Development: Enforce test-first workflow
 │
-├── # Plugin: journalism-core (11 skills) — registered in marketplace.json
+├── # Plugin: journalism-core (13 skills) — registered in marketplace.json
 ├── journalism-core/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
 │   └── skills/
-│       ├── ai-writing-detox/        # Eliminate AI writing patterns
-│       ├── crisis-communications/   # Breaking news, rapid verification
-│       ├── editorial-workflow/      # Assignment tracking, calendars
-│       ├── fact-check-workflow/     # Claim verification
-│       ├── foia-requests/           # Public records requests
-│       ├── interview-prep/          # Interview preparation
-│       ├── interview-transcription/ # Recording, transcription, quotes
-│       ├── newsletter-publishing/   # Email newsletters, subscribers
-│       ├── newsroom-style/          # AP Style enforcement
-│       ├── source-verification/     # SIFT method, verification, deepfakes/C2PA
-│       └── story-pitch/             # Pitch templates
-│
-├── # Bare journalism skills (candidates for future bundles)
-├── data-journalism/             # Data analysis and storytelling
-├── social-media-intelligence/   # OSINT, account analysis
+│       ├── ai-writing-detox/         # Eliminate AI writing patterns
+│       ├── crisis-communications/    # Breaking news, rapid verification
+│       ├── data-journalism/          # Data analysis, federal-data currency, AI-assisted-analysis cautions
+│       ├── editorial-workflow/       # Assignment tracking, calendars
+│       ├── fact-check-workflow/      # Claim verification
+│       ├── foia-requests/            # Public records requests
+│       ├── interview-prep/           # Interview preparation
+│       ├── interview-transcription/  # Recording, transcription, quotes
+│       ├── newsletter-publishing/    # Email newsletters, subscribers
+│       ├── newsroom-style/           # AP Style enforcement
+│       ├── social-media-intelligence/ # OSINT, account analysis, platform-API currency
+│       ├── source-verification/      # SIFT method, verification, deepfakes/C2PA
+│       └── story-pitch/              # Pitch templates
 │
 ├── # Design and production (2)
 ├── pdf-design/                  # PDF reports, proposals, brand system
