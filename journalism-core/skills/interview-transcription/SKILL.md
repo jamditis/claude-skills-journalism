@@ -1,6 +1,6 @@
 ---
 name: interview-transcription
-description: Interview management, transcription workflows, and source note-taking for journalists. Use when preparing for interviews, managing recordings, transcribing audio/video, organizing source notes, creating timestamped references, or building interview databases. Essential for reporters conducting interviews and managing source relationships.
+description: Transcription workflows, recording management, and quote extraction for journalists. Use when processing audio/video recordings, generating transcripts with timestamps, extracting quotes for fact-checking, or building source-and-recording databases. For interview question design and pre-interview preparation, see the interview-prep skill.
 ---
 
 # Interview transcription and management
@@ -17,81 +17,75 @@ Practical workflows for journalists managing interviews from preparation through
 - Generating timestamped quotes for fact-checking
 - Converting recordings to publishable quotes
 
-## Pre-interview preparation
+## Recording setup for transcription
 
-### Research checklist
-
-Before recording starts, you should already know:
-
-```markdown
-## Source prep for: [Name]
-
-### Background
-- Role/title:
-- Organization:
-- Why they're relevant to this story:
-- Previous media appearances (note inconsistencies):
-
-### Key questions (prioritized)
-1. [Must-ask question]
-2. [Must-ask question]
-3. [If time permits]
-
-### Documents to reference
-- [ ] Bring/share [specific document]
-- [ ] Ask about [specific claim/data point]
-
-### Red lines
-- Topics they'll likely avoid:
-- Sensitive areas to approach carefully:
-```
-
-### Recording setup
+For pre-interview research, question design, attribution agreements, and consent scripts, use the **interview-prep** skill. The notes here cover only the recording configuration that affects transcription quality.
 
 ```python
-# Standard recording configuration
+# Standard recording configuration for clean transcription
 RECORDING_SETTINGS = {
     'format': 'wav',           # Lossless for transcription
-    'sample_rate': 44100,      # Standard quality
-    'channels': 1,             # Mono is fine for speech
-    'backup': True,            # Always run backup recorder
+    'sample_rate': 16000,      # Whisper resamples to 16k anyway; 16k saves disk
+    'channels': 1,             # Mono is fine for speech; stereo only if mics are positionally distinct
+    'backup': True,            # Always run a backup recorder
 }
 
 # File naming convention
 # YYYY-MM-DD_source-lastname_topic.wav
-# Example: 2024-03-15_smith_budget-hearing.wav
+# Example: 2026-05-08_smith_budget-hearing.wav
 ```
 
-**Two-device rule**: Always record on two devices. Phone as backup minimum.
+**Two-device rule.** Always record on two devices. Phone as backup minimum. If using a wireless lav mic, the recorder built into the lav unit is one device; the phone running a backup app is the second.
+
+**Mono is preferred** unless each speaker has their own dedicated microphone routed to a distinct channel. Stereo with both speakers bleeding into both channels is worse for diarization than clean mono.
 
 ## Transcription workflows
 
 ### Automated transcription pipeline
+
+Vanilla OpenAI Whisper transcribes audio to text but does **not** assign speaker labels. To get diarized output ("Speaker 1:" / "Speaker 2:" / etc.) you need a tool that combines Whisper with a diarization model — typically **WhisperX** (`m-bain/whisperX`), which wraps faster-whisper transcription with pyannote.audio diarization and produces word-level timestamps with speaker IDs in one pass.
 
 ```python
 from pathlib import Path
 import subprocess
 import json
 
-def transcribe_interview(audio_path: str, output_dir: str = "./transcripts") -> dict:
+def transcribe_interview(
+    audio_path: str,
+    output_dir: str = "./transcripts",
+    diarize: bool = True,
+    hf_token: str | None = None,
+    min_speakers: int = 2,
+    max_speakers: int = 2,
+) -> dict:
     """
-    Transcribe using Whisper with speaker diarization.
-    Returns transcript with timestamps.
+    Transcribe an interview using WhisperX (Whisper + pyannote diarization).
+    Returns a transcript with word-level timestamps and speaker labels.
+
+    Diarization needs a Hugging Face token with access to the pyannote
+    speaker-diarization-3.1 model. Accept the model EULA at
+    huggingface.co/pyannote/speaker-diarization-3.1 once, then pass the token.
     """
     Path(output_dir).mkdir(exist_ok=True)
 
-    # Use whisper.cpp or OpenAI Whisper
-    result = subprocess.run([
-        'whisper',
-        audio_path,
-        '--model', 'medium',
+    cmd = [
+        'whisperx', audio_path,
+        '--model', 'large-v3',
         '--output_format', 'json',
         '--output_dir', output_dir,
         '--language', 'en',
-        '--word_timestamps', 'True'
-    ], capture_output=True)
+        '--compute_type', 'int8',     # CPU-friendly; use 'float16' on GPU
+        '--min_speakers', str(min_speakers),
+        '--max_speakers', str(max_speakers),
+    ]
 
-    # Load and return structured transcript
+    if diarize:
+        cmd.append('--diarize')
+        if hf_token:
+            cmd += ['--hf_token', hf_token]
+
+    subprocess.run(cmd, check=True, capture_output=True)
+
     json_path = Path(output_dir) / f"{Path(audio_path).stem}.json"
     with open(json_path) as f:
         return json.load(f)
@@ -112,6 +106,8 @@ def format_timestamp(seconds: float) -> str:
     s = int(seconds % 60)
     return f"{h:02d}:{m:02d}:{s:02d}"
 ```
+
+**Falling back to plain Whisper.** If diarization is overkill or you can't get a Hugging Face token, drop the `--diarize` flag — the model still produces accurate timestamped transcription and you label speakers manually based on context. `faster-whisper` (CTranslate2 backend) is the speed-optimized variant and works the same way at the CLI. `whisper.cpp` is the C++ port for resource-constrained machines (Raspberry Pi, older laptops); it doesn't include diarization but runs the small/medium models on CPU comfortably.
 
 ### Manual transcription template
 
@@ -380,28 +376,36 @@ def extract_audio_from_video(video_path: str, output_path: str = None) -> str:
 - [ ] Embargo until [date]:
 ```
 
-### Two-party consent states (US)
+### Recording-consent jurisdiction
 
-California, Connecticut, Florida, Illinois, Maryland, Massachusetts, Michigan, Montana, Nevada, New Hampshire, Pennsylvania, Washington require all-party consent.
+For the per-state breakdown of one-party vs. all-party consent, hidden-recording rules, and federal preemption, use the **interview-prep** skill (which points to the Reporters Committee for Freedom of the Press *Reporter's Recording Guide* — the authoritative continuously-updated source).
 
-**Always get explicit consent on recording** regardless of jurisdiction.
+**Always get explicit consent on recording** regardless of jurisdiction. Note the consent verbatim at the head of every transcript file (timestamp, speaker, response). This protects you legally everywhere and gives the fact-checker a clean starting point.
 
 ## Tools and resources
 
 | Tool | Purpose | Notes |
 |------|---------|-------|
-| Whisper | Local transcription | Free, accurate, private |
-| Otter.ai | Cloud transcription | Real-time, speaker ID |
-| Descript | Edit audio like text | Good for pulling clips |
-| Rev | Human transcription | For sensitive/legal |
-| Trint | Journalist-focused | Collaboration features |
-| oTranscribe | Free web player | Manual transcription aid |
+| OpenAI Whisper | Local transcription, no diarization | Free, runs offline. `large-v3` is the current best model |
+| WhisperX | Whisper + speaker diarization | `m-bain/whisperX`. Free. Word-level timestamps with speaker IDs. Needs a Hugging Face token for the pyannote model |
+| faster-whisper | Speed-optimized Whisper | CTranslate2 backend. ~4x faster than vanilla Whisper at the same accuracy. Used internally by WhisperX |
+| whisper.cpp | CPU-friendly Whisper port | C++ implementation. Runs the small/medium models on a Raspberry Pi |
+| pyannote.audio | Standalone speaker diarization | Use directly when you already have transcripts from another source |
+| MacWhisper / Buzz | GUI wrappers for Whisper | macOS / cross-platform GUIs for journalists who don't want a CLI |
+| Otter.ai | Cloud transcription, real-time | Verify privacy posture before using with sensitive sources — Otter Pilot has historically joined meetings unannounced and indexed transcripts; check current settings |
+| Descript | Edit audio like text | Good for pulling clips. Cloud-hosted |
+| Rev (human + AI) | Human transcription for sensitive material | Slower, more accurate. Cloud-hosted |
+| Trint | Journalist-focused, collaboration | Cloud-hosted. Has team features |
+| oTranscribe | Free web-based manual transcription aid | Local-only (browser); no upload. Good for off-the-record material you can't hand to a cloud service |
 
 ## Related skills
 
-- **source-verification** - Verify source credentials before interview
-- **foia-requests** - Get documents to inform interview questions
-- **data-journalism** - Analyze data sources mention in interviews
+- **interview-prep** — Pre-interview research, question design, consent scripts, and recording-law jurisdiction
+- **source-verification** — Verify source credentials before interview
+- **fact-check-workflow** — Verify quotes against the recording before publication
+- **foia-requests** — Get documents to inform interview questions
+- **data-journalism** — Analyze data sources mentioned in interviews
+- **newsroom-style** — Convert verbatim quotes into AP-style copy for publication
 
 ---
 
@@ -409,8 +413,9 @@ California, Connecticut, Florida, Illinois, Maryland, Massachusetts, Michigan, M
 
 | Field | Value |
 |-------|-------|
-| Version | 1.0.0 |
-| Created | 2025-12-26 |
-| Author | Claude Skills for Journalism |
-| Domain | Journalism, Research |
-| Complexity | Intermediate |
+| version | 1.0.0 |
+| created | 2025-12-26 |
+| updated | 2026-05-08 |
+| author | Joe Amditis |
+| domain | journalism, research |
+| complexity | intermediate |

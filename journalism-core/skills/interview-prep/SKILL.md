@@ -39,11 +39,11 @@ Interviews fail in the preparation, not the conversation. This skill covers pre-
 - [ ] Professional associations
 
 ### Social media audit
-- [ ] All platforms identified (Twitter, Facebook, Instagram, etc.)
+- [ ] All platforms identified (X, Bluesky, Threads, Mastodon, Instagram, Facebook, LinkedIn, TikTok, YouTube, Substack, etc.)
 - [ ] Post history reviewed
 - [ ] Connections/followers analyzed
 - [ ] Previous statements on topic found
-- [ ] Any deleted content recovered?
+- [ ] Any deleted content recovered? (See **web-archiving** skill for Wayback / Archive.today retrieval)
 
 ### Media appearances
 - [ ] Previous interviews found
@@ -135,16 +135,25 @@ Every interview should be built to answer:
 
 ## Recording and consent
 
-### Recording laws by state type
+### Recording laws by state
 
-**One-party consent states:** You can record without telling the other person (but you should tell them anyway for ethical reasons).
+State recording-consent law is jurisdiction-specific and shifts. Some states distinguish telephone from in-person recording; others treat electronic communications under a separate statute; case law in several states (e.g., Massachusetts, Michigan, Connecticut) has narrowed or expanded the original statutory rule.
 
-**Two-party/all-party consent states:** All parties must consent. These include: California, Connecticut, Florida, Illinois, Maryland, Massachusetts, Michigan, Montana, Nevada, New Hampshire, Pennsylvania, Washington.
+**The single most reliable reference is the Reporters Committee for Freedom of the Press *Reporter's Recording Guide*** at `rcfp.org/reporters-recording-guide`. It is maintained continuously and provides per-state breakdowns covering one-party vs. all-party consent, phone-vs-in-person distinctions, hidden-recording rules, and federal preemption.
 
-**Always do:**
+**General categories:**
+
+- **One-party consent (federal default).** You can record without telling the other person if you are a party to the conversation. You *should* tell them anyway for ethical reasons.
+- **All-party (two-party) consent.** All participants must consent. As of 2025-2026 this category includes (non-exhaustive, verify against RCFP before relying): California, Florida, Illinois, Maryland, Massachusetts, Montana, Nevada, New Hampshire, Pennsylvania, Washington. Several other states (Connecticut, Michigan, Oregon, Delaware, Vermont, Hawaii) apply two-party rules in some contexts but not all — RCFP has the per-context details.
+- **Cross-state calls.** When the parties are in different states, the stricter state's law generally controls. If you are in a one-party state interviewing someone in a two-party state, get consent.
+
+**Always do, regardless of jurisdiction:**
+
 - State clearly at the start: "I'm recording this interview. Is that okay?"
-- Get affirmative consent on the recording itself
-- Note the consent in your notes
+- Get affirmative consent on the recording itself.
+- Note the consent in your notes.
+
+This protects you legally everywhere and is the ethical baseline.
 
 ### Consent template
 
@@ -282,14 +291,14 @@ Please let me know if you have questions about the story.
 
 ## Follow-up protocols
 
+For recording backup, transcription tooling, and quote verification mechanics, use the **interview-transcription** skill. The notes here cover only the post-interview *editorial* steps that aren't covered there.
+
 ### Immediate (same day)
-- [ ] Back up recording
-- [ ] Transcribe key quotes while fresh
-- [ ] Note observations not on recording
+- [ ] Back up recording (see interview-transcription for storage and naming)
+- [ ] Note observations not on recording (body language, environment, off-mic remarks)
 - [ ] Send thank-you if appropriate
 
 ### Within 48 hours
-- [ ] Full transcription or detailed notes
 - [ ] Fact-check claims against available records
 - [ ] Identify gaps requiring follow-up
 - [ ] Add source to contacts database

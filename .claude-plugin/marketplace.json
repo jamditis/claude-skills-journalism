@@ -1,6 +1,6 @@
 {
   "name": "claude-skills-journalism",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Claude Code plugins for journalism and media organizations",
   "owner": {
     "name": "Joe Amditis",
@@ -17,6 +17,17 @@
       },
       "source": "./autocontext",
       "category": "Productivity"
+    },
+    {
+      "name": "journalism-core",
+      "description": "Eleven core journalism skills for reporting, verification, and publishing. Covers AP-style writing, AI-slop detoxing, source verification (including 2026 deepfake/C2PA detection), FOIA and OPRA requests with current statutory citations, fact-checking workflows, interview prep and transcription, story pitches, editorial workflow, crisis communications, and newsletter publishing with the 2024-2026 Gmail/Yahoo/Outlook bulk-sender requirements.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Joe Amditis",
+        "email": "jamditis@gmail.com"
+      },
+      "source": "./journalism-core",
+      "category": "Journalism"
     },
     {
       "name": "pdf-design",

@@ -5,7 +5,7 @@ description: Freedom of Information Act (FOIA) and public records request workfl
 
 # FOIA and public records requests
 
-Comprehensive guide for obtaining government records through freedom of information laws.
+Workflows and templates for obtaining government records through freedom of information laws.
 
 ## Understanding FOIA landscape
 
@@ -61,7 +61,7 @@ All 50 states have enacted laws requiring certain government records to be open 
 - Agency response time data
 ```
 
-### Common state examptions
+### Common state exemptions
 State legislatures may be subject to different rules than the rest of their governing bodies:
 
 1. **Exempt from public records statute** (e.g., Massachusetts, Oklahoma, Oregon, Wyoming)
@@ -128,6 +128,20 @@ Court decisions and attorneys general opinions in some states have held that the
 
 *Source: [National Conference of State Legislatures](https://www.ncsl.org/center-for-legislative-strengthening/public-records-law-and-state-legislatures), Updated April 2025*
 
+### NJ OPRA reforms (P.L. 2024, c. 16) — effective Sept. 3, 2024
+
+Senate bill S2930 (signed June 5, 2024; effective Sept. 3, 2024) changed New Jersey's Open Public Records Act in five ways that make requesting harder:
+
+- **Fee-shifting weakened.** Prevailing requesters now receive attorneys' fees only when a court finds the agency's denial was in bad faith or knowing and willful. Previously, prevailing requesters were entitled to fees in most successful suits.
+- **Anonymous requesters lose standing.** Requesters must identify themselves by name and address; agencies may reject anonymous requests.
+- **Deadline tiers introduced.** The standard 7-business-day response window remains, but agencies can extend timelines for "voluminous" or "complex" requests under defined criteria, and may treat certain commercial requests differently.
+- **Special service charge presumption.** Agencies may impose extraordinary service fees more readily; requests for large data extracts, bulk records, or programmatic responses are presumed to justify a service charge above the standard copy fee.
+- **Agencies can sue requesters.** Public agencies have new authority to seek injunctive relief against requesters whose requests the agency deems harassing, repeated, or filed in bad faith.
+
+Practical effect for journalists: file under your byline and outlet (anonymous requests are now risky); narrow the scope to avoid triggering "voluminous" treatment; document the public-interest rationale up front because fee-shifting protection is weaker.
+
+Sources: New Jersey P.L. 2024, c. 16 (S2930); New Jersey Press Association coverage; Lowenstein Sandler client advisory; HealthLaw Advisor analysis; Chasan Lamparello Mallon & Cappuzzo summary.
+
 ## Drafting effective requests
 
 ### Request template (Federal FOIA)
@@ -184,22 +198,17 @@ INSTRUCTIONS REGARDING SCOPE AND BREADTH OF REQUESTS
 Please interpret the scope of this request broadly. [AGENCY] is instructed to interpret the scope of this request in the most liberal manner possible short of an interpretation that would lead to a conclusion that the request does not reasonably describe the records sought.
 
 EXEMPTIONS AND SEGREGABILITY
-I call your attention to a 21 January 2009 Memorandum concerning the Freedom of Information Act, in which the President states: 
-All agencies should adopt a presumption in favor of disclosure, in order to renew their commitment to the principles embodied in FOIA 
-[ .... ] The presumption of disclosure should be applied to all decisions involving FOIA.
 
-In the same Memorandum, he added that government information should not be kept confidential "merely because public officials might be embarrassed by disclosure, because errors and failures might be revealed, or because of speculative or abstract fears.''
+The FOIA Improvement Act of 2016 codified a foreseeable-harm standard at 5 U.S.C. § 552(a)(8)(A). An agency may withhold information only if it (i) reasonably foresees that disclosure would harm an interest protected by an exemption, or (ii) disclosure is prohibited by law. Embarrassment to officials, the possibility that disclosure might reveal errors or failures, and speculative or abstract fears are not legitimate grounds for withholding.
 
-Finally, the President ordered that "The Freedom of Information Act should be administered with a clear presumption: In the case of doubt, openness prevails."
-
-Nonetheless, if any responsive record or portion thereof is claimed to be exempt from production, FOIA statutes provide that even if some of the requested material is properly exempt from mandatory disclosure, all segregable portions must be released. If documents are denied in part or in whole, please specify which exemption(s) is (are) claimed for each passage or whole document denied. 
+Even where an exemption properly applies to part of a record, the statute requires the agency to release all reasonably segregable non-exempt portions. If documents are denied in part or in whole, please specify which exemption(s) is (are) claimed for each passage or whole document denied. 
 
 Please provide a complete itemized inventory and a detailed factual justification of total or partial denial of documents. Specify the number of pages in each document and the total number of pages pertaining to this request. For "classified" material denied, please include the following
 information: the classification (confidential, secret or top secret); identity of the classifier; date or event for automatic declassification or classification review or downgrading; if applicable, identity of official authorizing extension of automatic declassification or review past six years; and, if applicable, the reason for extended classification beyond six years.
 
 In excising material, please "black out" the material rather than "white out" or "cut out." I expect, as provided by FOIA, that the remaining non-exempt portions of documents will be released.
 
-Please release all pages regardless of the extent of excising, even if all that remains are the stationary headings or administrative markings.
+Please release all pages regardless of the extent of excising, even if all that remains are the letterhead, page numbers, or administrative markings.
 
 In addition, I ask that your agency exercise its discretion to release records which may be technically exempt, but where withholding serves no important public interest.
 
@@ -215,26 +224,24 @@ Please send a memo (copy to me) to the appropriate units in your office to assur
 
 
 **Fee waiver request (for U.S. federal FOIA):**
-I am an [JOB_TITLE] for [CURRENT_OUTLET] covering a wide-range of issues. My reporting has been published in [PRIOR_OUTLETS] and other outlets.
+I am a [JOB_TITLE] for [CURRENT_OUTLET], covering [BEAT/TOPIC]. My reporting has appeared in [PRIOR_OUTLETS].
 
-I am willing to pay any reasonable expenses, up to $[AMOUNT], associated with this request, however, as the purpose of the requested disclosure is in full conformity with the statutory requirements for a waiver of fees, I formally request such a waiver. I request a waiver of all costs pursuant to 5 U.S.C. §552(a }( 4 HA)( iii l ("Documents shall be furnished without any charge ... if disclosure of the information is in the public interest because it is likely to contribute significantly to public understanding of the operations or activities of the government and is not primarily in the commercial interest of the requester ... ). Disclosure in this case meets the statutory criteria. and a foe waiver would fulfill Congress’s legislative intent in amending FOIA. Sec Judicial Watch. Inc. v. Rossotti. 326 F.3d 1309. 1312 (D.C. Cir. 2003) ("Congress amended FOIA to ensure that it be liberally construed in favor of waivers for noncommercial requesters.""). I incorporate by reference the explanation and attached materials in the above sections which demonstrates why the requested information is in the public interest.
+I request a waiver of all fees pursuant to 5 U.S.C. § 552(a)(4)(A)(iii), which provides that documents shall be furnished without charge "if disclosure of the information is in the public interest because it is likely to contribute significantly to public understanding of the operations or activities of the government and is not primarily in the commercial interest of the requester."
 
-Should my request for a fee waiver be denied, I request that I be categorized as a member of the news media for fee purposes pursuant to DoJ 5400.7-R C6.l.5.7. According to 5 U.S.C. § 552(a)(4l(A)(ii), which codified the ruling of Nat'I Security Archive v. Dept of Defense, 880 F.2d 1381 (D.C. Cir. 1989). the term "a representative of the news media" means any person or entity that gathers information of potential interest to a segment of the public. Uses its editorial skills to turn the raw materials into a distinct work, and distributes that work to an audience. 
+The records I have requested meet that standard. They bear directly on [SPECIFIC_GOVERNMENT_OPERATION], a matter of public concern. I have the intent and ability to disseminate this information to a meaningful audience through [PUBLICATION_CHANNEL]. My request is non-commercial; I will not resell the records or use them primarily for private gain. *See Judicial Watch, Inc. v. Rossotti*, 326 F.3d 1309, 1312 (D.C. Cir. 2003) (Congress amended FOIA to ensure that fee-waiver provisions are "liberally construed in favor of waivers for noncommercial requesters"). I incorporate by reference the explanation in the sections above.
 
-If the fee waiver is denied, I also request that all charges be itemized in writing.
+Should the fee waiver be denied, I request to be categorized as a representative of the news media for fee purposes pursuant to 5 U.S.C. § 552(a)(4)(A)(ii)(II). The statute defines a representative of the news media as "any person or entity that gathers information of potential interest to a segment of the public, uses its editorial skills to turn the raw materials into a distinct work, and distributes that work to an audience" — a definition derived from the holding in *Nat'l Sec. Archive v. Dep't of Def.*, 880 F.2d 1387 (D.C. Cir. 1989). I qualify under this definition because I [DESCRIBE_REPORTING_PROCESS_AND_AUDIENCE].
 
-As the legislative history of FOIA reveals, it is critical that the phrase 'representative of the news media' be broadly interpreted if the act is to work as expected .... In fact, any person or organization which regularly publishes or disseminates information to the public … should qualit:y for waivers as a ·representative of the news media."' 132 Cong. Rec. SI 4298 ( daily ed. Sept. 30. 1986) (emphasis in original quotation); and 2) ''A request by a reporter or other person affiliated with a newspaper. magazine. television or radio station, or other entity that is in the business of publishing or otherwise disseminating information to the public qualifies under this provision.'' 132 Cong. Rec. I 19463 ( Oct. 8. I 986) ( emphasis in original quotation) J. Therefore, in accordance with the Freedom of Information Act and relevant case law, I, Arijit Sen, should be considered a representative of the news media.
+If both the fee waiver and the news-media classification are denied, please provide an itemized estimate of charges in writing before processing further. I am willing to pay reasonable charges up to $[AMOUNT] only if such a denial is final.
 
-I have the intent and ability to disseminate this significant expansion of public understanding of government operations. The public interest presented in this case far outweighs any commercial interest of my own in the requested release. For these reasons and based upon their extensive elaboration above, I request a full waiver of fees be granted. 
-
-I will appeal any denial of my request for a waiver administratively and to the courts if necessary.
+I will appeal any denial of the fee waiver administratively and, if necessary, in court.
 
 **Expedited processing request (if applicable):**
 I request expedited processing because:
 - [Urgent need to inform the public about actual or alleged government activity]
 - [Imminent threat to life or physical safety]
 
-As a reminder [TIME_LIMIT_STATUTE] requries a response with [DAYS_NUMBER] days.
+As a reminder, [TIME_LIMIT_STATUTE] requires a response within [DAYS_NUMBER] days.
 
 **Contact information:**
 Please do not hesitate to contact me at [EMAIL] or [PHONE] if you have questions or need clarification about this request.
@@ -277,7 +284,7 @@ GOOD: "Emails between [Office] and [External Party] regarding [Topic] from [Date
 - Contracts, purchase orders and invoices
 - Meeting minutes and notes
 - Policies and procedures
-- Databases and datasets; schema for databases/datsets
+- Databases and datasets; schema for databases/datasets
 
 ```
 
@@ -286,7 +293,7 @@ GOOD: "Emails between [Office] and [External Party] regarding [Topic] from [Date
 ### Request tracking system
 
 ```python
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, timedelta
 from enum import Enum
 from typing import Optional
@@ -322,12 +329,12 @@ class FOIARequest:
 
     # Timeline
     acknowledgment_date: Optional[date] = None
-    response_dates: list[date] = None
+    response_dates: list[date] = field(default_factory=list)
 
     # Documents
     pages_received: int = 0
     pages_withheld: int = 0
-    exemptions_cited: list[str] = None
+    exemptions_cited: list[str] = field(default_factory=list)
 
     # Appeals
     appeal_deadline: Optional[date] = None
@@ -370,7 +377,7 @@ TRACKING_COLUMNS = [
 ```markdown
 ## Status inquiry (after 20+ business days)
 
-Subject: Status Inquiry - FOIA Request [Tracking Number]
+Subject: Status inquiry — FOIA request [tracking number]
 
 Dear FOIA Officer:
 
@@ -393,7 +400,7 @@ Sincerely,
 ```markdown
 ## Fee waiver appeal
 
-Subject: Appeal of Fee Waiver Denial - Request [Number]
+Subject: Appeal of fee waiver denial — request [number]
 
 Dear FOIA Appeals Officer:
 
@@ -552,7 +559,6 @@ Sincerely,
 | New Jersey OPRA | 45 days | Government Records Council |
 | New York FOIL | 30 days | Agency appeals officer |
 | California PRA | No admin appeal | Direct to court |
-| [Add your state] | [Deadline] | [Location] |
 
 ## Advanced strategies
 
