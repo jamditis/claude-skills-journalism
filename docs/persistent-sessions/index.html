@@ -309,7 +309,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-6">Setup</h2>
 
-            <p class="text-clay/80 mb-6">tmux runs on the <strong>server</strong> — the always-on machine where Claude Code lives. Your laptop, phone, or tablet is just the client connecting to it. Everything below is configured on the server. See <a href="#install-tmux" class="text-accentDark underline underline-offset-2">Installing tmux</a> if you don't have it yet, and <a href="#clients" class="text-accentDark underline underline-offset-2">Connecting from different devices</a> for the client side.</p>
+            <p class="text-clay/80 mb-6">tmux runs on the <strong>server</strong> — the always-on machine where Claude Code lives. Your laptop, phone, or tablet is just the client connecting to it. Everything in this Setup section is configured on the server. See <a href="#install-tmux" class="text-accentDark underline underline-offset-2">Installing tmux</a> if you don't have it yet, and <a href="#clients" class="text-accentDark underline underline-offset-2">Connecting from different devices</a> for the client side.</p>
 
             <!-- Step 1 -->
             <div class="flex gap-4 mb-8">
@@ -415,10 +415,11 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
             <div class="bg-white rounded-xl border border-mist/30 overflow-hidden">
                 <table class="w-full text-sm">
+                    <caption class="sr-only">tmux install commands by server operating system</caption>
                     <thead>
                         <tr class="bg-mist/10 border-b border-mist/30">
-                            <th class="px-5 py-3 text-left font-semibold">Server OS</th>
-                            <th class="px-5 py-3 text-left font-semibold">Install command</th>
+                            <th scope="col" class="px-5 py-3 text-left font-semibold">Server OS</th>
+                            <th scope="col" class="px-5 py-3 text-left font-semibold">Install command</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-mist/20">
@@ -427,8 +428,12 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <td class="px-5 py-3"><code>sudo apt update &amp;&amp; sudo apt install tmux</code></td>
                         </tr>
                         <tr>
-                            <td class="px-5 py-3">Fedora / RHEL / CentOS / Rocky / AlmaLinux</td>
+                            <td class="px-5 py-3">Fedora / RHEL 8+ / Rocky / AlmaLinux</td>
                             <td class="px-5 py-3"><code>sudo dnf install tmux</code></td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3">CentOS 7 / older RHEL</td>
+                            <td class="px-5 py-3"><code>sudo yum install tmux</code></td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3">Arch / Manjaro</td>
@@ -440,7 +445,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </tr>
                         <tr>
                             <td class="px-5 py-3">Alpine</td>
-                            <td class="px-5 py-3"><code>sudo apk add tmux</code></td>
+                            <td class="px-5 py-3"><code>apk add tmux</code> as root (Alpine has no <code>sudo</code> by default — use <code>doas</code> if configured)</td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3">macOS (as the server)</td>
@@ -470,7 +475,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <!-- Connecting from different devices -->
         <section id="clients" class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Connecting from different devices</h2>
-            <p class="text-clay/80 mb-6">Once tmux is set up on the server, anything that can open an SSH session works as a client. The auto-attach snippet drops you straight into the running session, so the client doesn't need to know anything about tmux.</p>
+            <p class="text-clay/80 mb-6">Once tmux is set up on the server, anything that can open a shell on it — SSH, mosh, or Cockpit's web terminal — works as a client. The auto-attach snippet drops you straight into the running session, so the client doesn't need to know anything about tmux.</p>
 
             <div class="grid md:grid-cols-2 gap-4">
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
@@ -511,7 +516,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <h3 class="font-semibold mb-2">Flaky networks (any device)</h3>
-                    <p class="text-sm text-clay/70">Install <a href="https://mosh.org" class="text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">mosh</a> on the server (<code>apt/dnf/brew install mosh</code>) and use <code>mosh user@server</code> instead of <code>ssh</code>. Mosh survives network changes and sleep — a good companion to tmux on cellular or while moving between Wi-Fi networks.</p>
+                    <p class="text-sm text-clay/70 mb-2">Install <a href="https://mosh.org" class="text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">mosh</a> on <em>both</em> the server and the client (<code>apt/dnf/brew install mosh</code>; Blink Shell has it built in), then use <code>mosh user@server</code> instead of <code>ssh</code>. Mosh survives network changes and sleep — a good companion to tmux on cellular or while moving between Wi-Fi networks.</p>
+                    <p class="text-xs text-clay/60">Mosh also needs UDP ports <code>60000–61000</code> open inbound to the server — open them in your firewall (and any cloud security group) or you'll see "mosh: connect failed".</p>
                 </div>
             </div>
 
