@@ -182,7 +182,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <div class="max-w-6xl mx-auto relative z-10">
             <div class="flex items-center gap-3 mb-6">
                 <div class="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide uppercase">Claude Code Plugin</div>
-                <div class="inline-block px-3 py-1 bg-white/10 rounded-full font-mono text-xs">v0.6.0</div>
+                <div class="inline-block px-3 py-1 bg-white/10 rounded-full font-mono text-xs">v1.0.0</div>
             </div>
             <h1 class="font-display text-5xl md:text-7xl font-black leading-[0.9] mb-6">superjawn</h1>
             <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-4 font-light">Skills that research before they act.</p>
@@ -225,7 +225,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                                 </div>
                                 <h3 class="font-display text-base font-bold">Three categories, 14 skills total</h3>
                             </div>
-                            <p class="text-mist text-sm">Research phase (3 skills), freshness check (1 skill), consumer/straight port (10 skills). v0.6.0 has all 14 ported across five batches; v1.0.0 (disabling the upstream <code>superpowers</code> plugin) is gated on at least 2 weeks of real use.</p>
+                            <p class="text-mist text-sm">Research phase (3 skills), freshness check (1 skill), consumer/straight port (10 skills). v1.0.0 ships all 14 with no soft dependencies on the upstream <code>superpowers</code> plugin — code-reviewer agent dispatches now target <code>pr-review-toolkit:code-reviewer</code>.</p>
                         </div>
                         <div class="feature-card p-6 rounded-xl">
                             <div class="flex items-center gap-3 mb-3">
@@ -383,17 +383,17 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             </div>
         </section>
 
-        <!-- What's ported (v0.6.0) -->
+        <!-- What's ported (v1.0.0) -->
         <section class="py-24 px-6">
             <div class="max-w-6xl mx-auto reveal">
                 <div class="mb-12">
-                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">What's ported (v0.6.0)</h2>
+                    <h2 class="font-display text-4xl md:text-5xl font-light italic mb-4">What's ported (v1.0.0)</h2>
                     <div class="flex items-center gap-3">
                         <div class="flex items-center gap-2 px-4 py-2 bg-accentLight rounded-lg">
                             <i data-lucide="check-circle-2" class="w-4 h-4 text-accent"></i>
                             <span class="font-mono text-sm font-semibold text-accent">14 of 14 complete</span>
                         </div>
-                        <span class="text-sm text-mist">Feature-complete. v1.0.0 gates on 2 weeks of real use.</span>
+                        <span class="text-sm text-mist">Standalone — no soft dependency on upstream <code>superpowers</code>.</span>
                     </div>
                 </div>
 
@@ -514,8 +514,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <span class="w-8 h-8 bg-accentDark text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">!</span>
                             <h3 class="font-display text-xl font-bold">Existing superpowers users</h3>
                         </div>
-                        <p class="text-mist mb-3">Keep both <code>superpowers</code> and <code>superjawn</code> enabled during the rollout (v0.1.0 through v0.6.0). Skills not yet ported in superjawn still resolve via <code>superpowers:&lt;skill&gt;</code>.</p>
-                        <p class="text-mist text-sm">At v1.0.0 — after all 14 skills land and at least two weeks of real use — disable the upstream <code>superpowers</code> plugin in your Claude Code config.</p>
+                        <p class="text-mist mb-3">v1.0.0 ships with no soft dependencies on the upstream <code>superpowers</code> plugin — code-reviewer agent dispatches now target <code>pr-review-toolkit:code-reviewer</code> (Anthropic-maintained, in <code>@claude-code-plugins</code>). You can run <code>superjawn</code> standalone from this version forward.</p>
+                        <p class="text-mist text-sm">If you want to revert to the upstream plugin: <code>/plugin install superpowers@claude-plugins-official</code>.</p>
                     </div>
                 </div>
 
