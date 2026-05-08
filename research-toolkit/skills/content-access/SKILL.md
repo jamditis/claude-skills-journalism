@@ -42,7 +42,7 @@ Ethical and legal approaches for accessing restricted web content for journalism
 
 ### Unpaywall browser extension
 
-Unpaywall finds free, legal copies of 20+ million academic papers.
+Unpaywall finds free, legal copies of 50M+ open-access academic records.
 
 ```python
 # Unpaywall API (free, requires email for identification)
@@ -89,7 +89,7 @@ if result.get('is_open_access'):
     print(f"Free PDF at: {result['oa_url']}")
 ```
 
-### CORE API (295M papers)
+### CORE API (290M+ open-access works)
 
 ```python
 # CORE API - requires free API key from https://core.ac.uk/
@@ -148,10 +148,13 @@ class CORESearch:
         return response.json() if response.status_code == 200 else {}
 ```
 
-### Semantic Scholar API (214M papers)
+### Semantic Scholar API (220M+ papers)
 
 ```python
-# Semantic Scholar API - free, no key required for basic use
+# Semantic Scholar API - free, but request a key from
+# https://www.semanticscholar.org/product/api for anything beyond
+# ad-hoc calls. Unkeyed access has been tightened to a low shared
+# rate limit and is no longer reliable for batch lookups.
 
 import requests
 
@@ -195,12 +198,83 @@ def get_paper_by_doi(doi: str) -> dict:
     return response.json() if response.status_code == 200 else {}
 ```
 
+### OpenAlex API (250M+ scholarly works, free, no key required)
+
+OpenAlex replaced Microsoft Academic Graph after MAG was retired and
+has become the de-facto open scholarly data backbone — many tools
+(Unpaywall companion data, Local Citation Network, OpenCitations)
+now resolve via OpenAlex.
+
+```python
+# OpenAlex - free, no API key required, 100k req/day per email
+# https://docs.openalex.org/
+
+import requests
+
+def search_openalex(query: str, limit: int = 25, email: str = None) -> list:
+    """Search OpenAlex for works. Pass email to enter the polite pool
+    (higher rate limits, faster service). Returns OA flag + landing page."""
+    headers = {'User-Agent': f'research-toolkit ({email})'} if email else {}
+    params = {'search': query, 'per-page': limit}
+
+    response = requests.get(
+        'https://api.openalex.org/works',
+        params=params,
+        headers=headers,
+        timeout=30,
+    )
+    if response.status_code != 200:
+        return []
+
+    results = []
+    for work in response.json().get('results', []):
+        oa = work.get('open_access') or {}
+        results.append({
+            'id': work.get('id'),
+            'doi': work.get('doi'),
+            'title': work.get('title'),
+            'year': work.get('publication_year'),
+            'is_oa': oa.get('is_oa', False),
+            'oa_status': oa.get('oa_status'),  # gold, green, hybrid, bronze, closed
+            'oa_url': oa.get('oa_url'),
+            'cited_by_count': work.get('cited_by_count', 0),
+        })
+    return results
+```
+
+### Other open-access sources worth checking
+
+- **DOAJ** (`doaj.org/api/v3`) — Directory of Open Access Journals; useful when you need to verify a publisher is fully OA before trusting a "journal lookup" claim.
+- **EuropePMC** (`europepmc.org/RestfulWebService`) — Mirror of PubMed Central plus preprints, OA full-text search, and ORCID-aware author lookup.
+- **PubMed Central** (`eutils.ncbi.nlm.nih.gov`) — NIH OA biomedical archive; required for NIH-funded papers under the 2026 OSTP Nelson Memo.
+
+### Deliberately excluded (legally risky, likely ToS / copyright violation)
+
+This skill does not recommend Sci-Hub, Library Genesis (LibGen), Anna's
+Archive, or paywall-redirector services like 12ft.io / removepaywall.com.
+These are widely used in the research community but sit in clear legal
+grey-to-red zones (depending on jurisdiction) and have been targets of
+DMCA takedowns, publisher lawsuits, and domain seizures. Use the
+legitimate open-access paths above; if a paper truly isn't available,
+the author-contact and ILL paths in this skill have very high success
+rates without legal exposure.
+
 ## Browser reader mode for soft paywalls
 
 ### Activating reader mode
 
+This bookmarklet only works for **soft / metered paywalls** where the
+publisher loads the article HTML and visually overlays a subscription
+prompt — the content is already in the DOM, just hidden. It does
+**not** defeat hard paywalls (NYT, WSJ, FT, The Atlantic, Bloomberg,
+Stratechery, etc.) where article HTML is server-side gated; on those
+sites the bookmarklet simply removes overlays and reveals nothing
+useful. Systematic use to read otherwise-paywalled content may
+violate the publisher's ToS — use it only as a reader-mode shim for
+content you legitimately have access to.
+
 ```javascript
-// Bookmarklet to trigger Firefox-style reader mode
+// Bookmarklet to strip soft-paywall overlays so reader mode works
 // Works on some soft paywalls that load content before blocking
 
 javascript:(function(){
@@ -239,7 +313,7 @@ javascript:(function(){
 | **Safari** | Click Reader icon in URL bar | High for soft paywalls |
 | **Firefox** | Click Reader View icon (or F9) | High |
 | **Edge** | Click Immersive Reader icon | Highest |
-| **Chrome** | Requires flag: chrome://flags/#enable-reader-mode | Medium |
+| **Chrome** | Side panel → Reading mode (stable since Chrome 114, May 2023) | Medium |
 
 ## Library database access
 
@@ -283,7 +357,7 @@ class LibraryAccess:
             'in_library': 'Connect to library WiFi, visit pressreader.com',
             'remote': 'Log in with library card credentials',
             'app': 'Download PressReader app, link library card',
-            'note': 'Access typically 30-48 hours per session'
+            'note': 'Session length varies by library; typically requires re-authentication every 24-72 hours'
         }
 
 # Interlibrary Loan (ILL) workflow
@@ -331,15 +405,25 @@ def request_via_ill(paper_info: dict, library_email: str) -> str:
 - Evading bans or blocks placed on your account
 ```
 
-### VPN service comparison
+### VPN service evaluation
 
-| Service | Best For | Privacy | Speed | Price |
-|---------|----------|---------|-------|-------|
-| **ExpressVPN** | Censorship bypass | Excellent | Fast | $$$ |
-| **NordVPN** | General use | Excellent | Fast | $$ |
-| **Surfshark** | Budget, unlimited devices | Good | Good | $ |
-| **ProtonVPN** | Privacy-focused | Excellent | Medium | $$ |
-| **Tor Browser** | Maximum anonymity | Excellent | Slow | Free |
+VPN ratings age badly — privacy claims, ownership structures, and
+audit findings change yearly. Rather than maintain a stale ranked
+table here (the major commercial VPNs have undergone notable
+ownership consolidation: ExpressVPN by Kape Technologies, Surfshark
+merging with Nord), consult an independent reviewer at point-of-use:
+
+- **PrivacyGuides** (`privacyguides.org/en/vpn/`) — community-maintained,
+  privacy-prioritized recommendations with explicit criteria.
+- **Privacy Tools** historical comparisons.
+- **Tor Browser** (`torproject.org`) — maximum-anonymity option,
+  free, no provider trust required; slow but the right tool for
+  source protection or genuinely sensitive research.
+
+For routine geo-restriction testing (not source protection),
+mainstream commercial VPNs in the $3-10/month tier are
+interchangeable on speed; pick on jurisdiction (your threat model)
+and recent independent audits, not marketing copy.
 
 ### Checking geo-restriction status
 
@@ -384,25 +468,39 @@ from urllib.parse import quote
 def get_archived_article(url: str) -> str:
     """Try to get article from Archive.today.
 
-    Archive.today often captures full article content
-    because it renders JavaScript and captures the result.
+    Archive.today often captures full article content because it
+    renders JavaScript and captures the result. Legal status varies
+    by jurisdiction; treat systematic use to bypass paywalls as ToS-
+    violating and use only for ad-hoc research access.
 
-    Legal status varies by jurisdiction - use for research purposes.
+    Operational notes (2026): the FBI subpoenaed archive.today's
+    registrar in October 2025; Wikipedia stopped accepting it as a
+    citation source in February 2026. Still useful for capturing
+    JS-rendered content, but treat as secondary to Wayback Machine
+    for legal/citation use.
     """
+    from urllib.parse import urljoin
 
-    # Check for existing archive
-    search_url = f"https://archive.today/{quote(url, safe='')}"
+    # /newest/<url> 302s to the most recent snapshot or to a CAPTCHA
+    # page if rate-limited. Disable redirects so we can inspect the
+    # Location header explicitly.
+    search_url = f"https://archive.ph/newest/{url}"
 
     try:
-        response = requests.get(search_url, timeout=30, allow_redirects=True)
-
-        if response.status_code == 200 and 'archive.today' in response.url:
-            return response.url
-
-        # No existing archive - could request one
-        # Note: This may violate ToS, use responsibly
+        response = requests.get(
+            search_url,
+            timeout=30,
+            allow_redirects=False,
+            headers={'User-Agent': 'Mozilla/5.0 (research-archiver)'},
+        )
+        if response.status_code in (301, 302, 303, 307, 308):
+            location = response.headers.get('Location')
+            if location:
+                resolved = urljoin(response.url, location)
+                # Only return if we landed on an archive page, not CAPTCHA
+                if 'archive.' in resolved and '/newest/' not in resolved:
+                    return resolved
         return None
-
     except Exception:
         return None
 ```
@@ -418,7 +516,7 @@ def get_wayback_article(url: str) -> str:
     """
 
     # Check availability
-    api_url = f"http://archive.org/wayback/available?url={url}"
+    api_url = f"https://archive.org/wayback/available?url={url}"
 
     try:
         response = requests.get(api_url, timeout=10)
@@ -534,10 +632,11 @@ Best regards,
 5. **Google search** - Sometimes cached versions appear
 
 ## Tips:
-- Many newspapers offer free articles for .edu emails
-- Press releases often contain same info as paywalled articles
-- Local library cards often include digital news access
-- Some publications have free tiers (5-10 articles/month)
+- Some publishers offer institutional access via .edu email — check the publisher's institutional-access page rather than assuming the program still exists; most major outlets have wound these programs down.
+- Press releases often contain the same factual content as the paywalled article and can be quoted directly.
+- Local library cards often include digital news access via PressReader, OverDrive, or the library's own login portal.
+- Some publications have free tiers (5-10 articles/month) reset by clearing cookies; mind the publisher's ToS before relying on this.
+- Archive.today snapshots of news articles work for ad-hoc research access but should not be the citation in your final piece — link the original article and keep the archive as a backup, with the FBI/Wikipedia caveat noted in the archive section above.
 ```
 
 ### Academic papers
@@ -546,15 +645,16 @@ Best regards,
 ## Academic paper access strategies (in order)
 
 1. **Unpaywall extension** - Check first, automatic
-2. **Google Scholar** - Click "All versions", look for [PDF]
-3. **Author's website** - Check their academic page
-4. **Institutional repository** - Search university library
-5. **Preprint servers** - arXiv, SSRN, bioRxiv, medRxiv
-6. **ResearchGate/Academia.edu** - Author-uploaded copies
-7. **CORE.ac.uk** - 295M open access papers
-8. **PubMed Central** - For biomedical papers
-9. **Contact author directly** - High success rate
-10. **Interlibrary Loan** - Free, gets almost anything
+2. **OpenAlex** - 250M+ works with OA links; the de-facto open scholarly data backbone since MAG was retired
+3. **Google Scholar** - Click "All versions", look for [PDF]
+4. **Author's website** - Check their academic page
+5. **Institutional repository** - Search university library
+6. **Preprint servers** - arXiv, SSRN, bioRxiv, medRxiv (note: 2026 OSTP Nelson Memo requires immediate OA for federally-funded US research)
+7. **ResearchGate/Academia.edu** - Author-uploaded copies, BUT availability is uneven: both have faced publisher takedown campaigns (Elsevier/ACS lawsuits) and many entries now resolve to "request full text" rather than a PDF
+8. **CORE.ac.uk** - 290M+ open access papers
+9. **PubMed Central** - For biomedical papers
+10. **Contact author directly** - High success rate (70-90%)
+11. **Interlibrary Loan** - Free, gets almost anything
 ```
 
 ### Books and reports
