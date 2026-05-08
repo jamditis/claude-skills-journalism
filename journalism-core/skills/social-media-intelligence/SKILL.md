@@ -443,7 +443,8 @@ class SocialArchiver:
                 # contain ;-separated params. Match the url= directive itself.
                 m = re.search(r'\burl\s*=\s*(.+)', refresh, re.IGNORECASE)
                 if m:
-                    return m.group(1).strip().strip('\'"')
+                    target = m.group(1).strip().strip('\'"')
+                    return urljoin(response.url, target)
         except Exception as e:
             print(f"archive.today failed: {e}")
         return None
