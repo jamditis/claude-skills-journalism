@@ -51,13 +51,15 @@
     },
     "requesting-code-review": {
       "category": "consumer",
-      "skill_md_parity": true,
+      "skill_md_parity": false,
       "supporting_file_overrides": {}
     },
     "subagent-driven-development": {
       "category": "consumer",
       "skill_md_parity": false,
-      "supporting_file_overrides": {}
+      "supporting_file_overrides": {
+        "code-quality-reviewer-prompt.md": "v1.0.0: Task tool dispatch target rewritten from superpowers:code-reviewer to pr-review-toolkit:code-reviewer to remove the soft dependency on the upstream superpowers plugin (uninstalled at v1.0.0)"
+      }
     },
     "dispatching-parallel-agents": {
       "category": "consumer",

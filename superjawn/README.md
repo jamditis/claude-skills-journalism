@@ -12,26 +12,26 @@ Claude Code skills derived from [obra/superpowers](https://github.com/obra/super
 | `systematic-debugging` | Research | Ported (Batch 2) |
 | `test-driven-development` | Consumer | Ported (Batch 2) |
 | `verification-before-completion` | Consumer | Ported (Batch 2) |
-| `receiving-code-review` | Consumer | Pending (Batch 3) |
-| `requesting-code-review` | Consumer | Pending (Batch 3) |
-| `subagent-driven-development` | Freshness check | Pending (Batch 4) |
-| `dispatching-parallel-agents` | Consumer | Pending (Batch 4) |
-| `using-git-worktrees` | Consumer | Pending (Batch 4) |
-| `finishing-a-development-branch` | Consumer | Pending (Batch 5) |
-| `using-superjawn` | Consumer | Pending (Batch 5) |
-| `writing-skills` | Research | Pending (Batch 5) |
+| `receiving-code-review` | Consumer | Ported (Batch 3) |
+| `requesting-code-review` | Consumer | Ported (Batch 3, parity dropped in v1.0.0 for code-reviewer agent rewrite) |
+| `subagent-driven-development` | Consumer | Ported (Batch 4) |
+| `dispatching-parallel-agents` | Consumer | Ported (Batch 4) |
+| `using-git-worktrees` | Consumer | Ported (Batch 4) |
+| `finishing-a-development-branch` | Consumer | Ported (Batch 5) |
+| `using-superjawn` | Consumer | Ported (Batch 5, renamed from upstream `using-superpowers`) |
+| `writing-skills` | Research | Ported (Batch 5) |
 
 ## Coexistence with upstream
 
-During the rollout (v0.1.0 through v0.6.0), keep both `superpowers` and `superjawn` plugins installed. Skills not yet ported still resolve via `superpowers:<skill>`. At v1.0.0, after at least 2 weeks of real use of the full set, disable the upstream `superpowers` plugin in your Claude Code config.
+v1.0.0 ships with no soft dependencies on the upstream `superpowers` plugin — the four `superpowers:code-reviewer` agent dispatches in v0.6.0 now target `pr-review-toolkit:code-reviewer` (Anthropic-maintained, in `@claude-code-plugins`). You can run `superjawn` as a standalone replacement for `superpowers` from this version forward. If you want to revert to the upstream plugin for any reason, install with `/plugin install superpowers@claude-plugins-official`.
 
 ## Phase shapes
 
 **Research phase (3 entry-point skills).** Default-on. Subagent dispatch by default (`Explore` for codebase, `general-purpose` for web/discourse). Findings land in the skill's existing artifact. Skip requires an explicit, justified line per the locked skip protocol.
 
-**Freshness check (2 stale-artifact consumer skills).** Default-skip. Fires only when a trigger indicates real drift risk: cross-session execution, external API/service touched, or working on `main`/`master`. Findings land in `.superpowers/exec-journal-<plan-slug>.md`.
+**Freshness check (1 stale-artifact consumer skill).** Default-skip. Fires only when a trigger indicates real drift risk: cross-session execution, external API/service touched, or working on `main`/`master`. Findings land in `.superpowers/exec-journal-<plan-slug>.md`.
 
-**Consumer (9 skills).** No phase. Pure port from upstream with attribution comment + dual-namespace cross-reference rewrites. Trusts the upstream-artifact handoff.
+**Consumer (10 skills).** No phase. Pure port from upstream with attribution comment + dual-namespace cross-reference rewrites. Trusts the upstream-artifact handoff.
 
 ## Credits
 
