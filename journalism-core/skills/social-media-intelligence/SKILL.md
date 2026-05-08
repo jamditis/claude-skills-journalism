@@ -29,7 +29,7 @@ from enum import Enum
 import hashlib
 
 class Platform(Enum):
-    TWITTER = "twitter"
+    TWITTER = "twitter"  # X since 2023; "twitter" retained for legacy data
     FACEBOOK = "facebook"
     INSTAGRAM = "instagram"
     TIKTOK = "tiktok"
@@ -38,6 +38,7 @@ class Platform(Enum):
     THREADS = "threads"
     BLUESKY = "bluesky"
     MASTODON = "mastodon"
+    TELEGRAM = "telegram"
 
 @dataclass
 class SocialPost:
@@ -371,10 +372,14 @@ class HashtagAnalyzer:
 
 ### Archive before it disappears
 
+For full archiving workflows (rate limits, batch jobs, recovery from broken archive UIs), see the **web-archiving** skill.
+
 ```python
+import re
 import requests
 from datetime import datetime
 from typing import Optional
+from urllib.parse import quote, urljoin
 
 class SocialArchiver:
     """Archive social content before deletion."""
@@ -383,34 +388,65 @@ class SocialArchiver:
         self.archived = {}
 
     def archive_to_wayback(self, url: str) -> Optional[str]:
-        """Submit URL to Internet Archive."""
-        try:
-            save_url = f"https://web.archive.org/save/{url}"
-            response = requests.get(save_url, timeout=30)
+        """Submit URL to Internet Archive.
 
+        Anonymous saves are rate-limited at roughly 15/minute and silently drop
+        some paywalled or heavily JS-rendered pages. For high-volume archiving,
+        register an Internet Archive S3 key and add an Authorization header.
+        """
+        try:
+            save_url = f"https://web.archive.org/save/{quote(url, safe='')}"
+            response = requests.get(save_url, timeout=30)
             if response.status_code == 200:
                 archived_url = response.url
                 self.archived[url] = {
                     'wayback': archived_url,
-                    'archived_at': datetime.now().isoformat()
+                    'archived_at': datetime.now().isoformat(),
                 }
                 return archived_url
         except Exception as e:
-            print(f"Archive failed: {e}")
+            print(f"Wayback archive failed: {e}")
         return None
 
     def archive_to_archive_today(self, url: str) -> Optional[str]:
-        """Submit URL to archive.today."""
+        """Submit URL to archive.today.
+
+        Operational notes (2026): the FBI subpoenaed archive.today's registrar
+        in October 2025 to identify the operator; Wikipedia voted in February
+        2026 to stop accepting it as a citation source after the site shipped
+        DDoS-attack code in January 2026. The service is still useful for
+        capturing content the Wayback Machine can't render, but treat it as
+        secondary to the Internet Archive and document any reliance on it.
+        It also rate-limits aggressively and serves CAPTCHAs to scrapers.
+        """
         try:
             response = requests.post(
                 'https://archive.today/submit/',
-                data={'url': url},
-                timeout=60
+                data={'url': url, 'anyway': '1'},
+                timeout=60,
+                allow_redirects=False,
+                headers={'User-Agent': 'Mozilla/5.0 (verification archive bot)'},
             )
+            # archive.today returns the snapshot URL in one of two shapes:
+            #   - 30x with Location: https://archive.today/<snapshot_id>
+            #   - 200 with Refresh: 0;url=https://archive.today/<snapshot_id>
+            # Following redirects silently can land on /wip/ pages or hide the
+            # canonical snapshot URL, so handle both headers explicitly.
+            if response.status_code in (301, 302, 303, 307, 308):
+                location = response.headers.get('Location')
+                if location:
+                    # Location MAY be relative per RFC 7231; resolve against request URL.
+                    return urljoin(response.url, location)
             if response.status_code == 200:
-                return response.url
+                refresh = response.headers.get('Refresh', '')
+                # Refresh keyword is case-insensitive per HTML spec; values may
+                # contain ;-separated params. Match the url= directive itself.
+                m = re.search(r'\burl\s*=\s*(.+)', refresh, re.IGNORECASE)
+                if m:
+                    target = m.group(1).strip().strip('\'"')
+                    return urljoin(response.url, target)
         except Exception as e:
-            print(f"Archive.today failed: {e}")
+            print(f"archive.today failed: {e}")
         return None
 
     def full_archive(self, url: str) -> dict:
@@ -418,7 +454,7 @@ class SocialArchiver:
         results = {
             'original_url': url,
             'archived_at': datetime.now().isoformat(),
-            'archives': {}
+            'archives': {},
         }
 
         wayback = self.archive_to_wayback(url)
@@ -512,30 +548,74 @@ def coordination_likelihood(posts: List[SocialPost]) -> dict:
 
 ## Platform-specific tools
 
-| Platform | Monitoring Tool | Notes |
+Status as of 2026. Platform APIs change rapidly — verify pricing and access before designing a project around any one path.
+
+| Platform | Research access | Notes |
 |----------|-----------------|-------|
-| Twitter/X | TweetDeck, Brandwatch | API increasingly restricted |
-| Facebook | CrowdTangle (limited) | Academic access only now |
-| Instagram | Later, Brandwatch | No public API for search |
-| TikTok | Exolyt, Pentos | Limited historical data |
-| Reddit | Pushshift, Arctic Shift | Archive access varies |
-| YouTube | YouTube Data API | Good metadata access |
-| Bluesky | Firehose API | Open, real-time access |
+| X (Twitter) | Pay-per-use developer API (developer.x.com); X Pro Search (consumer-facing, behind X Premium+); Brandwatch / Sprinklr (paid third-party) | Free academic/research tier ended early 2023. The 2024 Basic and Pro subscription tiers were replaced in Feb 2026 with a pay-per-use model — billed by API call, no monthly subscription. Verify current per-call rates and any rate-limit caps in the developer portal before scoping a project. Post-2023 ToS explicitly prohibits scraping. |
+| Facebook / Instagram | Meta Content Library + Library API (research access); Junkipedia (free, journalist-friendly); NewsWhip (paid) | CrowdTangle was shut down on Aug 14, 2024 — it does not exist in any form. Meta Content Library replaced it. As of Dec 8, 2025, applications go through Meta's portal directly (previously routed via University of Michigan ICPSR). Eligibility favors academic and nonprofit researchers; most working journalists qualify only through institutional affiliation. SOMAR and other secure enclaves remain typical execution environments. |
+| TikTok | Research API (qualifying academic and nonprofit researchers; DSA-vetted researchers in the EU); Exolyt, Pentos (paid) | Apply at developers.tiktok.com. Eligible organizations are typically academic institutions and nonprofit research entities; EU-based researchers have stronger access via DSA Article 40. Playlist Info and Commercial Content endpoints expanded in 2026. |
+| YouTube | YouTube Data API v3 | 10,000 units per day default (search costs 100 units = ~100 searches/day); higher quota by application, multi-week review. No journalist-specific tier. |
+| Reddit | Reddit API (free for non-commercial research); Arctic Shift (Pushshift successor, free dumps via Academic Torrents) | Pushshift restricted to verified moderators since 2023 — it is no longer a journalist-research path. Arctic Shift is the active successor. |
+| Bluesky | Jetstream (filtered JSON over WebSocket, no auth required) or raw firehose | Public-by-default. Jetstream is the journalist-friendly entrypoint at ~850 MB/day filtered; raw firehose is 4-8 GB/hour and requires you to build archives yourself. |
+| Threads (Meta) | Threads API (publishing/embedding); Meta Content Library (research) | Public profile discovery threshold lowered to 100 followers in March 2026. Bulk historical research routes through Meta Content Library, with the same academic-only restriction. |
+| Mastodon / Fediverse | Public-timeline API (per-instance); cross-instance search at search.noc.social or fediverse.info | Many instances now set `DISALLOW_UNAUTHENTICATED_API_ACCESS`; admin-controlled. Cross-instance search is fragmented. |
+| Telegram | Bot API + MTProto + public previews at `t.me/s/<channel>`; Bellingcat tools (Telegago, Telepathy, TelegramDB) | Public-channel scraping is legal in most jurisdictions; private groups are off-limits. |
+
+### EU DSA Article 40 access
+
+The EU Digital Services Act gives EU-based researchers stronger access rights than US researchers on TikTok and the Meta platforms. US journalists may need EU institutional partners (a university, a vetted research nonprofit) to qualify for the Research API tiers on those platforms. This is a real path, not a workaround.
+
+## OSINT tooling
+
+The custom Python heuristics above are starting points for monitoring and pattern surfacing. For production OSINT work, the canonical external tools are:
+
+### Account authenticity and coordination
+
+- **Botometer X** (osome.iu.edu) — academic standard for Twitter bot likelihood; archival mode only since June 2023, so it cannot score accounts created or active after May 31, 2023.
+- **Hoaxy / Hoaxy2** (osome.iu.edu) — operational; Hoaxy2 added Mastodon search, Bluesky real-time monitoring, and a Facebook News Bridge. Bot scores were removed when the Twitter API died.
+- **OSoMe Coordiscope** — coordinated-network visualizer, free.
+- **CooRTweet** (R package) — successor to CooRnet for coordinated inauthentic behavior analysis. CooRnet was discontinued alongside CrowdTangle in August 2024.
+- **Bot Sentinel** (botsentinel.com) — was offline through 2025 with relaunch announced for 2026; verify operational status before citing in reporting.
+
+### Reverse image and forensic verification
+
+- **TinEye** — canonical exact-match and first-appearance reverse-image search.
+- **Yandex Images** — strong for face and region matching, especially Russia and Eastern Europe.
+- **Google Lens** — successor to the deprecated legacy Google reverse-image search.
+- **Forensically** (29a.ch) and **FotoForensics** — image manipulation analysis (error level analysis, clone detection, metadata).
+- **InVID-WeVerify plugin** — operational under the EU vera.ai project; new beta synthetic-image and voice-clone detectors added in 2025. Some Twitter-era features broke after the API change.
+
+### Network analysis
+
+- **Gephi** — free, open-source; the ICIJ Panama Papers tool of record.
+- **Maltego CE** — Community Edition free with registration; paid tiers expanded in 2025.
+- **NodeXL** — Excel add-on, basic free / Pro paid; legacy but functional.
+
+### Methodology authorities (current, 2026)
+
+- **Bellingcat Online Investigation Toolkit** ([bellingcat.gitbook.io/toolkit](https://bellingcat.gitbook.io/toolkit)) — community-maintained "Toolkit 2.0," updated continuously.
+- **Information Futures Lab** at Brown SPH — successor to First Draft News (which closed June 2022); Claire Wardle co-directs.
+- **WITNESS Deepfakes Rapid Response Force** ([gen-ai.witness.org](https://www.gen-ai.witness.org/deepfakes-rapid-response-force/)) — pairs reporters with media-forensics experts on deadline.
+- **CJR Tow Center** — non-technical 2025 deepfake-detection guide for journalists.
+- Note: **Stanford Internet Observatory** was effectively dismantled in June 2024; the election-research mantle moved to the **Stanford Social Media Lab** (Hancock) and the **NYU Stern Center for Business and Human Rights**.
 
 ## Ethical guidelines
 
-- Archive public content only
-- Don't create fake accounts for monitoring
-- Respect platform terms of service
-- Protect sources who share social content
-- Verify before publishing claims about coordination
-- Consider context before amplifying harmful content
+- Archive public content only.
+- Don't create fake accounts for monitoring.
+- Respect platform terms of service. X's post-2023 ToS explicitly prohibits scraping even of public posts; rely on the API or licensed data brokers. Don't reuse research-access tokens for non-research purposes — Meta and TikTok terminate access for ToS drift.
+- Protect sources who share social content.
+- Verify before publishing claims about coordination — coordination scoring is a hypothesis, not a finding.
+- Consider context before amplifying harmful content.
 
 ## Related skills
 
-- **source-verification** - Verify accounts and claims found on social
-- **web-scraping** - Programmatic collection of public content
-- **data-journalism** - Analyze social data for patterns
+- **source-verification** — Verify accounts and claims found on social
+- **web-archiving** — Full archiving workflows beyond the wrappers shown above
+- **web-scraping** — Programmatic collection of public content
+- **data-journalism** — Analyze social data for patterns and produce charts
+- **crisis-communications** — Time-pressure verification during breaking news
 
 ---
 
@@ -543,8 +623,9 @@ def coordination_likelihood(posts: List[SocialPost]) -> dict:
 
 | Field | Value |
 |-------|-------|
-| Version | 1.0.0 |
-| Created | 2025-12-26 |
-| Author | Claude Skills for Journalism |
-| Domain | Journalism, OSINT |
-| Complexity | Advanced |
+| version | 1.1.0 |
+| created | 2025-12-26 |
+| updated | 2026-05-08 |
+| author | Joe Amditis |
+| domain | journalism, osint |
+| complexity | advanced |
