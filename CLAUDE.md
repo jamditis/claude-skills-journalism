@@ -59,6 +59,17 @@ claude-skills-journalism/
 │       ├── source-verification/        # SIFT method, verification, deepfakes/C2PA
 │       └── story-pitch/                # Pitch templates
 │
+├── # Plugin: research-toolkit (5 skills) — registered in marketplace.json
+├── research-toolkit/
+│   ├── .claude-plugin/plugin.json
+│   ├── README.md
+│   └── skills/
+│       ├── academic-writing/           # Research and scholarly communication
+│       ├── content-access/             # Unpaywall, library databases, paywall bypass
+│       ├── digital-archive/            # AI-enriched archives, entity extraction
+│       ├── page-monitoring/            # Change detection, availability tracking
+│       └── web-archiving/              # Wayback, Archive.today, evidence preservation
+│
 ├── # Design and production (2)
 ├── pdf-design/                  # PDF reports, proposals, brand system
 │   └── templates/               # HTML templates (Democracy Day, etc.)
@@ -73,13 +84,6 @@ claude-skills-journalism/
 ├── project-retrospective/       # LESSONS.md generation
 │   └── templates/               # 4 project type templates
 ├── template-selector/           # Choose the right template
-│
-├── # Academic and research (5)
-├── academic-writing/            # Research and academic writing
-├── digital-archive/             # Archive building
-├── web-archiving/               # Wayback, Archive.today, evidence
-├── content-access/              # Unpaywall, CORE, library access
-├── page-monitoring/             # Change detection, alerts
 │
 ├── # Development (10)
 ├── test-first-bugs/             # Test-driven bug fixing workflow
@@ -170,24 +174,25 @@ This repo distributes its skills in two ways: **as Marketplace plugins** (regist
 /plugin install journalism-core@claude-skills-journalism
 ```
 
-Available plugins: `autocontext`, `journalism-core`, `pdf-design`, `pdf-playground`, `superjawn`. See `.claude-plugin/marketplace.json` for the full list.
+Available plugins: `autocontext`, `journalism-core`, `pdf-design`, `pdf-playground`, `research-toolkit`, `superjawn`. See `.claude-plugin/marketplace.json` for the full list.
 
 ### Alternate: copy a bare skill into `~/.claude/skills/`
 
-Some top-level directories (e.g. `web-archiving`, `academic-writing`, `python-pipeline`) are still distributed as bare skills outside any plugin. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
+Some top-level directories (e.g. `python-pipeline`, `vibe-coding`, `web-scraping`) are still distributed as bare skills outside any plugin. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
 
 ```bash
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
 cd ~/projects/claude-skills-journalism
 mkdir -p ~/.claude/skills
-cp -r web-archiving ~/.claude/skills/
-# or: ln -sfn "$PWD/web-archiving" ~/.claude/skills/web-archiving
+cp -r python-pipeline ~/.claude/skills/
+# or: ln -sfn "$PWD/python-pipeline" ~/.claude/skills/python-pipeline
 ```
 
-For skills inside a plugin directory (e.g., `journalism-core/skills/source-verification`), point at the nested path:
+For skills inside a plugin directory (e.g., `journalism-core/skills/source-verification`, `research-toolkit/skills/web-archiving`), point at the nested path:
 
 ```bash
 cp -r journalism-core/skills/source-verification ~/.claude/skills/
+cp -r research-toolkit/skills/web-archiving ~/.claude/skills/
 ```
 
 Cloning the whole repo into `~/.claude/skills/journalism-skills/` nests each `SKILL.md` too deep and will not load.

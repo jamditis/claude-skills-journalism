@@ -1,0 +1,9 @@
+{
+  "name": "research-toolkit",
+  "version": "1.0.0",
+  "description": "Five skills for research, source preservation, and academic workflows. Covers academic writing and scholarly communication, legal paywall-bypass strategies (Unpaywall, library databases, ethical open-access access), web archiving (Wayback Machine, Archive.today, ArchiveBox, evidence preservation), web page monitoring and change detection (Visualping, ChangeTower, self-hosted alternatives), and AI-enriched digital archive construction with entity extraction and knowledge graphs. Built for journalists, researchers, librarians, and academics who need to find, preserve, and analyze evidence across the web.",
+  "author": {
+    "name": "Joe Amditis",
+    "email": "jamditis@gmail.com"
+  }
+}
