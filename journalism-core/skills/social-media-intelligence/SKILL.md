@@ -423,10 +423,22 @@ class SocialArchiver:
                 'https://archive.today/submit/',
                 data={'url': url, 'anyway': '1'},
                 timeout=60,
+                allow_redirects=False,
                 headers={'User-Agent': 'Mozilla/5.0 (verification archive bot)'},
             )
+            # archive.today returns the snapshot URL in one of two shapes:
+            #   - 30x with Location: https://archive.today/<snapshot_id>
+            #   - 200 with Refresh: 0;url=https://archive.today/<snapshot_id>
+            # Following redirects silently can land on /wip/ pages or hide the
+            # canonical snapshot URL, so handle both headers explicitly.
+            if response.status_code in (301, 302, 303, 307, 308):
+                location = response.headers.get('Location')
+                if location:
+                    return location
             if response.status_code == 200:
-                return response.url
+                refresh = response.headers.get('Refresh', '')
+                if 'url=' in refresh:
+                    return refresh.split('url=', 1)[1].strip()
         except Exception as e:
             print(f"archive.today failed: {e}")
         return None

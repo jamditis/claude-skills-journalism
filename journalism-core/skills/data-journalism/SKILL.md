@@ -221,6 +221,8 @@ def handle_missing(
     """Drop rows missing values in `required_col` if missingness exceeds either threshold."""
     if required_col is None or df.empty:
         return df
+    if required_col not in df.columns:
+        return df
 
     missing = df[required_col].isna().sum()
 
@@ -722,7 +724,11 @@ chart
 import censusgeocode as cg
 import pandas as pd
 
-# DataFrame must have columns: id, address, city, state, zipcode
+# DataFrame must have columns matching the *_col parameters below
+# (defaults: id, address, city, state, zipcode). If your CSV uses
+# different names like 'street' or 'zip', pass them via address_col=,
+# zipcode_col=, etc. — internally these are renamed to the keys the
+# Census API expects ('address', 'zip', etc.) before the request.
 # (state and zipcode are optional but improve match rates)
 
 def census_geocode(
