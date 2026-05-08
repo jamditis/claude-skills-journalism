@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-05-08
+
+### Changed
+
+- **superjawn v1.0.0 — standalone (#58)**: decouples superjawn's runtime dispatch from the upstream `superpowers` plugin. The four `superpowers:code-reviewer` agent dispatches that v0.6.0 left in place (three in `requesting-code-review/SKILL.md`, one in `subagent-driven-development/code-quality-reviewer-prompt.md`) now target `pr-review-toolkit:code-reviewer`, an Anthropic-maintained agent in `@claude-code-plugins`. After this release, no skill in `superjawn` requires the upstream `superpowers` plugin to be installed. The original "≥2 weeks of real use" readiness gate is waived ahead of ship; reinstall path for the upstream plugin is `/plugin install superpowers@claude-plugins-official`. Manifest: `requesting-code-review` drops `skill_md_parity` from `true` to `false` (the rewrite breaks byte-identity); `subagent-driven-development` adds a `supporting_file_overrides` entry for `code-quality-reviewer-prompt.md`. Three documentation example mentions of `superpowers:code-reviewer` in `using-superjawn/references/{codex,copilot}-tools.md` are intentionally preserved as references to upstream's canonical agent name.
+- **persistent-sessions guide expanded (#57)**: promotes the SSH path to first-class alongside Cockpit in the auto-attach step, marks the Cockpit `IdleTimeout` step as Cockpit-only with an anchor link, adds an "Installing tmux" table covering Debian/Ubuntu, Fedora/RHEL, Arch, openSUSE, Alpine, macOS, FreeBSD, and WSL2 (plus notes on Windows-as-server and macOS-as-server), and adds a "Connecting from different devices" section covering macOS, Windows, Linux, iOS/iPadOS, Android, ChromeOS, Cockpit, and mosh. Notes the Ctrl-prefix alternative for mobile keyboards and updates the CTA so it no longer claims the skill requires Cockpit.
+- **Marketplace landing page: superjawn card refreshed**. The featured-plugin card on `docs/index.html` previously read "v0.6.0 ships all 14 skills; v1.0.0 (disabling the upstream plugin) gates on 2 weeks of real use." Now reads as the v1.0.0 standalone description, matching `docs/superjawn/index.html` (which was updated in PR #58).
+
+### Fixed
+
+- **README skill-status table for `superjawn` (#58 fold-in)**: eight rows still read "Pending (Batch 3/4/5)" for skills that had already shipped, one category was wrong (`subagent-driven-development` listed as freshness check instead of consumer), and the phase-shape counts were off by one (1 freshness + 10 consumer, was written as 2 + 9). All corrected as part of the v1.0.0 cut.
+- **`superjawn:debugging` typo in top-level `README.md` plugin catalog (#58 round 1 Copilot)**: the row's "fires before brainstorming, debugging, and writing-skills" copy and the example invocation `superjawn:debugging` referenced a skill that does not exist; the actual skill is `systematic-debugging`. Updated both occurrences so the example invocation resolves to a real skill.
+
 ## [1.8.0] - 2026-05-07
 
 ### Added
