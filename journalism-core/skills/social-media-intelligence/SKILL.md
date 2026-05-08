@@ -375,10 +375,11 @@ class HashtagAnalyzer:
 For full archiving workflows (rate limits, batch jobs, recovery from broken archive UIs), see the **web-archiving** skill.
 
 ```python
+import re
 import requests
 from datetime import datetime
 from typing import Optional
-from urllib.parse import quote
+from urllib.parse import quote, urljoin
 
 class SocialArchiver:
     """Archive social content before deletion."""
@@ -434,11 +435,15 @@ class SocialArchiver:
             if response.status_code in (301, 302, 303, 307, 308):
                 location = response.headers.get('Location')
                 if location:
-                    return location
+                    # Location MAY be relative per RFC 7231; resolve against request URL.
+                    return urljoin(response.url, location)
             if response.status_code == 200:
                 refresh = response.headers.get('Refresh', '')
-                if 'url=' in refresh:
-                    return refresh.split('url=', 1)[1].strip()
+                # Refresh keyword is case-insensitive per HTML spec; values may
+                # contain ;-separated params. Match the url= directive itself.
+                m = re.search(r'\burl\s*=\s*(.+)', refresh, re.IGNORECASE)
+                if m:
+                    return m.group(1).strip().strip('\'"')
         except Exception as e:
             print(f"archive.today failed: {e}")
         return None
