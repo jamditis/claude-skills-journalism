@@ -36,27 +36,31 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | Plugin | Description | Commands |
 |--------|-------------|----------|
 | [autocontext](./autocontext/) | Cross-session knowledge persistence with skill evolution. Lessons accumulate per-skill, and `/autocontext:evolve` folds them back into skill files | `/autocontext:setup`, `/autocontext:init`, `/autocontext:review`, `/autocontext:status`, `/autocontext:evolve` |
+| [journalism-core](./journalism-core/) | Eleven core journalism skills: AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, fact-checking, interview prep + transcription, story pitches, editorial workflow, crisis communications, and newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements | n/a — skills only |
 | [pdf-design](./pdf-design/) | PDF report and proposal design system with brand variables, budget tables, and reusable content blocks (stats strips, three-column, four-tile pillars, partner grids) | n/a — skill-only |
 | [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials with an interactive control panel for live design editing (colors, fonts, spacing, sections) and a guided wizard for proposals | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` |
 | [superjawn](./superjawn/) | Research-augmented fork of obra/superpowers. Default-on research phase fires before brainstorming, systematic-debugging, and writing-skills. v1.0.0 ships all 14 skills with no soft dependencies on the upstream `superpowers` plugin | invoked indirectly via skills (e.g. `superjawn:brainstorming`, `superjawn:systematic-debugging`, `superjawn:writing-plans`) |
 
 ### Skills (manual installation)
 
-Skills load automatically when relevant to your work. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep. Clone this repo anywhere you like, then copy or symlink the skills you want into `~/.claude/skills/`:
+Most skills now ship inside plugins (see the table above). For skills that haven't been bundled into a plugin yet (e.g., `data-journalism`, `social-media-intelligence`, `web-archiving`), Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep. Clone this repo anywhere you like, then copy or symlink the bare skills you want:
 
 ```
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
 cd ~/projects/claude-skills-journalism
 mkdir -p ~/.claude/skills
 
-# Copy individual skills you want:
-cp -r source-verification ~/.claude/skills/
+# Copy a bare top-level skill:
+cp -r data-journalism ~/.claude/skills/
+
+# Or pull a single skill out of a plugin's skills/ directory:
+cp -r journalism-core/skills/source-verification ~/.claude/skills/
 
 # Or symlink so git pull updates them in place (ln -sfn replaces an existing link):
-ln -sfn "$PWD/source-verification" ~/.claude/skills/source-verification
+ln -sfn "$PWD/data-journalism" ~/.claude/skills/data-journalism
 ```
 
-Do not clone the repo directly into `~/.claude/skills/journalism-skills/` — that nests each `SKILL.md` two levels deep and Claude Code won't find them.
+Do not clone the repo directly into `~/.claude/skills/journalism-skills/` — that nests each `SKILL.md` too deep and Claude Code won't find them.
 
 ### For Claude.ai users
 
@@ -64,27 +68,30 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 
 ## Skills overview
 
-### Core journalism skills
+### Core journalism skills (in `journalism-core` plugin)
+
+These eleven skills ship together as the [journalism-core](./journalism-core/) plugin. Install via `/plugin install journalism-core@claude-skills-journalism` to get all of them at once.
 
 | Skill | Description |
 |-------|-------------|
-| [source-verification](./source-verification/) | SIFT method, digital verification, reverse image search, social media account analysis, building verification trails |
-| [foia-requests](./foia-requests/) | Public records request drafting, tracking systems, appeals process, state-specific guidance |
+| [ai-writing-detox](./journalism-core/skills/ai-writing-detox/) | Eliminate AI-generated patterns that erode reader trust. Banned words, phrases, and structures with alternatives |
+| [crisis-communications](./journalism-core/skills/crisis-communications/) | Breaking news protocol, rapid verification, crisis response, misinformation countering |
+| [editorial-workflow](./journalism-core/skills/editorial-workflow/) | Story assignment tracking, deadline management, editorial calendars, handoff protocols |
+| [fact-check-workflow](./journalism-core/skills/fact-check-workflow/) | Claim extraction, evidence gathering, rating scales, correction protocols |
+| [foia-requests](./journalism-core/skills/foia-requests/) | Public records request drafting (federal FOIA + NJ OPRA), tracking, appeals, current statutory citations |
+| [interview-prep](./journalism-core/skills/interview-prep/) | Pre-interview research, question frameworks, recording consent, attribution guidelines |
+| [interview-transcription](./journalism-core/skills/interview-transcription/) | Whisper / WhisperX transcription pipelines, quote management, speaker diarization |
+| [newsletter-publishing](./journalism-core/skills/newsletter-publishing/) | Email newsletter creation, subscriber management, deliverability, 2024–2026 Gmail / Yahoo / Outlook bulk-sender compliance |
+| [newsroom-style](./journalism-core/skills/newsroom-style/) | AP Style enforcement, attribution rules, headline formatting, number conventions |
+| [source-verification](./journalism-core/skills/source-verification/) | SIFT method, image and video verification, deepfake detection (2026), C2PA Content Credentials, verification trails |
+| [story-pitch](./journalism-core/skills/story-pitch/) | Pitch templates for daily news, features, investigations, op-eds, and freelance queries |
+
+### Bare journalism skills (not yet bundled into a plugin)
+
+| Skill | Description |
+|-------|-------------|
 | [data-journalism](./data-journalism/) | Data acquisition, cleaning, analysis, visualization, and storytelling for newsrooms |
-| [newsroom-style](./newsroom-style/) | AP Style enforcement, attribution rules, headline formatting, number conventions |
-| [interview-prep](./interview-prep/) | Pre-interview research, question frameworks, recording consent, attribution guidelines |
-| [interview-transcription](./interview-transcription/) | Recording workflows, transcription, quote management, source databases |
-| [story-pitch](./story-pitch/) | Pitch templates for daily news, features, investigations, op-eds, and freelance queries |
-| [fact-check-workflow](./fact-check-workflow/) | Claim extraction, evidence gathering, rating scales, correction protocols |
-| [editorial-workflow](./editorial-workflow/) | Story assignment tracking, deadline management, editorial calendars, handoff protocols |
-| [crisis-communications](./crisis-communications/) | Breaking news protocol, rapid verification, crisis response, misinformation countering |
 | [social-media-intelligence](./social-media-intelligence/) | Social monitoring, narrative tracking, account analysis, coordination detection, OSINT |
-
-### Communications and publishing
-
-| Skill | Description |
-|-------|-------------|
-| [newsletter-publishing](./newsletter-publishing/) | Email newsletter creation, subscriber management, deliverability, A/B testing |
 
 ### Design and production
 
@@ -92,12 +99,6 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 |-------|-------------|
 | [pdf-design](./pdf-design/) | Professional PDF reports and proposals with brand system, budget tables, and multi-page layouts. For the full interactive experience, use [pdf-playground](./pdf-playground/) instead |
 | [visual-explainer](./visual-explainer/) | Turn complex data into styled HTML pages — architecture diagrams, data tables, flowcharts, timelines, source maps, and dashboards with dark/light theme support |
-
-### Writing quality
-
-| Skill | Description |
-|-------|-------------|
-| [ai-writing-detox](./ai-writing-detox/) | Eliminate AI-generated patterns that erode reader trust. Banned words, phrases, and structures with alternatives |
 
 ### Project documentation
 

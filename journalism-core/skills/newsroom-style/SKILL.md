@@ -24,7 +24,7 @@ Write like a professional journalist. Follow AP Style. Keep it tight.
 | Spell out one through nine | "three witnesses" not "3 witnesses" |
 | Use numerals for 10 and above | "15 people attended" |
 | Always use numerals for ages | "a 5-year-old girl" |
-| Always use numerals for percentages | "5 percent" (spell out "percent") |
+| Always use numerals for percentages | AP allows the `%` symbol with numerals (`5%`) since 2019; some publications still spell out "percent" as house style |
 | Always use numerals for addresses | "123 Main St." |
 | Always use numerals for money | "$5 million" not "five million dollars" |
 | Spell out first through ninth for ordinals | "first place" but "10th anniversary" |
@@ -55,11 +55,11 @@ Write like a professional journalist. Follow AP Style. Keep it tight.
 
 **Examples:**
 
-❌ Bad: Mayor Smith stated, "We are committed to this project."
+**Bad:** Mayor Smith stated, "We are committed to this project."
 
-✅ Good: "We are committed to this project," Mayor Smith said.
+**Good:** "We are committed to this project," Mayor Smith said.
 
-✅ Good: "We are committed to this project," said Mayor Jane Smith, who has pushed for the development since 2022.
+**Good:** "We are committed to this project," said Mayor Jane Smith, who has pushed for the development since 2022.
 
 ### Dates and times
 
@@ -143,10 +143,10 @@ Most important information first. Answer the key questions:
 - One sentence is ideal
 - Focus on the news, not background
 
-**❌ Too long:**
+**Too long:**
 > The city council, which has been debating the issue for several months and heard from dozens of residents at multiple public meetings, voted Tuesday night to approve a controversial new zoning ordinance that would allow high-rise buildings in the downtown area.
 
-**✅ Better:**
+**Better:**
 > The city council approved a zoning ordinance Tuesday that allows high-rise buildings downtown, ending months of debate.
 
 ### Types of ledes
@@ -210,21 +210,21 @@ Most important information first. Answer the key questions:
 ---
 
 **Before:**
-> Smith stated that he believed the project would be "transformative."
+> Smith stated that he believed the project would be "important."
 
 **After:**
-> Smith said he believed the project would be "transformative."
+> Smith said he believed the project would be "important."
 
 ## House style notes
 
 Different publications have their own style guides that override AP Style. Common variations:
 
-- Oxford comma (AP doesn't use it; many publications do)
+- Oxford comma (AP doesn't use it; many publications do — verify with your editor)
 - Courtesy titles (AP doesn't use them; NYT does)
-- Web style (some publications use "website" vs. AP's "website")
+- Web style (AP merged "web site" to "website" in 2010; some legacy guides still split it)
 
 **Always ask about house style before writing for a new publication.**
 
 ---
 
-*Based on the Associated Press Stylebook. Check the current AP Stylebook for updates and edge cases.*
+*Based on the Associated Press Stylebook. Check the current AP Stylebook (apstylebook.com) for updates and edge cases.*

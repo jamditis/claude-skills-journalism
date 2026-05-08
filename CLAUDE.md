@@ -40,21 +40,26 @@ claude-skills-journalism/
 │   ├── bug-report-detector.md   # Development: Detect bug reports
 │   └── enforce-test-first.md    # Development: Enforce test-first workflow
 │
-├── # Core journalism skills (11)
-├── source-verification/         # SIFT method, verification trails
-├── foia-requests/               # Public records requests
-├── data-journalism/             # Data analysis and storytelling
-├── newsroom-style/              # AP Style enforcement
-├── interview-prep/              # Interview preparation
-├── interview-transcription/     # Recording, transcription, quotes
-├── story-pitch/                 # Pitch templates
-├── fact-check-workflow/         # Claim verification
-├── editorial-workflow/          # Assignment tracking, calendars
-├── crisis-communications/       # Breaking news, rapid verification
-├── social-media-intelligence/   # OSINT, account analysis
+├── # Plugin: journalism-core (11 skills) — registered in marketplace.json
+├── journalism-core/
+│   ├── .claude-plugin/plugin.json
+│   ├── README.md
+│   └── skills/
+│       ├── ai-writing-detox/        # Eliminate AI writing patterns
+│       ├── crisis-communications/   # Breaking news, rapid verification
+│       ├── editorial-workflow/      # Assignment tracking, calendars
+│       ├── fact-check-workflow/     # Claim verification
+│       ├── foia-requests/           # Public records requests
+│       ├── interview-prep/          # Interview preparation
+│       ├── interview-transcription/ # Recording, transcription, quotes
+│       ├── newsletter-publishing/   # Email newsletters, subscribers
+│       ├── newsroom-style/          # AP Style enforcement
+│       ├── source-verification/     # SIFT method, verification, deepfakes/C2PA
+│       └── story-pitch/             # Pitch templates
 │
-├── # Communications and publishing (1)
-├── newsletter-publishing/       # Email newsletters, subscribers
+├── # Bare journalism skills (candidates for future bundles)
+├── data-journalism/             # Data analysis and storytelling
+├── social-media-intelligence/   # OSINT, account analysis
 │
 ├── # Design and production (2)
 ├── pdf-design/                  # PDF reports, proposals, brand system
@@ -63,9 +68,6 @@ claude-skills-journalism/
 │   ├── references/              # CSS patterns, library guides, nav patterns
 │   ├── templates/               # Architecture, flowchart, data table templates
 │   └── prompts/                 # Slash command templates
-│
-├── # Writing quality (1)
-├── ai-writing-detox/            # Eliminate AI writing patterns
 │
 ├── # Project documentation (3)
 ├── project-memory/              # CLAUDE.md generation
@@ -161,17 +163,36 @@ Hooks run automatically at specific workflow events. Most are **non-blocking war
 
 ## Installation
 
-Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep. Clone anywhere, then copy or symlink individual skills into `~/.claude/skills/`:
+This repo distributes its skills in two ways: **as Marketplace plugins** (registered in `.claude-plugin/marketplace.json`) and **as bare skill directories** (top-level dirs that haven't been bundled into a plugin yet).
+
+### Recommended: install via Marketplace plugin
+
+```
+/plugin marketplace add jamditis/claude-skills-journalism
+/plugin install journalism-core@claude-skills-journalism
+```
+
+Available plugins: `autocontext`, `journalism-core`, `pdf-design`, `pdf-playground`, `superjawn`. See `.claude-plugin/marketplace.json` for the full list.
+
+### Alternate: copy a bare skill into `~/.claude/skills/`
+
+For skills that haven't been packaged into a plugin yet (e.g., `data-journalism`, `social-media-intelligence`), Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
 
 ```bash
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
 cd ~/projects/claude-skills-journalism
 mkdir -p ~/.claude/skills
-cp -r source-verification ~/.claude/skills/
-# or: ln -sfn "$PWD/source-verification" ~/.claude/skills/source-verification
+cp -r data-journalism ~/.claude/skills/
+# or: ln -sfn "$PWD/data-journalism" ~/.claude/skills/data-journalism
 ```
 
-Cloning the whole repo into `~/.claude/skills/journalism-skills/` nests each `SKILL.md` two levels deep and will not load.
+For skills inside a plugin directory (e.g., `journalism-core/skills/source-verification`), point at the nested path:
+
+```bash
+cp -r journalism-core/skills/source-verification ~/.claude/skills/
+```
+
+Cloning the whole repo into `~/.claude/skills/journalism-skills/` nests each `SKILL.md` too deep and will not load.
 
 ## Multi-machine workflow
 

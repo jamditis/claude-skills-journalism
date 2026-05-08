@@ -103,7 +103,7 @@ After 47 years, the last original captain of the Staten Island Ferry is retiring
 No one has profiled the ferry crews since the 2003 accident. Carbone has agreed to a ride-along on his final week. He's kept a journal since 1977.
 
 **The shape:**
-Narrative profile. Open with his final departure. Flash back through career highlights. Include voices from crew, family, passengers he's befriended over decades.
+Narrative profile. Open with his final departure. Flash back through career highlights. Include voices from crew, family, passengers he's befriended across decades.
 
 **Sources and access:**
 - Carbone (confirmed, ride-along approved)
@@ -167,7 +167,7 @@ Example:
 ## State contracts going to insiders
 
 **The thesis:**
-At least $50 million in state construction contracts over five years went to companies with personal ties to procurement officials, circumventing competitive bidding.
+At least more than $50 million in state construction contracts across five years went to companies with personal ties to procurement officials, circumventing competitive bidding.
 
 **Why it matters:**
 Taxpayers are overpaying for public projects. At least three bridges have needed early repairs after work by connected contractors.
@@ -351,24 +351,24 @@ Can you explain this story in one sentence to someone at dinner?
 ## Common pitch mistakes
 
 ### The information dump
-❌ "There's a lot going on with the school board. They've had budget issues, enrollment decline, a superintendent search, and facilities problems. I want to cover all of it."
+**Wrong:** "There's a lot going on with the school board. They've had budget issues, enrollment decline, a superintendent search, and facilities problems. I want to cover all of it."
 
-✅ "The superintendent search is down to two finalists with opposite visions for the district. I'll profile both and explain what's at stake."
+**Better:** "The superintendent search is down to two finalists with opposite visions for the district. I'll profile both and explain what's at stake."
 
 ### The missing news hook
-❌ "Homelessness is a growing problem in our city."
+**Wrong:** "Homelessness is a growing problem in our city."
 
-✅ "The city's eviction filings hit a five-year high last month. Here's what's driving it."
+**Better:** "The city's eviction filings hit a five-year high last month. Here's what's driving it."
 
 ### The vague access
-❌ "I'll talk to homeless people and officials."
+**Wrong:** "I'll talk to homeless people and officials."
 
-✅ "I've been following one family through the shelter system for two months. The housing director has agreed to an interview."
+**Better:** "I've been following one family through the shelter system for two months. The housing director has agreed to an interview."
 
 ### The no-stakes pitch
-❌ "The museum is having an exhibit on local history."
+**Wrong:** "The museum is having an exhibit on local history."
 
-✅ "The museum's new exhibit includes artifacts a local family claims were stolen during redevelopment. The family wants them back."
+**Better:** "The museum's new exhibit includes artifacts a local family claims were stolen during redevelopment. The family wants them back."
 
 ## After the pitch
 

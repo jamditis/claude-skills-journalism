@@ -1,6 +1,6 @@
 ---
 name: ai-writing-detox
-description: Eliminate AI-generated writing patterns that erode reader trust. Activate when writing articles, documentation, press releases, or any content where AI patterns would undermine credibility. Essential for journalists using AI assistance who need human-sounding output.
+description: Eliminate AI-generated writing patterns that erode reader trust. Activate when writing articles, documentation, press releases, or any content where AI patterns would undermine credibility. For journalists using AI assistance who need human-sounding output.
 ---
 
 # AI writing detox
@@ -35,7 +35,11 @@ Good writing is invisible. If readers notice the writing style, it's distracting
 | empower | Vague | (be specific about what capability) |
 | innovative | Empty praise | (describe what's new) |
 | transformative | Hyperbolic | changed, improved |
+| sophisticated | Vague filler | advanced, or describe what's complex |
+| leveraging | Corporate jargon | using |
+| ecosystem | Overused metaphor | system, environment |
 | rich | (as modifier) | (delete or be specific) |
+| over (for quantity) | AP rule | more than |
 
 ## Banned phrases
 
@@ -123,33 +127,61 @@ Good writing is invisible. If readers notice the writing style, it's distracting
 
 ### "Not just X—it's Y" pattern
 
-❌ "This isn't just a news story—it's a wake-up call"
-❌ "This wasn't just a press conference—it was a turning point"
+**Avoid:** "This isn't just a news story—it's a wake-up call"
+**Avoid:** "This wasn't just a press conference—it was a turning point"
 
-✅ State the thing directly without dramatic framing
+**Do instead:** State the thing directly without dramatic framing
 
 ### "Fundamentally transforms" pattern
 
-❌ "This fundamentally transforms how newsrooms operate"
-❌ "This represents a fundamental shift in journalism"
+**Avoid:** "This fundamentally transforms how newsrooms operate"
+**Avoid:** "This represents a fundamental shift in journalism"
 
-✅ Describe the actual change without hyperbole
+**Do instead:** Describe the actual change without hyperbole
 
 ### Inflated claims in reporting
 
-❌ "A bombshell revelation"
-❌ "A major milestone"
-❌ "A groundbreaking investigation"
+**Avoid:** "A bombshell revelation"
+**Avoid:** "A major milestone"
+**Avoid:** "A groundbreaking investigation"
 
-✅ Let the facts speak. Readers judge significance.
+**Do instead:** Let the facts speak. Readers judge significance.
 
 ### Empty transitions
 
-❌ "With that in mind..."
-❌ "Building on this foundation..."
-❌ "Taking this a step further..."
+**Avoid:** "With that in mind..."
+**Avoid:** "Building on this foundation..."
+**Avoid:** "Taking this a step further..."
 
-✅ Just make the next point
+**Do instead:** Just make the next point
+
+### "It's not about X, it's about Y" pattern
+
+**Avoid:** "It's not about the technology, it's about the people"
+**Avoid:** "This isn't about clicks. It's about trust."
+
+**Do instead:** State the actual point without rhetorical setup. The X-not-Y construction is the dominant 2025-2026 ChatGPT/Claude rhetorical signature.
+
+### Em-dash overuse between independent clauses
+
+**Avoid:** "The vote was close — only three council members opposed it — but the measure passed."
+**Avoid:** "Reporters arrived early — the press conference was already underway."
+
+**Do instead:** Use commas, periods, or semicolons. Em-dashes are fine in moderation; reflexive use across every paragraph is a tell.
+
+### "The reality is..." / "The truth is..." openers
+
+**Avoid:** "The reality is, most newsrooms can't afford this."
+**Avoid:** "The truth is, readers don't trust anonymous sources."
+
+**Do instead:** Just state the claim. The opener adds words and signals AI-generated framing.
+
+### Tricolon abuse (reflexive three-item lists)
+
+**Avoid:** "Clear, concise, and compelling reporting."
+**Avoid:** "Trust is built through accuracy, transparency, and consistency."
+
+**Do instead:** Use one or two specific points. Three-item parallel lists are an AI rhythm pattern that reads as filler when used reflexively.
 
 ## Before and after examples
 
@@ -224,8 +256,10 @@ Before accepting any AI-assisted text, ask:
 3. Would I say this out loud to a colleague? → If not, rewrite
 4. Does this add information or just sound impressive? → If the latter, cut it
 
-**Remember:** If readers think "AI wrote this," you've already lost their trust.
+If readers think "AI wrote this," you've already lost their trust.
 
 ---
 
 *Good writing is invisible. If readers notice the writing, it's getting in the way of the content.*
+
+*See also: hooks/ai-slop-detector.md for the automated companion to this skill.*

@@ -204,9 +204,9 @@ My deadline is [date/time]. Please let me know if you need more time.
 ### Standard rating scales
 
 **Binary (for internal fact-checking):**
-- ✅ Verified
-- ❌ False
-- ⚠️ Unverifiable
+- Verified
+- False
+- Unverifiable
 
 **Graduated (for fact-check articles):**
 
@@ -345,8 +345,8 @@ Before any story publishes:
 ### Claims verified
 | Claim | Status | Evidence | Notes |
 |-------|--------|----------|-------|
-| [claim 1] | ✅ | [source] | |
-| [claim 2] | ✅ | [source] | |
+| [claim 1] | verified | [source] | |
+| [claim 2] | verified | [source] | |
 
 ### Sources contacted for comment
 | Source | Contacted | Response |
@@ -408,4 +408,4 @@ For dedicated fact-check stories:
 
 ---
 
-*Fact-checking isn't about gotchas. It's about accuracy. The goal is truth, not points.*
+*The goal is accuracy.*

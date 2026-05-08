@@ -132,62 +132,11 @@ When time is critical, prioritize these checks:
 - [ ] MONITOR: Developing, don't publish yet
 ```
 
-### Verification triage system
+### Verification triage
 
-```python
-from dataclasses import dataclass
-from datetime import datetime
-from typing import Optional
-from enum import Enum
+For verification mechanics (source credibility, image/video checks, archiving evidence), use the **source-verification** skill. This skill focuses on the time-pressure layer: what to triage first, who decides to publish, and how to communicate uncertainty.
 
-class VerificationStatus(Enum):
-    UNVERIFIED = "unverified"
-    PARTIALLY_VERIFIED = "partially_verified"
-    VERIFIED = "verified"
-    DEBUNKED = "debunked"
-    UNCERTAIN = "uncertain"
-
-@dataclass
-class Claim:
-    text: str
-    source: str
-    first_seen: datetime
-    urgency: int  # 1-5, higher = more urgent to verify
-    status: VerificationStatus = VerificationStatus.UNVERIFIED
-    verification_notes: str = ""
-    verifier: Optional[str] = None
-
-class VerificationQueue:
-    """Manage claims awaiting verification."""
-
-    def __init__(self):
-        self.claims = []
-
-    def add_claim(self, claim: Claim):
-        self.claims.append(claim)
-        self._sort_by_priority()
-
-    def _sort_by_priority(self):
-        """Urgent claims first, then by time seen."""
-        self.claims.sort(
-            key=lambda c: (-c.urgency, c.first_seen)
-        )
-
-    def next_claim(self) -> Optional[Claim]:
-        """Get highest priority unverified claim."""
-        for claim in self.claims:
-            if claim.status == VerificationStatus.UNVERIFIED:
-                return claim
-        return None
-
-    def update_status(self, claim: Claim,
-                      status: VerificationStatus,
-                      notes: str,
-                      verifier: str):
-        claim.status = status
-        claim.verification_notes = notes
-        claim.verifier = verifier
-```
+Triage rule: claims with the highest physical-harm or election-impact potential go first, then claims that name specific people, then everything else.
 
 ## Crisis communication templates
 
@@ -390,7 +339,7 @@ class CrisisLog:
 For keeping stakeholders informed:
 
 ```markdown
-## Crisis status update #[X]
+## Crisis status update [number]
 
 **As of**: [timestamp]
 **Next update**: [scheduled time]
@@ -520,8 +469,9 @@ BAD: "Some people are saying the event is at 5pm. That's wrong. It's actually at
 
 | Field | Value |
 |-------|-------|
-| Version | 1.0.0 |
-| Created | 2025-12-26 |
-| Author | Claude Skills for Journalism |
-| Domain | Communications, Journalism |
-| Complexity | Advanced |
+| version | 1.0.0 |
+| created | 2025-12-26 |
+| updated | 2026-05-08 |
+| author | Claude skills for journalism |
+| domain | communications, journalism |
+| complexity | advanced |
