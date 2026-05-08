@@ -167,7 +167,7 @@ Example:
 ## State contracts going to insiders
 
 **The thesis:**
-At least more than $50 million in state construction contracts across five years went to companies with personal ties to procurement officials, circumventing competitive bidding.
+More than $50 million in state construction contracts across five years went to companies with personal ties to procurement officials, circumventing competitive bidding.
 
 **Why it matters:**
 Taxpayers are overpaying for public projects. At least three bridges have needed early repairs after work by connected contractors.

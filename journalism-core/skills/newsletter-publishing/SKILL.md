@@ -571,6 +571,6 @@ BENCHMARKS = {
 | version | 1.0.0 |
 | created | 2025-12-26 |
 | updated | 2026-05-08 |
-| author | Claude skills for journalism |
+| author | Joe Amditis |
 | domain | publishing, marketing |
 | complexity | intermediate |

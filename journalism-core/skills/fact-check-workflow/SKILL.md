@@ -345,8 +345,8 @@ Before any story publishes:
 ### Claims verified
 | Claim | Status | Evidence | Notes |
 |-------|--------|----------|-------|
-| [claim 1] | verified | [source] | |
-| [claim 2] | verified | [source] | |
+| [claim 1] | Verified | [source] | |
+| [claim 2] | Verified | [source] | |
 
 ### Sources contacted for comment
 | Source | Contacted | Response |

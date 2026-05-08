@@ -312,6 +312,7 @@ For full archiving workflows (rate limits, batch jobs, recovery from broken arch
 
 ```python
 import requests
+from urllib.parse import quote
 
 def archive_url(url: str, perma_cc_api_key: str | None = None) -> dict:
     """Archive a URL to Wayback Machine and Archive.today.
@@ -324,7 +325,7 @@ def archive_url(url: str, perma_cc_api_key: str | None = None) -> dict:
     # Internet Archive Wayback Machine
     try:
         response = requests.get(
-            f'https://web.archive.org/save/{url}',
+            f'https://web.archive.org/save/{quote(url, safe="")}',
             timeout=60,
             allow_redirects=True,
         )
@@ -506,6 +507,6 @@ Recommended tools:
 | version | 1.1.0 |
 | created | 2025-12-26 |
 | updated | 2026-05-08 |
-| author | Claude skills for journalism |
+| author | Joe Amditis |
 | domain | journalism, verification |
 | complexity | intermediate |

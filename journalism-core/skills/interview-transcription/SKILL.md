@@ -416,6 +416,6 @@ For the per-state breakdown of one-party vs. all-party consent, hidden-recording
 | version | 1.0.0 |
 | created | 2025-12-26 |
 | updated | 2026-05-08 |
-| author | Claude skills for journalism |
+| author | Joe Amditis |
 | domain | journalism, research |
 | complexity | intermediate |

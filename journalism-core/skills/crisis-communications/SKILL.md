@@ -472,6 +472,6 @@ BAD: "Some people are saying the event is at 5pm. That's wrong. It's actually at
 | version | 1.0.0 |
 | created | 2025-12-26 |
 | updated | 2026-05-08 |
-| author | Claude skills for journalism |
+| author | Joe Amditis |
 | domain | communications, journalism |
 | complexity | advanced |
