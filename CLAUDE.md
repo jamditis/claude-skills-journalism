@@ -45,19 +45,19 @@ claude-skills-journalism/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
 │   └── skills/
-│       ├── ai-writing-detox/         # Eliminate AI writing patterns
-│       ├── crisis-communications/    # Breaking news, rapid verification
-│       ├── data-journalism/          # Data analysis, federal-data currency, AI-assisted-analysis cautions
-│       ├── editorial-workflow/       # Assignment tracking, calendars
-│       ├── fact-check-workflow/      # Claim verification
-│       ├── foia-requests/            # Public records requests
-│       ├── interview-prep/           # Interview preparation
-│       ├── interview-transcription/  # Recording, transcription, quotes
-│       ├── newsletter-publishing/    # Email newsletters, subscribers
-│       ├── newsroom-style/           # AP Style enforcement
-│       ├── social-media-intelligence/ # OSINT, account analysis, platform-API currency
-│       ├── source-verification/      # SIFT method, verification, deepfakes/C2PA
-│       └── story-pitch/              # Pitch templates
+│       ├── ai-writing-detox/           # Eliminate AI writing patterns
+│       ├── crisis-communications/      # Breaking news, rapid verification
+│       ├── data-journalism/            # Data analysis, federal-data currency, AI-assisted-analysis cautions
+│       ├── editorial-workflow/         # Assignment tracking, calendars
+│       ├── fact-check-workflow/        # Claim verification
+│       ├── foia-requests/              # Public records requests
+│       ├── interview-prep/             # Interview preparation
+│       ├── interview-transcription/    # Recording, transcription, quotes
+│       ├── newsletter-publishing/      # Email newsletters, subscribers
+│       ├── newsroom-style/             # AP Style enforcement
+│       ├── social-media-intelligence/  # OSINT, account analysis, platform-API currency
+│       ├── source-verification/        # SIFT method, verification, deepfakes/C2PA
+│       └── story-pitch/                # Pitch templates
 │
 ├── # Design and production (2)
 ├── pdf-design/                  # PDF reports, proposals, brand system
@@ -174,14 +174,14 @@ Available plugins: `autocontext`, `journalism-core`, `pdf-design`, `pdf-playgrou
 
 ### Alternate: copy a bare skill into `~/.claude/skills/`
 
-For skills that haven't been packaged into a plugin yet (e.g., `data-journalism`, `social-media-intelligence`), Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
+Some top-level directories (e.g. `web-archiving`, `academic-writing`, `python-pipeline`) are still distributed as bare skills outside any plugin. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
 
 ```bash
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
 cd ~/projects/claude-skills-journalism
 mkdir -p ~/.claude/skills
-cp -r data-journalism ~/.claude/skills/
-# or: ln -sfn "$PWD/data-journalism" ~/.claude/skills/data-journalism
+cp -r web-archiving ~/.claude/skills/
+# or: ln -sfn "$PWD/web-archiving" ~/.claude/skills/web-archiving
 ```
 
 For skills inside a plugin directory (e.g., `journalism-core/skills/source-verification`), point at the nested path:

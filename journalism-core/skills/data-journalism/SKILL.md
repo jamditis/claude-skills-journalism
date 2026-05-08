@@ -98,9 +98,9 @@ The process is iterative, not sequential.
 **Federal data sources**
 
 *General:*
-- **Data.gov** — Federal open data portal. More than 3,000 datasets were removed between Feb 2025 and 2026; consult the [Harvard LIL Data.gov archive](https://lil.law.harvard.edu/blog/2025/02/06/announcing-data-gov-archive/) and the [Data Rescue Project](https://www.datarescueproject.org/) for preserved copies before assuming anything is still accessible.
-- **Census Bureau** (census.gov) — Demographics, economic data. Roughly 3,000 research pages were removed during the 2025 transition; the [End of Term Web Archive](https://eotarchive.org) holds snapshots.
-- **BLS** (bls.gov) — Employment, inflation, wages. The agency lost ~25% of staff after Feb 2025 and skipped the October 2025 Employment Situation release; the CPS October 2025 reference period is permanently uncollected. Check [revised release dates](https://www.bls.gov/bls/2025-lapse-revised-release-dates.htm) before relying on series continuity.
+- **Data.gov** — Federal open data portal. Many datasets were removed between Feb 2025 and 2026; consult the [Harvard LIL Data.gov archive](https://lil.law.harvard.edu/blog/2025/02/06/announcing-data-gov-archive/) and the [Data Rescue Project](https://www.datarescueproject.org/) for preserved copies before assuming anything is still accessible.
+- **Census Bureau** (census.gov) — Demographics, economic data. Many research pages were removed during the 2025 transition; the [End of Term Web Archive](https://eotarchive.org) holds snapshots.
+- **BLS** (bls.gov) — Employment, inflation, wages. Following the 2025 funding lapse, the October 2025 Employment Situation release was canceled and the CPS October 2025 reference period is permanently uncollected. Check [revised release dates](https://www.bls.gov/bls/2025-lapse-revised-release-dates.htm) before relying on series continuity.
 - **BEA** (bea.gov) — GDP, economic accounts.
 - **FRED / Federal Reserve** (fred.stlouisfed.org) — Financial and macroeconomic data; expanded API access through 2026.
 - **SEC EDGAR** — Corporate filings.
@@ -108,7 +108,7 @@ The process is iterative, not sequential.
 *Specific domains:*
 - **EPA** (epa.gov/data) — Environmental data. At least 80 climate webpages were removed in Dec 2025, the endangerment finding was repealed Feb 12, 2026, and the Climate Change Indicators site was largely gutted. The [Environmental Data & Governance Initiative](https://envirodatagov.org) maintains mirrors.
 - **FDA / openFDA** (open.fda.gov) — Drug approvals, recalls, adverse events.
-- **CDC WONDER** — Health statistics. More than 156 datasets were removed from data.cdc.gov after Jan 2025, partially restored under Doctors for America v. Trump (TRO Feb 11, 2025) but with altered terminology in some returns. The volunteer-run [RestoredCDC.org](https://restoredcdc.org/wonder.cdc.gov/) mirrors removed content.
+- **CDC WONDER** — Health statistics. Many datasets were removed from data.cdc.gov after Jan 2025, partially restored under Doctors for America v. Trump (TRO Feb 11, 2025) but with altered terminology in some returns. The volunteer-run [RestoredCDC.org](https://restoredcdc.org/wonder.cdc.gov/) mirrors removed content.
 - **NHTSA FARS / vPIC APIs** — Vehicle safety data.
 - **DOT** — Transportation statistics.
 - **FEC** — Campaign finance; 2025-2026 cycle data live.
@@ -219,7 +219,7 @@ def handle_missing(
     required_col: str | None = None,
 ) -> pd.DataFrame:
     """Drop rows missing values in `required_col` if missingness exceeds either threshold."""
-    if required_col is None:
+    if required_col is None or df.empty:
         return df
 
     missing = df[required_col].isna().sum()
@@ -563,6 +563,7 @@ def adjust_for_inflation(
 
 ```python
 import plotly.express as px
+import plotly.graph_objects as go
 
 # Set default template for all charts
 px.defaults.template = 'simple_white'
@@ -573,18 +574,26 @@ def create_bar_chart(
     source: str,
     x_val: str,
     y_val: str,
-    desc: str = '',
     x_lab: str | None = None,
     y_lab: str | None = None,
-) -> px.bar:
-    """Create a bar chart."""
+    text_col: str | None = None,
+) -> go.Figure:
+    """Create a bar chart with a source-credit footer."""
     fig = px.bar(
         data,
         x=x_val,
         y=y_val,
-        text=desc,
+        text=text_col,
         title=title,
-        labels={'category': (x_lab if x_lab else x_val), 'value': (y_lab if y_lab else y_val)},
+        labels={x_val: x_lab or x_val, y_val: y_lab or y_val},
+    )
+    fig.add_annotation(
+        text=f"Source: {source}",
+        showarrow=False,
+        xref='paper', yref='paper',
+        x=0, y=-0.15,
+        xanchor='left', yanchor='top',
+        font=dict(size=10, color='gray'),
     )
     return fig
 
@@ -593,7 +602,6 @@ fig = create_bar_chart(
     data,
     title='Annual widget production',
     source='Department of Widgets, 2024',
-    desc='The widget department increased its production dramatically starting in 2014.',
     x_val='year',
     y_val='widgets_prod',
     x_lab='Year',
@@ -730,8 +738,13 @@ def census_geocode(
     Geocode a DataFrame using the U.S. Census batch geocoder.
     Automatically handles datasets larger than 10,000 rows by chunking.
 
-    Returns DataFrame with: latitude, longitude, statefp, countyfp,
-    tract, block, match, matchtype, parsed, tigerlineid, side
+    Returns DataFrame with the documented batch-endpoint fields:
+        id, address, match, matchtype, parsed, tigerlineid, side, lat, lon
+
+    The batch endpoint does not return state/county/tract FIPS codes.
+    For census-geography output, use the per-address helper below
+    (`cg.onelineaddress(addr, returntype='geographies')`) on the matched
+    rows, or call `cg.address(...)` per row.
     """
     col_map = {id_col: 'id', address_col: 'address', city_col: 'city'}
     if state_col and state_col in df.columns:
@@ -768,6 +781,26 @@ geocoded = (pd
                     city_col='city',
                     state_col='state',
                     zipcode_col='zip'))
+
+# Follow-up per-address lookup for census geographies (state/county/tract FIPS).
+# The batch endpoint above does not return these — only lat/lon and match status.
+def add_geographies(geocoded: pd.DataFrame) -> pd.DataFrame:
+    """For each matched row, fetch census-geography FIPS via per-address API."""
+    fips_rows = []
+    for row in geocoded[geocoded['match']].itertuples():
+        try:
+            geo = cg.onelineaddress(row.address, returntype='geographies')
+            block = geo[0]['geographies']['Census Blocks'][0]
+            fips_rows.append({
+                'id': row.id,
+                'state_fips': block['STATE'],
+                'county_fips': block['COUNTY'],
+                'tract': block['TRACT'],
+                'block': block['BLOCK'],
+            })
+        except (IndexError, KeyError):
+            continue
+    return geocoded.merge(pd.DataFrame(fips_rows), on='id', how='left')
 ```
 
 #### Google Maps Geocoder
