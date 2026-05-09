@@ -52,7 +52,12 @@ pytest tests/test_module.py::test_bug_description -v
 pytest tests/test_module.py -v  # All tests in file
 pytest -x  # Stop on first failure
 pytest --tb=short  # Shorter tracebacks
+
+# Watch-mode loop (re-runs on file change). Install with: pip install pytest-watcher
+ptw -- tests/test_module.py -v
 ```
+
+For async tests, install `pytest-asyncio` and either decorate each test with `@pytest.mark.asyncio` (above) or set `asyncio_mode = auto` in `pytest.ini` / `pyproject.toml` to skip the per-test decorator.
 
 ### unittest
 
@@ -122,7 +127,8 @@ it('should handle API error', async () => {
 
 **Run commands:**
 ```bash
-npm test -- --grep "should handle edge case"
+# Jest uses -t / --testNamePattern (NOT --grep, which is Mocha)
+npm test -- -t "should handle edge case"
 npm test -- __tests__/module.test.js
 npm test -- --watch  # Watch mode
 ```
