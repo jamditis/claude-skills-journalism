@@ -43,13 +43,14 @@ Try services in this order for maximum coverage:
 import requests
 from typing import Optional
 from datetime import datetime
+from urllib.parse import quote
 
 def check_wayback_availability(url: str) -> Optional[dict]:
     """Check if URL exists in Wayback Machine."""
-    api_url = f"https://archive.org/wayback/available?url={url}"
+    api_url = "https://archive.org/wayback/available"
 
     try:
-        response = requests.get(api_url, timeout=10)
+        response = requests.get(api_url, params={'url': url}, timeout=10)
         data = response.json()
 
         if data.get('archived_snapshots', {}).get('closest'):
@@ -89,7 +90,7 @@ def save_to_wayback(url: str, s3_keys: Optional[tuple[str, str]] = None) -> Opti
     to raise the cap (anonymous → ~50/min with auth) and avoid silent
     drops on paywalled / heavily JS-rendered pages.
     """
-    save_url = f"https://web.archive.org/save/{url}"
+    save_url = f"https://web.archive.org/save/{quote(url, safe='')}"
 
     headers = {'User-Agent': 'Mozilla/5.0 (research-archiver)'}
     if s3_keys:
@@ -211,7 +212,7 @@ def search_archive_today(url: str) -> Optional[str]:
     Uses the /newest/<url> lookup which 302s to the most recent
     snapshot (or to a CAPTCHA page if rate-limited).
     """
-    search_url = f"https://archive.ph/newest/{url}"
+    search_url = f"https://archive.ph/newest/{quote(url, safe='')}"
 
     try:
         response = requests.get(
@@ -420,9 +421,11 @@ class ArchiveBoxManager:
 ```python
 import hashlib
 import sys
+import json
+import requests
 from datetime import datetime, timezone
 from dataclasses import dataclass, asdict
-import json
+from typing import List
 
 @dataclass
 class EvidenceRecord:
@@ -605,9 +608,12 @@ javascript:(function(){
 // Sept 2024 and is omitted here.
 javascript:(function(){
     var url = location.href;
+    // archive.ph reads its URL argument as a path segment, so it must
+    // be percent-encoded; Wayback /web/*/ and Memento /list/0/ accept
+    // raw URLs per their documented APIs.
     var archives = [
         'https://web.archive.org/web/*/' + url,
-        'https://archive.ph/newest/' + url,
+        'https://archive.ph/newest/' + encodeURIComponent(url),
         'https://timetravel.mementoweb.org/list/0/' + url
     ];
     archives.forEach(function(a){ window.open(a, '_blank'); });

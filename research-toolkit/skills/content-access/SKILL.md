@@ -503,7 +503,7 @@ def get_archived_article(url: str) -> str:
     # /newest/<url> 302s to the most recent snapshot or to a CAPTCHA
     # page if rate-limited. Disable redirects so we can inspect the
     # Location header explicitly.
-    search_url = f"https://archive.ph/newest/{url}"
+    search_url = f"https://archive.ph/newest/{quote(url, safe='')}"
 
     try:
         response = requests.get(
