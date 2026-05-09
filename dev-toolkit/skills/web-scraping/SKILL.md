@@ -36,7 +36,7 @@ class Scraper(ABC):
     @abstractmethod
     def fetch(self, url: str) -> Optional[ScrapingResult]: ...
 
-class TrafilaturaСscraper(Scraper):
+class TrafilaturaCscraper(Scraper):
     """Fast, lightweight extraction for standard articles."""
 
     def fetch(self, url: str) -> Optional[ScrapingResult]:
@@ -196,7 +196,7 @@ class ScrapingCascade:
 
     def __init__(self):
         self.scrapers = [
-            TrafilaturaСscraper(),
+            TrafilaturaCscraper(),
             RequestsScraper(),
             PlaywrightScraper(),
         ]
@@ -208,6 +208,22 @@ class ScrapingCascade:
                 return result
         return None
 ```
+
+## Anti-bot landscape (as of 2026-05)
+
+The cascade above (`requests` → `trafilatura` → Playwright + `playwright-stealth`) handles plain HTML and lightly-protected JS sites. Modern anti-bot stacks (Cloudflare Bot Management / Turnstile, DataDome, Akamai Bot Manager, PerimeterX) layer multiple detection signals: TLS / HTTP-2 fingerprints, browser fingerprints, JS-execution proofs, residential-IP reputation, session behavior. No single tool defeats all of them.
+
+`playwright-stealth` (2.0+, current) patches obvious detection vectors — `navigator.webdriver`, `chrome.runtime`, plugin enumeration, language settings, WebGL fingerprints. Treat it as the floor, not the ceiling. If a target fingerprints TLS or runs Turnstile, stealth alone won't pass.
+
+| Tool | Layer it addresses | Notes |
+|---|---|---|
+| `curl_cffi` | TLS / HTTP-2 fingerprint | Drop-in replacement for `requests` that mimics Chrome/Safari/Edge JA3+ALPN. Can't run JS — pair with a parsed-HTML extractor when JS isn't required. |
+| `playwright-stealth` 2.x | JS-runtime fingerprint | The starting line for Playwright/Chromium. Updates lag the bot stacks; expect to combine with rotation. |
+| Camoufox | JS + browser fingerprint at C++ level | Firefox-based stealth browser. Spoofs fingerprint values low enough that JS-side checks can't see through them. Use when Chromium-based stealth is detected. |
+| SeleniumBase UC Mode | Turnstile + browser fingerprint | The closest thing to a one-shot Turnstile solver in 2026, but heavier than playwright-stealth. |
+| Residential proxy pool | IP reputation | Datacenter IPs (DigitalOcean, AWS) get challenged on first request. Residential pools cost more but bypass the cheapest layer of defense. |
+
+**Use the lightest tool that works.** Targets without aggressive defense don't need Camoufox or proxy pools — `curl_cffi` plus a sleep is usually enough. Reserve heavier tools for sites that explicitly serve a Turnstile challenge or DataDome interstitial.
 
 ## Undocumented APIs
 
@@ -608,11 +624,25 @@ class PoliteRequester:
         self.last_request_per_domain[domain] = time.time()
 ```
 
-## Ethical considerations
+## Ethics, robots.txt, and the legal landscape
 
-- Always check `robots.txt` before scraping
-- Respect rate limits and add delays between requests
-- Don't scrape personal data without consent
-- Cache responses to avoid redundant requests
-- Identify yourself with a descriptive User-Agent when appropriate
-- Stop if you receive explicit blocking signals
+Scraping is technically simple, ethically nuanced, and legally a moving target. The current state in the US (2026):
+
+**Computer Fraud and Abuse Act (CFAA).** *Van Buren v. United States* (2021) and *hiQ Labs v. LinkedIn* (2022) narrowed the CFAA so that scraping public, non-credentialed pages does NOT constitute "unauthorized access." Logging in (or using credentials), bypassing technical access controls, or scraping after an explicit cease-and-desist letter remains legally fraught. State equivalents (e.g., California's CDAFA) sometimes go further than federal law.
+
+**Terms of service.** Many sites' ToS forbid scraping. ToS is a contract, not a criminal statute — breach exposes you to civil claims (breach of contract, tortious interference, trespass to chattels in some jurisdictions), not jail. The risk profile differs sharply from CFAA.
+
+**robots.txt** is a polite request, not a legal mandate. Ignoring it doesn't make you criminally liable, but courts have cited it as evidence of intent. For journalism in the public interest, that intent can be defensible; for commercial use, it's harder.
+
+**EU GDPR / UK DPA.** If your scraping pulls personal data of EU/UK residents, GDPR/DPA apply regardless of where you run the scraper. Public availability does NOT exempt personal data from these regimes — `Lloyd v. Google` (UK Supreme Court 2021) and CJEU's `Schrems II` lineage make scraping personal data without a lawful basis a real liability.
+
+**Practical baseline:**
+- Always read `robots.txt`. Honor crawl delays. Honor `Disallow:`.
+- Respect rate limits; add jitter; back off on `429`.
+- Don't scrape behind authentication unless you have explicit permission.
+- Don't scrape personal data (names, emails, photos) without a lawful basis.
+- Identify yourself with a descriptive User-Agent and a contact URL when crawling at volume.
+- Cache aggressively to avoid redundant requests.
+- Stop if you receive a cease-and-desist or explicit blocking signal — escalating past one is the move that turns a civil dispute into a CFAA case.
+
+**Notes on specific platforms.** Instagram's `instaloader` and TikTok scraping via `yt-dlp` work today but break frequently — Meta and TikTok roll out anti-bot updates monthly. Account bans on the credentials you used are common. For journalism, the official APIs (Meta Content Library, TikTok Research API) are slower but more durable.
