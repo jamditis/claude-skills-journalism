@@ -41,11 +41,12 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | [pdf-design](./pdf-design/) | PDF report and proposal design system with brand variables, budget tables, and reusable content blocks (stats strips, three-column, four-tile pillars, partner grids) | n/a — skill-only |
 | [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials with an interactive control panel for live design editing (colors, fonts, spacing, sections) and a guided wizard for proposals | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` |
 | [research-toolkit](./research-toolkit/) | Five skills for research, source preservation, and academic workflows: academic writing, legal paywall-bypass via Unpaywall and library databases, web archiving (Wayback / Archive.today / ArchiveBox), web page change monitoring, and AI-enriched digital archive construction | n/a — skills only |
+| [security-toolkit](./security-toolkit/) | Three defensive web application security skills covering OWASP Top 10 fundamentals: pre-deployment audit checklists (auth, input validation, secrets management), secure authentication implementation patterns (password hashing, session management, JWT, OAuth, passkeys), and API hardening (rate limiting, CORS, request throttling, defense-in-depth for Express, FastAPI, and serverless) | n/a — skills only |
 | [superjawn](./superjawn/) | Research-augmented fork of obra/superpowers. Default-on research phase fires before brainstorming, systematic-debugging, and writing-skills. v1.0.0 ships all 14 skills with no soft dependencies on the upstream `superpowers` plugin | invoked indirectly via skills (e.g. `superjawn:brainstorming`, `superjawn:systematic-debugging`, `superjawn:writing-plans`) |
 
 ### Skills (manual installation)
 
-Most skills now ship inside plugins (see the table above). For skills that haven't been bundled into a plugin yet (e.g., `security-checklist`, `nano-banana-image-gen`, `visual-explainer`), Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep. Clone this repo anywhere you like, then copy or symlink the bare skills you want:
+Most skills now ship inside plugins (see the table above). For skills that haven't been bundled into a plugin yet (e.g., `nano-banana-image-gen`, `visual-explainer`, `free-apis-catalog`), Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep. Clone this repo anywhere you like, then copy or symlink the bare skills you want:
 
 ```
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
@@ -53,15 +54,16 @@ cd ~/projects/claude-skills-journalism
 mkdir -p ~/.claude/skills
 
 # Copy a bare top-level skill:
-cp -r security-checklist ~/.claude/skills/
+cp -r nano-banana-image-gen ~/.claude/skills/
 
 # Or pull a single skill out of a plugin's skills/ directory:
 cp -r journalism-core/skills/source-verification ~/.claude/skills/
 cp -r research-toolkit/skills/web-archiving ~/.claude/skills/
 cp -r dev-toolkit/skills/web-scraping ~/.claude/skills/
+cp -r security-toolkit/skills/secure-auth ~/.claude/skills/
 
 # Or symlink so git pull updates them in place (ln -sfn replaces an existing link):
-ln -sfn "$PWD/security-checklist" ~/.claude/skills/security-checklist
+ln -sfn "$PWD/nano-banana-image-gen" ~/.claude/skills/nano-banana-image-gen
 ```
 
 Do not clone the repo directly into `~/.claude/skills/journalism-skills/` — that nests each `SKILL.md` too deep and Claude Code won't find them.
@@ -136,13 +138,15 @@ These ten skills ship together as the [dev-toolkit](./dev-toolkit/) plugin. Inst
 | [web-ui-best-practices](./dev-toolkit/skills/web-ui-best-practices/) | Container queries, `:has()`, view transitions, scroll-driven animations, signs of taste in web UI |
 | [zero-build-frontend](./dev-toolkit/skills/zero-build-frontend/) | ESM import maps, htmx, Alpine.js, no-build deployment |
 
-### Security (ship without getting sued)
+### Security skills (in `security-toolkit` plugin)
+
+These three skills ship together as the [security-toolkit](./security-toolkit/) plugin. Install via `/plugin install security-toolkit@claude-skills-journalism` to get all of them at once.
 
 | Skill | Description |
 |-------|-------------|
-| [security-checklist](./security-checklist/) | Pre-deployment security audit covering auth, input validation, secrets, and compliance |
-| [secure-auth](./secure-auth/) | Production-ready authentication patterns (sessions, JWTs, OAuth, MFA) |
-| [api-hardening](./api-hardening/) | Rate limiting, input validation, CORS, API key management |
+| [api-hardening](./security-toolkit/skills/api-hardening/) | Rate limiting, input validation, CORS, security headers, API key management, defense-in-depth for Express, FastAPI, and serverless |
+| [secure-auth](./security-toolkit/skills/secure-auth/) | Production-ready authentication patterns: password hashing, session management, JWT, OAuth, passkeys / WebAuthn, MFA |
+| [security-checklist](./security-toolkit/skills/security-checklist/) | Pre-deployment security audit covering OWASP Top 10 fundamentals: authentication, input validation, secrets, database security, compliance basics |
 
 ### AI and creative tools
 
