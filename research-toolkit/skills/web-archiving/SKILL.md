@@ -68,14 +68,19 @@ def check_wayback_availability(url: str) -> Optional[dict]:
 def get_wayback_url(url: str, timestamp: str = None) -> str:
     """Generate Wayback Machine URL for a page.
 
+    Returns the canonical raw form (`.../web/<timestamp>/<url>`) per
+    Wayback's replay-URL convention. If you intend to navigate to the
+    returned link in a browser AND the target URL has `#` fragments,
+    encode at the call site with urllib.parse.quote so the browser
+    doesn't strip the fragment before request dispatch.
+
     Args:
         url: Original URL to retrieve
         timestamp: Optional YYYYMMDDHHMMSS format, or None for latest
     """
-    encoded = quote(unquote(url), safe='')
     if timestamp:
-        return f"https://web.archive.org/web/{timestamp}/{encoded}"
-    return f"https://web.archive.org/web/{encoded}"
+        return f"https://web.archive.org/web/{timestamp}/{url}"
+    return f"https://web.archive.org/web/{url}"
 ```
 
 ### Save page to Wayback Machine
