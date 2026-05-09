@@ -72,9 +72,10 @@ def get_wayback_url(url: str, timestamp: str = None) -> str:
         url: Original URL to retrieve
         timestamp: Optional YYYYMMDDHHMMSS format, or None for latest
     """
+    encoded = quote(unquote(url), safe='')
     if timestamp:
-        return f"https://web.archive.org/web/{timestamp}/{url}"
-    return f"https://web.archive.org/web/{url}"
+        return f"https://web.archive.org/web/{timestamp}/{encoded}"
+    return f"https://web.archive.org/web/{encoded}"
 ```
 
 ### Save page to Wayback Machine
@@ -585,20 +586,17 @@ class PermaCC:
 ```javascript
 // Save to Wayback Machine - add as bookmark
 javascript:(function(){
-    var url = location.href;
-    window.open('https://web.archive.org/save/' + url, '_blank');
+    window.open('https://web.archive.org/save/' + encodeURIComponent(location.href), '_blank');
 })();
 
 // Save to Archive.today
 javascript:(function(){
-    var url = location.href;
-    window.open('https://archive.today/?run=1&url=' + encodeURIComponent(url), '_blank');
+    window.open('https://archive.today/?run=1&url=' + encodeURIComponent(location.href), '_blank');
 })();
 
 // Check all archives (Memento)
 javascript:(function(){
-    var url = location.href;
-    window.open('https://timetravel.mementoweb.org/list/0/' + url, '_blank');
+    window.open('https://timetravel.mementoweb.org/list/0/' + encodeURIComponent(location.href), '_blank');
 })();
 ```
 
@@ -636,8 +634,10 @@ javascript:(function(){
 ## Error handling and fallbacks
 
 ```python
+import requests
 from enum import Enum
 from typing import Optional
+from urllib.parse import quote, unquote
 
 class ArchiveError(Enum):
     NOT_FOUND = "No archive found"
@@ -669,7 +669,7 @@ def get_archived_page(url: str) -> tuple[Optional[str], Optional[ArchiveError]]:
 
     # 3. Try Memento aggregator
     try:
-        memento_url = f"https://timetravel.mementoweb.org/api/json/0/{url}"
+        memento_url = f"https://timetravel.mementoweb.org/api/json/0/{quote(unquote(url), safe='')}"
         response = requests.get(memento_url, timeout=30)
         data = response.json()
 
