@@ -36,6 +36,7 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | Plugin | Description | Commands |
 |--------|-------------|----------|
 | [autocontext](./autocontext/) | Cross-session knowledge persistence with skill evolution. Lessons accumulate per-skill, and `/autocontext:evolve` folds them back into skill files | `/autocontext:setup`, `/autocontext:init`, `/autocontext:review`, `/autocontext:status`, `/autocontext:evolve` |
+| [dev-toolkit](./dev-toolkit/) | Ten development-focused skills for journalists, researchers, and small newsroom dev teams: accessibility (WCAG 2.2), Electron app patterns, mobile/remote debugging, irreversible-decision discipline, Python data pipelines, test-first bug fixing, AI-assisted development workflows, ethical web scraping, no-build frontend patterns, and signs-of-taste guidance for web UI | n/a — skills only |
 | [journalism-core](./journalism-core/) | Eleven core journalism skills: AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, fact-checking, interview prep + transcription, story pitches, editorial workflow, crisis communications, and newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements | n/a — skills only |
 | [pdf-design](./pdf-design/) | PDF report and proposal design system with brand variables, budget tables, and reusable content blocks (stats strips, three-column, four-tile pillars, partner grids) | n/a — skill-only |
 | [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials with an interactive control panel for live design editing (colors, fonts, spacing, sections) and a guided wizard for proposals | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` |
@@ -44,7 +45,7 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 
 ### Skills (manual installation)
 
-Most skills now ship inside plugins (see the table above). For skills that haven't been bundled into a plugin yet (e.g., `python-pipeline`, `vibe-coding`, `web-scraping`), Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep. Clone this repo anywhere you like, then copy or symlink the bare skills you want:
+Most skills now ship inside plugins (see the table above). For skills that haven't been bundled into a plugin yet (e.g., `security-checklist`, `nano-banana-image-gen`, `visual-explainer`), Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep. Clone this repo anywhere you like, then copy or symlink the bare skills you want:
 
 ```
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
@@ -52,14 +53,15 @@ cd ~/projects/claude-skills-journalism
 mkdir -p ~/.claude/skills
 
 # Copy a bare top-level skill:
-cp -r python-pipeline ~/.claude/skills/
+cp -r security-checklist ~/.claude/skills/
 
 # Or pull a single skill out of a plugin's skills/ directory:
 cp -r journalism-core/skills/source-verification ~/.claude/skills/
 cp -r research-toolkit/skills/web-archiving ~/.claude/skills/
+cp -r dev-toolkit/skills/web-scraping ~/.claude/skills/
 
 # Or symlink so git pull updates them in place (ln -sfn replaces an existing link):
-ln -sfn "$PWD/python-pipeline" ~/.claude/skills/python-pipeline
+ln -sfn "$PWD/security-checklist" ~/.claude/skills/security-checklist
 ```
 
 Do not clone the repo directly into `~/.claude/skills/journalism-skills/` — that nests each `SKILL.md` too deep and Claude Code won't find them.
@@ -115,20 +117,22 @@ These five skills ship together as the [research-toolkit](./research-toolkit/) p
 | [project-retrospective](./project-retrospective/) | Generate LESSONS.md files that document what worked and what didn't. Templates for investigations, events, publications, and tools |
 | [template-selector](./template-selector/) | Decision tree for choosing the right project documentation template |
 
-### Development (for building tools)
+### Development skills (in `dev-toolkit` plugin)
+
+These ten skills ship together as the [dev-toolkit](./dev-toolkit/) plugin. Install via `/plugin install dev-toolkit@claude-skills-journalism` to get all of them at once, or copy individual skills from `dev-toolkit/skills/<name>/`.
 
 | Skill | Description |
 |-------|-------------|
-| [test-first-bugs](./test-first-bugs/) | Test-driven bug fixing: write failing test first, then fix with subagents |
-| [vibe-coding](./vibe-coding/) | AI-assisted software development methodology based on YC best practices |
-| [electron-dev](./electron-dev/) | Electron + React desktop application development patterns |
-| [python-pipeline](./python-pipeline/) | Data processing pipelines with modular architecture |
-| [web-scraping](./web-scraping/) | Content extraction with anti-bot handling and poison pill detection |
-| [zero-build-frontend](./zero-build-frontend/) | Static web apps without build tools, CDN-loaded frameworks |
-| [mobile-debugging](./mobile-debugging/) | Eruda, vConsole, remote debugging, iOS debugging, console capture |
-| [accessibility-compliance](./accessibility-compliance/) | WCAG compliance, alt text, accessible charts, keyboard navigation |
-| [web-ui-best-practices](./web-ui-best-practices/) | Signs of taste in web UI — 100ms interactions, skeleton loading, minimal color, command palette, honest cancellation, optical alignment |
-| [one-way-door](./one-way-door/) | Flag irreversible architectural decisions (data models, infra, auth, APIs) before committing |
+| [accessibility-compliance](./dev-toolkit/skills/accessibility-compliance/) | WCAG 2.2 baseline, alt text, focus management, motion preferences, accessible charts |
+| [electron-dev](./dev-toolkit/skills/electron-dev/) | Electron security model (contextIsolation, sandbox), IPC patterns, packaging |
+| [mobile-debugging](./dev-toolkit/skills/mobile-debugging/) | Eruda, vConsole, Chrome DevTools on Android, Safari Web Inspector for iOS, console capture |
+| [one-way-door](./dev-toolkit/skills/one-way-door/) | Flag irreversible architectural decisions (data models, infra, auth, APIs) before committing |
+| [python-pipeline](./dev-toolkit/skills/python-pipeline/) | Data pipelines (pandas, polars, DuckDB, asyncio) with modular architecture |
+| [test-first-bugs](./dev-toolkit/skills/test-first-bugs/) | Test-driven bug fixing: write failing test first, then fix with subagents |
+| [vibe-coding](./dev-toolkit/skills/vibe-coding/) | AI-assisted development workflow (Claude Code, Cursor, Aider, Continue) |
+| [web-scraping](./dev-toolkit/skills/web-scraping/) | Ethical scraping patterns (Playwright, robots.txt, anti-bot defense, terms-of-service) |
+| [web-ui-best-practices](./dev-toolkit/skills/web-ui-best-practices/) | Container queries, `:has()`, view transitions, scroll-driven animations, signs of taste in web UI |
+| [zero-build-frontend](./dev-toolkit/skills/zero-build-frontend/) | ESM import maps, htmx, Alpine.js, no-build deployment |
 
 ### Security (ship without getting sued)
 
