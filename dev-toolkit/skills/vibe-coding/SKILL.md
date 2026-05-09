@@ -1,11 +1,13 @@
 ---
 name: vibe-coding
-description: Methodology for effective AI-assisted software development. Use when helping users build software with AI coding assistants, debugging AI-generated code, planning features for AI implementation, managing version control in AI workflows, or when users mention "vibe coding," Cursor, Windsurf, or similar AI coding tools. Provides strategies for planning, testing, debugging, and iterating on code written with LLM assistance.
+description: Methodology for effective AI-assisted software development. Use when helping users build software with AI coding assistants, debugging AI-generated code, planning features for AI implementation, managing version control in AI workflows, or when users mention "vibe coding," Claude Code, Cursor, GitHub Copilot, Aider, Continue, Cline, Codex, Windsurf, or similar AI coding tools. Provides strategies for planning, testing, debugging, and iterating on code written with LLM assistance.
 ---
 
 # Vibe coding methodology
 
 Practical strategies for building software effectively with AI coding assistants.
+
+> **Tool landscape moves fast.** This skill was last swept 2026-05-08. The methodology (planning, version control, testing, bug-fixing) is stable; the specific tool names, instruction-file conventions, and pricing details drift quarterly. Treat the named tools as representative, not exhaustive.
 
 ## Planning process
 
@@ -19,11 +21,13 @@ Start by working with the AI to write a detailed implementation plan in a markdo
 
 ## Version control strategies
 
-Git is your safety net—don't rely solely on the AI tool's revert functionality.
+Git is your safety net — don't rely solely on the AI tool's revert functionality.
 
-**Clean slate principle**: Begin each new feature with a clean git state. When stuck, use `git reset --hard HEAD` if the AI goes down an unproductive path. Multiple failed attempts create layers of bad code that compound problems.
+**Branch per attempt**: Begin each new feature on a fresh feature branch (`git switch -c feature/xyz`) and commit small chunks as the AI makes progress. The branch boundary is your "if this goes off the rails, throw it away" boundary — you discard the branch, not your working tree.
 
-**Clean implementation**: When you finally find a working solution after several attempts, reset to a clean state and implement it fresh. Multiple failed attempts create layers and layers of bad code—don't keep the accumulated mess. A clean re-implementation of a known-good solution is faster and more maintainable than untangling spaghetti.
+**When the AI goes down a bad path**: Prefer reversible commands. `git restore .` discards uncommitted changes; `git stash` parks them; `git switch -` jumps back to your previous branch. Reach for `git reset --hard HEAD` only when you've confirmed there's nothing in the working tree worth keeping — destructive commands skip the reflog niceties and can swallow uncommitted experiments. (If the agent has been creating new files, a separate `git clean -fd` is also part of "really, throw it all away" — same caveats.)
+
+**Clean re-implementation**: When you finally find a working solution after several attempts, branch from main, implement it fresh, and discard the throwaway branch. Multiple failed AI attempts leave layers of dead code that compound future confusion — a clean re-implementation of a known-good solution is faster and more maintainable than untangling the spaghetti.
 
 ## Testing framework
 
@@ -45,15 +49,41 @@ Prioritize end-to-end integration tests over unit tests. Focus on simulating use
 
 **Switch models**: Try different AI models when one gets stuck on a problem.
 
+## AI tool landscape (as of 2026-05)
+
+The current tools cluster into four shapes. Pick by where you work, not by hype.
+
+| Shape | Examples | When |
+|---|---|---|
+| CLI agents | Claude Code, Aider, Codex CLI, Gemini CLI, GitHub Copilot CLI, opencode, Goose | Repo-wide changes, multi-file refactors, automation, headless / cron use |
+| Standalone IDEs | Cursor, Windsurf, Zed, Kiro | Day-to-day editing with chat + autocomplete tightly integrated |
+| IDE extensions | GitHub Copilot, Continue, Cline, Roo Code, Amazon Q | Stay in your existing editor (VS Code, JetBrains, Neovim) |
+| Cloud agents | Devin, OpenHands, Jules, GitHub Copilot Coding Agent | Async / background work via PR, no local terminal needed |
+
+A common stack many developers converge on: **Cursor or Copilot for daily editing + Claude Code (or Codex CLI) for repo-wide / agentic tasks**. They're complementary — fast inline edits in the IDE, longer agentic loops at the terminal.
+
 ## AI tool optimization
 
-**Instruction files**: Write detailed instructions for your AI in appropriate files (cursor.rules, windsurf.rules, claude.md). These provide project-specific context that improves output quality.
+**Instruction files**: Write project-specific context for your AI assistants. Conventions have splintered, but several tools converge on `AGENTS.md` as a shared format. Current naming as of 2026-05:
 
-**Local documentation**: Download API documentation to your project folder. AI tools work more accurately with local docs than trying to recall API details from training.
+| Tool | File(s) | Notes |
+|---|---|---|
+| Claude Code | `CLAUDE.md` (per-directory, nested) | Loaded automatically; see [docs.anthropic.com/en/docs/claude-code/memory](https://docs.anthropic.com/en/docs/claude-code/memory) |
+| Cursor | `.cursor/rules/*.mdc` (modern) — Markdown + YAML frontmatter (`description`, `globs`, `alwaysApply`) | Legacy `.cursorrules` single-file still works but Cursor recommends migrating |
+| Windsurf | `.windsurfrules` or `.windsurf/rules/*.md` | Same dual pattern as Cursor |
+| GitHub Copilot | `.github/copilot-instructions.md` | Single repo-level file, ~4k char practical cap |
+| Cline | `.clinerules` | Single file |
+| Aider | `.aider.conf.yml` (config) + chat history files | Git-native; reads `CONVENTIONS.md` if you point it there |
+| Continue | `.continue/config.json` | JSON config; per-repo |
+| Codex CLI / Gemini CLI / Aider / Continue | `AGENTS.md` (vendor-neutral fallback) | Becoming the cross-tool common denominator |
 
-**Multiple tools**: Some developers run both Cursor and Windsurf simultaneously on the same project. Cursor tends to be faster for frontend work while Windsurf thinks longer on complex problems.
+When working across multiple tools, keep the canonical guidance in `AGENTS.md` and reference it from tool-specific files (`CLAUDE.md`: "Also read AGENTS.md."). That avoids drift between siblings.
 
-**Compare outputs**: Generate multiple solutions and pick the best one rather than accepting the first output.
+**Local documentation**: Download API documentation to your project folder. AI tools work more accurately against local docs than against recalled training data — especially for libraries that release breaking changes faster than training cutoffs (e.g., Sentry SDK, Google GenAI SDK, Selenium).
+
+**Run multiple tools**: There's no penalty for running Cursor for inline edits while a Claude Code or Codex CLI session works in another terminal on a separate task. Different shapes for different work.
+
+**Compare outputs**: For high-stakes decisions, generate solutions from two different model families (e.g., Claude + GPT-5) and pick the better one. They make different mistakes.
 
 ## Complex feature development
 
@@ -79,8 +109,8 @@ AI assistants help with more than writing code:
 - **Design**: Generating favicons and other design elements
 - **Documentation**: Drafting docs and marketing materials
 - **Education**: Explaining implementations line by line
-- **Visual input**: Share screenshots for UI bugs or design inspiration
-- **Voice input**: Tools like Aqua enable 140 words per minute input
+- **Visual input**: Share screenshots for UI bugs or design inspiration. Most modern assistants (Claude Code via paste, Cursor, Copilot Chat) accept image input directly.
+- **Voice input**: Whisper-based transcription tools (Whispr Flow, Superwhisper, MacWhisper, Aqua) reach 130-180 wpm with current OpenAI / Whisper.cpp models. Useful for long-form prompting and rubber-ducking.
 
 ## Continuous improvement
 
