@@ -1,6 +1,6 @@
 # journalism-core
 
-Eleven core journalism skills for Claude Code — covering reporting, verification, and publishing workflows for working journalists.
+Thirteen core journalism skills for Claude Code — covering reporting, verification, and publishing workflows for working journalists.
 
 ## What's in this plugin
 
@@ -8,6 +8,7 @@ Eleven core journalism skills for Claude Code — covering reporting, verificati
 |---|---|
 | **ai-writing-detox** | Eliminate AI-generated writing patterns that erode reader trust |
 | **crisis-communications** | Rapid-response and breaking-news verification frameworks |
+| **data-journalism** | Dataset analysis, chart and map creation, statistical reasoning, data-driven story structure |
 | **editorial-workflow** | Assignment tracking, deadlines, and editorial calendars |
 | **fact-check-workflow** | Structured claim verification, evidence gathering, and rating scales |
 | **foia-requests** | Federal FOIA and state OPRA request templates with current statutory citations (FOIA Improvement Act 2016, NJ OPRA reform 2024) |
@@ -15,6 +16,7 @@ Eleven core journalism skills for Claude Code — covering reporting, verificati
 | **interview-transcription** | Whisper / WhisperX transcription pipelines with speaker diarization |
 | **newsletter-publishing** | Email newsletter workflows including 2024-2026 Gmail / Yahoo / Outlook bulk-sender compliance |
 | **newsroom-style** | AP Style enforcement for journalism writing |
+| **social-media-intelligence** | Narrative tracking, coordinated-campaign analysis, account authenticity checks, OSINT for digital investigations |
 | **source-verification** | Source credibility, image and video verification, deepfake detection (2026), and C2PA Content Credentials |
 | **story-pitch** | Pitch templates for daily news, features, investigations, and freelance queries |
 
