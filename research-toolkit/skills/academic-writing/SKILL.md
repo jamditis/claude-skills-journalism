@@ -560,9 +560,11 @@ verify the target journal's policy before posting if you're unsure.
 | **EngrXiv** | Engineering | OSF-hosted. |
 
 **Why preprint:** Faster timestamp on priority claims, citable months
-before journal acceptance, broader feedback before final review, and
-public availability under the 2026 OSTP Nelson Memo for federally-funded
-US research even before the journal version exists.
+before journal acceptance, and broader feedback before final review.
+(The 2026 OSTP Nelson Memo governs immediate public access to the
+*peer-reviewed* version of federally-funded US research at publication
+— it is not a preprint mandate. Preprinting is a separate, voluntary
+choice that complements but doesn't satisfy Nelson Memo compliance.)
 
 ### Persistent identifiers — get an ORCID and use DOIs
 
@@ -781,7 +783,7 @@ author, not as evidence on their own.
 
 | Purpose | Tools |
 |---------|-------|
-| Reference management | Zotero (recommended; open source, syncs across devices), Paperpile (web-first, Google Docs integration), EndNote, Citavi. **Note:** Mendeley Desktop was discontinued by Elsevier in September 2022 — only the web-based Mendeley Reference Manager remains, with reduced features. |
+| Reference management | Zotero (recommended; open source, syncs across devices), Paperpile (web-first, Google Docs integration), EndNote, Citavi. **Note on Mendeley:** Elsevier announced an end to Mendeley Desktop downloads in September 2022, then later restored availability. Mendeley Desktop remains legacy software with no further feature development; the Mendeley Reference Manager (web/cloud) is the actively maintained product. New users are better served by Zotero or Paperpile. |
 | Writing | Scrivener, Overleaf (LaTeX collaboration), Word, Typst (newer LaTeX alternative) |
 | Collaboration | Google Docs, Overleaf, Hedgedoc |
 | Version control | Git / GitHub / GitLab (true version control). **Word's Track Changes is collaborative editing, not version control** — it lacks branching, merging, history rewrite, and atomic commits. |

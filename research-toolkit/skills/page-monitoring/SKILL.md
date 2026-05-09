@@ -376,12 +376,13 @@ docker run -d -p 3000:80 rssbridge/rss-bridge
 # Twarc requires X (Twitter) API credentials.
 #
 # IMPORTANT (2023+): X eliminated the free Twitter API tier and the
-# free academic research access program. Twarc-based archiving now
-# requires a paid X API plan (Basic at $200/month, Pro at $5,000+/
-# month as of 2026) or institutional access via the post-academic-
-# program research products. For one-off archiving, the snscrape /
-# nitter / web-scraping path may be more cost-effective — see the
-# web-scraping skill.
+# free academic research access program. Current X API pricing has
+# shifted multiple times since the 2023 changes — the Basic / Pro /
+# Enterprise tier names and pay-per-use credit model have been
+# revised; check the current pricing page at
+# https://developer.x.com/en/products/x-api before estimating cost.
+# For one-off archiving, the snscrape / nitter / web-scraping path
+# may be more cost-effective — see the web-scraping skill.
 
 # Installation
 # pip install twarc

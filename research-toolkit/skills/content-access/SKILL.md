@@ -198,23 +198,42 @@ def get_paper_by_doi(doi: str) -> dict:
     return response.json() if response.status_code == 200 else {}
 ```
 
-### OpenAlex API (250M+ scholarly works, free, no key required)
+### OpenAlex API (250M+ scholarly works)
 
 OpenAlex replaced Microsoft Academic Graph after MAG was retired and
 has become the de-facto open scholarly data backbone — many tools
 (Unpaywall companion data, Local Citation Network, OpenCitations)
 now resolve via OpenAlex.
 
+**Auth note (2026):** OpenAlex moved to API-key-required access on
+February 13, 2026, with a credit-based rate model. Anonymous access
+to the website is still free; API access via key has metered limits
+that step up with paid tiers — verify the current model at
+https://docs.openalex.org/. Get a free key from your OpenAlex account.
+
 ```python
-# OpenAlex - free, no API key required, 100k req/day per email
+# OpenAlex API client
 # https://docs.openalex.org/
+# Pricing & key issuance: https://openalex.org/
 
 import requests
 
-def search_openalex(query: str, limit: int = 25, email: str = None) -> list:
-    """Search OpenAlex for works. Pass email to enter the polite pool
-    (higher rate limits, faster service). Returns OA flag + landing page."""
-    headers = {'User-Agent': f'research-toolkit ({email})'} if email else {}
+def search_openalex(query: str, api_key: str, limit: int = 25,
+                    email: str = None) -> list:
+    """Search OpenAlex for works.
+
+    Args:
+        query: free-text search string.
+        api_key: OpenAlex API key (required as of 2026-02-13).
+        limit: max results per page (1-200).
+        email: contact email for the polite pool — recommended even
+               with a key, since OpenAlex prioritizes requests with
+               an identifiable sender.
+    """
+    headers = {
+        'Authorization': f'Bearer {api_key}',
+        'User-Agent': f'research-toolkit ({email})' if email else 'research-toolkit',
+    }
     params = {'search': query, 'per-page': limit}
 
     response = requests.get(
