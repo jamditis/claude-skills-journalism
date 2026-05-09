@@ -585,7 +585,23 @@ app.post('/auth/logout', (req, res) => {
   res.json({ success: true });
 });
 
-// Auth middleware for protected routes — full validation per Storm-0558 lesson
+// Auth middleware for protected routes.
+//
+// Scope of THIS sample: single-issuer private-token deployments using HS256
+// (shared secret). It enforces iss / aud / exp / scope / pinned algorithm —
+// the claim-level half of the Storm-0558 lesson.
+//
+// What this sample does NOT cover and you MUST add for multi-issuer / OIDC
+// (Azure AD / Auth0 / Cognito / etc.): the signing-key tenancy half. There:
+// 1. Use a public-key algorithm (RS256, ES256, EdDSA) — not HS256.
+// 2. Resolve the issuer's JWKS at the issuer's well-known URL.
+// 3. Pin which JWKS each trusted issuer is allowed to use, and reject any
+//    token whose iss does not match the JWKS that signed it. Storm-0558's
+//    proximate failure was OWA accepting a consumer-tenant key for an
+//    enterprise-tenant token because the verifier did NOT enforce this
+//    issuer-to-key-set binding.
+// 4. Select the verifying key by the JWT's `kid` — but only from within
+//    the pinned key set for that issuer.
 function requireAuth(requiredScope) {
   return function (req, res, next) {
     const authHeader = req.headers.authorization;
@@ -1332,7 +1348,7 @@ Attackers used compromised credentials on a Citrix remote-access portal that lac
 
 ### Snowflake / UNC5537 (Apr-Jun 2024)
 
-Approximately 165 customer tenants were breached because Snowflake's MFA was opt-in per tenant; attackers used infostealer-harvested credentials against accounts with no second factor. Mandiant's writeup is at https://cloud.google.com/blog/topics/threat-intelligence/unc5537-snowflake-data-theft-extortion. Snowflake enforced default-on MFA from October 2024 and blocked password-only sign-in entirely by November 2025.
+Approximately 165 customer tenants were breached because Snowflake's MFA was opt-in per tenant; attackers used infostealer-harvested credentials against accounts with no second factor. Mandiant's writeup is at https://cloud.google.com/blog/topics/threat-intelligence/unc5537-snowflake-data-theft-extortion. Snowflake enforced default-on MFA from October 2024 and has been phasing in mandatory blocking of password-only sign-in across 2025-2026; see Snowflake's MFA enforcement documentation (https://docs.snowflake.com/) for the current rollout schedule.
 
 **Lesson:** MFA must default to ON, not opt-in. If your customers can disable it, attackers will find the ones who did.
 
@@ -1340,7 +1356,7 @@ Approximately 165 customer tenants were breached because Snowflake's MFA was opt
 
 A Microsoft consumer signing key was compromised; attackers forged Azure AD tokens and accessed enterprise OWA mailboxes. The proximate failure was that OWA's token-validation library accepted a consumer-key-signed token for enterprise mailboxes — it skipped scope, issuer, and signing-key tenancy validation. CSRB report: https://www.cisa.gov/resources-tools/resources/CSRB-Review-Summer-2023-MEO-Intrusion. (Microsoft's MSRC postmortem URL is decommissioned.)
 
-**Lesson:** Validate every claim every time — issuer, audience, scope, signing-key tenancy. The JWT recipe above bakes this in via `jwt.verify`'s issuer / audience options and an explicit scope check.
+**Lesson:** Validate every claim every time — issuer, audience, scope, expiration, pinned algorithm. AND for multi-issuer / OIDC deployments, validate signing-key tenancy: pin which JWKS each trusted issuer is allowed to use, and never select a verifying key from a different issuer's set, even if the `kid` matches. The JWT recipe above bakes in `iss` / `aud` / `scope` / pinned algorithm — that's the claim-level half of the lesson and covers single-issuer private-token deployments. The signing-key tenancy half (JWKS resolution and issuer-to-key-set binding) is not in the sample; see the comment block above the `requireAuth` function for what to add when accepting tokens from multiple tenants.
 
 ### Okta HAR breach (Oct 2023)
 
