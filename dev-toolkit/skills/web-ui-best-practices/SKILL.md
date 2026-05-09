@@ -48,6 +48,86 @@ Never show a spinner when you know the shape of what's coming. Render a skeleton
 }
 ```
 
+## Modern CSS toolkit
+
+Four capabilities matured between 2023 and 2026 that change how you build component-level responsive layouts and SPA-like transitions without JavaScript. Reach for them before adding a framework.
+
+### Container queries
+
+Container queries let a component respond to **its container's** size, not the viewport's. The same card can render in a 300px sidebar and a 900px main column without media-query coordination at the page level.
+
+```css
+.card-list {
+  container-type: inline-size;
+  container-name: cards;
+}
+
+@container cards (min-width: 480px) {
+  .card { display: grid; grid-template-columns: 120px 1fr; }
+}
+```
+
+Stable in all major browsers since 2023. Replaces most "the same component in two places needs to look different" hacks.
+
+### `:has()` parent selector
+
+`:has()` lets a parent style itself based on its descendants — the long-requested "parent selector." Useful for marking a form field as in-error, a card as having an attached image, or a row as containing a focused input — all without JS.
+
+```css
+/* Highlight a form group when its input has focus */
+.form-group:has(input:focus) {
+  outline: 2px solid var(--color-primary);
+}
+
+/* Add bottom margin to articles that contain a figure */
+article:has(figure) {
+  margin-bottom: 2rem;
+}
+```
+
+Stable in Chrome, Safari, and Firefox since late 2023. Cuts a real category of JS-driven class toggling.
+
+### View transitions
+
+The View Transitions API animates between two DOM states (route changes, modal open/close, list-item swaps) without a framework. The browser snapshots the old state, swaps in the new state, then crossfades or slides between them.
+
+```js
+// Same-document transition (Chrome 111+, Safari TP, Firefox behind a flag)
+function navigate(newView) {
+  if (!document.startViewTransition) {
+    renderView(newView);
+    return;
+  }
+  document.startViewTransition(() => renderView(newView));
+}
+```
+
+```css
+/* Smooth crossfade by default; override per element */
+::view-transition-old(*) { animation-duration: 200ms; }
+::view-transition-new(*) { animation-duration: 200ms; }
+```
+
+Cross-document view transitions (between full page navigations) shipped to Chrome 126 in 2024 and let MPAs feel like SPAs. Pair with `prefers-reduced-motion` so users with motion sensitivity get an instant swap, not an animation.
+
+### Scroll-driven animations
+
+`animation-timeline: scroll()` and `animation-timeline: view()` drive CSS animations from scroll position instead of wall-clock time. The classic use case is a progress indicator at the top of an article that fills as you scroll.
+
+```css
+@keyframes fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+.read-progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--color-primary);
+  transform-origin: left;
+  animation: fill linear;
+  animation-timeline: scroll(root);
+}
+```
+
+Stable in Chromium-based browsers (Chrome 115+, Edge); not yet in Safari or Firefox as of 2026-05. Use as progressive enhancement; provide a JS fallback or accept a less-flashy baseline elsewhere.
+
 ## No product tours
 
 If you need a tour to explain your UI, the UI is wrong. Instead:
@@ -203,7 +283,7 @@ async function copyToClipboard(text, label = "Copied") {
 
 ## Hit targets
 
-Larger hit targets for buttons and inputs. Minimum 44x44px touch targets (WCAG 2.5.8). On desktop, generous padding is still faster than precise aim.
+Larger hit targets for buttons and inputs. WCAG 2.2 (success criterion 2.5.8) sets the floor at **24×24 CSS pixels**; Apple's Human Interface Guidelines and most native iOS/Android conventions recommend **44×44 points** as the comfortable target. Use 44px as the working minimum for primary actions; 24px as the absolute legal floor for secondary controls (e.g., dense table-row icons).
 
 ```css
 button, .btn, [role="button"] {
@@ -215,7 +295,7 @@ button, .btn, [role="button"] {
 input, select, textarea {
   min-height: 44px;
   padding: 10px 12px;
-  font-size: 16px;  /* Prevents iOS zoom on focus */
+  font-size: 16px;  /* Prevents iOS Safari zoom on focus */
 }
 ```
 
