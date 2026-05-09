@@ -737,10 +737,13 @@ const stale = await db.query(
 
 ```javascript
 async function apiKeyAuth(req, res, next) {
-  // Check multiple locations for API key
+  // Accept the key from headers ONLY — never query strings.
+  // Query strings are routinely logged by web servers, reverse proxies, CDN
+  // edge nodes, and analytics tooling, so a key in `?api_key=...` becomes a
+  // credential leak by way of access logs. OWASP API Top 10 (API2:2023) and
+  // RFC 6750 §2.3 both call this out.
   const apiKey = req.headers['x-api-key']
-    || req.headers['authorization']?.replace('Bearer ', '')
-    || req.query.api_key;
+    || req.headers['authorization']?.replace('Bearer ', '');
 
   if (!apiKey) {
     return res.status(401).json({

@@ -284,6 +284,15 @@ const ARGON2_OPTS = {
   parallelism: 1
 };
 
+// Precompute a real argon2id hash for the user-not-found timing-attack defense.
+// Must be a valid hash string at the same parameters used for storage so that
+// argon2.verify does the full work — a malformed string would short-circuit at
+// parse time and reintroduce the timing channel.
+let DUMMY_VERIFY_HASH = null;
+(async () => {
+  DUMMY_VERIFY_HASH = await argon2.hash('argon2-timing-defense-init', ARGON2_OPTS);
+})();
+
 // Registration
 app.post('/auth/register', async (req, res) => {
   const { email, password } = req.body;
@@ -352,11 +361,14 @@ app.post('/auth/login', async (req, res) => {
   );
 
   if (result.rows.length === 0) {
-    // Timing attack prevention: still do a hash-verify against a dummy hash
-    await argon2.verify(
-      '$argon2id$v=19$m=19456,t=2,p=1$YWFhYWFhYWFhYWFhYWFhYQ$invalidhashtopreventtiming',
-      password
-    ).catch(() => false);
+    // Timing attack prevention: full-cost verify against a real precomputed hash.
+    // A malformed hash string would make argon2.verify fail at parse time —
+    // that's faster than the valid-user path and leaks "user not found" via
+    // timing. DUMMY_VERIFY_HASH is computed once at module init below so
+    // this path does the same work as the real verify.
+    if (DUMMY_VERIFY_HASH) {
+      await argon2.verify(DUMMY_VERIFY_HASH, password).catch(() => false);
+    }
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 

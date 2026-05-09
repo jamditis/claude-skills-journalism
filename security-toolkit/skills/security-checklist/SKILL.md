@@ -109,9 +109,11 @@ Misconfiguration moved up the rankings (was A05 in 2021) because default-insecur
 
 ```bash
 # .env (development only, never commit)
-DATABASE_URL=postgresql://user:pass@localhost:5432/myapp
-JWT_SECRET=your-256-bit-secret-here
-API_KEY=sk_test_xxxxx
+# Replace each <placeholder> with a real value generated locally.
+# Generate JWT_SECRET with `openssl rand -hex 32` (256 bits).
+DATABASE_URL=<your-database-connection-string>
+JWT_SECRET=<32-byte-hex-secret>
+API_KEY=<api-key-from-your-provider>
 ```
 
 ```gitignore
