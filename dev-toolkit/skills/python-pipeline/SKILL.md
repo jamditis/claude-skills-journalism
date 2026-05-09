@@ -382,11 +382,21 @@ class BatchAIProcessor:
         self.input_tokens = 0
         self.output_tokens = 0
 
-    def process_batch(self, items: list[str]) -> list[dict]:
+    def process_batch(
+        self, items: list[str], prompt_template: str
+    ) -> list[dict]:
+        """Render each item into prompt_template via .format(item=...).
+        prompt_template must instruct the model to return JSON, since this
+        method enforces response_mime_type='application/json'.
+        """
         results = []
         for item in items:
             response = client.models.generate_content(
-                model=self.ai.model, contents=item
+                model=self.ai.model,
+                contents=prompt_template.format(item=item),
+                config=types.GenerateContentConfig(
+                    response_mime_type='application/json'
+                ),
             )
             usage = response.usage_metadata
             self.input_tokens += usage.prompt_token_count or 0
@@ -395,7 +405,7 @@ class BatchAIProcessor:
         return results
 ```
 
-`response.usage_metadata` carries the actual token counts, which is more accurate than length heuristics. For multimodal calls, pass content as a list (text + parts), not a single string.
+`response.usage_metadata` carries the actual token counts, which is more accurate than length heuristics. Without `response_mime_type='application/json'`, Gemini returns prose (often wrapped in markdown fences) and `json.loads` fails — every JSON-returning call needs both the config flag and a JSON-shaped prompt. For multimodal calls, pass content as a list (text + parts), not a single string.
 
 ## Image classification with Gemini Vision
 
