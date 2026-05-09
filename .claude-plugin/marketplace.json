@@ -1,6 +1,6 @@
 {
   "name": "claude-skills-journalism",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Claude Code plugins for journalism, research, and media organizations",
   "owner": {
     "name": "Joe Amditis",
@@ -17,6 +17,17 @@
       },
       "source": "./autocontext",
       "category": "Productivity"
+    },
+    {
+      "name": "dev-toolkit",
+      "description": "Ten development-focused skills for journalists, researchers, and small newsroom dev teams. Covers accessibility (WCAG 2.2), Electron app patterns, mobile/remote debugging, irreversible-decision discipline, Python data pipelines, test-first bug fixing, AI-assisted development workflows, ethical web scraping, no-build frontend patterns, and signs-of-taste guidance for web UI.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Joe Amditis",
+        "email": "jamditis@gmail.com"
+      },
+      "source": "./dev-toolkit",
+      "category": "Development"
     },
     {
       "name": "journalism-core",

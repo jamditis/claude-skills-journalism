@@ -70,6 +70,22 @@ claude-skills-journalism/
 │       ├── page-monitoring/            # Change detection, availability tracking
 │       └── web-archiving/              # Wayback, Archive.today, evidence preservation
 │
+├── # Plugin: dev-toolkit (10 skills) — registered in marketplace.json
+├── dev-toolkit/
+│   ├── .claude-plugin/plugin.json
+│   ├── README.md
+│   └── skills/
+│       ├── accessibility-compliance/   # WCAG 2.2, alt text, focus management
+│       ├── electron-dev/               # Electron security model, packaging
+│       ├── mobile-debugging/           # Eruda, vConsole, remote debug
+│       ├── one-way-door/               # Block irreversible decisions
+│       ├── python-pipeline/            # Data pipelines (pandas, polars, DuckDB)
+│       ├── test-first-bugs/            # TDD bug-fixing workflow
+│       ├── vibe-coding/                # AI-assisted development
+│       ├── web-scraping/               # Ethical content extraction
+│       ├── web-ui-best-practices/      # Container queries, :has(), view transitions
+│       └── zero-build-frontend/        # ESM import maps, htmx, Alpine.js
+│
 ├── # Design and production (2)
 ├── pdf-design/                  # PDF reports, proposals, brand system
 │   └── templates/               # HTML templates (Democracy Day, etc.)
@@ -84,18 +100,6 @@ claude-skills-journalism/
 ├── project-retrospective/       # LESSONS.md generation
 │   └── templates/               # 4 project type templates
 ├── template-selector/           # Choose the right template
-│
-├── # Development (10)
-├── test-first-bugs/             # Test-driven bug fixing workflow
-├── vibe-coding/                 # AI-assisted development
-├── one-way-door/                # Flag irreversible architectural decisions
-├── electron-dev/                # Electron patterns
-├── python-pipeline/             # Data pipelines
-├── web-scraping/                # Content extraction
-├── zero-build-frontend/         # No-build web apps
-├── mobile-debugging/            # Eruda, vConsole, remote debug
-├── accessibility-compliance/    # WCAG, alt text, a11y
-├── web-ui-best-practices/       # Signs of taste in web UI
 │
 ├── # Security (3)
 ├── security-checklist/          # Pre-deployment audit
@@ -174,25 +178,27 @@ This repo distributes its skills in two ways: **as Marketplace plugins** (regist
 /plugin install journalism-core@claude-skills-journalism
 ```
 
-Available plugins: `autocontext`, `journalism-core`, `pdf-design`, `pdf-playground`, `research-toolkit`, `superjawn`. See `.claude-plugin/marketplace.json` for the full list.
+Available plugins: `autocontext`, `dev-toolkit`, `journalism-core`, `pdf-design`, `pdf-playground`, `research-toolkit`, `superjawn`. See `.claude-plugin/marketplace.json` for the full list.
 
 ### Alternate: copy a bare skill into `~/.claude/skills/`
 
-Some top-level directories (e.g. `python-pipeline`, `vibe-coding`, `web-scraping`) are still distributed as bare skills outside any plugin. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
+Some top-level directories (e.g. `security-checklist`, `nano-banana-image-gen`, `visual-explainer`) are still distributed as bare skills outside any plugin. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
 
 ```bash
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
 cd ~/projects/claude-skills-journalism
 mkdir -p ~/.claude/skills
-cp -r python-pipeline ~/.claude/skills/
-# or: ln -sfn "$PWD/python-pipeline" ~/.claude/skills/python-pipeline
+cp -r security-checklist ~/.claude/skills/
+# or: ln -sfn "$PWD/security-checklist" ~/.claude/skills/security-checklist
 ```
 
-For skills inside a plugin directory (e.g., `journalism-core/skills/source-verification`, `research-toolkit/skills/web-archiving`), point at the nested path:
+For skills inside a plugin directory (e.g., `journalism-core/skills/source-verification`, `research-toolkit/skills/web-archiving`, `dev-toolkit/skills/web-scraping`), point at the nested path:
 
 ```bash
 cp -r journalism-core/skills/source-verification ~/.claude/skills/
 cp -r research-toolkit/skills/web-archiving ~/.claude/skills/
+cp -r dev-toolkit/skills/web-scraping ~/.claude/skills/
+cp -r dev-toolkit/skills/python-pipeline ~/.claude/skills/
 ```
 
 Cloning the whole repo into `~/.claude/skills/journalism-skills/` nests each `SKILL.md` too deep and will not load.

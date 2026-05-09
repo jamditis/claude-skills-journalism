@@ -7,6 +7,49 @@ description: Python data processing pipelines with modular architecture. Use whe
 
 Patterns for building production-quality data processing pipelines with Python.
 
+**Targeted at Python 3.11+** for `asyncio.TaskGroup` and exception groups; Python 3.12+ for the lighter `type X = ...` syntax. Pin a 3.13+ runtime if you want the JIT or experimental free-threading; the patterns here don't depend on either.
+
+## Choosing a DataFrame engine: pandas vs polars vs DuckDB
+
+For a long time pandas was the default for any tabular work in Python. As of 2026 the default has shifted: **polars** is the right pick for multi-GB pipelines on a single machine, **DuckDB** is the right pick when SQL or larger-than-RAM scans are involved, and **pandas** stays useful for small data and the ML/notebook ecosystem (scikit-learn, statsmodels, plotnine all speak it natively).
+
+| Tool | When | Why |
+|---|---|---|
+| pandas | < ~1 GB data, ML interop, single-threaded familiarity | Mature, ubiquitous, eager DataFrame model. Slowest in benchmarks but most ecosystem support. |
+| polars | 1 GB - tens of GB on one box, performance-critical pipelines | Multithreaded by default, lazy query engine, Arrow-native. ~5x speedup over pandas on filter / aggregate at 100M rows. |
+| DuckDB | SQL workflows, larger-than-RAM, parquet/CSV scanning, joins across many files | Vectorized + pipelined execution, cost-based optimizer, streaming scans. Works great as a thin wrapper over a directory of parquet files. |
+
+All three speak Apache Arrow, so zero-copy interop between them is the pragmatic answer most of the time:
+
+```python
+import polars as pl
+import duckdb
+
+# Polars: read a directory of CSVs, filter, group
+df = (
+    pl.scan_csv('data/articles_*.csv')
+      .filter(pl.col('published_at') >= '2026-01-01')
+      .group_by('source')
+      .agg(pl.len().alias('count'), pl.col('word_count').mean())
+      .collect()
+)
+
+# DuckDB: same shape with SQL, no intermediate copy
+con = duckdb.connect()
+df = con.execute("""
+    SELECT source, COUNT(*) AS count, AVG(word_count) AS avg_wc
+    FROM 'data/articles_*.csv'
+    WHERE published_at >= '2026-01-01'
+    GROUP BY source
+""").pl()  # returns a Polars DataFrame; use .df() for pandas
+
+# Hand off to pandas only at the boundary that needs it (e.g. scikit-learn)
+import pandas as pd
+pdf = df.to_pandas()
+```
+
+If your pipeline already uses pandas everywhere, don't pre-emptively rewrite. Migrate the bottleneck stages first — typically the CSV-load + filter step.
+
 ## Architecture patterns
 
 ### Modular processor architecture
@@ -182,6 +225,45 @@ def fetch_with_rate_limit(url: str):
     return requests.get(url)
 ```
 
+## Concurrent fetching with asyncio.TaskGroup (3.11+)
+
+For I/O-bound stages (HTTP fetches, API calls), `asyncio.TaskGroup` plus `httpx.AsyncClient` runs many requests in parallel without the boilerplate of `asyncio.gather`. TaskGroup's structured-concurrency model means an exception in one task cancels the rest and surfaces as an `ExceptionGroup` — easier to reason about than `gather(return_exceptions=True)`.
+
+```python
+import asyncio
+import httpx
+
+async def fetch_one(client: httpx.AsyncClient, url: str) -> tuple[str, str | Exception]:
+    try:
+        response = await client.get(url, timeout=30)
+        response.raise_for_status()
+        return (url, response.text)
+    except Exception as e:
+        return (url, e)
+
+async def fetch_many(urls: list[str], concurrency: int = 10) -> dict[str, str | Exception]:
+    results: dict[str, str | Exception] = {}
+    sem = asyncio.Semaphore(concurrency)
+
+    async def _bounded(client: httpx.AsyncClient, url: str):
+        async with sem:
+            url, body = await fetch_one(client, url)
+            results[url] = body
+
+    async with httpx.AsyncClient(http2=True, timeout=30) as client:
+        async with asyncio.TaskGroup() as tg:
+            for url in urls:
+                tg.create_task(_bounded(client, url))
+
+    return results
+
+# Usage
+urls = ['https://example.com/a', 'https://example.com/b', ...]
+data = asyncio.run(fetch_many(urls, concurrency=20))
+```
+
+Pair with `aiolimiter` if you need a true requests-per-second cap (semaphore alone bounds concurrency, not rate). For exponential-backoff retries, wrap `fetch_one` with `tenacity.AsyncRetrying`.
+
 ## Progress tracking with resume capability
 
 ```python
@@ -228,21 +310,34 @@ for record in records:
 
 ## Gemini AI integration
 
-```python
-import google.generativeai as genai
-from pathlib import Path
+The `google-generativeai` package was deprecated August 31, 2025 and the unified `google-genai` SDK replaced it. New code should target `google-genai`:
 
-genai.configure(api_key=os.environ['GEMINI_API_KEY'])
+```bash
+pip install google-genai
+```
+
+```python
+import os
+import json
+from google import genai
+from google.genai import types
+
+# Client carries config (API key, project, location). Reuse across calls.
+client = genai.Client(api_key=os.environ['GEMINI_API_KEY'])
+
+# Pick a current model. Names drift; check ai.google.dev/gemini-api/docs/models
+# for the active list. gemini-2.5-flash is a reasonable cost-efficient default.
+DEFAULT_MODEL = 'gemini-2.5-flash'
 
 class AIService:
-    def __init__(self, model: str = 'gemini-2.0-flash'):
-        self.model = genai.GenerativeModel(model)
+    def __init__(self, model: str = DEFAULT_MODEL):
+        self.model = model
 
     def categorize(self, text: str, taxonomy: dict) -> dict:
         prompt = f"""Analyze this content and categorize it.
 
 Content:
-{text[:10000]}  # Truncate to avoid token limits
+{text[:10000]}
 
 Taxonomy:
 {json.dumps(taxonomy, indent=2)}
@@ -252,7 +347,11 @@ Respond with JSON containing:
 - tags: list of relevant tags
 - summary: 2-3 sentence summary
 """
-        response = self.model.generate_content(prompt)
+        response = client.models.generate_content(
+            model=self.model,
+            contents=prompt,
+            config=types.GenerateContentConfig(response_mime_type='application/json'),
+        )
         return json.loads(response.text)
 
     def extract_entities(self, text: str) -> list[dict]:
@@ -268,38 +367,57 @@ For each entity, provide:
 
 Respond with JSON array of entities.
 """
-        response = self.model.generate_content(prompt)
+        response = client.models.generate_content(
+            model=self.model,
+            contents=prompt,
+            config=types.GenerateContentConfig(response_mime_type='application/json'),
+        )
         return json.loads(response.text)
 
-# Batch processing with cost tracking
+# Batch processing with token-usage tracking (cost varies by model and time;
+# look up live pricing rather than hardcoding a per-1k figure).
 class BatchAIProcessor:
     def __init__(self, ai_service: AIService):
         self.ai = ai_service
-        self.total_tokens = 0
-        self.cost_per_1k_tokens = 0.00025  # Adjust for your model
+        self.input_tokens = 0
+        self.output_tokens = 0
 
-    def process_batch(self, items: list[str]) -> list[dict]:
+    def process_batch(
+        self, items: list[str], prompt_template: str
+    ) -> list[dict]:
+        """Render each item into prompt_template via .format(item=...).
+        prompt_template must instruct the model to return JSON, since this
+        method enforces response_mime_type='application/json'.
+        """
         results = []
         for item in items:
-            result = self.ai.categorize(item, TAXONOMY)
-            self.total_tokens += len(item) // 4  # Rough estimate
-            results.append(result)
+            response = client.models.generate_content(
+                model=self.ai.model,
+                contents=prompt_template.format(item=item),
+                config=types.GenerateContentConfig(
+                    response_mime_type='application/json'
+                ),
+            )
+            usage = response.usage_metadata
+            self.input_tokens += usage.prompt_token_count or 0
+            self.output_tokens += usage.candidates_token_count or 0
+            results.append(json.loads(response.text))
         return results
-
-    @property
-    def estimated_cost(self) -> float:
-        return (self.total_tokens / 1000) * self.cost_per_1k_tokens
 ```
+
+`response.usage_metadata` carries the actual token counts, which is more accurate than length heuristics. Without `response_mime_type='application/json'`, Gemini returns prose (often wrapped in markdown fences) and `json.loads` fails — every JSON-returning call needs both the config flag and a JSON-shaped prompt. For multimodal calls, pass content as a list (text + parts), not a single string.
 
 ## Image classification with Gemini Vision
 
 ```python
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from PIL import Image
 from pathlib import Path
 
+client = genai.Client(api_key=os.environ['GEMINI_API_KEY'])
+
 def classify_image(image_path: Path, categories: list[str]) -> dict:
-    model = genai.GenerativeModel('gemini-2.0-flash')
     image = Image.open(image_path)
 
     prompt = f"""Analyze this image and classify it.
@@ -314,23 +432,37 @@ Respond with JSON:
   "tags": ["tag1", "tag2", "tag3"]
 }}
 """
-    response = model.generate_content([prompt, image])
+    response = client.models.generate_content(
+        model='gemini-2.5-flash',
+        contents=[prompt, image],
+        config=types.GenerateContentConfig(response_mime_type='application/json'),
+    )
     return json.loads(response.text)
+
+# pathlib.Path.glob does NOT support brace expansion (`*.{jpg,png,webp}`);
+# iterate the extensions explicitly.
+IMAGE_EXTS = ('.jpg', '.jpeg', '.png', '.webp')
 
 def organize_images(source_dir: Path, output_dir: Path):
     categories = ['Nature', 'People', 'Architecture', 'Art', 'Technology', 'Other']
 
-    for image_path in source_dir.glob('*.{jpg,png,webp}'):
+    image_paths = (
+        p for p in source_dir.iterdir()
+        if p.is_file() and p.suffix.lower() in IMAGE_EXTS
+    )
+
+    for image_path in image_paths:
         try:
             result = classify_image(image_path, categories)
             category_dir = output_dir / result['category']
-            category_dir.mkdir(exist_ok=True)
+            category_dir.mkdir(parents=True, exist_ok=True)
 
-            new_name = f"{result['suggested_filename']}{image_path.suffix}"
+            new_name = f"{result['suggested_filename']}{image_path.suffix.lower()}"
             image_path.rename(category_dir / new_name)
         except Exception as e:
-            (output_dir / 'failures').mkdir(exist_ok=True)
-            image_path.rename(output_dir / 'failures' / image_path.name)
+            failures = output_dir / 'failures'
+            failures.mkdir(parents=True, exist_ok=True)
+            image_path.rename(failures / image_path.name)
 ```
 
 ## Environment configuration

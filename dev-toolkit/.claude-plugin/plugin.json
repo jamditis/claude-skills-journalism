@@ -1,0 +1,9 @@
+{
+  "name": "dev-toolkit",
+  "version": "1.0.0",
+  "description": "Ten development-focused skills for journalists, researchers, and small newsroom dev teams. Covers accessibility (WCAG 2.2), Electron app patterns, mobile/remote debugging, irreversible-decision discipline, Python data pipelines, test-first bug fixing, AI-assisted development workflows, ethical web scraping, no-build frontend patterns, and signs-of-taste guidance for web UI.",
+  "author": {
+    "name": "Joe Amditis",
+    "email": "jamditis@gmail.com"
+  }
+}

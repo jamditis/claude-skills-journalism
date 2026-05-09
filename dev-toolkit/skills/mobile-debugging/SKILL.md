@@ -27,7 +27,7 @@ javascript:(function(){var script=document.createElement('script');script.src='h
 
 ### Eruda setup
 
-Eruda provides a full DevTools-like experience in a floating panel.
+Eruda provides a full DevTools-like experience in a floating panel. Eruda 3.x (3.4.3 current as of 2026-05) is the right baseline; it ships ES2020 syntax and assumes a modern mobile browser.
 
 ```html
 <!-- CDN (development only) -->
@@ -171,6 +171,26 @@ vConsole.destroy();
 # Now Android Chrome can access your dev server at localhost:3000
 ```
 
+**Android 11+ wireless debugging (no USB needed):**
+```bash
+# 1. On the Android device:
+#    Settings → Developer Options → Wireless debugging = ON
+#    Tap "Pair device with pairing code"
+#    Note the IP:PORT and 6-digit code shown
+
+# 2. On the computer (Android Platform Tools 30.0.0+):
+adb pair <DEVICE_IP>:<PAIRING_PORT>
+# Enter the 6-digit code when prompted
+
+# 3. Connect to the debug port (different from pairing port):
+adb connect <DEVICE_IP>:<DEBUG_PORT>
+
+# 4. Verify and proceed to chrome://inspect#devices as usual:
+adb devices
+```
+
+Wireless debugging persists across reboots once paired, but the `adb connect` step is needed each session.
+
 ### Safari Web Inspector (iOS)
 
 ```bash
@@ -284,27 +304,30 @@ def test_on_lambdatest():
 
 ```python
 # BrowserStack: $29/month+, 10,000+ real devices
+# Selenium 4 removed DesiredCapabilities — pass capabilities via Options instead.
 
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.chrome.options import Options
 
 def get_browserstack_driver():
     """Create BrowserStack WebDriver with console logging."""
 
-    capabilities = {
-        'browserName': 'chrome',
-        'device': 'Samsung Galaxy S21',
+    options = Options()
+    bstack_options = {
+        'deviceName': 'Samsung Galaxy S21',
+        'osVersion': '11.0',
         'realMobile': 'true',
-        'os_version': '11.0',
-        'browserstack.console': 'verbose',  # Capture console logs
-        'browserstack.networkLogs': 'true',
-        'browserstack.user': 'YOUR_USERNAME',
-        'browserstack.key': 'YOUR_KEY'
+        'consoleLogs': 'verbose',     # Capture console logs
+        'networkLogs': 'true',
+        'userName': 'YOUR_USERNAME',
+        'accessKey': 'YOUR_KEY'
     }
+    options.set_capability('bstack:options', bstack_options)
+    options.set_capability('browserName', 'chrome')
 
     driver = webdriver.Remote(
         command_executor='https://hub-cloud.browserstack.com/wd/hub',
-        desired_capabilities=capabilities
+        options=options
     )
 
     return driver
@@ -322,9 +345,11 @@ const { chromium, devices } = require('playwright');
 async function captureConsoleLogs(url) {
     const browser = await chromium.launch();
 
-    // Emulate mobile device
+    // Emulate mobile device. Playwright ships an updated devices map per
+    // release; iPhone 15 / Pixel 8 are reasonable 2026 baselines. List with
+    // `npx playwright devices` if you need an exact name.
     const context = await browser.newContext({
-        ...devices['iPhone 13']
+        ...devices['iPhone 15']
     });
 
     const page = await context.newPage();
@@ -441,6 +466,9 @@ async function debugMobilePage(url) {
 
 ```javascript
 // npm install @sentry/browser
+// Sentry SDK v8+ uses functional integrations; class-based
+// `new Sentry.BrowserTracing()` / `new Sentry.Replay()` were
+// deprecated in v8 and removed in v9.
 
 import * as Sentry from '@sentry/browser';
 
@@ -448,10 +476,9 @@ Sentry.init({
     dsn: 'YOUR_SENTRY_DSN',
     environment: 'production',
 
-    // Capture console.error
     integrations: [
-        new Sentry.BrowserTracing(),
-        new Sentry.Replay()  // Session replay for debugging
+        Sentry.browserTracingIntegration(),
+        Sentry.replayIntegration()  // Session replay for debugging
     ],
 
     // Sample rates
@@ -472,7 +499,7 @@ try {
     Sentry.captureException(error);
 }
 
-// Add context
+// Add context (also functional in v8+)
 Sentry.setUser({ id: 'user123' });
 Sentry.setTag('page', 'checkout');
 ```
