@@ -43,7 +43,7 @@ Try services in this order for maximum coverage:
 import requests
 from typing import Optional
 from datetime import datetime
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
 def check_wayback_availability(url: str) -> Optional[dict]:
     """Check if URL exists in Wayback Machine."""
@@ -90,7 +90,9 @@ def save_to_wayback(url: str, s3_keys: Optional[tuple[str, str]] = None) -> Opti
     to raise the cap (anonymous → ~50/min with auth) and avoid silent
     drops on paywalled / heavily JS-rendered pages.
     """
-    save_url = f"https://web.archive.org/save/{quote(url, safe='')}"
+    # quote(unquote(url), ...) normalizes any existing %xx escapes
+    # first so they don't get double-encoded into %25xx.
+    save_url = f"https://web.archive.org/save/{quote(unquote(url), safe='')}"
 
     headers = {'User-Agent': 'Mozilla/5.0 (research-archiver)'}
     if s3_keys:
@@ -154,7 +156,7 @@ def get_all_snapshots(url: str, limit: int = 100) -> list[dict]:
 ```python
 import re
 import requests
-from urllib.parse import quote, urljoin
+from urllib.parse import quote, unquote, urljoin
 
 def save_to_archive_today(url: str) -> Optional[str]:
     """Submit URL to Archive.today for archiving.
@@ -212,7 +214,7 @@ def search_archive_today(url: str) -> Optional[str]:
     Uses the /newest/<url> lookup which 302s to the most recent
     snapshot (or to a CAPTCHA page if rate-limited).
     """
-    search_url = f"https://archive.ph/newest/{quote(url, safe='')}"
+    search_url = f"https://archive.ph/newest/{quote(unquote(url), safe='')}"
 
     try:
         response = requests.get(
@@ -607,14 +609,14 @@ javascript:(function(){
 // Note: Google Cache (webcache.googleusercontent.com) was retired in
 // Sept 2024 and is omitted here.
 javascript:(function(){
-    var url = location.href;
-    // archive.ph reads its URL argument as a path segment, so it must
-    // be percent-encoded; Wayback /web/*/ and Memento /list/0/ accept
-    // raw URLs per their documented APIs.
+    // Encode location.href so any '#' / '?' inside it travels as part
+    // of the path argument; raw concatenation lets the browser strip
+    // fragments and re-attach query strings to the outer URL.
+    var encoded = encodeURIComponent(location.href);
     var archives = [
-        'https://web.archive.org/web/*/' + url,
-        'https://archive.ph/newest/' + encodeURIComponent(url),
-        'https://timetravel.mementoweb.org/list/0/' + url
+        'https://web.archive.org/web/*/' + encoded,
+        'https://archive.ph/newest/' + encoded,
+        'https://timetravel.mementoweb.org/list/0/' + encoded
     ];
     archives.forEach(function(a){ window.open(a, '_blank'); });
 })();

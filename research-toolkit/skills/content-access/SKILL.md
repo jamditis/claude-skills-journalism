@@ -482,7 +482,7 @@ def check_geo_access(url: str, regions: list = None) -> dict:
 
 ```python
 import requests
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
 def get_archived_article(url: str) -> str:
     """Try to get article from Archive.today.
@@ -502,8 +502,9 @@ def get_archived_article(url: str) -> str:
 
     # /newest/<url> 302s to the most recent snapshot or to a CAPTCHA
     # page if rate-limited. Disable redirects so we can inspect the
-    # Location header explicitly.
-    search_url = f"https://archive.ph/newest/{quote(url, safe='')}"
+    # Location header explicitly. quote(unquote(url), ...) normalizes
+    # any existing %xx escapes so they aren't double-encoded.
+    search_url = f"https://archive.ph/newest/{quote(unquote(url), safe='')}"
 
     try:
         response = requests.get(
@@ -535,10 +536,10 @@ def get_wayback_article(url: str) -> str:
     """
 
     # Check availability
-    api_url = f"https://archive.org/wayback/available?url={url}"
+    api_url = "https://archive.org/wayback/available"
 
     try:
-        response = requests.get(api_url, timeout=10)
+        response = requests.get(api_url, params={'url': url}, timeout=10)
         data = response.json()
 
         snapshot = data.get('archived_snapshots', {}).get('closest', {})
