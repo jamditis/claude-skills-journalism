@@ -7,6 +7,108 @@ description: Zero-build frontend development with CDN-loaded React, Tailwind CSS
 
 Patterns for building production-quality web applications without build tools, bundlers, or complex toolchains.
 
+## Picking a stack
+
+Three current zero-build approaches, each with different trade-offs:
+
+| Stack | When | Bundle size impact |
+|---|---|---|
+| **React via esm.sh + htm** | Component-heavy SPAs, existing React mental model, Tailwind styling | ~50 KB gzipped (React + ReactDOM + htm) |
+| **htmx 2.x + server-rendered HTML** | CRUD apps, traditional MPA flow, want server-side state of truth | ~14 KB gzipped (htmx alone) |
+| **Alpine.js 3.x + plain HTML** | Light interactivity sprinkled into mostly-static pages, no full SPA | ~15 KB gzipped (Alpine alone) |
+
+You can mix htmx and Alpine.js in the same page — htmx handles server interactions, Alpine handles client-side UI state. Many production sites converge on this combo.
+
+## ESM import maps
+
+Import maps let you write `import x from 'react'` in a `<script type="module">` without a bundler — the browser resolves the bare specifier against the map. Stable in all major browsers since 2023.
+
+```html
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "lodash-es": "https://esm.sh/lodash-es@4.17.21",
+    "@my-app/": "/src/"
+  },
+  "scopes": {
+    "https://esm.sh/": {
+      "scheduler": "https://esm.sh/scheduler@0.23.0"
+    }
+  }
+}
+</script>
+```
+
+The `scopes` block lets a sub-tree of imports resolve differently. Useful when one CDN package needs a specific transitive dependency. The trailing `/` form (`"@my-app/": "/src/"`) lets you import any file under that prefix.
+
+**Pin versions in production.** `esm.sh/react` (without a version) and `esm.sh/react@latest` resolve at request time and can shift under you. Use exact pinned versions or SHA-locked URLs.
+
+## htmx 2.x — server-rendered interactivity
+
+htmx 2.0 (released June 2024) lets you add AJAX, WebSockets, and SSE to plain HTML through `hx-*` attributes. The server sends HTML fragments; the client swaps them in. No JS framework required.
+
+```html
+<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+
+<!-- Click button → POST to server → swap response into #result -->
+<button hx-post="/api/clicked" hx-target="#result" hx-swap="innerHTML">
+  Click me
+</button>
+<div id="result"></div>
+
+<!-- Search-as-you-type with debounce -->
+<input
+  type="search"
+  name="q"
+  hx-get="/api/search"
+  hx-trigger="input changed delay:300ms"
+  hx-target="#results"
+/>
+<div id="results"></div>
+
+<!-- Infinite scroll -->
+<div hx-get="/api/items?page=2"
+     hx-trigger="revealed"
+     hx-swap="afterend">
+  ...
+</div>
+```
+
+htmx 2.x dropped IE support and tightened the API; if you're on htmx 1.x and don't need to migrate, 1.x still receives security patches. New code should target 2.x.
+
+## Alpine.js 3.x — client-side reactivity in HTML
+
+Alpine.js (current 3.14+) is a minimal alternative to Vue/React for sprinkles of interactivity. State and behavior live as `x-*` attributes in the markup.
+
+```html
+<script defer src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"></script>
+
+<!-- Toggle visibility -->
+<div x-data="{ open: false }">
+  <button @click="open = !open">Toggle</button>
+  <div x-show="open" x-transition>Content here</div>
+</div>
+
+<!-- Two-way binding + computed -->
+<div x-data="{ first: '', last: '' }">
+  <input x-model="first" placeholder="First">
+  <input x-model="last" placeholder="Last">
+  <p x-text="`Hello, ${first} ${last}`"></p>
+</div>
+
+<!-- Fetch on mount -->
+<div x-data="{ items: [] }"
+     x-init="items = await (await fetch('/api/items')).json()">
+  <template x-for="item in items" :key="item.id">
+    <li x-text="item.title"></li>
+  </template>
+</div>
+```
+
+Alpine pairs naturally with htmx: htmx swaps a server-rendered fragment in, Alpine handles whatever client-side state that fragment needs (open/close, optimistic toggles, form validation).
+
 ## React via CDN (esm.sh)
 
 ### Basic setup
@@ -19,7 +121,12 @@ Patterns for building production-quality web applications without build tools, b
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zero-Build React App</title>
 
-  <!-- Tailwind CSS via CDN -->
+  <!-- Tailwind CSS via CDN.
+       cdn.tailwindcss.com is the Play CDN; Tailwind explicitly recommends
+       it for prototyping only — it ships an in-browser JIT compiler that
+       runs at every page load. For production, use the standalone CLI
+       binary or the Vite/PostCSS plugin. Tailwind 4 (released Jan 2025)
+       is the current major; the Play CDN serves v3 by default. -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -50,12 +157,15 @@ Patterns for building production-quality web applications without build tools, b
 <body>
   <div id="root"></div>
 
-  <!-- ES Module imports -->
+  <!-- ES Module imports.
+       React 19 (Dec 2024) is the current major; 18.x still works fine
+       for sites that pin to it. Pin a specific version in production —
+       don't ship `react@latest`, since esm.sh resolves at request time. -->
   <script type="importmap">
   {
     "imports": {
-      "react": "https://esm.sh/react@18.2.0",
-      "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+      "react": "https://esm.sh/react@19.0.0",
+      "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
       "htm": "https://esm.sh/htm@3.1.1"
     }
   }
