@@ -101,10 +101,14 @@ claude-skills-journalism/
 │   └── templates/               # 4 project type templates
 ├── template-selector/           # Choose the right template
 │
-├── # Security (3)
-├── security-checklist/          # Pre-deployment audit
-├── secure-auth/                 # Authentication patterns
-├── api-hardening/               # API security
+├── # Plugin: security-toolkit (3 skills) — registered in marketplace.json
+├── security-toolkit/
+│   ├── .claude-plugin/plugin.json
+│   ├── README.md
+│   └── skills/
+│       ├── api-hardening/              # Rate limiting, CORS, request throttling, defense-in-depth
+│       ├── secure-auth/                # Password hashing, sessions, JWT, OAuth, passkeys
+│       └── security-checklist/         # Pre-deployment OWASP audit
 │
 ├── # AI and creative tools (1)
 ├── nano-banana-image-gen/       # Gemini image gen model selection and prompting
@@ -178,27 +182,27 @@ This repo distributes its skills in two ways: **as Marketplace plugins** (regist
 /plugin install journalism-core@claude-skills-journalism
 ```
 
-Available plugins: `autocontext`, `dev-toolkit`, `journalism-core`, `pdf-design`, `pdf-playground`, `research-toolkit`, `superjawn`. See `.claude-plugin/marketplace.json` for the full list.
+Available plugins: `autocontext`, `dev-toolkit`, `journalism-core`, `pdf-design`, `pdf-playground`, `research-toolkit`, `security-toolkit`, `superjawn`. See `.claude-plugin/marketplace.json` for the full list.
 
 ### Alternate: copy a bare skill into `~/.claude/skills/`
 
-Some top-level directories (e.g. `security-checklist`, `nano-banana-image-gen`, `visual-explainer`) are still distributed as bare skills outside any plugin. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
+Some top-level directories (e.g. `nano-banana-image-gen`, `visual-explainer`, `free-apis-catalog`) are still distributed as bare skills outside any plugin. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
 
 ```bash
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
 cd ~/projects/claude-skills-journalism
 mkdir -p ~/.claude/skills
-cp -r security-checklist ~/.claude/skills/
-# or: ln -sfn "$PWD/security-checklist" ~/.claude/skills/security-checklist
+cp -r nano-banana-image-gen ~/.claude/skills/
+# or: ln -sfn "$PWD/nano-banana-image-gen" ~/.claude/skills/nano-banana-image-gen
 ```
 
-For skills inside a plugin directory (e.g., `journalism-core/skills/source-verification`, `research-toolkit/skills/web-archiving`, `dev-toolkit/skills/web-scraping`), point at the nested path:
+For skills inside a plugin directory (e.g., `journalism-core/skills/source-verification`, `research-toolkit/skills/web-archiving`, `dev-toolkit/skills/web-scraping`, `security-toolkit/skills/secure-auth`), point at the nested path:
 
 ```bash
 cp -r journalism-core/skills/source-verification ~/.claude/skills/
 cp -r research-toolkit/skills/web-archiving ~/.claude/skills/
 cp -r dev-toolkit/skills/web-scraping ~/.claude/skills/
-cp -r dev-toolkit/skills/python-pipeline ~/.claude/skills/
+cp -r security-toolkit/skills/secure-auth ~/.claude/skills/
 ```
 
 Cloning the whole repo into `~/.claude/skills/journalism-skills/` nests each `SKILL.md` too deep and will not load.
