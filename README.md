@@ -39,11 +39,12 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | [journalism-core](./journalism-core/) | Eleven core journalism skills: AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, fact-checking, interview prep + transcription, story pitches, editorial workflow, crisis communications, and newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements | n/a — skills only |
 | [pdf-design](./pdf-design/) | PDF report and proposal design system with brand variables, budget tables, and reusable content blocks (stats strips, three-column, four-tile pillars, partner grids) | n/a — skill-only |
 | [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials with an interactive control panel for live design editing (colors, fonts, spacing, sections) and a guided wizard for proposals | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` |
+| [research-toolkit](./research-toolkit/) | Five skills for research, source preservation, and academic workflows: academic writing, legal paywall-bypass via Unpaywall and library databases, web archiving (Wayback / Archive.today / ArchiveBox), web page change monitoring, and AI-enriched digital archive construction | n/a — skills only |
 | [superjawn](./superjawn/) | Research-augmented fork of obra/superpowers. Default-on research phase fires before brainstorming, systematic-debugging, and writing-skills. v1.0.0 ships all 14 skills with no soft dependencies on the upstream `superpowers` plugin | invoked indirectly via skills (e.g. `superjawn:brainstorming`, `superjawn:systematic-debugging`, `superjawn:writing-plans`) |
 
 ### Skills (manual installation)
 
-Most skills now ship inside plugins (see the table above). For skills that haven't been bundled into a plugin yet (e.g., `data-journalism`, `social-media-intelligence`, `web-archiving`), Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep. Clone this repo anywhere you like, then copy or symlink the bare skills you want:
+Most skills now ship inside plugins (see the table above). For skills that haven't been bundled into a plugin yet (e.g., `python-pipeline`, `vibe-coding`, `web-scraping`), Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep. Clone this repo anywhere you like, then copy or symlink the bare skills you want:
 
 ```
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
@@ -51,13 +52,14 @@ cd ~/projects/claude-skills-journalism
 mkdir -p ~/.claude/skills
 
 # Copy a bare top-level skill:
-cp -r data-journalism ~/.claude/skills/
+cp -r python-pipeline ~/.claude/skills/
 
 # Or pull a single skill out of a plugin's skills/ directory:
 cp -r journalism-core/skills/source-verification ~/.claude/skills/
+cp -r research-toolkit/skills/web-archiving ~/.claude/skills/
 
 # Or symlink so git pull updates them in place (ln -sfn replaces an existing link):
-ln -sfn "$PWD/data-journalism" ~/.claude/skills/data-journalism
+ln -sfn "$PWD/python-pipeline" ~/.claude/skills/python-pipeline
 ```
 
 Do not clone the repo directly into `~/.claude/skills/journalism-skills/` — that nests each `SKILL.md` too deep and Claude Code won't find them.
@@ -86,12 +88,17 @@ These eleven skills ship together as the [journalism-core](./journalism-core/) p
 | [source-verification](./journalism-core/skills/source-verification/) | SIFT method, image and video verification, deepfake detection (2026), C2PA Content Credentials, verification trails |
 | [story-pitch](./journalism-core/skills/story-pitch/) | Pitch templates for daily news, features, investigations, op-eds, and freelance queries |
 
-### Bare journalism skills (not yet bundled into a plugin)
+### Research and academic skills (in `research-toolkit` plugin)
+
+These five skills ship together as the [research-toolkit](./research-toolkit/) plugin. Install via `/plugin install research-toolkit@claude-skills-journalism` to get all of them at once.
 
 | Skill | Description |
 |-------|-------------|
-| [data-journalism](./data-journalism/) | Data acquisition, cleaning, analysis, visualization, and storytelling for newsrooms |
-| [social-media-intelligence](./social-media-intelligence/) | Social monitoring, narrative tracking, account analysis, coordination detection, OSINT |
+| [academic-writing](./research-toolkit/skills/academic-writing/) | Research design, literature reviews, IMRaD structure, peer review responses, grant proposals |
+| [content-access](./research-toolkit/skills/content-access/) | Unpaywall, CORE, Semantic Scholar APIs, library databases, ethical access patterns |
+| [digital-archive](./research-toolkit/skills/digital-archive/) | Building archives with AI enrichment, entity extraction, knowledge graphs |
+| [page-monitoring](./research-toolkit/skills/page-monitoring/) | Change detection, RSS generation, webhook alerts, automatic archiving on changes |
+| [web-archiving](./research-toolkit/skills/web-archiving/) | Wayback Machine, Archive.today, legal evidence preservation, multi-archive redundancy |
 
 ### Design and production
 
@@ -107,16 +114,6 @@ These eleven skills ship together as the [journalism-core](./journalism-core/) p
 | [project-memory](./project-memory/) | Generate CLAUDE.md files that capture project-specific knowledge. Includes templates for editorial tools, events, publications, research, pipelines, and archives |
 | [project-retrospective](./project-retrospective/) | Generate LESSONS.md files that document what worked and what didn't. Templates for investigations, events, publications, and tools |
 | [template-selector](./template-selector/) | Decision tree for choosing the right project documentation template |
-
-### Academic and research
-
-| Skill | Description |
-|-------|-------------|
-| [academic-writing](./academic-writing/) | Research design, literature reviews, IMRaD structure, peer review responses, grant proposals |
-| [digital-archive](./digital-archive/) | Building archives with AI enrichment, entity extraction, knowledge graphs |
-| [web-archiving](./web-archiving/) | Wayback Machine, Archive.today, legal evidence preservation, multi-archive redundancy |
-| [content-access](./content-access/) | Unpaywall, CORE, Semantic Scholar APIs, library databases, ethical access patterns |
-| [page-monitoring](./page-monitoring/) | Change detection, RSS generation, webhook alerts, automatic archiving on changes |
 
 ### Development (for building tools)
 

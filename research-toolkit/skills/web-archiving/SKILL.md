@@ -17,19 +17,20 @@ Try services in this order for maximum coverage:
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │  1. Wayback Machine (archive.org)                               │
-│     └─ 916B+ pages, historical depth, API access                │
+│     └─ 900B+ pages, historical depth, API access                │
 │                         ↓ not found                              │
 │  2. Archive.today (archive.is/archive.ph)                       │
 │     └─ On-demand snapshots, paywall bypass                      │
+│     └─ Caveat (2026): FBI subpoenaed registrar in Oct 2025;     │
+│        Wikipedia deprecated as citation source in Feb 2026 —    │
+│        prefer Wayback / Perma.cc for legal or citation use      │
 │                         ↓ not found                              │
-│  3. Google Cache (limited availability)                         │
-│     └─ Recent pages, search: cache:url                          │
-│                         ↓ not found                              │
-│  4. Bing Cache                                                  │
-│     └─ Click dropdown arrow in search results                   │
-│                         ↓ not found                              │
-│  5. Memento Time Travel (aggregator)                            │
+│  3. Memento Time Travel (aggregator)                            │
 │     └─ Searches multiple archives simultaneously                │
+│                                                                  │
+│  Retired (do not use): Google Cache (`cache:` operator) was     │
+│  shut down in Sept 2024; Bing Cache dropdown was removed in     │
+│  the same year. Both formerly fed this cascade.                 │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -42,13 +43,14 @@ Try services in this order for maximum coverage:
 import requests
 from typing import Optional
 from datetime import datetime
+from urllib.parse import quote, unquote
 
 def check_wayback_availability(url: str) -> Optional[dict]:
     """Check if URL exists in Wayback Machine."""
-    api_url = f"http://archive.org/wayback/available?url={url}"
+    api_url = "https://archive.org/wayback/available"
 
     try:
-        response = requests.get(api_url, timeout=10)
+        response = requests.get(api_url, params={'url': url}, timeout=10)
         data = response.json()
 
         if data.get('archived_snapshots', {}).get('closest'):
@@ -66,6 +68,12 @@ def check_wayback_availability(url: str) -> Optional[dict]:
 def get_wayback_url(url: str, timestamp: str = None) -> str:
     """Generate Wayback Machine URL for a page.
 
+    Returns the canonical raw form (`.../web/<timestamp>/<url>`) per
+    Wayback's replay-URL convention. If you intend to navigate to the
+    returned link in a browser AND the target URL has `#` fragments,
+    encode at the call site with urllib.parse.quote so the browser
+    doesn't strip the fragment before request dispatch.
+
     Args:
         url: Original URL to retrieve
         timestamp: Optional YYYYMMDDHHMMSS format, or None for latest
@@ -78,26 +86,31 @@ def get_wayback_url(url: str, timestamp: str = None) -> str:
 ### Save page to Wayback Machine
 
 ```python
-def save_to_wayback(url: str) -> Optional[str]:
-    """Request Wayback Machine to archive a URL.
+def save_to_wayback(url: str, s3_keys: Optional[tuple[str, str]] = None) -> Optional[str]:
+    """Request Wayback Machine to archive a URL via Save Page Now.
 
     Returns the archived URL if successful.
-    """
-    save_url = f"https://web.archive.org/save/{url}"
 
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (research-archiver)'
-    }
+    Anonymous requests are rate-limited at roughly 15/minute. Pass
+    `s3_keys=(access_key, secret)` from an Internet Archive account
+    to raise the cap (anonymous → ~50/min with auth) and avoid silent
+    drops on paywalled / heavily JS-rendered pages.
+    """
+    # quote(unquote(url), ...) normalizes any existing %xx escapes
+    # first so they don't get double-encoded into %25xx.
+    save_url = f"https://web.archive.org/save/{quote(unquote(url), safe='')}"
+
+    headers = {'User-Agent': 'Mozilla/5.0 (research-archiver)'}
+    if s3_keys:
+        headers['Authorization'] = f'LOW {s3_keys[0]}:{s3_keys[1]}'
 
     try:
         response = requests.get(save_url, headers=headers, timeout=60)
 
-        # Check for successful archive
         if response.status_code == 200:
-            # The archived URL is in the Content-Location header
-            archived_url = response.headers.get('Content-Location')
-            if archived_url:
-                return f"https://web.archive.org{archived_url}"
+            # SPN delivers the canonical archive URL via the final URL
+            # after redirect-following (or the `Link` header on async
+            # captures). `response.url` is the reliable common case.
             return response.url
         return None
     except Exception:
@@ -112,7 +125,7 @@ def get_all_snapshots(url: str, limit: int = 100) -> list[dict]:
 
     Returns list of snapshots with timestamps and status codes.
     """
-    cdx_url = "http://web.archive.org/cdx/search/cdx"
+    cdx_url = "https://web.archive.org/cdx/search/cdx"
     params = {
         'url': url,
         'output': 'json',
@@ -147,8 +160,9 @@ def get_all_snapshots(url: str, limit: int = 100) -> list[dict]:
 ### Save to Archive.today
 
 ```python
+import re
 import requests
-from urllib.parse import quote
+from urllib.parse import quote, unquote, urljoin
 
 def save_to_archive_today(url: str) -> Optional[str]:
     """Submit URL to Archive.today for archiving.
@@ -156,6 +170,13 @@ def save_to_archive_today(url: str) -> Optional[str]:
     Note: Archive.today has rate limiting and CAPTCHA requirements.
     This function works for basic archiving but may require
     manual intervention for high-volume use.
+
+    Operational notes (2026): the FBI subpoenaed archive.today's
+    registrar in October 2025; Wikipedia stopped accepting it as a
+    citation source in February 2026 after the site shipped
+    DDoS-attack code in January 2026. Still useful for capturing
+    content the Wayback Machine can't render — but treat as
+    secondary to Wayback / Perma.cc for legal or citation use.
     """
     submit_url = "https://archive.today/submit/"
 
@@ -165,22 +186,56 @@ def save_to_archive_today(url: str) -> Optional[str]:
     }
 
     try:
-        response = requests.post(submit_url, data=data, timeout=60)
-        # Archive.today returns the archived URL in the response
+        response = requests.post(
+            submit_url,
+            data=data,
+            timeout=60,
+            allow_redirects=False,
+            headers={'User-Agent': 'Mozilla/5.0 (research-archiver)'},
+        )
+        # archive.today returns the snapshot URL in one of two shapes:
+        #   - 30x with Location: https://archive.today/<snapshot_id>
+        #     (Location MAY be relative per RFC 7231)
+        #   - 200 with Refresh: 0;url=https://archive.today/<snapshot_id>
+        #     (Refresh keyword is case-insensitive per HTML spec)
+        # Following redirects silently can land on /wip/ pages or hide
+        # the canonical snapshot URL, so handle both headers explicitly.
+        if response.status_code in (301, 302, 303, 307, 308):
+            location = response.headers.get('Location')
+            if location:
+                return urljoin(response.url, location)
         if response.status_code == 200:
-            return response.url
+            refresh = response.headers.get('Refresh', '')
+            m = re.search(r'\burl\s*=\s*(.+)', refresh, re.IGNORECASE)
+            if m:
+                target = m.group(1).strip().strip('\'"')
+                return urljoin(response.url, target)
         return None
     except Exception:
         return None
 
 def search_archive_today(url: str) -> Optional[str]:
-    """Search for existing Archive.today snapshot."""
-    search_url = f"https://archive.today/{quote(url, safe='')}"
+    """Search for existing Archive.today snapshot.
+
+    Uses the /newest/<url> lookup which 302s to the most recent
+    snapshot (or to a CAPTCHA page if rate-limited).
+    """
+    search_url = f"https://archive.ph/newest/{quote(unquote(url), safe='')}"
 
     try:
-        response = requests.get(search_url, timeout=30, allow_redirects=True)
-        if response.status_code == 200 and 'archive.today' in response.url:
-            return response.url
+        response = requests.get(
+            search_url,
+            timeout=30,
+            allow_redirects=False,
+            headers={'User-Agent': 'Mozilla/5.0 (research-archiver)'},
+        )
+        if response.status_code in (301, 302, 303, 307, 308):
+            location = response.headers.get('Location')
+            if location:
+                resolved = urljoin(response.url, location)
+                # Only return if we landed on an archive page, not CAPTCHA
+                if 'archive.' in resolved and '/newest/' not in resolved:
+                    return resolved
         return None
     except Exception:
         return None
@@ -285,24 +340,25 @@ class MultiArchiver:
 ### ArchiveBox setup
 
 ```bash
-# Install ArchiveBox
-pip install archivebox
-
-# Or with Docker
-docker pull archivebox/archivebox
-
-# Initialize archive directory
+# Recommended: Docker Compose (v0.8.x ships with Chromium, yt-dlp,
+# wget, single-file, and other capture tools preinstalled).
 mkdir ~/web-archives && cd ~/web-archives
-archivebox init
+curl -O 'https://docker-compose.archivebox.io' && mv docker-compose.archivebox.io docker-compose.yml
+docker compose run archivebox init --setup
+docker compose up -d                    # start the web UI on :8000
 
-# Add URLs to archive
-archivebox add "https://example.com/article"
+# Pip-based install still works but you'll need to install Chromium /
+# yt-dlp / wget / single-file separately for full capture coverage:
+# pip install archivebox && archivebox init
+
+# Add URLs to archive (from inside the archive directory)
+docker compose run archivebox add "https://example.com/article"
 
 # Add multiple URLs from file
-archivebox add --depth=0 < urls.txt
+docker compose run archivebox add --depth=0 < urls.txt
 
 # Schedule regular archiving
-archivebox schedule --every=day --depth=1 "https://example.com/feed.rss"
+docker compose run archivebox schedule --every=day --depth=1 "https://example.com/feed.rss"
 ```
 
 ### ArchiveBox Python integration
@@ -372,9 +428,12 @@ class ArchiveBoxManager:
 
 ```python
 import hashlib
-from datetime import datetime
-from dataclasses import dataclass, asdict
+import sys
 import json
+import requests
+from datetime import datetime, timezone
+from dataclasses import dataclass, asdict
+from typing import List
 
 @dataclass
 class EvidenceRecord:
@@ -401,7 +460,7 @@ class EvidenceRecord:
     def add_custody_entry(self, accessor: str, action: str, notes: str = ""):
         """Log access to evidence."""
         self.custody_log.append({
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'accessor': accessor,
             'action': action,
             'notes': notes
@@ -413,18 +472,22 @@ class EvidenceRecord:
     @classmethod
     def from_capture(cls, url: str, content: bytes, captured_by: str):
         """Create evidence record from captured content."""
+        now = datetime.now(timezone.utc).isoformat()
+        py = sys.version_info
         return cls(
             original_url=url,
             archived_urls=[],
             content_hash_sha256=hashlib.sha256(content).hexdigest(),
-            capture_time_utc=datetime.utcnow().isoformat(),
-            first_observed=datetime.utcnow().isoformat(),
+            capture_time_utc=now,
+            first_observed=now,
             page_title="",
             captured_by=captured_by,
             capture_method="automated_capture",
             tool_versions={
+                # Replace 'archiver' with your tool's actual __version__
                 'archiver': '1.0.0',
-                'python': '3.11'
+                'python': f'{py.major}.{py.minor}.{py.micro}',
+                'requests': requests.__version__,
             },
             custody_log=[]
         )
@@ -528,20 +591,17 @@ class PermaCC:
 ```javascript
 // Save to Wayback Machine - add as bookmark
 javascript:(function(){
-    var url = location.href;
-    window.open('https://web.archive.org/save/' + url, '_blank');
+    window.open('https://web.archive.org/save/' + encodeURIComponent(location.href), '_blank');
 })();
 
 // Save to Archive.today
 javascript:(function(){
-    var url = location.href;
-    window.open('https://archive.today/?run=1&url=' + encodeURIComponent(url), '_blank');
+    window.open('https://archive.today/?run=1&url=' + encodeURIComponent(location.href), '_blank');
 })();
 
 // Check all archives (Memento)
 javascript:(function(){
-    var url = location.href;
-    window.open('http://timetravel.mementoweb.org/list/0/' + url, '_blank');
+    window.open('https://timetravel.mementoweb.org/list/0/' + encodeURIComponent(location.href), '_blank');
 })();
 ```
 
@@ -549,13 +609,17 @@ javascript:(function(){
 
 ```javascript
 // Try multiple archives for dead pages
+// Note: Google Cache (webcache.googleusercontent.com) was retired in
+// Sept 2024 and is omitted here.
 javascript:(function(){
-    var url = location.href;
+    // Encode location.href so any '#' / '?' inside it travels as part
+    // of the path argument; raw concatenation lets the browser strip
+    // fragments and re-attach query strings to the outer URL.
+    var encoded = encodeURIComponent(location.href);
     var archives = [
-        'https://web.archive.org/web/*/' + url,
-        'https://archive.today/' + encodeURIComponent(url),
-        'https://webcache.googleusercontent.com/search?q=cache:' + url,
-        'http://timetravel.mementoweb.org/list/0/' + url
+        'https://web.archive.org/web/*/' + encoded,
+        'https://archive.ph/newest/' + encoded,
+        'https://timetravel.mementoweb.org/list/0/' + encoded
     ];
     archives.forEach(function(a){ window.open(a, '_blank'); });
 })();
@@ -563,19 +627,22 @@ javascript:(function(){
 
 ## Archive service comparison
 
-| Service | Best For | API | Deletions | Max Size |
-|---------|----------|-----|-----------|----------|
-| **Wayback Machine** | Historical research | Yes (free) | On request | Unlimited |
-| **Archive.today** | Paywall bypass, quick saves | No | Never | 50MB |
-| **Perma.cc** | Legal citations | Yes (free tier) | By creator | Standard pages |
-| **ArchiveBox** | Self-hosted, privacy | Local | Never | Disk space |
-| **Conifer** | Interactive content | Yes | By creator | 5GB free |
+| Service | Best For | API | Deletions | Max Size | Notes |
+|---------|----------|-----|-----------|----------|-------|
+| **Wayback Machine** | Historical research | Yes (free) | On request | Unlimited | Anonymous SPN ~15/min; auth via S3 keys raises cap |
+| **Archive.today** | Paywall bypass, quick saves | Informal | Never | 50MB | FBI subpoena Oct 2025; Wikipedia deprecated as citation source Feb 2026 — avoid for legal/citation use |
+| **Perma.cc** | Legal citations | Yes (free tier) | By creator | Standard pages | Used by US courts; `Authorization: ApiKey <key>` |
+| **ArchiveBox** | Self-hosted, privacy | Local | Never | Disk space | v0.8 ships Docker Compose with Chromium / yt-dlp / wget |
+| **Browsertrix Cloud** | Interactive / JS-heavy capture | Yes | By creator | Plan-based | Webrecorder.net successor to Conifer; outputs WARC |
+| **Conifer** | Interactive content | Yes | By creator | 5GB free | Older Webrecorder service; Browsertrix Cloud is the active path |
 
 ## Error handling and fallbacks
 
 ```python
+import requests
 from enum import Enum
 from typing import Optional
+from urllib.parse import quote, unquote
 
 class ArchiveError(Enum):
     NOT_FOUND = "No archive found"
@@ -607,7 +674,7 @@ def get_archived_page(url: str) -> tuple[Optional[str], Optional[ArchiveError]]:
 
     # 3. Try Memento aggregator
     try:
-        memento_url = f"http://timetravel.mementoweb.org/api/json/0/{url}"
+        memento_url = f"https://timetravel.mementoweb.org/api/json/0/{quote(unquote(url), safe='')}"
         response = requests.get(memento_url, timeout=30)
         data = response.json()
 

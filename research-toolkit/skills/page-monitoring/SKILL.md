@@ -9,13 +9,19 @@ Patterns for tracking web page changes, detecting content removal, and preservin
 
 ## Monitoring service comparison
 
-| Service | Free Tier | Best For | Storage | Alert Speed |
+Free-tier limits and retention windows shift annually — verify at the
+service's pricing page before relying on a specific number. The
+columns below reflect a 2026 snapshot.
+
+| Service | Free Tier | Best For | History | Alert Speed |
 |---------|-----------|----------|---------|-------------|
-| **Visualping** | 5 pages | Visual changes | Standard | Minutes |
-| **ChangeTower** | Yes | Compliance, archiving | 12 years | Minutes |
-| **Distill.io** | 25 pages | Element-level tracking | 12 months | Seconds |
+| **Visualping** | A few daily checks (free plan tightened in recent years) | Visual changes | Standard | Minutes |
+| **ChangeTower** | Yes (verify current limits) | Compliance, archiving | Multi-year on paid plans | Minutes |
+| **Distill.io** | ~5 monitors with 7-day history | Element-level tracking | Limited on free tier | Seconds |
 | **Wachete** | Limited | Login-protected pages | 12 months | Minutes |
-| **UptimeRobot** | 50 monitors | Uptime only | 2 months | Minutes |
+| **UptimeRobot** | 50 monitors at 5-minute intervals (free SMS removed) | Uptime only | 60 days | 5-min checks |
+| **changedetection.io** | Self-hosted; free | Privacy / DIY | Disk space | Configurable |
+| **urlwatch** | Self-hosted; free | Cron-driven CLI | Configurable | Configurable |
 
 ## Quick-start: Monitor a page
 
@@ -71,7 +77,7 @@ class PageMonitor:
     def _save_state(self):
         self.state_file.write_text(json.dumps(self.state, indent=2))
 
-    def _get_page_hash(self, url: str, selector: str = None) -> tuple[str, str]:
+    def _get_page_hash(self, url: str, selector: Optional[str] = None) -> tuple[str, str]:
         """Get content hash and content for a page or element."""
 
         response = requests.get(url, timeout=30, headers={
@@ -89,7 +95,7 @@ class PageMonitor:
         content_hash = hashlib.sha256(content.encode()).hexdigest()
         return content_hash, content
 
-    def add_page(self, url: str, name: str, selector: str = None):
+    def add_page(self, url: str, name: str, selector: Optional[str] = None):
         """Add a page to monitor."""
 
         content_hash, content = self._get_page_hash(url, selector)
@@ -190,6 +196,9 @@ class UptimeRobotClient:
 
     def __init__(self, api_key: str):
         self.api_key = api_key
+        # v2 still works as of 2026 but is in maintenance mode; v3 is
+        # the current REST API at https://api.uptimerobot.com/v3 with
+        # a different request shape (Bearer auth, JSON bodies).
         self.base_url = "https://api.uptimerobot.com/v2"
 
     def _request(self, endpoint: str, params: dict = None) -> dict:
@@ -275,7 +284,7 @@ class RSSGenerator:
 
     def add_from_page(self, url: str, item_selector: str,
                       title_selector: str, link_selector: str,
-                      description_selector: str = None):
+                      description_selector: Optional[str] = None):
         """Parse a page and add items to feed.
 
         Args:
@@ -364,12 +373,21 @@ docker run -d -p 3000:80 rssbridge/rss-bridge
 ### Twitter/X archiving with Twarc
 
 ```python
-# Twarc requires Twitter API credentials
+# Twarc requires X (Twitter) API credentials.
+#
+# IMPORTANT (2023+): X eliminated the free Twitter API tier and the
+# free academic research access program. Current X API pricing has
+# shifted multiple times since the 2023 changes — the Basic / Pro /
+# Enterprise tier names and pay-per-use credit model have been
+# revised; check the current pricing page at
+# https://developer.x.com/en/products/x-api before estimating cost.
+# For one-off archiving, the snscrape / nitter / web-scraping path
+# may be more cost-effective — see the web-scraping skill.
 
 # Installation
 # pip install twarc
 
-# Configure
+# Configure (interactive — provides API keys + bearer token)
 # twarc2 configure
 
 import subprocess
@@ -430,6 +448,7 @@ class TwitterArchiver:
 
 ```python
 import requests
+from datetime import datetime
 from typing import Optional
 
 class AlertManager:
@@ -580,6 +599,10 @@ if __name__ == '__main__':
 ### Automatic archiving when changes detected
 
 ```python
+# `MultiArchiver` is the cascade-archive helper from the sibling
+# web-archiving skill (see research-toolkit/skills/web-archiving/).
+# Replace this import with your own multi-service archiver, or
+# port the MultiArchiver class from that skill.
 from multiarchiver import MultiArchiver
 
 class ArchivingMonitor(PageMonitor):
