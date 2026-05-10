@@ -17,7 +17,7 @@ This affects how you write a CLAUDE.md and what you put elsewhere:
 |---|---|---|
 | **CLAUDE.md** | Standing facts, conventions, "always do X" rules | Advisory |
 | **Skills** | Multi-step procedures, on-demand workflows | Loaded when invoked |
-| **Hooks** | Actions that must happen every time, no exceptions | Deterministic — runs as a shell command |
+| **Hooks** | Actions that must happen every time, no exceptions | Deterministic — runs as a shell command (e.g., `hooks/one-way-door-check.md`) or as a prompt the harness enforces (e.g., `hooks/enforce-test-first.md`) |
 
 If an instruction is "block writes to `published/`" or "run accessibility check before commit," that belongs in a hook, not CLAUDE.md. If it's "fact-check workflow" or "FOIA-letter drafting," that's a skill. CLAUDE.md is the place for things Claude must hold in every session.
 
