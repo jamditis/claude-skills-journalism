@@ -86,20 +86,24 @@ claude-skills-journalism/
 │       ├── web-ui-best-practices/      # Container queries, :has(), view transitions
 │       └── zero-build-frontend/        # ESM import maps, htmx, Alpine.js
 │
-├── # Design and production (2)
+├── # Plugin: pdf-design (1 skill) — registered in marketplace.json
 ├── pdf-design/                  # PDF reports, proposals, brand system
 │   └── templates/               # HTML templates (Democracy Day, etc.)
+│
+├── # Plugin: visual-explainer (1 skill) — registered in marketplace.json
 ├── visual-explainer/            # HTML diagrams, data tables, architecture views
 │   ├── references/              # CSS patterns, library guides, nav patterns
 │   ├── templates/               # Architecture, flowchart, data table templates
-│   └── prompts/                 # Slash command templates
+│   └── commands/                # Slash command templates
 │
-├── # Project documentation (3)
-├── project-memory/              # CLAUDE.md generation
-│   └── templates/               # 6 project type templates
-├── project-retrospective/       # LESSONS.md generation
-│   └── templates/               # 4 project type templates
-├── template-selector/           # Choose the right template
+├── # Plugin: project-templates-toolkit (3 skills) — registered in marketplace.json
+├── project-templates-toolkit/
+│   ├── .claude-plugin/plugin.json
+│   ├── README.md
+│   └── skills/
+│       ├── project-memory/             # CLAUDE.md generation, 6 project type templates
+│       ├── project-retrospective/      # LESSONS.md generation, 4 project type templates
+│       └── template-selector/          # Decision tree for picking the right template
 │
 ├── # Plugin: security-toolkit (3 skills) — registered in marketplace.json
 ├── security-toolkit/
@@ -178,11 +182,11 @@ This repo distributes its skills in two ways: **as Marketplace plugins** (regist
 /plugin install journalism-core@claude-skills-journalism
 ```
 
-Available plugins: `autocontext`, `dev-toolkit`, `journalism-core`, `pdf-design`, `pdf-playground`, `research-toolkit`, `security-toolkit`, `superjawn`. See `.claude-plugin/marketplace.json` for the full list.
+Available plugins: `autocontext`, `dev-toolkit`, `journalism-core`, `pdf-design`, `pdf-playground`, `project-templates-toolkit`, `research-toolkit`, `security-toolkit`, `superjawn`, `visual-explainer`. See `.claude-plugin/marketplace.json` for the full list.
 
 ### Alternate: copy a bare skill into `~/.claude/skills/`
 
-Some top-level directories (e.g. `free-apis-catalog`, `visual-explainer`, `project-memory`) are still distributed as bare skills outside any plugin. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
+A few top-level directories (e.g. `free-apis-catalog`) are still distributed as bare skills outside any plugin. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
 
 ```bash
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
@@ -192,13 +196,14 @@ cp -r free-apis-catalog ~/.claude/skills/
 # or: ln -sfn "$PWD/free-apis-catalog" ~/.claude/skills/free-apis-catalog
 ```
 
-For skills inside a plugin directory (e.g., `journalism-core/skills/source-verification`, `research-toolkit/skills/web-archiving`, `dev-toolkit/skills/web-scraping`, `security-toolkit/skills/secure-auth`), point at the nested path:
+For skills inside a plugin directory (e.g., `journalism-core/skills/source-verification`, `research-toolkit/skills/web-archiving`, `dev-toolkit/skills/web-scraping`, `security-toolkit/skills/secure-auth`, `project-templates-toolkit/skills/project-memory`), point at the nested path:
 
 ```bash
 cp -r journalism-core/skills/source-verification ~/.claude/skills/
 cp -r research-toolkit/skills/web-archiving ~/.claude/skills/
 cp -r dev-toolkit/skills/web-scraping ~/.claude/skills/
 cp -r security-toolkit/skills/secure-auth ~/.claude/skills/
+cp -r project-templates-toolkit/skills/project-memory ~/.claude/skills/
 ```
 
 Cloning the whole repo into `~/.claude/skills/journalism-skills/` nests each `SKILL.md` too deep and will not load.

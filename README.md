@@ -40,13 +40,15 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | [journalism-core](./journalism-core/) | Thirteen core journalism skills, including AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, fact-checking, interview prep + transcription, story pitches, editorial workflow, crisis communications, and newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements | n/a — skills only |
 | [pdf-design](./pdf-design/) | PDF report and proposal design system with brand variables, budget tables, and reusable content blocks (stats strips, three-column, four-tile pillars, partner grids) | n/a — skill-only |
 | [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials with an interactive control panel for live design editing (colors, fonts, spacing, sections) and a guided wizard for proposals | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` |
+| [project-templates-toolkit](./project-templates-toolkit/) | Three skills for setting up and closing out journalism projects: a CLAUDE.md project-memory writer (institutional knowledge), a LESSONS.md retrospective writer (failures and decisions), and a template-selector decision tree across 6 project types | n/a — skills only |
 | [research-toolkit](./research-toolkit/) | Five skills for research, source preservation, and academic workflows: academic writing, legal paywall-bypass via Unpaywall and library databases, web archiving (Wayback / Archive.today / ArchiveBox), web page change monitoring, and AI-enriched digital archive construction | n/a — skills only |
 | [security-toolkit](./security-toolkit/) | Three defensive web application security skills covering OWASP Top 10 fundamentals: pre-deployment audit checklists (auth, input validation, secrets management), secure authentication implementation patterns (password hashing, session management, JWT, OAuth, passkeys), and API hardening (rate limiting, CORS, request throttling, defense-in-depth for Express, FastAPI, and serverless) | n/a — skills only |
 | [superjawn](./superjawn/) | Research-augmented fork of obra/superpowers. Default-on research phase fires before brainstorming, systematic-debugging, and writing-skills. v1.0.0 ships all 14 skills with no soft dependencies on the upstream `superpowers` plugin | invoked indirectly via skills (e.g. `superjawn:brainstorming`, `superjawn:systematic-debugging`, `superjawn:writing-plans`) |
+| [visual-explainer](./visual-explainer/) | HTML diagrams, data tables, architecture views, slide decks, and KPI dashboards adapted from nicobailon/visual-explainer with journalism, newsroom, and academic design sensibilities | `/visual-explainer:project-recap` |
 
 ### Skills (manual installation)
 
-Most skills now ship inside plugins (see the table above). For skills that haven't been bundled into a plugin yet (e.g., `free-apis-catalog`, `visual-explainer`, `project-memory`), Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep. Clone this repo anywhere you like, then copy or symlink the bare skills you want:
+Most skills now ship inside plugins (see the table above). For skills that haven't been bundled into a plugin yet (e.g., `free-apis-catalog`), Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep. Clone this repo anywhere you like, then copy or symlink the bare skills you want:
 
 ```
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
@@ -61,6 +63,7 @@ cp -r journalism-core/skills/source-verification ~/.claude/skills/
 cp -r research-toolkit/skills/web-archiving ~/.claude/skills/
 cp -r dev-toolkit/skills/web-scraping ~/.claude/skills/
 cp -r security-toolkit/skills/secure-auth ~/.claude/skills/
+cp -r project-templates-toolkit/skills/project-memory ~/.claude/skills/
 
 # Or symlink so git pull updates them in place (ln -sfn replaces an existing link):
 ln -sfn "$PWD/free-apis-catalog" ~/.claude/skills/free-apis-catalog
@@ -111,15 +114,17 @@ These five skills ship together as the [research-toolkit](./research-toolkit/) p
 | Skill | Description |
 |-------|-------------|
 | [pdf-design](./pdf-design/) | Professional PDF reports and proposals with brand system, budget tables, and multi-page layouts. For the full interactive experience, use [pdf-playground](./pdf-playground/) instead |
-| [visual-explainer](./visual-explainer/) | Turn complex data into styled HTML pages — architecture diagrams, data tables, flowcharts, timelines, source maps, and dashboards with dark/light theme support |
+| [visual-explainer](./visual-explainer/) | Turn complex data into styled HTML pages — architecture diagrams, data tables, flowcharts, timelines, source maps, and dashboards with dark/light theme support. Now registered as a plugin (`/plugin install visual-explainer@claude-skills-journalism`) |
 
-### Project documentation
+### Project documentation skills (in `project-templates-toolkit` plugin)
+
+These three skills ship together as the [project-templates-toolkit](./project-templates-toolkit/) plugin. Install via `/plugin install project-templates-toolkit@claude-skills-journalism` to get all of them at once.
 
 | Skill | Description |
 |-------|-------------|
-| [project-memory](./project-memory/) | Generate CLAUDE.md files that capture project-specific knowledge. Includes templates for editorial tools, events, publications, research, pipelines, and archives |
-| [project-retrospective](./project-retrospective/) | Generate LESSONS.md files that document what worked and what didn't. Templates for investigations, events, publications, and tools |
-| [template-selector](./template-selector/) | Decision tree for choosing the right project documentation template |
+| [project-memory](./project-templates-toolkit/skills/project-memory/) | Generate CLAUDE.md files that capture project-specific knowledge. Includes templates for editorial tools, events, publications, research, pipelines, and archives |
+| [project-retrospective](./project-templates-toolkit/skills/project-retrospective/) | Generate LESSONS.md files that document what worked and what didn't. Templates for investigations, events, publications, and tools |
+| [template-selector](./project-templates-toolkit/skills/template-selector/) | Decision tree for choosing the right project documentation template |
 
 ### Development skills (in `dev-toolkit` plugin)
 

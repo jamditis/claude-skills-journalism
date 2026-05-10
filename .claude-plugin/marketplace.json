@@ -1,6 +1,6 @@
 {
   "name": "claude-skills-journalism",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Claude Code plugins for journalism, research, and media organizations",
   "owner": {
     "name": "Joe Amditis",
@@ -63,6 +63,17 @@
       "category": "Productivity"
     },
     {
+      "name": "project-templates-toolkit",
+      "description": "Three skills for setting up and closing out journalism projects: a CLAUDE.md project-memory writer (carries institutional knowledge into the repo), a LESSONS.md retrospective writer (captures failures and decisions worth remembering), and a template-selector decision tree that picks the right starting template for editorial tools, events, publications, research projects, content pipelines, and digital archives.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Joe Amditis",
+        "email": "jamditis@gmail.com"
+      },
+      "source": "./project-templates-toolkit",
+      "category": "Productivity"
+    },
+    {
       "name": "research-toolkit",
       "description": "Five skills for research, source preservation, and academic workflows. Covers academic writing and scholarly communication, legal paywall-bypass strategies (Unpaywall, library databases, ethical open-access access), web archiving (Wayback Machine, Archive.today, ArchiveBox, evidence preservation), web page monitoring and change detection (Visualping, ChangeTower, self-hosted alternatives), and AI-enriched digital archive construction with entity extraction and knowledge graphs. Built for journalists, researchers, librarians, and academics who need to find, preserve, and analyze evidence across the web.",
       "version": "1.0.0",
@@ -94,6 +105,17 @@
       },
       "source": "./superjawn",
       "category": "Productivity"
+    },
+    {
+      "name": "visual-explainer",
+      "description": "HTML diagrams, data tables, and architecture views — adapted from nicobailon/visual-explainer with journalism, newsroom, and academic design sensibilities. Generates self-contained HTML pages with Mermaid diagrams, responsive section navigation, KPI cards, slide decks, and zoom/pan controls. Useful for project recaps, architecture snapshots, post-mortem visualizations, and editorial dashboards.",
+      "version": "0.7.1",
+      "author": {
+        "name": "Joe Amditis",
+        "email": "jamditis@gmail.com"
+      },
+      "source": "./visual-explainer",
+      "category": "Design"
     }
   ]
 }
