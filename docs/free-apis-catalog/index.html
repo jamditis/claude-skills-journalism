@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free APIs catalog | Claude Skills for Journalism</title>
-    <meta name="description" content="1000+ free public APIs organized by category. Weather, news, finance, sports, ML, entertainment — most require no API key.">
+    <meta name="description" content="Curated free-API catalog for journalism use-cases — government data, news, social media, AI/ML, business, geocoding — with currency notes for major API sunsets (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) and an evaluation rubric.">
 
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -120,7 +120,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
     <!-- Open Graph -->
     <meta property="og:title" content="Free APIs catalog">
-    <meta property="og:description" content="1000+ free public APIs organized by category. Weather, news, finance, sports, ML, entertainment — most require no API key.">
+    <meta property="og:description" content="Curated free-API catalog for journalism use-cases — government data, news, social media, AI/ML, business, geocoding — with currency notes for major API sunsets (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) and an evaluation rubric.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://skills.amditis.tech/free-apis-catalog/">
     <meta property="og:image" content="https://skills.amditis.tech/free-apis-catalog/og-image.png">
@@ -130,7 +130,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Free APIs catalog">
-    <meta name="twitter:description" content="1000+ free public APIs organized by category. Weather, news, finance, sports, ML, entertainment — most require no API key.">
+    <meta name="twitter:description" content="Curated free-API catalog for journalism use-cases — government data, news, social media, AI/ML, business, geocoding — with currency notes for major API sunsets (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) and an evaluation rubric.">
     <meta name="twitter:image" content="https://skills.amditis.tech/free-apis-catalog/og-image.png">
 <script src="../ask-ai.js" defer></script>
     <!-- a11y-patch-v1 -->
@@ -158,7 +158,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <div class="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide uppercase mb-6">Developer reference</div>
             <h1 class="font-display text-5xl md:text-7xl font-black leading-[0.9] mb-6">Free APIs<br>catalog</h1>
             <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-10 font-light">
-                1000+ free public APIs organized by category. Weather, news, finance, sports, ML, entertainment &mdash; most require no API key.
+                Curated free-API catalog for journalism use-cases &mdash; government data, news, social media, AI/ML, business, geocoding. Currency notes for major API sunsets (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) and an evaluation rubric for picking APIs.
             </p>
             <div class="flex flex-wrap gap-4">
                 <a href="#categories" class="inline-flex items-center gap-2 bg-white text-accentDark font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors">
@@ -393,17 +393,20 @@ Slack message."
                     <div class="bg-white/5 p-6 rounded-xl">
                         <h3 class="font-semibold mb-3 flex items-center gap-2">
                             <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">1</span>
-                            Clone the repository
+                            Recommended: install the research-toolkit plugin
                         </h3>
-                        <pre tabindex="0"><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
+                        <pre tabindex="0"><code>/plugin marketplace add jamditis/claude-skills-journalism
+/plugin install research-toolkit@claude-skills-journalism</code></pre>
+                        <p class="text-sm text-white/70 mt-3">Ships with five sibling skills (academic-writing, content-access, digital-archive, page-monitoring, web-archiving).</p>
                     </div>
 
                     <div class="bg-white/5 p-6 rounded-xl">
                         <h3 class="font-semibold mb-3 flex items-center gap-2">
                             <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">2</span>
-                            Copy skill to Claude skills directory
+                            Or copy just this skill into your Claude skills directory
                         </h3>
-                        <pre tabindex="0"><code>cp -r free-apis-catalog ~/.claude/skills/</code></pre>
+                        <pre tabindex="0"><code>git clone https://github.com/jamditis/claude-skills-journalism.git
+cp -r claude-skills-journalism/research-toolkit/skills/free-apis-catalog ~/.claude/skills/</code></pre>
                     </div>
 
                     <div class="bg-white/5 p-6 rounded-xl">
@@ -421,10 +424,10 @@ Slack message."
         <section class="py-16 px-6 border-t border-ink/10">
             <div class="max-w-6xl mx-auto text-center">
                 <p class="text-mist text-sm mb-2">
-                    Based on <a href="https://x.com/qwerty_ytrevvq" class="text-accentDark hover:underline">@qwerty</a>'s free APIs catalog (Mar 2026)
+                    Canonical breadth reference: <a href="https://github.com/public-apis/public-apis" class="text-accentDark hover:underline">public-apis/public-apis</a>
                 </p>
                 <p class="text-mist text-sm mb-4">
-                    Adapted by <a href="https://github.com/jamditis" class="text-accentDark hover:underline">Joe Amditis</a> at the
+                    Curated by <a href="https://github.com/jamditis" class="text-accentDark hover:underline">Joe Amditis</a> at the
                     <a href="https://centerforcooperativemedia.org" class="text-accentDark hover:underline">Center for Cooperative Media</a>
                 </p>
                 <p class="text-mist text-xs">Part of <a href="../" class="hover:underline">Claude Skills for Journalism</a> &bull; MIT License</p>

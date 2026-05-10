@@ -59,7 +59,7 @@ claude-skills-journalism/
 │       ├── source-verification/        # SIFT method, verification, deepfakes/C2PA
 │       └── story-pitch/                # Pitch templates
 │
-├── # Plugin: research-toolkit (5 skills) — registered in marketplace.json
+├── # Plugin: research-toolkit (6 skills, v1.1.0) — registered in marketplace.json
 ├── research-toolkit/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -67,6 +67,7 @@ claude-skills-journalism/
 │       ├── academic-writing/           # Research and scholarly communication
 │       ├── content-access/             # Unpaywall, library databases, paywall bypass
 │       ├── digital-archive/            # AI-enriched archives, entity extraction
+│       ├── free-apis-catalog/          # Curated free-API catalog with sunset currency notes
 │       ├── page-monitoring/            # Change detection, availability tracking
 │       └── web-archiving/              # Wayback, Archive.today, evidence preservation
 │
@@ -105,17 +106,13 @@ claude-skills-journalism/
 │       ├── project-retrospective/      # LESSONS.md generation, 4 project type templates
 │       └── template-selector/          # Decision tree for picking the right template
 │
-├── # Plugin: security-toolkit (3 skills) — registered in marketplace.json
-├── security-toolkit/
-│   ├── .claude-plugin/plugin.json
-│   ├── README.md
-│   └── skills/
-│       ├── api-hardening/              # Rate limiting, CORS, request throttling, defense-in-depth
-│       ├── secure-auth/                # Password hashing, sessions, JWT, OAuth, passkeys
-│       └── security-checklist/         # Pre-deployment OWASP audit
-│
-└── # Reference (1)
-    └── free-apis-catalog/       # 1000+ free public APIs by category
+└── # Plugin: security-toolkit (3 skills) — registered in marketplace.json
+    ├── .claude-plugin/plugin.json
+    ├── README.md
+    └── skills/
+        ├── api-hardening/              # Rate limiting, CORS, request throttling, defense-in-depth
+        ├── secure-auth/                # Password hashing, sessions, JWT, OAuth, passkeys
+        └── security-checklist/         # Pre-deployment OWASP audit
 ```
 
 ## Skill format
@@ -184,26 +181,24 @@ This repo distributes its skills in two ways: **as Marketplace plugins** (regist
 
 Available plugins: `autocontext`, `dev-toolkit`, `journalism-core`, `pdf-design`, `pdf-playground`, `project-templates-toolkit`, `research-toolkit`, `security-toolkit`, `superjawn`, `visual-explainer`. See `.claude-plugin/marketplace.json` for the full list.
 
-### Alternate: copy a bare skill into `~/.claude/skills/`
+### Alternate: copy a single skill into `~/.claude/skills/`
 
-A few top-level directories (e.g. `free-apis-catalog`) are still distributed as bare skills outside any plugin. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
+Every skill in this repo now lives inside a plugin's `skills/` directory. To install just one without taking the whole plugin, clone the repo and copy the nested skill folder. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
 
 ```bash
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
 cd ~/projects/claude-skills-journalism
 mkdir -p ~/.claude/skills
-cp -r free-apis-catalog ~/.claude/skills/
-# or: ln -sfn "$PWD/free-apis-catalog" ~/.claude/skills/free-apis-catalog
-```
 
-For skills inside a plugin directory (e.g., `journalism-core/skills/source-verification`, `research-toolkit/skills/web-archiving`, `dev-toolkit/skills/web-scraping`, `security-toolkit/skills/secure-auth`, `project-templates-toolkit/skills/project-memory`), point at the nested path:
-
-```bash
 cp -r journalism-core/skills/source-verification ~/.claude/skills/
+cp -r research-toolkit/skills/free-apis-catalog ~/.claude/skills/
 cp -r research-toolkit/skills/web-archiving ~/.claude/skills/
 cp -r dev-toolkit/skills/web-scraping ~/.claude/skills/
 cp -r security-toolkit/skills/secure-auth ~/.claude/skills/
 cp -r project-templates-toolkit/skills/project-memory ~/.claude/skills/
+
+# Or symlink so git pull updates them in place (ln -sfn replaces an existing link):
+ln -sfn "$PWD/research-toolkit/skills/free-apis-catalog" ~/.claude/skills/free-apis-catalog
 ```
 
 Cloning the whole repo into `~/.claude/skills/journalism-skills/` nests each `SKILL.md` too deep and will not load.
