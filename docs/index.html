@@ -1030,8 +1030,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         <div>git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism</div>
                         <div>cd ~/projects/claude-skills-journalism</div>
                         <div>mkdir -p ~/.claude/skills</div>
-                        <div>cp -r source-verification ~/.claude/skills/</div>
-                        <div># or: ln -sfn "$PWD/source-verification" ~/.claude/skills/source-verification</div>
+                        <div>cp -r journalism-core/skills/source-verification ~/.claude/skills/</div>
+                        <div># or: ln -sfn "$PWD/journalism-core/skills/source-verification" ~/.claude/skills/source-verification</div>
                     </div>
                     <p class="text-sm text-mist">Skills activate automatically. For example, asking Claude to verify a source will use the source-verification skill. Don't clone the whole repo into <code>~/.claude/skills/journalism-skills/</code> — that nests each <code>SKILL.md</code> two levels deep and Claude Code won't find them.</p>
                 </div>

@@ -139,7 +139,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
     <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-ink/5">
         <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
             <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">← Back to all skills</a>
-            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/data-journalism" class="text-sm font-semibold text-accentDark hover:text-accentDark transition-colors">View on GitHub →</a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/journalism-core/skills/data-journalism" class="text-sm font-semibold text-accentDark hover:text-accentDark transition-colors">View on GitHub →</a>
         </div>
     </nav>
 
@@ -347,17 +347,20 @@ print(f"${salary_2010:,} in 2010 = ${salary_2024_dollars:,.0f} in 2024")
                     <div class="bg-white/5 p-6 rounded-xl">
                         <h3 class="font-semibold mb-3 flex items-center gap-2">
                             <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">1</span>
-                            Clone the repository
+                            Recommended: install the journalism-core plugin
                         </h3>
-                        <pre tabindex="0"><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
+                        <pre tabindex="0"><code>/plugin marketplace add jamditis/claude-skills-journalism
+/plugin install journalism-core@claude-skills-journalism</code></pre>
+                        <p class="text-sm text-white/70 mt-3">Ships with twelve sibling skills covering AP-style writing, FOIA, fact-checking, interview workflows, and more.</p>
                     </div>
 
                     <div class="bg-white/5 p-6 rounded-xl">
                         <h3 class="font-semibold mb-3 flex items-center gap-2">
                             <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">2</span>
-                            Copy skill to Claude skills directory
+                            Or copy just this skill from the plugin tree
                         </h3>
-                        <pre tabindex="0"><code>cp -r data-journalism ~/.claude/skills/</code></pre>
+                        <pre tabindex="0"><code>git clone https://github.com/jamditis/claude-skills-journalism.git
+cp -r claude-skills-journalism/journalism-core/skills/data-journalism ~/.claude/skills/</code></pre>
                     </div>
 
                     <div class="bg-white/5 p-6 rounded-xl">
