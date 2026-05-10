@@ -109,7 +109,7 @@ Vary the choice each time. If the last diagram was dark and technical, make the 
 
 **Mermaid containers.** Always center Mermaid diagrams with `display: flex; justify-content: center;`. Add zoom controls (+/−/reset/expand) to every `.mermaid-wrap` container. Include the click-to-expand JavaScript so clicking the diagram (or the ⛶ button) opens it full-size in a new tab.
 
-**Never use bare `<pre class="mermaid">`.** It renders but has no zoom/pan controls — diagrams become tiny and unusable. Always use the full `diagram-shell` pattern from `templates/mermaid-flowchart.html`: the HTML structure (`.diagram-shell` > `.mermaid-wrap` > `.zoom-controls` + `.mermaid-viewport` > `.mermaid-canvas`), the CSS, and the ~200-line JS module for zoom/pan/fit. Copy it wholesale.
+**Never use bare `<pre class="mermaid">`.** It renders but has no zoom/pan controls — diagrams become tiny and unusable. Always use the journalism `mermaid-flowchart.html` pattern: a `.mermaid-wrap` container with `.zoom-controls` (+/−/reset/expand buttons) wrapping a `.mermaid` element. The container's CSS handles overflow and pan affordances; the bundled JS wires zoom buttons, ctrl+scroll wheel zoom, click-and-drag panning, and click-to-expand into a new tab. Copy the template wholesale rather than reconstructing the pattern.
 
 **Mermaid scaling.** Diagrams with 10+ nodes render too small by default. For 10–12 nodes, increase `fontSize` in themeVariables to 18–20px and set `INITIAL_ZOOM` to 1.5–1.6. For 15+ elements, don't try to scale — use the hybrid pattern instead (simple Mermaid overview + CSS Grid cards). See "Architecture / system diagrams" below.
 

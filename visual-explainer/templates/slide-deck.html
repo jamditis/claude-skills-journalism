@@ -800,7 +800,7 @@ graph LR
 
   const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   mermaid.initialize({
-    startOnLoad: true,
+    startOnLoad: false,
     theme: 'base',
     look: 'classic',
     themeVariables: {
@@ -855,12 +855,72 @@ graph LR
 
 <script>
   // Mermaid zoom controls + click-to-expand
-  var INITIAL_ZOOM=1;
-  function zoomDiagram(b,f){var w=b.closest('.mermaid-wrap');var t=w.querySelector('.mermaid');var c=parseFloat(t.dataset.zoom||INITIAL_ZOOM);var n=Math.min(Math.max(c*f,0.5),5);t.dataset.zoom=n;t.style.zoom=n;}
-  function resetZoom(b){var w=b.closest('.mermaid-wrap');var t=w.querySelector('.mermaid');t.dataset.zoom=INITIAL_ZOOM;t.style.zoom=INITIAL_ZOOM;}
-  function openDiagramFullscreen(b){openMermaidInNewTab(b.closest('.mermaid-wrap'));}
-  function openMermaidInNewTab(w){var svg=w.querySelector('.mermaid svg');if(!svg)return;var clone=svg.cloneNode(true);clone.style.zoom='';clone.style.transform='';var styles=getComputedStyle(document.documentElement);var bg=styles.getPropertyValue('--bg').trim()||'#ffffff';var html='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Diagram</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:'+bg+';padding:40px;box-sizing:border-box}svg{max-width:100%;max-height:90vh;height:auto}</style></head><body>'+clone.outerHTML+'</body></html>';window.open(URL.createObjectURL(new Blob([html],{type:'text/html'})),'_blank');}
-  document.querySelectorAll('.mermaid-wrap').forEach(function(w){w.addEventListener('wheel',function(e){if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();var t=w.querySelector('.mermaid');var c=parseFloat(t.dataset.zoom||INITIAL_ZOOM);var f=e.deltaY<0?1.1:0.9;var n=Math.min(Math.max(c*f,0.5),5);t.dataset.zoom=n;t.style.zoom=n;},{passive:false});var sX,sY,sL,sT,sTime,didPan;w.addEventListener('mousedown',function(e){if(e.target.closest('.zoom-controls'))return;w.classList.add('is-panning');sX=e.clientX;sY=e.clientY;sL=w.scrollLeft;sT=w.scrollTop;sTime=Date.now();didPan=false;});window.addEventListener('mousemove',function(e){if(!w.classList.contains('is-panning'))return;var dx=e.clientX-sX,dy=e.clientY-sY;if(Math.abs(dx)>5||Math.abs(dy)>5)didPan=true;w.scrollLeft=sL-dx;w.scrollTop=sT-dy;});window.addEventListener('mouseup',function(){if(!w.classList.contains('is-panning'))return;w.classList.remove('is-panning');if(!didPan&&Date.now()-sTime<300)openMermaidInNewTab(w);});});
+  // Uses transform: scale() for cross-browser support (element.style.zoom is non-standard
+  // and broken in Firefox). Window-level pan listeners are registered once and shared
+  // across all .mermaid-wrap diagrams via a top-level pan-state variable.
+  var INITIAL_ZOOM = 1;
+  function applyMermaidScale(target, n) {
+    target.dataset.zoom = n;
+    target.style.transform = 'scale(' + n + ')';
+    target.style.transformOrigin = '0 0';
+  }
+  function zoomDiagram(b, f) {
+    var t = b.closest('.mermaid-wrap').querySelector('.mermaid');
+    var c = parseFloat(t.dataset.zoom || INITIAL_ZOOM);
+    applyMermaidScale(t, Math.min(Math.max(c * f, 0.5), 5));
+  }
+  function resetZoom(b) {
+    applyMermaidScale(b.closest('.mermaid-wrap').querySelector('.mermaid'), INITIAL_ZOOM);
+  }
+  function openDiagramFullscreen(b) { openMermaidInNewTab(b.closest('.mermaid-wrap')); }
+  function openMermaidInNewTab(w) {
+    var svg = w.querySelector('.mermaid svg'); if (!svg) return;
+    var clone = svg.cloneNode(true);
+    clone.style.transform = '';
+    var styles = getComputedStyle(document.documentElement);
+    var bg = styles.getPropertyValue('--bg').trim() || '#ffffff';
+    var html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Diagram</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:' + bg + ';padding:40px;box-sizing:border-box}svg{max-width:100%;max-height:90vh;height:auto}</style></head><body>' + clone.outerHTML + '</body></html>';
+    window.open(URL.createObjectURL(new Blob([html], { type: 'text/html' })), '_blank');
+  }
+
+  // Shared pan state — only one diagram pans at a time, and only one set of window listeners.
+  var __vePanActive = null;
+  window.addEventListener('mousemove', function(e) {
+    if (!__vePanActive) return;
+    var s = __vePanActive;
+    var dx = e.clientX - s.sX, dy = e.clientY - s.sY;
+    if (Math.abs(dx) > 5 || Math.abs(dy) > 5) s.didPan = true;
+    s.wrap.scrollLeft = s.sL - dx;
+    s.wrap.scrollTop = s.sT - dy;
+  });
+  window.addEventListener('mouseup', function() {
+    if (!__vePanActive) return;
+    var s = __vePanActive;
+    s.wrap.classList.remove('is-panning');
+    if (!s.didPan && Date.now() - s.sTime < 300) openMermaidInNewTab(s.wrap);
+    __vePanActive = null;
+  });
+
+  document.querySelectorAll('.mermaid-wrap').forEach(function(w) {
+    w.addEventListener('wheel', function(e) {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      var t = w.querySelector('.mermaid');
+      var c = parseFloat(t.dataset.zoom || INITIAL_ZOOM);
+      var f = e.deltaY < 0 ? 1.1 : 0.9;
+      applyMermaidScale(t, Math.min(Math.max(c * f, 0.5), 5));
+    }, { passive: false });
+    w.addEventListener('mousedown', function(e) {
+      if (e.target.closest('.zoom-controls')) return;
+      w.classList.add('is-panning');
+      __vePanActive = {
+        wrap: w,
+        sX: e.clientX, sY: e.clientY,
+        sL: w.scrollLeft, sT: w.scrollTop,
+        sTime: Date.now(), didPan: false
+      };
+    });
+  });
 
   // SlideEngine
   function SlideEngine(){

@@ -3,9 +3,7 @@
   "description": "HTML diagrams, data tables, and architecture views — adapted from nicobailon/visual-explainer with journalism, newsroom, and academic design sensibilities",
   "version": "0.7.1",
   "author": {
-    "name": "jamditis (journalism fork); upstream nicobailon"
-  },
-  "repository": "https://github.com/jamditis/claude-skills-journalism",
-  "license": "MIT",
-  "skills": ["./SKILL.md"]
+    "name": "Joe Amditis",
+    "email": "jamditis@gmail.com"
+  }
 }

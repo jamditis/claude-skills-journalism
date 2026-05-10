@@ -10,7 +10,7 @@ The page uses a two-column CSS Grid: sidebar (TOC) + main content. On mobile it 
 <body>
 <div class="wrap">
 
-  <nav class="toc" id="toc">
+  <nav class="toc" id="toc" aria-label="Table of contents">
     <div class="toc-title">Contents</div>
     <a href="#s1">1. First Section</a>
     <a href="#s2">2. Second Section</a>
