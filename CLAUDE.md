@@ -110,10 +110,6 @@ claude-skills-journalism/
 │       ├── secure-auth/                # Password hashing, sessions, JWT, OAuth, passkeys
 │       └── security-checklist/         # Pre-deployment OWASP audit
 │
-├── # AI and creative tools (1)
-├── nano-banana-image-gen/       # Gemini image gen model selection and prompting
-├── animated-sprite-gen/         # AI-generated animated sprite sheets
-│
 └── # Reference (1)
     └── free-apis-catalog/       # 1000+ free public APIs by category
 ```
@@ -186,14 +182,14 @@ Available plugins: `autocontext`, `dev-toolkit`, `journalism-core`, `pdf-design`
 
 ### Alternate: copy a bare skill into `~/.claude/skills/`
 
-Some top-level directories (e.g. `nano-banana-image-gen`, `visual-explainer`, `free-apis-catalog`) are still distributed as bare skills outside any plugin. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
+Some top-level directories (e.g. `free-apis-catalog`, `visual-explainer`, `project-memory`) are still distributed as bare skills outside any plugin. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
 
 ```bash
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
 cd ~/projects/claude-skills-journalism
 mkdir -p ~/.claude/skills
-cp -r nano-banana-image-gen ~/.claude/skills/
-# or: ln -sfn "$PWD/nano-banana-image-gen" ~/.claude/skills/nano-banana-image-gen
+cp -r free-apis-catalog ~/.claude/skills/
+# or: ln -sfn "$PWD/free-apis-catalog" ~/.claude/skills/free-apis-catalog
 ```
 
 For skills inside a plugin directory (e.g., `journalism-core/skills/source-verification`, `research-toolkit/skills/web-archiving`, `dev-toolkit/skills/web-scraping`, `security-toolkit/skills/secure-auth`), point at the nested path:

@@ -46,7 +46,7 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 
 ### Skills (manual installation)
 
-Most skills now ship inside plugins (see the table above). For skills that haven't been bundled into a plugin yet (e.g., `nano-banana-image-gen`, `visual-explainer`, `free-apis-catalog`), Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep. Clone this repo anywhere you like, then copy or symlink the bare skills you want:
+Most skills now ship inside plugins (see the table above). For skills that haven't been bundled into a plugin yet (e.g., `free-apis-catalog`, `visual-explainer`, `project-memory`), Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep. Clone this repo anywhere you like, then copy or symlink the bare skills you want:
 
 ```
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
@@ -54,7 +54,7 @@ cd ~/projects/claude-skills-journalism
 mkdir -p ~/.claude/skills
 
 # Copy a bare top-level skill:
-cp -r nano-banana-image-gen ~/.claude/skills/
+cp -r free-apis-catalog ~/.claude/skills/
 
 # Or pull a single skill out of a plugin's skills/ directory:
 cp -r journalism-core/skills/source-verification ~/.claude/skills/
@@ -63,7 +63,7 @@ cp -r dev-toolkit/skills/web-scraping ~/.claude/skills/
 cp -r security-toolkit/skills/secure-auth ~/.claude/skills/
 
 # Or symlink so git pull updates them in place (ln -sfn replaces an existing link):
-ln -sfn "$PWD/nano-banana-image-gen" ~/.claude/skills/nano-banana-image-gen
+ln -sfn "$PWD/free-apis-catalog" ~/.claude/skills/free-apis-catalog
 ```
 
 Do not clone the repo directly into `~/.claude/skills/journalism-skills/` — that nests each `SKILL.md` too deep and Claude Code won't find them.
@@ -147,13 +147,6 @@ These three skills ship together as the [security-toolkit](./security-toolkit/) 
 | [api-hardening](./security-toolkit/skills/api-hardening/) | Rate limiting, input validation, CORS, security headers, API key management, defense-in-depth for Express, FastAPI, and serverless |
 | [secure-auth](./security-toolkit/skills/secure-auth/) | Production-ready authentication patterns: password hashing, session management, JWT, OAuth, passkeys / WebAuthn, MFA |
 | [security-checklist](./security-toolkit/skills/security-checklist/) | Pre-deployment security audit covering OWASP Top 10 fundamentals: authentication, input validation, secrets, database security, compliance basics |
-
-### AI and creative tools
-
-| Skill | Description |
-|-------|-------------|
-| [nano-banana-image-gen](./nano-banana-image-gen/) | Gemini image generation model selection (NB1/NB2/Pro), visual grounding, cost optimization, prompt recipes |
-| [animated-sprite-gen](./animated-sprite-gen/) | Anchor-frame workflow for consistent AI-generated sprite sheets, strip normalization, pose handling |
 
 ### Reference
 
