@@ -41,32 +41,30 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | [pdf-design](./pdf-design/) | PDF report and proposal design system with brand variables, budget tables, and reusable content blocks (stats strips, three-column, four-tile pillars, partner grids) | n/a — skill-only |
 | [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials with an interactive control panel for live design editing (colors, fonts, spacing, sections) and a guided wizard for proposals | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` |
 | [project-templates-toolkit](./project-templates-toolkit/) | Three skills for setting up and closing out journalism projects: a CLAUDE.md project-memory writer (institutional knowledge), a LESSONS.md retrospective writer (failures and decisions), and a template-selector decision tree across 6 project types | n/a — skills only |
-| [research-toolkit](./research-toolkit/) | Five skills for research, source preservation, and academic workflows: academic writing, legal paywall-bypass via Unpaywall and library databases, web archiving (Wayback / Archive.today / ArchiveBox), web page change monitoring, and AI-enriched digital archive construction | n/a — skills only |
+| [research-toolkit](./research-toolkit/) | Six skills for research, source preservation, and academic workflows: academic writing, legal paywall-bypass via Unpaywall and library databases, web archiving (Wayback / Archive.today / ArchiveBox), web page change monitoring, AI-enriched digital archive construction, and a curated free-API catalog with sunset currency notes (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) | n/a — skills only |
 | [security-toolkit](./security-toolkit/) | Three defensive web application security skills covering OWASP Top 10 fundamentals: pre-deployment audit checklists (auth, input validation, secrets management), secure authentication implementation patterns (password hashing, session management, JWT, OAuth, passkeys), and API hardening (rate limiting, CORS, request throttling, defense-in-depth for Express, FastAPI, and serverless) | n/a — skills only |
 | [superjawn](./superjawn/) | Research-augmented fork of obra/superpowers. Default-on research phase fires before brainstorming, systematic-debugging, and writing-skills. v1.0.0 ships all 14 skills with no soft dependencies on the upstream `superpowers` plugin | invoked indirectly via skills (e.g. `superjawn:brainstorming`, `superjawn:systematic-debugging`, `superjawn:writing-plans`) |
 | [visual-explainer](./visual-explainer/) | HTML diagrams, data tables, architecture views, slide decks, and KPI dashboards adapted from nicobailon/visual-explainer with journalism, newsroom, and academic design sensibilities | `/visual-explainer:project-recap` |
 
 ### Skills (manual installation)
 
-Most skills now ship inside plugins (see the table above). For skills that haven't been bundled into a plugin yet (e.g., `free-apis-catalog`), Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep. Clone this repo anywhere you like, then copy or symlink the bare skills you want:
+Every skill in this repo now lives inside a plugin's `skills/` directory. To install just one without taking the whole plugin, clone the repo and copy or symlink the nested skill folder. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
 
 ```
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
 cd ~/projects/claude-skills-journalism
 mkdir -p ~/.claude/skills
 
-# Copy a bare top-level skill:
-cp -r free-apis-catalog ~/.claude/skills/
-
-# Or pull a single skill out of a plugin's skills/ directory:
+# Pull a single skill out of a plugin's skills/ directory:
 cp -r journalism-core/skills/source-verification ~/.claude/skills/
+cp -r research-toolkit/skills/free-apis-catalog ~/.claude/skills/
 cp -r research-toolkit/skills/web-archiving ~/.claude/skills/
 cp -r dev-toolkit/skills/web-scraping ~/.claude/skills/
 cp -r security-toolkit/skills/secure-auth ~/.claude/skills/
 cp -r project-templates-toolkit/skills/project-memory ~/.claude/skills/
 
 # Or symlink so git pull updates them in place (ln -sfn replaces an existing link):
-ln -sfn "$PWD/free-apis-catalog" ~/.claude/skills/free-apis-catalog
+ln -sfn "$PWD/research-toolkit/skills/free-apis-catalog" ~/.claude/skills/free-apis-catalog
 ```
 
 Do not clone the repo directly into `~/.claude/skills/journalism-skills/` — that nests each `SKILL.md` too deep and Claude Code won't find them.
@@ -99,13 +97,14 @@ These thirteen skills ship together as the [journalism-core](./journalism-core/)
 
 ### Research and academic skills (in `research-toolkit` plugin)
 
-These five skills ship together as the [research-toolkit](./research-toolkit/) plugin. Install via `/plugin install research-toolkit@claude-skills-journalism` to get all of them at once.
+These six skills ship together as the [research-toolkit](./research-toolkit/) plugin. Install via `/plugin install research-toolkit@claude-skills-journalism` to get all of them at once.
 
 | Skill | Description |
 |-------|-------------|
 | [academic-writing](./research-toolkit/skills/academic-writing/) | Research design, literature reviews, IMRaD structure, peer review responses, grant proposals |
 | [content-access](./research-toolkit/skills/content-access/) | Unpaywall, CORE, Semantic Scholar APIs, library databases, ethical access patterns |
 | [digital-archive](./research-toolkit/skills/digital-archive/) | Building archives with AI enrichment, entity extraction, knowledge graphs |
+| [free-apis-catalog](./research-toolkit/skills/free-apis-catalog/) | Curated free-API catalog organized by journalism use-case, with currency notes for major API sunsets (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) and an evaluation rubric |
 | [page-monitoring](./research-toolkit/skills/page-monitoring/) | Change detection, RSS generation, webhook alerts, automatic archiving on changes |
 | [web-archiving](./research-toolkit/skills/web-archiving/) | Wayback Machine, Archive.today, legal evidence preservation, multi-archive redundancy |
 
@@ -152,12 +151,6 @@ These three skills ship together as the [security-toolkit](./security-toolkit/) 
 | [api-hardening](./security-toolkit/skills/api-hardening/) | Rate limiting, input validation, CORS, security headers, API key management, defense-in-depth for Express, FastAPI, and serverless |
 | [secure-auth](./security-toolkit/skills/secure-auth/) | Production-ready authentication patterns: password hashing, session management, JWT, OAuth, passkeys / WebAuthn, MFA |
 | [security-checklist](./security-toolkit/skills/security-checklist/) | Pre-deployment security audit covering OWASP Top 10 fundamentals: authentication, input validation, secrets, database security, compliance basics |
-
-### Reference
-
-| Skill | Description |
-|-------|-------------|
-| [free-apis-catalog](./free-apis-catalog/) | 1000+ free public APIs by category (finance, news, weather, sports, ML, entertainment) with evaluation criteria and project ideas |
 
 ## Hooks
 
