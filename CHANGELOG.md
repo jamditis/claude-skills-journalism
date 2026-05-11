@@ -28,7 +28,7 @@ The bundling milestone: every skill in the repo now lives inside a registered pl
 - **Currency sweeps across multiple skills** (Phase 3 #62, Phase 5 #64, Phase 6c #67): updated `data-journalism`, `social-media-intelligence`, `source-verification`, `web-archiving`, `page-monitoring`, `api-hardening`, `secure-auth`, `security-checklist`, `project-memory`, `project-retrospective`, `free-apis-catalog` against authoritative 2026 sources (NIST, IETF, W3C, OWASP, vendor docs, CVE DBs).
 - **visual-explainer backported v0.1.0 → upstream v0.7.1 (#66)**: pulled in the upstream nicobailon/visual-explainer fork at v0.7.1, preserved the journalism-specific palette and design sensibilities as overlays.
 - **Docs site sweep (#71)**: 36 landing pages updated for the bundling reorg — install snippets switched from `cp -r <skill>` to the plugin-install pattern with the new plugin-nested bare path as a fallback. 41 GitHub tree links rewritten to the new paths. 28 pages got real `<meta name="description">` tags sourced from each SKILL.md frontmatter (previously many had placeholder OG descriptions like "A Claude Code skill for X"). 5 pages had lead-paragraph drift fixed against their SKILL.md.
-- **project-memory: "tribal knowledge" → "institutional knowledge" (this release)**: SKILL.md body lines 8 and 140, plus `docs/project-memory/index.html` lines 237 and 381, now match the canonical phrasing from the SKILL.md frontmatter description (which already said "institutional knowledge" after Phase 6c). Closes the last drift loose-thread from PR #71.
+- **project-memory language drift fix (this release)**: SKILL.md body lines 8 and 140, plus `docs/project-memory/index.html` lines 237 and 381, now consistently use "institutional knowledge" — matching the canonical phrasing from the SKILL.md frontmatter description (which already used that phrasing after Phase 6c). Closes the last drift loose-thread from PR #71.
 
 ### Fixed
 
@@ -444,6 +444,17 @@ Initial commit with foundational skills.
 
 ---
 
+[2.0.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.9.0...v2.0.0
+[1.9.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.8.0...v1.9.0
+[1.8.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.7.0...v1.8.0
+[1.7.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.6.2...v1.7.0
+[1.6.2]: https://github.com/jamditis/claude-skills-journalism/compare/v1.6.1...v1.6.2
+[1.6.1]: https://github.com/jamditis/claude-skills-journalism/compare/v1.6.0...v1.6.1
+[1.6.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.5.1...v1.6.0
+[1.5.1]: https://github.com/jamditis/claude-skills-journalism/compare/v1.5.0...v1.5.1
+[1.5.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.4.1...v1.5.0
+[1.4.1]: https://github.com/jamditis/claude-skills-journalism/compare/v1.4.0...v1.4.1
+[1.4.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/jamditis/claude-skills-journalism/compare/v1.1.0...v1.1.1
