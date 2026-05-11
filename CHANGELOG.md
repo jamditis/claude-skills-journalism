@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-05-11
+
+The bundling milestone: every skill in the repo now lives inside a registered plugin, so the marketplace install path is the only first-class install path. Headline numbers: 10 plugins registered (was 4 at v1.9.0), zero bare skill directories at the repo root, marketplace manifest version bumped 1.8.0 → 2.0.0 to signal the breaking layout change.
+
+### Breaking
+
+- **Bare-path skill installs no longer work.** Every skill moved from `<repo>/<skill>/` to `<repo>/<plugin>/skills/<skill>/` across Phases 1-6 (PRs #60-#69). Anyone scripting `cp -r ~/projects/claude-skills-journalism/<skill> ~/.claude/skills/` against the old paths will get "no such file." Updated install paths are documented on each `docs/<skill>/index.html` landing page (PR #71) and in the top-level README. Recommended fix: switch to `/plugin install <plugin>@claude-skills-journalism`.
+- **Two skills removed (#65)**: `animated-sprite-gen` and `nano-banana-image-gen`. Off-theme for a journalism-skills repo; never bundled into a plugin. No replacement.
+
+### Added
+
+- **journalism-core plugin v1.1.0 (#60, #61)**: 13 skills — `ai-writing-detox`, `crisis-communications`, `data-journalism`, `editorial-workflow`, `fact-check-workflow`, `foia-requests`, `interview-prep`, `interview-transcription`, `newsletter-publishing`, `newsroom-style`, `social-media-intelligence`, `source-verification`, `story-pitch`. Phase 2 (#61) absorbed `data-journalism` and `social-media-intelligence` from the bare-skill set.
+- **research-toolkit plugin v1.1.0 (#62, #69)**: 6 skills — `academic-writing`, `content-access`, `digital-archive`, `free-apis-catalog`, `page-monitoring`, `web-archiving`. v1.1.0 (#69) absorbed `free-apis-catalog` from the bare-skill set.
+- **dev-toolkit plugin v1.0.0 (#63)**: 10 skills — `accessibility-compliance`, `electron-dev`, `mobile-debugging`, `one-way-door`, `python-pipeline`, `test-first-bugs`, `vibe-coding`, `web-scraping`, `web-ui-best-practices`, `zero-build-frontend`.
+- **security-toolkit plugin v1.0.0 (#64)**: 3 skills — `api-hardening`, `secure-auth`, `security-checklist`. Includes 2026 currency sweep aligned to OWASP Top 10:2025, NIST SP 800-63B-4, OAuth 2.1, WebAuthn L3.
+- **project-templates-toolkit plugin v1.0.0 (#68)**: 3 skills — `project-memory`, `project-retrospective`, `template-selector`.
+- **visual-explainer plugin (#68 registration)**: registered in marketplace.json alongside the v0.7.1 backport (#66) that pulled in the upstream nicobailon/visual-explainer fork while preserving journalism overlays.
+
+### Changed
+
+- **Currency sweeps across multiple skills** (Phase 3 #62, Phase 5 #64, Phase 6c #67): updated `data-journalism`, `social-media-intelligence`, `source-verification`, `web-archiving`, `page-monitoring`, `api-hardening`, `secure-auth`, `security-checklist`, `project-memory`, `project-retrospective`, `free-apis-catalog` against authoritative 2026 sources (NIST, IETF, W3C, OWASP, vendor docs, CVE DBs).
+- **visual-explainer backported v0.1.0 → upstream v0.7.1 (#66)**: pulled in the upstream nicobailon/visual-explainer fork at v0.7.1, preserved the journalism-specific palette and design sensibilities as overlays.
+- **Docs site sweep (#71)**: 36 landing pages updated for the bundling reorg — install snippets switched from `cp -r <skill>` to the plugin-install pattern with the new plugin-nested bare path as a fallback. 41 GitHub tree links rewritten to the new paths. 28 pages got real `<meta name="description">` tags sourced from each SKILL.md frontmatter (previously many had placeholder OG descriptions like "A Claude Code skill for X"). 5 pages had lead-paragraph drift fixed against their SKILL.md.
+- **project-memory language drift fix (this release)**: SKILL.md body lines 8 and 140, plus `docs/project-memory/index.html` lines 237 and 381, now consistently use "institutional knowledge" — matching the canonical phrasing from the SKILL.md frontmatter description (which already used that phrasing after Phase 6c). Closes the last drift loose-thread from PR #71.
+
+### Fixed
+
+- **Indentation drift on 2 docs pages (#71)**: install-snippet bulk fixer hardcoded a 16-space leading indent, which broke on `web-ui-best-practices/index.html` and `one-way-door/index.html` where the install block sits inside an Option-1/Option-2 wrapper at 24-space context. Surgically re-indented both before PR #71 merged.
+
 ## [1.9.0] - 2026-05-08
 
 ### Changed
@@ -415,6 +444,17 @@ Initial commit with foundational skills.
 
 ---
 
+[2.0.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.9.0...v2.0.0
+[1.9.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.8.0...v1.9.0
+[1.8.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.7.0...v1.8.0
+[1.7.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.6.2...v1.7.0
+[1.6.2]: https://github.com/jamditis/claude-skills-journalism/compare/v1.6.1...v1.6.2
+[1.6.1]: https://github.com/jamditis/claude-skills-journalism/compare/v1.6.0...v1.6.1
+[1.6.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.5.1...v1.6.0
+[1.5.1]: https://github.com/jamditis/claude-skills-journalism/compare/v1.5.0...v1.5.1
+[1.5.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.4.1...v1.5.0
+[1.4.1]: https://github.com/jamditis/claude-skills-journalism/compare/v1.4.0...v1.4.1
+[1.4.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/jamditis/claude-skills-journalism/compare/v1.1.0...v1.1.1
