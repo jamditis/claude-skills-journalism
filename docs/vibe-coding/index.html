@@ -179,7 +179,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">
                 ← Back to all skills
             </a>
-            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/vibe-coding" class="text-sm font-semibold text-accentDark hover:text-accentDark transition-colors">
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/dev-toolkit/skills/vibe-coding" class="text-sm font-semibold text-accentDark hover:text-accentDark transition-colors">
                 View on GitHub →
             </a>
         </div>
@@ -481,17 +481,20 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <div class="feature-card p-8 rounded-xl">
                         <div class="flex items-center gap-4 mb-4">
                             <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">1</span>
-                            <h3 class="font-display text-xl font-bold">Clone the repository</h3>
+                            <h3 class="font-display text-xl font-bold">Recommended: install the dev-toolkit plugin</h3>
                         </div>
-                        <pre tabindex="0"><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
+                        <pre tabindex="0"><code>/plugin marketplace add jamditis/claude-skills-journalism
+/plugin install dev-toolkit@claude-skills-journalism</code></pre>
+                        <p class="text-mist text-sm mt-3">Ships with nine sibling skills (accessibility, mobile-debugging, python-pipeline, test-first-bugs, web-scraping, web-ui-best-practices, zero-build-frontend, electron-dev, one-way-door).</p>
                     </div>
 
                     <div class="feature-card p-8 rounded-xl">
                         <div class="flex items-center gap-4 mb-4">
                             <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">2</span>
-                            <h3 class="font-display text-xl font-bold">Copy the skill to your Claude config</h3>
+                            <h3 class="font-display text-xl font-bold">Or copy just this skill from the plugin tree</h3>
                         </div>
-                        <pre tabindex="0"><code>cp -r claude-skills-journalism/vibe-coding ~/.claude/skills/</code></pre>
+                        <pre tabindex="0"><code>git clone https://github.com/jamditis/claude-skills-journalism.git
+cp -r claude-skills-journalism/dev-toolkit/skills/vibe-coding ~/.claude/skills/</code></pre>
                     </div>
 
                     <div class="feature-card p-8 rounded-xl">
@@ -531,7 +534,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 </div>
 
                 <div class="mt-12 text-center">
-                    <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/vibe-coding" class="inline-flex items-center gap-2 bg-accent text-white font-semibold px-6 py-3 rounded-lg hover:bg-accentDark transition-colors">
+                    <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/dev-toolkit/skills/vibe-coding" class="inline-flex items-center gap-2 bg-accent text-white font-semibold px-6 py-3 rounded-lg hover:bg-accentDark transition-colors">
                         <i data-lucide="github" class="w-5 h-5"></i>
                         View full skill on GitHub
                     </a>

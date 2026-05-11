@@ -717,16 +717,18 @@ useEffect(() => {
                 <div>
                     <h3 class="font-semibold mb-3">Install the skill</h3>
                     <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
-                        <p class="text-white/50 mb-2"># Clone the repository</p>
-                        <p class="text-white mb-4">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
-                        <p class="text-white/50 mb-2"># Copy the skill to your Claude config</p>
-                        <p class="text-white">cp -r claude-skills-journalism/web-ui-best-practices ~/.claude/skills/</p>
+                        <p class="text-white/50 mb-2"># Recommended: install the dev-toolkit plugin</p>
+                        <p class="text-white mb-1">/plugin marketplace add jamditis/claude-skills-journalism</p>
+                        <p class="text-white mb-4">/plugin install dev-toolkit@claude-skills-journalism</p>
+                        <p class="text-white/50 mb-2"># Or copy just this skill from the plugin tree</p>
+                        <p class="text-white mb-1">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
+                        <p class="text-white">cp -r claude-skills-journalism/dev-toolkit/skills/web-ui-best-practices ~/.claude/skills/</p>
                     </div>
                 </div>
             </div>
             <p class="mt-4 text-clay/70 text-sm">
-                Or download just this skill from the
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/web-ui-best-practices" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
+                Or browse this skill in the
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/dev-toolkit/skills/web-ui-best-practices" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
             </p>
         </section>
 
@@ -748,7 +750,7 @@ useEffect(() => {
                 <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
                     18 principles. Zero tolerance for dark patterns. Every interaction under 100ms.
                 </p>
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/web-ui-best-practices" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors" rel="noopener noreferrer">
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/dev-toolkit/skills/web-ui-best-practices" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors" rel="noopener noreferrer">
                     View on GitHub
                     <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>

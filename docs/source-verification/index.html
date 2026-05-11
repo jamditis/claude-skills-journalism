@@ -139,7 +139,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <a href="../" class="text-sm font-medium text-mist hover:text-ink transition-colors">
                 ← Back to all skills
             </a>
-            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/source-verification" class="text-sm font-semibold text-accentDark hover:text-accentDark transition-colors">
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/journalism-core/skills/source-verification" class="text-sm font-semibold text-accentDark hover:text-accentDark transition-colors">
                 View on GitHub →
             </a>
         </div>
@@ -424,17 +424,20 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <div class="bg-white/5 p-6 rounded-xl">
                         <h3 class="font-semibold mb-3 flex items-center gap-2">
                             <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">1</span>
-                            Clone the repository
+                            Recommended: install the journalism-core plugin
                         </h3>
-                        <pre tabindex="0"><code>git clone https://github.com/jamditis/claude-skills-journalism.git</code></pre>
+                        <pre tabindex="0"><code>/plugin marketplace add jamditis/claude-skills-journalism
+/plugin install journalism-core@claude-skills-journalism</code></pre>
+                        <p class="text-sm text-white/70 mt-3">Ships with twelve sibling skills covering AP-style writing, FOIA, fact-checking, interview workflows, and more.</p>
                     </div>
 
                     <div class="bg-white/5 p-6 rounded-xl">
                         <h3 class="font-semibold mb-3 flex items-center gap-2">
                             <span class="w-6 h-6 bg-accent rounded-full flex items-center justify-center text-xs">2</span>
-                            Copy skill to Claude skills directory
+                            Or copy just this skill from the plugin tree
                         </h3>
-                        <pre tabindex="0"><code>cp -r source-verification ~/.claude/skills/</code></pre>
+                        <pre tabindex="0"><code>git clone https://github.com/jamditis/claude-skills-journalism.git
+cp -r claude-skills-journalism/journalism-core/skills/source-verification ~/.claude/skills/</code></pre>
                     </div>
 
                     <div class="bg-white/5 p-6 rounded-xl">

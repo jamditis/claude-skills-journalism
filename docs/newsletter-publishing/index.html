@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Email newsletter workflows for journalists and researchers. Use when creating, managing, or optimizing email newsletters, building subscriber lists, designing email templates, analyzing engagement metrics, or planning newsletter content calendars. For independent journalists, academic communicators, and media organizations building direct audience relationships.">
     <title>Newsletter publishing - Claude skills for journalism</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -131,7 +132,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
     <!-- Open Graph -->
     <meta property="og:title" content="Newsletter publishing - Claude skills for journalism">
-    <meta property="og:description" content="# Clone the repository">
+    <meta property="og:description" content="Email newsletter workflows for journalists and researchers. Use when creating, managing, or optimizing email newsletters, building subscriber lists, designing email templates, analyzing engagement metrics, or planning newsletter content calendars. For independent journalists, academic communicators, and media organizations building direct audience relationships.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://skills.amditis.tech/newsletter-publishing/">
     <meta property="og:image" content="https://skills.amditis.tech/newsletter-publishing/og-image.png">
@@ -141,7 +142,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Newsletter publishing - Claude skills for journalism">
-    <meta name="twitter:description" content="# Clone the repository">
+    <meta name="twitter:description" content="Email newsletter workflows for journalists and researchers. Use when creating, managing, or optimizing email newsletters, building subscriber lists, designing email templates, analyzing engagement metrics, or planning newsletter content calendars. For independent journalists, academic communicators, and media organizations building direct audience relationships.">
     <meta name="twitter:image" content="https://skills.amditis.tech/newsletter-publishing/og-image.png">
 <script src="../ask-ai.js" defer></script>
     <!-- a11y-patch-v1 -->
@@ -325,14 +326,16 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Installation</h2>
             <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
-                <p class="text-white/50 mb-2"># Clone the repository</p>
-                <p class="text-white mb-4">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
-                <p class="text-white/50 mb-2"># Copy the skill to your Claude config</p>
-                <p class="text-white">cp -r claude-skills-journalism/newsletter-publishing ~/.claude/skills/</p>
+                <p class="text-white/50 mb-2"># Recommended: install the journalism-core plugin</p>
+                <p class="text-white mb-1">/plugin marketplace add jamditis/claude-skills-journalism</p>
+                <p class="text-white mb-4">/plugin install journalism-core@claude-skills-journalism</p>
+                <p class="text-white/50 mb-2"># Or copy just this skill from the plugin tree</p>
+                <p class="text-white mb-1">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
+                <p class="text-white">cp -r claude-skills-journalism/journalism-core/skills/newsletter-publishing ~/.claude/skills/</p>
             </div>
             <p class="mt-4 text-clay/70 text-sm">
-                Or download just this skill from the
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/newsletter-publishing" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
+                Or browse this skill in the
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/journalism-core/skills/newsletter-publishing" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
             </p>
         </section>
 
@@ -353,7 +356,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
                     Strategy frameworks, templates, and deliverability guidance in one skill.
                 </p>
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/newsletter-publishing" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors" rel="noopener noreferrer">
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/journalism-core/skills/newsletter-publishing" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors" rel="noopener noreferrer">
                     View on GitHub
                     <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
