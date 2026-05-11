@@ -5,7 +5,7 @@ description: Generate CLAUDE.md project memory files that transfer institutional
 
 # Project memory generator
 
-Create CLAUDE.md files that transfer tribal knowledge, not obvious information. Think like a senior journalist onboarding a competent colleague — you don't explain how journalism works, you explain YOUR project's quirks.
+Create CLAUDE.md files that transfer institutional knowledge, not obvious information. Think like a senior journalist onboarding a competent colleague — you don't explain how journalism works, you explain YOUR project's quirks.
 
 ## CLAUDE.md is advisory, not enforced
 
@@ -137,7 +137,7 @@ npm install
 npm start
 ```
 
-**Good (tribal knowledge only):**
+**Good (institutional knowledge only):**
 ```markdown
 # CLAUDE.md
 
