@@ -6,17 +6,27 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://skills.amditis.tech/nano-banana-image-gen/</loc>
+    <loc>https://skills.amditis.tech/security-checklist/</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://skills.amditis.tech/secure-auth/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://skills.amditis.tech/api-hardening/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://skills.amditis.tech/supply-chain-hardening/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://skills.amditis.tech/free-apis-catalog/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://skills.amditis.tech/animated-sprite-gen/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

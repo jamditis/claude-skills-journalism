@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Install-time cooldowns for npm and bun plus a sandboxed pre-install scan when the cooldown has to be bypassed. Defends against Mini Shai-Hulud-class supply-chain worms — TanStack-style maintainer compromises and CI/CD pipeline hijacks that ship a malicious version before the community can flag it.">
+    <title>Supply-chain hardening - Claude skills for journalism</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'display': ['Fraunces', 'serif'],
+                        'body': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'canvas': '#ede6d4',
+                        'ink': '#121212',
+                        'clay': '#2d2a26',
+                        'mist': '#c4bfb4',
+                        'accent': '#dc2626',
+                        'accentDark': '#b91c1c',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Fraunces', serif; }
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("https://www.transparenttextures.com/patterns/natural-paper.png"),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .content-section h2 { margin-top: 2.5rem; margin-bottom: 1rem; }
+        .content-section h3 { margin-top: 2rem; margin-bottom: 0.75rem; }
+        .content-section p { margin-bottom: 1rem; }
+        .content-section ul, .content-section ol { margin-bottom: 1rem; margin-left: 1.5rem; }
+        .content-section li { margin-bottom: 0.5rem; }
+        .content-section code {
+            background: rgba(0,0,0,0.06);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+        .content-section pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        .content-section pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        .content-section table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        .content-section th, .content-section td {
+            border: 1px solid rgba(0,0,0,0.1);
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+        }
+        .content-section th {
+            background: rgba(0,0,0,0.04);
+            font-weight: 600;
+        }
+
+/* a11y-patch-v1 */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+.skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #121212; color: #ede6d4; font-weight: 700; text-decoration: none; }
+:focus-visible { outline: 2px solid #3d4b40; outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+p a:not(.btn-primary):not(.btn-outline):not(.skill-card):not(.deckle-card):not(.feature-card),
+li a:not(.btn-primary):not(.btn-outline),
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDeep"]:not(.btn-primary):not(.btn-outline) { color: #1e293b !important; }
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline):hover,
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline):hover { color: #0f172a !important; }
+strong[class~="text-accent"], em[class~="text-accent"], code[class~="text-accent"],
+strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b !important; }
+.bg-canvas [class~="text-mist"], main [class~="text-mist"], [class~="text-mist"] { color: #3a3a3a !important; }
+.bg-ink [class~="text-accent"], [class~="bg-ink"] [class~="text-accent"],
+.bg-zinc-900 [class~="text-accent"], .bg-gray-900 [class~="text-accent"],
+[class*="bg-zinc-9"] [class~="text-accent"], [class*="bg-gray-9"] [class~="text-accent"],
+[class*="text-white"] [class~="text-accent"],
+[style*="background:#1"] [class~="text-accent"], [style*="background-color:#1"] [class~="text-accent"] {
+  color: #ddd6fe !important;
+}
+.bg-ink [class~="text-mist"], [class~="bg-ink"] [class~="text-mist"],
+[class*="text-white"] [class~="text-mist"] {
+  color: #d4d4d4 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-section, .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+/* stat-on-dark-fix */
+.bg-ink .text-accent, .bg-zinc-900 .text-accent, .bg-gray-900 .text-accent,
+.bg-ink .text-accentDark, .bg-zinc-900 .text-accentDark, .bg-gray-900 .text-accentDark {
+  filter: brightness(1.6) saturate(0.85);
+}
+    </style>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Supply-chain hardening - Claude skills for journalism">
+    <meta property="og:description" content="Install-time cooldowns for npm and bun plus a sandboxed pre-install scan when the cooldown has to be bypassed. Defends against Mini Shai-Hulud-class supply-chain worms.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/supply-chain-hardening/">
+    <meta property="og:image" content="https://skills.amditis.tech/supply-chain-hardening/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Supply-chain hardening - Claude skills for journalism">
+    <meta name="twitter:description" content="Install-time cooldowns for npm and bun plus a sandboxed pre-install scan when the cooldown has to be bypassed. Defends against Mini Shai-Hulud-class supply-chain worms.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/supply-chain-hardening/og-image.png">
+    <script src="../ask-ai.js" defer></script>
+</head>
+<body class="bg-canvas text-ink">
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <div class="paper-overlay" aria-hidden="true"></div>
+
+    <!-- Navigation -->
+    <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="../" class="text-clay/70 hover:text-ink flex items-center gap-2 text-sm font-medium transition-colors">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                All skills
+            </a>
+            <a aria-label="GitHub" href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors" rel="noopener noreferrer">
+                <svg aria-hidden="true" focusable="false" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+                </svg>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="bg-gradient-to-br from-accent to-accentDark text-white pt-24 pb-16">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1 text-sm mb-4">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Security skill
+            </div>
+            <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">Supply-chain hardening</h1>
+            <p class="text-xl text-white/90 max-w-2xl">
+                Install-time cooldowns for npm and bun, plus a sandboxed pre-install scan when the cooldown has to be bypassed. Layered defense against the npm/bun maintainer-compromise pattern that powered Mini Shai-Hulud.
+            </p>
+        </div>
+    </header>
+
+    <main id="main" class="max-w-4xl mx-auto px-6 py-12 relative z-10">
+        <!-- When to use -->
+        <section class="mb-12" aria-labelledby="when-heading">
+            <h2 id="when-heading" class="font-display text-2xl font-semibold mb-4">When to use</h2>
+            <ul class="space-y-2 text-clay/80">
+                <li class="flex items-start gap-3">
+                    <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Hardening a new dev machine, CI runner, or build server against npm/bun supply-chain attacks
+                </li>
+                <li class="flex items-start gap-3">
+                    <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Reacting to a fresh ecosystem incident (Shai-Hulud-class worm, maintainer-account compromise, CI pipeline hijack)
+                </li>
+                <li class="flex items-start gap-3">
+                    <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Asked about "minimum release age," "install cooldown," or how to safely install a just-published package
+                </li>
+                <li class="flex items-start gap-3">
+                    <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Need to bypass the cooldown for a CVE patch and want a sanity scan before letting the tarball run
+                </li>
+            </ul>
+        </section>
+
+        <!-- Motivating attack -->
+        <section class="mb-12" aria-labelledby="attack-heading">
+            <h2 id="attack-heading" class="font-display text-2xl font-semibold mb-4">The attack this stops</h2>
+            <div class="bg-white rounded-xl p-6 border border-mist/30">
+                <p class="text-clay/80 mb-3">
+                    <strong>Mini Shai-Hulud TanStack attack, 2026-05-11.</strong> 84 versions across 42 <code class="bg-black/5 px-1.5 py-0.5 rounded text-sm">@tanstack/*</code> packages compromised via OIDC token theft from an orphan-commit workflow run. The payload exfiltrated AWS, GCP, Vault, GitHub, and SSH credentials via a <code class="bg-black/5 px-1.5 py-0.5 rounded text-sm">prepare</code> script on a <code class="bg-black/5 px-1.5 py-0.5 rounded text-sm">github:</code>-resolved optional dependency.
+                </p>
+                <p class="text-clay/80">
+                    A 7-day install-time cooldown plus <code class="bg-black/5 px-1.5 py-0.5 rounded text-sm">--ignore-scripts</code> on every cooldown bypass would have blocked the entire attack on a stock laptop with no human in the loop. This skill makes that posture the default.
+                </p>
+            </div>
+        </section>
+
+        <!-- Three layers -->
+        <section class="mb-12" aria-labelledby="layers-heading">
+            <h2 id="layers-heading" class="font-display text-2xl font-semibold mb-6">Three layers of defense</h2>
+            <div class="space-y-4">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-red-100 text-red-900 text-xs font-semibold px-2.5 py-1 rounded">Layer 1</span>
+                        <div>
+                            <h3 class="font-semibold">Install-time cooldown</h3>
+                            <p class="text-sm text-clay/80 mt-1">Only install versions older than N days (default 7). By the time the cooldown expires, the security community has almost always flagged a compromised version and the registry has yanked it. This is the primary defense.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-red-100 text-red-900 text-xs font-semibold px-2.5 py-1 rounded">Layer 2</span>
+                        <div>
+                            <h3 class="font-semibold">Sandboxed pre-install scan</h3>
+                            <p class="text-sm text-clay/80 mt-1">When the cooldown has to be bypassed (CVE patch, fresh dep, urgent install), run the candidate tarball through a static-analysis scan inside <code class="bg-black/5 px-1.5 py-0.5 rounded">bwrap</code>/<code class="bg-black/5 px-1.5 py-0.5 rounded">firejail</code>/<code class="bg-black/5 px-1.5 py-0.5 rounded">unshare</code> with no network and no access to <code class="bg-black/5 px-1.5 py-0.5 rounded">~/.ssh</code>, <code class="bg-black/5 px-1.5 py-0.5 rounded">~/.aws</code>, <code class="bg-black/5 px-1.5 py-0.5 rounded">~/.npmrc</code>, or your pass-store.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-red-100 text-red-900 text-xs font-semibold px-2.5 py-1 rounded">Layer 3</span>
+                        <div>
+                            <h3 class="font-semibold"><code class="bg-black/5 px-1.5 py-0.5 rounded text-sm">--ignore-scripts</code> on every bypass</h3>
+                            <p class="text-sm text-clay/80 mt-1">Postinstall is the #1 attack vector. Skip lifecycle scripts on every cooldown-bypass install. Native modules that legitimately need postinstall can have the script run manually after a human-readable review.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cooldown config -->
+        <section class="mb-12" aria-labelledby="config-heading">
+            <h2 id="config-heading" class="font-display text-2xl font-semibold mb-4">Configure the cooldown</h2>
+            <p class="text-clay/80 mb-4">Verified config keys (npm v11+ and bun 1.3+):</p>
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden mb-4 overflow-x-auto" tabindex="0" role="region" aria-label="Cooldown config keys">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-mist/10 border-b border-mist/30">
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">Manager</th>
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">File</th>
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">Key</th>
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">Units</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-mist/20">
+                        <tr>
+                            <td class="px-5 py-3 font-medium">npm</td>
+                            <td class="px-5 py-3 text-clay/80"><code class="bg-black/5 px-1.5 py-0.5 rounded">~/.npmrc</code></td>
+                            <td class="px-5 py-3 text-clay/80"><code class="bg-black/5 px-1.5 py-0.5 rounded">min-release-age</code></td>
+                            <td class="px-5 py-3 text-clay/80">days</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">bun</td>
+                            <td class="px-5 py-3 text-clay/80"><code class="bg-black/5 px-1.5 py-0.5 rounded">~/.bunfig.toml</code></td>
+                            <td class="px-5 py-3 text-clay/80"><code class="bg-black/5 px-1.5 py-0.5 rounded">[install] minimumReleaseAge</code></td>
+                            <td class="px-5 py-3 text-clay/80">seconds</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Minimal config example">
+                <p class="text-white/50 mb-2"># ~/.npmrc</p>
+                <p class="text-white mb-4">min-release-age=7</p>
+                <p class="text-white/50 mb-2"># ~/.bunfig.toml</p>
+                <p class="text-white">[install]</p>
+                <p class="text-white">minimumReleaseAge = 604800  # 7 days</p>
+                <p class="text-white">minimumReleaseAgeExcludes = []</p>
+            </div>
+            <p class="mt-3 text-clay/80 text-sm">
+                <strong>Requires npm 11+.</strong> Older npm silently ignores unknown keys, so the config looks correct but does nothing. Verify with <code class="bg-black/5 px-1.5 py-0.5 rounded">npm config get min-release-age</code> — should echo <code class="bg-black/5 px-1.5 py-0.5 rounded">7</code>, not <code class="bg-black/5 px-1.5 py-0.5 rounded">null</code>.
+            </p>
+        </section>
+
+        <!-- Per-command bypass -->
+        <section class="mb-12" aria-labelledby="bypass-heading">
+            <h2 id="bypass-heading" class="font-display text-2xl font-semibold mb-4">Per-command bypass</h2>
+            <p class="text-clay/80 mb-4">When the cooldown blocks an install you actually want:</p>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Per-command bypass examples">
+                <p class="text-white mb-1">npm install &lt;pkg&gt;@&lt;version&gt; --min-release-age=0 --ignore-scripts</p>
+                <p class="text-white">bun add     &lt;pkg&gt;@&lt;version&gt; --minimum-release-age=0 --ignore-scripts</p>
+            </div>
+            <p class="mt-4 text-clay/80 text-sm">
+                The <code class="bg-black/5 px-1.5 py-0.5 rounded">bun add --minimum-release-age=0</code> CLI flag works in 1.3+ even though the docs don't list it — it follows bun's <em>bunfig key → kebab-case flag</em> convention.
+            </p>
+        </section>
+
+        <!-- Scan heuristics -->
+        <section class="mb-12" aria-labelledby="scan-heading">
+            <h2 id="scan-heading" class="font-display text-2xl font-semibold mb-4">What the scan checks for</h2>
+            <p class="text-clay/80 mb-4">Each check is backed by a real attack signature:</p>
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden overflow-x-auto" tabindex="0" role="region" aria-label="Scan heuristics table">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-mist/10 border-b border-mist/30">
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">Check</th>
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">Diagnostic of</th>
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">Severity</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-mist/20">
+                        <tr>
+                            <td class="px-5 py-3"><code class="bg-black/5 px-1.5 py-0.5 rounded">optionalDependencies</code> or <code class="bg-black/5 px-1.5 py-0.5 rounded">dependencies</code> containing <code class="bg-black/5 px-1.5 py-0.5 rounded">github:</code>/<code class="bg-black/5 px-1.5 py-0.5 rounded">git+</code> URLs</td>
+                            <td class="px-5 py-3 text-clay/80">Mini Shai-Hulud-style payload delivery</td>
+                            <td class="px-5 py-3"><span class="bg-red-100 text-red-900 text-xs font-semibold px-2 py-1 rounded">Red</span></td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3">Large JS file at package root not referenced by <code class="bg-black/5 px-1.5 py-0.5 rounded">main</code>/<code class="bg-black/5 px-1.5 py-0.5 rounded">module</code>/<code class="bg-black/5 px-1.5 py-0.5 rounded">exports</code>/<code class="bg-black/5 px-1.5 py-0.5 rounded">bin</code>/<code class="bg-black/5 px-1.5 py-0.5 rounded">files</code></td>
+                            <td class="px-5 py-3 text-clay/80">Planted payload (<code class="bg-black/5 px-1.5 py-0.5 rounded">router_init.js</code>)</td>
+                            <td class="px-5 py-3"><span class="bg-red-100 text-red-900 text-xs font-semibold px-2 py-1 rounded">Red</span></td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3">Unpacked size &gt;3x prior stable version</td>
+                            <td class="px-5 py-3 text-clay/80">Bulk payload smuggling</td>
+                            <td class="px-5 py-3"><span class="bg-red-100 text-red-900 text-xs font-semibold px-2 py-1 rounded">Red</span></td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3"><code class="bg-black/5 px-1.5 py-0.5 rounded">fileCount</code> delta of 1–4 with &gt;2x size jump</td>
+                            <td class="px-5 py-3 text-clay/80">Single planted file</td>
+                            <td class="px-5 py-3"><span class="bg-red-100 text-red-900 text-xs font-semibold px-2 py-1 rounded">Red</span></td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3"><code class="bg-black/5 px-1.5 py-0.5 rounded">preinstall</code>/<code class="bg-black/5 px-1.5 py-0.5 rounded">install</code>/<code class="bg-black/5 px-1.5 py-0.5 rounded">postinstall</code>/<code class="bg-black/5 px-1.5 py-0.5 rounded">prepare</code> scripts present</td>
+                            <td class="px-5 py-3 text-clay/80">Lifecycle-script attack vector</td>
+                            <td class="px-5 py-3"><span class="bg-yellow-100 text-yellow-900 text-xs font-semibold px-2 py-1 rounded">Yellow</span></td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3">JS referencing <code class="bg-black/5 px-1.5 py-0.5 rounded">.ssh/</code>, <code class="bg-black/5 px-1.5 py-0.5 rounded">.aws/</code>, <code class="bg-black/5 px-1.5 py-0.5 rounded">.npmrc</code>, <code class="bg-black/5 px-1.5 py-0.5 rounded">GITHUB_TOKEN</code>, kube config</td>
+                            <td class="px-5 py-3 text-clay/80">Credential exfiltration</td>
+                            <td class="px-5 py-3"><span class="bg-yellow-100 text-yellow-900 text-xs font-semibold px-2 py-1 rounded">Yellow</span></td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3">Version flagged <code class="bg-black/5 px-1.5 py-0.5 rounded">deprecated</code> with "security"/"compromised"/"malicious" wording</td>
+                            <td class="px-5 py-3 text-clay/80">Maintainer/registry yank</td>
+                            <td class="px-5 py-3"><span class="bg-red-100 text-red-900 text-xs font-semibold px-2 py-1 rounded">Red</span></td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3">OSV.dev returns known vulnerabilities for the candidate version</td>
+                            <td class="px-5 py-3 text-clay/80">Disclosed CVE</td>
+                            <td class="px-5 py-3"><span class="bg-red-100 text-red-900 text-xs font-semibold px-2 py-1 rounded">Red</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- /hotpatch command -->
+        <section class="mb-12" aria-labelledby="hotpatch-heading">
+            <h2 id="hotpatch-heading" class="font-display text-2xl font-semibold mb-4">The <code class="bg-black/5 px-1.5 py-0.5 rounded">/security-toolkit:hotpatch</code> command</h2>
+            <p class="text-clay/80 mb-4">
+                Bundled with this skill in the security-toolkit plugin: a slash command that wraps the scan workflow.
+            </p>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="hotpatch command examples">
+                <p class="text-white/50 mb-2"># Scan a registry tarball before installing</p>
+                <p class="text-white mb-4">/security-toolkit:hotpatch lodash@4.17.21</p>
+                <p class="text-white/50 mb-2"># Scan a local .tgz</p>
+                <p class="text-white">/security-toolkit:hotpatch ./suspicious.tgz</p>
+            </div>
+            <p class="mt-4 text-clay/80 text-sm">
+                The command tries the local <code class="bg-black/5 px-1.5 py-0.5 rounded">hotpatch.example.sh</code> reference implementation first and falls back to an in-conversation scan when no script is present. A bundled synthetic Mini Shai-Hulud fixture (<code class="bg-black/5 px-1.5 py-0.5 rounded">test-fixtures/fake-mini-shai.tgz</code>) lets you self-test the heuristics — <code class="bg-black/5 px-1.5 py-0.5 rounded">--self-test</code> against it should report <code class="bg-black/5 px-1.5 py-0.5 rounded">2 red, 1 yellow, SELF-TEST PASSED</code>.
+            </p>
+        </section>
+
+        <!-- Threat model -->
+        <section class="mb-12" aria-labelledby="threat-heading">
+            <h2 id="threat-heading" class="font-display text-2xl font-semibold mb-4">Threat model</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <h3 class="font-semibold mb-3 text-green-800">Defends against</h3>
+                    <ul class="space-y-2 text-sm text-clay/80 list-disc list-inside">
+                        <li>Maintainer account compromise (npm token theft)</li>
+                        <li>CI/CD pipeline hijack (Mini Shai-Hulud, valid OIDC tokens)</li>
+                        <li>Typosquatting when paired with lockfile review</li>
+                        <li>Postinstall payload execution</li>
+                        <li>Drive-by <code class="bg-black/5 px-1.5 py-0.5 rounded">npm install</code> of a brand-new transitive</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <h3 class="font-semibold mb-3 text-red-800">Doesn't defend against</h3>
+                    <ul class="space-y-2 text-sm text-clay/80 list-disc list-inside">
+                        <li>Targeted attack tailored to wait out the cooldown</li>
+                        <li>Compromise of a transitive already pinned in a lockfile</li>
+                        <li>Malicious code in dev dependencies you authored</li>
+                        <li>Runtime supply-chain attacks (CDN-loaded code)</li>
+                        <li>Compromise of the registry itself (rare; out of scope)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resources -->
+        <section class="mb-12" aria-labelledby="resources-heading">
+            <h2 id="resources-heading" class="font-display text-2xl font-semibold mb-4">Resources</h2>
+            <div class="bg-white rounded-xl p-5 border border-mist/30">
+                <ul class="space-y-2 text-sm">
+                    <li><a href="https://www.stepsecurity.io/blog/mini-shai-hulud-is-back-a-self-spreading-supply-chain-attack-hits-the-npm-ecosystem" target="_blank" class="text-accentDark hover:text-accentDark underline underline-offset-2" rel="noopener noreferrer">StepSecurity: Mini Shai-Hulud TanStack analysis</a> — original incident write-up</li>
+                    <li><a href="https://docs.npmjs.com/cli/v11/using-npm/config" target="_blank" class="text-accentDark hover:text-accentDark underline underline-offset-2" rel="noopener noreferrer">npm config docs (v11)</a> — <code class="bg-black/5 px-1.5 py-0.5 rounded">min-release-age</code> reference</li>
+                    <li><a href="https://bun.com/docs/runtime/bunfig" target="_blank" class="text-accentDark hover:text-accentDark underline underline-offset-2" rel="noopener noreferrer">bun bunfig docs</a> — <code class="bg-black/5 px-1.5 py-0.5 rounded">minimumReleaseAge</code> reference</li>
+                    <li><a href="https://osv.dev/docs/#tag/api" target="_blank" class="text-accentDark hover:text-accentDark underline underline-offset-2" rel="noopener noreferrer">OSV.dev API</a> — free, unauthenticated vulnerability lookup</li>
+                    <li><a href="https://github.com/advisories?query=shai-hulud" target="_blank" class="text-accentDark hover:text-accentDark underline underline-offset-2" rel="noopener noreferrer">GitHub Advisory database</a> — earlier Shai-Hulud worm context</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section class="mb-12" aria-labelledby="install-heading">
+            <h2 id="install-heading" class="font-display text-2xl font-semibold mb-4">Installation</h2>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Installation commands">
+                <p class="text-white/50 mb-2"># Recommended: install the security-toolkit plugin</p>
+                <p class="text-white mb-1">/plugin marketplace add jamditis/claude-skills-journalism</p>
+                <p class="text-white mb-4">/plugin install security-toolkit@claude-skills-journalism</p>
+                <p class="text-white/50 mb-2"># Or copy just this skill from the plugin tree</p>
+                <p class="text-white mb-1">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
+                <p class="text-white">cp -r claude-skills-journalism/security-toolkit/skills/supply-chain-hardening ~/.claude/skills/</p>
+            </div>
+            <p class="mt-4 text-clay/80 text-sm">
+                Or browse this skill in the
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/security-toolkit/skills/supply-chain-hardening" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
+            </p>
+        </section>
+
+        <!-- Related skills -->
+        <section class="mb-12" aria-labelledby="related-heading">
+            <h2 id="related-heading" class="font-display text-2xl font-semibold mb-4">Related skills</h2>
+            <div class="flex flex-wrap gap-2">
+                <a href="../security-checklist/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Security checklist</a>
+                <a href="../secure-auth/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Secure auth</a>
+                <a href="../api-hardening/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">API hardening</a>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="text-center" aria-labelledby="cta-heading">
+            <div class="bg-gradient-to-br from-accent to-accentDark rounded-xl p-8 text-white">
+                <h2 id="cta-heading" class="font-display text-xl font-bold mb-3">Layered defense, no human in the loop</h2>
+                <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
+                    Cooldown plus sandbox plus <code class="bg-white/15 px-1.5 py-0.5 rounded">--ignore-scripts</code> would have blocked Mini Shai-Hulud on a stock laptop.
+                </p>
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/security-toolkit/skills/supply-chain-hardening" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors" rel="noopener noreferrer">
+                    View on GitHub
+                    <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-mist/30 mt-12 relative z-10">
+        <div class="max-w-4xl mx-auto px-6 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-clay/80 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accentDark hover:text-accentDark underline underline-offset-2" rel="noopener noreferrer">Center for Cooperative Media</a>
+                </p>
+                <div class="flex items-center gap-6">
+                    <a href="../" class="text-clay/80 hover:text-ink text-sm transition-colors">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/80 hover:text-ink text-sm transition-colors" rel="noopener noreferrer">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
