@@ -1,0 +1,23 @@
+name: Security toolkit hotpatch self-test
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'security-toolkit/scripts/**'
+      - 'security-toolkit/test-fixtures/**'
+      - '.github/workflows/security-toolkit-hotpatch-selftest.yml'
+
+jobs:
+  self-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install bubblewrap
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y bubblewrap
+
+      - name: Run hotpatch self-test
+        run: bash security-toolkit/scripts/hotpatch.example.sh --self-test

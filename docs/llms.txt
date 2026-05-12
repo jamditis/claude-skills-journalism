@@ -12,10 +12,10 @@ Source: https://github.com/jamditis/claude-skills-journalism
 Joe Amditis — associate director of operations, Center for Cooperative Media, Montclair State University.
 Personal site: https://jamditis.com
 
-## Skills (32 total)
+## Skills (53 total)
 
 ### Journalism and verification
-- source-verification — SIFT method, verification trails, source credibility
+- source-verification — SIFT method, verification trails, source credibility, deepfakes/C2PA
 - foia-requests — drafting and tracking public records requests
 - fact-check-workflow — claim verification, evidence chains
 - crisis-communications — breaking news protocols, rapid verification
@@ -35,6 +35,7 @@ Personal site: https://jamditis.com
 - web-archiving — Wayback, Archive.today, URL preservation
 - content-access — Unpaywall, CORE, open access tools
 - page-monitoring — change detection and alerts
+- free-apis-catalog — curated free-API catalog with sunset/currency notes
 
 ### Writing quality
 - ai-writing-detox — eliminate AI writing patterns from your work
@@ -58,9 +59,35 @@ Personal site: https://jamditis.com
 - api-hardening — API security
 - supply-chain-hardening — npm/bun install-time cooldown plus sandboxed pre-install scan; defends against Mini Shai-Hulud-class supply-chain worms (paired with /security-toolkit:hotpatch slash command)
 
+### Project templates
+- project-memory — generate CLAUDE.md files for new projects
+- project-retrospective — generate LESSONS.md files
+- template-selector — pick the right CLAUDE.md or LESSONS.md template
+
+### Documents and explainers
+- pdf-design — design and edit professional PDF reports and proposals
+- pdf-playground — document design (proposals, reports)
+- visual-explainer — generate self-contained HTML pages that visually explain systems
+
+### Workflow patterns (superjawn)
+- using-superjawn — establishes how to find and use skills
+- brainstorming — required before creative work
+- writing-plans — multi-step task planning before touching code
+- writing-skills — creating or editing skills
+- test-driven-development — TDD before writing implementation code
+- systematic-debugging — bug triage before proposing fixes
+- subagent-driven-development — parallel task execution in one session
+- dispatching-parallel-agents — independent tasks across 2+ agents
+- executing-plans — run a written implementation plan
+- requesting-code-review — verify completed work before merging
+- receiving-code-review — handle review feedback effectively
+- verification-before-completion — confirm work is complete before committing
+- finishing-a-development-branch — decide how to land completed work
+- using-git-worktrees — isolate feature work from current workspace
+
 ## Hooks (14 workflow hooks)
 
-Hooks run automatically at specific workflow events. All are non-blocking warnings.
+Hooks run automatically at specific workflow events. Most are non-blocking warnings; two block intentionally — `one-way-door-check` exits 2 to prevent irreversible architectural decisions, and `enforce-test-first` blocks source edits until a failing test exists.
 
 ### Writing quality
 - ap-style-check — flags AP Style violations on write/edit
@@ -86,13 +113,27 @@ Hooks run automatically at specific workflow events. All are non-blocking warnin
 - bug-report-detector — detects when user is describing a bug
 - enforce-test-first — blocks source edits until a test is written
 
-## Installation
+## Plugins
 
-```bash
-git clone https://github.com/jamditis/claude-skills-journalism.git ~/.claude/skills/journalism-skills
+Skills above are distributed as Claude Code plugins. Install via:
+
+```
+/plugin marketplace add jamditis/claude-skills-journalism
+/plugin install <plugin-name>@claude-skills-journalism
 ```
 
-Skills load automatically when you start a Claude Code session. Use `/skill-name` to invoke a specific skill.
+Restart your Claude Code session after installing or updating a plugin so the new skills and commands register.
+
+Plugins: `journalism-core` (13 skills), `research-toolkit` (6), `dev-toolkit` (10), `security-toolkit` (4 skills + /hotpatch command), `project-templates-toolkit` (3), `pdf-design` (1), `pdf-playground` (1), `visual-explainer` (1), `superjawn` (14).
+
+## Alternate installation
+
+Clone the repo and copy or symlink individual skill directories into `~/.claude/skills/`:
+
+```bash
+git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
+ln -sfn ~/projects/claude-skills-journalism/research-toolkit/skills/free-apis-catalog ~/.claude/skills/free-apis-catalog
+```
 
 ## License
 

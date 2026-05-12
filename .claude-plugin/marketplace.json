@@ -1,6 +1,6 @@
 {
   "name": "claude-skills-journalism",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Claude Code plugins for journalism, research, and media organizations",
   "owner": {
     "name": "Joe Amditis",
@@ -87,7 +87,7 @@
     {
       "name": "security-toolkit",
       "description": "Four defensive security skills covering OWASP Top 10 fundamentals and supply-chain hardening: pre-deployment audit checklists (authentication, input validation, secrets management), secure authentication patterns (password hashing, session management, JWT, OAuth, passkeys), API hardening (rate limiting, CORS, request throttling, defense-in-depth for Express, FastAPI, and serverless), and npm/bun supply-chain hardening with install-time cooldown plus a sandboxed pre-install scan for the bypass case (defends against Mini Shai-Hulud-class worms).",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"
