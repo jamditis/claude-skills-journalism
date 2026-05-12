@@ -1,7 +1,7 @@
 {
   "name": "security-toolkit",
-  "version": "1.0.0",
-  "description": "Three defensive web application security skills covering OWASP Top 10 fundamentals: pre-deployment audit checklists (authentication, input validation, secrets management), secure authentication implementation patterns (password hashing, session management, JWT, OAuth), and API hardening (rate limiting, CORS, request throttling, defense-in-depth for Express, FastAPI, and serverless).",
+  "version": "1.1.0",
+  "description": "Four defensive security skills: pre-deployment OWASP audit, secure authentication patterns, API hardening, and npm/bun supply-chain hardening (install-time cooldown plus sandboxed pre-install scan for the bypass case — defends against Mini Shai-Hulud-class worms).",
   "author": {
     "name": "Joe Amditis",
     "email": "jamditis@gmail.com"

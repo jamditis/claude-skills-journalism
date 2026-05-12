@@ -106,13 +106,17 @@ claude-skills-journalism/
 │       ├── project-retrospective/      # LESSONS.md generation, 4 project type templates
 │       └── template-selector/          # Decision tree for picking the right template
 │
-└── # Plugin: security-toolkit (3 skills) — registered in marketplace.json
+└── # Plugin: security-toolkit (4 skills, /hotpatch command) — registered in marketplace.json
     ├── .claude-plugin/plugin.json
     ├── README.md
+    ├── commands/hotpatch.md            # Slash command: sandboxed pre-install scan + cooldown bypass
+    ├── scripts/hotpatch.example.sh     # Reference Linux/bwrap implementation
+    ├── test-fixtures/                  # Synthetic malicious tarballs for self-test
     └── skills/
         ├── api-hardening/              # Rate limiting, CORS, request throttling, defense-in-depth
         ├── secure-auth/                # Password hashing, sessions, JWT, OAuth, passkeys
-        └── security-checklist/         # Pre-deployment OWASP audit
+        ├── security-checklist/         # Pre-deployment OWASP audit
+        └── supply-chain-hardening/     # npm/bun install-time cooldown + sandboxed bypass scan
 ```
 
 ## Skill format
