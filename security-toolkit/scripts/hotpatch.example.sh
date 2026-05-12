@@ -265,19 +265,23 @@ sandboxed_extract_bwrap() {
 
 sandboxed_extract_macos() {
   local tarball="$1" dest="$2"
-  local tarball_dir dest_abs profile
+  local tarball_abs dest_abs profile rc
   # sandbox-exec subpath rules require absolute, resolved paths.
-  tarball_dir="$(cd "$(dirname "$tarball")" && pwd -P)"
+  # We resolve the tarball as a FILE (not its parent dir) so the read scope
+  # stays tight — tar reads the archive itself, never its siblings.
+  tarball_abs="$(cd "$(dirname "$tarball")" && pwd -P)/$(basename "$tarball")"
   dest_abs="$(cd "$dest" && pwd -P)"
   profile="$(mktemp -t hotpatch-sandbox.XXXXXX)"
-  # The profile is a Scheme-syntax policy:
-  #   - deny default: everything is denied unless explicitly allowed
-  #   - file-read*  : let tar read the OS, dynamic libs, and the tarball
-  #   - file-write* : only the destination dir (scan output)
-  #   - network*    : explicitly deny (covers TCP/UDP/Unix sockets at syscall layer)
-  #   - process-exec: tar only, so a malicious archive can't pivot
-  # sandbox-exec is technically deprecated by Apple but still ships and works on
-  # macOS 14/15. If/when it's removed, fall back to an `tar --no-xattrs` + chroot.
+  # The profile is a Scheme-syntax deny-default policy.
+  # Read scope: system dirs + the tarball file only. NOT the user homedir;
+  # otherwise a malicious archive's symlinks/hardlinks could exfiltrate
+  # ~/.ssh, ~/.aws, etc. via tar's symlink-follow behavior.
+  # Write scope: $dest only — the tarball directory is read-only.
+  # Process exec: /usr/bin/tar only.
+  # Network: denied at the syscall layer.
+  # sandbox-exec is technically deprecated by Apple but still ships and
+  # works on macOS 14/15. If/when it's removed, fall back to `tar
+  # --no-xattrs --no-same-owner` inside a `chroot` jail.
   cat > "$profile" <<PROFILE
 (version 1)
 (deny default)
@@ -285,19 +289,26 @@ sandboxed_extract_macos() {
 (allow sysctl-read)
 (allow signal (target self))
 (allow mach-lookup)
-(allow file-read*)
+(allow file-read*
+  (subpath "/usr")
+  (subpath "/System")
+  (subpath "/Library")
+  (subpath "/bin")
+  (subpath "/sbin")
+  (subpath "/private/var/db/dyld")
+  (literal "/dev/null")
+  (literal "/dev/urandom")
+  (literal "$tarball_abs"))
 (allow file-write*
-  (subpath "$dest_abs")
-  (subpath "$tarball_dir"))
+  (subpath "$dest_abs"))
 (deny network*)
 (allow process-exec
-  (literal "/usr/bin/tar")
-  (literal "/bin/sh")
-  (literal "/usr/bin/env"))
+  (literal "/usr/bin/tar"))
 PROFILE
-  # shellcheck disable=SC2064
-  trap "rm -f '$profile'" RETURN
   sandbox-exec -f "$profile" /usr/bin/tar -xzf "$tarball" -C "$dest"
+  rc=$?
+  rm -f "$profile"
+  return $rc
 }
 
 # ---- Run the scan against an extracted package ----

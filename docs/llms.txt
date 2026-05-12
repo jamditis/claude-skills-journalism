@@ -87,7 +87,7 @@ Personal site: https://jamditis.com
 
 ## Hooks (14 workflow hooks)
 
-Hooks run automatically at specific workflow events. All are non-blocking warnings.
+Hooks run automatically at specific workflow events. Most are non-blocking warnings; two block intentionally — `one-way-door-check` exits 2 to prevent irreversible architectural decisions, and `enforce-test-first` blocks source edits until a failing test exists.
 
 ### Writing quality
 - ap-style-check — flags AP Style violations on write/edit
@@ -121,6 +121,8 @@ Skills above are distributed as Claude Code plugins. Install via:
 /plugin marketplace add jamditis/claude-skills-journalism
 /plugin install <plugin-name>@claude-skills-journalism
 ```
+
+Restart your Claude Code session after installing or updating a plugin so the new skills and commands register.
 
 Plugins: `journalism-core` (13 skills), `research-toolkit` (6), `dev-toolkit` (10), `security-toolkit` (4 skills + /hotpatch command), `project-templates-toolkit` (3), `pdf-design` (1), `pdf-playground` (1), `visual-explainer` (1), `superjawn` (14).
 
