@@ -191,6 +191,14 @@ check_credential_paths() {
 # Dispatches to a platform-specific backend so the same scan workflow runs
 # on Linux (bwrap) and macOS (sandbox-exec). The contract is identical:
 # extract <tarball> into <dest> with no network and no writes outside <dest>.
+
+# Probe whether bwrap can actually function. Unprivileged user namespaces are
+# blocked on many CI runners (GitHub Actions Ubuntu hosts, certain Docker
+# containers) and inside hardened production environments. The cheapest test
+# is a no-op bind+true; if it can't even mount /, it can't sandbox anything.
+bwrap_works() {
+  bwrap --bind / / -- true 2>/dev/null
+}
 sandboxed_extract() {
   local tarball="$1" dest="$2"
   mkdir -p "$dest"
@@ -198,8 +206,11 @@ sandboxed_extract() {
   os="$(uname -s)"
   case "$os" in
     Linux)
-      if command -v bwrap >/dev/null 2>&1; then
+      if command -v bwrap >/dev/null 2>&1 && bwrap_works; then
         sandboxed_extract_bwrap "$tarball" "$dest"
+      elif command -v bwrap >/dev/null 2>&1; then
+        warn "bwrap installed but blocked by host policy (likely AppArmor/seccomp restriction on unprivileged user namespaces — common in CI runners and containers). Falling back to unsandboxed tar. Static scan still runs."
+        tar -xzf "$tarball" -C "$dest"
       else
         warn "bwrap not installed; falling back to unsandboxed tar. Install bubblewrap (apt/dnf/pacman install bubblewrap) for isolation."
         tar -xzf "$tarball" -C "$dest"
