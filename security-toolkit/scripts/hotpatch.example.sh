@@ -188,9 +188,40 @@ check_credential_paths() {
 }
 
 # ---- Sandboxed extract ----
+# Dispatches to a platform-specific backend so the same scan workflow runs
+# on Linux (bwrap) and macOS (sandbox-exec). The contract is identical:
+# extract <tarball> into <dest> with no network and no writes outside <dest>.
 sandboxed_extract() {
   local tarball="$1" dest="$2"
   mkdir -p "$dest"
+  local os
+  os="$(uname -s)"
+  case "$os" in
+    Linux)
+      if command -v bwrap >/dev/null 2>&1; then
+        sandboxed_extract_bwrap "$tarball" "$dest"
+      else
+        warn "bwrap not installed; falling back to unsandboxed tar. Install bubblewrap (apt/dnf/pacman install bubblewrap) for isolation."
+        tar -xzf "$tarball" -C "$dest"
+      fi
+      ;;
+    Darwin)
+      if command -v sandbox-exec >/dev/null 2>&1; then
+        sandboxed_extract_macos "$tarball" "$dest"
+      else
+        warn "sandbox-exec not found; falling back to unsandboxed tar."
+        tar -xzf "$tarball" -C "$dest"
+      fi
+      ;;
+    *)
+      warn "unsupported OS ($os); falling back to unsandboxed tar. Sandbox backends: Linux (bwrap), macOS (sandbox-exec)."
+      tar -xzf "$tarball" -C "$dest"
+      ;;
+  esac
+}
+
+sandboxed_extract_bwrap() {
+  local tarball="$1" dest="$2"
   # bwrap: no network, ro system, only the scan dir is writable.
   # /bin and /lib are symlinks into /usr on Debian unified-/usr layout, so
   # binding /usr alone is sufficient. Add symlinks back inside the sandbox so
@@ -208,6 +239,43 @@ sandboxed_extract() {
     --unshare-all --die-with-parent \
     -- \
     /usr/bin/tar -xzf "$tarball" -C "$dest"
+}
+
+sandboxed_extract_macos() {
+  local tarball="$1" dest="$2"
+  local tarball_dir dest_abs profile
+  # sandbox-exec subpath rules require absolute, resolved paths.
+  tarball_dir="$(cd "$(dirname "$tarball")" && pwd -P)"
+  dest_abs="$(cd "$dest" && pwd -P)"
+  profile="$(mktemp -t hotpatch-sandbox.XXXXXX)"
+  # The profile is a Scheme-syntax policy:
+  #   - deny default: everything is denied unless explicitly allowed
+  #   - file-read*  : let tar read the OS, dynamic libs, and the tarball
+  #   - file-write* : only the destination dir (scan output)
+  #   - network*    : explicitly deny (covers TCP/UDP/Unix sockets at syscall layer)
+  #   - process-exec: tar only, so a malicious archive can't pivot
+  # sandbox-exec is technically deprecated by Apple but still ships and works on
+  # macOS 14/15. If/when it's removed, fall back to an `tar --no-xattrs` + chroot.
+  cat > "$profile" <<PROFILE
+(version 1)
+(deny default)
+(allow process-fork)
+(allow sysctl-read)
+(allow signal (target self))
+(allow mach-lookup)
+(allow file-read*)
+(allow file-write*
+  (subpath "$dest_abs")
+  (subpath "$tarball_dir"))
+(deny network*)
+(allow process-exec
+  (literal "/usr/bin/tar")
+  (literal "/bin/sh")
+  (literal "/usr/bin/env"))
+PROFILE
+  # shellcheck disable=SC2064
+  trap "rm -f '$profile'" RETURN
+  sandbox-exec -f "$profile" /usr/bin/tar -xzf "$tarball" -C "$dest"
 }
 
 # ---- Run the scan against an extracted package ----

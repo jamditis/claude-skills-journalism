@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-05-12
+
+The security-toolkit supply-chain release. Marketplace bumped 2.0.0 → 2.1.0 to roll up PR #77 (security-toolkit 1.1.0) and the docs-surface follow-up.
+
+### Added
+
+- **security-toolkit plugin v1.2.0 (#77, #80, this PR)**: new `supply-chain-hardening` skill plus a `/security-toolkit:hotpatch` slash command that runs a sandboxed (`bwrap`) pre-install scan of npm/bun packages. The skill ships install-time cooldown configuration (npm `min-release-age`, bun `[install] minimumReleaseAge`) plus a reference shell script (`scripts/hotpatch.example.sh`) with a `--self-test` mode that verifies against synthetic malicious tarballs in `test-fixtures/`. Defends against the Mini Shai-Hulud-class TanStack supply-chain worm pattern.
+- **Docs landing page** at `docs/supply-chain-hardening/index.html` (#80) mirroring the security-checklist template with a red gradient hero, threat-model two-column grid, scan-heuristics table, and `aria-labelledby` / `scope="col"` accessibility additions beyond the cohort baseline.
+- **`docs/supply-chain-hardening/og-image.png`** (#80) — 1200×630 OG image matching the security cohort palette.
+- **CI hotpatch self-test workflow** (this PR): `.github/workflows/security-toolkit-hotpatch-selftest.yml` runs `bash scripts/hotpatch.example.sh --self-test` on every PR that touches `security-toolkit/scripts/` or `security-toolkit/test-fixtures/`.
+
+### Changed
+
+- **`security-toolkit/scripts/hotpatch.example.sh` is now cross-platform** (this PR): detects host OS via `uname` and selects a sandbox backend per platform — `bwrap` on Linux, `sandbox-exec` on macOS with a deny-default profile that blocks network, file writes outside scan-dir, and process execution. Falls back to a clearly-flagged unsandboxed dry run on platforms with neither backend.
+- **`docs/index.html`** (#80): `09 / Security` cluster header `3 Skills` → `4 Skills`; new `supply-chain-hardening` card with the `package-check` lucide icon.
+- **`docs/llms.txt`** (this PR): rebuilt from the filesystem — `31 → 53` skills, added "Project templates", "Documents and explainers", and "Workflow patterns (superjawn)" sections that were missing entirely. Closes the count drift noted in #83.
+- **`docs/sitemap.xml`** (this PR): regenerated from the filesystem — 6 → 43 URLs, every page under `docs/<slug>/index.html` now listed with current `<lastmod>`. Closes the staleness noted in #82.
+
+### Fixed
+
+- **a11y color-contrast on `docs/persistent-sessions/index.html`** (this PR): three nodes using `text-clay/50` and `text-clay/60` fell below WCAG AA 4.5:1 against the white card background; bumped to the cohort-standard `text-clay/70`. axe-core 4.x scan now reports zero severe and zero minor violations across all 43 docs pages. Closes #81.
+
 ## [2.0.0] - 2026-05-11
 
 The bundling milestone: every skill in the repo now lives inside a registered plugin, so the marketplace install path is the only first-class install path. Headline numbers: 10 plugins registered (was 4 at v1.9.0), zero bare skill directories at the repo root, marketplace manifest version bumped 1.8.0 → 2.0.0 to signal the breaking layout change.

@@ -1,6 +1,6 @@
 {
   "name": "security-toolkit",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Four defensive security skills: pre-deployment OWASP audit, secure authentication patterns, API hardening, and npm/bun supply-chain hardening (install-time cooldown plus sandboxed pre-install scan for the bypass case — defends against Mini Shai-Hulud-class worms).",
   "author": {
     "name": "Joe Amditis",
