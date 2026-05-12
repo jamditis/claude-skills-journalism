@@ -19,4 +19,4 @@ Allow: /
 User-agent: Applebot-Extended
 Allow: /
 
-Sitemap: https://jamditis.github.io/claude-skills-journalism/sitemap.xml
+Sitemap: https://skills.amditis.tech/sitemap.xml
