@@ -2,7 +2,7 @@
 
 A curated collection of Claude Code skills designed for journalists, researchers, academics, media professionals, and communications practitioners.
 
-**Docs site:** [jamditis.github.io/claude-skills-journalism](https://jamditis.github.io/claude-skills-journalism/) — interactive skill browser, setup guides, and full documentation.
+**Docs site:** [skills.amditis.tech](https://skills.amditis.tech) — interactive skill browser, setup guides, and full documentation.
 
 ## Guides
 
@@ -10,7 +10,7 @@ Setup and workflow guides, separate from the skills themselves:
 
 | Guide | Description |
 |-------|-------------|
-| [Persistent sessions](https://jamditis.github.io/claude-skills-journalism/persistent-sessions/) | Keep Claude Code sessions alive through disconnects using tmux — setup, key bindings, activity notifications, and scheduler coexistence |
+| [Persistent sessions](https://skills.amditis.tech/persistent-sessions/) | Keep Claude Code sessions alive through disconnects using tmux — setup, key bindings, activity notifications, and scheduler coexistence |
 
 ## What are Claude skills?
 
@@ -42,7 +42,7 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials with an interactive control panel for live design editing (colors, fonts, spacing, sections) and a guided wizard for proposals | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` |
 | [project-templates-toolkit](./project-templates-toolkit/) | Three skills for setting up and closing out journalism projects: a CLAUDE.md project-memory writer (institutional knowledge), a LESSONS.md retrospective writer (failures and decisions), and a template-selector decision tree across 6 project types | n/a — skills only |
 | [research-toolkit](./research-toolkit/) | Six skills for research, source preservation, and academic workflows: academic writing, legal paywall-bypass via Unpaywall and library databases, web archiving (Wayback / Archive.today / ArchiveBox), web page change monitoring, AI-enriched digital archive construction, and a curated free-API catalog with sunset currency notes (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) | n/a — skills only |
-| [security-toolkit](./security-toolkit/) | Three defensive web application security skills covering OWASP Top 10 fundamentals: pre-deployment audit checklists (auth, input validation, secrets management), secure authentication implementation patterns (password hashing, session management, JWT, OAuth, passkeys), and API hardening (rate limiting, CORS, request throttling, defense-in-depth for Express, FastAPI, and serverless) | n/a — skills only |
+| [security-toolkit](./security-toolkit/) | Four defensive security skills covering OWASP Top 10 fundamentals and supply-chain hardening: pre-deployment audit checklists (auth, input validation, secrets management), secure authentication patterns (password hashing, session management, JWT, OAuth, passkeys), API hardening (rate limiting, CORS, request throttling, defense-in-depth for Express, FastAPI, and serverless), and npm/bun supply-chain hardening with install-time cooldown plus a sandboxed pre-install scan for the bypass case (defends against Mini Shai-Hulud-class worms) | `/security-toolkit:hotpatch` |
 | [superjawn](./superjawn/) | Research-augmented fork of obra/superpowers. Default-on research phase fires before brainstorming, systematic-debugging, and writing-skills. v1.0.0 ships all 14 skills with no soft dependencies on the upstream `superpowers` plugin | invoked indirectly via skills (e.g. `superjawn:brainstorming`, `superjawn:systematic-debugging`, `superjawn:writing-plans`) |
 | [visual-explainer](./visual-explainer/) | HTML diagrams, data tables, architecture views, slide decks, and KPI dashboards adapted from nicobailon/visual-explainer with journalism, newsroom, and academic design sensibilities | `/visual-explainer:project-recap` |
 
@@ -144,13 +144,14 @@ These ten skills ship together as the [dev-toolkit](./dev-toolkit/) plugin. Inst
 
 ### Security skills (in `security-toolkit` plugin)
 
-These three skills ship together as the [security-toolkit](./security-toolkit/) plugin. Install via `/plugin install security-toolkit@claude-skills-journalism` to get all of them at once.
+These four skills ship together as the [security-toolkit](./security-toolkit/) plugin, paired with the `/security-toolkit:hotpatch` slash command. Install via `/plugin install security-toolkit@claude-skills-journalism` to get all of them at once.
 
 | Skill | Description |
 |-------|-------------|
 | [api-hardening](./security-toolkit/skills/api-hardening/) | Rate limiting, input validation, CORS, security headers, API key management, defense-in-depth for Express, FastAPI, and serverless |
 | [secure-auth](./security-toolkit/skills/secure-auth/) | Production-ready authentication patterns: password hashing, session management, JWT, OAuth, passkeys / WebAuthn, MFA |
 | [security-checklist](./security-toolkit/skills/security-checklist/) | Pre-deployment security audit covering OWASP Top 10 fundamentals: authentication, input validation, secrets, database security, compliance basics |
+| [supply-chain-hardening](./security-toolkit/skills/supply-chain-hardening/) | npm/bun install-time cooldown plus sandboxed pre-install scan (bwrap on Linux, sandbox-exec on macOS). Defends against Mini Shai-Hulud-class worms; paired with `/security-toolkit:hotpatch` for the cooldown-bypass case |
 
 ## Hooks
 
