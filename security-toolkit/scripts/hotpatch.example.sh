@@ -222,10 +222,19 @@ sandboxed_extract() {
 
 sandboxed_extract_bwrap() {
   local tarball="$1" dest="$2"
-  # bwrap: no network, ro system, only the scan dir is writable.
+  # bwrap: ro system, only the scan dir is writable.
   # /bin and /lib are symlinks into /usr on Debian unified-/usr layout, so
   # binding /usr alone is sufficient. Add symlinks back inside the sandbox so
   # tools that hardcode /bin/sh still work.
+  #
+  # We enumerate --unshare-* flags individually instead of --unshare-all because
+  # --unshare-net triggers loopback (lo) interface setup inside the new netns,
+  # which requires CAP_NET_ADMIN — not granted to unprivileged users on
+  # hardened/containerized hosts (e.g. GitHub Actions runners), producing
+  # "bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted". Tar
+  # extraction doesn't need network anyway; the script's `curl` calls all
+  # happen OUTSIDE the sandbox, and filesystem confinement (--bind, --ro-bind)
+  # is what actually contains a malicious archive during extraction.
   bwrap \
     --ro-bind /usr /usr \
     --symlink usr/bin /bin \
@@ -236,7 +245,9 @@ sandboxed_extract_bwrap() {
     --bind "$dest" "$dest" \
     --proc /proc --dev /dev \
     --setenv PATH /usr/bin:/usr/local/bin \
-    --unshare-all --die-with-parent \
+    --unshare-user --unshare-ipc --unshare-pid \
+    --unshare-uts --unshare-cgroup-try \
+    --die-with-parent \
     -- \
     /usr/bin/tar -xzf "$tarball" -C "$dest"
 }
