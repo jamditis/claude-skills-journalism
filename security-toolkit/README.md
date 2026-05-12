@@ -9,13 +9,13 @@ Four defensive security skills for web applications, APIs, and toolchain hardeni
 | api-hardening | Rate limiting, input validation, CORS, security headers, request throttling, defense-in-depth for Express / FastAPI / serverless |
 | secure-auth | Password hashing (argon2id, bcrypt cost), session management, JWT, OAuth 2.1, passkeys / WebAuthn, common tutorial pitfalls |
 | security-checklist | Pre-deployment audit aligned to OWASP Top 10 — authentication, input validation, secrets management, database security, compliance basics |
-| supply-chain-hardening | npm/bun install-time cooldown (`min-release-age` / `minimumReleaseAge`) plus a sandboxed pre-install scan for the bypass case. Defends against Mini Shai-Hulud-class worms that ship within the cooldown window. Includes `/hotpatch` slash command, a reference Bash implementation, and a synthetic test fixture mimicking the TanStack 2026-05-11 attack signatures. |
+| supply-chain-hardening | npm/bun install-time cooldown (`min-release-age` / `minimumReleaseAge`) plus a sandboxed pre-install scan for the bypass case. Defends against Mini Shai-Hulud-class worms that ship within the cooldown window. Includes `/security-toolkit:hotpatch` slash command, a reference Bash implementation, and a synthetic test fixture mimicking the TanStack 2026-05-11 attack signatures. |
 
 ## Slash commands
 
 | Command | What it does |
 |---|---|
-| `/hotpatch <pkg>[@<version>]` | Sandboxed pre-install scan + cooldown bypass for an urgent npm/bun install — see `supply-chain-hardening` skill for threat model |
+| `/security-toolkit:hotpatch <pkg>[@<version>]` | Sandboxed pre-install scan + cooldown bypass for an urgent npm/bun install — see `supply-chain-hardening` skill for threat model |
 
 ## Reference script + test fixture
 

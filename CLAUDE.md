@@ -106,7 +106,7 @@ claude-skills-journalism/
 │       ├── project-retrospective/      # LESSONS.md generation, 4 project type templates
 │       └── template-selector/          # Decision tree for picking the right template
 │
-└── # Plugin: security-toolkit (4 skills, /hotpatch command) — registered in marketplace.json
+└── # Plugin: security-toolkit (4 skills, /security-toolkit:hotpatch command) — registered in marketplace.json
     ├── .claude-plugin/plugin.json
     ├── README.md
     ├── commands/hotpatch.md            # Slash command: sandboxed pre-install scan + cooldown bypass

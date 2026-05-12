@@ -23,7 +23,16 @@ trap 'cleanup' EXIT
 
 cleanup() { [ -n "${SCAN_DIR:-}" ] && [ -d "$SCAN_DIR" ] && rm -rf "$SCAN_DIR"; }
 die() { echo "hotpatch: $*" >&2; exit 1; }
+# Distinct exit code (2) so CI/automation can tell "scan blocked install"
+# apart from "error" (1). Honors the contract in the script header.
+die_red() { echo "hotpatch: $*" >&2; exit 2; }
 warn() { echo "WARN: $*" >&2; }
+need_value() {
+  # Usage: need_value "$#" "$1"  — fail loudly when a flag is given without
+  # its required value (otherwise set -u crashes with "unbound variable").
+  local remaining="$1" flag="$2"
+  [ "$remaining" -ge 2 ] || die "flag $flag requires a value"
+}
 
 declare -a FLAGS_RED=()
 declare -a FLAGS_YELLOW=()
@@ -56,10 +65,10 @@ SCAN_LOCAL=""
 SELF_TEST=0
 while [ $# -gt 0 ]; do
   case "$1" in
-    --manager)     MANAGER="$2"; shift 2 ;;
+    --manager)     need_value "$#" "$1"; MANAGER="$2"; shift 2 ;;
     --force)       FORCE=1; shift ;;
     --yes|-y)      ASSUME_YES=1; shift ;;
-    --scan-local)  SCAN_LOCAL="$2"; shift 2 ;;
+    --scan-local)  need_value "$#" "$1"; SCAN_LOCAL="$2"; shift 2 ;;
     --self-test)   SELF_TEST=1; shift ;;
     -h|--help)     print_usage; exit 0 ;;
     -*)            die "unknown flag: $1" ;;
@@ -211,20 +220,6 @@ run_static_checks() {
   check_credential_paths "$pkg_root"
 }
 
-# ---- Registry helpers ----
-fetch_meta() {
-  local name="$1"
-  curl -fsSL "https://registry.npmjs.org/${name//\//%2F}" 2>/dev/null
-}
-
-resolve_version() {
-  local meta="$1" req="$2"
-  python3 - "$req" <<PY
-import json, sys
-d = json.loads('''$meta''') if False else None
-PY
-}
-
 # ---- OSV.dev (free, no auth) + npm deprecation check ----
 check_external() {
   local name="$1" version="$2" meta_file="$3"
@@ -353,9 +348,11 @@ do_hotpatch() {
   SCAN_DIR=$(mktemp -d /tmp/hotpatch.XXXXXX)
   local meta_file="$SCAN_DIR/meta.json"
 
-  # Fetch metadata to disk (big JSON breaks heredoc interpolation)
-  curl -fsSL "https://registry.npmjs.org/${name//\//%2F}" -o "$meta_file" \
-    || die "package not found on registry: $name"
+  # Fetch metadata to disk (big JSON breaks heredoc interpolation).
+  # --max-time / --connect-timeout so a hung registry can't hang the script.
+  curl -fsSL --max-time 30 --connect-timeout 10 \
+    "https://registry.npmjs.org/${name//\//%2F}" -o "$meta_file" \
+    || die "package not found on registry (or fetch timed out): $name"
 
   local tarball_url version pub_date age_days
   read -r version tarball_url pub_date age_days < <(python3 - "$meta_file" "$version_req" <<'PY'
@@ -381,7 +378,8 @@ PY
 
   # Download tarball
   local tarball="$SCAN_DIR/pkg.tgz"
-  curl -fsSL -o "$tarball" "$tarball_url" || die "tarball download failed"
+  curl -fsSL --max-time 60 --connect-timeout 10 -o "$tarball" "$tarball_url" \
+    || die "tarball download failed (or timed out)"
   local size_kb=$(( $(stat -c%s "$tarball") / 1024 ))
   echo "         tarball:  ${size_kb}KB"
 
@@ -451,7 +449,7 @@ PY
 
   if [ "${#FLAGS_RED[@]}" -gt 0 ] && [ "$FORCE" -eq 0 ]; then
     echo
-    die "ABORT: red flags present. Re-run with --force to install anyway, or pick a different version."
+    die_red "ABORT: red flags present. Re-run with --force to install anyway, or pick a different version."
   fi
 
   if [ "$ASSUME_YES" -eq 0 ]; then

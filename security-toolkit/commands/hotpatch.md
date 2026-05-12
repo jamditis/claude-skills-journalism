@@ -2,9 +2,9 @@
 description: Sandboxed pre-install scan + cooldown bypass for an urgent npm/bun install. Use when a recent package version must be installed despite the global supply-chain cooldown — for example a published CVE patch, a dependency that just shipped, or any case where waiting the full cooldown is not acceptable.
 ---
 
-# /hotpatch
+# /security-toolkit:hotpatch
 
-`/hotpatch <pkg>[@<version>] [--manager npm|bun]`
+`/security-toolkit:hotpatch <pkg>[@<version>] [--manager npm|bun]`
 
 This command runs the supply-chain pre-install scan defined in the `supply-chain-hardening` skill, then performs an `--ignore-scripts` install with the cooldown bypassed if the scan is clean.
 
