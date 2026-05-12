@@ -12,7 +12,7 @@ Source: https://github.com/jamditis/claude-skills-journalism
 Joe Amditis — associate director of operations, Center for Cooperative Media, Montclair State University.
 Personal site: https://jamditis.com
 
-## Skills (31 total)
+## Skills (32 total)
 
 ### Journalism and verification
 - source-verification — SIFT method, verification trails, source credibility
@@ -56,6 +56,7 @@ Personal site: https://jamditis.com
 - security-checklist — pre-deployment security audit
 - secure-auth — authentication patterns
 - api-hardening — API security
+- supply-chain-hardening — npm/bun install-time cooldown plus sandboxed pre-install scan; defends against Mini Shai-Hulud-class supply-chain worms (paired with /security-toolkit:hotpatch slash command)
 
 ## Hooks (14 workflow hooks)
 
