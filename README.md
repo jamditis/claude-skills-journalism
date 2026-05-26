@@ -46,6 +46,24 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | [superjawn](./superjawn/) | Research-augmented fork of obra/superpowers. Default-on research phase fires before brainstorming, systematic-debugging, and writing-skills. v1.0.0 ships all 14 skills with no soft dependencies on the upstream `superpowers` plugin | invoked indirectly via skills (e.g. `superjawn:brainstorming`, `superjawn:systematic-debugging`, `superjawn:writing-plans`) |
 | [visual-explainer](./visual-explainer/) | HTML diagrams, data tables, architecture views, slide decks, and KPI dashboards adapted from nicobailon/visual-explainer with journalism, newsroom, and academic design sensibilities | `/visual-explainer:project-recap` |
 
+### Install via npx (skills CLI)
+
+Requires [Node.js](https://nodejs.org/) (ships with `npx`). To drop the `npx` prefix, install the CLI globally once: `npm i -g skills`. `cd` into the project folder where you want the skills installed before running.
+
+```bash
+# Pick which skills to install into the current project (interactive)
+npx skills add jamditis/claude-skills-journalism
+
+# Pick from one plugin (replace journalism-core with any plugin name above)
+npx skills add jamditis/claude-skills-journalism/journalism-core
+
+# Install all skills into the current project
+npx skills add jamditis/claude-skills-journalism --all
+
+# Install all skills globally (user-level, available across all projects)
+npx skills add jamditis/claude-skills-journalism --all -g
+```
+
 ### Skills (manual installation)
 
 Every skill in this repo now lives inside a plugin's `skills/` directory. To install just one without taking the whole plugin, clone the repo and copy or symlink the nested skill folder. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
