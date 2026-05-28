@@ -889,7 +889,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <span class="section-label">14 Automated Checks</span>
                 </div>
 
-                <p class="text-mist mb-8 max-w-3xl">Hooks run automatically at specific workflow events. All are <strong>non-blocking warnings</strong>—they provide guidance but don't prevent actions.</p>
+                <p class="text-mist mb-8 max-w-3xl">Hooks run automatically at specific workflow events. Most are <strong>non-blocking warnings</strong>, but two &mdash; one-way-door-check and enforce-test-first &mdash; block intentionally until you resolve them.</p>
 
                 <div class="deckle-card-solid p-8">
                     <!-- Writing Quality Hooks -->
@@ -1051,7 +1051,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         <div>cp -r journalism-core/skills/source-verification ~/.claude/skills/</div>
                         <div># or: ln -sfn "$PWD/journalism-core/skills/source-verification" ~/.claude/skills/source-verification</div>
                     </div>
-                    <p class="text-sm text-mist">Skills activate automatically. For example, asking Claude to verify a source will use the source-verification skill. Don't clone the whole repo into <code>~/.claude/skills/journalism-skills/</code> — that nests each <code>SKILL.md</code> two levels deep and Claude Code won't find them.</p>
+                    <p class="text-sm text-mist">For example, asking Claude to verify a source will use the source-verification skill. Don't clone the whole repo into <code>~/.claude/skills/journalism-skills/</code> — that nests each <code>SKILL.md</code> two levels deep and Claude Code won't find them.</p>
                 </div>
             </section>
 
