@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A plain-language guide to multi-agent AI workflows for journalists, media professionals, and researchers. What fan-out, pipeline, and adversarial-verify mean, real newsroom and academic examples (ICIJ, The Markup, Full Fact, Elicit), and honest cautions on cost and verification.">
+    <title>Multi-agent workflows - Claude skills for journalism</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'display': ['Fraunces', 'serif'],
+                        'body': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'canvas': '#ede6d4',
+                        'ink': '#121212',
+                        'clay': '#2d2a26',
+                        'mist': '#c4bfb4',
+                        'accent': '#0d9488',
+                        'accentDark': '#0f766e',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Fraunces', serif; }
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("https://www.transparenttextures.com/patterns/natural-paper.png"),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .content-section h2 { margin-top: 2.5rem; margin-bottom: 1rem; }
+        .content-section h3 { margin-top: 2rem; margin-bottom: 0.75rem; }
+        .content-section p { margin-bottom: 1rem; }
+        .content-section ul, .content-section ol { margin-bottom: 1rem; margin-left: 1.5rem; }
+        .content-section li { margin-bottom: 0.5rem; }
+        .content-section code {
+            background: rgba(0,0,0,0.06);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+        .content-section pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        .content-section pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        .content-section table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        .content-section th, .content-section td {
+            border: 1px solid rgba(0,0,0,0.1);
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+        }
+        .content-section th {
+            background: rgba(0,0,0,0.04);
+            font-weight: 600;
+        }
+
+/* a11y-patch-v1 */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+.skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #121212; color: #ede6d4; font-weight: 700; text-decoration: none; }
+:focus-visible { outline: 2px solid #3d4b40; outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+p a:not(.btn-primary):not(.btn-outline):not(.skill-card):not(.deckle-card):not(.feature-card),
+li a:not(.btn-primary):not(.btn-outline),
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDeep"]:not(.btn-primary):not(.btn-outline) { color: #1e293b !important; }
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline):hover,
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline):hover { color: #0f172a !important; }
+strong[class~="text-accent"], em[class~="text-accent"], code[class~="text-accent"],
+strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b !important; }
+.bg-canvas [class~="text-mist"], main [class~="text-mist"], [class~="text-mist"] { color: #3a3a3a !important; }
+.bg-ink [class~="text-accent"], [class~="bg-ink"] [class~="text-accent"],
+.bg-zinc-900 [class~="text-accent"], .bg-gray-900 [class~="text-accent"],
+[class*="bg-zinc-9"] [class~="text-accent"], [class*="bg-gray-9"] [class~="text-accent"],
+[class*="text-white"] [class~="text-accent"],
+[style*="background:#1"] [class~="text-accent"], [style*="background-color:#1"] [class~="text-accent"] {
+  color: #ddd6fe !important;
+}
+.bg-ink [class~="text-mist"], [class~="bg-ink"] [class~="text-mist"],
+[class*="text-white"] [class~="text-mist"] {
+  color: #d4d4d4 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-section, .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+/* stat-on-dark-fix */
+.bg-ink .text-accent, .bg-zinc-900 .text-accent, .bg-gray-900 .text-accent,
+.bg-ink .text-accentDark, .bg-zinc-900 .text-accentDark, .bg-gray-900 .text-accentDark {
+  filter: brightness(1.6) saturate(0.85);
+}
+    </style>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Multi-agent workflows - Claude skills for journalism">
+    <meta property="og:description" content="A plain-language guide to multi-agent AI workflows for journalists and researchers: what fan-out, pipeline, and adversarial-verify mean, real newsroom and academic examples, and honest cautions on cost and verification.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/workflows/">
+    <meta property="og:image" content="https://skills.amditis.tech/workflows/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Multi-agent workflows - Claude skills for journalism">
+    <meta name="twitter:description" content="A plain-language guide to multi-agent AI workflows for journalists and researchers: real examples from ICIJ, The Markup, Full Fact, and Elicit, plus honest cautions.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/workflows/og-image.png">
+    <script src="../ask-ai.js" defer></script>
+    <!-- a11y-patch-v1 -->
+</head>
+<body class="bg-canvas text-ink">
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <div class="paper-overlay"></div>
+
+    <!-- Navigation -->
+    <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="../" class="text-clay/70 hover:text-ink flex items-center gap-2 text-sm font-medium transition-colors">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                All skills
+            </a>
+            <a aria-label="GitHub" href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors" rel="noopener noreferrer">
+                <svg aria-hidden="true" focusable="false" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+                </svg>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="bg-gradient-to-br from-accent to-accentDark text-white pt-24 pb-16">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1 text-sm mb-4">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                Guide
+            </div>
+            <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">Multi-agent workflows</h1>
+            <p class="text-xl text-white/90 max-w-2xl">
+                What it means to run many AI agents on one job instead of chatting with a single one &mdash; written for journalists, editors, and researchers who are curious but not engineers.
+            </p>
+        </div>
+    </header>
+
+    <main id="main" class="max-w-4xl mx-auto px-6 py-12 relative z-10 content-section">
+
+        <!-- The one idea -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">The one idea</h2>
+            <p class="text-clay/80">
+                A workflow is an <strong>assignment desk</strong>, not a single reporter. Instead of asking one AI to do an entire job in one long conversation, you split the work across many narrow agents &mdash; each with one beat &mdash; then run an editor's pass over what they file. The shape is older than the technology: the most credible AI-assisted journalism, from the Panama Papers to The Markup's algorithm audits, already works this way. A machine does the high-volume first pass at scale, and a <strong>separate verification step</strong> decides what to actually trust before anything gets published.
+            </p>
+            <p class="text-clay/80">
+                That second step is the whole game. &ldquo;The AI found it&rdquo; is not a finding. &ldquo;A separate agent tried to knock it down and couldn't&rdquo; is a method you can defend to an editor.
+            </p>
+            <div class="bg-white rounded-xl p-5 border border-mist/30 mt-6">
+                <p class="text-sm text-clay/70 mb-0">
+                    <strong>Who this is for:</strong> AI-curious journalists, media professionals, faculty, and researchers. No code required to understand it. The examples are real and sourced; the cautions are honest.
+                </p>
+            </div>
+        </section>
+
+        <!-- Single chat vs workflow -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">One chat vs. a workflow</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <h3 class="font-semibold mb-2 mt-0">A single chat</h3>
+                    <ul class="text-sm text-clay/70 space-y-1.5 mb-0">
+                        <li>One model, one context window, one pass.</li>
+                        <li>Loses track somewhere around document 20.</li>
+                        <li>Grades its own homework.</li>
+                        <li>Cheap and fast &mdash; right for most questions.</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <h3 class="font-semibold mb-2 mt-0">A workflow</h3>
+                    <ul class="text-sm text-clay/70 space-y-1.5 mb-0">
+                        <li>Many agents, each with its own focus, run in parallel.</li>
+                        <li>Holds hundreds of items in flight; returns a structured table.</li>
+                        <li>A separate agent checks the work before you see it.</li>
+                        <li>Expensive &mdash; earns its keep at volume and when verification matters.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- The patterns -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Four patterns, in plain language</h2>
+            <p class="text-clay/80">Almost every workflow is built from four moves. You don't need the names to use them, but they make the rest of this page easier to read.</p>
+            <div class="grid md:grid-cols-2 gap-4 mt-6">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <h3 class="font-semibold mb-2 mt-0 flex items-center gap-2">
+                        <span class="bg-accent/10 text-ink text-xs font-semibold px-2 py-1 rounded">Fan-out</span>
+                    </h3>
+                    <p class="text-sm text-clay/70 mb-0">Split a big job into independent pieces and run them at the same time, then merge. Like handing 50 documents to 50 researchers at once. Fast; uses the most compute. Best when the pieces don't depend on each other.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <h3 class="font-semibold mb-2 mt-0 flex items-center gap-2">
+                        <span class="bg-accent/10 text-ink text-xs font-semibold px-2 py-1 rounded">Pipeline</span>
+                    </h3>
+                    <p class="text-sm text-clay/70 mb-0">A fixed sequence where each step feeds the next: draft, then translate, then proofread. Linear and easy to trace, so you can see exactly where something went wrong. Slower than running in parallel.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <h3 class="font-semibold mb-2 mt-0 flex items-center gap-2">
+                        <span class="bg-accent/10 text-ink text-xs font-semibold px-2 py-1 rounded">Adversarial-verify</span>
+                    </h3>
+                    <p class="text-sm text-clay/70 mb-0">One agent produces an answer; a different agent (or a human) tries to poke holes in it against explicit criteria before it's trusted. It works only if the checker is genuinely independent and pulls its own fresh evidence. A refutation pass with no new evidence is theater.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <h3 class="font-semibold mb-2 mt-0 flex items-center gap-2">
+                        <span class="bg-accent/10 text-ink text-xs font-semibold px-2 py-1 rounded">Loop-until-dry</span>
+                    </h3>
+                    <p class="text-sm text-clay/70 mb-0">Keep trying until a condition is met or there's nothing left to find: try the live URL, fall back to an archive, confirm a usable copy exists, then stop. Set a stopping rule so it doesn't loop forever or chase diminishing returns.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- IRL examples -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-2">How it works in real life</h2>
+            <p class="text-clay/80">These are documented, real efforts &mdash; not hypotheticals. Each one already follows the assignment-desk shape. The sources are linked; treat any vendor accuracy figures as starting points to verify, not settled facts.</p>
+
+            <h3 class="font-display text-xl font-semibold mb-3 mt-8">Investigation at scale</h3>
+            <div class="space-y-4">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start justify-between gap-3 mb-1">
+                        <h4 class="font-semibold m-0">Panama &amp; Pandora Papers + Datashare</h4>
+                        <span class="bg-accent/10 text-ink text-[11px] font-semibold px-2 py-1 rounded whitespace-nowrap">Fan-out + verify</span>
+                    </div>
+                    <p class="text-xs text-clay/60 mb-2">ICIJ &middot; 2016&ndash;2021</p>
+                    <p class="text-sm text-clay/70 mb-2">ICIJ ran OCR and named-entity recognition over roughly 11.5M (Panama) and 11.9M (Pandora) leaked files with its open-source Datashare tool to auto-detect people, organizations, and places, then mapped the relationships in a graph database.</p>
+                    <p class="text-sm text-clay/70 mb-2"><strong>The shape:</strong> millions of documents split for parallel extraction; reporters in dozens of countries confirm entities against public records before publishing; the graph is the merge step that links per-document findings into one deduplicated network.</p>
+                    <a href="https://www.icij.org/inside-icij/2019/11/what-is-datashare-frequently-asked-questions-about-our-document-analysis-software/" target="_blank" rel="noopener noreferrer" class="text-accentDark text-sm underline underline-offset-2">ICIJ on Datashare &rarr;</a>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start justify-between gap-3 mb-1">
+                        <h4 class="font-semibold m-0">Hidden Spy Planes</h4>
+                        <span class="bg-accent/10 text-ink text-[11px] font-semibold px-2 py-1 rounded whitespace-nowrap">Fan-out + verify</span>
+                    </div>
+                    <p class="text-xs text-clay/60 mb-2">BuzzFeed News (Peter Aldhous) &middot; 2017</p>
+                    <p class="text-sm text-clay/70 mb-2">A machine-learning classifier trained on the flight patterns of known FBI and DHS planes scored about 20,000 aircraft from four months of flight data, flagging roughly 69 candidate surveillance planes. The code and data were open-sourced.</p>
+                    <p class="text-sm text-clay/70 mb-2"><strong>The shape:</strong> the model scores every plane independently; reporters then cross-check FAA registration, shell-company ownership, and flight behavior to confirm each hit before naming it.</p>
+                    <a href="https://www.buzzfeednews.com/article/peteraldhous/hidden-spy-planes" target="_blank" rel="noopener noreferrer" class="text-accentDark text-sm underline underline-offset-2">BuzzFeed News &rarr;</a>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start justify-between gap-3 mb-1">
+                        <h4 class="font-semibold m-0">Algorithm audits (Citizen Browser, Allstate)</h4>
+                        <span class="bg-accent/10 text-ink text-[11px] font-semibold px-2 py-1 rounded whitespace-nowrap">Fan-out + verify</span>
+                    </div>
+                    <p class="text-xs text-clay/60 mb-2">The Markup (Allstate work with Consumer Reports) &middot; 2020&ndash;2021</p>
+                    <p class="text-sm text-clay/70 mb-2">The Markup analyzed feed data from a paid panel of 1,000+ Facebook users to see what different demographics were shown, and separately analyzed pricing for about 93,000 Allstate policyholders in Maryland to expose a discriminatory pricing scheme.</p>
+                    <p class="text-sm text-clay/70 mb-2"><strong>The shape:</strong> automated analysis across many sampled units, then a rigorous verify stage &mdash; published methodology, independent re-runs by data scientists, and outside-expert review before publication.</p>
+                    <a href="https://themarkup.org/citizen-browser" target="_blank" rel="noopener noreferrer" class="text-accentDark text-sm underline underline-offset-2">The Markup &rarr;</a>
+                </div>
+            </div>
+
+            <h3 class="font-display text-xl font-semibold mb-3 mt-8">Production at scale</h3>
+            <div class="space-y-4">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start justify-between gap-3 mb-1">
+                        <h4 class="font-semibold m-0">Automated earnings and sports coverage</h4>
+                        <span class="bg-accent/10 text-ink text-[11px] font-semibold px-2 py-1 rounded whitespace-nowrap">Fan-out</span>
+                    </div>
+                    <p class="text-xs text-clay/60 mb-2">Associated Press (with Automated Insights) &middot; 2014&ndash;2016</p>
+                    <p class="text-sm text-clay/70 mb-2">AP used natural-language generation to turn structured earnings data into stories, scaling quarterly coverage roughly tenfold &mdash; from about 300 to several thousand stories per quarter &mdash; and later extended it to minor-league baseball recaps.</p>
+                    <p class="text-sm text-clay/70 mb-2"><strong>The shape:</strong> one generation step produces a draft per item (each filing, each box score) in parallel; verification is built in as templates plus source-data validation, with editors spot-checking and a disclosure line as the audit trail. The pattern works even when the per-item agent is template generation, not a chatbot.</p>
+                    <a href="https://www.poynter.org/reporting-editing/2015/robot-writing-increased-aps-earnings-stories-by-tenfold/" target="_blank" rel="noopener noreferrer" class="text-accentDark text-sm underline underline-offset-2">Poynter &rarr;</a>
+                </div>
+            </div>
+
+            <h3 class="font-display text-xl font-semibold mb-3 mt-8">Verification &amp; fact-checking</h3>
+            <div class="space-y-4">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start justify-between gap-3 mb-1">
+                        <h4 class="font-semibold m-0">AI claim detection and matching</h4>
+                        <span class="bg-accent/10 text-ink text-[11px] font-semibold px-2 py-1 rounded whitespace-nowrap">Fan-out + human verify</span>
+                    </div>
+                    <p class="text-xs text-clay/60 mb-2">Full Fact (UK) &middot; 2016&ndash;present</p>
+                    <p class="text-sm text-clay/70 mb-2">A classifier spots check-worthy claims across news, TV subtitles, and social media at firehose scale, and a separate model flags when an already-debunked claim resurfaces even reworded. The AI surfaces candidates; human fact-checkers write the verdict. Used by 45+ organizations across 30 countries.</p>
+                    <p class="text-sm text-clay/70 mb-2"><strong>The shape:</strong> detection parallelizes across hundreds of thousands of sentences, but nothing publishes until a skeptical human confirms or refutes each flag. The mandatory human challenge is the guardrail.</p>
+                    <a href="https://fullfact.org/ai/" target="_blank" rel="noopener noreferrer" class="text-accentDark text-sm underline underline-offset-2">Full Fact &rarr;</a>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start justify-between gap-3 mb-1">
+                        <h4 class="font-semibold m-0">Squash and Tech &amp; Check</h4>
+                        <span class="bg-accent/10 text-ink text-[11px] font-semibold px-2 py-1 rounded whitespace-nowrap">Pipeline + verify</span>
+                    </div>
+                    <p class="text-xs text-clay/60 mb-2">Duke Reporters' Lab &middot; 2016&ndash;present</p>
+                    <p class="text-sm text-clay/70 mb-2">Tech &amp; Check runs a claim-spotting model over transcripts and emails journalists a daily list of check-worthy claims. Squash transcribes live political speeches and instantly matches spoken claims against a database of published human fact-checks, displaying matches on screen.</p>
+                    <p class="text-sm text-clay/70 mb-2"><strong>The shape:</strong> detection is cleanly separated from verification &mdash; a model proposes a claim, then a distinct layer must ground it in an independent corpus of human-vetted checks. It refuses to surface a verdict it cannot anchor.</p>
+                    <a href="https://reporterslab.org/tech-and-check/" target="_blank" rel="noopener noreferrer" class="text-accentDark text-sm underline underline-offset-2">Duke Reporters' Lab &rarr;</a>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start justify-between gap-3 mb-1">
+                        <h4 class="font-semibold m-0">InVID / WeVerify Verification Plugin</h4>
+                        <span class="bg-accent/10 text-ink text-[11px] font-semibold px-2 py-1 rounded whitespace-nowrap">Adversarial-verify</span>
+                    </div>
+                    <p class="text-xs text-clay/60 mb-2">InVID &amp; WeVerify consortia, maintained by AFP Medialab &middot; 2017&ndash;present</p>
+                    <p class="text-sm text-clay/70 mb-2">A browser plugin used by 50,000+ journalists and fact-checkers weekly: keyframe extraction, reverse image search across multiple engines, metadata analysis, forensic filters, and synthetic-media detection.</p>
+                    <p class="text-sm text-clay/70 mb-2"><strong>The shape:</strong> built for refutation. A journalist starts with a claim (&ldquo;this video shows event X today&rdquo;) and the tools hunt for evidence that disproves it &mdash; earlier copies, mismatched metadata, manipulation artifacts. Each check is a fresh challenge to the original claim.</p>
+                    <a href="https://github.com/AFP-Medialab/verification-plugin" target="_blank" rel="noopener noreferrer" class="text-accentDark text-sm underline underline-offset-2">Verification Plugin (GitHub) &rarr;</a>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start justify-between gap-3 mb-1">
+                        <h4 class="font-semibold m-0">Multi-agent debate fact-checking</h4>
+                        <span class="bg-accent/10 text-ink text-[11px] font-semibold px-2 py-1 rounded whitespace-nowrap">Adversarial-verify</span>
+                    </div>
+                    <p class="text-xs text-clay/60 mb-2">Academic research groups (arXiv) &middot; 2025&ndash;2026</p>
+                    <p class="text-sm text-clay/70 mb-2">Research frameworks where two agents take opposing stances &mdash; one affirming, one refuting a claim &mdash; over several rounds while a moderator renders a verdict. Some add per-agent evidence retrieval. Published results show the debate setup corrects single-model errors.</p>
+                    <p class="text-sm text-clay/70 mb-2"><strong>The shape:</strong> the most literal version of adversarial-verify &mdash; one agent argues a claim is true, a second is tasked specifically with refuting it, a third adjudicates. Direct evidence that a separate refuting agent reduces error, especially when it retrieves its own evidence. (Preprint; not yet peer-reviewed.)</p>
+                    <a href="https://arxiv.org/abs/2507.19090" target="_blank" rel="noopener noreferrer" class="text-accentDark text-sm underline underline-offset-2">arXiv preprint &rarr;</a>
+                </div>
+            </div>
+
+            <h3 class="font-display text-xl font-semibold mb-3 mt-8">Research &amp; academia</h3>
+            <div class="space-y-4">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start justify-between gap-3 mb-1">
+                        <h4 class="font-semibold m-0">Systematic literature review</h4>
+                        <span class="bg-accent/10 text-ink text-[11px] font-semibold px-2 py-1 rounded whitespace-nowrap">Fan-out + verify</span>
+                    </div>
+                    <p class="text-xs text-clay/60 mb-2">Elicit &middot; 2023&ndash;2026</p>
+                    <p class="text-sm text-clay/70 mb-2">An AI research assistant that runs the systematic-review pipeline end to end: takes a research question, screens large paper sets, and extracts structured data into a table, with a supporting quote and citation attached to every answer. The company reports high screening recall benchmarked against hundreds of Cochrane reviews.</p>
+                    <p class="text-sm text-clay/70 mb-2"><strong>The shape:</strong> one query expands into thousands of parallel per-paper screening calls; each judgment ships with a verbatim quote and citation so a human can audit it. The quote-per-claim is the structural verification gate. (Accuracy figures are the vendor's own.)</p>
+                    <a href="https://elicit.com/blog/evaluating-elicit-slr" target="_blank" rel="noopener noreferrer" class="text-accentDark text-sm underline underline-offset-2">Elicit evaluation &rarr;</a>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start justify-between gap-3 mb-1">
+                        <h4 class="font-semibold m-0">AI Co-Scientist</h4>
+                        <span class="bg-accent/10 text-ink text-[11px] font-semibold px-2 py-1 rounded whitespace-nowrap">Fan-out + adversarial-verify</span>
+                    </div>
+                    <p class="text-xs text-clay/60 mb-2">Google DeepMind &middot; 2025&ndash;2026</p>
+                    <p class="text-sm text-clay/70 mb-2">A multi-agent system where specialized agents generate, debate, rank, and refine research hypotheses, spending most of the compute on verifying hypotheses rather than generating them. Validated on drug repurposing (30 candidates narrowed to 5 lab-tested) and published in Nature.</p>
+                    <p class="text-sm text-clay/70 mb-2"><strong>The shape:</strong> a generation agent proposes many hypotheses in parallel; a debate agent and a ranking tournament adversarially score and eliminate weak ones; an evolution loop refines the survivors. Verification is a dedicated agent role, not an afterthought.</p>
+                    <a href="https://deepmind.google/blog/co-scientist-a-multi-agent-ai-partner-to-accelerate-research/" target="_blank" rel="noopener noreferrer" class="text-accentDark text-sm underline underline-offset-2">Google DeepMind &rarr;</a>
+                </div>
+            </div>
+
+            <h3 class="font-display text-xl font-semibold mb-3 mt-8">Archiving &amp; link rot</h3>
+            <div class="space-y-4">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start justify-between gap-3 mb-1">
+                        <h4 class="font-semibold m-0">Dead-link repair at scale</h4>
+                        <span class="bg-accent/10 text-ink text-[11px] font-semibold px-2 py-1 rounded whitespace-nowrap">Loop-until-dry</span>
+                    </div>
+                    <p class="text-xs text-clay/60 mb-2">InternetArchiveBot, Internet Archive + Wikimedia &middot; 2016&ndash;present</p>
+                    <p class="text-sm text-clay/70 mb-2">A bot scans outbound links across Wikipedia, confirms a URL is actually dead before acting, then rewrites the citation to an archived snapshot. It has fixed roughly 6 million dead references; 9M+ Wikipedia URLs now point to archived copies.</p>
+                    <p class="text-sm text-clay/70 mb-2"><strong>The shape:</strong> probe each live URL; on confirmed failure, query archive providers for a usable snapshot; rewrite the citation only when a valid replacement is verified. The dead-link confirmation is a false-positive guard before the archive fallback.</p>
+                    <a href="https://meta.wikimedia.org/wiki/InternetArchiveBot/How_the_bot_fixes_broken_links" target="_blank" rel="noopener noreferrer" class="text-accentDark text-sm underline underline-offset-2">How the bot works &rarr;</a>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start justify-between gap-3 mb-1">
+                        <h4 class="font-semibold m-0">Link rot and content drift</h4>
+                        <span class="bg-accent/10 text-ink text-[11px] font-semibold px-2 py-1 rounded whitespace-nowrap">Verify at scale</span>
+                    </div>
+                    <p class="text-xs text-clay/60 mb-2">Harvard Library Innovation Lab, in Columbia Journalism Review &middot; 2021</p>
+                    <p class="text-sm text-clay/70 mb-2">Analyzed 553,693 New York Times articles (1996&ndash;2019) containing over 2.2M outbound links, finding widespread link rot (dead pages) and content drift (pages that still load but silently changed from what was cited).</p>
+                    <p class="text-sm text-clay/70 mb-2"><strong>The shape:</strong> a large automated verify pass over millions of URLs that compared current content against the original, not just HTTP status. The lesson: real verification checks whether the content still supports the claim, not just whether the link loads.</p>
+                    <a href="https://www.cjr.org/analysis/linkrot-content-drift-new-york-times.php" target="_blank" rel="noopener noreferrer" class="text-accentDark text-sm underline underline-offset-2">Columbia Journalism Review &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- What you could do -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">What you could do with it</h2>
+            <p class="text-clay/80">The same patterns map onto everyday newsroom and research jobs. These are drawn from tools and sites built at the <a href="https://centerforcooperativemedia.org" target="_blank" rel="noopener noreferrer" class="text-accentDark underline underline-offset-2">Center for Cooperative Media</a> and elsewhere &mdash; sorted by how much you need to know to try them.</p>
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden overflow-x-auto mt-6" tabindex="0" role="region" aria-label="Scrollable table">
+                <table class="w-full text-sm m-0">
+                    <thead>
+                        <tr class="bg-mist/10 border-b border-mist/30">
+                            <th class="text-left px-4 py-3 font-semibold">Job</th>
+                            <th class="text-left px-4 py-3 font-semibold">Pattern</th>
+                            <th class="text-left px-4 py-3 font-semibold">Real anchor</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-mist/20 text-clay/75">
+                        <tr><td class="px-4 py-3">Find what matters in a FOIA dump or document set</td><td class="px-4 py-3">Pipeline</td><td class="px-4 py-3">ICIJ Datashare; DocumentCloud</td></tr>
+                        <tr><td class="px-4 py-3">Research a topic, then prove or kill each finding</td><td class="px-4 py-3">Sweep + adversarial-verify</td><td class="px-4 py-3">Anthropic research system</td></tr>
+                        <tr><td class="px-4 py-3">Recover dead links and rebuild an archive</td><td class="px-4 py-3">Loop-until-dry</td><td class="px-4 py-3">InternetArchiveBot; the Jay Rosen archive</td></tr>
+                        <tr><td class="px-4 py-3">Audit a whole site for accessibility and broken metadata</td><td class="px-4 py-3">Dimensions + verify</td><td class="px-4 py-3">CCM tool sites</td></tr>
+                        <tr><td class="px-4 py-3">Publish civic information in 10+ languages</td><td class="px-4 py-3">Fan-out + per-language check</td><td class="px-4 py-3">ReRoute NJ; NJ News Commons translation API</td></tr>
+                        <tr><td class="px-4 py-3">Turn a backlog of meetings into action items</td><td class="px-4 py-3">Pipeline</td><td class="px-4 py-3">Transcript pipelines</td></tr>
+                        <tr><td class="px-4 py-3">Watch many feeds and surface only what needs a human</td><td class="px-4 py-3">Loop-until-dry</td><td class="px-4 py-3">NJ News Wire aggregation</td></tr>
+                        <tr><td class="px-4 py-3">Map who's connected to whom (funders, sources)</td><td class="px-4 py-3">Sweep + dedupe</td><td class="px-4 py-3">NJCIC grantees map; CCM stakeholder map</td></tr>
+                        <tr><td class="px-4 py-3">Keep a course or skill library from going stale</td><td class="px-4 py-3">Fan-out + completeness critic</td><td class="px-4 py-3">The Knight Center MOOC</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Case study -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-2">Case study: the run that built this page</h2>
+            <p class="text-clay/80">The real-world examples above weren't pulled from memory. They came from an actual workflow &mdash; the research-and-synthesis pattern &mdash; run while this page was being written. Here's exactly what happened, because the run is a cleaner teaching example than any diagram.</p>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 my-6">
+                <div class="bg-white rounded-xl p-4 border border-mist/30 text-center">
+                    <div class="font-display text-3xl font-bold text-accentDark">11</div>
+                    <div class="text-xs text-clay/60 mt-1">agents spawned</div>
+                </div>
+                <div class="bg-white rounded-xl p-4 border border-mist/30 text-center">
+                    <div class="font-display text-3xl font-bold text-accentDark">~13.5</div>
+                    <div class="text-xs text-clay/60 mt-1">minutes, start to finish</div>
+                </div>
+                <div class="bg-white rounded-xl p-4 border border-mist/30 text-center">
+                    <div class="font-display text-3xl font-bold text-accentDark">~801K</div>
+                    <div class="text-xs text-clay/60 mt-1">tokens used</div>
+                </div>
+                <div class="bg-white rounded-xl p-4 border border-mist/30 text-center">
+                    <div class="font-display text-3xl font-bold text-accentDark">13</div>
+                    <div class="text-xs text-clay/60 mt-1">verified examples kept</div>
+                </div>
+            </div>
+
+            <h3 class="font-display text-xl font-semibold mb-3 mt-6">The three phases</h3>
+            <ol class="text-clay/80">
+                <li><strong>Research (5 agents, in parallel).</strong> One agent per domain &mdash; investigative documents, fact-checking, multi-agent practice, academic research, archiving. Each was told to use web search, confirm facts, and return findings in a fixed structure with a real source URL for every example.</li>
+                <li><strong>Verify (5 skeptic agents, one per domain).</strong> As soon as a domain's research finished, a separate skeptic agent re-checked each example against fresh web searches and dropped or corrected anything it couldn't confirm. This ran as a <em>pipeline</em>, not a barrier &mdash; the fact-checking domain could be under verification while the archiving domain was still researching, so no agent sat idle.</li>
+                <li><strong>Synthesize (1 agent).</strong> A final agent merged all the verified findings, removed duplicates, and produced the intro, the example set, the patterns, and the cautions &mdash; as structured data, not prose to be re-parsed.</li>
+            </ol>
+
+            <h3 class="font-display text-xl font-semibold mb-3 mt-6">What the verify pass actually caught</h3>
+            <p class="text-clay/80">This is the part worth dwelling on. The skeptic agents weren't decoration. Forcing each example to survive an independent second search is why the figures on this page are sourced and hedged (&ldquo;the vendor's own number,&rdquo; &ldquo;preprint, not peer-reviewed&rdquo;) rather than confidently wrong. The run practiced the exact adversarial-verify pattern the page recommends.</p>
+
+            <h3 class="font-display text-xl font-semibold mb-3 mt-6">What it looks like in code</h3>
+            <p class="text-clay/80">You don't write this by hand to use it &mdash; you describe the job and the script is generated. But seeing the shape demystifies it. This is the core of the actual script, trimmed:</p>
+            <pre tabindex="0" role="region" aria-label="Scrollable code sample"><code>// one research agent per domain, each verified as soon as it finishes
+const results = await pipeline(
+  DOMAINS,
+  (d) =&gt; agent(d.researchPrompt, { schema: FINDINGS }),        // research
+  (findings) =&gt; agent(`Skeptically re-check each example via
+                       web search; drop what you can't confirm:
+                       ${findings}`, { schema: FINDINGS })       // verify
+)
+
+// merge everything, dedupe, write the structured brief
+const brief = await agent(`Synthesize: ${results}`, { schema: PAGE })</code></pre>
+            <p class="text-clay/70 text-sm">Three ideas do all the work: <code>agent()</code> spawns one worker; <code>pipeline()</code> pushes each item through research-then-verify without waiting for the slowest; <code>schema</code> forces clean, structured data back instead of free text. That's the whole assignment desk.</p>
+        </section>
+
+        <!-- Two more runs -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-2">Two more runs, on newsroom-shaped tasks</h2>
+            <p class="text-clay/80">To show the pattern doing work an editor would recognize, two more workflows ran live while this page was being written &mdash; together as one job: 12 agents, under four minutes. Both are deliberate dogfooding. One fact-checks claims about the examples on this very page; the other audits live pages on this very site.</p>
+
+            <h3 class="font-display text-xl font-semibold mb-3 mt-8">Run 2 &mdash; a fact-check fan-out</h3>
+            <p class="text-clay/80">Four claims, each researched and rated on a verdict scale, then handed to a <em>separate</em> skeptic agent told to refute the rating using its own fresh searches. All four ratings held up &mdash; and the pass correctly failed the two false claims rather than rubber-stamping them.</p>
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden overflow-x-auto mt-4" tabindex="0" role="region" aria-label="Scrollable table">
+                <table class="w-full text-sm m-0">
+                    <thead>
+                        <tr class="bg-mist/10 border-b border-mist/30">
+                            <th class="text-left px-4 py-3 font-semibold">Claim</th>
+                            <th class="text-left px-4 py-3 font-semibold">Verdict</th>
+                            <th class="text-left px-4 py-3 font-semibold">Held up?</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-mist/20 text-clay/75">
+                        <tr><td class="px-4 py-3">First Panama Papers stories published in 2016</td><td class="px-4 py-3"><span class="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">True</span></td><td class="px-4 py-3">Yes</td></tr>
+                        <tr><td class="px-4 py-3">AP automated earnings via Wordsmith around 2014</td><td class="px-4 py-3"><span class="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">True</span></td><td class="px-4 py-3">Yes</td></tr>
+                        <tr><td class="px-4 py-3">The Markup is a for-profit advertising company</td><td class="px-4 py-3"><span class="bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded">False</span></td><td class="px-4 py-3">Yes</td></tr>
+                        <tr><td class="px-4 py-3">Perma.cc is operated by the Internet Archive</td><td class="px-4 py-3"><span class="bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded">False</span></td><td class="px-4 py-3">Yes</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-clay/70 text-sm mt-3">The skeptic correctly established that The Markup is a nonprofit newsroom (acquired by CalMatters in 2024) and that Perma.cc is run by Harvard's Library Innovation Lab, with the Internet Archive only a preservation partner. The point isn't the four answers &mdash; it's that a second, independent agent had to fail to break each one before it was trusted.</p>
+
+            <h3 class="font-display text-xl font-semibold mb-3 mt-8">Run 3 &mdash; a live site audit</h3>
+            <p class="text-clay/80">Four published pages on this site, each checked on six criteria &mdash; Open Graph tags, Twitter card, favicon, image alt text, heading order, and external-link <code>rel="noopener"</code>. One agent per page, in parallel.</p>
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden overflow-x-auto mt-4" tabindex="0" role="region" aria-label="Scrollable table">
+                <table class="w-full text-sm m-0">
+                    <thead>
+                        <tr class="bg-mist/10 border-b border-mist/30">
+                            <th class="text-left px-4 py-3 font-semibold">Page</th>
+                            <th class="text-left px-4 py-3 font-semibold">Result</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-mist/20 text-clay/75">
+                        <tr><td class="px-4 py-3">fact-check-workflow</td><td class="px-4 py-3"><span class="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">6 / 6 pass</span></td></tr>
+                        <tr><td class="px-4 py-3">web-archiving</td><td class="px-4 py-3"><span class="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">6 / 6 pass</span></td></tr>
+                        <tr><td class="px-4 py-3">source-verification</td><td class="px-4 py-3"><span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded">2 warnings</span> &mdash; external links missing rel="noopener" (none open in new tabs)</td></tr>
+                        <tr><td class="px-4 py-3">data-journalism</td><td class="px-4 py-3"><span class="bg-orange-100 text-orange-800 text-xs font-semibold px-2 py-1 rounded">1 flag</span> &mdash; 3 external links missing rel="noopener" (low risk)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-clay/70 text-sm mt-3">This is the honest part: the audit found something. Two pages carry external links without <code>rel="noopener"</code> &mdash; low risk, since none open in a new tab, but a real inconsistency worth a follow-up. A four-minute parallel run surfaced it across the site without anyone reading four pages by hand. That's the whole case for the pattern, in miniature: it doesn't replace the editor, it hands the editor a shorter, sharper list.</p>
+        </section>
+
+        <!-- Cautions -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Honest cautions</h2>
+            <p class="text-clay/80">This pattern is powerful and oversold in equal measure. Read these before you pitch it to a newsroom or a dean.</p>
+            <div class="space-y-3 mt-6">
+                <div class="bg-white rounded-xl p-5 border-l-4 border-accent border border-mist/30">
+                    <p class="text-sm text-clay/75 mb-0"><strong>The AI step is triage, not the final word.</strong> In every credible example here, the machine narrows a haystack and a human (or a separate verification layer) decides what to trust and publish. None of these auto-publish unchecked AI output. Remove the verify stage and you have data science, not journalism.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border-l-4 border-accent border border-mist/30">
+                    <p class="text-sm text-clay/75 mb-0"><strong>Fan-out is expensive.</strong> Anthropic's own multi-agent research system uses roughly 15&times; the tokens of a normal chat, and token usage explained about 80% of its performance gain. It only pays off when the task genuinely parallelizes and quality matters more than cost. Start with the simplest approach; add agents only when the task needs it.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border-l-4 border-accent border border-mist/30">
+                    <p class="text-sm text-clay/75 mb-0"><strong>A checker can share the first agent's blind spots.</strong> An AI grading another AI can rubber-stamp the same mistake if both reason the same way. Real independence means a different model or a human, and a verifier that retrieves its own fresh evidence. A refutation pass with no new evidence is theater.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border-l-4 border-accent border border-mist/30">
+                    <p class="text-sm text-clay/75 mb-0"><strong>Verify content, not just that something technically worked.</strong> The NYT link-rot study found pages that load fine but silently changed from what was cited. A checker that only confirms a link returns 200-OK, or that an answer is well-formatted, will pass content that no longer supports the claim.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border-l-4 border-accent border border-mist/30">
+                    <p class="text-sm text-clay/75 mb-0"><strong>Don't use it for simple, ordered tasks.</strong> If a single prompt or a short pipeline does the job, adding agents adds cost, latency, and more places to break. The pattern earns its complexity on high-volume parallel work, or where an independent check measurably reduces error.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border-l-4 border-accent border border-mist/30">
+                    <p class="text-sm text-clay/75 mb-0"><strong>Benchmark figures usually come from the vendor.</strong> Several headline accuracy numbers here originate as a company's own claims, and several research results are preprints that haven't been peer-reviewed. Treat impressive percentages as starting points to verify, not settled facts.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border-l-4 border-accent border border-mist/30">
+                    <p class="text-sm text-clay/75 mb-0"><strong>The infrastructure can be fragile and centralized.</strong> Recovery and archiving workflows lean heavily on the Internet Archive as a single point of failure. Build in redundancy &mdash; query multiple sources &mdash; rather than assuming one provider is always up.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Composable skills -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">The skills that compose into workflows</h2>
+            <p class="text-clay/80">If a workflow is the assignment desk, these skills are the individual beats it dispatches. Each one is a focused instruction set; a workflow is what runs many of them across a corpus, with a verify pass on top.</p>
+            <div class="flex flex-wrap gap-2 mt-4">
+                <a href="../fact-check-workflow/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Fact-check workflow</a>
+                <a href="../source-verification/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Source verification</a>
+                <a href="../web-archiving/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Web archiving</a>
+                <a href="../digital-archive/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Digital archive</a>
+                <a href="../data-journalism/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Data journalism</a>
+                <a href="../foia-requests/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">FOIA requests</a>
+                <a href="../interview-transcription/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Interview transcription</a>
+                <a href="../editorial-workflow/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Editorial workflow</a>
+                <a href="../page-monitoring/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Page monitoring</a>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="text-center">
+            <div class="bg-gradient-to-br from-accent to-accentDark rounded-xl p-8 text-white">
+                <h2 class="font-display text-xl font-bold mb-3 mt-0">Machines narrow the haystack. People decide what's true.</h2>
+                <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
+                    A workflow is just that division of labor, made repeatable. Start simple, add a verify pass, and add agents only when the job earns it.
+                </p>
+                <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors" rel="noopener noreferrer">
+                    Browse the skills
+                    <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-mist/30 mt-12 relative z-10">
+        <div class="max-w-4xl mx-auto px-6 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-clay/80 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accentDark hover:text-accentDark underline underline-offset-2" rel="noopener noreferrer">Center for Cooperative Media</a>
+                </p>
+                <div class="flex items-center gap-6">
+                    <a href="../" class="text-clay/80 hover:text-ink text-sm transition-colors">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/80 hover:text-ink text-sm transition-colors" rel="noopener noreferrer">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
