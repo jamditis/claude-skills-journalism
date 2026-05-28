@@ -409,7 +409,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">What you could do with it</h2>
             <p class="text-clay/80">The same patterns map onto everyday newsroom and research jobs. These are drawn from tools and sites built at the <a href="https://centerforcooperativemedia.org" target="_blank" rel="noopener noreferrer" class="text-accentDark underline underline-offset-2">Center for Cooperative Media</a> and elsewhere &mdash; sorted by how much you need to know to try them.</p>
-            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden mt-6">
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden overflow-x-auto mt-6" tabindex="0" role="region" aria-label="Scrollable table">
                 <table class="w-full text-sm m-0">
                     <thead>
                         <tr class="bg-mist/10 border-b border-mist/30">
@@ -490,7 +490,7 @@ const brief = await agent(`Synthesize: ${results}`, { schema: PAGE })</code></pr
 
             <h3 class="font-display text-xl font-semibold mb-3 mt-8">Run 2 &mdash; a fact-check fan-out</h3>
             <p class="text-clay/80">Four claims, each researched and rated on a verdict scale, then handed to a <em>separate</em> skeptic agent told to refute the rating using its own fresh searches. All four ratings held up &mdash; and the pass correctly failed the two false claims rather than rubber-stamping them.</p>
-            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden mt-4">
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden overflow-x-auto mt-4" tabindex="0" role="region" aria-label="Scrollable table">
                 <table class="w-full text-sm m-0">
                     <thead>
                         <tr class="bg-mist/10 border-b border-mist/30">
@@ -511,7 +511,7 @@ const brief = await agent(`Synthesize: ${results}`, { schema: PAGE })</code></pr
 
             <h3 class="font-display text-xl font-semibold mb-3 mt-8">Run 3 &mdash; a live site audit</h3>
             <p class="text-clay/80">Four published pages on this site, each checked on six criteria &mdash; Open Graph tags, Twitter card, favicon, image alt text, heading order, and external-link <code>rel="noopener"</code>. One agent per page, in parallel.</p>
-            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden mt-4">
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden overflow-x-auto mt-4" tabindex="0" role="region" aria-label="Scrollable table">
                 <table class="w-full text-sm m-0">
                     <thead>
                         <tr class="bg-mist/10 border-b border-mist/30">
