@@ -190,10 +190,10 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">The one idea</h2>
             <p class="text-clay/80">
-                A workflow is an <strong>assignment desk</strong>, not a single reporter. Instead of asking one AI to do an entire job in one long conversation, you split the work across many narrow agents &mdash; each with one beat &mdash; then run an editor's pass over what they file. The shape is older than the technology: the most credible AI-assisted journalism, from the Panama Papers to The Markup's algorithm audits, already works this way. A machine does the high-volume first pass at scale, and a <strong>separate verification step</strong> decides what to actually trust before anything gets published.
+                A workflow is an <strong>assignment desk</strong>, not a single reporter. Instead of asking one AI to do an entire job in one long conversation, you split the work across many narrow agents &mdash; each with one beat &mdash; then run an editor's pass over what they file. The shape is older than the technology: the most credible AI-assisted journalism, from the Panama Papers to The Markup's algorithm audits, already works this way. A machine does the high-volume first pass at scale, and a <strong>separate verification step</strong> decides what to trust before anything gets published.
             </p>
             <p class="text-clay/80">
-                That second step is the whole game. &ldquo;The AI found it&rdquo; is not a finding. &ldquo;A separate agent tried to knock it down and couldn't&rdquo; is a method you can defend to an editor.
+                That second step is the difference. &ldquo;The AI found it&rdquo; is not a finding. &ldquo;A separate agent tried to knock it down and couldn't&rdquo; is a method you can defend to an editor.
             </p>
             <div class="bg-white rounded-xl p-5 border border-mist/30 mt-6">
                 <p class="text-sm text-clay/70 mb-0">
@@ -248,7 +248,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <h3 class="font-semibold mb-2 mt-0 flex items-center gap-2">
                         <span class="bg-accent/10 text-ink text-xs font-semibold px-2 py-1 rounded">Adversarial-verify</span>
                     </h3>
-                    <p class="text-sm text-clay/70 mb-0">One agent produces an answer; a different agent (or a human) tries to poke holes in it against explicit criteria before it's trusted. It works only if the checker is genuinely independent and pulls its own fresh evidence. A refutation pass with no new evidence is theater.</p>
+                    <p class="text-sm text-clay/70 mb-0">One agent produces an answer; a different agent (or a human) tries to poke holes in it against explicit criteria before it's trusted. It works only if the checker is genuinely independent and pulls its own fresh evidence &mdash; a refutation that adds nothing new proves nothing.</p>
                 </div>
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <h3 class="font-semibold mb-2 mt-0 flex items-center gap-2">
@@ -464,11 +464,11 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 <li><strong>Synthesize (1 agent).</strong> A final agent merged all the verified findings, removed duplicates, and produced the intro, the example set, the patterns, and the cautions &mdash; as structured data, not prose to be re-parsed.</li>
             </ol>
 
-            <h3 class="font-display text-xl font-semibold mb-3 mt-6">What the verify pass actually caught</h3>
-            <p class="text-clay/80">This is the part worth dwelling on. The skeptic agents weren't decoration. Forcing each example to survive an independent second search is why the figures on this page are sourced and hedged (&ldquo;the vendor's own number,&rdquo; &ldquo;preprint, not peer-reviewed&rdquo;) rather than confidently wrong. The run practiced the exact adversarial-verify pattern the page recommends.</p>
+            <h3 class="font-display text-xl font-semibold mb-3 mt-6">What the verify pass caught</h3>
+            <p class="text-clay/80">The skeptic agents weren't decoration. Forcing each example to survive an independent second search is why the figures on this page are sourced and hedged (&ldquo;the vendor's own number,&rdquo; &ldquo;preprint, not peer-reviewed&rdquo;) rather than confidently wrong. The run practiced the exact adversarial-verify pattern the page recommends.</p>
 
             <h3 class="font-display text-xl font-semibold mb-3 mt-6">What it looks like in code</h3>
-            <p class="text-clay/80">You don't write this by hand to use it &mdash; you describe the job and the script is generated. But seeing the shape demystifies it. This is the core of the actual script, trimmed:</p>
+            <p class="text-clay/80">You don't write this by hand to use it &mdash; you describe the job and the script is generated. But seeing the shape demystifies it. This is the core of the real script, trimmed:</p>
             <pre tabindex="0" role="region" aria-label="Scrollable code sample"><code>// one research agent per domain, each verified as soon as it finishes
 const results = await pipeline(
   DOMAINS,
@@ -480,13 +480,13 @@ const results = await pipeline(
 
 // merge everything, dedupe, write the structured brief
 const brief = await agent(`Synthesize: ${results}`, { schema: PAGE })</code></pre>
-            <p class="text-clay/70 text-sm">Three ideas do all the work: <code>agent()</code> spawns one worker; <code>pipeline()</code> pushes each item through research-then-verify without waiting for the slowest; <code>schema</code> forces clean, structured data back instead of free text. That's the whole assignment desk.</p>
+            <p class="text-clay/70 text-sm">Three ideas do all the work: <code>agent()</code> spawns one worker; <code>pipeline()</code> pushes each item through research-then-verify without waiting for the slowest; <code>schema</code> forces clean, structured data back instead of free text. That's the assignment desk, in code.</p>
         </section>
 
         <!-- Two more runs -->
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-2">Two more runs, on newsroom-shaped tasks</h2>
-            <p class="text-clay/80">To show the pattern doing work an editor would recognize, two more workflows ran live while this page was being written &mdash; together as one job: 12 agents, under four minutes. Both are deliberate dogfooding. One fact-checks claims about the examples on this very page; the other audits live pages on this very site.</p>
+            <p class="text-clay/80">To show the pattern doing work an editor would recognize, two more workflows ran live while this page was being written &mdash; together as one job: 12 agents, under four minutes. Both deliberately turn the tool on its own work. One fact-checks claims about the examples on this very page; the other audits live pages on this very site.</p>
 
             <h3 class="font-display text-xl font-semibold mb-3 mt-8">Run 2 &mdash; a fact-check fan-out</h3>
             <p class="text-clay/80">Four claims, each researched and rated on a verdict scale, then handed to a <em>separate</em> skeptic agent told to refute the rating using its own fresh searches. All four ratings held up &mdash; and the pass correctly failed the two false claims rather than rubber-stamping them.</p>
@@ -507,7 +507,7 @@ const brief = await agent(`Synthesize: ${results}`, { schema: PAGE })</code></pr
                     </tbody>
                 </table>
             </div>
-            <p class="text-clay/70 text-sm mt-3">The skeptic correctly established that The Markup is a nonprofit newsroom (acquired by CalMatters in 2024) and that Perma.cc is run by Harvard's Library Innovation Lab, with the Internet Archive only a preservation partner. The point isn't the four answers &mdash; it's that a second, independent agent had to fail to break each one before it was trusted.</p>
+            <p class="text-clay/70 text-sm mt-3">The skeptic correctly established that The Markup is a nonprofit newsroom (acquired by CalMatters in 2024) and that Perma.cc is run by Harvard's Library Innovation Lab, with the Internet Archive only a preservation partner. The four answers aren't the point &mdash; the method is. A second, independent agent had to fail to break each one before it was trusted.</p>
 
             <h3 class="font-display text-xl font-semibold mb-3 mt-8">Run 3 &mdash; a live site audit</h3>
             <p class="text-clay/80">Four published pages on this site, each checked on six criteria &mdash; Open Graph tags, Twitter card, favicon, image alt text, heading order, and external-link <code>rel="noopener"</code>. One agent per page, in parallel.</p>
@@ -527,13 +527,13 @@ const brief = await agent(`Synthesize: ${results}`, { schema: PAGE })</code></pr
                     </tbody>
                 </table>
             </div>
-            <p class="text-clay/70 text-sm mt-3">This is the honest part: the audit found something. Two pages carry external links without <code>rel="noopener"</code> &mdash; low risk, since none open in a new tab, but a real inconsistency worth a follow-up. A four-minute parallel run surfaced it across the site without anyone reading four pages by hand. That's the whole case for the pattern, in miniature: it doesn't replace the editor, it hands the editor a shorter, sharper list.</p>
+            <p class="text-clay/70 text-sm mt-3">This is the honest part: the audit found something. Two pages carry external links without <code>rel="noopener"</code> &mdash; low risk, since none open in a new tab, but a real inconsistency worth a follow-up. A four-minute parallel run surfaced it across the site without anyone reading four pages by hand. That's the case for the pattern in one example: it doesn't replace the editor, it hands the editor a shorter, sharper list.</p>
         </section>
 
         <!-- Cautions -->
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Honest cautions</h2>
-            <p class="text-clay/80">This pattern is powerful and oversold in equal measure. Read these before you pitch it to a newsroom or a dean.</p>
+            <p class="text-clay/80">This pattern is as oversold as it is useful. Read these before you pitch it to a newsroom or a dean.</p>
             <div class="space-y-3 mt-6">
                 <div class="bg-white rounded-xl p-5 border-l-4 border-accent border border-mist/30">
                     <p class="text-sm text-clay/75 mb-0"><strong>The AI step is triage, not the final word.</strong> In every credible example here, the machine narrows a haystack and a human (or a separate verification layer) decides what to trust and publish. None of these auto-publish unchecked AI output. Remove the verify stage and you have data science, not journalism.</p>
