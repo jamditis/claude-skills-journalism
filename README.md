@@ -10,6 +10,7 @@ Setup and workflow guides, separate from the skills themselves:
 
 | Guide | Description |
 |-------|-------------|
+| [Multi-agent workflows](https://skills.amditis.tech/workflows/) | Plain-language guide to running many AI agents on one job — fan-out, pipeline, and adversarial-verify patterns, with real examples from ICIJ, The Markup, Full Fact, and Elicit, plus honest cautions |
 | [Persistent sessions](https://skills.amditis.tech/persistent-sessions/) | Keep Claude Code sessions alive through disconnects using tmux — setup, key bindings, activity notifications, and scheduler coexistence |
 
 ## What are Claude skills?
@@ -22,11 +23,11 @@ Skills are modular instruction sets that extend Claude's capabilities for specia
 
 ### Plugins (recommended)
 
-Plugins give you slash commands you can run directly inside Claude Code. Run these two commands in your terminal:
+Plugins give you slash commands you can run directly inside Claude Code. Run these two commands inside a Claude Code session:
 
 ```
-claude plugin marketplace add https://github.com/jamditis/claude-skills-journalism
-claude plugin install pdf-playground@claude-skills-journalism
+/plugin marketplace add jamditis/claude-skills-journalism
+/plugin install pdf-playground@claude-skills-journalism
 ```
 
 Then restart Claude Code (close and reopen). See the [PDF Playground README](./pdf-playground/) for detailed setup instructions and troubleshooting.
@@ -315,6 +316,7 @@ Quick version: fork, create your skill with a `SKILL.md` frontmatter file, test 
 - [Anthropic official skills](https://github.com/anthropics/skills)
 - [Claude Code documentation](https://docs.anthropic.com/claude-code)
 - [Agent Skills Standard](http://agentskills.io)
+- [autopunk-media-skills](https://github.com/ur-grue/autopunk-media-skills) — broadcast, TV, podcast, and radio production skills; complements this repo's investigative focus. Free library, paired with a paid product ([autopunk.io](https://autopunk.io))
 - [NICAR (Investigative Reporters & Editors)](https://www.ire.org/nicar/)
 - [First Draft News](https://firstdraftnews.org/)
 - [Verification Handbook](https://verificationhandbook.com/)
