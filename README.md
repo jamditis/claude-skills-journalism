@@ -316,6 +316,7 @@ Quick version: fork, create your skill with a `SKILL.md` frontmatter file, test 
 - [Anthropic official skills](https://github.com/anthropics/skills)
 - [Claude Code documentation](https://docs.anthropic.com/claude-code)
 - [Agent Skills Standard](http://agentskills.io)
+- [autopunk-media-skills](https://github.com/ur-grue/autopunk-media-skills) — broadcast, TV, podcast, and radio production skills; complements this repo's investigative focus. Free library, paired with a paid product ([autopunk.io](https://autopunk.io))
 - [NICAR (Investigative Reporters & Editors)](https://www.ire.org/nicar/)
 - [First Draft News](https://firstdraftnews.org/)
 - [Verification Handbook](https://verificationhandbook.com/)
