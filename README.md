@@ -155,7 +155,7 @@ These four skills ship together as the [security-toolkit](./security-toolkit/) p
 
 ## Hooks
 
-Hooks are automated checks that run at specific points in your workflow. All hooks are **non-blocking warnings**—they provide guidance but don't prevent actions.
+Hooks are automated checks that run at specific points in your workflow. Most are **non-blocking warnings**, but two — `one-way-door-check` and `enforce-test-first` — block intentionally until you resolve them.
 
 ### Writing quality hooks
 
