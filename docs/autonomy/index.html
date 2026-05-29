@@ -244,6 +244,7 @@
       transition: color 0.12s, border-color 0.12s;
     }
     .prompt-card__copy:hover, .prompt-card__copy.copied { color: var(--accent); border-color: var(--accent); }
+    .prompt-card__copy.copy-failed { color: var(--text); border-color: var(--text-dim); }
     .prompt-card__body { padding: 16px; font-size: 13.5px; line-height: 1.62; color: var(--text); }
 
     /* ---------- Data table ---------- */
@@ -904,8 +905,6 @@ flowchart TD
 <!-- ---------- Zoom / pan / expand ---------- -->
 <script>
   (function () {
-    var pageBg = getComputedStyle(document.body).backgroundColor || '#ffffff';
-
     document.querySelectorAll('.mermaid-wrap').forEach(function (wrap) {
       var vp = wrap.querySelector('.mermaid-viewport');
       var scale = 1, panX = 0, panY = 0, dragging = false, sx = 0, sy = 0;
@@ -919,13 +918,15 @@ flowchart TD
       wrap.querySelector('[data-action="expand"]').addEventListener('click', function () {
         var svg = wrap.querySelector('.mermaid svg');
         if (!svg) return;
+        var bg = getComputedStyle(document.body).backgroundColor || '#ffffff';
         var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Diagram</title>' +
-          '<style>html,body{margin:0;height:100%;background:' + pageBg + ';}' +
+          '<style>html,body{margin:0;height:100%;background:' + bg + ';}' +
           'body{display:grid;place-items:center;padding:24px;box-sizing:border-box;}' +
           'svg{max-width:100%;height:auto;}</style></head><body>' + svg.outerHTML + '</body></html>';
         var url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
         var w = window.open(url, '_blank');
         if (w) { setTimeout(function () { URL.revokeObjectURL(url); }, 30000); }
+        else { URL.revokeObjectURL(url); }
       });
 
       wrap.addEventListener('wheel', function (e) {
@@ -967,7 +968,8 @@ flowchart TD
           if (match) {
             match.link.classList.add('active');
             if (window.innerWidth <= 1000) {
-              match.link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+              var smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+              match.link.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'nearest', inline: 'center' });
             }
           }
         }
@@ -987,15 +989,29 @@ flowchart TD
         var body = card.querySelector('.prompt-card__body');
         if (!body) return;
         var text = body.textContent.trim();
+        var reset = function () { btn.textContent = 'copy'; btn.classList.remove('copied', 'copy-failed'); };
         var done = function () {
           btn.textContent = 'copied';
           btn.classList.add('copied');
-          setTimeout(function () { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 1600);
+          setTimeout(reset, 1600);
+        };
+        var fail = function () {
+          // Clipboard write failed or unavailable: select the prompt so the reader can copy it by hand.
+          try {
+            var range = document.createRange();
+            range.selectNodeContents(body);
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+          } catch (e) {}
+          btn.textContent = 'press ⌘/Ctrl+C';
+          btn.classList.add('copy-failed');
+          setTimeout(reset, 2600);
         };
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text).then(done, done);
+          navigator.clipboard.writeText(text).then(done, fail);
         } else {
-          done();
+          fail();
         }
       });
     });
