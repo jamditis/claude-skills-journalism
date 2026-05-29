@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -103,6 +103,7 @@
     }
     .toc a:hover { color: var(--text-bright); }
     .toc a.active { color: var(--accent); font-weight: 700; }
+    .toc-toggle { display: none; }
 
     /* ---------- Theme toggle ---------- */
     .theme-toggle {
@@ -172,6 +173,16 @@
     .mermaid-viewport { transform-origin: 0 0; transition: transform 0.08s ease; }
     .mermaid-viewport.dragging { transition: none; }
     .mermaid { font-family: var(--font-body); }
+
+    /* ---------- Wake sample (redacted Telegram handoff) ---------- */
+    .wake-sample { border: 1px solid var(--ink); background: var(--surface); margin: 4px 0 0; }
+    .wake-sample__head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 16px; border-bottom: 1px solid var(--border); }
+    .wake-sample__app { font-family: var(--font-mono); font-size: 12px; font-weight: 500; color: var(--text-bright); letter-spacing: 0.03em; }
+    .wake-sample__tag { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-dim); }
+    .wake-sample__body { padding: 15px 16px; font-size: 14px; line-height: 1.62; color: var(--text); }
+    .wake-sample__body p { margin: 0 0 11px; }
+    .wake-sample__foot { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); margin: 0; padding-top: 11px; border-top: 1px solid var(--border); }
+    .rd { font-family: var(--font-mono); font-size: 0.86em; color: var(--text-dim); background: var(--surface-2); border: 1px solid var(--border); padding: 0 5px; white-space: nowrap; }
 
     /* ---------- Legend ---------- */
     .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; padding: 11px 14px; margin-top: 0; border: 1px solid var(--border); border-top: none; font-size: 11.5px; color: var(--text-dim); }
@@ -287,20 +298,38 @@
       body { padding: 0 22px; }
       .wrap { grid-template-columns: 1fr; gap: 0; }
       .main { max-width: none; }
+
+      /* Collapsible hamburger nav */
       .toc {
         position: sticky; top: 0; z-index: 200; max-height: none; grid-row: auto;
-        display: flex; gap: 2px; align-items: center; overflow-x: auto; -webkit-overflow-scrolling: touch;
-        background: var(--bg); border-bottom: 1px solid var(--ink); margin: 0 -22px; padding: 10px 22px;
+        display: block; padding: 0; overflow: visible;
+        background: var(--bg); border-bottom: 1px solid var(--ink); margin: 0 -22px;
       }
-      .toc::-webkit-scrollbar { display: none; }
-      .toc-title { display: none; }
-      .toc a { white-space: nowrap; flex-shrink: 0; border-left: none; border-bottom: 2px solid transparent; padding: 6px 10px; }
-      .toc a.active { border-left: none; border-bottom-color: var(--accent); }
-      .sec-head { scroll-margin-top: 56px; margin-top: 64px; }
+      .toc-bar { display: flex; align-items: center; justify-content: space-between; padding: 11px 22px; }
+      .toc-title { display: block; border-bottom: none; padding: 0; margin: 0; }
+      .toc-toggle {
+        display: flex; align-items: center; justify-content: center; width: 36px; height: 36px;
+        background: var(--surface); border: 1px solid var(--ink); color: var(--text-bright); cursor: pointer;
+      }
+      .toc-toggle .ic-close { display: none; }
+      .toc-toggle[aria-expanded="true"] .ic-menu { display: none; }
+      .toc-toggle[aria-expanded="true"] .ic-close { display: block; }
+      .toc-links {
+        display: none; position: absolute; top: 100%; left: 0; right: 0;
+        background: var(--bg); border-bottom: 1px solid var(--ink);
+        max-height: 72dvh; overflow-y: auto; padding: 4px 0;
+        box-shadow: 0 16px 32px rgba(0,0,0,0.20);
+      }
+      .toc.open .toc-links { display: block; }
+      .toc-links a { padding: 12px 22px; border-bottom: 1px solid var(--border); line-height: 1.3; }
+      .toc-links a:last-child { border-bottom: none; }
+
+      .sec-head { scroll-margin-top: 64px; margin-top: 64px; }
       .hero { padding: 44px 0 24px; }
       .lanes { grid-template-columns: 1fr; }
       .lane { border-right: none; border-bottom: 1px solid var(--border); }
       .pipeline__step { min-width: 200px; }
+      .mermaid-wrap { min-height: 180px; padding: 16px 10px; }
       .theme-toggle { bottom: 14px; right: 14px; }
     }
   </style>
@@ -315,18 +344,26 @@
 <div class="wrap">
 
   <nav class="toc" id="toc" aria-label="Table of contents">
-    <div class="toc-title">Contents</div>
-    <a href="#s1">01 &nbsp;The big loop</a>
-    <a href="#s2">02 &nbsp;When sessions wake up</a>
-    <a href="#s3">03 &nbsp;What each session is told</a>
-    <a href="#s4">04 &nbsp;Hands-on sessions</a>
-    <a href="#s5">05 &nbsp;Three models, one change</a>
-    <a href="#s6">06 &nbsp;Issues are the to-do list</a>
-    <a href="#s7">07 &nbsp;Worktrees</a>
-    <a href="#s8">08 &nbsp;Who does what</a>
-    <a href="#s9">09 &nbsp;Context &amp; compaction</a>
-    <a href="#s10">10 &nbsp;Steal this</a>
-    <a href="#s11">11 &nbsp;Prompts you can borrow</a>
+    <div class="toc-bar">
+      <div class="toc-title">Contents</div>
+      <button class="toc-toggle" id="tocToggle" type="button" aria-expanded="false" aria-controls="tocLinks" aria-label="Open contents menu">
+        <svg class="ic-menu" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        <svg class="ic-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="toc-links" id="tocLinks">
+      <a href="#s1">01 &nbsp;The big loop</a>
+      <a href="#s2">02 &nbsp;When sessions wake up</a>
+      <a href="#s3">03 &nbsp;What each session is told</a>
+      <a href="#s4">04 &nbsp;Hands-on sessions</a>
+      <a href="#s5">05 &nbsp;Three models, one change</a>
+      <a href="#s6">06 &nbsp;Issues are the to-do list</a>
+      <a href="#s7">07 &nbsp;Worktrees</a>
+      <a href="#s8">08 &nbsp;Who does what</a>
+      <a href="#s9">09 &nbsp;Context &amp; compaction</a>
+      <a href="#s10">10 &nbsp;Steal this</a>
+      <a href="#s11">11 &nbsp;Prompts you can borrow</a>
+    </div>
   </nav>
 
   <main class="main">
@@ -334,7 +371,7 @@
     <header class="hero">
       <h1>How I run dev work with Claude, on autopilot and at the keyboard</h1>
       <p class="lead">A few of you asked how my setup works, so here it is end to end. It runs in <strong>two modes that share one quality bar</strong>. On autopilot, a cron scheduler wakes a Claude Code session every hour to pull a GitHub issue and work it in an isolated git worktree. Before any pull request reaches me, it's been read by a second model and a separate coach agent whose only job is to ask whether the work is good. Hands-on, I'm at the keyboard and we run heavier multi-agent reviews together on bigger changes. Either way, Copilot reviews the PR, I have the final say, and I get a Telegram message when something's done.</p>
-      <p class="lead">The thing I keep coming back to: quality doesn't come from one model being smart. It comes from <strong>stacking independent checks</strong> so the cost of any single miss is a review comment, not a bad merge.</p>
+      <p class="lead">Quality comes from <strong>stacking independent checks</strong>. No single model has to be brilliant; enough of them have to disagree. Stack a few and a single miss gets caught in review, before it can become a bad merge.</p>
 
       <div class="stats">
         <div class="stat"><div class="stat__val">2</div><div class="stat__label">modes: autopilot + hands-on</div></div>
@@ -400,7 +437,7 @@ flowchart TD
         <li><b>Event wakes</b> &mdash; every 15 minutes a lighter pass drains a queue of things that just happened: a new meeting transcript, an email from me, a forwarded message, a Slack mention.</li>
         <li><b>The notifications poller</b> &mdash; also every 15 minutes, it checks email, shared Drive files, and 38 Slack channels, and writes anything interesting into that queue.</li>
       </ul>
-      <p>A wake is just a Claude Code session in a tmux pane, running at high reasoning effort with a hard timeout. The session picks its work, does 15 to 30 minutes of it, then hands off: a Telegram summary, a work-log doc, and any board updates.</p>
+      <p>A wake is a Claude Code session in a tmux pane, running at high reasoning effort with a hard timeout. The session picks its work, does 15 to 30 minutes of it, then hands off: a Telegram summary, a work-log doc, and any board updates.</p>
     </div>
 
     <div class="diagram-shell">
@@ -440,33 +477,48 @@ flowchart TD
       </div>
     </div>
 
+    <p class="fig-cap" style="margin-top:22px"><span class="fig">Fig. 2b</span> &mdash; what a finished wake sends me, names and projects redacted</p>
+    <div class="wake-sample">
+      <div class="wake-sample__head">
+        <span class="wake-sample__app">Telegram</span>
+        <span class="wake-sample__tag">wake handoff</span>
+      </div>
+      <div class="wake-sample__body">
+        <p><b>Claude check-in wake complete</b> &nbsp;(18 min)</p>
+        <p>Midday wake (Fri May 29) &mdash; I'm out.</p>
+        <p>Progressed issue #18 in <span class="rd">a repo</span> (tech-debt): a freshness check was flagging years buried in HTML attributes (upload paths, CSS classes, script bodies) as false-positive findings. Fixed it with a parser that reads reader-facing text only (element text + alt / title / aria-label). Live re-audit on <span class="rd">a section</span>: 6 false positives down to 2 true ones. PR #61, 17 new tests, 131 green, lint clean. Awaiting Copilot + my merge.</p>
+        <p>New since last check-in: Google Docs comments on <span class="rd">a draft doc</span> from <span class="rd">two colleagues</span> &mdash; FYI. No new emails.</p>
+        <p class="wake-sample__foot">codex: 1 finding / 1 fixed / 2 clean passes &nbsp;&middot;&nbsp; coach: applied</p>
+      </div>
+    </div>
+
     <div class="callout callout--warn">
-      <div class="callout__title">The footgun that cost me days</div>
-      <p>Wrap the session in <code>timeout --foreground</code>, not plain <code>timeout</code>. Plain <code>timeout</code> starts a new process group and kills the Node tree before it produces output &mdash; you get zero-byte result files and silent multi-day outages that look like nothing ran. The idle-killer also watches CPU time in the process subtree, so long, quiet tool phases (a slow API call, a browser run) don't trip a false "this session is stuck."</p>
+      <div class="callout__title">Always wrap the session in timeout --foreground</div>
+      <p>Wrap the session in <code>timeout --foreground</code>. Plain <code>timeout</code> starts a new process group and kills the Node tree before it produces output &mdash; you get zero-byte result files and silent multi-day outages that look like nothing ran. The idle-killer also watches CPU time in the process subtree, so long, quiet tool phases (a slow API call, a browser run) don't trip a false "this session is stuck."</p>
     </div>
 
     <!-- ============ S3 ============ -->
     <div id="s3" class="sec-head"><span class="sec-head__num">03</span><h2>What each session is told</h2><span class="sec-head__mode">autopilot</span></div>
     <div class="sec-intro">
       <p>The prompt is assembled fresh each wake. A picker shortlists three candidates &mdash; an open GitHub issue, a backlog item, or a wildcard &mdash; and the session commits to one. Then comes a stack of shared instruction blocks: how to write a work-log doc, how to touch the board and CRM safely, an SMTP-only email rule, and how to leave a Telegram summary.</p>
-      <p>The piece I added most recently is a <b>quality-bar nudge</b> that brackets the work. Before it starts, the session has to name the single highest-leverage move that will make the output better than a rote pass &mdash; a fact to verify instead of assert, an earlier work-log to build on instead of repeating it, or a claim to test empirically. Before it wraps up, it re-reads what it produced and confirms it made that move.</p>
+      <p>A <b>quality-bar check</b> brackets the work. Before it starts, the session has to name the single best move that will make the output better than a rote pass &mdash; a fact to verify instead of assert, an earlier work-log to build on instead of repeating it, or a claim to test empirically. Before it wraps up, it re-reads what it produced and confirms it made that move.</p>
     </div>
 
     <div class="callout callout--info">
       <div class="callout__title">How an autonomous session proves it did the work</div>
-      <p>The sessions commit under my git identity, so I needed a way to tell "a wake did this" from "I did this." Each wake carries a receipt token like <code>wake-20260529T1405-a1b2c3</code>. A verifier later confirms the session progressed its item by finding that token in a commit, a PR body, or an issue comment &mdash; and records a verdict (shipped an artifact, changed state, blocked on me, and so on). No token, no credit. It keeps the autonomy honest about what really moved.</p>
+      <p>The sessions commit under my git identity, so I needed a way to tell "a wake did this" from "I did this." Each wake carries a receipt token like <code>wake-20260529T1405-a1b2c3</code>. A verifier later confirms the session progressed its item by finding that token in a commit, a PR body, or an issue comment &mdash; and records a verdict (shipped an artifact, changed state, blocked on me, and so on). No token, no credit, so the record of what each wake moved stays accurate.</p>
     </div>
 
     <!-- ============ S4 ============ -->
     <div id="s4" class="sec-head"><span class="sec-head__num">04</span><h2>Hands-on sessions</h2><span class="sec-head__mode">at the keyboard</span></div>
     <div class="sec-intro">
-      <p>Not everything runs on a timer. When I'm at the keyboard the same machinery is there, but I'm in the loop in real time &mdash; so we can take on bigger, riskier changes than an unattended wake should, and I can steer mid-flight instead of waiting for a PR.</p>
+      <p>Not everything runs on a timer. When I'm at the keyboard the same machinery is there, but I'm in the loop in real time &mdash; so we can take on bigger, riskier changes than an unattended wake should, and I can steer mid-flight.</p>
       <ul>
-        <li><b>Plan mode first.</b> For anything non-trivial we write the plan before touching code, and I approve it. Ambiguous specs produce ambiguous code, so the spec is where the time goes.</li>
+        <li><b>superjawn for anything non-trivial.</b> I run it through superjawn &mdash; my fork of superpowers that forces a research phase before any brainstorming or planning, so the work starts from evidence. It writes the spec before touching code and I approve it; ambiguous specs produce ambiguous code, so the spec is where the time goes.</li>
         <li><b>Fan out.</b> Instead of one session grinding through a problem, I have it spawn several subagents in parallel &mdash; one exploring the codebase, one running a codex review, one acting as the coach, one driving the Copilot CLI &mdash; then synthesize what they bring back. More compute on the same problem, and independent passes that catch each other's misses.</li>
         <li><b>Reviews on demand.</b> The codex and coach passes from the autonomous flow are available here too, and I can fire a Copilot CLI review on a single fix without spending one of GitHub's metered PR-bot reviews.</li>
         <li><b>Verify before "done."</b> Nothing gets called finished on a claim. The session has to prove it &mdash; run the test and show the output, diff the behavior against main, demonstrate the fix fires. "It should work now" is not done.</li>
-        <li><b>I'm the gate at every step,</b> not just at merge &mdash; which is what makes the bigger changes safe to attempt.</li>
+        <li><b>I'm the gate at every step</b> &mdash; the plan, the fan-out, the diff, the merge &mdash; which is what makes the bigger changes safe to attempt.</li>
       </ul>
     </div>
 
@@ -483,7 +535,7 @@ flowchart TD
           <pre class="mermaid">
 flowchart TD
     me["Me, at the keyboard"]
-    plan["Main session&lt;br/&gt;plan mode for real work"]
+    plan["Main session&lt;br/&gt;superjawn: research first"]
     sub1["subagent:&lt;br/&gt;explore / research"]
     sub2["subagent:&lt;br/&gt;codex review"]
     sub3["subagent:&lt;br/&gt;coach (quality)"]
@@ -519,30 +571,30 @@ flowchart TD
 
     <div class="callout callout--info">
       <div class="callout__title">Same checks, different control loop</div>
-      <p>Autopilot and hands-on aren't separate systems &mdash; they share the same reviewers and the same merge discipline. The difference is who closes the loop: when I'm away it's a Telegram approve/deny on a finished PR; when I'm at the keyboard it's me approving the plan, the fan-out, and the diff as we go. The next section is the part both modes run through.</p>
+      <p>Autopilot and hands-on share the same reviewers and the same merge discipline. What changes is who closes the loop: when I'm away, a Telegram approve/deny on a finished PR; at the keyboard, me approving the plan, the fan-out, and the diff as we go. Both modes run through the next section.</p>
     </div>
 
     <div class="callout callout--info">
       <div class="callout__title">When the work is a UI, design gets the same treatment</div>
-      <p>Code isn't the only thing with an AI-slop failure mode &mdash; interfaces have one too. When a session builds a page, it works against an explicit design rulebook: a distinctive typeface instead of the default sans, one committed aesthetic instead of a timid mix, and a list of template tells to avoid &mdash; the accent stripe down the left edge of a card, the kicker label floating above every heading, the lone gradient on plain text. The page you're reading went through exactly that pass. Same idea as the code reviews: name the generic defaults up front so the work has to clear a higher bar than "it renders."</p>
+      <p>Interfaces have their own AI-slop failure mode, so design gets the same treatment as code. When a session builds a page, it works against an explicit design rulebook: a distinctive typeface over the default sans, one committed aesthetic over a timid mix, and a list of template tells to avoid &mdash; the accent stripe down the edge of a card, the kicker label floating above a heading, the lone gradient on plain text. This page went through that pass. Same idea as the code reviews: name the generic defaults up front so the work clears a higher bar than "it renders."</p>
     </div>
 
     <!-- ============ S5 ============ -->
     <div id="s5" class="sec-head"><span class="sec-head__num">05</span><h2>Three models check one change</h2><span class="sec-head__mode">both modes</span></div>
     <div class="sec-intro">
-      <p>This is the part I'm most happy with, and it runs in both modes. The work gets done with Claude Opus at high reasoning. Before anything is committed, a <b>different</b> model reads the change.</p>
+      <p>The review stack is the core of the setup, and it runs in both modes. Work gets done with Claude Opus at high reasoning. Before anything is committed, a <b>different</b> model reads the change.</p>
       <p>First, <b>Codex reviews the uncommitted diff</b> &mdash; bugs, security, swallowed errors, and style, up to three passes. High-severity findings get fixed in place; anything that would balloon the scope becomes its own issue instead.</p>
-      <p>Then the part I added this week: an independent <b>coach</b> &mdash; a separate Claude subagent at high reasoning whose job is not bugs but judgment. Codex already covered correctness; the coach reads the diff and answers two questions: would this genuinely impress a sharp reviewer, or is it competent-but-forgettable, and what single change would most raise its quality? It runs even when Codex is down, and it skips itself when there's no code to review.</p>
+      <p>Then an independent <b>coach</b>: a separate Claude subagent at high reasoning that judges quality. Codex already covered correctness, so the coach reads the diff and answers two questions &mdash; would this impress a sharp reviewer or land as competent but forgettable, and what single change would raise it most? It runs even when Codex is down, and skips itself when there's no code to review.</p>
       <p>Only then does the change get committed and the PR opened, where <b>Copilot</b> reviews it again, independently, on GitHub. The last gate is me.</p>
     </div>
 
     <div class="pullquote">
-      <p>I love having a low-reasoning model review the high-reasoning model's work before I open the PR &mdash; and then a coach asking the question neither bug-checker does: is this good?</p>
+      <p>A low-reasoning model reviews the high-reasoning model's work before I open the PR &mdash; then a coach asks the question neither bug-checker does: is this good?</p>
     </div>
 
     <div class="callout callout--warn">
       <div class="callout__title">Why the reviewer runs at low reasoning, on purpose</div>
-      <p>Codex reviews at low reasoning by design &mdash; it's not a cost compromise, it's the right setting for the job, and it helps two ways at once. It's far lighter on tokens, so a three-pass review is nearly free. And it keeps the reviewer from overthinking: turn a code reviewer up to high or xhigh and it starts inventing problems, rewriting things that were already fine, and burying the two findings that matter under a pile of speculation. For "read this diff and tell me what's actually wrong," low and fast is the better tool. I save the high-reasoning effort for the model that writes the code and the coach that judges it.</p>
+      <p>Codex reviews at low reasoning by design, and it helps two ways at once. It's far lighter on tokens, so a three-pass review is nearly free. It also keeps the reviewer from overthinking: turn a code reviewer up to high or xhigh and it starts inventing problems, rewriting things that were already fine, and burying the two findings that matter under a pile of speculation. For "read this diff and tell me what's broken," low and fast wins. The high-reasoning effort goes to the model writing the code and the coach judging it.</p>
     </div>
 
     <div class="diagram-shell">
@@ -560,7 +612,7 @@ flowchart TD
     work["Claude Opus, high effort&lt;br/&gt;writes the change"]
     codex["Codex review&lt;br/&gt;low reasoning, via CLI&lt;br/&gt;bugs, security, style"]
     decide{"high or medium&lt;br/&gt;findings?"}
-    coach["Coach subagent&lt;br/&gt;Claude, high reasoning&lt;br/&gt;is this genuinely good?"]
+    coach["Coach subagent&lt;br/&gt;Claude, high reasoning&lt;br/&gt;is this good?"]
     commit["commit + push"]
     pr["open pull request"]
     copilot["Copilot PR bot&lt;br/&gt;repo-specific instructions"]
@@ -591,9 +643,9 @@ flowchart TD
     <p class="sec-intro" style="margin-top:24px">Stacked end to end, that's five independent checks before anything lands &mdash; each one looking for something the others don't:</p>
 
     <div class="pipeline">
-      <div class="pipeline__step"><div class="who">self</div><b>Quality-bar pass</b><span>The session names and makes one high-leverage improvement.</span></div>
+      <div class="pipeline__step"><div class="who">self</div><b>Quality-bar pass</b><span>The session names and makes one high-impact improvement.</span></div>
       <div class="pipeline__step"><div class="who">Codex</div><b>Correctness</b><span>Bugs, security, swallowed errors, style.</span></div>
-      <div class="pipeline__step"><div class="who">Coach</div><b>Quality</b><span>Is this genuinely good, or just done?</span></div>
+      <div class="pipeline__step"><div class="who">Coach</div><b>Quality</b><span>Is this good, or just done?</span></div>
       <div class="pipeline__step"><div class="who">Copilot</div><b>Independent</b><span>Fresh eyes on the PR, on GitHub.</span></div>
       <div class="pipeline__step"><div class="who">me</div><b>Merge gate</b><span>Nothing ships without my yes.</span></div>
     </div>
@@ -612,8 +664,8 @@ flowchart TD
     <!-- ============ S6 ============ -->
     <div id="s6" class="sec-head"><span class="sec-head__num">06</span><h2>Issues are the to-do list</h2><span class="sec-head__mode">both modes</span></div>
     <div class="sec-intro">
-      <p>I abuse GitHub issues on every repo. They are the queue the scheduler pulls from, but more than that, they're how out-of-scope work gets captured without derailing the change in front of me. When a session notices a problem outside its current task &mdash; a bug it tripped over, a follow-up a reviewer flagged as scope creep &mdash; it doesn't widen the diff. It files an issue right there, with a finding, the impact, and a suggested fix, and moves on. That issue becomes a future session's work.</p>
-      <p>It's the highest-leverage habit in the whole setup. Small PRs stay small and reviewable, nothing gets lost, and the backlog grows itself from real work, not from my own memory.</p>
+      <p>I abuse GitHub issues on every repo. They're the queue the scheduler pulls from, and they're how out-of-scope work gets captured without derailing the change in front of me. When a session notices a problem outside its current task &mdash; a bug it tripped over, a follow-up a reviewer flagged as scope creep &mdash; it doesn't widen the diff. It files an issue right there, with a finding, the impact, and a suggested fix, and moves on. That issue becomes a future session's work.</p>
+      <p>It's the most useful habit in the whole setup. Small PRs stay small and reviewable, nothing gets lost, and the backlog builds itself from real work.</p>
     </div>
 
     <div class="diagram-shell">
@@ -651,8 +703,8 @@ flowchart TD
     </div>
 
     <div class="callout callout--ok">
-      <div class="callout__title">The one failure mode &mdash; and the net that caught it</div>
-      <p>The honest bug in all this: a couple of times a session picked up an issue I'd already half-finished and never closed, and redid work that was mostly done. Every single time, the Copilot PR review caught the duplication before I merged. That's exactly why the reviewers are stacked and independent &mdash; when something slips through one layer, the cost is a comment on a pull request, not a bad merge into main.</p>
+      <div class="callout__title">One failure mode the review stack caught</div>
+      <p>A couple of times, a session picked up an issue I'd already half-finished and never closed, and redid work that was mostly done. Each time, the Copilot review caught the duplication before I merged. That's why the reviewers are stacked and independent: when something slips past one layer, the next one catches it as a comment on a PR, before it reaches main.</p>
     </div>
 
     <!-- ============ S7 ============ -->
@@ -737,7 +789,7 @@ flowchart TD
 
     <div class="callout callout--info">
       <div class="callout__title">Each repo teaches its own reviewer</div>
-      <p>Copilot's review isn't generic. Every repo carries a custom <code>.github/copilot-instructions.md</code> that tells Copilot the project's architecture, the patterns to enforce, and the specific mistakes to watch for &mdash; a missing query limit, a NaN write, a wrong dependency arrow, a factual error in the docs. So the PR review is grounded in that repo's context instead of handing back boilerplate. It's the same idea as the per-repo <code>CLAUDE.md</code> the sessions read: the project carries its own standards, and every model that touches it inherits them.</p>
+      <p>Copilot's review is grounded in each repo. Every repo carries a custom <code>.github/copilot-instructions.md</code> that tells Copilot the project's architecture, the patterns to enforce, and the specific mistakes to watch for &mdash; a missing query limit, a NaN write, a wrong dependency arrow, a factual error in the docs. The review comes back shaped by that repo's context. Same idea as the per-repo <code>CLAUDE.md</code> the sessions read: the project carries its own standards, and every model that touches it inherits them.</p>
     </div>
 
     <p class="sec-intro" style="margin-top:18px">Copilot's PR bot is the one place a review costs metered minutes, so I treat it as a once-per-PR resource: it reviews on open, I address everything it raises in one pass, and I don't re-trigger it. The cheap reviewers (Codex, the coach) do the iterating before the PR ever opens.</p>
@@ -767,7 +819,7 @@ flowchart TD
     <div class="pipeline">
       <div class="pipeline__step"><div class="who">step 1</div><b>Reach a stop</b><span>Finish a coherent chunk, don't compact mid-thought.</span></div>
       <div class="pipeline__step"><div class="who">step 2</div><b>Write the handoff</b><span>Task, decisions, file paths, next steps &mdash; to disk.</span></div>
-      <div class="pipeline__step"><div class="who">step 3</div><b>Compact with a note</b><span>Tell it what we're doing next, not just "summarize."</span></div>
+      <div class="pipeline__step"><div class="who">step 3</div><b>Compact with a note</b><span>Tell it what we're doing next.</span></div>
       <div class="pipeline__step"><div class="who">step 4</div><b>Resume from the file</b><span>Re-read the handoff first; fidelity restored.</span></div>
     </div>
 
@@ -779,9 +831,9 @@ flowchart TD
         <li><b>Make a queue you trust.</b> Issues work because they're already where the work lives. The scheduler just pulls from them one at a time.</li>
         <li><b>Pull one item per session.</b> Small, bounded work produces small, reviewable PRs.</li>
         <li><b>Isolate every session.</b> Worktrees mean concurrency never corrupts your main checkout.</li>
-        <li><b>Put at least one independent reviewer between the writer and main.</b> Ideally one that isn't the model &mdash; or the vendor &mdash; that wrote the code. Stack a couple and the cost of a miss drops to a comment.</li>
+        <li><b>Put at least one independent reviewer between the writer and main.</b> Use a different model than the one that wrote the code; a different vendor is better still. Stack a couple and the cost of a miss drops to a comment.</li>
         <li><b>Match the reasoning level to the task.</b> High for writing and judgment; low for a fast, literal code review that won't overthink.</li>
-        <li><b>Prove "done," don't claim it.</b> A passing test, pasted output, a before/after &mdash; not "this should work now." Verification is a step, not a vibe.</li>
+        <li><b>Prove "done," don't claim it.</b> A passing test, pasted output, a before/after beats "this should work now." Make verification a step the session has to run.</li>
         <li><b>Respect the context window.</b> Compact before the dumb zone, and write a handoff to disk before you do.</li>
         <li><b>Keep one human gate.</b> Everything is built to make that gate a quick yes &mdash; from my phone when I'm away, or step by step when I'm there.</li>
       </ul>
@@ -789,18 +841,18 @@ flowchart TD
 
     <div class="callout callout--info">
       <div class="callout__title">Next thing I want to add</div>
-      <p>An idea from Lars worth stealing too: pipe the week's trending GitHub repos into the session brief, filtered for relevance, so a session reaches for an existing tool instead of reinventing one. Not wired up yet &mdash; but it's next on the list.</p>
+      <p>An idea from Lars worth stealing: pipe the week's trending GitHub repos into the session brief, filtered for relevance, so a session reaches for an existing tool instead of reinventing one. Not wired up yet &mdash; but it's next on the list.</p>
     </div>
 
     <!-- ============ S11 ============ -->
     <div id="s11" class="sec-head"><span class="sec-head__num">11</span><h2>Prompts you can borrow</h2></div>
     <div class="sec-intro">
-      <p>None of this depends on my exact stack. The principles above are really just instructions you give an agent &mdash; so here they are as text you can paste into whatever you use, Claude or Codex or something else, and adapt. They're written tool-agnostic and a little loose on purpose: the shape is what matters, not the specifics. Take what fits, change the rest.</p>
+      <p>None of this depends on my exact stack. The principles above are instructions you give an agent, so here they are as text &mdash; paste them into whatever you use, Claude or Codex or something else, and adapt. They're tool-agnostic and loose on purpose; the shape carries the value. Take what fits, change the rest.</p>
     </div>
 
     <div class="prompt-card">
       <div class="prompt-card__head"><span class="prompt-card__label"><b>01</b> &nbsp;the quality bar</span><button type="button" class="prompt-card__copy">copy</button></div>
-      <div class="prompt-card__body">Before you start, tell me the single highest-leverage thing you could do to make this better than a rote pass — a fact to verify instead of assert, an earlier file or note to build on, an approach worth trying. Do that thing. Before you finish, re-read what you produced and confirm you did it. If the task is genuinely trivial, say so and skip this rather than manufacturing busywork.</div>
+      <div class="prompt-card__body">Before you start, tell me the single most useful thing you could do to make this better than a rote pass — a fact to verify instead of assert, an earlier file or note to build on, an approach worth trying. Do that thing. Before you finish, re-read what you produced and confirm you did it. If the task is trivial, say so and skip this rather than manufacturing busywork.</div>
     </div>
 
     <div class="prompt-card">
@@ -810,7 +862,7 @@ flowchart TD
 
     <div class="prompt-card">
       <div class="prompt-card__head"><span class="prompt-card__label"><b>03</b> &nbsp;a coach pass for quality, not bugs</span><button type="button" class="prompt-card__copy">copy</button></div>
-      <div class="prompt-card__body">After the correctness review, do one more pass with fresh eyes whose only question is quality, not bugs: would this genuinely impress a sharp reviewer, or is it competent but forgettable — and what single change would raise it most? Make that change if it's cheap. Skip this entirely if there's nothing of substance to review.</div>
+      <div class="prompt-card__body">After the correctness review, do one more pass with fresh eyes whose only question is quality, not bugs: would this impress a sharp reviewer, or land as competent but forgettable — and what single change would raise it most? Make that change if it's cheap. Skip this entirely if there's nothing of substance to review.</div>
     </div>
 
     <div class="prompt-card">
@@ -867,7 +919,7 @@ flowchart TD
     var dark = currentDark();
     mermaid.initialize({
       startOnLoad: false, theme: 'base',
-      flowchart: { curve: 'basis', padding: 14, useMaxWidth: false },
+      flowchart: { curve: 'basis', padding: 14, useMaxWidth: true },
       themeVariables: themeVars(dark)
     });
     nodes.forEach(function (n, i) { n.removeAttribute('data-processed'); n.textContent = sources[i]; });
@@ -899,6 +951,24 @@ flowchart TD
       sync();
       if (window.__rerenderMermaid) window.__rerenderMermaid();
     });
+  })();
+</script>
+
+<!-- ---------- Mobile contents menu ---------- -->
+<script>
+  (function () {
+    var toc = document.getElementById('toc');
+    var toggle = document.getElementById('tocToggle');
+    if (!toc || !toggle) return;
+    function close() { toc.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); }
+    function open() { toc.classList.add('open'); toggle.setAttribute('aria-expanded', 'true'); }
+    toggle.addEventListener('click', function () {
+      if (toc.classList.contains('open')) close(); else open();
+    });
+    // Close after picking a section, on Escape, or when tapping outside the menu.
+    toc.querySelectorAll('.toc-links a').forEach(function (a) { a.addEventListener('click', close); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    document.addEventListener('click', function (e) { if (!toc.contains(e.target)) close(); });
   })();
 </script>
 
