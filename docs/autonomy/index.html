@@ -960,8 +960,16 @@ flowchart TD
     var toc = document.getElementById('toc');
     var toggle = document.getElementById('tocToggle');
     if (!toc || !toggle) return;
-    function close() { toc.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); }
-    function open() { toc.classList.add('open'); toggle.setAttribute('aria-expanded', 'true'); }
+    function close() {
+      toc.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Open contents menu');
+    }
+    function open() {
+      toc.classList.add('open');
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.setAttribute('aria-label', 'Close contents menu');
+    }
     toggle.addEventListener('click', function () {
       if (toc.classList.contains('open')) close(); else open();
     });
