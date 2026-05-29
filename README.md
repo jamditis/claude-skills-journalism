@@ -10,6 +10,7 @@ Setup and workflow guides, separate from the skills themselves:
 
 | Guide | Description |
 |-------|-------------|
+| [Autonomous and hands-on dev work](https://skills.amditis.tech/autonomy/) | A first-person account of running dev work with Claude in two modes — autonomous sessions that pull tasks off GitHub issues, and hands-on multi-agent reviews at the keyboard — held to one quality bar, with copy-able prompts to adapt the approach to your own agent |
 | [Multi-agent workflows](https://skills.amditis.tech/workflows/) | Plain-language guide to running many AI agents on one job — fan-out, pipeline, and adversarial-verify patterns, with real examples from ICIJ, The Markup, Full Fact, and Elicit, plus honest cautions |
 | [Persistent sessions](https://skills.amditis.tech/persistent-sessions/) | Keep Claude Code sessions alive through disconnects using tmux — setup, key bindings, activity notifications, and scheduler coexistence |
 
