@@ -332,13 +332,13 @@
 
     <header class="hero">
       <h1>How I run dev work with Claude, on autopilot and at the keyboard</h1>
-      <p class="lead">A few of you asked how my setup actually works, so here it is end to end. It runs in <strong>two modes that share one quality bar</strong>. On autopilot, a cron scheduler wakes a Claude Code session every hour to pull a GitHub issue and work it in an isolated git worktree &mdash; and before any pull request reaches me it's been read by a second model and a separate coach agent whose only job is to ask whether the work is actually good. Hands-on, I'm at the keyboard and we run heavier multi-agent reviews together on bigger changes. Either way, Copilot reviews the PR, I have the final say, and I get a Telegram message when something's done.</p>
+      <p class="lead">A few of you asked how my setup works, so here it is end to end. It runs in <strong>two modes that share one quality bar</strong>. On autopilot, a cron scheduler wakes a Claude Code session every hour to pull a GitHub issue and work it in an isolated git worktree. Before any pull request reaches me, it's been read by a second model and a separate coach agent whose only job is to ask whether the work is good. Hands-on, I'm at the keyboard and we run heavier multi-agent reviews together on bigger changes. Either way, Copilot reviews the PR, I have the final say, and I get a Telegram message when something's done.</p>
       <p class="lead">The thing I keep coming back to: quality doesn't come from one model being smart. It comes from <strong>stacking independent checks</strong> so the cost of any single miss is a review comment, not a bad merge.</p>
 
       <div class="stats">
         <div class="stat"><div class="stat__val">2</div><div class="stat__label">modes: autopilot + hands-on</div></div>
         <div class="stat"><div class="stat__val">4</div><div class="stat__label">models, 0 direct API calls</div></div>
-        <div class="stat"><div class="stat__val">7a&ndash;9p</div><div class="stat__label">hourly scheduled wakes</div></div>
+        <div class="stat"><div class="stat__val">hourly</div><div class="stat__label">scheduled wakes, 7 a.m. to 9 p.m.</div></div>
         <div class="stat"><div class="stat__val">1</div><div class="stat__label">human merge gate (me)</div></div>
       </div>
       <p class="hero__meta">Working notes &middot; Joe Amditis &middot; Center for Cooperative Media &middot; updated May 2026</p>
@@ -415,7 +415,7 @@ flowchart TD
           <pre class="mermaid">
 flowchart TD
     cron["cron on the services Pi"]
-    checkin["check-in wake&lt;br/&gt;hourly, 7a to 9p"]
+    checkin["check-in wake&lt;br/&gt;hourly, 7 a.m. to 9 p.m."]
     events["event wake&lt;br/&gt;every 15 min"]
     notif["notifications poller&lt;br/&gt;every 15 min&lt;br/&gt;email, Drive, 38 Slack channels"]
     queue["pending-events queue"]
@@ -447,13 +447,13 @@ flowchart TD
     <!-- ============ S3 ============ -->
     <div id="s3" class="sec-head"><span class="sec-head__num">03</span><h2>What each session is told</h2><span class="sec-head__mode">autopilot</span></div>
     <div class="sec-intro">
-      <p>The prompt is assembled fresh each wake. A picker shortlists three candidates &mdash; an open GitHub issue, a backlog item, or a wildcard &mdash; and the session commits to one. Then it gets a stack of shared instruction blocks: how to write a work-log doc, how to touch the board and CRM safely, an SMTP-only email rule, and how to leave a Telegram summary.</p>
-      <p>The piece I added most recently is a <b>quality-bar nudge</b> that brackets the work. Before it starts, the session has to name the single highest-leverage move that will make the output better than a rote pass &mdash; a fact to look up instead of asserting, a file or past work-log to check so it builds on earlier sessions instead of repeating them, or a claim to verify empirically. Before it wraps up, it re-reads what it produced and confirms it actually made that move.</p>
+      <p>The prompt is assembled fresh each wake. A picker shortlists three candidates &mdash; an open GitHub issue, a backlog item, or a wildcard &mdash; and the session commits to one. Then comes a stack of shared instruction blocks: how to write a work-log doc, how to touch the board and CRM safely, an SMTP-only email rule, and how to leave a Telegram summary.</p>
+      <p>The piece I added most recently is a <b>quality-bar nudge</b> that brackets the work. Before it starts, the session has to name the single highest-leverage move that will make the output better than a rote pass &mdash; a fact to verify instead of assert, an earlier work-log to build on instead of repeating it, or a claim to test empirically. Before it wraps up, it re-reads what it produced and confirms it made that move.</p>
     </div>
 
     <div class="callout callout--info">
       <div class="callout__title">How an autonomous session proves it did the work</div>
-      <p>The sessions commit under my git identity, so I needed a way to tell "a wake did this" from "I did this." Each wake carries a receipt token like <code>wake-20260529T1405-a1b2c3</code>. A verifier later confirms the session actually progressed its item by finding that token in a commit, a PR body, or an issue comment &mdash; and records a verdict (shipped an artifact, changed state, blocked on me, and so on). No token, no credit. It keeps the autonomy honest about what really moved.</p>
+      <p>The sessions commit under my git identity, so I needed a way to tell "a wake did this" from "I did this." Each wake carries a receipt token like <code>wake-20260529T1405-a1b2c3</code>. A verifier later confirms the session progressed its item by finding that token in a commit, a PR body, or an issue comment &mdash; and records a verdict (shipped an artifact, changed state, blocked on me, and so on). No token, no credit. It keeps the autonomy honest about what really moved.</p>
     </div>
 
     <!-- ============ S4 ============ -->
@@ -464,7 +464,7 @@ flowchart TD
         <li><b>Plan mode first.</b> For anything non-trivial we write the plan before touching code, and I approve it. Ambiguous specs produce ambiguous code, so the spec is where the time goes.</li>
         <li><b>Fan out.</b> Instead of one session grinding through a problem, I have it spawn several subagents in parallel &mdash; one exploring the codebase, one running a codex review, one acting as the coach, one driving the Copilot CLI &mdash; then synthesize what they bring back. More compute on the same problem, and independent passes that catch each other's misses.</li>
         <li><b>Reviews on demand.</b> The codex and coach passes from the autonomous flow are available here too, and I can fire a Copilot CLI review on a single fix without spending one of GitHub's metered PR-bot reviews.</li>
-        <li><b>Verify before "done."</b> Nothing gets called finished on a claim. The session has to prove it &mdash; run the test and show the output, diff the behavior against main, demonstrate the fix actually fires. "It should work now" is not done.</li>
+        <li><b>Verify before "done."</b> Nothing gets called finished on a claim. The session has to prove it &mdash; run the test and show the output, diff the behavior against main, demonstrate the fix fires. "It should work now" is not done.</li>
         <li><b>I'm the gate at every step,</b> not just at merge &mdash; which is what makes the bigger changes safe to attempt.</li>
       </ul>
     </div>
@@ -523,7 +523,7 @@ flowchart TD
 
     <div class="callout callout--info">
       <div class="callout__title">When the work is a UI, design gets the same treatment</div>
-      <p>Code isn't the only thing with an AI-slop failure mode &mdash; interfaces have one too. When a session builds a page, it works against an explicit design rulebook: a distinctive typeface instead of the default sans, one committed aesthetic instead of a timid mix, and a list of template tells to avoid &mdash; the accent stripe down the left edge of a card, the kicker label floating above every heading, the lone gradient on otherwise-flat text. The page you're reading went through exactly that pass. Same idea as the code reviews: name the generic defaults up front so the work has to clear a higher bar than "it renders."</p>
+      <p>Code isn't the only thing with an AI-slop failure mode &mdash; interfaces have one too. When a session builds a page, it works against an explicit design rulebook: a distinctive typeface instead of the default sans, one committed aesthetic instead of a timid mix, and a list of template tells to avoid &mdash; the accent stripe down the left edge of a card, the kicker label floating above every heading, the lone gradient on plain text. The page you're reading went through exactly that pass. Same idea as the code reviews: name the generic defaults up front so the work has to clear a higher bar than "it renders."</p>
     </div>
 
     <!-- ============ S5 ============ -->
@@ -536,12 +536,12 @@ flowchart TD
     </div>
 
     <div class="pullquote">
-      <p>I love having a low-reasoning model review the high-reasoning model's work before I open the PR &mdash; and then a coach asking the question neither bug-checker does: is this actually good?</p>
+      <p>I love having a low-reasoning model review the high-reasoning model's work before I open the PR &mdash; and then a coach asking the question neither bug-checker does: is this good?</p>
     </div>
 
     <div class="callout callout--warn">
       <div class="callout__title">Why the reviewer runs at low reasoning, on purpose</div>
-      <p>Codex reviews at low reasoning by design &mdash; it's not a cost compromise, it's the right setting for the job, and it helps two ways at once. It's far lighter on tokens, so a three-pass review is essentially free. And it keeps the reviewer from overthinking: turn a code reviewer up to high or xhigh and it starts inventing problems, rewriting things that were already fine, and burying the two findings that matter under a pile of speculation. For "read this diff and tell me what's actually wrong," low and fast is the better tool. I save the high-reasoning effort for the model writing the code and for the coach judging it.</p>
+      <p>Codex reviews at low reasoning by design &mdash; it's not a cost compromise, it's the right setting for the job, and it helps two ways at once. It's far lighter on tokens, so a three-pass review is nearly free. And it keeps the reviewer from overthinking: turn a code reviewer up to high or xhigh and it starts inventing problems, rewriting things that were already fine, and burying the two findings that matter under a pile of speculation. For "read this diff and tell me what's actually wrong," low and fast is the better tool. I save the high-reasoning effort for the model that writes the code and the coach that judges it.</p>
     </div>
 
     <div class="diagram-shell">
@@ -612,7 +612,7 @@ flowchart TD
     <div id="s6" class="sec-head"><span class="sec-head__num">06</span><h2>Issues are the to-do list</h2><span class="sec-head__mode">both modes</span></div>
     <div class="sec-intro">
       <p>I abuse GitHub issues on every repo. They are the queue the scheduler pulls from, but more than that, they're how out-of-scope work gets captured without derailing the change in front of me. When a session notices a problem outside its current task &mdash; a bug it tripped over, a follow-up a reviewer flagged as scope creep &mdash; it doesn't widen the diff. It files an issue right there, with a finding, the impact, and a suggested fix, and moves on. That issue becomes a future session's work.</p>
-      <p>It's the highest-leverage habit in the whole setup. Small PRs stay small and reviewable, nothing gets lost, and the backlog grows itself from real work instead of from me remembering to write things down.</p>
+      <p>It's the highest-leverage habit in the whole setup. Small PRs stay small and reviewable, nothing gets lost, and the backlog grows itself from real work, not from my own memory.</p>
     </div>
 
     <div class="diagram-shell">
@@ -651,7 +651,7 @@ flowchart TD
 
     <div class="callout callout--ok">
       <div class="callout__title">The one failure mode &mdash; and the net that caught it</div>
-      <p>The honest bug in all this: a couple of times a session picked up an issue I'd already half-finished and never closed, and redid work that was basically done. Every single time, the Copilot PR review caught the duplication before I merged. That's exactly why the reviewers are stacked and independent &mdash; when something slips through one layer, the cost is a comment on a pull request, not a bad merge into main.</p>
+      <p>The honest bug in all this: a couple of times a session picked up an issue I'd already half-finished and never closed, and redid work that was mostly done. Every single time, the Copilot PR review caught the duplication before I merged. That's exactly why the reviewers are stacked and independent &mdash; when something slips through one layer, the cost is a comment on a pull request, not a bad merge into main.</p>
     </div>
 
     <!-- ============ S7 ============ -->
@@ -688,7 +688,7 @@ flowchart TD
     <details class="collapsible">
       <summary>One sharp edge with worktrees and automated review</summary>
       <div class="body">
-        <p>If a worktree's branch is behind main, an automated reviewer reading "the diff" can see the PR's real changes <em>plus</em> the reverse of every sibling change that already merged into main &mdash; and flag those reversals as new bugs. The fix is to rebase the worktree onto current main before running the review, so the reviewer only sees what the PR actually changes.</p>
+        <p>If a worktree's branch is behind main, an automated reviewer reading "the diff" can see the PR's real changes <em>plus</em> the reverse of every sibling change that already merged into main &mdash; and flag those reversals as new bugs. The fix is to rebase the worktree onto current main before running the review, so the reviewer only sees what the PR changes.</p>
       </div>
     </details>
 
@@ -726,8 +726,8 @@ flowchart TD
           </thead>
           <tbody>
             <tr><td><b>Claude Opus</b></td><td>Sessions + coach review</td><td><code>claude</code> CLI</td><td><span class="tag">subscription</span></td></tr>
-            <tr><td><b>Codex</b></td><td>Pre-PR review, low reasoning</td><td><code>codex exec</code> CLI</td><td><span class="tag">zero / OAuth</span></td></tr>
-            <tr><td><b>Copilot</b></td><td>Independent PR review</td><td>GitHub PR bot</td><td><span class="tag tag--cost">Actions minutes</span></td></tr>
+            <tr><td><b>Codex</b></td><td>Pre-PR review, low reasoning</td><td><code>codex exec</code> CLI</td><td><span class="tag">none (OAuth)</span></td></tr>
+            <tr><td><b>Copilot</b></td><td>Independent PR review</td><td>GitHub PR bot</td><td><span class="tag tag--cost">GitHub Actions minutes</span></td></tr>
             <tr><td><b>Gemini</b></td><td>Email triage, structured output</td><td><code>gemini</code> CLI</td><td><span class="tag">subscription</span></td></tr>
           </tbody>
         </table>
@@ -736,7 +736,7 @@ flowchart TD
 
     <div class="callout callout--info">
       <div class="callout__title">Each repo teaches its own reviewer</div>
-      <p>Copilot's review isn't generic. Every repo carries a custom <code>.github/copilot-instructions.md</code> that tells it the project's architecture, the patterns to enforce, and the specific mistakes to watch for &mdash; a missing query limit, a NaN write, a wrong dependency arrow, a factual error in the docs. So the PR review is grounded in that repo's context instead of handing back boilerplate. It's the same idea as the per-repo <code>CLAUDE.md</code> the sessions read: the project carries its own standards, and every model that touches it inherits them.</p>
+      <p>Copilot's review isn't generic. Every repo carries a custom <code>.github/copilot-instructions.md</code> that tells Copilot the project's architecture, the patterns to enforce, and the specific mistakes to watch for &mdash; a missing query limit, a NaN write, a wrong dependency arrow, a factual error in the docs. So the PR review is grounded in that repo's context instead of handing back boilerplate. It's the same idea as the per-repo <code>CLAUDE.md</code> the sessions read: the project carries its own standards, and every model that touches it inherits them.</p>
     </div>
 
     <p class="sec-intro" style="margin-top:18px">Copilot's PR bot is the one place a review costs metered minutes, so I treat it as a once-per-PR resource: it reviews on open, I address everything it raises in one pass, and I don't re-trigger it. The cheap reviewers (Codex, the coach) do the iterating before the PR ever opens.</p>
@@ -746,7 +746,7 @@ flowchart TD
     <div class="sec-intro">
       <p>Long sessions degrade as the context window fills &mdash; the model gets measurably worse well before it runs out of room. I call the last stretch the dumb zone and try to never work in it. Three habits keep sessions sharp.</p>
       <p>First, I compact early and on purpose. Autocompact is set to trigger around 300K tokens, and when I hit a natural stopping point I run a manual compact with a note about what we're doing next &mdash; so the summary that survives is built around the next task, not whatever happened to be on screen.</p>
-      <p>Second, before a planned compaction I have the session <b>write a durable handoff file to disk</b> &mdash; the task, the decisions made so far, the exact file paths, what's done and what's next. Compaction is lossy: the auto-summary keeps what it guesses matters and you can't predict what it drops. A file is byte-exact, and the first step after compacting is to re-read it, which restores full fidelity. This very page was built across a compaction exactly that way.</p>
+      <p>Second, before a planned compaction I have the session <b>write a durable handoff file to disk</b> &mdash; the task, the decisions made so far, the exact file paths, what's done and what's next. Compaction is lossy: the auto-summary keeps what the model guesses matters, and you can't predict what it drops. A file is byte-exact, and the first step after compacting is to re-read it, which restores full fidelity. This page was built across a compaction exactly that way.</p>
       <p>Third, I keep the always-loaded project instructions lean. The <code>CLAUDE.md</code> in each repo gets condensed to pointers &mdash; the anti-slop writing rules and the core engineering principles stay in full because they apply every session, but changelogs and old handoffs move to linked files. Every token of standing instructions is a token spent on every session, so the file earns its length or it gets trimmed.</p>
     </div>
 
@@ -773,7 +773,7 @@ flowchart TD
     <!-- ============ S10 ============ -->
     <div id="s10" class="sec-head"><span class="sec-head__num">10</span><h2>Steal this</h2></div>
     <div class="sec-intro">
-      <p>If you want to build something like it, the parts that actually matter are simpler than the wiring suggests &mdash; and they hold whether you're running on a timer or sitting at the keyboard:</p>
+      <p>If you want to build something like it, the parts that matter are simpler than the wiring suggests &mdash; and they hold whether you're running on a timer or sitting at the keyboard:</p>
       <ul>
         <li><b>Make a queue you trust.</b> Issues work because they're already where the work lives. The scheduler just pulls from them one at a time.</li>
         <li><b>Pull one item per session.</b> Small, bounded work produces small, reviewable PRs.</li>
@@ -799,7 +799,7 @@ flowchart TD
 
     <div class="prompt-card">
       <div class="prompt-card__head"><span class="prompt-card__label"><b>01</b> &nbsp;the quality bar</span><button type="button" class="prompt-card__copy">copy</button></div>
-      <div class="prompt-card__body">Before you start, tell me the single highest-leverage thing you could do to make this better than a rote pass — a fact to verify instead of assert, an earlier file or note to build on, an approach worth trying. Do that thing. Before you finish, re-read what you produced and confirm you actually did it. If the task is genuinely trivial, say so and skip this rather than manufacturing busywork.</div>
+      <div class="prompt-card__body">Before you start, tell me the single highest-leverage thing you could do to make this better than a rote pass — a fact to verify instead of assert, an earlier file or note to build on, an approach worth trying. Do that thing. Before you finish, re-read what you produced and confirm you did it. If the task is genuinely trivial, say so and skip this rather than manufacturing busywork.</div>
     </div>
 
     <div class="prompt-card">
