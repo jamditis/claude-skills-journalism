@@ -112,10 +112,23 @@ pick the right column. Nothing else in the build should branch on OS.
 | Primitive | What it does | Linux | macOS | Windows |
 |---|---|---|---|---|
 | **Scheduler** | fires the wake on a cadence | `cron` | `launchd` (a `.plist` in `~/Library/LaunchAgents`) or `cron` | Task Scheduler, or `cron` inside WSL |
-| **Timeout wrapper** | kills a hung session *without* killing it before output flushes | `timeout --foreground` (GNU coreutils) | `gtimeout --foreground` (`brew install coreutils`) | a PowerShell job with a kill timer, or run the loop in WSL with GNU `timeout` |
+| **Timeout wrapper** | kills a hung session *without* killing it before output flushes | `timeout --foreground` (GNU or uutils coreutils) | `gtimeout --foreground` (`brew install coreutils`) | a PowerShell job with a kill timer, or run the loop in WSL with GNU `timeout` |
 | **Session host** | keeps the long session alive and captures its output | `tmux` (or a detached process to a log) | `tmux` | Windows Terminal / a background `Start-Process`, or `tmux` in WSL |
 | **Secret store** | resolves the `*_ref` names to real values | `pass`, or env | Keychain, `pass`, or env | Credential Manager, `1password` CLI, or env |
 | **Notifier** | delivers the session summary | Telegram bot (HTTPS), or stdout | same | same |
+
+**Tested status — read before you trust a column.** Only the Linux column has been
+run end-to-end; it's what this was built on, specifically a Raspberry Pi 5 (8GB)
+running Ubuntu 25.10, ARM64 (kernel 6.17), with Python 3.13, cron, tmux 3.5a, and
+`timeout --foreground` from uutils coreutils 0.2.2. Another Linux distribution
+shares these primitives but differs in detail (init system, coreutils flavor,
+default shell), so don't assume a non-matching distro is identical either. The
+macOS and Windows columns are derived from the same five primitives but have not
+been tested as of this version (testing them is planned). On any untested OS or
+distro, verify each primitive on a throwaway issue before arming the schedule:
+confirm the timeout wrapper actually bounds a run and flushes its log, the
+scheduler trigger really fires, and the secret store resolves. Don't report the
+build as done until you've watched one real wake complete.
 
 Two warnings that have actually bitten people:
 

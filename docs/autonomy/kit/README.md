@@ -2,7 +2,7 @@
 
 Most people who work with a coding agent have never considered this is possible:
 you can point an agent at your own GitHub issues and let it work them on a
-schedule, unattended, while you do something else. This kit is a tested, careful
+schedule, unattended, while you do something else. This kit is a careful
 way to try that — and "careful" is the whole point.
 
 On a schedule, it picks one open issue from the repos you choose, hands it to your
@@ -76,9 +76,16 @@ confidence grows.
 
 ## Before you start
 
-- **Platform:** works on Linux, macOS, and Windows. Your agent picks the right
-  scheduler, timeout wrapper, and session host per your OS — see the primitives
-  table in `BUILD-WITH-YOUR-AGENT.md`.
+- **Platform:** the Linux path is what this was built and run on, so it's the
+  tested one — specifically a Raspberry Pi 5 (8GB) on Ubuntu 25.10, ARM64, with
+  Python 3.13, cron, tmux, and `timeout --foreground` from uutils coreutils.
+  Another Linux distribution shares the same primitives but differs in detail, so
+  verify on yours too. The macOS and Windows recipes follow the same five
+  primitives but haven't been run end-to-end as of this version — testing them is
+  planned. If you're on either, treat that column as a solid starting point, not a
+  guarantee: have your agent verify each piece on a throwaway issue before you arm
+  the schedule. The primitives table in `BUILD-WITH-YOUR-AGENT.md` is where the
+  per-OS choices live.
 - **Cost:** the loop is cheap only if your CLIs are logged into a subscription
   rather than billing an API key, and only if you keep the cadence sane. Read
   `COSTS.md` first.

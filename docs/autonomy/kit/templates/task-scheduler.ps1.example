@@ -4,6 +4,11 @@
 # Edit the paths and hours first. Check it took with:
 #   Get-ScheduledTask -TaskName "AutonomyWake"
 #
+# Untested as of this version: the Linux path is the one that's been run end to
+# end. This script is reasoned from the same design but not yet verified on
+# Windows. Register it against a throwaway issue and watch one wake complete
+# (including the hard-timeout kill) before you trust it.
+#
 # Two caveats for Windows:
 #  1. There is no exact equivalent of GNU `timeout --foreground`. The simplest
 #     reliable setup on Windows is to run the whole loop inside WSL and use the

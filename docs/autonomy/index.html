@@ -937,6 +937,11 @@ flowchart TD
       <p><a href="https://github.com/jamditis/claude-skills-journalism/tree/master/docs/autonomy/kit">github.com/jamditis/claude-skills-journalism &rarr; docs/autonomy/kit</a> &mdash; a spec your agent follows, the config you fill in, the prompt blocks above in full, reference code, per-OS scheduler templates, and a costs breakdown. MIT-licensed. Open a session with your agent, give it <code>BUILD-WITH-YOUR-AGENT.md</code> and <code>config.example.yaml</code>, and say &ldquo;set this up for me.&rdquo;</p>
     </div>
 
+    <div class="callout callout--warn">
+      <div class="callout__title">Tested on Linux only, so far</div>
+      <p>I've run this end to end on one setup: a Raspberry Pi 5 (8GB) on Ubuntu 25.10, ARM64, with Python 3.13, cron, tmux, and <code>timeout --foreground</code> from uutils coreutils. The macOS and Windows recipes follow the same design but haven't been run end to end as of this version &mdash; testing them is planned. And &ldquo;Linux&rdquo; has roughly 58 million permutations once you count distros, kernels, and coreutils flavors, so even a different Linux box can differ in the details. Unless you're on that exact setup, have your agent treat the matching template with some skepticism: verify each piece on a throwaway issue before you trust an unattended schedule.</p>
+    </div>
+
     <div class="foot">
       <p>That's the whole thing. Built on a couple of Raspberry Pis, a cron file, and the rule that no model gets to be the only one who checked its own work. Questions or "I built one too" notes welcome.</p>
     </div>

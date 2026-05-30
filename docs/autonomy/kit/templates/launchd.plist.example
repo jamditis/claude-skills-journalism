@@ -14,6 +14,11 @@
 
   macOS note: the wake script must call `gtimeout --foreground`, not `timeout`.
   Install GNU coreutils first:  brew install coreutils
+
+  Untested as of this version. The Linux path is the one that's been run end to
+  end; this plist is reasoned from the same design but not yet verified. Load it,
+  confirm `launchctl list | grep autonomy` shows it, and watch one wake finish
+  before you rely on it.
 -->
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
   "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
