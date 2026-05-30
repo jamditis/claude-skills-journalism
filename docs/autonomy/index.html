@@ -174,7 +174,7 @@
       position: relative; overflow: hidden; border: 1px solid var(--ink);
       background: var(--surface); padding: 28px 20px;
       display: flex; justify-content: center; align-items: flex-start; min-height: 320px; cursor: grab;
-      touch-action: none;  /* let our handlers own pinch/drag instead of the browser */
+      touch-action: pan-y;  /* one finger still scrolls the page; two fingers pinch/pan the diagram */
     }
     .mermaid-wrap.is-panning { cursor: grabbing; user-select: none; }
     .zoom-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 0; z-index: 10; border: 1px solid var(--border); }
@@ -967,6 +967,12 @@ flowchart TD
 
   window.__rerenderMermaid = renderAll;
   renderAll();
+
+  // Re-render when the viewport crosses the mobile breakpoint (e.g. rotating a phone),
+  // so useMaxWidth flips and diagrams don't keep the wrong sizing mode.
+  var mq = window.matchMedia('(max-width: 1000px)');
+  if (mq.addEventListener) mq.addEventListener('change', renderAll);
+  else if (mq.addListener) mq.addListener(renderAll);
 </script>
 
 <!-- ---------- Theme toggle ---------- -->
@@ -1062,38 +1068,35 @@ flowchart TD
         dragging = false; vp.classList.remove('dragging'); wrap.classList.remove('is-panning');
       });
 
-      // ---- Touch: one finger pans, two fingers pinch-zoom ----
-      var pinchStart = 0, pinchScale = 1;
+      // ---- Touch: two fingers pinch to zoom and drag to pan.
+      // One finger is left to the browser so the page still scrolls over a diagram.
+      var pinchStart = 0, pinchScale = 1, baseX = 0, baseY = 0, midX0 = 0, midY0 = 0;
       function touchDist(t) {
-        var dx = t[0].clientX - t[1].clientX, dy = t[0].clientY - t[1].clientY;
-        return Math.hypot(dx, dy);
+        return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+      }
+      function touchMid(t) {
+        return { x: (t[0].clientX + t[1].clientX) / 2, y: (t[0].clientY + t[1].clientY) / 2 };
       }
       wrap.addEventListener('touchstart', function (e) {
         if (e.target.closest('.zoom-controls')) return;
-        if (e.touches.length === 1) {
-          dragging = true; sx = e.touches[0].clientX - panX; sy = e.touches[0].clientY - panY;
-          vp.classList.add('dragging'); wrap.classList.add('is-panning');
-        } else if (e.touches.length === 2) {
-          dragging = false; pinchStart = touchDist(e.touches); pinchScale = scale;
+        if (e.touches.length === 2) {
+          pinchStart = touchDist(e.touches); pinchScale = scale;
+          var m = touchMid(e.touches); midX0 = m.x; midY0 = m.y; baseX = panX; baseY = panY;
+          wrap.classList.add('is-panning'); vp.classList.add('dragging');
         }
       }, { passive: true });
       wrap.addEventListener('touchmove', function (e) {
-        if (e.touches.length === 1 && dragging) {
-          e.preventDefault();
-          panX = e.touches[0].clientX - sx; panY = e.touches[0].clientY - sy; apply();
-        } else if (e.touches.length === 2 && pinchStart > 0) {
-          e.preventDefault();
-          setScale(pinchScale * (touchDist(e.touches) / pinchStart));
+        if (e.touches.length === 2 && pinchStart > 0) {
+          e.preventDefault();  // own the two-finger gesture; pan-y already lets one finger scroll
+          var m = touchMid(e.touches);
+          panX = baseX + (m.x - midX0); panY = baseY + (m.y - midY0);
+          scale = Math.max(0.4, Math.min(5, pinchScale * (touchDist(e.touches) / pinchStart)));
+          apply();
         }
       }, { passive: false });
       wrap.addEventListener('touchend', function (e) {
-        if (e.touches.length === 0) {
-          dragging = false; pinchStart = 0;
-          vp.classList.remove('dragging'); wrap.classList.remove('is-panning');
-        } else if (e.touches.length === 1) {
-          // Second finger lifted mid-pinch: hand control back to one-finger pan.
-          pinchStart = 0; dragging = true;
-          sx = e.touches[0].clientX - panX; sy = e.touches[0].clientY - panY;
+        if (e.touches.length < 2) {
+          pinchStart = 0; vp.classList.remove('dragging'); wrap.classList.remove('is-panning');
         }
       }, { passive: true });
     });
