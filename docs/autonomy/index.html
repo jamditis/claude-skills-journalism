@@ -344,7 +344,7 @@
       .lanes { grid-template-columns: 1fr; }
       .lane { border-right: none; border-bottom: 1px solid var(--border); }
       .pipeline__step { min-width: 200px; }
-      .mermaid-wrap { min-height: 300px; padding: 14px 8px; }
+      .mermaid-wrap { min-height: 180px; padding: 16px 10px; }
       .primer__row { grid-template-columns: 104px 1fr; gap: 3px 14px; }
       .theme-toggle { bottom: 14px; right: 14px; }
     }
@@ -953,12 +953,12 @@ flowchart TD
 
   async function renderAll() {
     var dark = currentDark();
-    // On phones, fitting a wide flowchart to the narrow column makes the text tiny.
-    // Render at natural size instead and let the reader pinch / drag to move around.
-    var narrow = window.matchMedia('(max-width: 1000px)').matches;
+    // Fit each diagram to the column so the whole thing is always visible (no horizontal
+    // cut-off on phones). Reading small labels on wide diagrams is handled by pinch / +-
+    // zoom and the full-size button, not by letting the diagram overflow the screen.
     mermaid.initialize({
       startOnLoad: false, theme: 'base',
-      flowchart: { curve: 'basis', padding: 14, useMaxWidth: !narrow },
+      flowchart: { curve: 'basis', padding: 14, useMaxWidth: true },
       themeVariables: themeVars(dark)
     });
     nodes.forEach(function (n, i) { n.removeAttribute('data-processed'); n.textContent = sources[i]; });
@@ -967,12 +967,6 @@ flowchart TD
 
   window.__rerenderMermaid = renderAll;
   renderAll();
-
-  // Re-render when the viewport crosses the mobile breakpoint (e.g. rotating a phone),
-  // so useMaxWidth flips and diagrams don't keep the wrong sizing mode.
-  var mq = window.matchMedia('(max-width: 1000px)');
-  if (mq.addEventListener) mq.addEventListener('change', renderAll);
-  else if (mq.addListener) mq.addListener(renderAll);
 </script>
 
 <!-- ---------- Theme toggle ---------- -->
