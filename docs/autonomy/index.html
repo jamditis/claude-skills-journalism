@@ -379,6 +379,7 @@
       <a href="#s9">09 &nbsp;Context &amp; compaction</a>
       <a href="#s10">10 &nbsp;Steal this</a>
       <a href="#s11">11 &nbsp;Prompts you can borrow</a>
+      <a href="#s12">12 &nbsp;Get the kit</a>
     </div>
   </nav>
 
@@ -914,6 +915,26 @@ flowchart TD
     <div class="prompt-card">
       <div class="prompt-card__head"><span class="prompt-card__label"><b>06</b> &nbsp;a standards file the whole repo inherits</span><button type="button" class="prompt-card__copy">copy</button></div>
       <div class="prompt-card__body">Read this repo and draft a short standards file for it — a CLAUDE.md, or a reviewer-instructions file. Two lines on the architecture, the patterns to follow here, and the three mistakes most likely to happen in this codebase. Keep it tight: every line gets read on every task, so each one has to earn its place.</div>
+    </div>
+
+    <!-- ============ S12 ============ -->
+    <div id="s12" class="sec-head"><span class="sec-head__num">12</span><h2>Get the kit</h2></div>
+    <div class="sec-intro">
+      <p>Most people I show this to didn't know it was a thing you could do &mdash; point an agent at your own GitHub issues and let it work them on a schedule, with the review and approval steps built in. So I packaged the autopilot half as a drop-in kit. You don't have to write the code or know Python: you hand two files to your own agent, answer its questions, and it builds the loop for your machine, whether that's a Mac, a Windows box, or Linux.</p>
+      <p>It's the careful version on purpose. What keeps autonomous work from turning into unreviewed output that quietly breaks something is bounded scope, a second model on every diff, and a person at the merge. The kit is built around those three, and it's the part most people ask about first.</p>
+      <p>You aim it as tightly as you want, then widen one ring at a time:</p>
+      <ul>
+        <li><b>Which repos</b> &mdash; and which one is the focus right now.</li>
+        <li><b>Which issues</b> &mdash; a label like <code>agent-ready</code> you apply by hand is the tightest gate.</li>
+        <li><b>Which files</b> &mdash; allow <code>docs/**</code> only, deny <code>.github/workflows/</code>, or both.</li>
+        <li><b>How big</b> &mdash; cap the files and lines a single change can touch.</li>
+        <li><b>Who checks and who approves</b> &mdash; a second model reviews every diff; you merge. It never merges its own work.</li>
+      </ul>
+    </div>
+
+    <div class="callout callout--info">
+      <div class="callout__title">The kit</div>
+      <p><a href="https://github.com/jamditis/claude-skills-journalism/tree/master/docs/autonomy/kit">github.com/jamditis/claude-skills-journalism &rarr; docs/autonomy/kit</a> &mdash; a spec your agent follows, the config you fill in, the prompt blocks above in full, reference code, per-OS scheduler templates, and a costs breakdown. MIT-licensed. Open a session with your agent, give it <code>BUILD-WITH-YOUR-AGENT.md</code> and <code>config.example.yaml</code>, and say &ldquo;set this up for me.&rdquo;</p>
     </div>
 
     <div class="foot">

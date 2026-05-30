@@ -1,0 +1,126 @@
+# Autonomous GitHub-issue workhorse — example config
+#
+# This is the one file you (or your agent) edit. Copy it to `config.yaml`, fill
+# it in, and keep `config.yaml` out of version control (it can hold secret
+# references).
+#
+# What this sets up: on a schedule, the kit picks one open GitHub issue from the
+# repos you choose, hands it to your coding agent to work, has a second model
+# review the change, opens a pull request (and never merges it), then reports
+# back. It also files NEW issues for follow-up work it finds, so nothing is lost
+# to forgetting, deletion, or a compacted context. Issues in, pull requests out,
+# and a durable to-do list that grows itself.
+
+machine:
+  # linux | macos | windows. Your agent uses this to pick the right scheduler,
+  # timeout wrapper, and session host (see BUILD-WITH-YOUR-AGENT.md, "Five
+  # primitives"). Set it; don't make the code guess.
+  os: linux
+
+  # Absolute path to the agent CLI you run unattended (cron and launchd run with
+  # a bare PATH and won't find a bare command).
+  #   ~/.local/bin/claude   (Claude Code)   |   /usr/local/bin/codex  (Codex)
+  agent_cli: ~/.local/bin/claude
+
+  # Where your repos are checked out. The session works inside a clone here.
+  work_dir: ~/projects
+
+schedule:
+  wake:
+    enabled: true
+    # cron-style on Linux/macOS; your agent translates this for launchd / Task
+    # Scheduler. "every hour, 7am-7pm" is a sane starting cadence. Cost scales
+    # with how often this fires — start low, raise it once you trust the output.
+    cron: "5 7-19 * * *"
+    timezone: America/New_York
+  timeouts:
+    idle_minutes: 20    # kill a session that stops producing output (likely stuck)
+    hard_minutes: 90    # absolute ceiling per session
+
+model:
+  # Effort for doing the work. Higher costs more and is slower; don't default
+  # everything to the top tier. See COSTS.md.       low|medium|high|xhigh|max
+  work_effort: high
+  # Effort for the review pass. Low on purpose — a fast literal read for bugs,
+  # not a rewrite that invents problems.
+  review_effort: low
+
+# --- WHERE the work comes from, and which repo gets the focus --------------
+github:
+  # The repos the workhorse pulls open issues from. It works ONE issue per wake.
+  # An entry can be a plain "owner/repo" string, or an object with a priority to
+  # bias the picker toward (or away from) it.
+  repos:
+    - owner/repo-a
+    - repo: owner/repo-b
+      priority: high          # high | normal | low — weights this repo in the picker
+    - repo: owner/repo-c
+      priority: low
+
+  # Optional: force ONE repo as the focus for now, overriding priorities. Handy
+  # for "this week, concentrate on the launch repo." Leave blank to spread work
+  # across all repos by priority.
+  focus_repo: ""              # e.g. owner/repo-a
+
+  # Gate which issues are eligible.
+  require_labels: [agent-ready]              # need ALL of these (empty = any open issue)
+  skip_labels: [blocked, needs-discussion, wontfix]   # skip if ANY of these present
+  skip_assigned: true                         # skip issues a human is already on
+
+  shortlist_size: 3           # candidates considered before choosing exactly one
+  order_by: oldest            # oldest|newest|priority-label|least-recently-touched
+
+# --- HOW MUCH each session is allowed to touch (surface area) ---------------
+scope:
+  # Limit which files a session may modify. Empty allowed_paths = the whole repo.
+  allowed_paths: []           # globs it MAY edit, e.g. ["src/**", "docs/**"]
+  denied_paths:               # globs it must NEVER touch, even inside allowed_paths
+    - ".github/workflows/**"  # CI config — a common "never auto-edit" surface
+    - "infra/**"
+    - "**/*secret*"
+  # Breadth caps per session. A change that needs more than this is a signal the
+  # issue should be decomposed into child issues, not forced through in one pass.
+  max_files_changed: 20
+  max_lines_changed: 600
+
+# --- The nudges that get the most out of each session (text in prompts.md) ---
+nudges:
+  # Standing instruction blocks wired into each wake prompt. Turn the dial up or
+  # down per your taste; the full text of each is in prompts.md so you can edit
+  # the wording, not just toggle it.
+  quality_bar: true                   # name the single highest-leverage move, then do it
+  verify_from_code: true              # treat any handed-down diagnosis as a rumor; reproduce first
+  review: true                        # multi-model review before commit (needs review.enabled too)
+  wrap_up: true                       # commit hygiene, one-issue scoping, receipt-token discipline
+  final_reflection: true              # one last pass: anything that would raise this run's quality?
+  capture_followups_as_issues: true   # file new issues for deferred/extra work it finds
+  out_of_scope_as_issue: true         # don't widen the change; file what's outside scope as an issue
+
+review:
+  enabled: true
+  # The reviewer command, run at model.review_effort. Use a CLI logged into a
+  # subscription, not an API key, to keep cost at zero per run (see COSTS.md).
+  # `{repo}` is filled in at runtime.
+  command: "codex -C {repo} exec review --uncommitted --skip-git-repo-check"
+  max_passes: 3               # cap review iterations so a session can't loop forever
+
+notify:
+  # Where session summaries go. `stdout` needs no setup and is the right default
+  # for trying the kit. `telegram` reaches your phone.   stdout | telegram
+  channel: stdout
+  telegram:
+    bot_token_ref: autonomy/telegram-bot-token   # secret NAMES, never the values
+    chat_id_ref: autonomy/telegram-chat-id
+
+secrets:
+  # GitHub auth comes from the `gh` CLI (`gh auth login`) — you do NOT put a
+  # GitHub token here. This backend only resolves the optional notifier secrets.
+  #   env | pass | keychain | credential-manager | 1password
+  backend: env
+  prefix: ""
+
+safety:
+  # Hard rules. Not style preferences — the difference between a helper and a
+  # liability. Your agent wires them into the prompt and the harness.
+  auto_merge: false                    # NEVER let an unattended session merge its own PR
+  protected_branches: [main, master]   # it opens PRs against these; never pushes directly

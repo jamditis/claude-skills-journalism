@@ -1,0 +1,42 @@
+# CLAUDE.md — example standards file
+
+Drop a file like this at the root of each repo the workhorse touches. The agent
+reads it on every task, so it's where you put the rules that should hold no matter
+which issue gets picked. Keep it short: every line is read on every run, so each
+one has to earn its place. This example is generic — replace it with the real
+shape of your repo.
+
+## What this repo is
+
+One or two lines. What it does, the stack, where the entry point lives. Enough
+that a session with no prior context knows where it landed.
+
+> Example: A small Flask API that serves the public events calendar. Entry point
+> is `app.py`; data access is in `db/`; templates render server-side in `views/`.
+
+## Patterns to follow here
+
+The conventions a change should match, so the work reads like the rest of the
+codebase instead of like a bolt-on.
+
+- Match the existing error handling — raise, don't swallow; no bare `except`.
+- New endpoints go in `views/`, with a test in `tests/` alongside.
+- Config comes from environment variables, never hardcoded.
+
+## The three mistakes most likely here
+
+The traps specific to this codebase. This section is worth more than the other
+two combined, because it's where an unattended session would otherwise fall in.
+
+1. The `events` table has a soft-delete flag — never hard-delete a row.
+2. Timestamps are stored UTC; render in the user's zone only at the view layer.
+3. `requirements.txt` is the source of truth; don't add an import without it.
+
+## Scope and review (the workhorse reads these too)
+
+- Open a pull request; never merge it yourself.
+- Don't touch `.github/workflows/` or anything under `infra/`.
+- A correctness review runs before every commit — fix what it flags, or file a
+  follow-up issue for anything that would widen the change.
+- A problem you notice outside the current issue becomes a new issue, not a
+  bigger diff.

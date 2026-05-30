@@ -1,0 +1,33 @@
+# Task Scheduler registration for the issue workhorse (Windows, PowerShell).
+#
+# Run this script once, from an elevated PowerShell, to register an hourly task.
+# Edit the paths and hours first. Check it took with:
+#   Get-ScheduledTask -TaskName "AutonomyWake"
+#
+# Two caveats for Windows:
+#  1. There is no exact equivalent of GNU `timeout --foreground`. The simplest
+#     reliable setup on Windows is to run the whole loop inside WSL and use the
+#     Linux primitives (cron + GNU timeout + tmux). Do that if you can.
+#  2. If you stay native, the wake script must enforce its own hard timeout (start
+#     the agent as a job and kill it after schedule.timeouts.hard_minutes). The
+#     trigger below only starts the run; it does not bound it.
+
+$python   = "C:\Path\To\python.exe"
+$wake     = "C:\Users\YOU\autonomy\wake.py"
+$taskName = "AutonomyWake"
+
+# Hourly from 7am, repeating for 12 hours -> last run at 7pm. Match this to
+# schedule.wake.cron in your config.yaml.
+$trigger = New-ScheduledTaskTrigger -Daily -At 7:05AM
+$trigger.Repetition = (New-ScheduledTaskTrigger -Once -At 7:05AM `
+    -RepetitionInterval (New-TimeSpan -Hours 1) `
+    -RepetitionDuration (New-TimeSpan -Hours 12)).Repetition
+
+$action = New-ScheduledTaskAction -Execute $python -Argument $wake
+
+# Run whether or not you're logged in; don't wake the machine just for this.
+$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable `
+    -DontStopOnIdleEnd -ExecutionTimeLimit (New-TimeSpan -Hours 2)
+
+Register-ScheduledTask -TaskName $taskName -Trigger $trigger -Action $action `
+    -Settings $settings -Description "Autonomous GitHub-issue workhorse, hourly wake"

@@ -1,0 +1,22 @@
+# cron entry for the issue workhorse (Linux, and macOS if you prefer cron to launchd)
+#
+# Install with:  crontab -e   then paste the line below (edit the paths first).
+# Check it took: crontab -l
+#
+# cron runs with a minimal environment, so set an explicit PATH and use ABSOLUTE
+# paths for both the interpreter and the wake script. A bare `python3` or `claude`
+# will "work in my terminal" and silently fail under cron.
+
+PATH=/usr/local/bin:/usr/bin:/bin:/home/YOU/.local/bin
+
+# minute 5, every hour from 7am to 7pm, every day.
+# Adjust the schedule to match schedule.wake.cron in your config.yaml.
+# Redirect stdout+stderr to a log you can actually read after an unattended run.
+5 7-19 * * * /usr/bin/python3 /home/YOU/autonomy/wake.py >> /home/YOU/autonomy/logs/wake.log 2>&1
+
+# Notes:
+# - The wake script itself wraps the agent in `timeout --foreground` (GNU
+#   coreutils). On macOS install coreutils (`brew install coreutils`) and have the
+#   script call `gtimeout --foreground` instead.
+# - Keep the cadence conservative until you trust the output. Every line here is a
+#   session that costs time and tokens.
