@@ -143,6 +143,20 @@
     .stat__val { font-size: 34px; font-weight: 800; color: var(--text-bright); letter-spacing: -0.03em; line-height: 1.0; }
     .stat__label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-dim); margin-top: 10px; }
 
+    /* ---------- Hero pointer to the primer ---------- */
+    .hero__note { font-size: 14px; color: var(--text-dim); margin-top: 20px; }
+    .hero__note a { color: var(--accent); }
+
+    /* ---------- Plain-language primer (glossary key) ---------- */
+    .primer { border: 1px solid var(--ink); background: var(--surface); margin: 36px 0 8px; }
+    .primer__head { font-family: var(--font-body); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); padding: 14px 18px; border-bottom: 1px solid var(--border); }
+    .primer__lead { font-size: 13.5px; color: var(--text); padding: 14px 18px 2px; max-width: 70ch; }
+    .primer__list { padding: 4px 18px 14px; margin: 0; }
+    .primer__row { display: grid; grid-template-columns: 148px 1fr; gap: 3px 22px; align-items: start; padding: 11px 0; border-bottom: 1px solid var(--border); }
+    .primer__row:last-child { border-bottom: none; }
+    .primer__row dt { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--text-bright); }
+    .primer__row dd { font-size: 13.5px; color: var(--text); margin: 0; line-height: 1.55; }
+
     /* ---------- Section heads ---------- */
     .sec-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; margin: 88px 0 4px; padding-top: 30px; border-top: 1px solid var(--ink); scroll-margin-top: 24px; }
     .sec-head__num { font-family: var(--font-mono); font-size: 14px; font-weight: 500; color: var(--accent); flex-shrink: 0; }
@@ -160,6 +174,7 @@
       position: relative; overflow: hidden; border: 1px solid var(--ink);
       background: var(--surface); padding: 28px 20px;
       display: flex; justify-content: center; align-items: flex-start; min-height: 320px; cursor: grab;
+      touch-action: none;  /* let our handlers own pinch/drag instead of the browser */
     }
     .mermaid-wrap.is-panning { cursor: grabbing; user-select: none; }
     .zoom-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 0; z-index: 10; border: 1px solid var(--border); }
@@ -329,7 +344,8 @@
       .lanes { grid-template-columns: 1fr; }
       .lane { border-right: none; border-bottom: 1px solid var(--border); }
       .pipeline__step { min-width: 200px; }
-      .mermaid-wrap { min-height: 180px; padding: 16px 10px; }
+      .mermaid-wrap { min-height: 300px; padding: 14px 8px; }
+      .primer__row { grid-template-columns: 104px 1fr; gap: 3px 14px; }
       .theme-toggle { bottom: 14px; right: 14px; }
     }
   </style>
@@ -380,7 +396,27 @@
         <div class="stat"><div class="stat__val">1</div><div class="stat__label">human merge gate (me)</div></div>
       </div>
       <p class="hero__meta">Working notes &middot; Joe Amditis &middot; Center for Cooperative Media &middot; updated May 2026</p>
+      <p class="hero__note">Not a developer? <a href="#primer">Start with the plain-language key below</a> &mdash; it defines every term the page leans on. None of this is as complicated as the words make it sound.</p>
     </header>
+
+    <!-- ============ Plain-language primer ============ -->
+    <section id="primer" class="primer" aria-label="Plain-language key">
+      <div class="primer__head">Start here &mdash; the words I use</div>
+      <p class="primer__lead">This is a developer setup, but the ideas behind it are simple. If a term below is unfamiliar, here's the plain version. The rest of the page builds on these.</p>
+      <dl class="primer__list">
+        <div class="primer__row"><dt>issue</dt><dd>A to-do item logged on GitHub, the website where the code lives. The list of open issues is the work queue.</dd></div>
+        <div class="primer__row"><dt>pull request</dt><dd>A finished change, bundled up and held for review. Nothing in it goes live until it's approved. Usually shortened to PR.</dd></div>
+        <div class="primer__row"><dt>worktree</dt><dd>A separate, private copy of the project's files. Each session gets its own, so two can run at the same time without overwriting each other.</dd></div>
+        <div class="primer__row"><dt>session</dt><dd>One run of Claude Code working on a task, from start to handoff.</dd></div>
+        <div class="primer__row"><dt>model</dt><dd>An AI system. This setup uses four: Claude writes the code, Codex and Copilot check it, and Gemini sorts email.</dd></div>
+        <div class="primer__row"><dt>commit / merge</dt><dd>To commit is to save a set of changes as one step. To merge is to accept those changes into the live version of the code.</dd></div>
+        <div class="primer__row"><dt>cron</dt><dd>A built-in timer that runs a job automatically at set times, with no one watching. The thing that wakes a session every hour.</dd></div>
+        <div class="primer__row"><dt>CLI</dt><dd>A command-line tool: you run it by typing a command, instead of clicking through an app or website.</dd></div>
+        <div class="primer__row"><dt>context window</dt><dd>How much text a model can hold in mind at once. It's limited, and the work gets worse as it fills up.</dd></div>
+        <div class="primer__row"><dt>compaction</dt><dd>Summarizing a long session down to its essentials, to free up room in the context window.</dd></div>
+        <div class="primer__row"><dt>reasoning effort</dt><dd>A setting for how hard a model thinks before it answers. More effort costs more and runs slower, and isn't always better.</dd></div>
+      </dl>
+    </section>
 
     <!-- ============ S1 ============ -->
     <div id="s1" class="sec-head"><span class="sec-head__num">01</span><h2>The big loop</h2><span class="sec-head__mode">autopilot</span></div>
@@ -389,7 +425,7 @@
     </div>
 
     <div class="diagram-shell">
-      <p class="diagram-shell__hint"><span class="fig">Fig. 1</span> &mdash; the autonomous loop &middot; Ctrl/Cmd + scroll to zoom &middot; drag to pan &middot; &#x26F6; full size</p>
+      <p class="diagram-shell__hint"><span class="fig">Fig. 1</span> &mdash; the autonomous loop &middot; pinch or +/&minus; to zoom &middot; drag to pan &middot; &#x26F6; full size</p>
       <div class="mermaid-wrap">
         <div class="zoom-controls">
           <button type="button" data-action="in" title="Zoom in">+</button>
@@ -431,17 +467,17 @@ flowchart TD
     <!-- ============ S2 ============ -->
     <div id="s2" class="sec-head"><span class="sec-head__num">02</span><h2>When sessions wake up</h2><span class="sec-head__mode">autopilot</span></div>
     <div class="sec-intro">
-      <p>Two Raspberry Pis do the work: a small services Pi runs the scheduler, the Telegram bot, and the notifications poller; a second Pi handles heavier compute. Cron on the services Pi drives everything.</p>
+      <p>Two Raspberry Pis (small, inexpensive, low-power computers) do the work: a small services Pi runs the scheduler, the Telegram bot, and the notifications poller; a second Pi handles heavier compute. Cron on the services Pi drives everything.</p>
       <ul>
         <li><b>Scheduled check-ins</b> &mdash; a wake fires every hour from 7 a.m. to 9 p.m. This is the one that pulls an issue and progresses it.</li>
         <li><b>Event wakes</b> &mdash; every 15 minutes a lighter pass drains a queue of things that just happened: a new meeting transcript, an email from me, a forwarded message, a Slack mention.</li>
         <li><b>The notifications poller</b> &mdash; also every 15 minutes, it checks email, shared Drive files, and 38 Slack channels, and writes anything interesting into that queue.</li>
       </ul>
-      <p>A wake is a Claude Code session in a tmux pane, running at high reasoning effort with a hard timeout. The session picks its work, does 15 to 30 minutes of it, then hands off: a Telegram summary, a work-log doc, and any board updates.</p>
+      <p>A wake is a Claude Code session in a tmux pane (a terminal that keeps running on the Pi after I disconnect), at high reasoning effort with a hard timeout (a time limit that ends a session if it runs too long). The session picks its work, does 15 to 30 minutes of it, then hands off: a Telegram summary, a work-log doc, and any board updates.</p>
     </div>
 
     <div class="diagram-shell">
-      <p class="diagram-shell__hint"><span class="fig">Fig. 2</span> &mdash; wake and event lifecycle &middot; Ctrl/Cmd + scroll to zoom &middot; &#x26F6; full size</p>
+      <p class="diagram-shell__hint"><span class="fig">Fig. 2</span> &mdash; wake and event lifecycle &middot; pinch or +/&minus; to zoom &middot; drag to pan &middot; &#x26F6; full size</p>
       <div class="mermaid-wrap">
         <div class="zoom-controls">
           <button type="button" data-action="in" title="Zoom in">+</button>
@@ -500,7 +536,7 @@ flowchart TD
     <!-- ============ S3 ============ -->
     <div id="s3" class="sec-head"><span class="sec-head__num">03</span><h2>What each session is told</h2><span class="sec-head__mode">autopilot</span></div>
     <div class="sec-intro">
-      <p>The prompt is assembled fresh each wake. A picker shortlists three candidates &mdash; an open GitHub issue, a backlog item, or a wildcard &mdash; and the session commits to one. Then comes a stack of shared instruction blocks: how to write a work-log doc, how to touch the board and CRM safely, an SMTP-only email rule, and how to leave a Telegram summary.</p>
+      <p>The prompt is assembled fresh each wake. A picker shortlists three candidates &mdash; an open GitHub issue, a backlog item, or a wildcard &mdash; and the session commits to one. Then comes a stack of shared instruction blocks: how to write a work-log doc, how to update the board and CRM safely (my task tracker and contacts list), an SMTP-only email rule (send through a standard mail server, never a model's own email feature), and how to leave a Telegram summary.</p>
       <p>A <b>quality-bar check</b> brackets the work. Before it starts, the session has to name the single best move that will make the output better than a rote pass &mdash; a fact to verify instead of assert, an earlier work-log to build on instead of repeating it, or a claim to test empirically. Before it wraps up, it re-reads what it produced and confirms it made that move.</p>
     </div>
 
@@ -514,8 +550,8 @@ flowchart TD
     <div class="sec-intro">
       <p>Not everything runs on a timer. When I'm at the keyboard the same machinery is there, but I'm in the loop in real time &mdash; so we can take on bigger, riskier changes than an unattended wake should, and I can steer mid-flight.</p>
       <ul>
-        <li><b>superjawn for anything non-trivial.</b> I run it through superjawn &mdash; my fork of superpowers that forces a research phase before any brainstorming or planning, so the work starts from evidence. It writes the spec before touching code and I approve it; ambiguous specs produce ambiguous code, so the spec is where the time goes.</li>
-        <li><b>Fan out.</b> Instead of one session grinding through a problem, I have it spawn several subagents in parallel &mdash; one exploring the codebase, one running a codex review, one acting as the coach, one driving the Copilot CLI &mdash; then synthesize what they bring back. More compute on the same problem, and independent passes that catch each other's misses.</li>
+        <li><b>superjawn for anything non-trivial.</b> I run it through superjawn &mdash; my fork of superpowers (a workflow add-on for Claude Code) that forces a research phase before any brainstorming or planning, so the work starts from evidence. It writes the spec before touching code and I approve it; ambiguous specs produce ambiguous code, so the spec is where the time goes.</li>
+        <li><b>Fan out.</b> Instead of one session grinding through a problem, I have it spawn several subagents in parallel (extra AI helpers the main session launches, each on one piece of the problem) &mdash; one exploring the codebase, one running a codex review, one acting as the coach, one driving the Copilot CLI &mdash; then synthesize what they bring back. More compute on the same problem, and independent passes that catch each other's misses.</li>
         <li><b>Reviews on demand.</b> The codex and coach passes from the autonomous flow are available here too, and I can fire a Copilot CLI review on a single fix without spending one of GitHub's metered PR-bot reviews.</li>
         <li><b>Verify before "done."</b> Nothing gets called finished on a claim. The session has to prove it &mdash; run the test and show the output, diff the behavior against main, demonstrate the fix fires. "It should work now" is not done.</li>
         <li><b>I'm the gate at every step</b> &mdash; the plan, the fan-out, the diff, the merge &mdash; which is what makes the bigger changes safe to attempt.</li>
@@ -523,7 +559,7 @@ flowchart TD
     </div>
 
     <div class="diagram-shell">
-      <p class="diagram-shell__hint"><span class="fig">Fig. 3</span> &mdash; hands-on multi-agent fan-out &middot; Ctrl/Cmd + scroll to zoom &middot; &#x26F6; full size</p>
+      <p class="diagram-shell__hint"><span class="fig">Fig. 3</span> &mdash; hands-on multi-agent fan-out &middot; pinch or +/&minus; to zoom &middot; drag to pan &middot; &#x26F6; full size</p>
       <div class="mermaid-wrap">
         <div class="zoom-controls">
           <button type="button" data-action="in" title="Zoom in">+</button>
@@ -583,7 +619,7 @@ flowchart TD
     <div id="s5" class="sec-head"><span class="sec-head__num">05</span><h2>Three models check one change</h2><span class="sec-head__mode">both modes</span></div>
     <div class="sec-intro">
       <p>The review stack is the core of the setup, and it runs in both modes. Work gets done with Claude Opus at high reasoning. Before anything is committed, a <b>different</b> model reads the change.</p>
-      <p>First, <b>Codex reviews the uncommitted diff</b> &mdash; bugs, security, swallowed errors, and style, up to three passes. High-severity findings get fixed in place; anything that would balloon the scope becomes its own issue instead.</p>
+      <p>First, <b>Codex reviews the uncommitted diff</b> &mdash; the exact lines the change adds or removes, before they're saved &mdash; for bugs, security, swallowed errors, and style, up to three passes. High-severity findings get fixed in place; anything that would balloon the scope becomes its own issue instead.</p>
       <p>Then an independent <b>coach</b>: a separate Claude subagent at high reasoning that judges quality. Codex already covered correctness, so the coach reads the diff and answers two questions &mdash; would this impress a sharp reviewer or land as competent but forgettable, and what single change would raise it most? It runs even when Codex is down, and skips itself when there's no code to review.</p>
       <p>Only then does the change get committed and the PR opened, where <b>Copilot</b> reviews it again, independently, on GitHub. The last gate is me.</p>
     </div>
@@ -598,7 +634,7 @@ flowchart TD
     </div>
 
     <div class="diagram-shell">
-      <p class="diagram-shell__hint"><span class="fig">Fig. 4</span> &mdash; the pre-PR review chain &middot; Ctrl/Cmd + scroll to zoom &middot; &#x26F6; full size</p>
+      <p class="diagram-shell__hint"><span class="fig">Fig. 4</span> &mdash; the pre-PR review chain &middot; pinch or +/&minus; to zoom &middot; drag to pan &middot; &#x26F6; full size</p>
       <div class="mermaid-wrap">
         <div class="zoom-controls">
           <button type="button" data-action="in" title="Zoom in">+</button>
@@ -669,7 +705,7 @@ flowchart TD
     </div>
 
     <div class="diagram-shell">
-      <p class="diagram-shell__hint"><span class="fig">Fig. 5</span> &mdash; issues as the to-do list &middot; Ctrl/Cmd + scroll to zoom &middot; &#x26F6; full size</p>
+      <p class="diagram-shell__hint"><span class="fig">Fig. 5</span> &mdash; issues as the to-do list &middot; pinch or +/&minus; to zoom &middot; drag to pan &middot; &#x26F6; full size</p>
       <div class="mermaid-wrap">
         <div class="zoom-controls">
           <button type="button" data-action="in" title="Zoom in">+</button>
@@ -741,14 +777,14 @@ flowchart TD
     <details class="collapsible">
       <summary>One sharp edge with worktrees and automated review</summary>
       <div class="body">
-        <p>If a worktree's branch is behind main, an automated reviewer reading "the diff" can see the PR's real changes <em>plus</em> the reverse of every sibling change that already merged into main &mdash; and flag those reversals as new bugs. The fix is to rebase the worktree onto current main before running the review, so the reviewer only sees what the PR changes.</p>
+        <p>If a worktree's branch is behind main (missing changes that have since gone live), an automated reviewer reading "the diff" can see the PR's real changes <em>plus</em> the reverse of every sibling change that already merged into main &mdash; and flag those reversals as new bugs. The fix is to rebase the worktree onto current main (replay its changes on top of the latest code) before running the review, so the reviewer only sees what the PR changes.</p>
       </div>
     </details>
 
     <!-- ============ S8 ============ -->
     <div id="s8" class="sec-head"><span class="sec-head__num">08</span><h2>Who does what</h2><span class="sec-head__mode">both modes</span></div>
     <div class="sec-intro">
-      <p>Four models, each on a job that fits it, and a hard rule underneath: <b>no direct API calls.</b> Everything runs through a CLI on a subscription I already pay for, so adding a model to the pipeline doesn't add a metered bill.</p>
+      <p>Four models, each on a job that fits it, and a hard rule underneath: <b>no direct API calls</b> &mdash; the pay-as-you-go way of calling a model, billed by the word. Everything runs through a CLI on a subscription I already pay for, so adding a model to the pipeline doesn't add a metered bill.</p>
     </div>
 
     <p class="fig-cap"><span class="fig">Fig. 7</span> &mdash; who does what</p>
@@ -767,7 +803,7 @@ flowchart TD
       </div>
       <div class="ve-card">
         <div class="ve-card__label">support</div>
-        <p><b>Gemini</b> handles the cheap, high-volume jobs: triaging email and returning structured output from the CLI.</p>
+        <p><b>Gemini</b> handles the cheap, high-volume jobs: triaging email and returning structured output (answers in a fixed, machine-readable format) from the CLI.</p>
       </div>
     </div>
 
@@ -789,7 +825,7 @@ flowchart TD
 
     <div class="callout callout--info">
       <div class="callout__title">Each repo teaches its own reviewer</div>
-      <p>Copilot's review is grounded in each repo. Every repo carries a custom <code>.github/copilot-instructions.md</code> that tells Copilot the project's architecture, the patterns to enforce, and the specific mistakes to watch for &mdash; a missing query limit, a NaN write, a wrong dependency arrow, a factual error in the docs. The review comes back shaped by that repo's context. Same idea as the per-repo <code>CLAUDE.md</code> the sessions read: the project carries its own standards, and every model that touches it inherits them.</p>
+      <p>Copilot's review is grounded in each repo. Every repo carries a custom <code>.github/copilot-instructions.md</code> that tells Copilot the project's architecture, the patterns to enforce, and the specific mistakes to watch for &mdash; concrete, repo-specific bugs like a missing query limit, a NaN write, a wrong dependency arrow, or a factual error in the docs. The review comes back shaped by that repo's context. Same idea as the per-repo <code>CLAUDE.md</code> the sessions read: the project carries its own standards, and every model that touches it inherits them.</p>
     </div>
 
     <p class="sec-intro" style="margin-top:18px">Copilot's PR bot is the one place a review costs metered minutes, so I treat it as a once-per-PR resource: it reviews on open, I address everything it raises in one pass, and I don't re-trigger it. The cheap reviewers (Codex, the coach) do the iterating before the PR ever opens.</p>
@@ -798,7 +834,7 @@ flowchart TD
     <div id="s9" class="sec-head"><span class="sec-head__num">09</span><h2>Context and pre-compaction prep</h2><span class="sec-head__mode">both modes</span></div>
     <div class="sec-intro">
       <p>Long sessions degrade as the context window fills &mdash; the model gets measurably worse well before it runs out of room. I call the last stretch the dumb zone and try to never work in it. Three habits keep sessions sharp.</p>
-      <p>First, I compact early and on purpose. Autocompact is set to trigger around 300K tokens, and when I hit a natural stopping point I run a manual compact with a note about what we're doing next &mdash; so the summary that survives is built around the next task, not whatever happened to be on screen.</p>
+      <p>First, I compact early and on purpose. Autocompact is set to trigger around 300K tokens (the units models count text in, each one roughly three-quarters of a word), and when I hit a natural stopping point I run a manual compact with a note about what we're doing next &mdash; so the summary that survives is built around the next task, not whatever happened to be on screen.</p>
       <p>Second, before a planned compaction I have the session <b>write a durable handoff file to disk</b> &mdash; the task, the decisions made so far, the exact file paths, what's done and what's next. Compaction is lossy: the auto-summary keeps what the model guesses matters, and you can't predict what it drops. A file is byte-exact, and the first step after compacting is to re-read it, which restores full fidelity. This page was built across a compaction exactly that way.</p>
       <p>Third, I keep the always-loaded project instructions lean. The <code>CLAUDE.md</code> in each repo gets condensed to pointers &mdash; the anti-slop writing rules and the core engineering principles stay in full because they apply every session, but changelogs and old handoffs move to linked files. Every token of standing instructions is a token spent on every session, so the file earns its length or it gets trimmed.</p>
     </div>
@@ -917,9 +953,12 @@ flowchart TD
 
   async function renderAll() {
     var dark = currentDark();
+    // On phones, fitting a wide flowchart to the narrow column makes the text tiny.
+    // Render at natural size instead and let the reader pinch / drag to move around.
+    var narrow = window.matchMedia('(max-width: 1000px)').matches;
     mermaid.initialize({
       startOnLoad: false, theme: 'base',
-      flowchart: { curve: 'basis', padding: 14, useMaxWidth: true },
+      flowchart: { curve: 'basis', padding: 14, useMaxWidth: !narrow },
       themeVariables: themeVars(dark)
     });
     nodes.forEach(function (n, i) { n.removeAttribute('data-processed'); n.textContent = sources[i]; });
@@ -1022,6 +1061,41 @@ flowchart TD
       window.addEventListener('mouseup', function () {
         dragging = false; vp.classList.remove('dragging'); wrap.classList.remove('is-panning');
       });
+
+      // ---- Touch: one finger pans, two fingers pinch-zoom ----
+      var pinchStart = 0, pinchScale = 1;
+      function touchDist(t) {
+        var dx = t[0].clientX - t[1].clientX, dy = t[0].clientY - t[1].clientY;
+        return Math.hypot(dx, dy);
+      }
+      wrap.addEventListener('touchstart', function (e) {
+        if (e.target.closest('.zoom-controls')) return;
+        if (e.touches.length === 1) {
+          dragging = true; sx = e.touches[0].clientX - panX; sy = e.touches[0].clientY - panY;
+          vp.classList.add('dragging'); wrap.classList.add('is-panning');
+        } else if (e.touches.length === 2) {
+          dragging = false; pinchStart = touchDist(e.touches); pinchScale = scale;
+        }
+      }, { passive: true });
+      wrap.addEventListener('touchmove', function (e) {
+        if (e.touches.length === 1 && dragging) {
+          e.preventDefault();
+          panX = e.touches[0].clientX - sx; panY = e.touches[0].clientY - sy; apply();
+        } else if (e.touches.length === 2 && pinchStart > 0) {
+          e.preventDefault();
+          setScale(pinchScale * (touchDist(e.touches) / pinchStart));
+        }
+      }, { passive: false });
+      wrap.addEventListener('touchend', function (e) {
+        if (e.touches.length === 0) {
+          dragging = false; pinchStart = 0;
+          vp.classList.remove('dragging'); wrap.classList.remove('is-panning');
+        } else if (e.touches.length === 1) {
+          // Second finger lifted mid-pinch: hand control back to one-finger pan.
+          pinchStart = 0; dragging = true;
+          sx = e.touches[0].clientX - panX; sy = e.touches[0].clientY - panY;
+        }
+      }, { passive: true });
     });
   })();
 </script>
