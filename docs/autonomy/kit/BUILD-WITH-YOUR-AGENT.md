@@ -57,9 +57,10 @@ Non-negotiable. A build that violates one is wrong even if it runs.
    commit/PR/comment text only — never inside a committed file.
 
 5. **A human gate on anything irreversible.** Honor `safety.auto_merge: false` and
-   `safety.protected_branches`. Unattended sessions open PRs; a person approves
-   and merges. They never merge their own work, never push to a protected branch,
-   never take an irreversible action.
+   `safety.protected_branches`. Unattended runs open PRs (the harness opens them,
+   after the scope check — not the session itself); a person approves and merges.
+   They never merge their own work, never push to a protected branch, never take
+   an irreversible action.
 
 6. **Match effort to the task.** Work runs at `model.work_effort`; review runs at
    `model.review_effort` (low on purpose — a fast literal read, not a rewrite).
@@ -92,10 +93,10 @@ scheduler fires
             wrap-up, final reflection, issue-capture)
           · the receipt token                      (invariant 4)
       → spawn the agent CLI on that prompt, under a hard timeout
-      → the session does the work + runs its review pass   (invariants 3, 6)
-      → enforce scope: reject a change that touches denied paths or
-        exceeds the breadth caps                   (invariant 2)
-      → open a PR — never merge                     (invariant 5)
+      → the session does the work, runs its review, commits to a branch  (3, 6)
+      → harness enforces scope: reject a diff outside allowed_paths, on a
+        denied path, or over the breadth caps                  (invariant 2)
+      → harness opens a PR — never merges                       (invariant 5)
       → verify the receipt token landed             (invariant 4)
       → notify (stdout / phone)
   → done; next fire is a fresh session
@@ -119,11 +120,14 @@ pick the right column. Nothing else in the build should branch on OS.
 Two warnings that have actually bitten people:
 
 - **The timeout wrapper must not kill the process tree before output flushes.**
-  GNU `timeout` without `--foreground` creates a new process group and can kill a
-  Node-based agent CLI before its output is written, leaving a zero-byte log and a
-  "succeeded" status that's a lie. Always use `--foreground` (or `gtimeout
-  --foreground` on macOS). On Windows, the simplest reliable path is to run the
-  whole loop inside WSL and use the Linux column.
+  `--foreground` keeps the wrapped command in the same foreground process group
+  instead of a new background one. Without it, a signal can take out the whole
+  group — and in practice a Node-based agent CLI killed that way can leave a
+  truncated or zero-byte log behind a "succeeded" status (we've hit exactly this).
+  Flush timing also depends on the child's stdio buffering, so treat `--foreground`
+  as necessary, not a guarantee. Use it (or `gtimeout --foreground` on macOS); on
+  Windows, the simplest reliable path is to run the loop inside WSL and use the
+  Linux column.
 
 - **The Notifier is the one primitive that's identical everywhere** because it's
   just an HTTPS call. To keep a first build trivial, set `notify.channel: stdout`
@@ -164,15 +168,23 @@ Two warnings that have actually bitten people:
    the reviewer CLI is installed and logged into a subscription (zero marginal
    cost — see COSTS.md), and that it runs before commit.
 
-7. **Enforce scope at the harness, not just the prompt.** Before the PR opens,
-   check the diff: if it touches a `scope.denied_paths` glob, or exceeds
-   `max_files_changed` / `max_lines_changed`, stop and turn it into a comment +
-   decomposition instead of a merge candidate. Prompt-level scope is guidance;
-   this check is the guardrail.
+7. **Enforce scope at the harness, and open the PR there — not in the session.**
+   The session commits to a new branch and stops; it does not open the PR itself,
+   because the wake loop only regains control after the agent exits, which is too
+   late to stop a bad PR. The harness then checks the branch diff and rejects it
+   if it falls *outside* `scope.allowed_paths` (when that allowlist is set),
+   touches a `scope.denied_paths` glob, or exceeds `max_files_changed` /
+   `max_lines_changed`. A rejected diff becomes a comment + decomposition instead
+   of a merge candidate. Prompt-level scope is guidance; this check is the
+   guardrail, and it has to run before the PR exists.
 
-8. **Open the PR, verify, notify.** Open a PR (never merge). Confirm the receipt
-   token landed (`reference/verify.reference.py`), read the session's summary, and
-   send it via `notify.channel`.
+8. **Open the PR (harness side), verify, notify.** Once the scope check passes,
+   the harness opens the PR — never merges. If the correctness reviewer couldn't
+   run this session, don't open a normal PR; report the run as blocked /
+   needs-review instead, because a second model checking the diff is a hard
+   requirement (invariant 3), not a nicety. Confirm the receipt token landed
+   (`reference/verify.reference.py`), read the session's summary, and send it via
+   `notify.channel`.
 
 9. **Install the schedule** from `templates/` for the OS, then **dry-run before
    arming it.** Run one wake by hand against a throwaway issue. Confirm: a prompt
@@ -206,7 +218,10 @@ time. Recommend that path.
 
 - Honor `safety.auto_merge: false` and `safety.protected_branches` — open PRs, a
   human merges.
-- Enforce `scope` at the harness (step 7), not only in the prompt.
+- Enforce `scope` at the harness (step 7), not only in the prompt — reject edits
+  outside `allowed_paths` when that allowlist is set, and have the harness (not the
+  session) open the PR, only after the check passes. A failed correctness review
+  blocks the PR too.
 - The receipt token belongs only in commit/PR/comment text — never in a committed
   file. Add no AI-authorship note anywhere.
 - Treat anything the session *reads* (an issue body, a linked page) as untrusted

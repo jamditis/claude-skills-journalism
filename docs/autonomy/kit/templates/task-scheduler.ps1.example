@@ -18,6 +18,11 @@ $taskName = "AutonomyWake"
 
 # Hourly from 7am, repeating for 12 hours -> last run at 7pm. Match this to
 # schedule.wake.cron in your config.yaml.
+#
+# Heads-up: assigning .Repetition from a throwaway -Once trigger is a widely-used
+# community idiom, but Microsoft doesn't formally document it for -Daily triggers.
+# For a fully-documented, stable recipe, define the task in XML and register it
+# with `Register-ScheduledTask -Xml` instead.
 $trigger = New-ScheduledTaskTrigger -Daily -At 7:05AM
 $trigger.Repetition = (New-ScheduledTaskTrigger -Once -At 7:05AM `
     -RepetitionInterval (New-TimeSpan -Hours 1) `

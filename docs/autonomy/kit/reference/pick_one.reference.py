@@ -16,8 +16,9 @@ from datetime import datetime, timezone
 def list_open_issues(repo, require_labels):
     """Return open issues for one repo as a list of dicts via the gh CLI.
 
-    Multiple --label flags AND together, so require_labels is enforced here at
-    the source. The rest of the gating happens in Python below.
+    Repeated --label flags filter at the source. `gh issue list` doesn't formally
+    document AND-across-labels the way `gh pr list` does, so passes_gates() below
+    re-checks the required labels in Python rather than trust it.
     """
     cmd = ["gh", "issue", "list", "--repo", repo, "--state", "open",
            "--json", "number,title,body,labels,assignees,updatedAt", "--limit", "100"]
@@ -30,9 +31,12 @@ def list_open_issues(repo, require_labels):
     return issues
 
 
-def passes_gates(issue, skip_labels, skip_assigned):
-    """A single issue's eligibility after the source-side require_labels filter."""
+def passes_gates(issue, require_labels, skip_labels, skip_assigned):
+    """A single issue's eligibility. Re-checks require_labels in Python instead of
+    trusting gh's --label AND semantics, then applies the skip gates."""
     labels = {l["name"] for l in issue.get("labels", [])}
+    if not set(require_labels) <= labels:  # missing a required label -> out
+        return False
     if labels & set(skip_labels):          # any skip label present -> out
         return False
     if skip_assigned and issue.get("assignees"):   # a human is already on it
@@ -77,7 +81,8 @@ def shortlist(cfg):
     pool = []
     for repo in repos:
         for issue in list_open_issues(repo, cfg.get("require_labels", [])):
-            if passes_gates(issue, cfg.get("skip_labels", []), cfg.get("skip_assigned", True)):
+            if passes_gates(issue, cfg.get("require_labels", []),
+                            cfg.get("skip_labels", []), cfg.get("skip_assigned", True)):
                 pool.append(issue)
     pool.sort(key=lambda it: sort_key(it, cfg["repo_priority"], cfg.get("order_by", "oldest")))
     return pool[: cfg.get("shortlist_size", 3)]

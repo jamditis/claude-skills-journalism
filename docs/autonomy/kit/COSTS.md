@@ -17,9 +17,10 @@ The biggest lever is which credential your CLIs use.
 - **A metered API key** (`ANTHROPIC_API_KEY`, an OpenAI API key): every token is
   pay-as-you-go. An unattended loop firing on a schedule bills continuously.
 
-A stray API key in your environment can override a subscription login, so it's
-worth confirming which mode each CLI is in — the worker and the reviewer both —
-before you arm the schedule.
+If an API key is set in your environment, confirm which auth mode each CLI is
+actually using before you schedule anything — the worker and the reviewer both.
+Don't assume the subscription login wins; check, because a metered key billing in
+the background is the surprise you're trying to avoid.
 
 ## The high end
 

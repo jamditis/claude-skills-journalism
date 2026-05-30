@@ -57,7 +57,11 @@ If the issue is blocked (needs a decision, credentials, or a dependency you don'
 have), don't force it. Leave a comment stating the blocker and what you'd need,
 carrying the receipt token, then stop and report it as blocked.
 
-Open a pull request for review. Never merge it yourself.
+Commit your work to a new branch and stop there — do NOT open the pull request
+yourself. The harness checks your diff against the scope rules above and opens the
+PR for you only if it passes; if your change falls outside the allowed paths,
+touches a denied path, or blows the size cap, the harness turns it into a comment
+or child issues instead. You never merge.
 === END YOUR TASK ===
 ```
 
@@ -132,9 +136,12 @@ Apply a suggestion if it clearly improves the change and fits your time; if you
 disagree, note why in one line rather than complying reflexively. Skip the whole
 pass only if you made no file changes at all.
 
-If the correctness reviewer fails (timeout, error, unparseable output), don't
-block — still run the quality pass, do a careful manual read, commit, and note
-that review failed.
+If the correctness reviewer can't run (timeout, error, unparseable output), fail
+closed. A second model reading the diff is a hard requirement, not a nicety, so
+don't turn an unreviewed change into a merge-ready PR. Commit it to the branch if
+you like, but report the run as blocked — leave a comment that correctness review
+was unavailable and the change needs a manual read — and stop. Don't quietly ship
+an unreviewed change just because the reviewer was down.
 === END REVIEW ===
 ```
 
@@ -151,7 +158,8 @@ that review failed.
   or several, reference them without auto-closing.
 - Keep the receipt token in the commit, PR, or comment only — never inside a
   committed file. Add no AI-authorship or "AI-assisted" note anywhere.
-- Open a PR for review. Never merge it yourself.
+- Commit to a new branch; let the harness run the scope check and open the PR.
+  Don't open or merge the PR yourself.
 === END WRAP UP ===
 ```
 
