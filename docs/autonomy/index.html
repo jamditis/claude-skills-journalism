@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>How I run dev work with Claude, on autopilot and at the keyboard</title>
   <meta name="description" content="Two modes, one quality bar: autonomous sessions that pull work off my GitHub issues while I'm away, and hands-on sessions where we run multi-agent reviews together. Plus how I keep both sharp.">
+  <meta name="author" content="Joe Amditis">
 
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23fff'/%3E%3Cpath d='M9 9 L24 16 L11 24' stroke='%23111' stroke-width='1.5' fill='none'/%3E%3Ccircle cx='9' cy='9' r='3.4' fill='%23e4002b'/%3E%3Ccircle cx='24' cy='16' r='3.4' fill='%23111'/%3E%3Ccircle cx='11' cy='24' r='3.4' fill='%23111'/%3E%3C/svg%3E">
 
@@ -20,6 +21,30 @@
   <meta name="twitter:title" content="How I run dev work with Claude, on autopilot and at the keyboard">
   <meta name="twitter:description" content="Two modes, one quality bar: autonomous sessions that pull work off my GitHub issues, and hands-on sessions where we run multi-agent reviews together.">
   <meta name="twitter:image" content="https://skills.amditis.tech/autonomy/og-image.png">
+
+  <!-- Structured data: author + article -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "How I run dev work with Claude, on autopilot and at the keyboard",
+    "description": "Two modes, one quality bar: autonomous sessions that pull work off my GitHub issues while I'm away, and hands-on sessions where we run multi-agent reviews together. Plus how I keep both sharp.",
+    "url": "https://skills.amditis.tech/autonomy/",
+    "image": "https://skills.amditis.tech/autonomy/og-image.png",
+    "datePublished": "2026-05-29T12:12:47-04:00",
+    "dateModified": "2026-05-30T14:37:04-04:00",
+    "author": {
+      "@type": "Person",
+      "name": "Joe Amditis",
+      "url": "https://jamditis.com",
+      "sameAs": "https://github.com/jamditis"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Center for Cooperative Media"
+    }
+  }
+  </script>
 
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 
@@ -124,6 +149,8 @@
       font-size: clamp(34px, 6vw, 66px); font-weight: 800; line-height: 1.0;
       letter-spacing: -0.035em; color: var(--text-bright); margin-bottom: 26px; max-width: 16ch;
     }
+    .hero__byline { font-family: var(--font-mono); font-size: 13px; font-weight: 500; margin: -8px 0 30px; }
+    .hero__byline .by { color: var(--text-dim); }
     .hero .lead { font-size: clamp(17px, 0.9vw + 14px, 20px); color: var(--text); max-width: 66ch; margin-bottom: 18px; }
     .hero__meta { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); margin-top: 26px; }
 
@@ -131,6 +158,7 @@
     @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
     .hero > * { animation: fadeUp 0.55s ease both; }
     .hero h1 { animation-delay: 0.05s; }
+    .hero__byline { animation-delay: 0.10s; }
     .hero .lead:nth-of-type(1) { animation-delay: 0.12s; }
     .hero .lead:nth-of-type(2) { animation-delay: 0.18s; }
     .hero .stats { animation-delay: 0.24s; }
@@ -387,6 +415,7 @@
 
     <header class="hero">
       <h1>How I run dev work with Claude, on autopilot and at the keyboard</h1>
+      <div class="hero__byline"><span class="by">By</span> <a href="https://jamditis.com" rel="author">Joe Amditis</a></div>
       <p class="lead">A few of you asked how my setup works, so here it is end to end. It runs in <strong>two modes that share one quality bar</strong>. On autopilot, a cron scheduler wakes a Claude Code session every hour to pull a GitHub issue and work it in an isolated git worktree. Before any pull request reaches me, it's been read by a second model and a separate coach agent whose only job is to ask whether the work is good. Hands-on, I'm at the keyboard and we run heavier multi-agent reviews together on bigger changes. Either way, Copilot reviews the PR, I have the final say, and I get a Telegram message when something's done.</p>
       <p class="lead">Quality comes from <strong>stacking independent checks</strong>. No single model has to be brilliant; enough of them have to disagree. Stack a few and a single miss gets caught in review, before it can become a bad merge.</p>
 
@@ -396,7 +425,7 @@
         <div class="stat"><div class="stat__val">hourly</div><div class="stat__label">scheduled wakes, 7 a.m. to 9 p.m.</div></div>
         <div class="stat"><div class="stat__val">1</div><div class="stat__label">human merge gate (me)</div></div>
       </div>
-      <p class="hero__meta">Working notes &middot; Joe Amditis &middot; Center for Cooperative Media &middot; updated May 2026</p>
+      <p class="hero__meta">Working notes &middot; Center for Cooperative Media &middot; updated May 2026</p>
       <p class="hero__note">Not a developer? <a href="#primer">Start with the plain-language key below</a> &mdash; it defines every term the page leans on. None of this is as complicated as the words make it sound.</p>
     </header>
 
