@@ -85,7 +85,9 @@ confidence grows.
   planned. If you're on either, treat that column as a solid starting point, not a
   guarantee: have your agent verify each piece on a throwaway issue before you arm
   the schedule. The primitives table in `BUILD-WITH-YOUR-AGENT.md` is where the
-  per-OS choices live.
+  per-OS choices live. On Windows specifically, the recommended path is to run the
+  loop inside WSL, which reuses the tested Linux primitives; native Task Scheduler
+  is an advanced, still-untested fallback.
 - **Cost:** the loop is cheap only if your CLIs are logged into a subscription
   rather than billing an API key, and only if you keep the cadence sane. Read
   `COSTS.md` first.

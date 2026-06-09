@@ -111,9 +111,9 @@ pick the right column. Nothing else in the build should branch on OS.
 
 | Primitive | What it does | Linux | macOS | Windows |
 |---|---|---|---|---|
-| **Scheduler** | fires the wake on a cadence | `cron` | `launchd` (a `.plist` in `~/Library/LaunchAgents`) or `cron` | Task Scheduler, or `cron` inside WSL |
-| **Timeout wrapper** | kills a hung session *without* killing it before output flushes | `timeout --foreground` (GNU or uutils coreutils) | `gtimeout --foreground` (`brew install coreutils`) | a PowerShell job with a kill timer, or run the loop in WSL with GNU `timeout` |
-| **Session host** | keeps the long session alive and captures its output | `tmux` (or a detached process to a log) | `tmux` | Windows Terminal / a background `Start-Process`, or `tmux` in WSL |
+| **Scheduler** | fires the wake on a cadence | `cron` | `launchd` (a `.plist` in `~/Library/LaunchAgents`) or `cron` | `cron` inside WSL (recommended), or native Task Scheduler |
+| **Timeout wrapper** | kills a hung session *without* killing it before output flushes | `timeout --foreground` (GNU or uutils coreutils) | `gtimeout --foreground` (`brew install coreutils`) | GNU `timeout --foreground` inside WSL (recommended), or a native PowerShell job with a kill timer |
+| **Session host** | keeps the long session alive and captures its output | `tmux` (or a detached process to a log) | `tmux` | `tmux` inside WSL (recommended), or Windows Terminal / a background `Start-Process` |
 | **Secret store** | resolves the `*_ref` names to real values | `pass`, or env | Keychain, `pass`, or env | Credential Manager, `1password` CLI, or env |
 | **Notifier** | delivers the session summary | Telegram bot (HTTPS), or stdout | same | same |
 
@@ -138,9 +138,18 @@ Two warnings that have actually bitten people:
   group — and in practice a Node-based agent CLI killed that way can leave a
   truncated or zero-byte log behind a "succeeded" status (we've hit exactly this).
   Flush timing also depends on the child's stdio buffering, so treat `--foreground`
-  as necessary, not a guarantee. Use it (or `gtimeout --foreground` on macOS); on
-  Windows, the simplest reliable path is to run the loop inside WSL and use the
-  Linux column.
+  as necessary, not a guarantee. Use it (or `gtimeout --foreground` on macOS).
+
+- **On Windows, run the loop inside WSL — that's the recommended path, not a
+  fallback.** WSL reuses the exact Linux primitives this kit was tested on (cron,
+  GNU `timeout --foreground`, tmux), so it sidesteps the two native Windows gaps:
+  there's no native `timeout --foreground` equivalent, and Task Scheduler's own
+  time limit terminates a run without letting the agent flush its log. Native
+  Task Scheduler is supported as an advanced, still-untested fallback —
+  `templates/task-scheduler.ps1.example` registers the schedule with the
+  documented `Register-ScheduledTask -Xml` form and shows a PowerShell
+  job-plus-kill-timer wrapper so the wake script bounds itself. If you can run
+  WSL, do; only reach for the native path if you genuinely can't.
 
 - **The Notifier is the one primitive that's identical everywhere** because it's
   just an HTTPS call. To keep a first build trivial, set `notify.channel: stdout`
