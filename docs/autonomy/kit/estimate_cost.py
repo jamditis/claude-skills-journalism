@@ -217,6 +217,8 @@ def estimate(inputs: Inputs) -> Estimate:
         raise ValueError("avg_session_minutes must be positive")
     if inputs.max_passes <= 0:
         raise ValueError("max_passes must be positive")
+    if inputs.days_per_month <= 0:
+        raise ValueError("days_per_month must be positive")
 
     per_active_day = cron_runs_per_active_day(inputs.cron)
     active_days = cron_active_days_per_week(inputs.cron)
@@ -381,16 +383,19 @@ def resolve_inputs(args: argparse.Namespace) -> tuple[Inputs, str]:
     if cfg_path:
         values.update(inputs_from_config(load_config(cfg_path)))
         source = cfg_path
-    # Flag overrides win over the config file.
-    if args.cron:
+    # Flag overrides win over the config file. Test "is not None" (was the flag
+    # passed?), not truthiness — otherwise an explicit --max-passes 0 or
+    # --avg-session-minutes 0 is falsy, gets silently dropped for the default,
+    # and the positive-value checks in estimate() never see the bad value.
+    if args.cron is not None:
         values["cron"] = args.cron
-    if args.work_effort:
+    if args.work_effort is not None:
         values["work_effort"] = args.work_effort
-    if args.review_effort:
+    if args.review_effort is not None:
         values["review_effort"] = args.review_effort
-    if args.max_passes:
+    if args.max_passes is not None:
         values["max_passes"] = args.max_passes
-    if args.avg_session_minutes:
+    if args.avg_session_minutes is not None:
         values["avg_session_minutes"] = args.avg_session_minutes
 
     if "cron" not in values:

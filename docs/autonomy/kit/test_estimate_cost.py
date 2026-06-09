@@ -171,6 +171,28 @@ def test_nonpositive_session_rejected():
         ec.estimate(_inputs(avg_session_minutes=0))
 
 
+@pytest.mark.parametrize("days", [0, -3])
+def test_nonpositive_days_per_month_rejected(days):
+    # A zero or negative calendar would yield zero/negative runs and cost.
+    with pytest.raises(ValueError, match="days_per_month"):
+        ec.estimate(_inputs(days_per_month=days))
+
+
+@pytest.mark.parametrize(
+    "flag, value",
+    [
+        ("--max-passes", "0"),
+        ("--avg-session-minutes", "0"),
+        ("--days-per-month", "0"),
+        ("--days-per-month", "-5"),
+    ],
+)
+def test_cli_rejects_explicit_invalid_overrides(flag, value):
+    # An explicit invalid override must be rejected (exit 2), not silently
+    # swapped for the default because 0 is falsy.
+    assert ec.main(["--cron", "0 * * * *", flag, value]) == 2
+
+
 # --- config extraction + end to end ---------------------------------------
 
 
