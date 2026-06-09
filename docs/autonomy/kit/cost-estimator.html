@@ -53,6 +53,7 @@
     }
     input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
     .num { width: 110px; text-align: right; }
+    input[type="checkbox"] { width: auto; justify-self: end; accent-color: var(--accent); }
     .row--full { grid-template-columns: 1fr; }
     .result { border: 1px solid var(--ink); }
     .result__head {
@@ -131,6 +132,12 @@
             <input class="num" id="passes" type="number" min="1" step="1" value="3">
           </div>
           <div class="row">
+            <label for="reviewOn">Review enabled
+              <span class="hint">off models <code>review.enabled: false</code> &mdash; no review cost</span>
+            </label>
+            <input id="reviewOn" type="checkbox" checked>
+          </div>
+          <div class="row">
             <label for="days">Days / month</label>
             <input class="num" id="days" type="number" min="1" step="0.1" value="30.4">
           </div>
@@ -194,6 +201,13 @@
     const EN = "–"; // en dash for ranges
 
     // ===== cron cadence -> runs per day (mirrors parse_cron_field / cron_runs_per_active_day) =====
+    // Strict: the whole token must be digits. parseInt("5x") returns 5, which
+    // would silently accept malformed cron the Python estimator rejects.
+    function toInt(s) {
+      const t = String(s).trim();
+      if (!/^\d+$/.test(t)) throw new Error('"' + t + '" is not a whole number');
+      return parseInt(t, 10);
+    }
     function parseField(text, lo, hi) {
       const values = new Set();
       for (let part of text.split(",")) {
@@ -202,16 +216,15 @@
         let step = 1, base = part;
         if (part.includes("/")) {
           const bits = part.split("/");
-          step = parseInt(bits[1], 10);
+          step = toInt(bits[1]);
           if (!(step > 0)) throw new Error('bad step in "' + part + '"');
           base = bits[0];
         }
         let start, end;
         if (base === "*") { start = lo; end = hi; }
         else if (base.includes("-")) {
-          const r = base.split("-"); start = parseInt(r[0], 10); end = parseInt(r[1], 10);
-        } else { start = end = parseInt(base, 10); }
-        if (!Number.isFinite(start) || !Number.isFinite(end)) throw new Error('bad field "' + text + '"');
+          const r = base.split("-"); start = toInt(r[0]); end = toInt(r[1]);
+        } else { start = end = toInt(base); }
         if (start < lo || end > hi || start > end) throw new Error('field "' + text + '" out of range [' + lo + "," + hi + "]");
         for (let v = start; v <= end; v += step) values.add(v);
       }
@@ -245,7 +258,8 @@
       const workerLo = w[0] * p.session, workerHi = w[1] * p.session;
       const wPrice = p.mtokWorker / 1e6;
       const r = REVIEW_TOKENS_PER_PASS, mult = REVIEW_EFFORT_MULTIPLIER[p.review];
-      const reviewLo = r[0] * mult * p.passes, reviewHi = r[1] * mult * p.passes;
+      const passes = p.reviewOn ? p.passes : 0;  // review.enabled: false bills nothing
+      const reviewLo = r[0] * mult * passes, reviewHi = r[1] * mult * passes;
       const rPrice = p.mtokReviewer / 1e6;
       return [workerLo * wPrice + reviewLo * rPrice, workerHi * wPrice + reviewHi * rPrice];
     }
@@ -300,6 +314,7 @@
       }
       const p = {
         work: $("work").value, review: $("review").value,
+        reviewOn: $("reviewOn").checked,
         session: Math.max(0.1, parseFloat($("session").value) || 0),
         passes: Math.max(1, parseInt($("passes").value, 10) || 1),
         days: Math.max(1, parseFloat($("days").value) || 30.4),

@@ -171,6 +171,7 @@ class Inputs:
     avg_session_minutes: float
     max_passes: int
     days_per_month: float = DAYS_PER_MONTH
+    review_enabled: bool = True
 
 
 @dataclass
@@ -199,10 +200,12 @@ def metered_cost_per_run(inputs: Inputs) -> tuple[float, float]:
     worker_tokens_hi = work_hi * inputs.avg_session_minutes
     worker_price = METERED_BLENDED_USD_PER_MTOK["worker"] / 1_000_000
 
+    # review.enabled: false means the review pass doesn't run, so it bills nothing.
+    passes = inputs.max_passes if inputs.review_enabled else 0
     pass_lo, pass_hi = REVIEW_TOKENS_PER_PASS
     mult = REVIEW_EFFORT_MULTIPLIER[inputs.review_effort]
-    review_tokens_lo = pass_lo * mult * inputs.max_passes
-    review_tokens_hi = pass_hi * mult * inputs.max_passes
+    review_tokens_lo = pass_lo * mult * passes
+    review_tokens_hi = pass_hi * mult * passes
     review_price = METERED_BLENDED_USD_PER_MTOK["reviewer"] / 1_000_000
 
     low = worker_tokens_lo * worker_price + review_tokens_lo * review_price
@@ -215,8 +218,8 @@ def estimate(inputs: Inputs) -> Estimate:
     inputs.review_effort = _validate_effort("review_effort", inputs.review_effort)
     if inputs.avg_session_minutes <= 0:
         raise ValueError("avg_session_minutes must be positive")
-    if inputs.max_passes <= 0:
-        raise ValueError("max_passes must be positive")
+    if inputs.review_enabled and inputs.max_passes <= 0:
+        raise ValueError("max_passes must be positive when review is enabled")
     if inputs.days_per_month <= 0:
         raise ValueError("days_per_month must be positive")
 
@@ -278,17 +281,22 @@ def inputs_from_config(cfg: dict) -> dict:
     model = cfg.get("model") or {}
     review = cfg.get("review") or {}
     out = {}
-    if wake.get("cron"):
+    # Test "is not None" (key present), not truthiness — else an explicit
+    # review.max_passes: 0 reads as absent and the bad value never reaches the
+    # validation in estimate(), exactly the trap the CLI path also had.
+    if wake.get("cron") is not None:
         out["cron"] = wake["cron"]
-    if model.get("work_effort"):
+    if model.get("work_effort") is not None:
         out["work_effort"] = model["work_effort"]
-    if model.get("review_effort"):
+    if model.get("review_effort") is not None:
         out["review_effort"] = model["review_effort"]
-    if review.get("max_passes"):
+    if review.get("max_passes") is not None:
         out["max_passes"] = int(review["max_passes"])
+    if review.get("enabled") is not None:
+        out["review_enabled"] = bool(review["enabled"])
     # hard_minutes is a ceiling on session length, not the average. It caps the
     # assumed average when it's tighter than the default (see resolve_inputs).
-    if timeouts.get("hard_minutes"):
+    if timeouts.get("hard_minutes") is not None:
         out["hard_minutes"] = int(timeouts["hard_minutes"])
     return out
 
@@ -307,13 +315,17 @@ def format_report(inputs: Inputs, est: Estimate, *, source: str) -> str:
         if est.active_days_per_week == 7
         else f"  ({est.active_days_per_week} days/week)"
     )
+    review_note = (
+        f"review up to {inputs.max_passes} passes"
+        if inputs.review_enabled
+        else "review disabled"
+    )
     lines = [
         "Autonomy loop cost estimate",
         f"  source            {source}",
         f"  cadence (cron)    {inputs.cron}",
         f"  work / review     {inputs.work_effort} / {inputs.review_effort} effort",
-        f"  avg session       {inputs.avg_session_minutes:g} min"
-        f"   (review up to {inputs.max_passes} passes)",
+        f"  avg session       {inputs.avg_session_minutes:g} min   ({review_note})",
         "",
         f"  runs/active day   {est.runs_per_active_day}{active_note}",
         f"  runs/month        {est.runs_per_month:,.0f}",
@@ -418,6 +430,7 @@ def resolve_inputs(args: argparse.Namespace) -> tuple[Inputs, str]:
         avg_session_minutes=avg_session_minutes,
         max_passes=values.get("max_passes", DEFAULT_MAX_PASSES),
         days_per_month=args.days_per_month,
+        review_enabled=values.get("review_enabled", True),
     )
     return inputs, source
 

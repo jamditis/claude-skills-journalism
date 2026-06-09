@@ -217,6 +217,47 @@ def test_inputs_from_config_tolerates_missing_sections():
     assert ec.inputs_from_config({}) == {}
 
 
+def test_inputs_from_config_preserves_explicit_zero_max_passes():
+    # review.max_passes: 0 must survive as 0, not be dropped by a truthiness
+    # check the way the CLI path used to drop --max-passes 0.
+    assert ec.inputs_from_config({"review": {"max_passes": 0}})["max_passes"] == 0
+
+
+def test_inputs_from_config_reads_review_enabled():
+    assert (
+        ec.inputs_from_config({"review": {"enabled": False}})["review_enabled"] is False
+    )
+    assert (
+        ec.inputs_from_config({"review": {"enabled": True}})["review_enabled"] is True
+    )
+    # Absent enabled key defaults to on (handled downstream), so it's not emitted.
+    assert "review_enabled" not in ec.inputs_from_config({"review": {}})
+
+
+def test_disabled_review_zeroes_review_cost():
+    on = ec.metered_cost_per_run(_inputs(review_enabled=True))
+    off = ec.metered_cost_per_run(_inputs(review_enabled=False))
+    assert off[0] < on[0]
+    assert off[1] < on[1]
+    # With review off, max_passes is irrelevant — it bills no review tokens.
+    assert ec.metered_cost_per_run(_inputs(review_enabled=False, max_passes=99)) == off
+
+
+def test_disabled_review_allows_zero_max_passes():
+    # max_passes 0 is moot when review is off, so estimate() accepts it; it's
+    # rejected only when review is enabled.
+    est = ec.estimate(_inputs(review_enabled=False, max_passes=0))
+    assert est.metered_per_run_usd[0] > 0  # worker cost still present
+    with pytest.raises(ValueError, match="max_passes"):
+        ec.estimate(_inputs(review_enabled=True, max_passes=0))
+
+
+def test_format_report_notes_disabled_review():
+    inputs = _inputs(review_enabled=False)
+    report = ec.format_report(inputs, ec.estimate(inputs), source="flags")
+    assert "review disabled" in report
+
+
 def test_example_config_round_trips_through_estimate():
     here = os.path.dirname(__file__)
     path = os.path.join(here, "config.example.yaml")
@@ -244,6 +285,32 @@ def _write_config(tmp_path, cfg):
     path = tmp_path / "config.yaml"
     path.write_text(yaml.safe_dump(cfg))
     return str(path)
+
+
+def test_config_explicit_zero_max_passes_rejected(tmp_path):
+    # The config path must reject review.max_passes: 0 too, not just the CLI.
+    path = _write_config(
+        tmp_path,
+        {"schedule": {"wake": {"cron": "0 * * * *"}}, "review": {"max_passes": 0}},
+    )
+    assert ec.main([path]) == 2
+
+
+def test_config_review_disabled_lowers_cost(tmp_path):
+    # review.enabled: false flows through to a lower metered estimate.
+    yaml = pytest.importorskip("yaml")
+    base = {"schedule": {"wake": {"cron": "0 * * * *"}}}
+    on_path = tmp_path / "on.yaml"
+    on_path.write_text(yaml.safe_dump(base))
+    off_path = tmp_path / "off.yaml"
+    off_path.write_text(yaml.safe_dump({**base, "review": {"enabled": False}}))
+    on, _ = ec.resolve_inputs(ec.build_parser().parse_args([str(on_path)]))
+    off, _ = ec.resolve_inputs(ec.build_parser().parse_args([str(off_path)]))
+    assert on.review_enabled is True
+    assert off.review_enabled is False
+    assert (
+        ec.estimate(off).metered_per_run_usd[0] < ec.estimate(on).metered_per_run_usd[0]
+    )
 
 
 def test_hard_timeout_caps_average_session(tmp_path):
