@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autonomy loop cost estimator</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23fff'/%3E%3Cpath d='M9 9 L24 16 L11 24' stroke='%23111' stroke-width='1.5' fill='none'/%3E%3Ccircle cx='9' cy='9' r='3.4' fill='%23e4002b'/%3E%3Ccircle cx='24' cy='16' r='3.4' fill='%23111'/%3E%3Ccircle cx='11' cy='24' r='3.4' fill='%23111'/%3E%3C/svg%3E">
+  <meta name="description" content="Size the autonomous issue-workhorse loop before you arm it: turn the cadence, effort, and timeout dials into a monthly cost range for subscription vs metered API billing.">
+  <meta property="og:title" content="Autonomy loop cost estimator">
+  <meta property="og:description" content="Turn the autonomy kit's dials into a number: estimated runs per day and a monthly cost range, subscription vs metered.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://skills.amditis.tech/autonomy/kit/cost-estimator.html">
+  <meta property="og:image" content="https://skills.amditis.tech/autonomy/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Autonomy loop cost estimator">
+  <meta name="twitter:description" content="Turn the autonomy kit's dials into a number: estimated runs per day and a monthly cost range, subscription vs metered.">
+  <meta name="twitter:image" content="https://skills.amditis.tech/autonomy/og-image.png">
+  <style>
+    :root {
+      --bg: #ffffff; --surface: #f4f4f1; --ink: #111111; --text: #1a1a1a;
+      --text-dim: #6a6a6a; --border: rgba(0,0,0,0.16); --accent: #e4002b;
+      --font-body: 'Archivo', system-ui, -apple-system, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-body); background: var(--bg); color: var(--text);
+      margin: 0; line-height: 1.5; -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 40px 20px 80px; }
+    a { color: var(--accent); }
+    h1 { font-size: 28px; line-height: 1.15; margin: 0 0 10px; letter-spacing: -0.01em; }
+    .intro { color: var(--text-dim); max-width: 64ch; margin: 0 0 8px; }
+    .intro code { font-family: var(--font-mono); font-size: 0.85em; background: var(--surface); padding: 1px 5px; }
+    .meta { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); margin: 22px 0 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 28px; align-items: start; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    .panel { border: 1px solid var(--ink); background: var(--bg); }
+    .panel__head {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em;
+      color: var(--accent); padding: 12px 16px; border-bottom: 1px solid var(--border);
+    }
+    .panel__body { padding: 14px 16px 18px; }
+    .row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; margin: 0 0 12px; }
+    .row label { font-size: 14px; }
+    .row .hint { display: block; font-size: 11.5px; color: var(--text-dim); font-family: var(--font-mono); margin-top: 2px; }
+    .row .hint code { background: var(--surface); padding: 0 3px; }
+    input, select {
+      font-family: var(--font-mono); font-size: 13px; padding: 6px 8px;
+      border: 1px solid var(--border); background: var(--bg); color: var(--text); width: 100%;
+    }
+    input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+    .num { width: 110px; text-align: right; }
+    .row--full { grid-template-columns: 1fr; }
+    .result { border: 1px solid var(--ink); }
+    .result__head {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em;
+      color: var(--accent); padding: 12px 16px; border-bottom: 1px solid var(--border);
+    }
+    .result__body { padding: 4px 0 8px; }
+    .line { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding: 11px 16px; border-bottom: 1px solid var(--border); }
+    .line:last-child { border-bottom: 0; }
+    .line .k { font-size: 13px; color: var(--text-dim); }
+    .line .v { font-family: var(--font-mono); font-size: 15px; font-weight: 600; color: var(--ink); text-align: right; }
+    .line--big .v { font-size: 21px; }
+    .line--accent .v { color: var(--accent); }
+    .sub { font-size: 11.5px; color: var(--text-dim); font-family: var(--font-mono); }
+    details.assumptions { margin-top: 22px; border: 1px solid var(--border); }
+    details.assumptions > summary {
+      cursor: pointer; padding: 11px 16px; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); list-style: none;
+    }
+    details.assumptions > summary::-webkit-details-marker { display: none; }
+    details.assumptions > summary::after { content: " +"; }
+    details.assumptions[open] > summary::after { content: " \2212"; }
+    .assume-grid { padding: 4px 16px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px; }
+    @media (max-width: 720px) { .assume-grid { grid-template-columns: 1fr; } }
+    .assume-grid label { font-size: 12.5px; display: block; margin-bottom: 4px; }
+    .assume-grid .hint { font-size: 11px; color: var(--text-dim); font-family: var(--font-mono); }
+    .assume-grid .hint code { background: var(--surface); padding: 0 3px; }
+    .caveat { font-size: 12.5px; color: var(--text-dim); margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px; max-width: 70ch; }
+    .err { color: var(--accent); font-family: var(--font-mono); font-size: 12.5px; padding: 11px 16px; }
+    .span-2 { grid-column: 1 / -1; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Autonomy loop cost estimator</h1>
+    <p class="intro">
+      Size the <a href="README.md">issue-workhorse loop</a> before you arm it. This turns the dials from
+      <a href="COSTS.md">COSTS.md</a> into a number: how many sessions a day your cadence fires, and a monthly
+      cost range for a flat subscription vs a metered API key. Defaults match the kit's
+      <code>config.example.yaml</code>. The prices under the fold are editable &mdash; replace them with your own
+      plans and observed per-session token use.
+    </p>
+
+    <div class="grid">
+      <div class="panel">
+        <div class="panel__head">The dials</div>
+        <div class="panel__body">
+          <div class="row row--full">
+            <label for="cron">Cadence (cron)
+              <span class="hint">minute hour dom month dow &mdash; e.g. <code>5 7-19 * * *</code></span>
+            </label>
+            <input id="cron" type="text" value="5 7-19 * * *" spellcheck="false">
+          </div>
+          <div class="row">
+            <label for="work">Work effort</label>
+            <select class="num" id="work">
+              <option>low</option><option>medium</option><option selected>high</option>
+              <option>xhigh</option><option>max</option>
+            </select>
+          </div>
+          <div class="row">
+            <label for="review">Review effort</label>
+            <select class="num" id="review">
+              <option selected>low</option><option>medium</option><option>high</option>
+              <option>xhigh</option><option>max</option>
+            </select>
+          </div>
+          <div class="row">
+            <label for="session">Avg session
+              <span class="hint">minutes; hard cap is the timeout</span>
+            </label>
+            <input class="num" id="session" type="number" min="1" step="1" value="30">
+          </div>
+          <div class="row">
+            <label for="passes">Review passes</label>
+            <input class="num" id="passes" type="number" min="1" step="1" value="3">
+          </div>
+          <div class="row">
+            <label for="days">Days / month</label>
+            <input class="num" id="days" type="number" min="1" step="0.1" value="30.4">
+          </div>
+        </div>
+      </div>
+
+      <div class="result">
+        <div class="result__head">Estimate</div>
+        <div class="result__body" id="resultBody"><!-- filled by JS --></div>
+      </div>
+    </div>
+
+    <details class="assumptions">
+      <summary>Price assumptions (USD) &mdash; edit to fit your plans</summary>
+      <div class="assume-grid">
+        <div>
+          <label for="subWorker">Subscription / mo &mdash; worker</label>
+          <input class="num" id="subWorker" type="number" min="0" step="1" value="100">
+          <span class="hint">flat plan for the coding agent</span>
+        </div>
+        <div>
+          <label for="subReviewer">Subscription / mo &mdash; reviewer</label>
+          <input class="num" id="subReviewer" type="number" min="0" step="1" value="20">
+          <span class="hint">flat plan for the reviewer (Codex/ChatGPT)</span>
+        </div>
+        <div>
+          <label for="mtokWorker">Metered $/Mtok &mdash; worker</label>
+          <input class="num" id="mtokWorker" type="number" min="0" step="0.5" value="12">
+          <span class="hint">blended input+output, Opus-class</span>
+        </div>
+        <div>
+          <label for="mtokReviewer">Metered $/Mtok &mdash; reviewer</label>
+          <input class="num" id="mtokReviewer" type="number" min="0" step="0.5" value="5">
+          <span class="hint">blended input+output, review-class</span>
+        </div>
+        <div class="span-2">
+          <span class="hint">Worker tokens billed per active minute scale with work effort (low&hellip;max):
+          3k&ndash;9k / 5k&ndash;14k / 8k&ndash;22k / 12k&ndash;30k / 18k&ndash;42k. Reviewer: 15k&ndash;60k per pass,
+          scaled by review effort. These mirror <code>estimate_cost.py</code> &mdash; keep the two in sync.</span>
+        </div>
+      </div>
+    </details>
+
+    <p class="caveat">
+      These are rough, order-of-magnitude assumptions, not a quote. Subscription runs cost nothing extra until you
+      hit the plan's limits; metered runs bill per token, and real token use swings widely with prompt caching and
+      how much each session actually does. Plans and prices move &mdash; calibrate with your own numbers before you
+      raise the cadence.
+    </p>
+    <p class="meta">Part of the autonomy issue-workhorse kit &middot; mirrors estimate_cost.py</p>
+  </div>
+
+  <script>
+    // ===== price assumptions that aren't editable inputs (mirror estimate_cost.py) =====
+    const WORKER_TOKENS_PER_MIN = {
+      low: [3000, 9000], medium: [5000, 14000], high: [8000, 22000],
+      xhigh: [12000, 30000], max: [18000, 42000],
+    };
+    const REVIEW_TOKENS_PER_PASS = [15000, 60000];
+    const REVIEW_EFFORT_MULTIPLIER = { low: 1.0, medium: 1.4, high: 2.0, xhigh: 2.6, max: 3.2 };
+    const EN = "–"; // en dash for ranges
+
+    // ===== cron cadence -> runs per day (mirrors parse_cron_field / cron_runs_per_active_day) =====
+    function parseField(text, lo, hi) {
+      const values = new Set();
+      for (let part of text.split(",")) {
+        part = part.trim();
+        if (!part) continue;
+        let step = 1, base = part;
+        if (part.includes("/")) {
+          const bits = part.split("/");
+          step = parseInt(bits[1], 10);
+          if (!(step > 0)) throw new Error('bad step in "' + part + '"');
+          base = bits[0];
+        }
+        let start, end;
+        if (base === "*") { start = lo; end = hi; }
+        else if (base.includes("-")) {
+          const r = base.split("-"); start = parseInt(r[0], 10); end = parseInt(r[1], 10);
+        } else { start = end = parseInt(base, 10); }
+        if (!Number.isFinite(start) || !Number.isFinite(end)) throw new Error('bad field "' + text + '"');
+        if (start < lo || end > hi || start > end) throw new Error('field "' + text + '" out of range [' + lo + "," + hi + "]");
+        for (let v = start; v <= end; v += step) values.add(v);
+      }
+      if (values.size === 0) throw new Error('field matched nothing: "' + text + '"');
+      return values;
+    }
+    function cronRunsPerActiveDay(expr) {
+      const f = expr.trim().split(/\s+/);
+      if (f.length !== 5) throw new Error("expected 5 cron fields, got " + f.length);
+      return parseField(f[0], 0, 59).size * parseField(f[1], 0, 23).size;
+    }
+    function cronActiveDaysPerWeek(expr) {
+      const dow = expr.trim().split(/\s+/)[4];
+      if (dow === "*") return 7;
+      // Parse against 0-7 (cron allows 0 and 7 for Sunday), then fold 7 -> 0.
+      // Normalizing the text first (dow.replace) would corrupt ranges like "1-7".
+      const days = new Set([...parseField(dow, 0, 7)].map(d => d % 7));
+      return days.size;
+    }
+    function cronRestrictions(expr) {
+      const f = expr.trim().split(/\s+/);
+      const notes = [];
+      if (f[2] !== "*") notes.push('day-of-month is "' + f[2] + '"');
+      if (f[3] !== "*") notes.push('month is "' + f[3] + '"');
+      return notes;
+    }
+
+    // ===== cost model (mirrors metered_cost_per_run) =====
+    function meteredPerRun(p) {
+      const w = WORKER_TOKENS_PER_MIN[p.work];
+      const workerLo = w[0] * p.session, workerHi = w[1] * p.session;
+      const wPrice = p.mtokWorker / 1e6;
+      const r = REVIEW_TOKENS_PER_PASS, mult = REVIEW_EFFORT_MULTIPLIER[p.review];
+      const reviewLo = r[0] * mult * p.passes, reviewHi = r[1] * mult * p.passes;
+      const rPrice = p.mtokReviewer / 1e6;
+      return [workerLo * wPrice + reviewLo * rPrice, workerHi * wPrice + reviewHi * rPrice];
+    }
+
+    function money(v) {
+      if (v >= 100) return "$" + Math.round(v).toLocaleString("en-US");
+      return "$" + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function intc(v) { return Math.round(v).toLocaleString("en-US"); }
+    const $ = id => document.getElementById(id);
+
+    // DOM builders — no innerHTML, so user-typed cron text is never parsed as markup.
+    function el(tag, cls, text) {
+      const n = document.createElement(tag);
+      if (cls) n.className = cls;
+      if (text != null) n.textContent = text;
+      return n;
+    }
+    function line(kText, vNode, opts) {
+      opts = opts || {};
+      const row = el("div", "line" + (opts.big ? " line--big" : "") + (opts.accent ? " line--accent" : ""));
+      const k = el("span", "k", kText);
+      if (opts.kSub) { k.appendChild(document.createElement("br")); k.appendChild(el("span", "sub", opts.kSub)); }
+      const v = el("span", "v");
+      if (typeof vNode === "string") v.textContent = vNode; else v.appendChild(vNode);
+      if (opts.vSub) { v.appendChild(document.createTextNode(" ")); v.appendChild(el("span", "sub", opts.vSub)); }
+      row.append(k, v);
+      return row;
+    }
+
+    function compute() {
+      const body = $("resultBody");
+      let perDay, activeDays;
+      try {
+        const cron = $("cron").value;
+        // day-of-month / month aren't modelled. Refuse rather than show a
+        // monthly total off by an order of magnitude (mirrors estimate_cost.py).
+        const restrictions = cronRestrictions(cron);
+        if (restrictions.length) {
+          body.replaceChildren(el("div", "err",
+            "cron restricts " + restrictions.join(" and ") +
+            ". This estimator reads cadence from minute, hour, and day-of-week only, " +
+            "so its monthly total would be wrong here. Estimate one without a " +
+            "day-of-month or month restriction, or work it out by hand."));
+          return;
+        }
+        perDay = cronRunsPerActiveDay(cron);
+        activeDays = cronActiveDaysPerWeek(cron);
+      } catch (e) {
+        body.replaceChildren(el("div", "err", "cadence error: " + e.message));
+        return;
+      }
+      const p = {
+        work: $("work").value, review: $("review").value,
+        session: Math.max(0.1, parseFloat($("session").value) || 0),
+        passes: Math.max(1, parseInt($("passes").value, 10) || 1),
+        days: Math.max(1, parseFloat($("days").value) || 30.4),
+        mtokWorker: Math.max(0, parseFloat($("mtokWorker").value) || 0),
+        mtokReviewer: Math.max(0, parseFloat($("mtokReviewer").value) || 0),
+      };
+      const runsPerMonth = perDay * (activeDays / 7) * p.days;
+      const subscription = (parseFloat($("subWorker").value) || 0) + (parseFloat($("subReviewer").value) || 0);
+      const run = meteredPerRun(p);
+      const moLo = run[0] * runsPerMonth, moHi = run[1] * runsPerMonth;
+      const gapLo = subscription ? moLo / subscription : 0;
+      const gapHi = subscription ? moHi / subscription : 0;
+
+      body.replaceChildren();
+      body.append(line("Runs / active day", String(perDay), {
+        big: true, vSub: activeDays === 7 ? null : "(" + activeDays + " days/wk)",
+      }));
+      body.append(line("Runs / month", intc(runsPerMonth)));
+      body.append(line("Subscription / mo", money(subscription), { kSub: "flat, ~$0 per run until limits" }));
+      body.append(line("Metered / mo", money(moLo) + EN + money(moHi), {
+        accent: true, kSub: money(run[0]) + EN + money(run[1]) + " per run",
+      }));
+      body.append(line("Gap at this cadence", intc(gapLo) + "x" + EN + intc(gapHi) + "x"));
+    }
+
+    document.querySelectorAll("input, select").forEach(elm => {
+      elm.addEventListener("input", compute);
+      elm.addEventListener("change", compute);
+    });
+    compute();
+  </script>
+</body>
+</html>

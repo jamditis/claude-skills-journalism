@@ -64,6 +64,24 @@ If you're on metered billing and want a firm ceiling, the practical budget is
 cadence × effort × timeout: fewer runs, lower effort, and a shorter cap each
 multiply down the worst case.
 
+## Estimate it
+
+To turn those dials into a number before you arm the loop:
+
+```
+python3 estimate_cost.py config.yaml          # reads your config
+python3 estimate_cost.py --cron "*/15 7-19 * * *" --work-effort high
+```
+
+It prints estimated runs per day, runs per month, and a monthly cost range for
+subscription vs. metered billing side by side, so the gap is concrete. The same
+math runs in the browser at `cost-estimator.html` — no setup. The price
+assumptions live in one editable block at the top of `estimate_cost.py`. The
+subscription defaults assume the common plan tiers — a $100/mo worker plan and a
+$20/mo reviewer plan — so swap in whichever tier ($20, $100, $200) you're
+actually on, and replace the metered figures with your observed per-session
+token use.
+
 ## A change worth watching
 
 Around mid-2026, two billing shifts are relevant to a loop like this. Check the
