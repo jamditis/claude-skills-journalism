@@ -1,43 +1,132 @@
 # Task Scheduler registration for the issue workhorse (Windows, PowerShell).
 #
-# Run this script once, from an elevated PowerShell, to register an hourly task.
-# Edit the paths and hours first. Check it took with:
-#   Get-ScheduledTask -TaskName "AutonomyWake"
+# RECOMMENDED WINDOWS PATH: run the loop inside WSL, not native Task Scheduler.
+# WSL reuses the exact Linux primitives this kit was tested on — cron, GNU
+# `timeout --foreground`, tmux — so it's the lower-risk setup by a wide margin.
+# Install a WSL distro, then follow the Linux recipe (crontab.example) inside it.
 #
-# Untested as of this version: the Linux path is the one that's been run end to
-# end. This script is reasoned from the same design but not yet verified on
-# Windows. Register it against a throwaway issue and watch one wake complete
-# (including the hard-timeout kill) before you trust it.
+# One WSL gotcha: the distro's lightweight VM shuts down when nothing is holding
+# it open, and cron does not auto-start — so a crontab alone won't survive a
+# reboot or an idle WSL shutdown. Two one-time steps fix it:
+#   1. Inside WSL, run cron under systemd:  set [boot] systemd=true in
+#      /etc/wsl.conf, `wsl --shutdown` once, then `sudo systemctl enable --now cron`.
+#   2. On Windows, add a Task Scheduler task "At log on" that boots the distro —
+#      e.g. action `wsl.exe` with arguments `-d <distro> -u root service cron start`
+#      (or `-d <distro> --exec true` just to start the VM). Without this the hourly
+#      wake won't fire until someone opens WSL by hand.
 #
-# Two caveats for Windows:
-#  1. There is no exact equivalent of GNU `timeout --foreground`. The simplest
-#     reliable setup on Windows is to run the whole loop inside WSL and use the
-#     Linux primitives (cron + GNU timeout + tmux). Do that if you can.
-#  2. If you stay native, the wake script must enforce its own hard timeout (start
-#     the agent as a job and kill it after schedule.timeouts.hard_minutes). The
-#     trigger below only starts the run; it does not bound it.
+# Reach for the native script below only if you can't use WSL.
+#
+# Untested as of this version: only the Linux path has been run end to end. This
+# script is reasoned from the same design but not yet verified on Windows.
+# Register it against a throwaway issue and watch one wake complete — including
+# the hard-timeout kill — before you trust it.
+#
+# Run once from an elevated PowerShell. Edit the paths and hours first. Check it
+# took with:  Get-ScheduledTask -TaskName "AutonomyWake"
 
-$python   = "C:\Path\To\python.exe"
-$wake     = "C:\Users\YOU\autonomy\wake.py"
+# --- 1. Write the timeout wrapper (the scheduled task runs THIS) -----------
+#
+# Windows has no equivalent of GNU `timeout --foreground`, and Task Scheduler's
+# own ExecutionTimeLimit is coarse (it terminates a run without giving the agent
+# a chance to flush its log). So the wake must run through a wrapper that bounds
+# it: a background job killed after schedule.timeouts.hard_minutes. Save this as
+# run-wake.ps1, edit the two paths to match your machine, and the registration
+# below points the scheduled task at it (via powershell.exe, not python.exe).
+#
+#   # run-wake.ps1
+#   param([int]$HardMinutes = 90)
+#   $python = "C:\Path\To\python.exe"
+#   $wake   = "C:\Users\YOU\autonomy\wake.py"
+#   $job = Start-Job {
+#       & $using:python $using:wake
+#       # A job reaches 'Completed' even when the child exits non-zero, so turn a
+#       # bad exit into a terminating error the parent can re-raise — otherwise a
+#       # failed wake (bad creds, wrong path, crashed session) is logged as a
+#       # successful run and you never find out.
+#       if ($LASTEXITCODE -ne 0) { throw "wake exited $LASTEXITCODE" }
+#   }
+#   try {
+#       if (Wait-Job $job -Timeout ($HardMinutes * 60)) {
+#           Receive-Job $job -ErrorAction Stop   # flush output; re-raise a bad exit
+#       } else {
+#           Stop-Job $job; Receive-Job $job      # kill the hung run, keep its log
+#           throw "wake exceeded $HardMinutes min hard timeout; killed"
+#       }
+#   } catch {
+#       Remove-Job $job -Force
+#       Write-Error $_              # non-zero exit -> Task Scheduler records failure
+#       exit 1
+#   }
+#   Remove-Job $job -Force
+#
+# A job + Stop-Job is not a perfect process-tree kill — verify on a deliberately
+# hung session that the child python actually dies and the log isn't zero-byte
+# before you rely on it.
+
+$wrapper  = "C:\Users\YOU\autonomy\run-wake.ps1"
 $taskName = "AutonomyWake"
 
-# Hourly from 7am, repeating for 12 hours -> last run at 7pm. Match this to
-# schedule.wake.cron in your config.yaml.
+# --- 2. Register the schedule (documented XML form) ------------------------
 #
-# Heads-up: assigning .Repetition from a throwaway -Once trigger is a widely-used
-# community idiom, but Microsoft doesn't formally document it for -Daily triggers.
-# For a fully-documented, stable recipe, define the task in XML and register it
-# with `Register-ScheduledTask -Xml` instead.
-$trigger = New-ScheduledTaskTrigger -Daily -At 7:05AM
-$trigger.Repetition = (New-ScheduledTaskTrigger -Once -At 7:05AM `
-    -RepetitionInterval (New-TimeSpan -Hours 1) `
-    -RepetitionDuration (New-TimeSpan -Hours 12)).Repetition
+# Hourly from 7:05am, repeating for 12 hours -> last run at 7:05pm. Match this to
+# schedule.wake.cron in your config.yaml: edit StartBoundary (start time),
+# Interval (PT1H = every hour), and Duration (PT12H = the active window).
+#
+# This uses Register-ScheduledTask -Xml, the form Microsoft documents. The older
+# idiom — assigning .Repetition from a throwaway -Once trigger onto a -Daily
+# trigger object — is widely copied but undocumented for daily triggers and has
+# been observed not to repeat. <Repetition> inside <CalendarTrigger> below is the
+# documented equivalent. The action runs powershell.exe against the wrapper, so
+# the hard timeout in step 1 actually bounds every wake.
+#
+# Element order matters: the XSD fixes the trigger sequence as Enabled,
+# StartBoundary, Repetition, then ScheduleByDay — out-of-order children make
+# Register-ScheduledTask reject the whole task. The <Principal id="Author"> has
+# to match Actions Context="Author" for the same reason (an action context that
+# names no defined principal is a validation error, not a silent default).
+# InteractiveToken runs the task while you're logged in; to run while logged out,
+# change LogonType to Password and register with `-User <you> -Password <pw>`.
+$xml = @"
+<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Description>Autonomous GitHub-issue workhorse, hourly wake</Description>
+  </RegistrationInfo>
+  <Triggers>
+    <CalendarTrigger>
+      <Enabled>true</Enabled>
+      <StartBoundary>2026-01-01T07:05:00</StartBoundary>
+      <Repetition>
+        <Interval>PT1H</Interval>
+        <Duration>PT12H</Duration>
+        <StopAtDurationEnd>true</StopAtDurationEnd>
+      </Repetition>
+      <ScheduleByDay>
+        <DaysInterval>1</DaysInterval>
+      </ScheduleByDay>
+    </CalendarTrigger>
+  </Triggers>
+  <Principals>
+    <Principal id="Author">
+      <LogonType>InteractiveToken</LogonType>
+      <RunLevel>LeastPrivilege</RunLevel>
+    </Principal>
+  </Principals>
+  <Settings>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <IdleSettings>
+      <StopOnIdleEnd>false</StopOnIdleEnd>
+    </IdleSettings>
+    <ExecutionTimeLimit>PT2H</ExecutionTimeLimit>
+  </Settings>
+  <Actions Context="Author">
+    <Exec>
+      <Command>powershell.exe</Command>
+      <Arguments>-NoProfile -ExecutionPolicy Bypass -File "$wrapper"</Arguments>
+    </Exec>
+  </Actions>
+</Task>
+"@
 
-$action = New-ScheduledTaskAction -Execute $python -Argument $wake
-
-# Run whether or not you're logged in; don't wake the machine just for this.
-$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable `
-    -DontStopOnIdleEnd -ExecutionTimeLimit (New-TimeSpan -Hours 2)
-
-Register-ScheduledTask -TaskName $taskName -Trigger $trigger -Action $action `
-    -Settings $settings -Description "Autonomous GitHub-issue workhorse, hourly wake"
+Register-ScheduledTask -TaskName $taskName -Xml $xml
