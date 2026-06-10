@@ -81,12 +81,43 @@ VALID_EFFORTS = tuple(WORKER_TOKENS_PER_MIN.keys())
 # Cron cadence  ->  runs per day
 # ===========================================================================
 
+# crontab(5) accepts three-letter names in the day-of-week field (SUN..SAT,
+# case-insensitive). Only the day-of-week field is expanded here — the month
+# field is never parsed (cron_unsupported_restrictions refuses any month
+# restriction, named or numeric, because the estimator doesn't model it), so a
+# month-name table would be unreachable.
+CRON_DOW_NAMES = {
+    "SUN": 0,
+    "MON": 1,
+    "TUE": 2,
+    "WED": 3,
+    "THU": 4,
+    "FRI": 5,
+    "SAT": 6,
+}
 
-def parse_cron_field(field_text: str, lo: int, hi: int) -> set[int]:
+
+def parse_cron_field(
+    field_text: str, lo: int, hi: int, names: dict[str, int] | None = None
+) -> set[int]:
     """Expand one cron field into the set of values it matches within [lo, hi].
 
-    Handles "*", lists ("a,b"), ranges ("a-b"), and steps ("*/n", "a-b/n").
+    Handles "*", lists ("a,b"), ranges ("a-b"), and steps ("*/n", "a-b/n"). When
+    a names map is given (e.g. SUN..SAT for day-of-week), named tokens resolve
+    through it, case-insensitively, on either side of a range.
     """
+
+    def to_int(token: str) -> int:
+        token = token.strip()
+        if names and token.upper() in names:
+            return names[token.upper()]
+        try:
+            return int(token)
+        except ValueError:
+            raise ValueError(
+                f"cron field {field_text!r} has an unrecognized value: {token!r}"
+            ) from None
+
     values: set[int] = set()
     for part in field_text.split(","):
         part = part.strip()
@@ -105,9 +136,18 @@ def parse_cron_field(field_text: str, lo: int, hi: int) -> set[int]:
             start, end = lo, hi
         elif "-" in base:
             start_text, end_text = base.split("-", 1)
-            start, end = int(start_text), int(end_text)
+            start, end = to_int(start_text), to_int(end_text)
+            # In the day-of-week field Sunday has two encodings, 0 and 7. The
+            # names map resolves SUN -> 0, so a range ending in Sunday (e.g.
+            # FRI-SUN -> 5-0, or numeric 5-0) reads as start > end. cron lets
+            # Sunday also be the high alias 7, so lift the end to hi to keep the
+            # range ordered — "FRI-SUN" then folds to {5,6,0} exactly like the
+            # numeric "5-7". Only the day-of-week field passes a names map, and
+            # its caller folds 7 -> 0, so this stays scoped to that field.
+            if names and start > end and end == lo:
+                end = hi
         else:
-            start = end = int(base)
+            start = end = to_int(base)
 
         if start < lo or end > hi or start > end:
             raise ValueError(f"cron field {field_text!r} out of range [{lo},{hi}]")
@@ -143,7 +183,7 @@ def cron_active_days_per_week(expr: str) -> int:
     # Parse against 0-7 (cron allows both 0 and 7 for Sunday), then fold 7 -> 0
     # on the integer set. Normalizing before the parse — dow.replace("7", "0") —
     # would corrupt ranges like "1-7" into the invalid "1-0".
-    days = {d % 7 for d in parse_cron_field(dow, 0, 7)}
+    days = {d % 7 for d in parse_cron_field(dow, 0, 7, CRON_DOW_NAMES)}
     return len(days)
 
 
@@ -172,6 +212,7 @@ class Inputs:
     max_passes: int
     days_per_month: float = DAYS_PER_MONTH
     review_enabled: bool = True
+    wake_enabled: bool = True
 
 
 @dataclass
@@ -222,6 +263,21 @@ def estimate(inputs: Inputs) -> Estimate:
         raise ValueError("max_passes must be positive when review is enabled")
     if inputs.days_per_month <= 0:
         raise ValueError("days_per_month must be positive")
+
+    # schedule.wake.enabled: false means the loop never fires, so it runs zero
+    # times and bills zero metered tokens. Short-circuit before reading cadence —
+    # a disabled schedule's cron is moot. The per-run figure stays informational
+    # ("if you turned it on..."); the subscription line is left to issue #110
+    # (a plan you hold whether or not this loop uses it).
+    if not inputs.wake_enabled:
+        return Estimate(
+            runs_per_active_day=0,
+            active_days_per_week=0,
+            runs_per_month=0.0,
+            subscription_monthly_usd=sum(SUBSCRIPTION_PLANS_USD.values()),
+            metered_per_run_usd=metered_cost_per_run(inputs),
+            metered_monthly_usd=(0.0, 0.0),
+        )
 
     per_active_day = cron_runs_per_active_day(inputs.cron)
     active_days = cron_active_days_per_week(inputs.cron)
@@ -292,6 +348,10 @@ def inputs_from_config(cfg: dict) -> dict:
     # validation in estimate(), exactly the trap the CLI path also had.
     if wake.get("cron") is not None:
         out["cron"] = wake["cron"]
+    # schedule.wake.enabled: false turns the whole loop off -> zero runs, $0
+    # metered. Presence check so an absent key defaults on downstream.
+    if wake.get("enabled") is not None:
+        out["wake_enabled"] = bool(wake["enabled"])
     if model.get("work_effort") is not None:
         out["work_effort"] = model["work_effort"]
     if model.get("review_effort") is not None:
@@ -332,10 +392,11 @@ def format_report(inputs: Inputs, est: Estimate, *, source: str) -> str:
         if inputs.review_enabled
         else "review disabled"
     )
+    cadence_note = "" if inputs.wake_enabled else "   (schedule disabled — 0 runs)"
     lines = [
         "Autonomy loop cost estimate",
         f"  source            {source}",
-        f"  cadence (cron)    {inputs.cron}",
+        f"  cadence (cron)    {inputs.cron}{cadence_note}",
         f"  work / review     {inputs.work_effort} / {inputs.review_effort} effort",
         f"  avg session       {inputs.avg_session_minutes:g} min   ({review_note})",
         "",
@@ -423,9 +484,15 @@ def resolve_inputs(args: argparse.Namespace) -> tuple[Inputs, str]:
         values["avg_session_minutes"] = args.avg_session_minutes
 
     if "cron" not in values:
-        raise SystemExit(
-            "no cadence given. Pass a config.yaml with schedule.wake.cron, or --cron."
-        )
+        # A disabled schedule never fires, so its cadence is moot — fill a
+        # placeholder so estimate() can short-circuit to 0 runs instead of
+        # demanding a cron the user rightly left out. Only an ENABLED loop with
+        # no cadence is an error.
+        if values.get("wake_enabled", True):
+            raise SystemExit(
+                "no cadence given. Pass a config.yaml with schedule.wake.cron, or --cron."
+            )
+        values["cron"] = "(disabled)"
     # An explicit average always wins. Otherwise start from the default and let a
     # hard timeout pull it down when the timeout is tighter than that default —
     # a 15-minute cap can't average 30 minutes a session.
@@ -443,6 +510,7 @@ def resolve_inputs(args: argparse.Namespace) -> tuple[Inputs, str]:
         max_passes=values.get("max_passes", DEFAULT_MAX_PASSES),
         days_per_month=args.days_per_month,
         review_enabled=values.get("review_enabled", True),
+        wake_enabled=values.get("wake_enabled", True),
     )
     return inputs, source
 

@@ -208,7 +208,17 @@
       if (!/^\d+$/.test(t)) throw new Error('"' + t + '" is not a whole number');
       return parseInt(t, 10);
     }
-    function parseField(text, lo, hi) {
+    // crontab(5) day-of-week names (case-insensitive). Day-of-week is the only
+    // field expanded here, so only it gets a name table (mirrors estimate_cost.py).
+    const CRON_DOW_NAMES = { SUN: 0, MON: 1, TUE: 2, WED: 3, THU: 4, FRI: 5, SAT: 6 };
+    function parseField(text, lo, hi, names) {
+      const tok = (s) => {
+        const t = String(s).trim();
+        if (names && Object.prototype.hasOwnProperty.call(names, t.toUpperCase()))
+          return names[t.toUpperCase()];
+        if (!/^\d+$/.test(t)) throw new Error('"' + t + '" is not a recognized cron value');
+        return parseInt(t, 10);
+      };
       const values = new Set();
       for (let part of text.split(",")) {
         part = part.trim();
@@ -223,8 +233,13 @@
         let start, end;
         if (base === "*") { start = lo; end = hi; }
         else if (base.includes("-")) {
-          const r = base.split("-"); start = toInt(r[0]); end = toInt(r[1]);
-        } else { start = end = toInt(base); }
+          const r = base.split("-"); start = tok(r[0]); end = tok(r[1]);
+          // Sunday has two encodings (0 and 7). A range ending in Sunday
+          // (FRI-SUN -> 5-0, or numeric 5-0) reads as start > end; lift the end
+          // to hi so it folds to {5,6,0} like the numeric "5-7". Only the
+          // day-of-week field passes a names map and its caller folds 7 -> 0.
+          if (names && start > end && end === lo) end = hi;
+        } else { start = end = tok(base); }
         if (start < lo || end > hi || start > end) throw new Error('field "' + text + '" out of range [' + lo + "," + hi + "]");
         for (let v = start; v <= end; v += step) values.add(v);
       }
@@ -241,7 +256,7 @@
       if (dow === "*") return 7;
       // Parse against 0-7 (cron allows 0 and 7 for Sunday), then fold 7 -> 0.
       // Normalizing the text first (dow.replace) would corrupt ranges like "1-7".
-      const days = new Set([...parseField(dow, 0, 7)].map(d => d % 7));
+      const days = new Set([...parseField(dow, 0, 7, CRON_DOW_NAMES)].map(d => d % 7));
       return days.size;
     }
     function cronRestrictions(expr) {
