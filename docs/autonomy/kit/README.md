@@ -56,6 +56,10 @@ widen one ring at a time as you trust it.
   starter standards file.
 - `COSTS.md` — read this before you raise the cadence. Subscription vs. metered
   billing, and what changes around June 1, 2026.
+- `estimate_cost.py` + `cost-estimator.html` — put a number on it before you arm
+  the loop. Both turn the cadence, effort, and timeout dials into estimated
+  runs/day and a monthly cost range, subscription vs. metered. The script reads
+  your `config.yaml` (or flags); the HTML page is the same math in the browser.
 
 ## Aiming it (this is the feature)
 
@@ -90,7 +94,8 @@ confidence grows.
   is an advanced, still-untested fallback.
 - **Cost:** the loop is cheap only if your CLIs are logged into a subscription
   rather than billing an API key, and only if you keep the cadence sane. Read
-  `COSTS.md` first.
+  `COSTS.md` first, then run `python3 estimate_cost.py config.yaml` (or open
+  `cost-estimator.html`) to put a number on your settings.
 - **Auth:** GitHub access comes from the `gh` CLI (`gh auth login`). The only
   other credential you might set is a notifier token, if you want phone alerts.
 
