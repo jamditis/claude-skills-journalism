@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`one-way-door` Windows (PowerShell) port** (this PR): `dev-toolkit/skills/one-way-door/one-way-door-check.ps1` and `one-way-door-approve.ps1`, behavior-matched to the shell hooks for Windows, where Claude Code runs hooks through PowerShell and `tool_input.file_path` can arrive with backslashes (which `basename` does not split on, so the shell safelist would misfire). The ports share the same session ledger (`%USERPROFILE%\.claude\hooks\state\one-way-door\`), early-exit safelist, and one-way-door categories; filename and directory splitting goes through `[System.IO.Path]` and directory patterns are matched after normalizing `\` to `/`, so the check is correct for backslash and forward-slash paths alike. Verified against a block / safelist / stateful-approve test matrix. Documented with the PowerShell `settings.json` wiring in `SKILL.md`, `hooks/one-way-door-check.md`, and `docs/one-way-door/index.html`.
+
 ### Changed
 
 - **`one-way-door` hook is now stateful** (this PR): the check (`PreToolUse:Write`) gained a session-scoped approval ledger, and a companion `one-way-door-approve.sh` (`PostToolUse:AskUserQuestion`) promotes pending files to approved once the user answers an `AskUserQuestion`. The old stateless check re-blocked the same file on the retry, so its own "ask, then retry" instruction never terminated. The retried write now passes; every other unapproved one-way-door file still blocks. The ledger lives in `~/.claude/hooks/state/one-way-door/` (`<session_id>.pending` / `.approved`), and a new session starts clean.

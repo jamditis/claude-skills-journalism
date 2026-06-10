@@ -528,6 +528,28 @@ committing.</code></pre>
   }
 }</code></pre>
                     </div>
+                    <h4 class="font-semibold mb-2 mt-6">Windows (PowerShell)</h4>
+                    <p class="text-sm text-clay/70 mb-3">On Windows, hooks run through PowerShell and file paths can use backslashes. Behavior-matched ports — <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">one-way-door-check.ps1</code> and <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">one-way-door-approve.ps1</code> — ship in the skill directory and use the same session ledger, safelist, and categories. Copy both into your hooks folder (for example <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">%USERPROFILE%\.claude\hooks\</code>), then wire them with the PowerShell launcher — update the paths to match where you saved them (replace <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">&lt;you&gt;</code>):</p>
+                    <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
+                        <pre tabindex="0" class="text-white"><code>{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Write",
+      "hooks": [{
+        "type": "command",
+        "command": "powershell -ExecutionPolicy Bypass -File C:/Users/&lt;you&gt;/.claude/hooks/one-way-door-check.ps1"
+      }]
+    }],
+    "PostToolUse": [{
+      "matcher": "AskUserQuestion",
+      "hooks": [{
+        "type": "command",
+        "command": "powershell -ExecutionPolicy Bypass -File C:/Users/&lt;you&gt;/.claude/hooks/one-way-door-approve.ps1"
+      }]
+    }]
+  }
+}</code></pre>
+                    </div>
                 </div>
             </div>
 

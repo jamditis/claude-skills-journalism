@@ -371,6 +371,46 @@ The ledger lives in `~/.claude/hooks/state/one-way-door/`, one pair of files per
 - `0` — Allow (two-way door, or a path already approved this session)
 - `2` — Block (one-way door not yet approved — requires discussion)
 
+### Windows (PowerShell)
+
+The shell scripts above assume a POSIX shell. On Windows, Claude Code invokes hooks through PowerShell, and `tool_input.file_path` can arrive with backslashes — which `basename` does not split on, so the shell version's safelist would misfire. Behavior-matched PowerShell ports ship alongside this skill:
+
+- `one-way-door-check.ps1` — the `PreToolUse:Write` check
+- `one-way-door-approve.ps1` — the `PostToolUse:AskUserQuestion` promoter
+
+They use the same session ledger (`%USERPROFILE%\.claude\hooks\state\one-way-door\`), the same early-exit safelist, and the same one-way-door categories as the shell version. Filename and directory splitting goes through `[System.IO.Path]`, and the directory patterns are matched after normalizing `\` to `/`, so the check is correct whether a path uses backslashes or forward slashes. They mirror the shell hooks check-for-check — the same patterns in the same order — so the behavioral contract is identical; only the language differs.
+
+Copy both `.ps1` files from this skill's directory into your hooks folder (for example `%USERPROFILE%\.claude\hooks\`), then wire them with the PowerShell launcher. Update the `command` paths to match where you saved them (replace `<you>` with your username):
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -ExecutionPolicy Bypass -File C:/Users/<you>/.claude/hooks/one-way-door-check.ps1"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -ExecutionPolicy Bypass -File C:/Users/<you>/.claude/hooks/one-way-door-approve.ps1"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
 ## The three questions
 
 Before committing to any one-way door, ask:

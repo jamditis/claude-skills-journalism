@@ -15,6 +15,8 @@ It ships as two scripts that share a session-scoped approval ledger:
 - **`one-way-door-check.sh`** (`PreToolUse:Write`) blocks the first write to a one-way-door file and records it as pending.
 - **`one-way-door-approve.sh`** (`PostToolUse:AskUserQuestion`) promotes the pending files to approved once the user answers any `AskUserQuestion` — normally the one the check told Claude to ask.
 
+Behavior-matched PowerShell ports for Windows (`one-way-door-check.ps1`, `one-way-door-approve.ps1`) ship in the [`one-way-door` skill directory](../dev-toolkit/skills/one-way-door/); see [Windows (PowerShell)](#windows-powershell) below.
+
 The ledger is what makes the hook stateful. A stateless check would re-block the same file on the retry, so the "ask, then retry" instruction would loop forever. With the ledger, answering the question opens that one file for the rest of the session while every other unapproved one-way-door file still blocks.
 
 The promoter keys on the `AskUserQuestion` event, not on which question was answered: if Claude asks an unrelated question while a file is pending, that file is approved too. The block-then-discuss prompt is the guardrail; the ledger only stops an already-discussed file from re-blocking.
@@ -297,6 +299,46 @@ Add both hooks to your Claude Code `settings.json` (user or project level):
 ```
 
 Save both scripts, make them executable (`chmod +x one-way-door-check.sh one-way-door-approve.sh`), and update the paths in the config. The approval hook is required: without it, the check would re-block an approved file on every retry.
+
+### Windows (PowerShell)
+
+The shell scripts assume a POSIX shell. On Windows, Claude Code invokes hooks through PowerShell, and `tool_input.file_path` can arrive with backslashes, which `basename` does not split on — so the shell version's safelist would misfire. Behavior-matched PowerShell ports ship in the [`one-way-door` skill directory](../dev-toolkit/skills/one-way-door/):
+
+- `one-way-door-check.ps1` — the `PreToolUse:Write` check
+- `one-way-door-approve.ps1` — the `PostToolUse:AskUserQuestion` promoter
+
+They use the same session ledger (`%USERPROFILE%\.claude\hooks\state\one-way-door\`), the same early-exit safelist, and the same categories as the shell version. Filename and directory splitting goes through `[System.IO.Path]`, and the directory patterns are matched after normalizing `\` to `/`, so the check is correct for backslash and forward-slash paths alike.
+
+Copy both `.ps1` files from the skill directory into your hooks folder (for example `%USERPROFILE%\.claude\hooks\`), then wire them with the PowerShell launcher. Update the `command` paths to match where you saved them (replace `<you>` with your username):
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -ExecutionPolicy Bypass -File C:/Users/<you>/.claude/hooks/one-way-door-check.ps1"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -ExecutionPolicy Bypass -File C:/Users/<you>/.claude/hooks/one-way-door-approve.ps1"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
 
 ## Examples
 
