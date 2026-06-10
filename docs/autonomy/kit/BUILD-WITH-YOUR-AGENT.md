@@ -149,7 +149,11 @@ Two warnings that have actually bitten people:
   `templates/task-scheduler.ps1.example` registers the schedule with the
   documented `Register-ScheduledTask -Xml` form and shows a PowerShell
   job-plus-kill-timer wrapper so the wake script bounds itself. If you can run
-  WSL, do; only reach for the native path if you genuinely can't.
+  WSL, do; only reach for the native path if you genuinely can't. One WSL setup
+  step is easy to miss: the distro's VM stops when idle and cron doesn't
+  auto-start, so a crontab alone won't survive a reboot — enable cron under
+  systemd and add a Windows logon task to boot the distro. The header of
+  `templates/task-scheduler.ps1.example` spells out both one-time steps.
 
 - **The Notifier is the one primitive that's identical everywhere** because it's
   just an HTTPS call. To keep a first build trivial, set `notify.channel: stdout`
