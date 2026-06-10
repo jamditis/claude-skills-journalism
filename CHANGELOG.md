@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **`one-way-door` Windows (PowerShell) port** (this PR): `dev-toolkit/skills/one-way-door/one-way-door-check.ps1` and `one-way-door-approve.ps1`, behavior-matched to the shell hooks for Windows, where Claude Code runs hooks through PowerShell and `tool_input.file_path` can arrive with backslashes (which `basename` does not split on, so the shell safelist would misfire). The ports share the same session ledger (`%USERPROFILE%\.claude\hooks\state\one-way-door\`), early-exit safelist, and one-way-door categories; filename and directory splitting goes through `[System.IO.Path]` and directory patterns are matched after normalizing `\` to `/`, so the check is correct for backslash and forward-slash paths alike. Verified against a block / safelist / stateful-approve test matrix. Documented with the PowerShell `settings.json` wiring in `SKILL.md`, `hooks/one-way-door-check.md`, and `docs/one-way-door/index.html`.
+
+### Changed
+
+- **`one-way-door` hook is now stateful** (this PR): the check (`PreToolUse:Write`) gained a session-scoped approval ledger, and a companion `one-way-door-approve.sh` (`PostToolUse:AskUserQuestion`) promotes pending files to approved once the user answers an `AskUserQuestion`. The old stateless check re-blocked the same file on the retry, so its own "ask, then retry" instruction never terminated. The retried write now passes; every other unapproved one-way-door file still blocks. The ledger lives in `~/.claude/hooks/state/one-way-door/` (`<session_id>.pending` / `.approved`), and a new session starts clean.
+- **`one-way-door` check gained a false-positive safelist and tighter auth matching** (this PR): the documented script is now the best-of-both version running locally — it early-exits an explicit safelist (test files by convention, `tests/`/`__tests__/`/`fixtures/`/`mocks/` directories, all Markdown, and `*.txt`/`*.rst` under `plans`/`docs`/`notes`/`superpowers`) before any pattern check, and the auth/security patterns are extension-qualified (`security.{ts,js,py,json,rules,yaml,yml}`, `rbac.{ts,js,py,json}`, `permissions.{ts,js,py,json}`) so a file that merely contains a keyword no longer trips. Updated `dev-toolkit/skills/one-way-door/SKILL.md`, `hooks/one-way-door-check.md`, and `docs/one-way-door/index.html` to document both hooks, the safelist, and the new `settings.json` wiring.
+
 ## [2.1.0] - 2026-05-12
 
 The security-toolkit supply-chain release. Marketplace bumped 2.0.0 → 2.1.0 to roll up PR #77 (security-toolkit 1.1.0) and the docs-surface follow-up.

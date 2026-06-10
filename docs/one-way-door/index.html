@@ -299,7 +299,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-1 rounded">Block</span>
                         <div>
                             <h3 class="font-semibold">One-way door detected</h3>
-                            <p class="text-sm text-clay/70 mt-1">If the file matches a one-way-door pattern, the hook exits with code 2 (block) and sends a message to stderr explaining what was caught and why.</p>
+                            <p class="text-sm text-clay/70 mt-1">If the file matches a one-way-door pattern and isn't already approved this session, the hook records it as pending, exits with code 2 (block), and sends a message to stderr explaining what was caught and why.</p>
                         </div>
                     </div>
                 </div>
@@ -316,8 +316,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <div class="flex items-start gap-4">
                         <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-1 rounded">Proceed</span>
                         <div>
-                            <h3 class="font-semibold">Write with confidence</h3>
-                            <p class="text-sm text-clay/70 mt-1">After the user makes an informed choice, Claude retries the write. Two-way door files always pass through silently with no interruption.</p>
+                            <h3 class="font-semibold">Approve, then write with confidence</h3>
+                            <p class="text-sm text-clay/70 mt-1">When the user answers, a companion hook (PostToolUse:AskUserQuestion) promotes the file to approved for the session, so Claude's retried write passes instead of re-blocking. Two-way door files always pass through silently, and a new session starts with a clean slate.</p>
                         </div>
                     </div>
                 </div>
@@ -326,8 +326,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
         <!-- Hook script -->
         <section class="mb-16">
-            <h2 class="font-display text-2xl font-semibold mb-4">The hook script</h2>
-            <p class="text-clay/80 mb-4">A shell script that runs on every <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">Write</code> tool call. It pattern-matches the filename and blocks with exit code 2 if the file is a one-way door.</p>
+            <h2 class="font-display text-2xl font-semibold mb-4">The hook scripts</h2>
+            <p class="text-clay/80 mb-4">Two shell scripts that share a session-scoped approval ledger. The check runs on every <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">Write</code>: it pattern-matches the filename and blocks with exit code 2 if the file is a one-way door it hasn't already seen approved this session.</p>
             <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                 <pre tabindex="0" class="text-white"><code>#!/bin/sh
 INPUT=$(cat)
@@ -337,9 +337,39 @@ FILE_PATH=$(echo "$INPUT" | grep -oP '"file_path"\s*:\s*"[^"]*"' \
   | head -1 | sed 's/.*"file_path"\s*:\s*"//;s/"//')
 [ -z "$FILE_PATH" ] && exit 0
 
+# Session-scoped approval ledger
+SESSION_ID=$(echo "$INPUT" | grep -oP '"session_id"\s*:\s*"[^"]*"' \
+  | head -1 | sed 's/.*"session_id"\s*:\s*"//;s/"//')
+[ -z "$SESSION_ID" ] && SESSION_ID="default"
+STATE_DIR="$HOME/.claude/hooks/state/one-way-door"; mkdir -p "$STATE_DIR"
+APPROVED_FILE="$STATE_DIR/$SESSION_ID.approved"
+PENDING_FILE="$STATE_DIR/$SESSION_ID.pending"
+
+# Already approved this session: note it and allow
+if [ -f "$APPROVED_FILE" ] && grep -Fxq "$FILE_PATH" "$APPROVED_FILE"; then
+    echo "one-way-door: proceeding with previously-approved $(basename "$FILE_PATH")" >&2
+    exit 0
+fi
+
 FILENAME=$(basename "$FILE_PATH")
 FILENAME_LOWER=$(echo "$FILENAME" | tr "[:upper:]" "[:lower:]")
+FILE_PATH_LOWER=$(echo "$FILE_PATH" | tr "[:upper:]" "[:lower:]")
 DIR=$(dirname "$FILE_PATH")
+
+# Early-exit safelist: always-reversible classes pass even if the name
+# contains a keyword like "auth" (tests, fixtures/mocks, markdown, docs)
+if echo "$FILENAME_LOWER" | grep -qE \
+  "^test_.*\.py$|_test\.py$|\.test\.(ts|tsx|js|jsx)$|\.spec\.(ts|tsx|js|jsx)$"; then
+    exit 0
+fi
+if echo "$FILE_PATH_LOWER" | grep -qE \
+  "/tests?/|/__tests__/|/fixtures?/|/mocks?/|/__mocks__/"; then
+    exit 0
+fi
+if echo "$FILENAME_LOWER" | grep -qE "\.md$"; then exit 0; fi
+if echo "$FILENAME_LOWER" | grep -qE "\.txt$|\.rst$"; then
+    echo "$DIR" | grep -qE "plans?|docs?|notes?|superpowers" && exit 0
+fi
 
 ONE_WAY=0
 REASON=""
@@ -356,22 +386,49 @@ if echo "$FILENAME_LOWER" | grep -qE \
 fi
 
 if echo "$FILENAME_LOWER" | grep -qE \
-  "auth\.(ts|js|py)|\.rules$|rbac|permissions"; then
+  "auth\.(ts|js|py)|\.rules$|security\.(ts|js|py|json|rules|yaml|yml)|rbac\.(ts|js|py|json)|permissions\.(ts|js|py|json)"; then
     ONE_WAY=1; REASON="auth / security rules"
 fi
 
 # ... (8 categories total)
 
 if [ "$ONE_WAY" = "1" ]; then
+    grep -Fxq "$FILE_PATH" "$PENDING_FILE" 2>/dev/null \
+      || printf '%s\n' "$FILE_PATH" >> "$PENDING_FILE"  # record as pending
     echo "ONE_WAY_DOOR: $FILENAME ($REASON)" >&2
-    echo "Blocked. Discuss trade-offs first." >&2
+    echo "Blocked. Use AskUserQuestion, then retry." >&2
     exit 2  # Block the write
 fi
 
 exit 0  # Allow two-way doors</code></pre>
             </div>
+            <p class="text-clay/80 mt-5 mb-3">A second hook runs on <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">PostToolUse:AskUserQuestion</code>. When the user answers any <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">AskUserQuestion</code>, it promotes every pending path to approved so the retried write passes. It never blocks. It keys on the event, not the specific question — so an unrelated question answered while a file is pending approves it too. The block-then-discuss prompt is the guardrail; the ledger just stops an already-discussed file from re-blocking.</p>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
+                <pre tabindex="0" class="text-white"><code>#!/bin/sh
+# one-way-door-approve.sh (PostToolUse:AskUserQuestion)
+INPUT=$(cat); [ -z "$INPUT" ] && exit 0
+
+SESSION_ID=$(echo "$INPUT" | grep -oP '"session_id"\s*:\s*"[^"]*"' \
+  | head -1 | sed 's/.*"session_id"\s*:\s*"//;s/"//')
+[ -z "$SESSION_ID" ] && SESSION_ID="default"
+STATE_DIR="$HOME/.claude/hooks/state/one-way-door"; mkdir -p "$STATE_DIR"
+APPROVED_FILE="$STATE_DIR/$SESSION_ID.approved"
+PENDING_FILE="$STATE_DIR/$SESSION_ID.pending"
+
+[ -s "$PENDING_FILE" ] || exit 0  # nothing pending
+
+# Promote each pending path into approved, deduped
+while IFS= read -r path; do
+    [ -z "$path" ] && continue
+    grep -Fxq "$path" "$APPROVED_FILE" 2>/dev/null \
+      || printf '%s\n' "$path" >> "$APPROVED_FILE"
+done < "$PENDING_FILE"
+
+: > "$PENDING_FILE"  # clear pending now that it's approved
+exit 0</code></pre>
+            </div>
             <p class="text-sm text-clay/80 mt-3">
-                Full script with all 8 categories available in the
+                Full check script with all 8 categories, plus the approval hook, in the
                 <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/dev-toolkit/skills/one-way-door" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">skill directory</a>.
             </p>
         </section>
@@ -379,7 +436,7 @@ exit 0  # Allow two-way doors</code></pre>
         <!-- Two-way doors -->
         <section class="mb-16">
             <h2 class="font-display text-2xl font-semibold mb-4">Two-way doors</h2>
-            <p class="text-clay/80 mb-4">These file types pass through the hook silently. They're safe to decide quickly and change later.</p>
+            <p class="text-clay/80 mb-4">These file types pass through the hook silently. They're safe to decide quickly and change later. Test files, Markdown, and docs/plans text files are enforced by an early-exit safelist, so they pass even when the name contains a keyword like "auth".</p>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
                     <i data-lucide="layout" class="w-5 h-5 text-green-700 mx-auto mb-1"></i>
@@ -449,8 +506,8 @@ committing.</code></pre>
                 </div>
 
                 <div>
-                    <h3 class="font-semibold mb-3">Option 3: Add the automated hook</h3>
-                    <p class="text-sm text-clay/70 mb-3">For automated enforcement, save the hook script and add this to your <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">settings.json</code>:</p>
+                    <h3 class="font-semibold mb-3">Option 3: Add the automated hooks</h3>
+                    <p class="text-sm text-clay/70 mb-3">For automated enforcement, save both scripts and add this to your <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">settings.json</code>. The approval hook is required — without it, the check re-blocks an approved file on every retry:</p>
                     <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                         <pre tabindex="0" class="text-white"><code>{
   "hooks": {
@@ -459,6 +516,35 @@ committing.</code></pre>
       "hooks": [{
         "type": "command",
         "command": "/path/to/one-way-door-check.sh"
+      }]
+    }],
+    "PostToolUse": [{
+      "matcher": "AskUserQuestion",
+      "hooks": [{
+        "type": "command",
+        "command": "/path/to/one-way-door-approve.sh"
+      }]
+    }]
+  }
+}</code></pre>
+                    </div>
+                    <h4 class="font-semibold mb-2 mt-6">Windows (PowerShell)</h4>
+                    <p class="text-sm text-clay/70 mb-3">On Windows, hooks run through PowerShell and file paths can use backslashes. Behavior-matched ports — <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">one-way-door-check.ps1</code> and <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">one-way-door-approve.ps1</code> — ship in the skill directory and use the same session ledger, safelist, and categories. Copy both into your hooks folder (for example <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">%USERPROFILE%\.claude\hooks\</code>), then wire them with the PowerShell launcher — update the paths to match where you saved them (replace <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">&lt;you&gt;</code>):</p>
+                    <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
+                        <pre tabindex="0" class="text-white"><code>{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Write",
+      "hooks": [{
+        "type": "command",
+        "command": "powershell -ExecutionPolicy Bypass -File C:/Users/&lt;you&gt;/.claude/hooks/one-way-door-check.ps1"
+      }]
+    }],
+    "PostToolUse": [{
+      "matcher": "AskUserQuestion",
+      "hooks": [{
+        "type": "command",
+        "command": "powershell -ExecutionPolicy Bypass -File C:/Users/&lt;you&gt;/.claude/hooks/one-way-door-approve.ps1"
       }]
     }]
   }
