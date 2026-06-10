@@ -53,6 +53,44 @@ def test_dow_ranges_containing_seven():
     assert ec.cron_active_days_per_week("0 9 * * 6-7") == 2
 
 
+def test_dow_named_weekdays():
+    # crontab(5) accepts SUN..SAT names in the day-of-week field.
+    assert ec.cron_active_days_per_week("5 7-19 * * MON-FRI") == 5
+    assert ec.cron_active_days_per_week("0 9 * * SAT,SUN") == 2
+    assert ec.cron_active_days_per_week("0 9 * * SUN") == 1  # SUN = 0
+    # Case-insensitive, and a named range folds the same way numbers do.
+    assert ec.cron_active_days_per_week("0 9 * * mon-fri") == 5
+
+
+def test_dow_named_range_ending_in_sunday():
+    # SUN resolves to 0, so a range ending in Sunday (FRI-SUN) reads as 5-0.
+    # cron lets Sunday also be 7, so it must fold like the numeric "5-7" rather
+    # than raise. FRI-SUN = Fri, Sat, Sun = 3 days.
+    assert ec.cron_active_days_per_week("0 9 * * FRI-SUN") == 3
+    # MON-SUN spans the whole week = 7 days.
+    assert ec.cron_active_days_per_week("0 9 * * MON-SUN") == 7
+    # SAT-SUN (and its numeric twin 6-0) is the weekend = 2 days.
+    assert ec.cron_active_days_per_week("0 9 * * SAT-SUN") == 2
+    assert ec.cron_active_days_per_week("0 9 * * 6-0") == 2
+    # SUN-SAT is the forward whole-week range and stays 7 days (no lift needed).
+    assert ec.cron_active_days_per_week("0 9 * * SUN-SAT") == 7
+    # A genuinely backwards range that does not end in Sunday still raises.
+    with pytest.raises(ValueError, match=r"out of range"):
+        ec.cron_active_days_per_week("0 9 * * WED-MON")
+
+
+def test_dow_unknown_name_rejected():
+    with pytest.raises(ValueError, match="unrecognized value"):
+        ec.cron_active_days_per_week("0 9 * * FUNDAY")
+
+
+def test_names_only_apply_where_passed():
+    # Minute/hour fields get no names map, so a name there is still rejected.
+    with pytest.raises(ValueError):
+        ec.parse_cron_field("MON", 0, 59)
+    assert ec.parse_cron_field("MON-FRI", 0, 7, ec.CRON_DOW_NAMES) == {1, 2, 3, 4, 5}
+
+
 @pytest.mark.parametrize(
     "field, lo, hi, expected",
     [
@@ -255,6 +293,40 @@ def test_inputs_from_config_nudge_off_disables_review():
     )
 
 
+def test_inputs_from_config_reads_wake_enabled():
+    cfg = {"schedule": {"wake": {"cron": "5 7-19 * * *", "enabled": False}}}
+    got = ec.inputs_from_config(cfg)
+    assert got["wake_enabled"] is False
+    assert got["cron"] == "5 7-19 * * *"
+    # Absent enabled key defaults to on downstream, so it's not emitted.
+    assert "wake_enabled" not in ec.inputs_from_config(
+        {"schedule": {"wake": {"cron": "5 7-19 * * *"}}}
+    )
+
+
+def test_disabled_wake_zeroes_runs_and_monthly():
+    on = ec.estimate(_inputs(wake_enabled=True))
+    off = ec.estimate(_inputs(wake_enabled=False))
+    assert on.runs_per_month > 0
+    assert off.runs_per_month == 0
+    assert off.metered_monthly_usd == (0.0, 0.0)
+    # Per-run stays informational ("if you turned it on..."), so it's unchanged.
+    assert off.metered_per_run_usd == on.metered_per_run_usd
+
+
+def test_disabled_wake_skips_cron_restriction_refusal():
+    # A disabled loop's cadence is moot, so an otherwise-unsupported cron does not
+    # raise — it just reports zero runs.
+    est = ec.estimate(_inputs(cron="0 9 1 * *", wake_enabled=False))
+    assert est.runs_per_month == 0
+
+
+def test_format_report_notes_disabled_schedule():
+    inputs = _inputs(wake_enabled=False)
+    report = ec.format_report(inputs, ec.estimate(inputs), source="flags")
+    assert "schedule disabled" in report
+
+
 def test_disabled_review_zeroes_review_cost():
     on = ec.metered_cost_per_run(_inputs(review_enabled=True))
     off = ec.metered_cost_per_run(_inputs(review_enabled=False))
@@ -332,6 +404,24 @@ def test_config_review_disabled_lowers_cost(tmp_path):
     assert (
         ec.estimate(off).metered_per_run_usd[0] < ec.estimate(on).metered_per_run_usd[0]
     )
+
+
+def test_disabled_wake_without_cron_reports_zero(tmp_path):
+    # wake.enabled: false with no cron must NOT fail "no cadence given" — the
+    # cadence is moot when the loop is off, so it estimates 0 runs.
+    path = _write_config(tmp_path, {"schedule": {"wake": {"enabled": False}}})
+    inputs, _ = ec.resolve_inputs(ec.build_parser().parse_args([path]))
+    assert inputs.wake_enabled is False
+    assert ec.estimate(inputs).runs_per_month == 0
+    assert ec.main([path]) == 0  # prints a report, doesn't error
+
+
+def test_enabled_wake_without_cron_still_errors(tmp_path):
+    # An ENABLED loop with no cadence is still an error — the placeholder only
+    # applies when the schedule is off.
+    path = _write_config(tmp_path, {"schedule": {"wake": {"enabled": True}}})
+    with pytest.raises(SystemExit):
+        ec.resolve_inputs(ec.build_parser().parse_args([path]))
 
 
 def test_hard_timeout_caps_average_session(tmp_path):
