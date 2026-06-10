@@ -234,6 +234,27 @@ def test_inputs_from_config_reads_review_enabled():
     assert "review_enabled" not in ec.inputs_from_config({"review": {}})
 
 
+def test_inputs_from_config_nudge_off_disables_review():
+    # nudges.review gates whether the wake prompt asks for review at all, so it
+    # disables review the same way review.enabled does — even with enabled true.
+    assert (
+        ec.inputs_from_config({"nudges": {"review": False}})["review_enabled"] is False
+    )
+    assert (
+        ec.inputs_from_config(
+            {"review": {"enabled": True}, "nudges": {"review": False}}
+        )["review_enabled"]
+        is False
+    )
+    # Both switches explicitly on -> review on.
+    assert (
+        ec.inputs_from_config(
+            {"review": {"enabled": True}, "nudges": {"review": True}}
+        )["review_enabled"]
+        is True
+    )
+
+
 def test_disabled_review_zeroes_review_cost():
     on = ec.metered_cost_per_run(_inputs(review_enabled=True))
     off = ec.metered_cost_per_run(_inputs(review_enabled=False))

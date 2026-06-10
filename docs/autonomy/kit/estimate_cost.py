@@ -273,6 +273,11 @@ def load_config(path: str) -> dict:
         return yaml.safe_load(handle) or {}
 
 
+def _switch_on(value: object) -> bool:
+    """A config switch defaults on; only an explicit falsey value turns it off."""
+    return value is None or bool(value)
+
+
 def inputs_from_config(cfg: dict) -> dict:
     """Pull the dials this estimator cares about out of a parsed config dict."""
     schedule = cfg.get("schedule") or {}
@@ -280,6 +285,7 @@ def inputs_from_config(cfg: dict) -> dict:
     timeouts = schedule.get("timeouts") or {}
     model = cfg.get("model") or {}
     review = cfg.get("review") or {}
+    nudges = cfg.get("nudges") or {}
     out = {}
     # Test "is not None" (key present), not truthiness — else an explicit
     # review.max_passes: 0 reads as absent and the bad value never reaches the
@@ -292,8 +298,14 @@ def inputs_from_config(cfg: dict) -> dict:
         out["review_effort"] = model["review_effort"]
     if review.get("max_passes") is not None:
         out["max_passes"] = int(review["max_passes"])
-    if review.get("enabled") is not None:
-        out["review_enabled"] = bool(review["enabled"])
+    # Review actually runs only when BOTH switches are on: review.enabled gates
+    # the machinery, and nudges.review gates whether the wake prompt even asks
+    # for it (reference/wake.reference.py appends the review block only when
+    # nudges.review is truthy). Either one off means no review tokens are billed.
+    review_on = review.get("enabled")
+    nudge_on = nudges.get("review")
+    if review_on is not None or nudge_on is not None:
+        out["review_enabled"] = _switch_on(review_on) and _switch_on(nudge_on)
     # hard_minutes is a ceiling on session length, not the average. It caps the
     # assumed average when it's tighter than the default (see resolve_inputs).
     if timeouts.get("hard_minutes") is not None:
