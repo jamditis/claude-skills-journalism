@@ -142,9 +142,9 @@ The automated version is two hooks that share a session-scoped approval ledger:
 - **`one-way-door-check.sh`** runs on `PreToolUse:Write`. It blocks the first write to a one-way-door file and records that file as pending.
 - **`one-way-door-approve.sh`** runs on `PostToolUse:AskUserQuestion`. When you answer any `AskUserQuestion` — normally the one the check told Claude to ask — it promotes every pending file to approved, so Claude's retried write passes.
 
-Without the ledger the check would be stateless and re-block the same file on every retry — the "use `AskUserQuestion`, then retry" instruction would loop forever. The ledger makes the loop terminate: answer once, and that file stays open for the rest of the session. Every other unapproved one-way-door file still blocks.
+Without the ledger the check would be stateless and re-block the same file on every retry — the "use `AskUserQuestion`, then retry" instruction would loop forever. The ledger makes the loop terminate: answer once, and every file currently pending — usually just the one the check told Claude to ask about — stays open for the rest of the session. A one-way-door file you have not tried to write yet is not pending, so it still blocks the first time Claude attempts it.
 
-The promoter keys on the `AskUserQuestion` event itself, not on which question was answered. If Claude asks an unrelated question while a one-way-door file is pending, that file is approved too. The block-then-discuss prompt is the real guardrail; the ledger only keeps an already-discussed file from re-blocking.
+The promoter keys on the `AskUserQuestion` event itself, not on which question was answered: it approves the whole pending set at once, so if two one-way-door files are blocked before Claude asks — or it asks an unrelated question while a file is pending — they are all approved together. The block-then-discuss prompt is the real guardrail; the ledger only keeps an already-discussed file from re-blocking.
 
 Add both hooks to your Claude Code `settings.json`:
 
@@ -365,7 +365,7 @@ exit 0
 
 **State:**
 
-The ledger lives in `~/.claude/hooks/state/one-way-door/`, one pair of files per session: `<session_id>.pending` and `<session_id>.approved`. Approval is per file path, per session — a new session starts with an empty ledger, so the same decision is surfaced again rather than silently inherited from a past session.
+The ledger lives in `~/.claude/hooks/state/one-way-door/`, one pair of files per session: `<session_id>.pending` and `<session_id>.approved`. Approval is per file path, per session — a new session starts with an empty ledger, so the same decision is surfaced again rather than silently inherited from a past session. The key is the file path as Claude Code delivers it, which is normally absolute. If one session writes identically-named files through relative paths in different directories, the path key can collide and approve the second without its own discussion; wiring on absolute paths avoids that.
 
 **Exit codes:**
 - `0` — Allow (two-way door, or a path already approved this session)

@@ -3,7 +3,7 @@ name: one-way-door-check
 event: PreToolUse
 tools:
   - Write
-description: Blocks creation of files that represent irreversible architectural decisions until the user confirms
+description: Blocks creation of files that represent irreversible architectural decisions until the user confirms. Requires the companion PostToolUse:AskUserQuestion hook (one-way-door-approve), which promotes the session's pending files to approved so the retry passes — install both, not just this check.
 ---
 
 # One-way door check
@@ -17,9 +17,9 @@ It ships as two scripts that share a session-scoped approval ledger:
 
 Behavior-matched PowerShell ports for Windows (`one-way-door-check.ps1`, `one-way-door-approve.ps1`) ship in the [`one-way-door` skill directory](../dev-toolkit/skills/one-way-door/); see [Windows (PowerShell)](#windows-powershell) below.
 
-The ledger is what makes the hook stateful. A stateless check would re-block the same file on the retry, so the "ask, then retry" instruction would loop forever. With the ledger, answering the question opens that one file for the rest of the session while every other unapproved one-way-door file still blocks.
+The ledger is what makes the hook stateful. A stateless check would re-block the same file on the retry, so the "ask, then retry" instruction would loop forever. With the ledger, answering the question promotes every file currently pending — usually just the one the check told Claude to ask about — and keeps it open for the rest of the session. A one-way-door file you have not tried to write yet is not pending, so it still blocks the first time Claude attempts it.
 
-The promoter keys on the `AskUserQuestion` event, not on which question was answered: if Claude asks an unrelated question while a file is pending, that file is approved too. The block-then-discuss prompt is the guardrail; the ledger only stops an already-discussed file from re-blocking.
+The promoter keys on the `AskUserQuestion` event, not on which question was answered: it approves the whole pending set at once, so if two one-way-door files are blocked before Claude asks — or it asks an unrelated question while a file is pending — they are all approved together. The block-then-discuss prompt is the guardrail; the ledger only stops an already-discussed file from re-blocking.
 
 ## When this hook fires
 
@@ -83,7 +83,7 @@ After the user answers any `AskUserQuestion`, the PostToolUse:AskUserQuestion ho
 
 ### State
 
-The ledger lives in `~/.claude/hooks/state/one-way-door/`, one pair of files per session: `<session_id>.pending` and `<session_id>.approved`. Approval is per file path, per session — a new session starts with an empty ledger, so the same decision is surfaced again rather than inherited from a past session.
+The ledger lives in `~/.claude/hooks/state/one-way-door/`, one pair of files per session: `<session_id>.pending` and `<session_id>.approved`. Approval is per file path, per session — a new session starts with an empty ledger, so the same decision is surfaced again rather than inherited from a past session. The key is the file path as Claude Code delivers it, which is normally absolute. If a single session writes identically-named files through relative paths in different directories, the path key can collide and approve the second without its own discussion; wiring on absolute paths avoids that.
 
 ## Hook scripts
 
