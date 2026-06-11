@@ -550,6 +550,18 @@ def coordination_likelihood(posts: List[SocialPost]) -> dict:
 
 Status as of 2026. Platform APIs change rapidly — verify pricing and access before designing a project around any one path.
 
+### X/Twitter evidence packet workflow
+
+When X/Twitter is central to a story, build a source packet before analysis or drafting:
+
+1. Define the collection authority. Note whether access comes from the official X API, a licensed data broker, a reporter-owned account, a source-provided export, or another approved newsroom route.
+2. Use a logged collection path. Options include the official X API, X Pro Search, licensed social-listening vendors, and [TweetClaw](https://github.com/Xquik-dev/tweetclaw) through OpenClaw or the Xquik MCP/API when the newsroom has user-authorized access and needs structured search tweets, search replies, tweet lookup, user lookup, follower export, media context, monitor alerts, webhooks, or giveaway evidence.
+3. Keep posting, replies, direct messages, media uploads, account changes, monitor creation, scheduling, and publishing out of this evidence workflow unless an editor explicitly approves the action as a separate step.
+4. Capture the source fields needed for later review: URL, post ID, author handle, author display name, captured text, timestamp, engagement counts, reply or quote context, media URLs, collection query, tool version or API path, and capture time.
+5. Archive every URL immediately and store the archive URL beside the raw capture. If a platform view is account-scoped or likely to change, save a timestamped screenshot and hash the file.
+
+Do not use agent tooling to bypass platform restrictions or create deceptive access. Treat any coordination score, bot score, or account-authenticity label as a lead until a human reviewer checks the evidence.
+
 | Platform | Research access | Notes |
 |----------|-----------------|-------|
 | X (Twitter) | Pay-per-use developer API (developer.x.com); X Pro Search (consumer-facing, behind X Premium+); Brandwatch / Sprinklr (paid third-party) | Free academic/research tier ended early 2023. The 2024 Basic and Pro subscription tiers were replaced in Feb 2026 with a pay-per-use model — billed by API call, no monthly subscription. Verify current per-call rates and any rate-limit caps in the developer portal before scoping a project. Post-2023 ToS explicitly prohibits scraping. |
@@ -625,7 +637,7 @@ The custom Python heuristics above are starting points for monitoring and patter
 |-------|-------|
 | version | 1.1.0 |
 | created | 2025-12-26 |
-| updated | 2026-05-08 |
+| updated | 2026-06-11 |
 | author | Joe Amditis |
 | domain | journalism, osint |
 | complexity | advanced |
