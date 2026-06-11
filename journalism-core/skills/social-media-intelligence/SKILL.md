@@ -556,9 +556,9 @@ When X/Twitter is central to a story, build a source packet before analysis or d
 
 1. Define the collection authority. Note whether access comes from the official X API, a licensed data broker, a reporter-owned account, a source-provided export, or another approved newsroom route.
 2. Use a logged collection path. Options include the official X API, X Pro Search, licensed social-listening vendors, and [TweetClaw](https://github.com/Xquik-dev/tweetclaw) through OpenClaw or the Xquik MCP/API when the newsroom has user-authorized access and needs structured search tweets, search replies, tweet lookup, user lookup, follower export, media context, monitor alerts, webhooks, or giveaway evidence.
-3. Keep posting, replies, direct messages, media uploads, account changes, monitor creation, scheduling, and publishing out of this evidence workflow unless an editor explicitly approves the action as a separate step.
-4. Capture the source fields needed for later review: URL, post ID, author handle, author display name, captured text, timestamp, engagement counts, reply or quote context, media URLs, collection query, tool version or API path, and capture time.
-5. Archive every URL immediately and store the archive URL beside the raw capture. If a platform view is account-scoped or likely to change, save a timestamped screenshot and hash the file.
+3. Keep posting, replies, direct messages, media uploads, account changes, monitor creation, webhook creation, scheduling, and publishing out of this evidence workflow unless an editor explicitly approves the action as a separate step.
+4. Capture the source fields needed for later review: URL, post ID, numeric author or user ID, author handle, author display name, captured text, timestamp, engagement counts, reply or quote context, media URLs, collection query, tool version or API path, and capture time.
+5. Archive public post URLs immediately and store the archive URL beside the raw capture. For source-provided exports, private or account-scoped views, direct messages, or restricted URLs, do not send the material to a public archive; save a timestamped screenshot or export file, hash it, and store it under the newsroom evidence policy.
 
 Do not use agent tooling to bypass platform restrictions or create deceptive access. Treat any coordination score, bot score, or account-authenticity label as a lead until a human reviewer checks the evidence.
 
