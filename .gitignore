@@ -16,6 +16,14 @@ Thumbs.db
 .superpowers
 .superpowers/
 
+# autocontext plugin runtime cache (pending-lessons.json, created when autocontext runs here)
+.autocontext
+.autocontext/
+
+# Local-only pre-PR linter tooling (not distributed via this repo)
+pre-pr-linter
+pre-pr-linter/
+
 # Python
 __pycache__/
 *.py[cod]
