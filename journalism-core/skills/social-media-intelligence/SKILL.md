@@ -550,6 +550,18 @@ def coordination_likelihood(posts: List[SocialPost]) -> dict:
 
 Status as of 2026. Platform APIs change rapidly — verify pricing and access before designing a project around any one path.
 
+### X/Twitter evidence packet workflow
+
+When X/Twitter is central to a story, assemble a source packet before you analyze or draft:
+
+1. Record the collection authority. Note where the access comes from — the official X API, X Pro Search, a licensed data broker (Brandwatch, Sprinklr), a reporter-owned account, or a source-provided export — and confirm it fits the platform's terms of service and the newsroom's ethics rules before collecting.
+2. Match the collection method to the authority, and never scrape. Bulk or programmatic collection stays on the official API or a licensed vendor; X's post-2023 ToS prohibits scraping even of public posts. A reporter-owned account view, X Pro Search, or a source-provided export is captured and preserved by hand under step 5, not automated against the site. Log the query or route used for each capture.
+3. Keep collection separate from action. Posting, replies, direct messages, media uploads, account changes, monitoring, scheduling, and publishing stay out of the evidence workflow unless an editor approves the step on its own.
+4. Capture the fields a later reviewer needs: URL, post ID, numeric author ID, handle, display name, captured text, timestamp, engagement counts, reply or quote context, media URLs, the collection query, the access path, and the capture time.
+5. Archive immediately, and only public content. Send public post URLs to a web archive and store the archive URL beside the raw capture. Never push non-public material to a public archive. Non-public material that an editor has approved under step 3 — a source-provided export, an account-scoped view, a restricted URL, or a message — is preserved instead: save a timestamped screenshot or export, hash it, and store it under the newsroom's evidence policy.
+
+Treat any coordination score, bot score, or authenticity label produced here as a lead, not a finding, until a human reviews the underlying evidence.
+
 | Platform | Research access | Notes |
 |----------|-----------------|-------|
 | X (Twitter) | Pay-per-use developer API (developer.x.com); X Pro Search (consumer-facing, behind X Premium+); Brandwatch / Sprinklr (paid third-party) | Free academic/research tier ended early 2023. The 2024 Basic and Pro subscription tiers were replaced in Feb 2026 with a pay-per-use model — billed by API call, no monthly subscription. Verify current per-call rates and any rate-limit caps in the developer portal before scoping a project. Post-2023 ToS explicitly prohibits scraping. |
@@ -625,7 +637,7 @@ The custom Python heuristics above are starting points for monitoring and patter
 |-------|-------|
 | version | 1.1.0 |
 | created | 2025-12-26 |
-| updated | 2026-05-08 |
+| updated | 2026-06-18 |
 | author | Joe Amditis |
 | domain | journalism, osint |
 | complexity | advanced |
