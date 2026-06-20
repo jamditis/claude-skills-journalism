@@ -12,7 +12,7 @@ Source: https://github.com/jamditis/claude-skills-journalism
 Joe Amditis — associate director of operations, Center for Cooperative Media, Montclair State University.
 Personal site: https://jamditis.com
 
-## Skills (53 total)
+## Skills (54 total)
 
 ### Journalism and verification
 - source-verification — SIFT method, verification trails, source credibility, deepfakes/C2PA
@@ -28,6 +28,7 @@ Personal site: https://jamditis.com
 - data-journalism — data analysis and data-driven storytelling
 - editorial-workflow — assignment tracking, story calendars
 - story-pitch — pitch templates and pitch-writing workflows
+- photo-metadata — embed caption, byline, credit, alt text, keywords, and license into a photo's IPTC/EXIF/XMP metadata for wire and archive use
 
 ### Academic and research
 - academic-writing — research writing, citation, lit review
@@ -124,7 +125,7 @@ Skills above are distributed as Claude Code plugins. Install via:
 
 Restart your Claude Code session after installing or updating a plugin so the new skills and commands register.
 
-Plugins: `journalism-core` (13 skills), `research-toolkit` (6), `dev-toolkit` (10), `security-toolkit` (4 skills + /hotpatch command), `project-templates-toolkit` (3), `pdf-design` (1), `pdf-playground` (1), `visual-explainer` (1), `superjawn` (14).
+Plugins: `journalism-core` (14 skills), `research-toolkit` (6), `dev-toolkit` (10), `security-toolkit` (4 skills + /hotpatch command), `project-templates-toolkit` (3), `pdf-design` (1), `pdf-playground` (1), `visual-explainer` (1), `superjawn` (14).
 
 ## Alternate installation
 

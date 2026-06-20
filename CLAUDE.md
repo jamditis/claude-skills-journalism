@@ -40,7 +40,7 @@ claude-skills-journalism/
 │   ├── bug-report-detector.md   # Development: Detect bug reports
 │   └── enforce-test-first.md    # Development: Enforce test-first workflow
 │
-├── # Plugin: journalism-core (13 skills) — registered in marketplace.json
+├── # Plugin: journalism-core (14 skills) — registered in marketplace.json
 ├── journalism-core/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -55,6 +55,7 @@ claude-skills-journalism/
 │       ├── interview-transcription/    # Recording, transcription, quotes
 │       ├── newsletter-publishing/      # Email newsletters, subscribers
 │       ├── newsroom-style/             # AP Style enforcement
+│       ├── photo-metadata/             # Embed caption, credit, alt text, license in IPTC/EXIF/XMP
 │       ├── social-media-intelligence/  # OSINT, account analysis, platform-API currency
 │       ├── source-verification/        # SIFT method, verification, deepfakes/C2PA
 │       └── story-pitch/                # Pitch templates
