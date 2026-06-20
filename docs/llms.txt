@@ -125,7 +125,7 @@ Skills above are distributed as Claude Code plugins. Install via:
 
 Restart your Claude Code session after installing or updating a plugin so the new skills and commands register.
 
-Plugins: `journalism-core` (14 skills), `research-toolkit` (6), `dev-toolkit` (10), `security-toolkit` (4 skills + /hotpatch command), `project-templates-toolkit` (3), `pdf-design` (1), `pdf-playground` (1), `visual-explainer` (1), `superjawn` (14).
+Plugins (10): `journalism-core` (14 skills), `research-toolkit` (6), `dev-toolkit` (10), `security-toolkit` (4 skills + /hotpatch command), `project-templates-toolkit` (3), `pdf-design` (1), `pdf-playground` (1), `visual-explainer` (1), `superjawn` (14), `autocontext` (cross-session knowledge persistence — hooks, commands, and agents rather than skills).
 
 ## Alternate installation
 
