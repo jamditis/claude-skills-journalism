@@ -107,17 +107,58 @@ claude-skills-journalism/
 │       ├── project-retrospective/      # LESSONS.md generation, 4 project type templates
 │       └── template-selector/          # Decision tree for picking the right template
 │
-└── # Plugin: security-toolkit (4 skills, /security-toolkit:hotpatch command) — registered in marketplace.json
+├── # Plugin: security-toolkit (4 skills, /security-toolkit:hotpatch command) — registered in marketplace.json
+├── security-toolkit/
+│   ├── .claude-plugin/plugin.json
+│   ├── README.md
+│   ├── commands/hotpatch.md            # Slash command: sandboxed pre-install scan + cooldown bypass
+│   ├── scripts/hotpatch.example.sh     # Reference Linux/bwrap implementation
+│   ├── test-fixtures/                  # Synthetic malicious tarballs for self-test
+│   └── skills/
+│       ├── api-hardening/              # Rate limiting, CORS, request throttling, defense-in-depth
+│       ├── secure-auth/                # Password hashing, sessions, JWT, OAuth, passkeys
+│       ├── security-checklist/         # Pre-deployment OWASP audit
+│       └── supply-chain-hardening/     # npm/bun install-time cooldown + sandboxed bypass scan
+│
+├── # Plugin: autocontext (no skills — hooks/commands/agents) — registered in marketplace.json
+├── autocontext/                 # Cross-session knowledge persistence with skill evolution
+│   ├── .claude-plugin/plugin.json
+│   ├── agents/                  # Lesson-review and evolution agents
+│   ├── commands/                # /autocontext:setup, :init, :review, :status, :evolve
+│   ├── hooks/                   # Capture, validate, and surface lessons across sessions
+│   ├── scripts/skill-evolution/ # Fold accumulated lessons back into skill files
+│   ├── templates/              # Lesson and archive templates
+│   └── tests/
+│
+├── # Plugin: pdf-playground (8 commands, v1.3.1) — registered in marketplace.json
+├── pdf-playground/              # Interactive proposal/report/slide builder with live control panel
+│   ├── .claude-plugin/plugin.json
+│   ├── brands/                  # Brand presets
+│   ├── commands/                # /proposal, /report, /onepager, /newsletter, /slides, /event, /preview, /update
+│   ├── controls/template-maps/  # Live design-editing control wiring
+│   ├── hooks/
+│   ├── templates/               # Document templates
+│   └── skills/                  # document-design/ + playground.md (user-invocable entry skill)
+│
+└── # Plugin: superjawn (14 skills, v1.0.0) — registered in marketplace.json
+    ├── # Research-augmented fork of obra/superpowers; standalone, no upstream dependency
     ├── .claude-plugin/plugin.json
     ├── README.md
-    ├── commands/hotpatch.md            # Slash command: sandboxed pre-install scan + cooldown bypass
-    ├── scripts/hotpatch.example.sh     # Reference Linux/bwrap implementation
-    ├── test-fixtures/                  # Synthetic malicious tarballs for self-test
     └── skills/
-        ├── api-hardening/              # Rate limiting, CORS, request throttling, defense-in-depth
-        ├── secure-auth/                # Password hashing, sessions, JWT, OAuth, passkeys
-        ├── security-checklist/         # Pre-deployment OWASP audit
-        └── supply-chain-hardening/     # npm/bun install-time cooldown + sandboxed bypass scan
+        ├── brainstorming/                 # Research phase: ideation before creative work
+        ├── dispatching-parallel-agents/   # Independent tasks across 2+ agents
+        ├── executing-plans/               # Run a written implementation plan
+        ├── finishing-a-development-branch/ # Decide how to land completed work
+        ├── receiving-code-review/         # Handle review feedback
+        ├── requesting-code-review/        # Verify completed work before merging
+        ├── subagent-driven-development/   # Parallel task execution in one session
+        ├── systematic-debugging/          # Research phase: triage before proposing fixes
+        ├── test-driven-development/        # TDD before implementation code
+        ├── using-git-worktrees/           # Isolate feature work
+        ├── using-superjawn/               # How to find and use skills
+        ├── verification-before-completion/ # Confirm work is complete before committing
+        ├── writing-plans/                 # Multi-step planning before touching code
+        └── writing-skills/                # Research phase: creating or editing skills
 ```
 
 ## Skill format
