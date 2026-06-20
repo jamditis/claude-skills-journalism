@@ -31,8 +31,8 @@
     },
     {
       "name": "journalism-core",
-      "description": "Thirteen core journalism skills for reporting, verification, publishing, and digital investigations. Covers AP-style writing, AI-slop detoxing, source verification (2026 deepfake/C2PA detection), FOIA and OPRA requests with current statutory citations, fact-checking workflows, interview prep and transcription, story pitches, editorial workflow, crisis communications, newsletter publishing (2024-2026 Gmail/Yahoo/Outlook bulk-sender requirements), data journalism (with 2025-2026 federal-data-portal currency notes and AI-assisted-analysis cautions), and social-media intelligence / OSINT (post-CrowdTangle Meta Content Library, X pay-per-use API, TikTok Research API, Bluesky/Threads/Mastodon/Telegram coverage).",
-      "version": "1.1.0",
+      "description": "Fourteen core journalism skills for reporting, verification, publishing, and digital investigations. Covers AP-style writing, AI-slop detoxing, source verification (2026 deepfake/C2PA detection), FOIA and OPRA requests with current statutory citations, fact-checking workflows, interview prep and transcription, story pitches, editorial workflow, crisis communications, newsletter publishing (2024-2026 Gmail/Yahoo/Outlook bulk-sender requirements), data journalism (with 2025-2026 federal-data-portal currency notes and AI-assisted-analysis cautions), and social-media intelligence / OSINT (post-CrowdTangle Meta Content Library, X pay-per-use API, TikTok Research API, Bluesky/Threads/Mastodon/Telegram coverage). Adds embedded photo metadata (IPTC/EXIF/XMP captions, byline, alt text, keywords, and Creative Commons or copyright licensing) for wire and archive use.",
+      "version": "1.2.0",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"

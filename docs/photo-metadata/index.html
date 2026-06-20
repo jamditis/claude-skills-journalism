@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Embed caption, byline, credit, alt text, keywords, copyright, and license into a photo's IPTC, EXIF, and XMP metadata for wire distribution and photo CMS intake.">
+    <title>Photo metadata - Claude skills for journalism</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'display': ['Fraunces', 'serif'],
+                        'body': ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        'canvas': '#ede6d4',
+                        'ink': '#121212',
+                        'clay': '#2d2a26',
+                        'mist': '#c4bfb4',
+                        'accent': '#0d9488',
+                        'accentDark': '#0f766e',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Fraunces', serif; }
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("https://www.transparenttextures.com/patterns/natural-paper.png"),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .content-section h2 { margin-top: 2.5rem; margin-bottom: 1rem; }
+        .content-section h3 { margin-top: 2rem; margin-bottom: 0.75rem; }
+        .content-section p { margin-bottom: 1rem; }
+        .content-section ul, .content-section ol { margin-bottom: 1rem; margin-left: 1.5rem; }
+        .content-section li { margin-bottom: 0.5rem; }
+        .content-section code {
+            background: rgba(0,0,0,0.06);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+        .content-section pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        .content-section pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        .content-section table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        .content-section th, .content-section td {
+            border: 1px solid rgba(0,0,0,0.1);
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+        }
+        .content-section th {
+            background: rgba(0,0,0,0.04);
+            font-weight: 600;
+        }
+
+/* a11y-patch-v1 */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+.skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #121212; color: #ede6d4; font-weight: 700; text-decoration: none; }
+:focus-visible { outline: 2px solid #3d4b40; outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+p a:not(.btn-primary):not(.btn-outline):not(.skill-card):not(.deckle-card):not(.feature-card),
+li a:not(.btn-primary):not(.btn-outline),
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDeep"]:not(.btn-primary):not(.btn-outline) { color: #1e293b !important; }
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline):hover,
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline):hover { color: #0f172a !important; }
+strong[class~="text-accent"], em[class~="text-accent"], code[class~="text-accent"],
+strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b !important; }
+.bg-canvas [class~="text-mist"], main [class~="text-mist"], [class~="text-mist"] { color: #3a3a3a !important; }
+.bg-ink [class~="text-accent"], [class~="bg-ink"] [class~="text-accent"],
+.bg-zinc-900 [class~="text-accent"], .bg-gray-900 [class~="text-accent"],
+[class*="bg-zinc-9"] [class~="text-accent"], [class*="bg-gray-9"] [class~="text-accent"],
+[class*="text-white"] [class~="text-accent"],
+[style*="background:#1"] [class~="text-accent"], [style*="background-color:#1"] [class~="text-accent"] {
+  color: #ddd6fe !important;
+}
+.bg-ink [class~="text-mist"], [class~="bg-ink"] [class~="text-mist"],
+[class*="text-white"] [class~="text-mist"] {
+  color: #d4d4d4 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-section, .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+/* stat-on-dark-fix */
+.bg-ink .text-accent, .bg-zinc-900 .text-accent, .bg-gray-900 .text-accent,
+.bg-ink .text-accentDark, .bg-zinc-900 .text-accentDark, .bg-gray-900 .text-accentDark {
+  filter: brightness(1.6) saturate(0.85);
+}
+</style>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Photo metadata - Claude skills for journalism">
+    <meta property="og:description" content="Embed caption, byline, credit, alt text, keywords, copyright, and license into a photo's IPTC, EXIF, and XMP metadata for wire distribution and photo CMS intake.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/photo-metadata/">
+    <meta property="og:image" content="https://skills.amditis.tech/photo-metadata/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Photo metadata - Claude skills for journalism">
+    <meta name="twitter:description" content="Embed caption, byline, credit, alt text, keywords, copyright, and license into a photo's IPTC, EXIF, and XMP metadata for wire distribution and photo CMS intake.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/photo-metadata/og-image.png">
+<script src="../ask-ai.js" defer></script>
+    <!-- a11y-patch-v1 -->
+</head>
+<body class="bg-canvas text-ink">
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <div class="paper-overlay"></div>
+
+    <!-- Navigation -->
+    <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="../" class="text-clay/70 hover:text-ink flex items-center gap-2 text-sm font-medium transition-colors">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                All skills
+            </a>
+            <a aria-label="GitHub" href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors" rel="noopener noreferrer">
+                <svg aria-hidden="true" focusable="false" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+                </svg>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="bg-gradient-to-br from-accent to-accentDark text-white pt-24 pb-16">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1 text-sm mb-4">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                </svg>
+                Journalism skill
+            </div>
+            <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">Photo metadata</h1>
+            <p class="text-xl text-white/90 max-w-2xl">
+                Embed caption, credit, alt text, and license inside the image file so the metadata travels wherever the photo goes.
+            </p>
+        </div>
+    </header>
+
+    <main id="main" class="max-w-4xl mx-auto px-6 py-12 relative z-10">
+
+        <!-- Why metadata travels with the file -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Why this matters</h2>
+            <p class="text-clay/80">
+                Metadata embedded in an image file travels with the file. Photo CMSs (Photo Mechanic, Lightroom, Capture One) and wire intake systems read a photo's caption, credit, and rights from its IPTC and XMP blocks — not from a separate document or the email it arrived in. If the caption, credit, alt text, and license are not <em>inside</em> the file, they are gone the moment the photo is downloaded, forwarded, or re-uploaded.
+            </p>
+            <p class="text-clay/80">
+                One <code>exiftool</code> pass writes the EXIF, IPTC, and XMP layers together and leaves every other tag (camera settings, shot time) untouched. Embedded metadata is what lets a partner newsroom find a photo, credit it correctly, and republish it under a clear license without contacting the photographer. Strip it, and the same photo is an orphaned file.
+            </p>
+        </section>
+
+        <!-- When to use -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">When to use</h2>
+            <ul class="space-y-2 text-clay/80">
+                <li class="flex items-start gap-3">
+                    <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Prepping press photos for a wire so partner newsrooms can search, credit, and republish them
+                </li>
+                <li class="flex items-start gap-3">
+                    <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Adding required photographer attribution and a reuse license before publishing or sharing
+                </li>
+                <li class="flex items-start gap-3">
+                    <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Batch-tagging a shoot (a folder of images)
+                </li>
+                <li class="flex items-start gap-3">
+                    <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Making images accessible (embedded alt text) and rights-clear (copyright or Creative Commons)
+                </li>
+            </ul>
+            <p class="mt-4 text-clay/70 text-sm">
+                <strong>When not to use:</strong> editing pixels (this is metadata only); writing alt text for an HTML <code>&lt;img&gt;</code> tag (use <code>accessibility-compliance</code>); preserving web pages as evidence (use <code>web-archiving</code>).
+            </p>
+        </section>
+
+        <!-- The discipline -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">The discipline</h2>
+            <p class="text-clay/80 mb-4">These are the failures a capable model makes anyway. They matter more than any tag name.</p>
+            <div class="space-y-3">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded flex-shrink-0">1</span>
+                        <div>
+                            <h3 class="font-semibold">Caption only what is visible</h3>
+                            <p class="text-sm text-clay/70 mt-1">Describe what the frame shows, not what you were told. Do not infer events, intent, identities, relationships, or legal status you cannot see. "Demonstrators gather to protest a court ruling" is a claim about facts not in the frame; "A crowd holds signs outside a courthouse" is the photo.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded flex-shrink-0">2</span>
+                        <div>
+                            <h3 class="font-semibold">Label people from visible evidence</h3>
+                            <p class="text-sm text-clay/70 mt-1">Name an agency or role only from a visible marking — a labeled vest, a uniform, a badge, a patch. Otherwise write "officers in tactical gear," "a man in a blue shirt." Never assert someone's immigration or legal status unless it is unambiguous in the frame.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded flex-shrink-0">3</span>
+                        <div>
+                            <h3 class="font-semibold">Always write alt text — it is not the caption</h3>
+                            <p class="text-sm text-clay/70 mt-1">Write both: a short screen-reader description in <code>XMP-iptcCore:AltTextAccessibility</code> and the publishable caption in <code>IPTC:Caption-Abstract</code>. Models routinely write the caption and skip the alt text.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded flex-shrink-0">4</span>
+                        <div>
+                            <h3 class="font-semibold">Keep structured fields neutral</h3>
+                            <p class="text-sm text-clay/70 mt-1">Editorial framing or a contested label belongs in <code>Headline</code>, never in <code>City</code>, <code>Caption-Abstract</code>, or the location fields. Partner newsrooms apply their own language; clean structured fields let them.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-start gap-4">
+                        <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded flex-shrink-0">5</span>
+                        <div>
+                            <h3 class="font-semibold">Verify the round-trip from the file</h3>
+                            <p class="text-sm text-clay/70 mt-1">Read the metadata back <em>from the written file</em>, not from your buffer. After any upload or transfer, re-read it <em>from the destination</em> — a 200 response proves the bytes were accepted, not that the metadata survived.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Field map table -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Field map</h2>
+            <p class="text-clay/80 mb-4">A JPEG can carry the same fact in three places. Write all three; <code>exiftool</code> keeps them consistent. EXIF is written by the camera and survives tools that strip other layers. IPTC-IIM is the legacy newsroom standard; wire intake systems still index it first. XMP is the modern XML layer with no byte limits.</p>
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-mist/10 border-b border-mist/30">
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">Role</th>
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">IPTC (IIM)</th>
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">XMP</th>
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">EXIF</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-mist/20">
+                        <tr>
+                            <td class="px-5 py-3 font-medium">Photographer</td>
+                            <td class="px-5 py-3 text-clay/70"><code>IPTC:By-line</code></td>
+                            <td class="px-5 py-3 text-clay/70"><code>XMP-dc:Creator</code></td>
+                            <td class="px-5 py-3 text-clay/70"><code>EXIF:Artist</code></td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">Credit (org / full)</td>
+                            <td class="px-5 py-3 text-clay/70"><code>IPTC:Credit</code> (org, max 32 chars)</td>
+                            <td class="px-5 py-3 text-clay/70"><code>XMP-photoshop:Credit</code> (full name / org)</td>
+                            <td class="px-5 py-3 text-clay/70">—</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">Caption</td>
+                            <td class="px-5 py-3 text-clay/70"><code>IPTC:Caption-Abstract</code></td>
+                            <td class="px-5 py-3 text-clay/70"><code>XMP-dc:Description</code>, <code>XMP-iptcCore:ExtDescrAccessibility</code></td>
+                            <td class="px-5 py-3 text-clay/70"><code>EXIF:ImageDescription</code></td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">Alt text (short)</td>
+                            <td class="px-5 py-3 text-clay/70">—</td>
+                            <td class="px-5 py-3 text-clay/70"><code>XMP-iptcCore:AltTextAccessibility</code></td>
+                            <td class="px-5 py-3 text-clay/70">—</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">Keywords</td>
+                            <td class="px-5 py-3 text-clay/70"><code>IPTC:Keywords</code> (repeatable)</td>
+                            <td class="px-5 py-3 text-clay/70"><code>XMP-dc:Subject</code></td>
+                            <td class="px-5 py-3 text-clay/70">—</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">Copyright</td>
+                            <td class="px-5 py-3 text-clay/70"><code>IPTC:CopyrightNotice</code></td>
+                            <td class="px-5 py-3 text-clay/70"><code>XMP-dc:Rights</code></td>
+                            <td class="px-5 py-3 text-clay/70"><code>EXIF:Copyright</code></td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">License (CC, machine-readable)</td>
+                            <td class="px-5 py-3 text-clay/70">—</td>
+                            <td class="px-5 py-3 text-clay/70"><code>XMP-cc:License</code>, <code>XMP-xmpRights:Marked</code>, <code>XMP-xmpRights:WebStatement</code>, <code>XMP-xmpRights:UsageTerms</code></td>
+                            <td class="px-5 py-3 text-clay/70">—</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">Headline</td>
+                            <td class="px-5 py-3 text-clay/70"><code>IPTC:Headline</code></td>
+                            <td class="px-5 py-3 text-clay/70"><code>XMP-photoshop:Headline</code></td>
+                            <td class="px-5 py-3 text-clay/70">—</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">Location</td>
+                            <td class="px-5 py-3 text-clay/70"><code>IPTC:Sub-location</code>, <code>IPTC:City</code>, <code>IPTC:Province-State</code>, <code>IPTC:Country-*</code></td>
+                            <td class="px-5 py-3 text-clay/70"><code>XMP-iptcCore:Location</code>, <code>XMP-photoshop:City</code>, <code>XMP-photoshop:State</code>, <code>XMP-photoshop:Country</code></td>
+                            <td class="px-5 py-3 text-clay/70">—</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">Date</td>
+                            <td class="px-5 py-3 text-clay/70"><code>IPTC:DateCreated</code></td>
+                            <td class="px-5 py-3 text-clay/70"><code>XMP-photoshop:DateCreated</code></td>
+                            <td class="px-5 py-3 text-clay/70"><code>EXIF:DateTimeOriginal</code> (source of truth)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- One-pass exiftool example -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">One pass that writes all three layers</h2>
+            <p class="text-clay/80 mb-4">This command tags a single file with photographer, credit, caption, alt text, keywords, copyright, Creative Commons license, and location — then copies the shoot date from EXIF rather than typing it.</p>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable code block">
+                <pre class="text-white/90 whitespace-pre m-0 bg-transparent p-0 rounded-none overflow-visible"><code>CAPTION="A crowd holds signs outside the Mercer County Courthouse, Friday, June 19, 2026, in Trenton, N.J. (Dana Rivera/Example News Collective)"
+ALT="A crowd of people holding handmade signs stands on the steps of a stone courthouse."
+
+exiftool -codedcharacterset=utf8 -overwrite_original \
+  -EXIF:Artist="Dana Rivera" -XMP-dc:Creator="Dana Rivera" -IPTC:By-line="Dana Rivera" \
+  -IPTC:Credit="Example News Collective" -XMP-photoshop:Credit="Dana Rivera / Example News Collective" \
+  -IPTC:Caption-Abstract="$CAPTION" -XMP-dc:Description="$CAPTION" \
+    -EXIF:ImageDescription="$CAPTION" -XMP-iptcCore:ExtDescrAccessibility="$CAPTION" \
+  -XMP-iptcCore:AltTextAccessibility="$ALT" \
+  -IPTC:Keywords="protest" -IPTC:Keywords+="Trenton" \
+    -XMP-dc:Subject="protest" -XMP-dc:Subject+="Trenton" \
+  -EXIF:Copyright="(c) 2026 Example News Collective. Licensed CC BY 4.0." \
+    -IPTC:CopyrightNotice="(c) 2026 Example News Collective. CC BY 4.0." \
+    -XMP-dc:Rights="(c) 2026 Example News Collective. Licensed CC BY 4.0." \
+  -XMP-xmpRights:Marked=True \
+    -XMP-xmpRights:WebStatement="https://creativecommons.org/licenses/by/4.0/" \
+    -XMP-xmpRights:UsageTerms="Licensed CC BY 4.0. Credit: Dana Rivera / Example News Collective." \
+    -XMP-cc:License="https://creativecommons.org/licenses/by/4.0/" \
+    -XMP-cc:AttributionName="Dana Rivera / Example News Collective" \
+  -IPTC:City="Trenton" -IPTC:Province-State="New Jersey" \
+    -IPTC:Country-PrimaryLocationName="United States" -IPTC:Country-PrimaryLocationCode="USA" \
+  "-IPTC:DateCreated&lt;EXIF:DateTimeOriginal" "-IPTC:TimeCreated&lt;EXIF:DateTimeOriginal" \
+    "-XMP-photoshop:DateCreated&lt;EXIF:DateTimeOriginal" \
+  photo.jpg</code></pre>
+            </div>
+            <p class="text-clay/80 mt-4 mb-2">Then <strong>verify from the file</strong> — the step that gets skipped:</p>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable code block">
+                <pre class="text-white/90 whitespace-pre m-0 bg-transparent p-0 rounded-none overflow-visible"><code>exiftool -G1 -s -IPTC:By-line -IPTC:Caption-Abstract \
+  -XMP-iptcCore:AltTextAccessibility -XMP-cc:License -IPTC:Keywords photo.jpg</code></pre>
+            </div>
+        </section>
+
+        <!-- Batch tagging -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Batch tagging a folder</h2>
+            <p class="text-clay/80">
+                For a shoot, drive <code>exiftool</code> from a manifest instead of one command per file. <code>embed.py</code> in this skill's directory takes a folder plus a JSON manifest — constant credit and license fields, then per-image alt text, caption, and keywords — writes tagged copies, and reads each one back to confirm the metadata landed. Run <code>python3 embed.py --help</code>.
+            </p>
+        </section>
+
+        <!-- Common mistakes table -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Common mistakes</h2>
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-mist/10 border-b border-mist/30">
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">Mistake</th>
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">Fix</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-mist/20">
+                        <tr>
+                            <td class="px-5 py-3 font-medium">Wrote a caption, no alt text</td>
+                            <td class="px-5 py-3 text-clay/70">Always write <code>AltTextAccessibility</code> too — they are different fields</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium"><code>By-line</code> / <code>Credit</code> / <code>City</code> silently truncated</td>
+                            <td class="px-5 py-3 text-clay/70">Those IIM fields cap at 32 chars; put the full credit in <code>XMP-photoshop:Credit</code></td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">Caption states things not in the frame</td>
+                            <td class="px-5 py-3 text-clay/70">Describe only what is visible; move unseeable context out</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">Editorial label in <code>City</code> or caption</td>
+                            <td class="px-5 py-3 text-clay/70">Put framing in <code>Headline</code>; keep structured fields neutral</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">Assumed the upload kept the metadata</td>
+                            <td class="px-5 py-3 text-clay/70">Re-read the metadata from the destination file</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">Keywords as one comma-joined string</td>
+                            <td class="px-5 py-3 text-clay/70">Write repeatable <code>Keywords</code> records (and a <code>dc:Subject</code> list)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">CC license note in plain text only</td>
+                            <td class="px-5 py-3 text-clay/70">Add the machine-readable <code>cc:License</code> and <code>xmpRights:Marked</code> fields</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- IPTC byte limits -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">IPTC-IIM byte limits</h2>
+            <p class="text-clay/80 mb-4">IIM fields are byte-capped; <code>exiftool</code> truncates silently unless you pass <code>-m</code>. XMP has no limit, so put the short form in IPTC and the full form in XMP. Use <code>-codedcharacterset=utf8</code> so accented names and curly quotes survive in the IPTC layer.</p>
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-mist/10 border-b border-mist/30">
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">Field</th>
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">Max bytes</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-mist/20">
+                        <tr>
+                            <td class="px-5 py-3 font-medium"><code>By-line</code></td>
+                            <td class="px-5 py-3 text-clay/70">32</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium"><code>Credit</code></td>
+                            <td class="px-5 py-3 text-clay/70">32</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium"><code>City</code></td>
+                            <td class="px-5 py-3 text-clay/70">32</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium"><code>Province-State</code></td>
+                            <td class="px-5 py-3 text-clay/70">32</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium"><code>Sub-location</code></td>
+                            <td class="px-5 py-3 text-clay/70">32</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium"><code>Country-PrimaryLocationName</code></td>
+                            <td class="px-5 py-3 text-clay/70">64</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium"><code>Country-PrimaryLocationCode</code></td>
+                            <td class="px-5 py-3 text-clay/70">3</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium"><code>Headline</code></td>
+                            <td class="px-5 py-3 text-clay/70">256</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium"><code>SpecialInstructions</code> (usage terms)</td>
+                            <td class="px-5 py-3 text-clay/70">256</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium"><code>CopyrightNotice</code></td>
+                            <td class="px-5 py-3 text-clay/70">128</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium"><code>Caption-Abstract</code></td>
+                            <td class="px-5 py-3 text-clay/70">2000</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium"><code>Keywords</code> (per record)</td>
+                            <td class="px-5 py-3 text-clay/70">64</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Installation</h2>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
+                <p class="text-white/50 mb-2"># Recommended: install the journalism-core plugin</p>
+                <p class="text-white mb-1">/plugin marketplace add jamditis/claude-skills-journalism</p>
+                <p class="text-white mb-4">/plugin install journalism-core@claude-skills-journalism</p>
+                <p class="text-white/50 mb-2"># Or copy just this skill from the plugin tree</p>
+                <p class="text-white mb-1">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
+                <p class="text-white">cp -r claude-skills-journalism/journalism-core/skills/photo-metadata ~/.claude/skills/</p>
+            </div>
+            <p class="mt-4 text-clay/70 text-sm">
+                Or browse this skill in the
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/journalism-core/skills/photo-metadata" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
+            </p>
+        </section>
+
+        <!-- Related skills -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Related skills</h2>
+            <div class="flex flex-wrap gap-2">
+                <a href="../accessibility-compliance/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Accessibility compliance</a>
+                <a href="../web-archiving/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Web archiving</a>
+                <a href="../newsroom-style/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Newsroom style</a>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="text-center">
+            <div class="bg-gradient-to-br from-accent to-accentDark rounded-xl p-8 text-white">
+                <h2 class="font-display text-xl font-bold mb-3">Metadata that travels with the photo</h2>
+                <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
+                    Caption, credit, alt text, and license embedded in the file — readable by any wire system or photo CMS.
+                </p>
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/journalism-core/skills/photo-metadata" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors" rel="noopener noreferrer">
+                    View on GitHub
+                    <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-mist/30 mt-12 relative z-10">
+        <div class="max-w-4xl mx-auto px-6 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-clay/80 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accentDark hover:text-accentDark underline underline-offset-2" rel="noopener noreferrer">Center for Cooperative Media</a>
+                </p>
+                <div class="flex items-center gap-6">
+                    <a href="../" class="text-clay/80 hover:text-ink text-sm transition-colors">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/80 hover:text-ink text-sm transition-colors" rel="noopener noreferrer">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

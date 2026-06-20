@@ -39,7 +39,7 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 |--------|-------------|----------|
 | [autocontext](./autocontext/) | Cross-session knowledge persistence with skill evolution. Lessons accumulate per-skill, and `/autocontext:evolve` folds them back into skill files | `/autocontext:setup`, `/autocontext:init`, `/autocontext:review`, `/autocontext:status`, `/autocontext:evolve` |
 | [dev-toolkit](./dev-toolkit/) | Ten development-focused skills for journalists, researchers, and small newsroom dev teams: accessibility (WCAG 2.2), Electron app patterns, mobile/remote debugging, irreversible-decision discipline, Python data pipelines, test-first bug fixing, AI-assisted development workflows, ethical web scraping, no-build frontend patterns, and signs-of-taste guidance for web UI | n/a — skills only |
-| [journalism-core](./journalism-core/) | Thirteen core journalism skills, including AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, fact-checking, interview prep + transcription, story pitches, editorial workflow, crisis communications, and newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements | n/a — skills only |
+| [journalism-core](./journalism-core/) | Fourteen core journalism skills, including AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, fact-checking, interview prep + transcription, story pitches, editorial workflow, crisis communications, newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements, and embedded photo metadata for wire distribution | n/a — skills only |
 | [pdf-design](./pdf-design/) | PDF report and proposal design system with brand variables, budget tables, and reusable content blocks (stats strips, three-column, four-tile pillars, partner grids) | n/a — skill-only |
 | [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials with an interactive control panel for live design editing (colors, fonts, spacing, sections) and a guided wizard for proposals | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` |
 | [project-templates-toolkit](./project-templates-toolkit/) | Three skills for setting up and closing out journalism projects: a CLAUDE.md project-memory writer (institutional knowledge), a LESSONS.md retrospective writer (failures and decisions), and a template-selector decision tree across 6 project types | n/a — skills only |
@@ -79,7 +79,7 @@ Skills can be added via the Claude.ai interface under Settings > Skills.
 
 ### Core journalism skills (in `journalism-core` plugin)
 
-These thirteen skills ship together as the [journalism-core](./journalism-core/) plugin. Install via `/plugin install journalism-core@claude-skills-journalism` to get all of them at once.
+These fourteen skills ship together as the [journalism-core](./journalism-core/) plugin. Install via `/plugin install journalism-core@claude-skills-journalism` to get all of them at once.
 
 | Skill | Description |
 |-------|-------------|
@@ -93,6 +93,7 @@ These thirteen skills ship together as the [journalism-core](./journalism-core/)
 | [interview-transcription](./journalism-core/skills/interview-transcription/) | Whisper / WhisperX transcription pipelines, quote management, speaker diarization |
 | [newsletter-publishing](./journalism-core/skills/newsletter-publishing/) | Email newsletter creation, subscriber management, deliverability, 2024–2026 Gmail / Yahoo / Outlook bulk-sender compliance |
 | [newsroom-style](./journalism-core/skills/newsroom-style/) | AP Style enforcement, attribution rules, headline formatting, number conventions |
+| [photo-metadata](./journalism-core/skills/photo-metadata/) | Embed caption, byline, credit, alt text, keywords, and copyright / Creative Commons license into a photo's IPTC/EXIF/XMP metadata; batch-tag a folder for a news wire |
 | [social-media-intelligence](./journalism-core/skills/social-media-intelligence/) | Narrative tracking, coordinated-campaign analysis, account authenticity checks, OSINT for digital investigations |
 | [source-verification](./journalism-core/skills/source-verification/) | SIFT method, image and video verification, deepfake detection (2026), C2PA Content Credentials, verification trails |
 | [story-pitch](./journalism-core/skills/story-pitch/) | Pitch templates for daily news, features, investigations, op-eds, and freelance queries |
