@@ -3,10 +3,10 @@
 // if any page has impact >= moderate (so it doubles as a CI gate).
 
 import { spawn } from 'node:child_process';
-import { createServer } from 'node:net';
+import { createServer, connect } from 'node:net';
 import { readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
 import { AxeBuilder } from '@axe-core/playwright';
 
@@ -43,16 +43,30 @@ function findIndexes(dir, out = []) {
   return out;
 }
 
-async function waitForServer(port, timeoutMs = 10000) {
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    try {
-      const r = await fetch(`http://127.0.0.1:${port}/`);
-      if (r.ok || r.status === 404) return;
-    } catch {}
-    await new Promise((r) => setTimeout(r, 100));
-  }
-  throw new Error(`server on :${port} did not start`);
+// Readiness probe via a raw TCP connect (node:net), NOT an HTTP fetch. A
+// successful connect means the listener is accepting, which is all "ready"
+// needs here. The old version used global fetch (undici) and never consumed
+// the response body, which parked the keep-alive socket in a paused state;
+// undici's later handling of that idle connection intermittently tripped
+// `assert(!this.paused)` and crashed the whole run (see issue #121). A connect
+// probe has no response body and no connection pool, so that failure class
+// cannot occur.
+export function waitForPort(port, { host = '127.0.0.1', timeoutMs = 10000, intervalMs = 100 } = {}) {
+  const probe = () => new Promise((resolve) => {
+    const sock = connect({ port, host });
+    const finish = (ok) => { sock.removeAllListeners(); sock.destroy(); resolve(ok); };
+    sock.once('connect', () => finish(true));
+    sock.once('error', () => finish(false));
+    sock.setTimeout(Math.max(250, intervalMs), () => finish(false));
+  });
+  return (async () => {
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
+      if (await probe()) return;
+      await new Promise((r) => setTimeout(r, intervalMs));
+    }
+    throw new Error(`server on ${host}:${port} did not start within ${timeoutMs}ms`);
+  })();
 }
 
 function truncate(s, n) { return s && s.length > n ? s.slice(0, n) + '...' : (s || ''); }
@@ -83,7 +97,7 @@ async function main() {
   process.on('SIGINT', () => { cleanup(); process.exit(130); });
 
   try {
-    await waitForServer(port);
+    await waitForPort(port);
 
     const indexFiles = findIndexes(DOCS_DIR);
     const pages = indexFiles.map((abs) => {
@@ -176,4 +190,8 @@ async function main() {
   }
 }
 
-main();
+// Only run the scan when executed directly (node verify_a11y.mjs). When the
+// module is imported — e.g. by verify_a11y.test.mjs to exercise waitForPort —
+// importing must not spawn the server or launch a browser.
+const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (isMain) main();
