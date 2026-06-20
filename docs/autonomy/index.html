@@ -65,6 +65,7 @@
       --border-bright: rgba(0,0,0,0.34);
       --accent: #e4002b;          /* Swiss red */
       --accent-dim: rgba(228,0,43,0.07);
+      --accent-strong: #c00020;   /* darker red: title text on the light warn bg (>=4.5:1) */
       --neutral: #8a8a8a;         /* diagram "a step" */
 
       --font-body: 'Archivo', system-ui, -apple-system, sans-serif;
@@ -76,14 +77,14 @@
         --bg: #0e0e0e; --surface: #161616; --surface-2: #1e1e1e;
         --ink: #f2f2f2; --text: #ececec; --text-bright: #ffffff; --text-dim: #9a9a9a;
         --border: rgba(255,255,255,0.16); --border-bright: rgba(255,255,255,0.34);
-        --accent: #ff3355; --accent-dim: rgba(255,51,85,0.12); --neutral: #8f8f8f;
+        --accent: #ff3355; --accent-dim: rgba(255,51,85,0.12); --neutral: #8f8f8f; --accent-strong: #ff3355;
       }
     }
     [data-theme="dark"] {
       --bg: #0e0e0e; --surface: #161616; --surface-2: #1e1e1e;
       --ink: #f2f2f2; --text: #ececec; --text-bright: #ffffff; --text-dim: #9a9a9a;
       --border: rgba(255,255,255,0.16); --border-bright: rgba(255,255,255,0.34);
-      --accent: #ff3355; --accent-dim: rgba(255,51,85,0.12); --neutral: #8f8f8f;
+      --accent: #ff3355; --accent-dim: rgba(255,51,85,0.12); --neutral: #8f8f8f; --accent-strong: #ff3355;
     }
 
     /* ---------- Reset & base ---------- */
@@ -279,7 +280,7 @@
     .callout { padding: 18px 20px; border: 1px solid var(--border); background: var(--surface); margin: 24px 0; }
     .callout__title { font-family: var(--font-body); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 9px; color: var(--callt, var(--text-bright)); }
     .callout p { font-size: 14px; }
-    .callout--warn { background: var(--accent-dim); border-color: var(--accent); --callt: var(--accent); }
+    .callout--warn { background: var(--accent-dim); border-color: var(--accent); --callt: var(--accent-strong); }
     .callout--ok   { --callt: var(--text-bright); }
     .callout--info { --callt: var(--accent); }
 
