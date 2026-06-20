@@ -4,7 +4,8 @@
   "description": "A curated collection of Claude Code skills designed for journalists, researchers, academics, media professionals, and communications practitioners.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test \"scripts/**/*.test.mjs\"",
+    "a11y": "node scripts/verify_a11y.mjs"
   },
   "repository": {
     "type": "git",
