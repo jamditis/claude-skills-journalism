@@ -12,7 +12,7 @@ Source: https://github.com/jamditis/claude-skills-journalism
 Joe Amditis — associate director of operations, Center for Cooperative Media, Montclair State University.
 Personal site: https://jamditis.com
 
-## Skills (54 total)
+## Skills (56 total)
 
 ### Journalism and verification
 - source-verification — SIFT method, verification trails, source credibility, deepfakes/C2PA
@@ -53,6 +53,7 @@ Personal site: https://jamditis.com
 - mobile-debugging — Eruda, vConsole, remote debug
 - accessibility-compliance — WCAG, alt text, a11y
 - web-ui-best-practices — signs of craft in web UI
+- claude-md-updater — propose scoped CLAUDE.md updates from a session
 
 ### Security
 - security-checklist — pre-deployment security audit
@@ -69,6 +70,7 @@ Personal site: https://jamditis.com
 - pdf-design — design and edit professional PDF reports and proposals
 - pdf-playground — document design (proposals, reports)
 - visual-explainer — generate self-contained HTML pages that visually explain systems
+- okf-wiki — scaffold an Open Knowledge Format knowledge base (one-concept-per-file markdown, validator, session-start orientation hooks)
 
 ### Workflow patterns (superjawn)
 - using-superjawn — establishes how to find and use skills
@@ -125,7 +127,7 @@ Skills above are distributed as Claude Code plugins. Install via:
 
 Restart your Claude Code session after installing or updating a plugin so the new skills and commands register.
 
-Plugins (10): `journalism-core` (14 skills), `research-toolkit` (6), `dev-toolkit` (10), `security-toolkit` (4 skills + /hotpatch command), `project-templates-toolkit` (3), `pdf-design` (1), `pdf-playground` (1), `visual-explainer` (1), `superjawn` (14), `autocontext` (cross-session knowledge persistence — hooks, commands, and agents rather than skills).
+Plugins (11): `journalism-core` (14 skills), `research-toolkit` (6), `dev-toolkit` (11), `security-toolkit` (4 skills + /hotpatch command), `project-templates-toolkit` (3), `pdf-design` (1), `pdf-playground` (1), `visual-explainer` (1), `okf-wiki` (1), `superjawn` (14), `autocontext` (cross-session knowledge persistence — hooks, commands, and agents rather than skills).
 
 ## Alternate installation
 

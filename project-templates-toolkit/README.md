@@ -19,7 +19,7 @@ Three skills for setting up and closing out journalism projects — the institut
 
 ## See also
 
-- [`dev-toolkit`](../dev-toolkit/README.md) — 10 development skills (accessibility, Electron, scraping, frontend patterns)
+- [`dev-toolkit`](../dev-toolkit/README.md) — 11 development skills (accessibility, Electron, scraping, frontend patterns, CLAUDE.md maintenance)
 - [`journalism-core`](../journalism-core/README.md) — 13 skills for reporting, verification, publishing
 - [`research-toolkit`](../research-toolkit/README.md) — 5 skills for research, archives, academic workflows
 - [`security-toolkit`](../security-toolkit/README.md) — 3 defensive security skills for web apps and APIs
