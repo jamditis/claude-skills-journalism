@@ -351,28 +351,28 @@ def test_settings_json_structure(tmp_path):
     scaffold(tmp_path / "kb", "--no-validate")
     s = settings_of(tmp_path / "kb")
     assert "SessionStart" in s["hooks"] and "PreToolUse" in s["hooks"]
-    start_cmd = s["hooks"]["SessionStart"][0]["hooks"][0]["command"]
-    pre = s["hooks"]["PreToolUse"][0]
-    assert "matcher" not in pre  # no matcher => fires on the first tool call of any kind
-    assert "okf-anchor.py" in start_cmd
-    pre_cmd = pre["hooks"][0]["command"]
-    assert "okf-orient.py" in pre_cmd
-    # the script path must use the ${CLAUDE_PROJECT_DIR} placeholder, not a bare
-    # cwd-relative path: the hook cwd is not guaranteed to be the project root.
-    for cmd in (start_cmd, pre_cmd):
-        assert "${CLAUDE_PROJECT_DIR}/.claude/hooks/" in cmd, cmd
+    start = s["hooks"]["SessionStart"][0]["hooks"][0]
+    pre_group = s["hooks"]["PreToolUse"][0]
+    assert "matcher" not in pre_group  # no matcher => fires on the first tool call of any kind
+    pre = pre_group["hooks"][0]
+    # exec form: interpreter in `command`, script path as one `args` element (no shell
+    # tokenization). The path must use the ${CLAUDE_PROJECT_DIR} placeholder, not a
+    # bare cwd-relative path: the hook cwd is not guaranteed to be the project root.
+    for hook, script in ((start, "okf-anchor.py"), (pre, "okf-orient.py")):
+        assert hook["command"] in ("python3", "python"), hook
+        assert hook["args"] == [f"${{CLAUDE_PROJECT_DIR}}/.claude/hooks/{script}"], hook
 
 
 def test_hooks_os_windows_uses_python(tmp_path):
     scaffold(tmp_path / "kb", "--no-validate", "--hooks-os", "windows")
-    cmd = settings_of(tmp_path / "kb")["hooks"]["SessionStart"][0]["hooks"][0]["command"]
-    assert cmd.startswith("python ")  # the py launcher, not python3
+    hook = settings_of(tmp_path / "kb")["hooks"]["SessionStart"][0]["hooks"][0]
+    assert hook["command"] == "python"  # the py launcher, not python3
 
 
 def test_hooks_os_posix_uses_python3(tmp_path):
     scaffold(tmp_path / "kb", "--no-validate", "--hooks-os", "posix")
-    cmd = settings_of(tmp_path / "kb")["hooks"]["SessionStart"][0]["hooks"][0]["command"]
-    assert cmd.startswith("python3 ")
+    hook = settings_of(tmp_path / "kb")["hooks"]["SessionStart"][0]["hooks"][0]
+    assert hook["command"] == "python3"
 
 
 def test_readme_validate_command_matches_os(tmp_path):
@@ -383,6 +383,209 @@ def test_readme_validate_command_matches_os(tmp_path):
     assert "python scripts/validate.py" in win and "python3 scripts/validate.py" not in win
     scaffold(tmp_path / "nix", "--no-validate", "--hooks-os", "posix")
     assert "python3 scripts/validate.py" in (tmp_path / "nix" / "README.md").read_text()
+
+
+def test_force_merges_into_existing_settings(tmp_path):
+    # scaffolding --force into a project that already has .claude/settings.json must
+    # preserve the user's settings (permissions, unrelated events, their own
+    # SessionStart hook) and add the OKF hooks, never overwrite the file wholesale.
+    target = tmp_path / "kb"
+    (target / ".claude").mkdir(parents=True)
+    existing = {
+        "permissions": {"allow": ["Bash(ls:*)"]},
+        "hooks": {
+            "SessionStart": [{"hooks": [{"type": "command", "command": "echo hi"}]}],
+            "Stop": [{"hooks": [{"type": "command", "command": "echo bye"}]}],
+        },
+    }
+    (target / ".claude" / "settings.json").write_text(json.dumps(existing), encoding="utf-8")
+    (target / "keep.txt").write_text("x")
+    rc, out = scaffold(target, "--force", "--no-validate")
+    assert rc == 0, out
+    s = settings_of(target)
+    assert s["permissions"] == {"allow": ["Bash(ls:*)"]}  # untouched
+    assert s["hooks"]["Stop"] == [{"hooks": [{"type": "command", "command": "echo bye"}]}]
+    start_cmds = [h.get("command") for g in s["hooks"]["SessionStart"] for h in g["hooks"]]
+    assert "echo hi" in start_cmds  # user's own hook preserved alongside ours
+    anchors = [h for g in s["hooks"]["SessionStart"] for h in g["hooks"]
+               if h.get("args") == ["${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-anchor.py"]]
+    assert len(anchors) == 1
+    assert "PreToolUse" in s["hooks"]
+
+
+def test_force_merge_is_idempotent(tmp_path):
+    # running the scaffold twice must not duplicate the OKF hook entries.
+    target = tmp_path / "kb"
+    scaffold(target, "--no-validate")
+    scaffold(target, "--force", "--no-validate")
+    s = settings_of(target)
+    anchors = [h for g in s["hooks"]["SessionStart"] for h in g["hooks"]
+               if h.get("args") == ["${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-anchor.py"]]
+    orients = [h for g in s["hooks"]["PreToolUse"] for h in g["hooks"]
+               if h.get("args") == ["${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-orient.py"]]
+    assert len(anchors) == 1 and len(orients) == 1
+
+
+def test_force_backs_up_unparseable_settings(tmp_path):
+    # a settings.json that is not valid JSON must be backed up, not silently
+    # discarded, before the OKF settings are written in its place.
+    target = tmp_path / "kb"
+    (target / ".claude").mkdir(parents=True)
+    (target / ".claude" / "settings.json").write_text("not json{", encoding="utf-8")
+    (target / "keep.txt").write_text("x")
+    rc, out = scaffold(target, "--force", "--no-validate")
+    assert rc == 0, out
+    assert (target / ".claude" / "settings.json.bak").read_text() == "not json{"
+    assert "backed up" in out
+    assert "SessionStart" in settings_of(target)["hooks"]
+
+
+def test_force_replaces_shellform_hook(tmp_path):
+    # if an OKF hook is recorded in shell form (our exact path inside a `command`
+    # string, e.g. hand-edited), --force must recognize it and replace it with the
+    # exec-form entry, not leave both active. shlex-splitting the command exposes the
+    # path token, which is then matched exactly against the paths we generate.
+    target = tmp_path / "kb"
+    (target / ".claude").mkdir(parents=True)
+    legacy = {"hooks": {
+        "SessionStart": [{"hooks": [{"type": "command",
+            "command": 'python3 "${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-anchor.py"'}]}],
+        "PreToolUse": [{"hooks": [{"type": "command",
+            "command": 'python3 "${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-orient.py"'}]}],
+    }}
+    (target / ".claude" / "settings.json").write_text(json.dumps(legacy), encoding="utf-8")
+    (target / "keep.txt").write_text("x")
+    rc, out = scaffold(target, "--force", "--no-validate")
+    assert rc == 0, out
+    s = settings_of(target)
+    anchors = [h for g in s["hooks"]["SessionStart"] for h in g["hooks"]
+               if any("okf-anchor.py" in str(t) for t in [h.get("command")] + (h.get("args") or []))]
+    assert len(anchors) == 1, s["hooks"]["SessionStart"]  # legacy entry replaced, not duplicated
+    assert anchors[0]["args"] == ["${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-anchor.py"]  # exec form
+
+
+def test_force_preserves_user_hook_sharing_okf_group(tmp_path):
+    # a user may add their own hook into the same group as the OKF hook; replacing our
+    # entry must strip only ours and keep theirs -- no whole-group drop (data loss).
+    target = tmp_path / "kb"
+    (target / ".claude").mkdir(parents=True)
+    existing = {"hooks": {
+        "SessionStart": [{"hooks": [
+            {"type": "command", "command": "python3",
+             "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-anchor.py"]},
+            {"type": "command", "command": "echo mine"},
+        ]}],
+    }}
+    (target / ".claude" / "settings.json").write_text(json.dumps(existing), encoding="utf-8")
+    (target / "keep.txt").write_text("x")
+    rc, out = scaffold(target, "--force", "--no-validate")
+    assert rc == 0, out
+    s = settings_of(target)
+    cmds = [h.get("command") for g in s["hooks"]["SessionStart"] for h in g["hooks"]]
+    assert "echo mine" in cmds  # the user's hook in the shared group survives
+    anchors = [h for g in s["hooks"]["SessionStart"] for h in g["hooks"]
+               if any("okf-anchor.py" in str(t) for t in [h.get("command")] + (h.get("args") or []))]
+    assert len(anchors) == 1, s["hooks"]["SessionStart"]  # ours replaced once, not duplicated
+
+
+def test_force_keeps_lookalike_user_hook(tmp_path):
+    # a user hook whose path merely starts with our script name (a .bak/-wrapper
+    # variant) is NOT ours; a whole-token match means --force must not strip it.
+    target = tmp_path / "kb"
+    (target / ".claude").mkdir(parents=True)
+    lookalike = "${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-anchor.py.bak"
+    existing = {"hooks": {
+        "SessionStart": [{"hooks": [
+            {"type": "command", "command": "python3", "args": [lookalike]},
+        ]}],
+    }}
+    (target / ".claude" / "settings.json").write_text(json.dumps(existing), encoding="utf-8")
+    (target / "keep.txt").write_text("x")
+    rc, out = scaffold(target, "--force", "--no-validate")
+    assert rc == 0, out
+    s = settings_of(target)
+    kept = [h for g in s["hooks"]["SessionStart"] for h in g["hooks"]
+            if h.get("args") == [lookalike]]
+    assert len(kept) == 1, s["hooks"]["SessionStart"]  # lookalike untouched, not stripped as ours
+
+
+def test_force_keeps_same_named_hook_at_other_path(tmp_path):
+    # a user hook that runs okf-anchor.py from a DIFFERENT location (a shared/global
+    # hooks dir, not ${CLAUDE_PROJECT_DIR}) is not ours; exact-path matching means
+    # --force must leave it in place.
+    target = tmp_path / "kb"
+    (target / ".claude").mkdir(parents=True)
+    other = "/opt/shared/.claude/hooks/okf-anchor.py"
+    existing = {"hooks": {
+        "SessionStart": [{"hooks": [
+            {"type": "command", "command": "python3", "args": [other]},
+        ]}],
+    }}
+    (target / ".claude" / "settings.json").write_text(json.dumps(existing), encoding="utf-8")
+    (target / "keep.txt").write_text("x")
+    rc, out = scaffold(target, "--force", "--no-validate")
+    assert rc == 0, out
+    s = settings_of(target)
+    kept = [h for g in s["hooks"]["SessionStart"] for h in g["hooks"]
+            if h.get("args") == [other]]
+    assert len(kept) == 1, s["hooks"]["SessionStart"]  # foreign-path hook left untouched
+
+
+def test_force_backs_up_malformed_event_value(tmp_path):
+    # a parseable settings.json whose event value is the wrong shape (not a list) must
+    # be backed up rather than crashing the merge, preserving the original on disk.
+    target = tmp_path / "kb"
+    (target / ".claude").mkdir(parents=True)
+    malformed = '{"hooks": {"SessionStart": 5}}'
+    (target / ".claude" / "settings.json").write_text(malformed, encoding="utf-8")
+    (target / "keep.txt").write_text("x")
+    rc, out = scaffold(target, "--force", "--no-validate")
+    assert rc == 0, out
+    assert (target / ".claude" / "settings.json.bak").read_text() == malformed  # original preserved
+    assert "backed up" in out
+    s = settings_of(target)
+    anchors = [h for g in s["hooks"]["SessionStart"] for h in g["hooks"]
+               if h.get("args") == ["${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-anchor.py"]]
+    assert len(anchors) == 1, s["hooks"]["SessionStart"]  # fresh hooks written after backup
+
+
+def test_force_tolerates_malformed_hook_entry(tmp_path):
+    # a list-shaped event holding a malformed hook entry (args not a list) must not
+    # crash the merge; the odd entry is preserved (we can't claim it) and ours is added.
+    target = tmp_path / "kb"
+    (target / ".claude").mkdir(parents=True)
+    existing = {"hooks": {
+        "SessionStart": [{"hooks": [{"type": "command", "args": 5}]}],
+    }}
+    (target / ".claude" / "settings.json").write_text(json.dumps(existing), encoding="utf-8")
+    (target / "keep.txt").write_text("x")
+    rc, out = scaffold(target, "--force", "--no-validate")
+    assert rc == 0, out
+    s = settings_of(target)
+    weird = [h for g in s["hooks"]["SessionStart"] for h in g["hooks"] if h.get("args") == 5]
+    assert len(weird) == 1, s["hooks"]["SessionStart"]  # malformed entry left in place
+    anchors = [h for g in s["hooks"]["SessionStart"] for h in g["hooks"]
+               if h.get("args") == ["${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-anchor.py"]]
+    assert len(anchors) == 1, s["hooks"]["SessionStart"]  # our hook still added
+
+
+def test_force_preserves_unrelated_keys_when_hooks_malformed(tmp_path):
+    # a parseable settings.json with unrelated live config (permissions) but a malformed
+    # hooks subtree must keep the unrelated config in the LIVE file and just repair the
+    # hooks; the original is copied to .bak. No whole-file reset, no lost permissions.
+    target = tmp_path / "kb"
+    (target / ".claude").mkdir(parents=True)
+    existing = {"permissions": {"allow": ["Bash(ls)"]}, "hooks": {"SessionStart": 5}}
+    (target / ".claude" / "settings.json").write_text(json.dumps(existing), encoding="utf-8")
+    (target / "keep.txt").write_text("x")
+    rc, out = scaffold(target, "--force", "--no-validate")
+    assert rc == 0, out
+    s = settings_of(target)
+    assert s["permissions"] == {"allow": ["Bash(ls)"]}  # unrelated config kept in live file
+    assert json.loads((target / ".claude" / "settings.json.bak").read_text()) == existing  # original saved
+    anchors = [h for g in s["hooks"]["SessionStart"] for h in g["hooks"]
+               if h.get("args") == ["${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-anchor.py"]]
+    assert len(anchors) == 1, s["hooks"]["SessionStart"]  # hooks repaired
 
 
 # --- session hooks: behavior ------------------------------------------------

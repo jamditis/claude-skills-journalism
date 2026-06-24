@@ -39,6 +39,7 @@ import argparse
 import datetime as dt
 import json
 import platform
+import shlex
 import shutil
 import stat
 import subprocess
@@ -50,6 +51,11 @@ SRC_SPEC = SKILL_ROOT / "spec" / "SPEC.md"
 SRC_VALIDATOR = SKILL_ROOT / "scripts" / "validate.py"
 SRC_HOOKS = SKILL_ROOT / "templates" / "hooks"
 HOOK_SCRIPTS = ("okf-anchor.py", "okf-orient.py")
+# The exact hook-command paths this scaffold writes (see cmd() in claude_settings).
+# We identify our own hook entries by exact match on these strings, so a re-run
+# replaces only what we generated and never a user's hook that merely lives at a
+# similarly named path elsewhere (e.g. /opt/shared/.claude/hooks/okf-anchor.py).
+OKF_HOOK_PATHS = frozenset(f"${{CLAUDE_PROJECT_DIR}}/.claude/hooks/{s}" for s in HOOK_SCRIPTS)
 
 
 def slugify(name: str) -> str:
@@ -146,20 +152,24 @@ def interpreter_for(hooks_os: str) -> str:
 def claude_settings(hooks_os: str) -> dict:
     """Build the .claude/settings.json that registers the orientation hooks.
 
-    The hook scripts are cross-platform python3; only the interpreter in the launch
-    command changes per OS (python3 on macOS/Linux, python on Windows). The script
-    path uses the ${CLAUDE_PROJECT_DIR} placeholder, which Claude Code substitutes
-    with the project root before running the command on every OS. That resolves the
-    hook even when its working directory has drifted (the hook cwd is not guaranteed
-    to be the project root), and stays correct when the bundle is cloned to another
-    path -- unlike a baked-in absolute path. PreToolUse omits a matcher so it sees
-    the first tool call of any kind.
+    The hook scripts are cross-platform python3; only the interpreter changes per OS
+    (python3 on macOS/Linux, python on Windows). Each hook uses exec form -- the
+    interpreter as `command` and the script path as a single `args` element -- which
+    Claude Code spawns directly with no shell, so a project path with spaces or other
+    special characters needs no quoting (the hooks docs recommend exec form for any
+    hook that references a path placeholder). The path uses the ${CLAUDE_PROJECT_DIR}
+    placeholder so it resolves even when the hook cwd has drifted from the project
+    root, and stays correct when the bundle is cloned to another path -- unlike a
+    baked-in absolute path. PreToolUse omits a matcher so it sees the first tool call
+    of any kind.
     """
     interp = interpreter_for(hooks_os)
 
     def cmd(script: str) -> dict:
         path = f"${{CLAUDE_PROJECT_DIR}}/.claude/hooks/{script}"
-        return {"type": "command", "command": f'{interp} "{path}"'}
+        # exec form: the script path is one args element, spawned with no shell, so a
+        # project path with spaces or special characters needs no quoting.
+        return {"type": "command", "command": interp, "args": [path]}
 
     return {
         "hooks": {
@@ -169,18 +179,116 @@ def claude_settings(hooks_os: str) -> dict:
     }
 
 
+def _is_okf_hook(h: dict) -> bool:
+    """True if a hook entry launches one of the OKF orientation scripts we generate.
+
+    We match the exact project-local path we write (`${CLAUDE_PROJECT_DIR}/.claude/
+    hooks/<script>`), found either as an exec-form `args` element or, after shlex-
+    splitting, as a token of a shell-form `command` string. Exact matching against
+    OKF_HOOK_PATHS -- not a suffix or substring test -- means a re-run replaces only
+    our own entries and never a user's hook that merely ends in the same filename
+    (`okf-anchor.py.bak`) or sits at a different absolute path. The check is total: any
+    hook shape returns a bool and never raises, so a malformed entry (e.g. a non-list
+    `args`) is simply judged "not ours" and left in place rather than crashing --force.
+    """
+    args = h.get("args")
+    tokens = list(args) if isinstance(args, (list, tuple)) else []
+    cmd = h.get("command")
+    if isinstance(cmd, str):
+        try:
+            tokens.extend(shlex.split(cmd))
+        except ValueError:
+            pass  # unbalanced quotes: nothing we generate parses to this
+    return any(str(t) in OKF_HOOK_PATHS for t in tokens)
+
+
+def merge_hook_settings(existing: dict, new: dict) -> dict:
+    """Merge our hook groups into existing settings without losing anything recoverable.
+
+    Every top-level key (e.g. permissions) and every unrelated hook event is preserved.
+    Within an event we register, only our own hook entries are stripped: a group that
+    also holds the user's hooks keeps them, and a group is dropped only when it empties.
+    Then our fresh group is appended, so a re-run is idempotent and never deletes a
+    user's hook that shared a group with ours. The function is total -- a non-dict
+    `hooks`, a non-list event value, or a malformed group/entry holds no mergeable hook
+    config and is treated as empty, so no input shape raises. write_claude_hooks backs
+    up the original first when it had to reset such a malformed subtree.
+    """
+    merged = dict(existing)
+    eh = merged.get("hooks")
+    hooks = dict(eh) if isinstance(eh, dict) else {}
+    for event, groups in new["hooks"].items():
+        prior = hooks.get(event)
+        prior = prior if isinstance(prior, list) else []
+        kept = []
+        for g in prior:
+            inner = g.get("hooks") if isinstance(g, dict) else None
+            if not isinstance(inner, list):
+                kept.append(g)  # a shape we don't manage -- leave it untouched
+                continue
+            remaining = [h for h in inner if not (isinstance(h, dict) and _is_okf_hook(h))]
+            if len(remaining) == len(inner):
+                kept.append(g)                          # no OKF hooks here
+            elif remaining:
+                kept.append({**g, "hooks": remaining})  # keep the user's hooks
+            # else: the group held only our hooks -- drop it
+        hooks[event] = kept + list(groups)
+    merged["hooks"] = hooks
+    return merged
+
+
 def write_claude_hooks(target: Path, hooks_os: str) -> None:
-    """Copy the hook scripts into target/.claude/hooks and write settings.json."""
+    """Copy the hook scripts into target/.claude/hooks and write settings.json.
+
+    If settings.json already exists (e.g. --force into a project that already uses
+    Claude Code), merge the OKF hooks into it rather than overwriting: the user's other
+    settings and hook events survive, and re-running replaces only our own entries. A
+    file that is not a JSON object at all is backed up to settings.json.bak and replaced.
+    A JSON object whose hook subtree is malformed is repaired in place -- unrelated keys
+    stay in the live file and the original is copied to settings.json.bak first, so the
+    malformed copy is still recoverable.
+    """
     hooks_dir = target / ".claude" / "hooks"
     hooks_dir.mkdir(parents=True, exist_ok=True)
     for script in HOOK_SCRIPTS:
         dest = hooks_dir / script
         shutil.copy2(SRC_HOOKS / script, dest)
-        # make executable for the shebang case; the launch command also names the
-        # interpreter explicitly, so this is belt-and-suspenders.
+        # make executable for the shebang case; exec form also names the interpreter
+        # explicitly, so this is belt-and-suspenders.
         dest.chmod(dest.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-    settings = target / ".claude" / "settings.json"
-    settings.write_text(json.dumps(claude_settings(hooks_os), indent=2) + "\n", encoding="utf-8")
+
+    settings_path = target / ".claude" / "settings.json"
+    new_settings = claude_settings(hooks_os)
+    if settings_path.exists():
+        try:
+            existing = json.loads(settings_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError, UnicodeDecodeError):
+            existing = None
+        if isinstance(existing, dict):
+            # The merge preserves every top-level key and unrelated event. If the hook
+            # subtree itself is malformed (hooks not an object, or an event we write into
+            # not a list), the merge resets just that subtree -- so copy the original to
+            # .bak first to keep the malformed version recoverable, then merge in place so
+            # unrelated settings (e.g. permissions) stay in the live file.
+            existing_hooks = existing.get("hooks")
+            clean = (existing_hooks is None or isinstance(existing_hooks, dict)) and (
+                existing_hooks is None or all(
+                    isinstance(existing_hooks.get(ev), (list, type(None)))
+                    for ev in new_settings["hooks"]
+                )
+            )
+            if not clean:
+                backup = settings_path.with_name(settings_path.name + ".bak")
+                shutil.copy2(settings_path, backup)
+                print(f"warning: {settings_path.name} had malformed hook settings; "
+                      f"repaired in place, original backed up to {backup.name}", file=sys.stderr)
+            new_settings = merge_hook_settings(existing, new_settings)
+        else:
+            backup = settings_path.with_name(settings_path.name + ".bak")
+            settings_path.replace(backup)
+            print(f"warning: existing {settings_path.name} could not be merged "
+                  f"(not a JSON object); backed up to {backup.name}", file=sys.stderr)
+    settings_path.write_text(json.dumps(new_settings, indent=2) + "\n", encoding="utf-8")
 
 
 def main() -> int:

@@ -500,17 +500,17 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <thead>
                         <tr class="bg-mist/10 border-b border-mist/30">
                             <th class="text-left px-5 py-3 font-semibold">Operating system</th>
-                            <th class="text-left px-5 py-3 font-semibold">Launch command in settings.json</th>
+                            <th class="text-left px-5 py-3 font-semibold">Hook entry in settings.json</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-mist/20">
                         <tr>
                             <td class="px-5 py-3 text-clay/70">macOS, Linux</td>
-                            <td class="px-5 py-3 font-mono text-sm">python3 "${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-anchor.py"</td>
+                            <td class="px-5 py-3 font-mono text-sm">"command": "python3", "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-anchor.py"]</td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3 text-clay/70">Windows</td>
-                            <td class="px-5 py-3 font-mono text-sm">python "${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-anchor.py"</td>
+                            <td class="px-5 py-3 font-mono text-sm">"command": "python", "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-anchor.py"]</td>
                         </tr>
                     </tbody>
                 </table>
