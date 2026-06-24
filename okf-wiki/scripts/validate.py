@@ -176,8 +176,15 @@ def main() -> int:
         print(f"FAIL: bundle path is not a directory: {bundle}")
         return 1
 
-    md_files = sorted(bundle.rglob("*.md"))
-    errors: list[str] = []
+    # rglob("*.md") also matches a directory named like "archive.md"; reading one
+    # raises IsADirectoryError. Iterate only real files, and report any *.md path
+    # that is a directory as a clean validation failure rather than crashing.
+    md_entries = sorted(bundle.rglob("*.md"))
+    md_files = [p for p in md_entries if p.is_file()]
+    errors: list[str] = [
+        f"{p.relative_to(bundle)}: a '*.md' path must be a file, not a directory"
+        for p in md_entries if not p.is_file()
+    ]
     type_counts: Counter = Counter()
     concepts = 0
 

@@ -88,13 +88,15 @@ claude-skills-journalism/
 │       ├── web-ui-best-practices/      # Container queries, :has(), view transitions
 │       └── zero-build-frontend/        # ESM import maps, htmx, Alpine.js
 │
-├── # Plugin: okf-init (1 skill) — registered in marketplace.json
-├── okf-init/                    # Scaffold an Open Knowledge Format knowledge base
+├── # Plugin: okf-wiki (1 skill) — registered in marketplace.json
+├── okf-wiki/                    # Scaffold an Open Knowledge Format knowledge base
 │   ├── .claude-plugin/plugin.json
 │   ├── SKILL.md
 │   ├── spec/SPEC.md             # generic OKF spec v1
 │   ├── scripts/                 # scaffold.py, validate.py, gh-wiki-bootstrap.py
-│   └── tests/                   # pytest: scaffold output + validator rejections
+│   ├── templates/              # .claude/ hooks copied into each scaffolded project
+│   ├── example/                # a scaffolded OKF wiki of this repo (dogfood + live example)
+│   └── tests/                   # pytest: scaffold output, hooks, validator rejections
 │
 ├── # Plugin: pdf-design (1 skill) — registered in marketplace.json
 ├── pdf-design/                  # PDF reports, proposals, brand system
@@ -233,7 +235,7 @@ This repo distributes its skills in two ways: **as Marketplace plugins** (regist
 /plugin install journalism-core@claude-skills-journalism
 ```
 
-Available plugins: `autocontext`, `dev-toolkit`, `journalism-core`, `okf-init`, `pdf-design`, `pdf-playground`, `project-templates-toolkit`, `research-toolkit`, `security-toolkit`, `superjawn`, `visual-explainer`. See `.claude-plugin/marketplace.json` for the full list.
+Available plugins: `autocontext`, `dev-toolkit`, `journalism-core`, `okf-wiki`, `pdf-design`, `pdf-playground`, `project-templates-toolkit`, `research-toolkit`, `security-toolkit`, `superjawn`, `visual-explainer`. See `.claude-plugin/marketplace.json` for the full list.
 
 ### Alternate: copy a single skill into `~/.claude/skills/`
 

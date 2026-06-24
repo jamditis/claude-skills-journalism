@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with provenance, a spec, and a validator">
-    <title>okf-init - Claude skills for journalism</title>
+    <meta name="description" content="Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with provenance, a spec, a validator, and session-start hooks that orient Claude on the bundle">
+    <title>okf-wiki - Claude skills for journalism</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -131,19 +131,19 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 </style>
 
     <!-- Open Graph -->
-    <meta property="og:title" content="okf-init - Claude skills for journalism">
-    <meta property="og:description" content="Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with provenance, a spec, and a validator">
+    <meta property="og:title" content="okf-wiki - Claude skills for journalism">
+    <meta property="og:description" content="Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with provenance, a spec, a validator, and session-start hooks that orient Claude on the bundle">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://skills.amditis.tech/okf-init/">
-    <meta property="og:image" content="https://skills.amditis.tech/okf-init/og-image.png">
+    <meta property="og:url" content="https://skills.amditis.tech/okf-wiki/">
+    <meta property="og:image" content="https://skills.amditis.tech/okf-wiki/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="okf-init - Claude skills for journalism">
-    <meta name="twitter:description" content="Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with provenance, a spec, and a validator">
-    <meta name="twitter:image" content="https://skills.amditis.tech/okf-init/og-image.png">
+    <meta name="twitter:title" content="okf-wiki - Claude skills for journalism">
+    <meta name="twitter:description" content="Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with provenance, a spec, a validator, and session-start hooks that orient Claude on the bundle">
+    <meta name="twitter:image" content="https://skills.amditis.tech/okf-wiki/og-image.png">
 <script src="../ask-ai.js" defer></script>
     <!-- a11y-patch-v1 -->
 </head>
@@ -177,9 +177,9 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 </svg>
                 Productivity skill
             </div>
-            <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">okf-init</h1>
+            <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">okf-wiki</h1>
             <p class="text-xl text-white/90 max-w-2xl">
-                Scaffold an Open Knowledge Format knowledge base: small markdown concept files, each carrying its own provenance, with a spec and a validator that keeps the tree honest.
+                One command scaffolds a knowledge base that Claude and your team can both read: small markdown files, one concept each, every fact carrying its own provenance. You get the spec, a validator that fails on a broken or stale concept, and session hooks that point Claude at the bundle before it touches anything.
             </p>
         </div>
     </header>
@@ -196,6 +196,54 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 people and agents read and edit, where a clean-looking page is not enough: you need to recover the
                 intent and provenance behind each fact.
             </p>
+        </section>
+
+        <!-- How it works -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">How it works</h2>
+            <p class="text-clay/80 mb-6">
+                You run the scaffolder once. After that, the generated project carries hooks that orient Claude
+                on the bundle at the start of every session, and a validator that keeps the tree honest in CI.
+            </p>
+
+            <!-- Phase 1: scaffold once -->
+            <p class="text-xs font-semibold uppercase tracking-widest text-accentDark mb-3">1 &middot; Scaffold once</p>
+            <div class="flex flex-col sm:flex-row items-stretch gap-3 mb-8">
+                <div class="flex-1 bg-ink text-white rounded-xl p-4 font-mono text-sm flex items-center break-all">python3 "$SKILL_DIR/scripts/scaffold.py" ./my-kb</div>
+                <div class="flex items-center justify-center text-accent text-2xl font-bold" aria-hidden="true">
+                    <span class="sm:hidden">&darr;</span><span class="hidden sm:inline">&rarr;</span>
+                </div>
+                <div class="flex-[2] bg-white rounded-xl p-4 border border-mist/30 text-sm text-clay/80 flex items-center">
+                    A project that validates itself: <code class="bg-black/5 px-1.5 py-0.5 rounded mx-1">bundle/</code>, the
+                    <code class="bg-black/5 px-1.5 py-0.5 rounded mx-1">.claude/</code> session hooks, the spec, and the validator.
+                </div>
+            </div>
+
+            <!-- Phase 2: every session -->
+            <p class="text-xs font-semibold uppercase tracking-widest text-accentDark mb-3">2 &middot; Every Claude session in that project</p>
+            <div class="grid sm:grid-cols-3 gap-3">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-accent text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0">1</span>
+                        <span class="font-mono text-xs text-clay/60">SessionStart</span>
+                    </div>
+                    <p class="text-sm text-clay/70"><strong>okf-anchor.py</strong> prints the bundle index into Claude's context, so work starts from the map, not from memory.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-accent text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0">2</span>
+                        <span class="font-mono text-xs text-clay/60">PreToolUse</span>
+                    </div>
+                    <p class="text-sm text-clay/70"><strong>okf-orient.py</strong> blocks the first action once, until Claude confirms it read the index, then unblocks for the rest of the session.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-green-600 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0">3</span>
+                        <span class="font-mono text-xs text-clay/60">on edit / in CI</span>
+                    </div>
+                    <p class="text-sm text-clay/70"><strong>validate.py</strong> checks schema, dates, links, and secrets, and exits non-zero so a broken or stale concept never merges.</p>
+                </div>
+            </div>
         </section>
 
         <!-- When to use -->
@@ -240,6 +288,10 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <h3 class="font-semibold mb-2">Validator</h3>
                     <p class="text-sm text-clay/70"><code class="bg-black/5 px-1.5 py-0.5 rounded">validate.py</code> checks frontmatter schema, ISO dates, list shapes, internal link resolution, and a secret-value scan. Exits non-zero on any failure, so it drops into CI.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <h3 class="font-semibold mb-2">Session hooks</h3>
+                    <p class="text-sm text-clay/70">A <code class="bg-black/5 px-1.5 py-0.5 rounded">.claude/</code> with two hooks: one injects the index at session start, one blocks the first action until Claude has read it. Cross-platform, one launch command per OS.</p>
                 </div>
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <h3 class="font-semibold mb-2">The spec</h3>
@@ -302,16 +354,16 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Installation</h2>
             <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
-                <p class="text-white/50 mb-2"># recommended: install the okf-init plugin</p>
+                <p class="text-white/50 mb-2"># recommended: install the okf-wiki plugin</p>
                 <p class="text-white mb-1">/plugin marketplace add jamditis/claude-skills-journalism</p>
-                <p class="text-white mb-4">/plugin install okf-init@claude-skills-journalism</p>
+                <p class="text-white mb-4">/plugin install okf-wiki@claude-skills-journalism</p>
                 <p class="text-white/50 mb-2"># or copy just this skill</p>
                 <p class="text-white mb-1">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
-                <p class="text-white">cp -r claude-skills-journalism/okf-init ~/.claude/skills/</p>
+                <p class="text-white">cp -r claude-skills-journalism/okf-wiki ~/.claude/skills/</p>
             </div>
             <p class="mt-4 text-clay/70 text-sm">
                 Or browse this skill in the
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/okf-init" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/okf-wiki" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
             </p>
         </section>
 
@@ -393,6 +445,87 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 <p class="text-white/50"># .github/workflows/okf.yml</p>
                 <p class="text-white">- name: validate OKF bundle</p>
                 <p class="text-white">&nbsp;&nbsp;run: python3 scripts/validate.py --bundle bundle</p>
+            </div>
+        </section>
+
+        <!-- See it in action -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">See it in action</h2>
+            <p class="text-clay/80 mb-4">
+                okf-wiki bootstrapped a wiki of <em>this very repository</em>, committed alongside the skill and
+                validated on every change. Below is one concept as a reading surface: the file tree on the left, and
+                the concept's provenance (source, when it was verified, tags) surfaced above the body.
+            </p>
+            <figure class="mb-4">
+                <img src="example-screenshot.png" width="1770" height="770"
+                     alt="A concept page from the example wiki: a file tree of the bundle on the left, and on the right the okf-wiki plugin concept with its type, source files, verified date, and tags shown above the rendered text."
+                     class="rounded-xl border border-mist/30 w-full h-auto" loading="lazy">
+                <figcaption class="text-clay/60 text-sm mt-2">The okf-wiki plugin, documented in the example wiki of this repo.</figcaption>
+            </figure>
+            <p class="text-clay/70 text-sm">
+                Browse the full example, 16 concepts across two sections, on
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/okf-wiki/example" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">GitHub</a>.
+                It is a plain scaffold, run on this repo and filled in with real concepts.
+            </p>
+        </section>
+
+        <!-- Session hooks -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Session hooks</h2>
+            <p class="text-clay/80 mb-4">
+                A scaffolded project includes a <code class="bg-black/5 px-1.5 py-0.5 rounded">.claude/</code> directory
+                with two hooks, so any Claude session opened in that project starts from the bundle instead of from
+                memory:
+            </p>
+            <div class="space-y-3 mb-6">
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <h3 class="font-semibold mb-1"><code class="bg-black/5 px-1.5 py-0.5 rounded text-sm">okf-anchor.py</code> &middot; SessionStart</h3>
+                    <p class="text-sm text-clay/70">Prints the bundle's root index so it lands in the session context. Work begins from the map of the knowledge base, not a guess about it.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30">
+                    <h3 class="font-semibold mb-1"><code class="bg-black/5 px-1.5 py-0.5 rounded text-sm">okf-orient.py</code> &middot; PreToolUse</h3>
+                    <p class="text-sm text-clay/70">Blocks the first action of the session once, until Claude confirms it read the index, then unblocks for the rest of the session. It is wired with no matcher, so it catches the first tool call of any kind, and it is inert outside an OKF bundle.</p>
+                </div>
+            </div>
+
+            <h3 class="font-display text-lg font-semibold mb-2">One script, a different launch command per OS</h3>
+            <p class="text-clay/80 mb-4">
+                Both hooks are a single cross-platform python3 script. The scripts are identical on every platform;
+                only the interpreter named in <code class="bg-black/5 px-1.5 py-0.5 rounded">.claude/settings.json</code>
+                changes. <code class="bg-black/5 px-1.5 py-0.5 rounded">scaffold.py</code> auto-detects your OS, and
+                <code class="bg-black/5 px-1.5 py-0.5 rounded">--hooks-os posix|windows</code> overrides it.
+            </p>
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden mb-4">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-mist/10 border-b border-mist/30">
+                            <th class="text-left px-5 py-3 font-semibold">Operating system</th>
+                            <th class="text-left px-5 py-3 font-semibold">Hook entry in settings.json</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-mist/20">
+                        <tr>
+                            <td class="px-5 py-3 text-clay/70">macOS, Linux</td>
+                            <td class="px-5 py-3 font-mono text-sm">"command": "python3", "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-anchor.py"]</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 text-clay/70">Windows</td>
+                            <td class="px-5 py-3 font-mono text-sm">"command": "python", "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/okf-anchor.py"]</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-mist/30">
+                <p class="text-sm text-clay/70 mb-2">
+                    <strong>First-open approval.</strong> Claude Code treats a checked-in
+                    <code class="bg-black/5 px-1.5 py-0.5 rounded">.claude/settings.json</code> as untrusted, so the
+                    first time you open the project it asks you to approve the hooks. They run automatically after that.
+                </p>
+                <p class="text-sm text-clay/70">
+                    <strong>Turning them off.</strong> Pass <code class="bg-black/5 px-1.5 py-0.5 rounded">--no-hooks</code>
+                    when scaffolding to skip them, or delete <code class="bg-black/5 px-1.5 py-0.5 rounded">.claude/</code>
+                    (or set <code class="bg-black/5 px-1.5 py-0.5 rounded">disableAllHooks</code>) in an existing project.
+                </p>
             </div>
         </section>
 
@@ -480,7 +613,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
                     A scaffold, a spec, and a validator for knowledge bases that people and agents share.
                 </p>
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/okf-init" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors" rel="noopener noreferrer">
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/okf-wiki" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors" rel="noopener noreferrer">
                     View on GitHub
                     <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
