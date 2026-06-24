@@ -222,7 +222,7 @@ def main() -> int:
                     if version != SPEC_VERSION:
                         errors.append(
                             f"index.md: okf_version {fm.get('okf_version')!r} is not supported "
-                            f"(this validator implements OKF spec v{SPEC_VERSION})")
+                            f"(this validator supports okf_version {SPEC_VERSION})")
                 extra = sorted(keys - {"okf_version"})
                 if extra:
                     errors.append(f"index.md: bundle-root index may carry only okf_version, found {extra}")
