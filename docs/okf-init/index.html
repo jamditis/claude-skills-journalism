@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Scaffold an Open Knowledge Format (OKF) knowledge base — one-concept-per-file markdown with provenance, a spec, and a validator">
+    <meta name="description" content="Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with provenance, a spec, and a validator">
     <title>okf-init - Claude skills for journalism</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -132,7 +132,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
     <!-- Open Graph -->
     <meta property="og:title" content="okf-init - Claude skills for journalism">
-    <meta property="og:description" content="Scaffold an Open Knowledge Format (OKF) knowledge base — one-concept-per-file markdown with provenance, a spec, and a validator">
+    <meta property="og:description" content="Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with provenance, a spec, and a validator">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://skills.amditis.tech/okf-init/">
     <meta property="og:image" content="https://skills.amditis.tech/okf-init/og-image.png">
@@ -142,7 +142,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="okf-init - Claude skills for journalism">
-    <meta name="twitter:description" content="Scaffold an Open Knowledge Format (OKF) knowledge base — one-concept-per-file markdown with provenance, a spec, and a validator">
+    <meta name="twitter:description" content="Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with provenance, a spec, and a validator">
     <meta name="twitter:image" content="https://skills.amditis.tech/okf-init/og-image.png">
 <script src="../ask-ai.js" defer></script>
     <!-- a11y-patch-v1 -->
@@ -279,7 +279,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </tr>
                         <tr>
                             <td class="px-5 py-3 font-mono text-sm">source</td>
-                            <td class="px-5 py-3 text-clay/70">Quoted list of provenance pointers (files, issues, URLs)</td>
+                            <td class="px-5 py-3 text-clay/70">List of provenance pointers (files, issues, URLs). Quote every element; an unquoted <code class="bg-black/5 px-1 py-0.5 rounded text-xs">#</code> or <code class="bg-black/5 px-1 py-0.5 rounded text-xs">:&nbsp;</code> breaks YAML. Example: <code class="bg-black/5 px-1 py-0.5 rounded text-xs">["README.md", "issue #445"]</code></td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3 font-mono text-sm">verified</td>
@@ -298,15 +298,32 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             </div>
         </section>
 
+        <!-- Installation -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Installation</h2>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
+                <p class="text-white/50 mb-2"># recommended: install the okf-init plugin</p>
+                <p class="text-white mb-1">/plugin marketplace add jamditis/claude-skills-journalism</p>
+                <p class="text-white mb-4">/plugin install okf-init@claude-skills-journalism</p>
+                <p class="text-white/50 mb-2"># or copy just this skill</p>
+                <p class="text-white mb-1">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
+                <p class="text-white">cp -r claude-skills-journalism/okf-init ~/.claude/skills/</p>
+            </div>
+            <p class="mt-4 text-clay/70 text-sm">
+                Or browse this skill in the
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/okf-init" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
+            </p>
+        </section>
+
         <!-- Quickstart -->
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Quickstart</h2>
             <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
-                <p class="text-white/50 mb-2"># scaffold a new knowledge base (validates itself at the end)</p>
-                <p class="text-white mb-1">python3 scripts/scaffold.py ./my-knowledge-base \</p>
+                <p class="text-white/50 mb-2"># SKILL_DIR is this skill's own folder (where SKILL.md lives)</p>
+                <p class="text-white mb-1">python3 "$SKILL_DIR/scripts/scaffold.py" ./my-knowledge-base \</p>
                 <p class="text-white mb-1">&nbsp;&nbsp;--title "Team knowledge base" \</p>
                 <p class="text-white mb-4">&nbsp;&nbsp;--sections concepts,services,decisions</p>
-                <p class="text-white/50 mb-2"># validate any time, from the project root</p>
+                <p class="text-white/50 mb-2"># the scaffolder validates at the end; re-run any time from the project root</p>
                 <p class="text-white">python3 scripts/validate.py --bundle bundle</p>
             </div>
             <p class="mt-4 text-clay/70 text-sm">
@@ -314,6 +331,69 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 <code class="bg-black/5 px-1.5 py-0.5 rounded">bundle/</code> tree, so the docs never trip the
                 concept checks.
             </p>
+        </section>
+
+        <!-- What it creates -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">What it creates</h2>
+            <p class="text-clay/80 mb-4">
+                The command above writes a project that passes its own validator. The spec, README, and
+                validator sit at the root; only <code class="bg-black/5 px-1.5 py-0.5 rounded">bundle/</code>
+                holds concepts.
+            </p>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto mb-6" tabindex="0" role="region" aria-label="Scrollable content">
+                <p class="text-white">my-knowledge-base/</p>
+                <p class="text-white">&nbsp;&nbsp;SPEC.md<span class="text-white/50">              # the OKF spec</span></p>
+                <p class="text-white">&nbsp;&nbsp;README.md<span class="text-white/50">            # how the bundle is laid out</span></p>
+                <p class="text-white">&nbsp;&nbsp;scripts/validate.py<span class="text-white/50">  # the validator, copied in</span></p>
+                <p class="text-white">&nbsp;&nbsp;bundle/<span class="text-white/50">              # the only validated tree</span></p>
+                <p class="text-white">&nbsp;&nbsp;&nbsp;&nbsp;index.md<span class="text-white/50">           # carries okf_version: "0.1"</span></p>
+                <p class="text-white">&nbsp;&nbsp;&nbsp;&nbsp;concepts/</p>
+                <p class="text-white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;index.md</p>
+                <p class="text-white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;example-concept.md<span class="text-white/50">  # a filled-in starter concept</span></p>
+                <p class="text-white">&nbsp;&nbsp;&nbsp;&nbsp;services/<span class="text-white/50">    # one folder per --sections name, same two files</span></p>
+                <p class="text-white">&nbsp;&nbsp;&nbsp;&nbsp;decisions/</p>
+            </div>
+
+            <p class="text-clay/80 mb-2">Each <code class="bg-black/5 px-1.5 py-0.5 rounded">example-concept.md</code> is filled in, not a stub. The two dates default to the day you scaffold:</p>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto mb-6" tabindex="0" role="region" aria-label="Scrollable content">
+                <p class="text-white/50">---</p>
+                <p class="text-white">type: Reference</p>
+                <p class="text-white">title: Example concept</p>
+                <p class="text-white">description: A starter concept showing the OKF frontmatter contract.</p>
+                <p class="text-white">source: ["SPEC.md", "scaffold.py"]</p>
+                <p class="text-white">verified: 2026-06-23</p>
+                <p class="text-white">timestamp: 2026-06-23</p>
+                <p class="text-white">tags: [example, starter]</p>
+                <p class="text-white/50">---</p>
+                <p class="text-white"># Example concept</p>
+            </div>
+
+            <p class="text-clay/80 mb-2">Validation runs at the end of scaffolding, and any time after:</p>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto mb-6" tabindex="0" role="region" aria-label="Scrollable content">
+                <p class="text-white">$ python3 scripts/validate.py --bundle bundle</p>
+                <p class="text-white/70">Markdown files: 7&nbsp;&nbsp;|&nbsp;&nbsp;concepts: 3</p>
+                <p class="text-green-300">PASS: bundle conforms to OKF spec v1 (schema, dates, lists, links, secret scan).</p>
+                <p class="text-white/50 mt-3"># on a broken concept it exits non-zero:</p>
+                <p class="text-red-300">FAIL: 1 problem(s):</p>
+                <p class="text-red-300">&nbsp;&nbsp;- decisions/example-concept.md: missing/empty required frontmatter key 'tags'</p>
+            </div>
+
+            <p class="text-clay/80 mb-2">In one pass the validator checks:</p>
+            <ul class="list-disc list-inside space-y-1 text-clay/80 text-sm mb-6">
+                <li>the required frontmatter keys and the supported <code class="bg-black/5 px-1.5 py-0.5 rounded">type</code> vocabulary</li>
+                <li>ISO dates, and list-shaped <code class="bg-black/5 px-1.5 py-0.5 rounded">source</code> and <code class="bg-black/5 px-1.5 py-0.5 rounded">tags</code></li>
+                <li>reserved <code class="bg-black/5 px-1.5 py-0.5 rounded">index.md</code> and <code class="bg-black/5 px-1.5 py-0.5 rounded">log.md</code> files</li>
+                <li>relative links that resolve inside the bundle</li>
+                <li>a secret-value scan that fails the build on a leaked token</li>
+            </ul>
+
+            <p class="text-clay/80 mb-2">Because it exits non-zero on any failure, it drops into CI:</p>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
+                <p class="text-white/50"># .github/workflows/okf.yml</p>
+                <p class="text-white">- name: validate OKF bundle</p>
+                <p class="text-white">&nbsp;&nbsp;run: python3 scripts/validate.py --bundle bundle</p>
+            </div>
         </section>
 
         <!-- Key principles -->
@@ -370,29 +450,17 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <code class="bg-black/5 px-1.5 py-0.5 rounded text-sm">gh-wiki-bootstrap.py</code> does that using
                     a saved GitHub web session you supply.
                 </p>
+                <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto mb-3" tabindex="0" role="region" aria-label="Scrollable content">
+                    <p class="text-white">python3 "$SKILL_DIR/scripts/gh-wiki-bootstrap.py" owner/repo \</p>
+                    <p class="text-white mb-2">&nbsp;&nbsp;--state path/to/gh_state.json</p>
+                    <p class="text-white/50"># then clone https://github.com/owner/repo.wiki.git and push the rest</p>
+                </div>
                 <p class="text-clay/70 text-sm">
                     Treat the wiki as a published view, not the source of truth. GitHub wikis are flatter than an OKF
                     tree and use their own link syntax, so nested directories and relative links need adapting. v0.1
                     ships the bootstrap step; an automatic bundle-to-wiki sync is not built yet.
                 </p>
             </div>
-        </section>
-
-        <!-- Installation -->
-        <section class="mb-12">
-            <h2 class="font-display text-2xl font-semibold mb-4">Installation</h2>
-            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
-                <p class="text-white/50 mb-2"># Recommended: install the okf-init plugin</p>
-                <p class="text-white mb-1">/plugin marketplace add jamditis/claude-skills-journalism</p>
-                <p class="text-white mb-4">/plugin install okf-init@claude-skills-journalism</p>
-                <p class="text-white/50 mb-2"># Or copy just this skill</p>
-                <p class="text-white mb-1">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
-                <p class="text-white">cp -r claude-skills-journalism/okf-init ~/.claude/skills/</p>
-            </div>
-            <p class="mt-4 text-clay/70 text-sm">
-                Or browse this skill in the
-                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/okf-init" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
-            </p>
         </section>
 
         <!-- Related skills -->
@@ -408,7 +476,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <!-- CTA -->
         <section class="text-center">
             <div class="bg-gradient-to-br from-accent to-accentDark rounded-xl p-8 text-white">
-                <h2 class="font-display text-xl font-bold mb-3">Knowledge that stays honest</h2>
+                <h2 class="font-display text-xl font-bold mb-3">Start from the source</h2>
                 <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
                     A scaffold, a spec, and a validator for knowledge bases that people and agents share.
                 </p>
