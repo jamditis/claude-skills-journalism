@@ -1,0 +1,9 @@
+{
+  "name": "okf-init",
+  "version": "0.1.0",
+  "description": "Scaffold an Open Knowledge Format (OKF) knowledge base — one-concept-per-file markdown with YAML frontmatter, a spec, and a validator.",
+  "author": {
+    "name": "Joe Amditis",
+    "email": "jamditis@gmail.com"
+  }
+}

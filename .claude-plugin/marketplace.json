@@ -41,6 +41,17 @@
       "category": "Journalism"
     },
     {
+      "name": "okf-init",
+      "description": "Scaffold an Open Knowledge Format (OKF) knowledge base — one-concept-per-file markdown with YAML frontmatter, directory navigation, and a validator. Generates a starter atlas/wiki that passes its own conformance and secret-leak checks, with an optional GitHub-wiki bootstrap. Built for newsroom institutional memory, research atlases, decision logs, and infrastructure maps.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Joe Amditis",
+        "email": "jamditis@gmail.com"
+      },
+      "source": "./okf-init",
+      "category": "Productivity"
+    },
+    {
       "name": "pdf-design",
       "description": "PDF report and proposal design system with interactive editing",
       "version": "1.1.0",
