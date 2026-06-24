@@ -333,7 +333,3 @@ MIT License - See [LICENSE](./LICENSE) for details.
 ## Author
 
 Joe Amditis ([@jamditis](https://github.com/jamditis))
-
----
-
-*Built with Claude Code*
