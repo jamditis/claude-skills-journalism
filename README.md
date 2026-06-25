@@ -201,6 +201,7 @@ Hooks are automated checks that run at specific points in your workflow. Most ar
 | [one-way-door-check](./hooks/one-way-door-check.md) | PreToolUse | Block creation of files representing irreversible architectural decisions |
 | [bug-report-detector](./hooks/bug-report-detector.md) | UserPromptSubmit | Detect bug reports and remind to follow test-first workflow |
 | [enforce-test-first](./hooks/enforce-test-first.md) | PreToolUse | Block source code edits until a test file has been written |
+| [pre-commit-review](./hooks/pre-commit-review.md) | PreToolUse | Surface the staged diff for line-by-line review before a commit, and flag deletions of safety-critical guardrails |
 
 ## Skill structure
 
