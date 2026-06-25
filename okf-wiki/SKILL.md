@@ -4,7 +4,7 @@ description: Scaffold a new Open Knowledge Format (OKF) knowledge base and popul
 license: MIT
 metadata:
   author: jamditis
-  version: "0.3.0"
+  version: "0.3.1"
   okf_spec: v1
 ---
 
@@ -52,11 +52,14 @@ The `.claude/` hooks sit outside `bundle/`, so they never trip the concept check
 
 ## How to run it
 
-`SKILL_DIR` below is this skill's own directory (the folder holding this `SKILL.md`).
-Scaffold into a new directory; it validates automatically at the end:
+`${CLAUDE_SKILL_DIR}` below is this skill's own directory (the folder holding this
+`SKILL.md`). Claude Code substitutes it with the real absolute path before you run the
+command, so it works regardless of the current directory. On Windows, use `python` instead
+of `python3` (stock Windows has no `python3`). Scaffold into a new directory; it validates
+automatically at the end:
 
 ```bash
-python3 "$SKILL_DIR/scripts/scaffold.py" ./my-knowledge-base \
+python3 "${CLAUDE_SKILL_DIR}/scripts/scaffold.py" ./my-knowledge-base \
   --title "Team knowledge base" \
   --sections concepts,services,decisions
 ```
@@ -66,7 +69,7 @@ Default section is `concepts`. Use `--force` to write into a non-empty directory
 frontmatter date. The session hooks are written by default; `--no-hooks` skips them and
 `--hooks-os posix|windows` overrides the auto-detected launch command (see below).
 
-Validate any time, from the scaffolded project root:
+Validate any time, from the scaffolded project root (use `python` on Windows):
 
 ```bash
 python3 scripts/validate.py --bundle bundle    # must exit 0
@@ -163,12 +166,21 @@ in an existing project.
 ## Optional: publish into a GitHub wiki
 
 OKF lives best as in-repo files (the validator and relative links work directly). A repo's
-GitHub wiki is an optional reading surface. A wiki with zero pages has no git repo to push
-to and no API, so the first page must be created via the web UI; `scripts/gh-wiki-bootstrap.py`
-does that using a saved GitHub web session (a Playwright `storageState` you supply):
+GitHub wiki is an optional reading surface, and wiring it up is an advanced, manual step —
+most users should skip it and keep the bundle in-repo.
+
+A wiki with zero pages has no git repo to push to and no API, so the very first page must be
+created through the web UI. `scripts/gh-wiki-bootstrap.py` automates that one step, but it
+drives a real logged-in browser, so it needs two things you provide yourself (a GitHub PAT
+does not work — wiki pages are a web-UI-only surface):
+
+- **Playwright with Chromium installed:** `pip install playwright && playwright install chromium`.
+- **A saved GitHub web session:** a Playwright `storageState` JSON, captured from a browser
+  where you have already logged into GitHub. The script reuses that session; it does not log
+  in for you. Pass its path with `--state` (default: `~/.cache/gh_state.json`).
 
 ```bash
-python3 "$SKILL_DIR/scripts/gh-wiki-bootstrap.py" owner/repo --state path/to/gh_state.json
+python3 "${CLAUDE_SKILL_DIR}/scripts/gh-wiki-bootstrap.py" owner/repo --state path/to/gh_state.json
 # then: git clone https://github.com/owner/repo.wiki.git and push your pages
 ```
 

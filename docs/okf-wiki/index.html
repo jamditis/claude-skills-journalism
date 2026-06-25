@@ -209,7 +209,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <!-- Phase 1: scaffold once -->
             <p class="text-xs font-semibold uppercase tracking-widest text-accentDark mb-3">1 &middot; Scaffold once</p>
             <div class="flex flex-col sm:flex-row items-stretch gap-3 mb-8">
-                <div class="flex-1 bg-ink text-white rounded-xl p-4 font-mono text-sm flex items-center break-all">python3 "$SKILL_DIR/scripts/scaffold.py" ./my-kb</div>
+                <div class="flex-1 bg-ink text-white rounded-xl p-4 font-mono text-sm flex items-center break-all">python3 "${CLAUDE_SKILL_DIR}/scripts/scaffold.py" ./my-kb</div>
                 <div class="flex items-center justify-center text-accent text-2xl font-bold" aria-hidden="true">
                     <span class="sm:hidden">&darr;</span><span class="hidden sm:inline">&rarr;</span>
                 </div>
@@ -371,8 +371,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Quickstart</h2>
             <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
-                <p class="text-white/50 mb-2"># SKILL_DIR is this skill's own folder (where SKILL.md lives)</p>
-                <p class="text-white mb-1">python3 "$SKILL_DIR/scripts/scaffold.py" ./my-knowledge-base \</p>
+                <p class="text-white/50 mb-2"># ${CLAUDE_SKILL_DIR} is the skill's own folder; Claude Code fills it in before running</p>
+                <p class="text-white mb-1">python3 "${CLAUDE_SKILL_DIR}/scripts/scaffold.py" ./my-knowledge-base \</p>
                 <p class="text-white mb-1">&nbsp;&nbsp;--title "Team knowledge base" \</p>
                 <p class="text-white mb-4">&nbsp;&nbsp;--sections concepts,services,decisions</p>
                 <p class="text-white/50 mb-2"># the scaffolder validates at the end; re-run any time from the project root</p>
@@ -584,7 +584,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     a saved GitHub web session you supply.
                 </p>
                 <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto mb-3" tabindex="0" role="region" aria-label="Scrollable content">
-                    <p class="text-white">python3 "$SKILL_DIR/scripts/gh-wiki-bootstrap.py" owner/repo \</p>
+                    <p class="text-white">python3 "${CLAUDE_SKILL_DIR}/scripts/gh-wiki-bootstrap.py" owner/repo \</p>
                     <p class="text-white mb-2">&nbsp;&nbsp;--state path/to/gh_state.json</p>
                     <p class="text-white/50"># then clone https://github.com/owner/repo.wiki.git and push the rest</p>
                 </div>
