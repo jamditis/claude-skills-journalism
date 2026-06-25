@@ -994,3 +994,22 @@ def test_wikilink_in_code_fence_ignored(tmp_path):
     write_concept(b, GOOD.rstrip() + "\n\n```md\nSee [[activecampaign]] (not an OKF link)\n```\n")
     rc, out = validate(b)
     assert rc == 0, out
+
+
+# --- canonical/example sync (#162) ------------------------------------------
+
+def test_example_spec_matches_canonical():
+    # scaffold copies spec/SPEC.md into each bundle verbatim, and example/SPEC.md is a
+    # committed copy. They must stay byte-identical, or the shipped example documents a
+    # different contract than the validator enforces. Drift bit us twice (#149, #159).
+    assert (SKILL / "example" / "SPEC.md").read_text(encoding="utf-8") == \
+           (SKILL / "spec" / "SPEC.md").read_text(encoding="utf-8"), \
+           "okf-wiki/example/SPEC.md drifted from spec/SPEC.md — re-sync the copy"
+
+
+def test_example_validator_matches_canonical():
+    # the example vendors scripts/validate.py; a drifted copy would validate the
+    # committed example against stale rules.
+    assert (SKILL / "example" / "scripts" / "validate.py").read_text(encoding="utf-8") == \
+           (SKILL / "scripts" / "validate.py").read_text(encoding="utf-8"), \
+           "okf-wiki/example/scripts/validate.py drifted from scripts/validate.py — re-sync the copy"
