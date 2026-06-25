@@ -415,6 +415,20 @@ def main() -> int:
     if args.no_validate:
         return 0
 
+    # The "validates by construction" guarantee only holds when the scaffold wrote
+    # everything fresh. Once --force preserves any existing file, the result is not
+    # guaranteed valid, and scripts/validate.py and bundle/index.md may themselves be
+    # the user's own preserved files -- so running validation here could execute an
+    # unrelated preserved validator or blame the scaffold for preserved user content.
+    # Skip it and tell the user to validate when they have reconciled their files.
+    if preserved:
+        print("\nScaffold written, but skipping validation: existing files were "
+              "preserved, so the bundle is not guaranteed valid by construction and "
+              "scripts/validate.py may be your own.", file=sys.stderr)
+        print("  reconcile the preserved files, then validate when ready:", file=sys.stderr)
+        print(f"    {interpreter_for(hooks_os)} scripts/validate.py --bundle bundle", file=sys.stderr)
+        return 0
+
     # validate.py runs under this same interpreter, so its `import yaml` succeeds
     # only if PyYAML is findable here. Check first: an absent dependency is a setup
     # gap, not a scaffold bug, and the scaffold itself succeeded. Report it plainly

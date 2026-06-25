@@ -143,6 +143,31 @@ def test_force_preserves_existing_content(tmp_path):
     assert "preserved" in out and "README.md" in out
 
 
+def test_force_preserve_skips_validation(tmp_path):
+    # when --force preserves a non-OKF bundle/index.md, the scaffold is no longer
+    # valid by construction; it must skip validation, not fail as "a bug in
+    # scaffold.py" over intentionally preserved user content.
+    target = tmp_path / "kb"
+    scaffold(target)
+    (target / "bundle" / "index.md").write_text("# my repo index\n", encoding="utf-8")
+    rc, out = scaffold(target, "--force")
+    assert rc == 0, out
+    assert "skipping validation" in out.lower()
+    assert "bug in scaffold.py" not in out
+
+
+def test_force_preserve_does_not_run_preserved_validator(tmp_path):
+    # a preserved user scripts/validate.py must never be executed by the scaffolder.
+    target = tmp_path / "kb"
+    scaffold(target)
+    sentinel = tmp_path / "ran"
+    (target / "scripts" / "validate.py").write_text(
+        f"import pathlib; pathlib.Path(r'{sentinel}').write_text('x')\n", encoding="utf-8")
+    rc, out = scaffold(target, "--force")
+    assert rc == 0, out
+    assert not sentinel.exists(), "preserved validate.py must not be run"
+
+
 def test_missing_pyyaml_skips_validation(tmp_path):
     # validate.py needs PyYAML; if it is absent the scaffold must still succeed and
     # say so plainly, not mislabel the missing dependency as a bug in scaffold.py.
