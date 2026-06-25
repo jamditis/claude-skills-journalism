@@ -24,7 +24,7 @@ claude-skills-journalism/
 ├── README.md                    # User documentation
 ├── LICENSE
 │
-├── hooks/                       # Automated workflow checks (15 hooks)
+├── hooks/                       # Automated workflow checks (16 hooks)
 │   ├── ap-style-check.md        # Writing: AP Style violations
 │   ├── ai-slop-detector.md      # Writing: AI patterns
 │   ├── accessibility-check.md   # Writing: Alt text, headings
@@ -39,7 +39,8 @@ claude-skills-journalism/
 │   ├── archive-reminder.md      # Preservation: Archive URLs
 │   ├── one-way-door-check.md    # Development: Block irreversible decisions
 │   ├── bug-report-detector.md   # Development: Detect bug reports
-│   └── enforce-test-first.md    # Development: Enforce test-first workflow
+│   ├── enforce-test-first.md    # Development: Enforce test-first workflow
+│   └── pre-commit-review.md     # Development: Review staged diff before commit
 │
 ├── # Plugin: journalism-core (14 skills) — registered in marketplace.json
 ├── journalism-core/
@@ -225,6 +226,7 @@ Hooks run automatically at specific workflow events. Most are **non-blocking war
 | one-way-door-check | PreToolUse(Write) | Block irreversible architectural decisions |
 | bug-report-detector | UserPromptSubmit | Detect bug reports |
 | enforce-test-first | PreToolUse(Edit,Write) | Block source edits until test written |
+| pre-commit-review | PreToolUse(Bash) | Surface staged diff for review; flag guardrail deletions |
 
 ## Installation
 
