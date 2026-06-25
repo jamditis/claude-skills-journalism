@@ -93,13 +93,21 @@ mechanical transform. So you (Claude) author the concepts directly, in this loop
      Path, Process, Reference (Reference is the catch-all).
    - `description` is one line. `source` — quote every element — points at where the fact
      actually came from (the origin file path, URL, command, or event), not at this skill.
-   - Set `verified` and `timestamp` to today; lower `verified` only when you are copying a
-     claim you have not re-checked against reality.
+   - Set `timestamp` to today. Set `verified` to today only for a fact you actually re-checked
+     now; for a claim copied from the source without re-checking, use the date it was last known
+     true (e.g. the source's own date), not today — stamping today makes stale facts look freshly
+     verified.
    - Strip secret values as you go: a credential concept names the key and its retrieval path,
      never the value. The validator fails the build on a leaked secret.
 4. **Place and link.** Put each concept in the right section (create sections as needed), add a
    bullet for it to that section's `index.md`, and cross-link related concepts with relative links.
-5. **Validate in a loop.** Run `python3 scripts/validate.py --bundle bundle`, fix what it
+   When you create a new section, also link it from the bundle-root `index.md` — that root is the
+   navigation map the session anchor loads, so a section missing from it is invisible to orientation
+   even though validation still passes.
+5. **Clear the placeholder.** If you scaffolded fresh, delete the starter `example-concept.md` (and
+   its bullet in the section `index.md`) once real concepts exist — otherwise the sample ships in
+   the finished wiki and still passes validation.
+6. **Validate in a loop.** Run `python3 scripts/validate.py --bundle bundle`, fix what it
    reports, repeat until it exits 0. Unquoted `source` elements and missing frontmatter keys are
    the common failures. Author in batches and validate between them rather than writing fifty
    files and debugging the lot.
@@ -109,10 +117,13 @@ mechanical transform. So you (Claude) author the concepts directly, in this loop
 If the user points you at an existing OKF bundle (e.g. an upstream example: an `index.md`
 carrying `okf_version` plus concept files with frontmatter), you are adopting it, not importing
 it. Copy or clone the tree in, point the validator at the new root, and fix any links that broke
-in the move. To keep it as its own area beside other content, follow Federation in `spec/SPEC.md`
-— a uniquely named top directory, relative cross-links, validate the combined root. Re-authoring
-an already-conforming bundle into your own concepts is wasted work; only reshape it if that is the
-actual goal.
+in the move. To keep it as its own area beside other content, give it a uniquely named top
+directory, then create one combined-root `index.md` that carries `okf_version` and strip the
+frontmatter from each adopted bundle's own root `index.md`, turning it into a normal section index
+(the validator allows `okf_version` on the one combined root only; a nested `index.md` that still
+carries it fails validation). Write cross-links as relative paths and validate the combined root.
+Re-authoring an already-conforming bundle into your own concepts is wasted work; only reshape it if
+that is the actual goal.
 
 ## The format, briefly
 
