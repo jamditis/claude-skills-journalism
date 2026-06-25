@@ -365,14 +365,36 @@ def test_github_pat_secret_detected(tmp_path):
     assert rc == 1 and "secret leak" in out
 
 
-def test_uppercase_md_link_checked(tmp_path):
-    # the .md link check is case-insensitive: a dangling uppercase-extension link
-    # must still be caught, not silently skipped.
+def test_uppercase_md_extension_out_of_scope(tmp_path):
+    # OKF concept files are lowercase .md (discovery uses *.md). A link to a .MD
+    # file is out of scope, not a validated internal link -- so it must NOT resolve
+    # (which would let .MD content bypass frontmatter/secret checks) and must NOT
+    # false-fail as dangling. It is simply skipped, like a link to a .txt file.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
     write_concept(b, GOOD.rstrip() + "\nSee [x](NOPE.MD).\n")
     rc, out = validate(b)
-    assert rc == 1 and "dangling" in out
+    assert rc == 0, out
+
+
+def test_uppercase_scheme_link_not_flagged(tmp_path):
+    # an external link with an uppercase scheme must be recognized as external and
+    # skipped, not resolved as a local path (which falsely fails as escaping).
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + "\nSee [s](HTTPS://example.com/readme.md).\n")
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_documented_credential_path_not_flagged(tmp_path):
+    # OKF credential concepts document key NAMES/paths, not values; a hyphenated
+    # path after a secret-ish label must not read as a high-entropy leaked value.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + "\nsecret: service/api/prod-client-secret-path\n")
+    rc, out = validate(b)
+    assert rc == 0, out
 
 
 # --- session hooks: scaffold wiring -----------------------------------------

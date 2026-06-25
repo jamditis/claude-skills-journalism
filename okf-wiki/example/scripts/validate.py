@@ -71,9 +71,12 @@ SECRET_PATTERNS = [
     ("GitHub fine-grained PAT", re.compile(r"\bgithub_pat_[0-9A-Za-z_]{22,}\b")),
     ("secret assignment", re.compile(
         r"(?i)(?:password|passwd|secret|api[_-]?key|apikey|client[_-]?secret|access[_-]?token|auth[_-]?token)"
-        # value charset includes - _ = so tokens like a fine-grained PAT or a base64
-        # value with padding are not split short of the 24-char entropy threshold.
-        r"\s*[:=]\s*['\"]?[A-Za-z0-9+/_=-]{24,}['\"]?")),
+        # Base64-standard value charset only -- deliberately excludes - and _. A
+        # credential concept documents key paths like `secret: svc/api/prod-key-path`,
+        # and a hyphen/underscore-rich path must not read as a high-entropy value.
+        # Structured tokens that use -/_ (fine-grained PATs, Slack, etc.) have their
+        # own specific patterns above.
+        r"\s*[:=]\s*['\"]?[A-Za-z0-9+/]{24,}['\"]?")),
 ]
 
 
@@ -286,9 +289,17 @@ def main() -> int:
             target = link_destination(raw)
             if not target:
                 continue
-            if target.startswith(("http://", "https://", "mailto:", "#", "tel:")):
+            low = target.lower()
+            # External/anchor links are out of scope. Lower-case the scheme test so an
+            # uppercase scheme (HTTPS://...) is still recognized and skipped, not
+            # resolved as a local path (which would falsely fail as escaping/dangling).
+            if low.startswith(("http://", "https://", "mailto:", "#", "tel:")):
                 continue
-            if ".md" not in target.lower():  # case-insensitive: also catch .MD links
+            # OKF concept files are lowercase .md (discovery uses bundle.rglob("*.md")).
+            # Match .md case-sensitively so the link check and file discovery agree: a
+            # link to a .MD file is out of scope, not a validated internal link -- it can
+            # never resolve to an uppercase-extension file that discovery never scanned.
+            if ".md" not in target:
                 continue
             if target.startswith("/"):
                 errors.append(f"{f.relative_to(bundle)}: root-relative link not allowed "
