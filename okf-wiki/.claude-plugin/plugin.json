@@ -1,7 +1,7 @@
 {
   "name": "okf-wiki",
-  "version": "0.2.0",
-  "description": "Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with YAML frontmatter, a spec, a validator, and session-start hooks that orient Claude on the knowledge base before it works.",
+  "version": "0.3.0",
+  "description": "Scaffold an Open Knowledge Format (OKF) knowledge base and populate it from existing docs, plans, notes, or a repo: one-concept-per-file markdown with YAML frontmatter, a spec, a validator, and session-start hooks that orient Claude on the knowledge base before it works.",
   "author": {
     "name": "Joe Amditis",
     "email": "jamditis@gmail.com"

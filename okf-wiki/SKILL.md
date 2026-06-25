@@ -1,10 +1,10 @@
 ---
 name: okf-wiki
-description: Scaffold a new Open Knowledge Format (OKF) knowledge base: a tree of small markdown concept files with YAML frontmatter, a spec, a validator, and session-start hooks that orient Claude on the knowledge base before it works. Use when the user wants to start an OKF atlas/wiki/knowledge base, structure docs as one-concept-per-file with provenance, or initialize OKF in a repo (optionally into its GitHub wiki).
+description: Scaffold a new Open Knowledge Format (OKF) knowledge base and populate it from existing material: a tree of small markdown concept files with YAML frontmatter, a spec, a validator, and session-start hooks that orient Claude on the knowledge base before it works. Use when the user wants to start an OKF atlas/wiki/knowledge base, build one from existing docs, plans, notes, or a repo, structure docs as one-concept-per-file with provenance, or initialize OKF in a repo (optionally into its GitHub wiki).
 license: MIT
 metadata:
   author: jamditis
-  version: "0.2.0"
+  version: "0.3.0"
   okf_spec: v1
 ---
 
@@ -71,6 +71,48 @@ Validate any time, from the scaffolded project root:
 ```bash
 python3 scripts/validate.py --bundle bundle    # must exit 0
 ```
+
+## Populate the bundle: author concepts from existing material
+
+Scaffolding leaves an empty tree with one placeholder concept. The usual next request
+— "here are my docs / plans / notes / repo, build the wiki" — has no importer script, and
+can't have one: deciding what counts as a single concept, writing its one-line description,
+choosing its `type`, and pointing `source` at real provenance is judgment work, not a
+mechanical transform. So you (Claude) author the concepts directly, in this loop:
+
+1. **Gather the source.** Read what the user pointed you at — a file, a folder, a repo, or a
+   URL (fetch a URL first). Skim the whole thing before writing anything, so you can see the
+   natural concept boundaries.
+2. **Decide concept boundaries.** One file is one concept: one thing a reader would look up on
+   its own (a service, a decision, a path, a person, an event). Split a doc that covers five
+   things into five concepts; merge fragments that only mean something together into one. A
+   heading is a hint, not a rule — do not blindly map one `##` to one file.
+3. **Draft each concept** at `bundle/<section>/<slug>.md` with the full frontmatter
+   (`type, title, description, source, verified, timestamp, tags`):
+   - `type` from the vocab: Machine, Network, Service, Session, Project, Repo, Credential,
+     Path, Process, Reference (Reference is the catch-all).
+   - `description` is one line. `source` — quote every element — points at where the fact
+     actually came from (the origin file path, URL, command, or event), not at this skill.
+   - Set `verified` and `timestamp` to today; lower `verified` only when you are copying a
+     claim you have not re-checked against reality.
+   - Strip secret values as you go: a credential concept names the key and its retrieval path,
+     never the value. The validator fails the build on a leaked secret.
+4. **Place and link.** Put each concept in the right section (create sections as needed), add a
+   bullet for it to that section's `index.md`, and cross-link related concepts with relative links.
+5. **Validate in a loop.** Run `python3 scripts/validate.py --bundle bundle`, fix what it
+   reports, repeat until it exits 0. Unquoted `source` elements and missing frontmatter keys are
+   the common failures. Author in batches and validate between them rather than writing fifty
+   files and debugging the lot.
+
+### When the source is already OKF
+
+If the user points you at an existing OKF bundle (e.g. an upstream example: an `index.md`
+carrying `okf_version` plus concept files with frontmatter), you are adopting it, not importing
+it. Copy or clone the tree in, point the validator at the new root, and fix any links that broke
+in the move. To keep it as its own area beside other content, follow Federation in `spec/SPEC.md`
+— a uniquely named top directory, relative cross-links, validate the combined root. Re-authoring
+an already-conforming bundle into your own concepts is wasted work; only reshape it if that is the
+actual goal.
 
 ## The format, briefly
 
