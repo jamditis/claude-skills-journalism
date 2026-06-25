@@ -4,7 +4,7 @@ description: Scaffold a new Open Knowledge Format (OKF) knowledge base and popul
 license: MIT
 metadata:
   author: jamditis
-  version: "0.5.0"
+  version: "0.6.0"
   okf_spec: v1
 ---
 
@@ -39,7 +39,7 @@ in `spec/SPEC.md` (in this skill's directory) — read it before changing struct
     hooks/okf-anchor.py   SessionStart: load the index into context
     hooks/okf-orient.py   PreToolUse: gate the first action on orientation
   bundle/                 the OKF bundle (the validated tree)
-    index.md              carries okf_version: "0.1"
+    index.md              carries okf_version: "0.2"
     <section>/
       index.md
       example-concept.md  a starter concept with full frontmatter

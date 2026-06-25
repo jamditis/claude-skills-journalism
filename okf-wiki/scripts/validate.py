@@ -57,7 +57,12 @@ ALLOWED_TYPES = {
     "Reference",
 }
 RESERVED = {"index.md", "log.md"}
-SPEC_VERSION = "0.1"  # the okf_version this validator implements
+# okf_version values this validator accepts. The last entry is the current format
+# version (what scaffold writes for a new bundle); older entries stay supported so a
+# newer validator still reads an older bundle. Adding allowed types is backward
+# compatible and bumps the format version (0.1 -> 0.2).
+SUPPORTED_VERSIONS = ("0.1", "0.2")
+SPEC_VERSION = SUPPORTED_VERSIONS[-1]  # current format version, written by new scaffolds
 # Inline markdown link. The destination group allows one level of balanced
 # parens so a filename like `missing(v2).md` is still captured (a plain [^)]+
 # would stop at the first ')' and skip the link entirely).
@@ -253,10 +258,10 @@ def main() -> int:
                     errors.append("index.md: bundle-root index must declare okf_version in frontmatter")
                 else:
                     version = str(fm.get("okf_version")).strip()
-                    if version != SPEC_VERSION:
+                    if version not in SUPPORTED_VERSIONS:
                         errors.append(
                             f"index.md: okf_version {fm.get('okf_version')!r} is not supported "
-                            f"(this validator supports okf_version {SPEC_VERSION})")
+                            f"(this validator supports {', '.join(SUPPORTED_VERSIONS)})")
                 extra = sorted(keys - {"okf_version"})
                 if extra:
                     errors.append(f"index.md: bundle-root index may carry only okf_version, found {extra}")
