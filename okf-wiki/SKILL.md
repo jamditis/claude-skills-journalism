@@ -4,7 +4,7 @@ description: Scaffold a new Open Knowledge Format (OKF) knowledge base and popul
 license: MIT
 metadata:
   author: jamditis
-  version: "0.4.0"
+  version: "0.5.0"
   okf_spec: v1
 ---
 
@@ -104,7 +104,9 @@ mechanical transform. So you (Claude) author the concepts directly, in this loop
    - Strip secret values as you go: a credential concept names the key and its retrieval path,
      never the value. The validator fails the build on a leaked secret.
 4. **Place and link.** Put each concept in the right section (create sections as needed), add a
-   bullet for it to that section's `index.md`, and cross-link related concepts with relative links.
+   bullet for it to that section's `index.md`, and cross-link related concepts with relative
+   `[text](path.md)` links — not `[[slug]]` wikilinks. `[[slug]]` is the auto-memory idiom; the
+   OKF validator rejects it and never resolves it, so a typo'd or deleted reference passes silently.
    When you create a new section, also link it from the bundle-root `index.md` — that root is the
    navigation map the session anchor loads, so a section missing from it is invisible to orientation
    even though validation still passes.

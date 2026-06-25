@@ -946,3 +946,40 @@ def test_committed_example_validates():
     assert example.is_dir(), "okf-wiki/example/bundle is missing"
     rc, out = validate(example)
     assert rc == 0, out
+
+
+# --- authoring-error hints (#157, #158) -------------------------------------
+
+def test_yaml_hint_names_colon_space(tmp_path):
+    # #157: an unquoted colon-space in description is the common real trigger. The
+    # parse-error hint must name it, not only the '#'-in-source case it used to.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.replace("description: a good concept",
+                                  "description: Network analysis finding: send volume"))
+    rc, out = validate(b)
+    assert rc == 1
+    assert "parse error" in out
+    assert "colon-space" in out
+
+
+def test_wikilink_fails(tmp_path):
+    # #158: the [[slug]] idiom is the auto-memory convention, not OKF. An unresolved
+    # [[ref]] used to pass the link check silently; it must now be reported.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + "\n\nSee [[activecampaign]] for the AC reference.\n")
+    rc, out = validate(b)
+    assert rc == 1
+    assert "not an OKF link" in out
+    assert "activecampaign" in out
+
+
+def test_wikilink_in_code_fence_ignored(tmp_path):
+    # a [[slug]] shown inside a fenced code block is illustrative, mirroring the
+    # link checker's tolerance for fenced example links.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + "\n\n```md\nSee [[activecampaign]] (not an OKF link)\n```\n")
+    rc, out = validate(b)
+    assert rc == 0, out

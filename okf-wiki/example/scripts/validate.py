@@ -8,7 +8,8 @@ agent-readable.
 
 Checks:
   1. Every non-reserved .md file has a parseable YAML frontmatter block. A YAML
-     parse error is reported (commonly an unquoted '#' inside a source/tags list).
+     parse error is reported (commonly an unquoted colon-space or '#' in a
+     string field — quote the value).
   2. Frontmatter carries every required key, non-empty:
      type, title, description, source, verified, timestamp, tags.
        - type     is one of the spec type vocab.
@@ -61,6 +62,11 @@ SPEC_VERSION = "0.1"  # the okf_version this validator implements
 # parens so a filename like `missing(v2).md` is still captured (a plain [^)]+
 # would stop at the first ')' and skip the link entirely).
 LINK_RE = re.compile(r"\[[^\]]*\]\(((?:[^()]|\([^()]*\))*)\)")
+# OKF links are relative markdown links only. The [[slug]] wikilink idiom (from the
+# auto-memory system) is not OKF, so a typo'd or deleted [[ref]] would otherwise pass
+# the link check unseen. It is reported as an error. Checked against strip_code output,
+# so a [[x]] shown inside a code fence is illustrative, not flagged.
+WIKILINK_RE = re.compile(r"\[\[([^\[\]]+)\]\]")
 
 # Secret-value detectors. These match credential VALUES, not the key names/paths
 # a credential concept is allowed to document. The generic assignment pattern
@@ -225,8 +231,10 @@ def main() -> int:
             # rejects (e.g. an invalid month), which is not a YAMLError subclass.
             errors.append(
                 f"{rel}: YAML frontmatter parse error ({e.__class__.__name__}: {e}) — "
-                f"check for an unquoted '#' in a source/tags list (quote every element) "
-                f"or an invalid date value")
+                f"quote any string field that holds a YAML-significant character. "
+                f"Common triggers: a colon-space (': ') anywhere in description, title, "
+                f"or a source element; a bare '#' in a source element; an invalid date "
+                f"in verified/timestamp.")
             continue
 
         # Past this point fm is either None or a mapping. Syntactically valid YAML
@@ -290,6 +298,12 @@ def main() -> int:
     # a single tree and point --bundle at that root.
     for f in md_files:
         text = strip_code(f.read_text(encoding="utf-8-sig"))
+        for m in WIKILINK_RE.finditer(text):
+            slug = m.group(1).strip()
+            errors.append(
+                f"{f.relative_to(bundle)}: '[[{slug}]]' is not an OKF link — use a "
+                f"relative markdown link like [text]({slug}.md). The [[slug]] form is "
+                f"the auto-memory convention, not OKF.")
         for raw in LINK_RE.findall(text):
             target = link_destination(raw)
             if not target:
