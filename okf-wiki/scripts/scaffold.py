@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import importlib.util
 import json
 import platform
 import shlex
@@ -57,9 +58,36 @@ HOOK_SCRIPTS = ("okf-anchor.py", "okf-orient.py")
 # similarly named path elsewhere (e.g. /opt/shared/.claude/hooks/okf-anchor.py).
 OKF_HOOK_PATHS = frozenset(f"${{CLAUDE_PROJECT_DIR}}/.claude/hooks/{s}" for s in HOOK_SCRIPTS)
 
+# validate.py imports PyYAML to parse frontmatter; a scaffolded project declares it
+# so the dependency is explicit, not discovered via a traceback. Mirrors the skill's
+# own requirements.txt.
+REQUIREMENTS_TXT = (
+    "# The validator (scripts/validate.py) parses YAML frontmatter with PyYAML.\n"
+    "PyYAML>=5.1\n"
+)
+
 
 def slugify(name: str) -> str:
     return "-".join("".join(c if c.isalnum() else " " for c in name.lower()).split())
+
+
+def write_if_absent(path: Path, content: str, preserved: list[Path]) -> None:
+    """Write content unless the file already exists. On --force into a populated
+    directory an existing file is the user's own, so preserve it instead of
+    clobbering it with a generic template. On a fresh scaffold nothing exists, so
+    every file is written as before."""
+    if path.exists():
+        preserved.append(path)
+        return
+    path.write_text(content, encoding="utf-8")
+
+
+def copy_if_absent(src: Path, dst: Path, preserved: list[Path]) -> None:
+    """copy2 src to dst unless dst exists (see write_if_absent for the rationale)."""
+    if dst.exists():
+        preserved.append(dst)
+        return
+    shutil.copy2(src, dst)
 
 
 def root_index(title: str, sections: list[str]) -> str:
@@ -119,6 +147,11 @@ def readme(title: str, hooks: bool, interp: str = "python3") -> str:
         f"# {title}\n\n"
         "An Open Knowledge Format (OKF) knowledge base: small markdown files, one concept each,\n"
         "with provenance in YAML frontmatter. See `SPEC.md` for the full contract.\n\n"
+        "## Requirements\n\n"
+        "The validator parses YAML frontmatter with PyYAML:\n\n"
+        "```bash\n"
+        "pip install -r requirements.txt    # or: pip install pyyaml\n"
+        "```\n\n"
         "## Validate\n\n"
         "```bash\n"
         f"{interp} scripts/validate.py --bundle bundle\n"
@@ -348,16 +381,22 @@ def main() -> int:
     write_hooks = not args.no_hooks
     hooks_os = resolve_hooks_os(args.hooks_os)
 
-    shutil.copy2(SRC_SPEC, target / "SPEC.md")
-    shutil.copy2(SRC_VALIDATOR, target / "scripts" / "validate.py")
-    (target / "README.md").write_text(
-        readme(title, write_hooks, interpreter_for(hooks_os)), encoding="utf-8")
-    (bundle / "index.md").write_text(root_index(title, sections), encoding="utf-8")
+    # Skip-if-exists so --force into a populated directory never overwrites a user's
+    # own SPEC.md/README.md/validator/bundle content with a generic template. (A
+    # fresh scaffold has none of these, so all are written.) The .claude/ hooks are
+    # stateless machinery, refreshed in place; settings.json is merged with backup.
+    preserved: list[Path] = []
+    copy_if_absent(SRC_SPEC, target / "SPEC.md", preserved)
+    copy_if_absent(SRC_VALIDATOR, target / "scripts" / "validate.py", preserved)
+    write_if_absent(target / "requirements.txt", REQUIREMENTS_TXT, preserved)
+    write_if_absent(target / "README.md",
+                    readme(title, write_hooks, interpreter_for(hooks_os)), preserved)
+    write_if_absent(bundle / "index.md", root_index(title, sections), preserved)
     for s in sections:
         sdir = bundle / s
         sdir.mkdir(parents=True, exist_ok=True)
-        (sdir / "index.md").write_text(section_index(s), encoding="utf-8")
-        (sdir / "example-concept.md").write_text(example_concept(today), encoding="utf-8")
+        write_if_absent(sdir / "index.md", section_index(s), preserved)
+        write_if_absent(sdir / "example-concept.md", example_concept(today), preserved)
     if write_hooks:
         write_claude_hooks(target, hooks_os)
 
@@ -368,8 +407,24 @@ def main() -> int:
         print(f"  hooks: .claude/ written for {hooks_os} (Claude Code asks you to approve them on first open)")
     else:
         print("  hooks: skipped (--no-hooks)")
+    if preserved:
+        rels = ", ".join(str(p.relative_to(target)) for p in sorted(preserved))
+        print(f"  preserved {len(preserved)} existing file(s), not overwritten: {rels}")
+        print("  (delete a file and re-run to regenerate it from the template)")
 
     if args.no_validate:
+        return 0
+
+    # validate.py runs under this same interpreter, so its `import yaml` succeeds
+    # only if PyYAML is findable here. Check first: an absent dependency is a setup
+    # gap, not a scaffold bug, and the scaffold itself succeeded. Report it plainly
+    # and exit 0 rather than letting the subprocess traceback be mislabeled below.
+    if importlib.util.find_spec("yaml") is None:
+        print("\nScaffold written, but skipping validation: PyYAML is not installed "
+              "for this interpreter.", file=sys.stderr)
+        print("  install it, then validate:", file=sys.stderr)
+        print("    pip install -r requirements.txt    # or: pip install pyyaml", file=sys.stderr)
+        print(f"    {interpreter_for(hooks_os)} scripts/validate.py --bundle bundle", file=sys.stderr)
         return 0
 
     print("\nValidating the new bundle...")
