@@ -85,6 +85,11 @@ Relative markdown links. Every link to a file inside the bundle must resolve to 
 exists; a link that escapes the bundle root or dangles fails validation. The bundle is
 validated as one self-contained tree (see Federation for combining several).
 
+The `[[slug]]` wikilink form is not an OKF link, and the validator rejects it. It is the
+auto-memory cross-reference idiom and easy to reach for by habit, but a `[[slug]]` is never
+resolved or checked, so a dead reference would pass silently. Always link with
+`[text](relative/path.md)`.
+
 ## Federation (optional)
 
 Several bundles can be combined into one tree. Add a new root `index.md` that carries
