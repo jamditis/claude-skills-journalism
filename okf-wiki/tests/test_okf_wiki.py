@@ -495,16 +495,18 @@ def test_github_pat_secret_detected(tmp_path):
     assert rc == 1 and "secret leak" in out
 
 
-def test_uppercase_md_extension_out_of_scope(tmp_path):
-    # OKF concept files are lowercase .md (discovery uses *.md). A link to a .MD
-    # file is out of scope, not a validated internal link -- so it must NOT resolve
-    # (which would let .MD content bypass frontmatter/secret checks) and must NOT
-    # false-fail as dangling. It is simply skipped, like a link to a .txt file.
+def test_link_to_existing_uppercase_md_fails(tmp_path):
+    # the case the prior case-sensitive design worried about: a link to an existing
+    # Foo.MD used to "resolve" as valid while discovery never scanned that file. Now
+    # discovery finds Target.MD and rejects it as non-conforming, so a bundle that
+    # contains it fails -- the file check and the link check stay in agreement.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
-    write_concept(b, GOOD.rstrip() + "\nSee [x](NOPE.MD).\n")
+    write_concept(b, GOOD, name="concepts/Target.MD")
+    write_concept(b, GOOD.rstrip() + "\n\nSee [target](Target.MD).\n", name="concepts/c.md")
     rc, out = validate(b)
-    assert rc == 0, out
+    assert rc == 1, out
+    assert "Target.MD" in out
 
 
 def test_uppercase_scheme_link_not_flagged(tmp_path):
@@ -1070,3 +1072,38 @@ def test_source_flow_unquoted_hash_still_fails(tmp_path):
     write_concept(b, _concept_with_source('source: ["README.md", issue #445]'))
     rc, out = validate(b)
     assert rc == 1, out
+
+
+# --- uppercase .md extension handling (#150 sub-item 2) ----------------------
+
+def test_uppercase_md_file_rejected(tmp_path):
+    # a Foo.MD file escaped the case-sensitive discovery (rglob("*.md")) entirely, so
+    # its content was never validated. Discover it case-insensitively and reject the
+    # non-conforming extension.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD, name="concepts/Foo.MD")
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "Foo.MD" in out and ("extension" in out or "non-conforming" in out)
+
+
+def test_mixedcase_md_file_rejected(tmp_path):
+    # same rule for any non-lowercase extension, e.g. .Md
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD, name="concepts/Bar.Md")
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "Bar.Md" in out
+
+
+def test_dangling_uppercase_md_link_caught(tmp_path):
+    # the link checker matched .md case-sensitively, so [x](ghost.MD) was skipped and a
+    # dangling uppercase-extension link passed silently. It must now be caught.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + "\n\nSee [the ghost](ghost.MD).\n")
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "ghost.MD" in out
