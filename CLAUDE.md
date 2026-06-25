@@ -24,10 +24,11 @@ claude-skills-journalism/
 ├── README.md                    # User documentation
 ├── LICENSE
 │
-├── hooks/                       # Automated workflow checks (14 hooks)
+├── hooks/                       # Automated workflow checks (15 hooks)
 │   ├── ap-style-check.md        # Writing: AP Style violations
 │   ├── ai-slop-detector.md      # Writing: AI patterns
 │   ├── accessibility-check.md   # Writing: Alt text, headings
+│   ├── copywriting-preflight.md # Writing: Intent interview before drafting
 │   ├── source-attribution-check.md  # Verification: Unattributed claims
 │   ├── verification-reminder.md # Verification: Fact-check prompt
 │   ├── data-methodology-check.md    # Verification: Methodology docs
@@ -196,6 +197,7 @@ Hooks run automatically at specific workflow events. Most are **non-blocking war
 | ap-style-check | PostToolUse(Write,Edit) | Flag AP Style violations |
 | ai-slop-detector | PostToolUse(Write,Edit) | Warn about AI patterns |
 | accessibility-check | PostToolUse(Write,Edit) | Check alt text, headings, links |
+| copywriting-preflight | UserPromptSubmit | Interview for intent before drafting |
 
 ### Verification
 | Hook | Event | Purpose |

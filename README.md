@@ -169,6 +169,7 @@ Hooks are automated checks that run at specific points in your workflow. Most ar
 | [ap-style-check](./hooks/ap-style-check.md) | PostToolUse | Flag common AP Style violations |
 | [ai-slop-detector](./hooks/ai-slop-detector.md) | PostToolUse | Warn about AI-generated patterns |
 | [accessibility-check](./hooks/accessibility-check.md) | PostToolUse | Check alt text, heading structure, link text |
+| [copywriting-preflight](./hooks/copywriting-preflight.md) | UserPromptSubmit | Interview for intent before drafting a new piece or revision |
 
 ### Verification hooks
 
