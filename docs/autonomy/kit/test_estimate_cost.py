@@ -336,6 +336,41 @@ def test_disabled_review_zeroes_review_cost():
     assert ec.metered_cost_per_run(_inputs(review_enabled=False, max_passes=99)) == off
 
 
+def test_subscription_total_drops_reviewer_when_review_off():
+    # issue #110: the subscription helper mirrors the metered side — review on
+    # sums every plan, review off drops the reviewer plan only.
+    assert ec.subscription_total(True) == sum(ec.SUBSCRIPTION_PLANS_USD.values())
+    assert ec.subscription_total(False) == sum(
+        v for k, v in ec.SUBSCRIPTION_PLANS_USD.items() if k != "reviewer"
+    )
+    assert ec.subscription_total(False) == ec.SUBSCRIPTION_PLANS_USD["worker"]
+
+
+def test_disabled_review_lowers_subscription_headline():
+    # issue #110: review off => the headline subscription excludes the reviewer
+    # plan, both on the normal path and the wake-disabled short-circuit.
+    on = ec.estimate(_inputs(review_enabled=True))
+    off = ec.estimate(_inputs(review_enabled=False))
+    assert on.subscription_monthly_usd == sum(ec.SUBSCRIPTION_PLANS_USD.values())
+    assert off.subscription_monthly_usd == ec.SUBSCRIPTION_PLANS_USD["worker"]
+    assert off.subscription_monthly_usd < on.subscription_monthly_usd
+    wake_off = ec.estimate(_inputs(review_enabled=False, wake_enabled=False))
+    assert wake_off.subscription_monthly_usd == ec.SUBSCRIPTION_PLANS_USD["worker"]
+
+
+def test_format_report_shows_with_reviewer_footnote_when_review_off():
+    # issue #110: with review off the report shows both — the worker-only
+    # headline and the with-reviewer figure for someone who keeps that plan.
+    off = _inputs(review_enabled=False)
+    report_off = ec.format_report(off, ec.estimate(off), source="flags")
+    assert "with reviewer" in report_off
+    full = sum(ec.SUBSCRIPTION_PLANS_USD.values())
+    assert ec._money(full) in report_off  # the with-reviewer total is surfaced
+    on = _inputs(review_enabled=True)
+    report_on = ec.format_report(on, ec.estimate(on), source="flags")
+    assert "with reviewer" not in report_on.lower()
+
+
 def test_disabled_review_allows_zero_max_passes():
     # max_passes 0 is moot when review is off, so estimate() accepts it; it's
     # rejected only when review is enabled.
