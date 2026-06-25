@@ -218,6 +218,18 @@ def test_bad_type_fails(tmp_path):
     assert rc == 1 and "not in the spec vocab" in out
 
 
+def test_domain_neutral_type_validates(tmp_path):
+    # the vocab is a superset: domain-neutral types (newsroom/research/decision-log)
+    # validate alongside the infrastructure types. Closed-set typo rejection is still
+    # covered by test_bad_type_fails above.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    for t in ("Concept", "Decision", "Event", "Person", "Org", "Source"):
+        write_concept(b, GOOD.replace("type: Process", f"type: {t}"), name=f"concepts/{t}.md")
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
 def test_invalid_date_shape_reports_cleanly(tmp_path):
     # date-shaped but invalid (month 13) — PyYAML raises ValueError during parse,
     # which is not a YAMLError. Must report cleanly, not crash with a traceback.
@@ -291,6 +303,39 @@ def test_root_index_unsupported_okf_version_fails(tmp_path):
     (b / "index.md").write_text('---\nokf_version: "0.2"\n---\n# root\n', encoding="utf-8")
     rc, out = validate(b)
     assert rc == 1 and "not supported" in out
+
+
+def build_federated_tree(root, members=("nodeA", "nodeB"), strip_member_markers=True):
+    """Assemble a combined tree the way SPEC.md "Federation" describes: a new root
+    index.md carrying okf_version, each member under its own subdirectory."""
+    nav = "\n".join(f"- [{m}]({m}/index.md)" for m in members)
+    (root).mkdir(parents=True, exist_ok=True)
+    (root / "index.md").write_text(
+        f'---\nokf_version: "0.1"\n---\n# Atlas\n\n{nav}\n', encoding="utf-8")
+    for m in members:
+        (root / m).mkdir(parents=True, exist_ok=True)
+        marker = '---\nokf_version: "0.1"\n---\n' if not strip_member_markers else ""
+        (root / m / "index.md").write_text(
+            f"{marker}# {m}\n\n- [concept](concept.md)\n", encoding="utf-8")
+        (root / m / "concept.md").write_text(GOOD, encoding="utf-8")
+
+
+def test_federated_tree_validates(tmp_path):
+    # the documented strip-and-merge procedure must actually pass: one root marker,
+    # members nested as marker-less section indexes.
+    root = tmp_path / "atlas"
+    build_federated_tree(root)
+    rc, out = validate(root)
+    assert rc == 0, out
+
+
+def test_nested_member_marker_fails(tmp_path):
+    # the failure the SPEC warns about: leaving okf_version on a nested member index.
+    root = tmp_path / "atlas"
+    build_federated_tree(root, strip_member_markers=False)
+    rc, out = validate(root)
+    assert rc == 1
+    assert "reserved file should not carry frontmatter" in out
 
 
 def test_link_escaping_bundle_fails(tmp_path):

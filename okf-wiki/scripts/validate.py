@@ -47,8 +47,13 @@ REQUIRED_KEYS = ("type", "title", "description", "source", "verified", "timestam
 LIST_KEYS = ("source", "tags")
 DATE_KEYS = ("verified", "timestamp")
 ALLOWED_TYPES = {
+    # Infrastructure / ops (fleet maps, system docs)
     "Machine", "Network", "Service", "Session", "Project",
-    "Repo", "Credential", "Path", "Process", "Reference",
+    "Repo", "Credential", "Path", "Process",
+    # Domain-neutral (newsrooms, research atlases, decision logs)
+    "Concept", "Decision", "Event", "Person", "Org", "Source",
+    # Catch-all
+    "Reference",
 }
 RESERVED = {"index.md", "log.md"}
 SPEC_VERSION = "0.1"  # the okf_version this validator implements
