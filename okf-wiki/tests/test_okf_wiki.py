@@ -322,6 +322,59 @@ def test_md_directory_fails_cleanly(tmp_path):
     assert "Traceback" not in out
 
 
+def test_nonscalar_type_reports_cleanly(tmp_path):
+    # type as a list/dict (a plausible YAML typo) is unhashable; counting it or
+    # testing membership would crash. Must report cleanly, not traceback.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.replace("type: Process", "type: [Process]"))
+    rc, out = validate(b)
+    assert rc == 1 and "'type' must be a string" in out
+    assert "Traceback" not in out
+
+
+def test_missing_root_index_fails(tmp_path):
+    # a bundle with concepts but no root index.md must fail: the okf_version gate
+    # only runs when that file exists, so its absence would otherwise pass.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD)
+    (b / "index.md").unlink()
+    rc, out = validate(b)
+    assert rc == 1 and "bundle-root index is required" in out
+
+
+def test_bom_frontmatter_is_parsed(tmp_path):
+    # a leading UTF-8 BOM (common from Windows editors) must not make valid
+    # frontmatter read as missing; utf-8-sig strips it.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, "﻿" + GOOD)
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_github_pat_secret_detected(tmp_path):
+    # build a fine-grained PAT shape from fragments so no real-looking token lives
+    # in this test file. The classic gh*_ pattern misses github_pat_.
+    fake = "github_pat_" + "11ABCDE" + "FGHIJKLMNOPQRSTUVWXYZ"
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + f"\ntoken = {fake}\n")
+    rc, out = validate(b)
+    assert rc == 1 and "secret leak" in out
+
+
+def test_uppercase_md_link_checked(tmp_path):
+    # the .md link check is case-insensitive: a dangling uppercase-extension link
+    # must still be caught, not silently skipped.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + "\nSee [x](NOPE.MD).\n")
+    rc, out = validate(b)
+    assert rc == 1 and "dangling" in out
+
+
 # --- session hooks: scaffold wiring -----------------------------------------
 
 def test_default_scaffold_writes_hooks(tmp_path):

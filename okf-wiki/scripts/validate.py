@@ -68,9 +68,12 @@ SECRET_PATTERNS = [
     ("Google API key", re.compile(r"\bAIza[0-9A-Za-z_\-]{35}\b")),
     ("Slack token", re.compile(r"\bxox[baprs]-[0-9A-Za-z-]{10,}")),
     ("GitHub token", re.compile(r"\bgh[pousr]_[0-9A-Za-z]{36,}\b")),
+    ("GitHub fine-grained PAT", re.compile(r"\bgithub_pat_[0-9A-Za-z_]{22,}\b")),
     ("secret assignment", re.compile(
         r"(?i)(?:password|passwd|secret|api[_-]?key|apikey|client[_-]?secret|access[_-]?token|auth[_-]?token)"
-        r"\s*[:=]\s*['\"]?[A-Za-z0-9+/]{24,}['\"]?")),
+        # value charset includes - _ = so tokens like a fine-grained PAT or a base64
+        # value with padding are not split short of the 24-char entropy threshold.
+        r"\s*[:=]\s*['\"]?[A-Za-z0-9+/_=-]{24,}['\"]?")),
 ]
 
 
@@ -185,12 +188,20 @@ def main() -> int:
         f"{p.relative_to(bundle)}: a '*.md' path must be a file, not a directory"
         for p in md_entries if not p.is_file()
     ]
+    # A bundle must have a root index.md. The okf_version gate below only runs when
+    # that file exists, so without this check a bundle that simply omits the root
+    # index (or an empty directory) would validate clean and bypass version gating.
+    if not (bundle / "index.md").is_file():
+        errors.append("index.md: bundle-root index is required and must declare okf_version")
     type_counts: Counter = Counter()
     concepts = 0
 
     for f in md_files:
         rel = f.relative_to(bundle)
-        text = f.read_text(encoding="utf-8")
+        # utf-8-sig strips a leading byte-order mark if present. A BOM (common from
+        # Windows editors) would otherwise defeat the startswith("---") frontmatter
+        # check, reporting valid frontmatter as missing.
+        text = f.read_text(encoding="utf-8-sig")
 
         # secret scan on every file, including index.md.
         for label, pat in SECRET_PATTERNS:
@@ -244,6 +255,13 @@ def main() -> int:
 
         concepts += 1
         ctype = fm.get("type", "<none>")
+        # type must be a scalar string. A list/dict (a plausible YAML typo like
+        # `type: [Reference]`) is unhashable and would crash both the Counter
+        # increment and the `in ALLOWED_TYPES` membership test, so report it and
+        # fall back to "<none>" to keep the rest of this concept's checks running.
+        if not isinstance(ctype, str):
+            errors.append(f"{rel}: 'type' must be a string, got {type(ctype).__name__}")
+            ctype = "<none>"
         type_counts[ctype] += 1
 
         for key in REQUIRED_KEYS:
@@ -263,14 +281,14 @@ def main() -> int:
     # self-contained tree. To validate federated content, assemble the bundles into
     # a single tree and point --bundle at that root.
     for f in md_files:
-        text = strip_code(f.read_text(encoding="utf-8"))
+        text = strip_code(f.read_text(encoding="utf-8-sig"))
         for raw in LINK_RE.findall(text):
             target = link_destination(raw)
             if not target:
                 continue
             if target.startswith(("http://", "https://", "mailto:", "#", "tel:")):
                 continue
-            if ".md" not in target:
+            if ".md" not in target.lower():  # case-insensitive: also catch .MD links
                 continue
             if target.startswith("/"):
                 errors.append(f"{f.relative_to(bundle)}: root-relative link not allowed "

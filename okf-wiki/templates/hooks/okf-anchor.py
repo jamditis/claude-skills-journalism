@@ -62,7 +62,9 @@ def main():
     index = find_index()
     if index is None:
         return 0
-    body = strip_frontmatter(index.read_text(encoding="utf-8"))
+    # utf-8-sig strips a leading BOM; without it a BOM defeats the "---" frontmatter
+    # check in strip_frontmatter and the raw YAML block would leak into the context.
+    body = strip_frontmatter(index.read_text(encoding="utf-8-sig"))
     if not body:
         return 0
     print(
