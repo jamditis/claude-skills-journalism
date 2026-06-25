@@ -61,9 +61,11 @@ rejects an unquoted source. Always quote them:
 source: ["README.md", "issue #445", "git log 9c2e510"]
 ```
 
-The validator enforces this through the YAML parse step: an unquoted element carrying a
-significant character fails to parse and is reported as an error. An element that is already
-quote-safe (a bare filename) parses fine and is accepted — quote everything anyway so you
+The validator enforces this in both list styles. In flow style (`["a", b]`) an unquoted
+element carrying a significant character fails to parse and is reported as an error. In block
+style (`- a`) YAML would silently drop an inline `#` comment and pass, so the validator also
+scans the raw source text and rejects an unquoted element with a `#`. An element that is
+already quote-safe (a bare filename) is accepted either way — quote everything anyway so you
 never have to judge which is which.
 
 `tags` and `description` follow a lighter rule: quote an element only when it contains a

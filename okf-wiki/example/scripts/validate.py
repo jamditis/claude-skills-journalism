@@ -14,6 +14,8 @@ Checks:
      type, title, description, source, verified, timestamp, tags.
        - type     is one of the spec type vocab.
        - source   is a non-empty list of non-empty strings (provenance pointers).
+                  An unquoted '#' in a block-style element (which YAML would silently
+                  drop as a comment, losing the rest) is rejected — quote it.
        - tags     is a list.
        - verified, timestamp parse as ISO dates (YYYY-MM-DD).
   3. Reserved filenames (index.md, log.md) name no concept and carry no
@@ -96,14 +98,27 @@ SECRET_PATTERNS = [
 ]
 
 
+FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n?(.*)$", re.DOTALL)
+
+
 def parse_frontmatter(text: str):
     """Return (frontmatter_dict_or_None, body). Raises yaml.YAMLError on bad YAML."""
     if not text.startswith("---"):
         return None, text
-    m = re.match(r"^---\n(.*?)\n---\n?(.*)$", text, re.DOTALL)
+    m = FRONTMATTER_RE.match(text)
     if not m:
         return None, text
     return yaml.safe_load(m.group(1)) or {}, m.group(2)
+
+
+def frontmatter_block(text: str) -> str | None:
+    """Return the raw YAML frontmatter text (between the --- fences), or None. Used to
+    enforce rules on the source text before YAML strips comments (see
+    check_source_quoting)."""
+    if not text.startswith("---"):
+        return None
+    m = FRONTMATTER_RE.match(text)
+    return m.group(1) if m else None
 
 
 def link_destination(raw: str) -> str:
@@ -156,6 +171,50 @@ def strip_code(text: str) -> str:
                 fence = None
             out.append("")
     return "\n".join(out)
+
+
+def check_source_quoting(rel, raw_fm, errors):
+    """Enforce the SPEC 'source' quoting rule where YAML's comment stripping would
+    otherwise hide a violation.
+
+    In block style an unquoted element with an inline '#' is silently truncated:
+        source:
+          - issue #445      -> parses to "issue"; "#445" is dropped as a comment
+    No parse error fires, so the provenance is lost with the build still green. Flow
+    style is self-enforcing (the '#' comments out the closing ']', a parse error
+    caught earlier), so this scan targets block-style items. The trigger is YAML's
+    own comment rule: a '#' preceded by whitespace, with content before it. A bare
+    '#'-first item parses to null (caught by check_lists); 'issue#445' (no space) is a
+    valid string and left alone; a colon-space makes the item a mapping (also caught
+    by check_lists)."""
+    if not raw_fm:
+        return
+    in_block = False
+    source_indent = 0
+    for line in raw_fm.splitlines():
+        m = re.match(r"^(\s*)source\s*:(.*)$", line)
+        if m:
+            rest = m.group(2).strip()
+            # block style only when nothing (or just a comment) follows the colon; an
+            # inline flow list or scalar is handled by the YAML parse step.
+            in_block = rest == "" or rest.startswith("#")
+            source_indent = len(m.group(1))
+            continue
+        if not in_block:
+            continue
+        stripped = line.strip()
+        if stripped == "":
+            continue
+        indent = len(line) - len(line.lstrip())
+        if not stripped.startswith("-") and indent <= source_indent:
+            in_block = False  # dedented to a sibling key -> the source block ended
+            continue
+        if stripped.startswith("-"):
+            value = stripped[1:].strip()
+            if value[:1] not in ("'", '"') and re.search(r"\S\s+#", value):
+                errors.append(
+                    f"{rel}: 'source' element {value!r} has an unquoted '#' that YAML "
+                    f"reads as a comment, dropping the rest — quote it: - \"{value}\"")
 
 
 def check_dates(rel, fm, errors):
@@ -295,6 +354,7 @@ def main() -> int:
 
         check_lists(rel, fm, errors)
         check_dates(rel, fm, errors)
+        check_source_quoting(rel, frontmatter_block(text), errors)
 
     # Link resolution: every internal link to a .md file must resolve to a file
     # that exists inside the bundle. A link escaping the bundle root or pointing at
