@@ -1209,6 +1209,48 @@ def test_source_indented_frontmatter_unquoted_hash_fails(tmp_path):
     assert "source" in out and "#" in out
 
 
+def test_source_comment_line_before_unquoted_item_fails(tmp_path):
+    # a benign comment in the source value must not stop the scan: `source: # note` then
+    # `- issue #445` still drops "#445" from the real (later) item.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source("source: # note\n  - issue #445"))
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "source" in out and "#" in out
+
+
+def test_source_flow_wrapped_at_base_indent_fails(tmp_path):
+    # a flow list may wrap with no extra indentation; YAML still parses the continuation,
+    # so `source: [` then a column-0 `"README.md", issue #445` still drops "#445".
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source('source: [\n"README.md", issue #445\n]'))
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "source" in out and "#" in out
+
+
+def test_source_block_scalar_with_hash_passes(tmp_path):
+    # a literal/folded block scalar keeps '#' as string content, not a comment, so a
+    # source written that way is valid and must not be flagged.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source("source:\n  - |\n    issue #445"))
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_source_anchored_quoted_value_passes(tmp_path):
+    # a YAML anchor/tag before a quoted value still protects the '#' inside the string;
+    # the scan must not read the anchor as plain content and reject the quoted pointer.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source('source: [&p "issue #445"]'))
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
 # --- uppercase .md extension handling (#150 sub-item 2) ----------------------
 
 def test_uppercase_md_file_rejected(tmp_path):

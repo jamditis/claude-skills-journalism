@@ -173,133 +173,58 @@ def strip_code(text: str) -> str:
     return "\n".join(out)
 
 
-SOURCE_KEY_RE = re.compile(r"^source\s*:(.*)$")  # matched on a de-indented line
+def _plain_scalar_dropped_comment(node, raw_fm):
+    """True if a YAML comment directly truncated this scalar's provenance.
 
-
-def _base_indent(lines):
-    """Indentation of the frontmatter's top-level keys — the indent of its first non-blank
-    line. Frontmatter is normally at column 0, but a consistently indented mapping is still
-    valid YAML; anchoring to this indent finds the real top-level `source` while skipping a
-    deeper, nested `source:` under another key."""
-    for ln in lines:
-        if ln.strip():
-            return len(ln) - len(ln.lstrip())
-    return 0
-
-
-def _source_region_loses_data(text):
-    """True if the raw text of a top-level source value would silently drop provenance to
-    a YAML comment. `text` is the source value — the part after `source:` plus any
-    continuation lines, joined by newlines — scanned as one unit so quote state and flow
-    nesting carry across line breaks.
-
-    A '#' starts a comment and YAML discards the rest of the line, but that loses data only
-    when the '#' interrupts an open unquoted scalar. A '#' inside a quoted string, or one
-    with only whitespace since the last completed value, drops nothing. Quote handling
-    follows YAML: '' is a literal apostrophe inside '...', and a backslash escapes inside
-    "...". A quote opens a string only at a value boundary, so a mid-scalar apostrophe
-    (`Joe's`) stays literal. Flow punctuation (',' '[' ']' '{' '}') is structure only
-    inside a flow collection — in a block scalar it is literal text, so a comment after it
-    still truncates."""
-    i, n = 0, len(text)
-    in_single = in_double = False
-    flow_depth = 0
-    pending = False        # an unquoted scalar is open since the last value boundary
-    at_line_start = True   # before any non-space char on the current physical line
-    while i < n:
-        ch = text[i]
-        if in_single:
-            if ch == "'":
-                if i + 1 < n and text[i + 1] == "'":
-                    i += 2          # '' escapes a literal apostrophe — stay in the string
-                    continue
-                in_single = False
-                pending = False     # the quoted scalar is complete
-            i += 1
-            continue
-        if in_double:
-            if ch == "\\":
-                i += 2              # backslash escapes the next char inside "..."
-                continue
-            if ch == '"':
-                in_double = False
-                pending = False
-            i += 1
-            continue
-        if ch == "\n":
-            if flow_depth == 0:
-                pending = False     # a block line break ends the current element
-            at_line_start = True
-            i += 1
-            continue
-        if ch in (" ", "\t"):
-            i += 1
-            continue
-        if at_line_start and flow_depth == 0 and ch == "-" and (
-                i + 1 >= n or text[i + 1] in (" ", "\t", "\n")):
-            pending = False         # block sequence-entry indicator, not content
-            i += 1
-            continue
-        at_line_start = False
-        if ch == "#" and i > 0 and text[i - 1] in (" ", "\t", "\n"):
-            return pending          # comment: data lost only if a scalar was open
-        if ch in ("'", '"') and not pending:
-            in_single = ch == "'"
-            in_double = ch == '"'
-            i += 1
-            continue
-        if ch in ("[", "{") and not pending:
-            flow_depth += 1         # opens flow only at a value boundary
-            i += 1
-            continue
-        if ch in ("]", "}") and flow_depth > 0:
-            flow_depth -= 1
-            pending = False
-            i += 1
-            continue
-        if ch == "," and flow_depth > 0:
-            pending = False         # flow separator (literal in a block scalar)
-            i += 1
-            continue
-        pending = True              # ordinary scalar content (incl. literal , [ ] in block)
-        i += 1
-    return False
+    `node` is a scalar node from the parsed frontmatter and `raw_fm` the raw text it was
+    parsed from. Only a plain (unquoted) scalar can lose data: a quoted or block scalar
+    (node.style set to ', ", |, or >) keeps a '#' as string content. For a plain scalar,
+    YAML stops the value at the space before an inline '#', so the comment shows up in the
+    raw text immediately after the scalar's end mark, on the same line. That is exactly the
+    silent-truncation case (`issue #445` -> "issue") the SPEC quoting rule guards against;
+    `issue#445` (no space) is one scalar and a '#' on a later line is a standalone comment,
+    and neither trips this."""
+    if node.style is not None:
+        return False
+    j = node.end_mark.index
+    while j < len(raw_fm) and raw_fm[j] in (" ", "\t"):
+        j += 1
+    return j < len(raw_fm) and raw_fm[j] == "#"
 
 
 def check_source_quoting(rel, raw_fm, errors):
-    """Enforce the SPEC 'source' quoting rule on the raw frontmatter, where YAML's comment
-    stripping would otherwise silently drop part of a provenance pointer.
+    """Enforce the SPEC 'source' quoting rule, where YAML's comment stripping would
+    otherwise silently drop part of a provenance pointer.
 
     Quoting source elements is a hard SPEC rule, but YAML drops an unquoted inline '#'
     comment with no error: `- issue #445` parses to "issue", losing "#445". The parsed
-    value cannot reveal the loss, so this scans the raw text of each top-level `source`
-    value (see _source_region_loses_data) for an unquoted, content-truncating '#'. It
-    covers every list shape — block items, single- and multi-line flow lists, wrapped
-    scalars — and is quote- and flow-aware so it neither misses a real loss nor rejects a
-    correctly quoted pointer. It is scoped to the top-level `source` key only (a nested
-    `source:` under other metadata is not the OKF provenance list), and scans every
-    top-level occurrence, since YAML keeps the last of duplicate keys. A bare '#'-first
-    item (null) and a colon-space mapping item are left to check_lists."""
+    value alone cannot reveal the loss, so this re-parses the frontmatter into its node
+    tree (which carries source position marks) and, for every top-level `source` element,
+    checks whether a comment directly truncated a plain scalar (see
+    _plain_scalar_dropped_comment). Delegating the lexing to YAML covers every shape —
+    block items, single- and multi-line flow lists, wrapped scalars, quoted strings with
+    escapes, anchors/tags, and block scalars — without re-implementing the parser. It is
+    scoped to the top-level `source` key only (a nested `source:` under other metadata is
+    not the OKF provenance list) and inspects every top-level occurrence, since YAML keeps
+    the last of duplicate keys. A real parse error is reported by the schema check."""
     if not raw_fm:
         return
-    lines = raw_fm.splitlines()
-    base = _base_indent(lines)
-    for i, ln in enumerate(lines):
-        indent = len(ln) - len(ln.lstrip())
-        m = SOURCE_KEY_RE.match(ln[indent:])
-        if indent != base or not m:
-            continue  # not a top-level source key (deeper => nested under another key)
-        # The source value region: text after `source:` on the key line, plus following
-        # blank, deeper-indented, or block-item ('-') lines, up to the next top-level key.
-        parts = [m.group(1)]
-        for nxt in lines[i + 1:]:
-            nstrip = nxt.strip()
-            nindent = len(nxt) - len(nxt.lstrip())
-            if nstrip == "" or nindent > base or nstrip.startswith("-"):
-                parts.append(nxt)
-            else:
-                break
-        if _source_region_loses_data("\n".join(parts)):
+    try:
+        root = yaml.compose(raw_fm, Loader=yaml.SafeLoader)
+    except yaml.YAMLError:
+        return
+    if not isinstance(root, yaml.MappingNode):
+        return
+    for key_node, val_node in root.value:
+        if not (isinstance(key_node, yaml.ScalarNode) and key_node.value == "source"):
+            continue
+        if isinstance(val_node, yaml.SequenceNode):
+            scalars = [n for n in val_node.value if isinstance(n, yaml.ScalarNode)]
+        elif isinstance(val_node, yaml.ScalarNode):
+            scalars = [val_node]
+        else:
+            scalars = []
+        if any(_plain_scalar_dropped_comment(n, raw_fm) for n in scalars):
             errors.append(
                 f"{rel}: a top-level 'source' element has an unquoted '#' that YAML "
                 f"reads as a comment, dropping the rest of the pointer — quote each "
