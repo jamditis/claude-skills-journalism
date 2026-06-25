@@ -1,0 +1,2 @@
+# The validator (scripts/validate.py) parses YAML frontmatter with PyYAML.
+PyYAML>=5.1

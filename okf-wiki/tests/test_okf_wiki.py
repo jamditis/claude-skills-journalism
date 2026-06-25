@@ -9,6 +9,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 SKILL = Path(__file__).resolve().parent.parent
 SCAFFOLD = SKILL / "scripts" / "scaffold.py"
 VALIDATE = SKILL / "scripts" / "validate.py"
@@ -116,6 +118,78 @@ def test_duplicate_sections_collapse(tmp_path):
     rc, out = scaffold(tmp_path / "kb", "--sections", "notes,notes")
     assert rc == 0, out
     assert (tmp_path / "kb" / "bundle" / "notes" / "index.md").exists()
+
+
+def test_scaffold_writes_requirements(tmp_path):
+    # the validator depends on PyYAML; the scaffolded project must declare it.
+    rc, out = scaffold(tmp_path / "kb")
+    assert rc == 0, out
+    assert "PyYAML" in (tmp_path / "kb" / "requirements.txt").read_text()
+
+
+def test_force_preserves_existing_content(tmp_path):
+    # --force into a populated project must not clobber a user's own files with the
+    # generic template. Scaffold once, edit content, re-scaffold --force: the edits
+    # survive and the run reports what it preserved.
+    target = tmp_path / "kb"
+    scaffold(target)
+    readme, root = target / "README.md", target / "bundle" / "index.md"
+    readme.write_text("MY OWN README\n", encoding="utf-8")
+    root.write_text("MY OWN INDEX\n", encoding="utf-8")
+    rc, out = scaffold(target, "--force", "--no-validate")
+    assert rc == 0, out
+    assert readme.read_text() == "MY OWN README\n"
+    assert root.read_text() == "MY OWN INDEX\n"
+    assert "preserved" in out and "README.md" in out
+
+
+def test_force_preserve_skips_validation(tmp_path):
+    # when --force preserves a non-OKF bundle/index.md, the scaffold is no longer
+    # valid by construction; it must skip validation, not fail as "a bug in
+    # scaffold.py" over intentionally preserved user content.
+    target = tmp_path / "kb"
+    scaffold(target)
+    (target / "bundle" / "index.md").write_text("# my repo index\n", encoding="utf-8")
+    rc, out = scaffold(target, "--force")
+    assert rc == 0, out
+    assert "skipping validation" in out.lower()
+    assert "bug in scaffold.py" not in out
+    # the printed validate command must cd into the target, not the caller's cwd
+    assert f"cd {target}" in out
+
+
+def test_force_preserve_does_not_run_preserved_validator(tmp_path):
+    # a preserved user scripts/validate.py must never be executed by the scaffolder.
+    target = tmp_path / "kb"
+    scaffold(target)
+    sentinel = tmp_path / "ran"
+    (target / "scripts" / "validate.py").write_text(
+        f"import pathlib; pathlib.Path(r'{sentinel}').write_text('x')\n", encoding="utf-8")
+    rc, out = scaffold(target, "--force")
+    assert rc == 0, out
+    assert not sentinel.exists(), "preserved validate.py must not be run"
+
+
+def test_missing_pyyaml_skips_validation(tmp_path):
+    # validate.py needs PyYAML; if it is absent the scaffold must still succeed and
+    # say so plainly, not mislabel the missing dependency as a bug in scaffold.py.
+    # Simulate absence with -S (no site-packages); skip if yaml is still findable.
+    probe = subprocess.run(
+        [sys.executable, "-S", "-c",
+         "import importlib.util, sys; "
+         "sys.exit(0 if importlib.util.find_spec('yaml') is None else 3)"])
+    if probe.returncode != 0:
+        pytest.skip("PyYAML is importable even under -S; cannot simulate its absence")
+    target = tmp_path / "kb"
+    r = subprocess.run([sys.executable, "-S", str(SCAFFOLD), str(target)],
+                       capture_output=True, text=True)
+    out = r.stdout + r.stderr
+    assert r.returncode == 0, out
+    assert "PyYAML is not installed" in out
+    assert "bug in scaffold.py" not in out
+    assert (target / "bundle" / "index.md").exists()
+    # the printed validate command must cd into the target, not the caller's cwd
+    assert f"cd {target}" in out
 
 
 # --- validator (negative cases) ---------------------------------------------
