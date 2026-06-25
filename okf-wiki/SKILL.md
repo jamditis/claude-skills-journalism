@@ -4,7 +4,7 @@ description: Scaffold a new Open Knowledge Format (OKF) knowledge base and popul
 license: MIT
 metadata:
   author: jamditis
-  version: "0.3.1"
+  version: "0.4.0"
   okf_spec: v1
 ---
 
@@ -92,8 +92,9 @@ mechanical transform. So you (Claude) author the concepts directly, in this loop
    heading is a hint, not a rule — do not blindly map one `##` to one file.
 3. **Draft each concept** at `bundle/<section>/<slug>.md` with the full frontmatter
    (`type, title, description, source, verified, timestamp, tags`):
-   - `type` from the vocab: Machine, Network, Service, Session, Project, Repo, Credential,
-     Path, Process, Reference (Reference is the catch-all).
+   - `type` from the vocab. Infrastructure: Machine, Network, Service, Session, Project,
+     Repo, Credential, Path, Process. Domain-neutral: Concept, Decision, Event, Person,
+     Org, Source. Plus Reference (the catch-all). The set is closed; an unlisted type fails.
    - `description` is one line. `source` — quote every element — points at where the fact
      actually came from (the origin file path, URL, command, or event), not at this skill.
    - Set `timestamp` to today. Set `verified` to today only for a fact you actually re-checked
@@ -134,7 +135,8 @@ Full contract in `spec/SPEC.md`. The load-bearing rules:
 
 - **Required frontmatter** on every concept: `type, title, description, source, verified,
   timestamp, tags`. `type` is one of: Machine, Network, Service, Session, Project, Repo,
-  Credential, Path, Process, Reference.
+  Credential, Path, Process (infrastructure); Concept, Decision, Event, Person, Org, Source
+  (domain-neutral); or Reference (catch-all).
 - **Quote every `source` element** — source pointers carry `#` and `: ` which break YAML
   if unquoted. `source: ["README.md", "issue #445"]`.
 - **`verified`** is the date the fact was last checked against reality; **`timestamp`** is

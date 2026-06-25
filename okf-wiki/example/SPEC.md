@@ -69,11 +69,15 @@ Provenance lives in `source` — there is no separate citations section or refer
 
 ## Type vocab
 
-`Machine`, `Network`, `Service`, `Session`, `Project`, `Repo`, `Credential`, `Path`,
-`Process`, `Reference`.
+Infrastructure and ops (fleet maps, system docs): `Machine`, `Network`, `Service`,
+`Session`, `Project`, `Repo`, `Credential`, `Path`, `Process`.
+
+Domain-neutral (newsrooms, research atlases, decision logs): `Concept`, `Decision`,
+`Event`, `Person`, `Org`, `Source`.
 
 `Reference` is the catch-all for a concept that is not one of the others. Index files carry
-no frontmatter, so there is no `Index` type.
+no frontmatter, so there is no `Index` type. The set is closed: an unlisted type fails the
+build, which catches typos. To extend it, add the type here and in `scripts/validate.py`.
 
 ## Links
 
@@ -83,11 +87,18 @@ validated as one self-contained tree (see Federation for combining several).
 
 ## Federation (optional)
 
-Several bundles can be combined into one tree by giving each a uniquely named top-level
-directory and concatenating them, with cross-bundle links written as relative paths into the
-sibling directories. Validate the combined result as a single bundle: assemble the tree, then
-point the validator at that root so every link resolves. Most single-repo knowledge bases
-never need this.
+Several bundles can be combined into one tree. Add a new root `index.md` that carries
+`okf_version` and links to each member, then place each bundle under a uniquely named
+subdirectory of that root. A member's own `index.md` is now a nested section index, so remove
+its `okf_version` frontmatter block entirely — a nested `index.md` carries no frontmatter at
+all. Write cross-bundle links as relative paths into the sibling directories. Validate by
+pointing the validator at the new root, so every link resolves and the single `okf_version`
+gate runs once at the top.
+
+A member's marker is stripped when it is nested, so it can no longer be validated on its own
+from inside the combined tree — validate the assembled root instead. (Per-node validation that
+keeps a marker in each member is planned but not yet built.) Most single-repo knowledge bases
+never need any of this.
 
 ## Security (hard)
 
