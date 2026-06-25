@@ -1,0 +1,28 @@
+name: okf-wiki tests
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'okf-wiki/**'
+      - '.github/workflows/okf-wiki-tests.yml'
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # pytest is a dev-only dep, not in requirements.txt (which declares the
+      # validator's runtime dep, PyYAML). Install both.
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest -r okf-wiki/requirements.txt
+
+      - name: Run okf-wiki test suite
+        run: python -m pytest okf-wiki/tests -q
