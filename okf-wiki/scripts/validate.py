@@ -257,10 +257,12 @@ def main() -> int:
         print(f"FAIL: bundle path is not a directory: {bundle}")
         return 1
 
-    # rglob("*.md") also matches a directory named like "archive.md"; reading one
-    # raises IsADirectoryError. Iterate only real files, and report any *.md path
-    # that is a directory as a clean validation failure rather than crashing.
-    md_entries = sorted(bundle.rglob("*.md"))
+    # Discover markdown files case-insensitively (suffix .lower() == ".md") so a
+    # non-conforming Foo.MD cannot hide from validation behind a case-sensitive glob;
+    # it is found here and rejected below. rglob("*") also yields a directory named
+    # like "archive.md"; reading one raises IsADirectoryError, so keep only real files
+    # and report any .md-suffixed path that is a directory rather than crashing.
+    md_entries = sorted(p for p in bundle.rglob("*") if p.suffix.lower() == ".md")
     md_files = [p for p in md_entries if p.is_file()]
     errors: list[str] = [
         f"{p.relative_to(bundle)}: a '*.md' path must be a file, not a directory"
@@ -281,12 +283,25 @@ def main() -> int:
         # check, reporting valid frontmatter as missing.
         text = f.read_text(encoding="utf-8-sig")
 
-        # secret scan on every file, including index.md.
+        # secret scan on every file, including index.md and a non-conforming Foo.MD
+        # (a leak is a leak regardless of extension — scan before rejecting below).
         for label, pat in SECRET_PATTERNS:
             if pat.search(text):
                 errors.append(
                     f"{rel}: possible secret leak ({label}) — remove the value, "
                     f"document the key name/path instead")
+
+        # OKF concept and index files use a lowercase .md extension. A non-lowercase
+        # extension (Foo.MD) is non-conforming: it was discovered case-insensitively
+        # above so its content is still secret-scanned, then rejected here instead of
+        # validated as a concept. With the case-insensitive link check below, this
+        # closes the bypass where an uppercase-extension file and links to it both
+        # escaped validation.
+        if f.suffix != ".md":
+            errors.append(
+                f"{rel}: non-conforming filename — OKF concept files use a lowercase "
+                f"'.md' extension, found {f.suffix!r}; rename it to .md")
+            continue
 
         try:
             fm, body = parse_frontmatter(text)
@@ -362,6 +377,8 @@ def main() -> int:
     # self-contained tree. To validate federated content, assemble the bundles into
     # a single tree and point --bundle at that root.
     for f in md_files:
+        if f.suffix != ".md":
+            continue  # non-conforming file already reported; don't pile on link errors
         text = strip_code(f.read_text(encoding="utf-8-sig"))
         for m in WIKILINK_RE.finditer(text):
             slug = m.group(1).strip()
@@ -379,11 +396,11 @@ def main() -> int:
             # resolved as a local path (which would falsely fail as escaping/dangling).
             if low.startswith(("http://", "https://", "mailto:", "#", "tel:")):
                 continue
-            # OKF concept files are lowercase .md (discovery uses bundle.rglob("*.md")).
-            # Match .md case-sensitively so the link check and file discovery agree: a
-            # link to a .MD file is out of scope, not a validated internal link -- it can
-            # never resolve to an uppercase-extension file that discovery never scanned.
-            if ".md" not in target:
+            # Match .md case-insensitively, the same way discovery now does, so a link
+            # to an uppercase-extension file (ghost.MD) is checked for dangling/escape
+            # instead of silently skipped. If such a target file exists it is separately
+            # rejected as non-conforming above, so the two checks stay in agreement.
+            if ".md" not in low:
                 continue
             if target.startswith("/"):
                 errors.append(f"{f.relative_to(bundle)}: root-relative link not allowed "

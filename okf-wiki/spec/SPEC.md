@@ -29,6 +29,9 @@ with an `index.md`. Larger bundles group concepts into subdirectories by subject
 - `log.md` (optional, per directory): dated entries, newest first, no frontmatter.
 - Concept files: one concept each, frontmatter required (below).
 - Reserved filenames: `index.md`, `log.md`.
+- All markdown files use a lowercase `.md` extension. A non-lowercase extension (`.MD`,
+  `.Md`) is non-conforming and rejected — the validator discovers files case-insensitively
+  so such a file cannot escape validation, and link checks match `.md` case-insensitively too.
 
 The validator enforces the frontmatter rules here — reserved files carry no frontmatter, and
 only the bundle-root `index.md` carries `okf_version` (and nothing else). The index/log body
