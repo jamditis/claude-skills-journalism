@@ -426,7 +426,7 @@ def main() -> int:
               "preserved, so the bundle is not guaranteed valid by construction and "
               "scripts/validate.py may be your own.", file=sys.stderr)
         print("  reconcile the preserved files, then validate when ready:", file=sys.stderr)
-        print(f"    {interpreter_for(hooks_os)} scripts/validate.py --bundle bundle", file=sys.stderr)
+        print(f"    cd {target} && {interpreter_for(hooks_os)} scripts/validate.py --bundle bundle", file=sys.stderr)
         return 0
 
     # validate.py runs under this same interpreter, so its `import yaml` succeeds
@@ -438,7 +438,7 @@ def main() -> int:
               "for this interpreter.", file=sys.stderr)
         print("  install it, then validate:", file=sys.stderr)
         print("    pip install -r requirements.txt    # or: pip install pyyaml", file=sys.stderr)
-        print(f"    {interpreter_for(hooks_os)} scripts/validate.py --bundle bundle", file=sys.stderr)
+        print(f"    cd {target} && {interpreter_for(hooks_os)} scripts/validate.py --bundle bundle", file=sys.stderr)
         return 0
 
     print("\nValidating the new bundle...")

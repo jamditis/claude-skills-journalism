@@ -154,6 +154,8 @@ def test_force_preserve_skips_validation(tmp_path):
     assert rc == 0, out
     assert "skipping validation" in out.lower()
     assert "bug in scaffold.py" not in out
+    # the printed validate command must cd into the target, not the caller's cwd
+    assert f"cd {target}" in out
 
 
 def test_force_preserve_does_not_run_preserved_validator(tmp_path):
@@ -186,6 +188,8 @@ def test_missing_pyyaml_skips_validation(tmp_path):
     assert "PyYAML is not installed" in out
     assert "bug in scaffold.py" not in out
     assert (target / "bundle" / "index.md").exists()
+    # the printed validate command must cd into the target, not the caller's cwd
+    assert f"cd {target}" in out
 
 
 # --- validator (negative cases) ---------------------------------------------

@@ -3,6 +3,14 @@
 An Open Knowledge Format (OKF) knowledge base: small markdown files, one concept each,
 with provenance in YAML frontmatter. See `SPEC.md` for the full contract.
 
+## Requirements
+
+The validator parses YAML frontmatter with PyYAML:
+
+```bash
+pip install -r requirements.txt    # or: pip install pyyaml
+```
+
 ## Validate
 
 ```bash
