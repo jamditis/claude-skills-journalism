@@ -3,28 +3,48 @@ name: copywriting-preflight
 event: UserPromptSubmit
 description: Detects writing and revision requests and prompts an intent interview before drafting
 match_patterns:
-  - "blog post"
-  - "substack post"
+  # Noun forms that rarely appear in code or admin prompts (safe to match bare)
   - "op-ed"
   - "press release"
-  - "newsletter"
+  - "substack post"
   - "talking points"
-  - "write a post"
+  # Drafting: a verb paired with a writing noun, so code prompts do not match
+  - "write a blog post"
+  - "draft a blog post"
+  - "write a newsletter"
+  - "draft a newsletter"
   - "write an article"
+  - "draft an article"
   - "write an essay"
+  - "draft an essay"
+  - "write a memo"
+  - "draft a memo"
   - "write a pitch"
+  - "draft a pitch"
+  - "write a proposal"
+  - "draft a proposal"
+  - "write a one-pager"
+  - "draft a one-pager"
+  - "draft an announcement"
   - "write copy"
   - "write the copy"
-  - "draft a post"
-  - "draft an article"
-  - "draft a pitch"
-  - "draft an announcement"
-  - "polish the draft"
-  - "punch up the copy"
+  - "draft the copy"
+  # Revision: a verb paired with a writing noun
   - "rewrite the post"
   - "rewrite the article"
+  - "rewrite the draft"
+  - "rewrite the copy"
   - "revise the draft"
+  - "revise the article"
+  - "revise the piece"
+  - "polish the draft"
+  - "polish the copy"
+  - "punch up the copy"
   - "tighten the copy"
+  - "tighten the draft"
+  - "edit the draft"
+  - "refine the draft"
+  - "strengthen the piece"
 ---
 
 # Copywriting preflight
@@ -35,14 +55,14 @@ This hook does not write anything. It pauses to gather intent, then gets out of 
 
 ## Detection criteria
 
-Skip very short messages (a one-line aside is rarely a real writing request). Otherwise, treat the message as a writing task when it contains:
+The signal is the verb-plus-writing-noun pairing, not message length. A terse command that matches a writing pattern — "write copy", "op-ed", "press release" — is still a real request, and terse is often exactly when an intent interview is most useful, so do not skip it for being short. Treat the message as a writing task when it contains:
 
-- **New writing:** "write/draft/create a [post, article, blog, essay, script, copy, memo, pitch, newsletter, press release, announcement, proposal, one-pager, talking points]", plus named forms like "op-ed", "blog post", "substack post", "press release".
-- **Revision:** a revision verb ("revise", "rewrite", "rework", "polish", "tighten", "punch up", "edit", "refine", "strengthen") **next to** a writing-context word ("draft", "post", "article", "piece", "copy", "script", "newsletter", "write-up"). Require both, so "tighten that" about a code hook does not trip it.
+- **New writing:** a drafting verb ("write", "draft", "create") next to a prose form (post, blog post, article, essay, memo, pitch, newsletter, press release, op-ed, announcement, proposal, one-pager, copy, talking points).
+- **Revision:** a revision verb ("revise", "rewrite", "rework", "polish", "tighten", "punch up", "edit", "refine", "strengthen") **next to** a writing-context word ("draft", "post", "article", "piece", "copy", "newsletter", "write-up"). Require both, so "tighten that" about a code hook does not trip it.
 
 Check revision first — it is the more specific case, since it implies a piece already exists.
 
-The `match_patterns` above are deliberately writing-noun-specific (`blog post`, `op-ed`, `write copy`) rather than bare verbs (`write a`, `rewrite`), so code prompts like "write a SQL query" or "rewrite this regex" never trip the interview. If a borderline prompt does match, apply the verb-plus-writing-noun test before interviewing and skip silently when the request turns out to be about code.
+The `match_patterns` above pair a verb with a writing noun (`write a newsletter`, `rewrite the post`) and keep bare nouns only for forms that rarely show up in code or admin prompts (`op-ed`, `press release`). That is why "write a SQL query", "build a newsletter signup form", and "rewrite this regex" never trip the interview. "Script" is deliberately left out: in a code repo "write a script" almost always means code, not a screenplay. If a borderline prompt still matches, apply the verb-plus-writing-noun test before interviewing and skip silently when the request turns out to be about code.
 
 ## Response (new writing)
 
