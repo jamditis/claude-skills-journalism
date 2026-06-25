@@ -1153,6 +1153,62 @@ def test_source_unquoted_with_apostrophe_then_hash_fails(tmp_path):
     assert "source" in out and "#" in out
 
 
+def test_source_block_item_with_comma_then_hash_fails(tmp_path):
+    # a comma is a flow separator only inside `[...]`; in a block scalar it is literal
+    # text, so `- report, #445` keeps "report," and still drops "#445". The scan must
+    # not treat the comma as a completed value the way it does inside flow.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source("source:\n  - report, #445"))
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "source" in out and "#" in out
+
+
+def test_source_single_quoted_doubled_apostrophe_passes(tmp_path):
+    # '' is YAML's escape for a literal apostrophe inside a single-quoted string, so
+    # 'Joe''s issue #445' keeps "#445" inside the (valid, complete) string. The scan must
+    # not close the string on the first quote of the pair and reject a correct pointer.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source("source: ['Joe''s issue #445']"))
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_source_multiline_quoted_scalar_passes(tmp_path):
+    # a quoted scalar may wrap onto the next line; YAML folds it and keeps "#445" inside
+    # the string. The scan must carry quote state across the line break, not treat the
+    # continuation as plain text and reject it.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source('source: ["issue\n  tracker #445"]'))
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_source_indented_frontmatter_unquoted_hash_fails(tmp_path):
+    # a consistently indented frontmatter mapping is valid YAML with top-level keys off
+    # column 0. The scan must anchor to the frontmatter's base indent so it still finds
+    # the real top-level `source` (and still drops its truncated provenance).
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, (
+        "---\n"
+        "  type: Process\n"
+        "  title: t\n"
+        "  description: d\n"
+        "  source:\n"
+        "    - issue #445\n"
+        '  verified: "2026-06-23"\n'
+        '  timestamp: "2026-06-23"\n'
+        '  tags: ["x"]\n'
+        "---\n# t\n"))
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "source" in out and "#" in out
+
+
 # --- uppercase .md extension handling (#150 sub-item 2) ----------------------
 
 def test_uppercase_md_file_rejected(tmp_path):
