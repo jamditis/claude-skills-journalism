@@ -1013,3 +1013,60 @@ def test_example_validator_matches_canonical():
     assert (SKILL / "example" / "scripts" / "validate.py").read_text(encoding="utf-8") == \
            (SKILL / "scripts" / "validate.py").read_text(encoding="utf-8"), \
            "okf-wiki/example/scripts/validate.py drifted from scripts/validate.py — re-sync the copy"
+
+
+# --- source-quoting enforcement in block style (#155) -----------------------
+
+def _concept_with_source(source_yaml):
+    # a valid concept whose `source:` field is the given raw YAML (flow or block).
+    return (
+        "---\n"
+        "type: Process\n"
+        "title: good\n"
+        "description: a good concept\n"
+        f"{source_yaml}\n"
+        "verified: 2026-06-23\n"
+        "timestamp: 2026-06-23\n"
+        'tags: ["x"]\n'
+        "---\n# good\n"
+    )
+
+
+def test_source_block_unquoted_hash_fails(tmp_path):
+    # the bug: block-style `- issue #445` parses to "issue" (YAML drops "#445" as a
+    # comment) with no error, silently losing provenance. Must fail explicitly.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source('source:\n  - "README.md"\n  - issue #445'))
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "source" in out and "#" in out
+
+
+def test_source_block_quoted_hash_passes(tmp_path):
+    # quoting the element protects it — this is the documented fix, so it must pass.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source('source:\n  - "README.md"\n  - "issue #445"'))
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_source_block_hash_no_space_ok(tmp_path):
+    # `issue#445` (no space before #) is NOT a YAML comment — it stays intact, so the
+    # guard must not false-positive on it.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source("source:\n  - issue#445"))
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_source_flow_unquoted_hash_still_fails(tmp_path):
+    # flow style was already enforced (the '#' comments out the closing ']' -> parse
+    # error). Guard against regressing that while fixing block style.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source('source: ["README.md", issue #445]'))
+    rc, out = validate(b)
+    assert rc == 1, out
