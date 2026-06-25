@@ -337,7 +337,12 @@
         mtokReviewer: Math.max(0, parseFloat($("mtokReviewer").value) || 0),
       };
       const runsPerMonth = perDay * (activeDays / 7) * p.days;
-      const subscription = (parseFloat($("subWorker").value) || 0) + (parseFloat($("subReviewer").value) || 0);
+      // Review off drops the reviewer plan from the headline, matching the metered
+      // side (which bills no review tokens). The with-reviewer figure is shown
+      // below as a footnote, since you might keep that plan for interactive use.
+      const subWorker = parseFloat($("subWorker").value) || 0;
+      const subReviewer = parseFloat($("subReviewer").value) || 0;
+      const subscription = subWorker + (p.reviewOn ? subReviewer : 0);
       const run = meteredPerRun(p);
       const moLo = run[0] * runsPerMonth, moHi = run[1] * runsPerMonth;
       const gapLo = subscription ? moLo / subscription : 0;
@@ -349,6 +354,9 @@
       }));
       body.append(line("Runs / month", intc(runsPerMonth)));
       body.append(line("Subscription / mo", money(subscription), { kSub: "flat, ~$0 per run until limits" }));
+      if (!p.reviewOn && subReviewer) {
+        body.append(line("With reviewer / mo", money(subscription + subReviewer), { kSub: "if you keep the reviewer plan for interactive use" }));
+      }
       body.append(line("Metered / mo", money(moLo) + EN + money(moHi), {
         accent: true, kSub: money(run[0]) + EN + money(run[1]) + " per run",
       }));

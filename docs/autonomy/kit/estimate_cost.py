@@ -225,6 +225,20 @@ class Estimate:
     metered_monthly_usd: tuple[float, float]
 
 
+def subscription_total(review_enabled: bool) -> float:
+    """Flat monthly subscription cost for the plans this loop actually uses.
+
+    When review is off, the reviewer plan is dropped so the headline matches the
+    metered side, which already bills zero review tokens. The report still
+    footnotes the reviewer plan separately, because a flat plan you keep for
+    interactive use is money you spend whether or not this loop triggers it
+    (issue #110). Any non-reviewer plan in the table is always counted.
+    """
+    if review_enabled:
+        return sum(SUBSCRIPTION_PLANS_USD.values())
+    return sum(v for k, v in SUBSCRIPTION_PLANS_USD.items() if k != "reviewer")
+
+
 def _validate_effort(name: str, value: str) -> str:
     value = (value or "").lower()
     if value not in VALID_EFFORTS:
@@ -267,14 +281,15 @@ def estimate(inputs: Inputs) -> Estimate:
     # schedule.wake.enabled: false means the loop never fires, so it runs zero
     # times and bills zero metered tokens. Short-circuit before reading cadence —
     # a disabled schedule's cron is moot. The per-run figure stays informational
-    # ("if you turned it on..."); the subscription line is left to issue #110
-    # (a plan you hold whether or not this loop uses it).
+    # ("if you turned it on..."); the subscription line still shows the flat
+    # plans you hold whether or not this loop fires, minus the reviewer plan when
+    # review is off (see subscription_total).
     if not inputs.wake_enabled:
         return Estimate(
             runs_per_active_day=0,
             active_days_per_week=0,
             runs_per_month=0.0,
-            subscription_monthly_usd=sum(SUBSCRIPTION_PLANS_USD.values()),
+            subscription_monthly_usd=subscription_total(inputs.review_enabled),
             metered_per_run_usd=metered_cost_per_run(inputs),
             metered_monthly_usd=(0.0, 0.0),
         )
@@ -296,7 +311,7 @@ def estimate(inputs: Inputs) -> Estimate:
         )
 
     runs_per_month = per_active_day * (active_days / 7.0) * inputs.days_per_month
-    subscription = sum(SUBSCRIPTION_PLANS_USD.values())
+    subscription = subscription_total(inputs.review_enabled)
     run_lo, run_hi = metered_cost_per_run(inputs)
     monthly = (run_lo * runs_per_month, run_hi * runs_per_month)
 
@@ -393,6 +408,21 @@ def format_report(inputs: Inputs, est: Estimate, *, source: str) -> str:
         else "review disabled"
     )
     cadence_note = "" if inputs.wake_enabled else "   (schedule disabled — 0 runs)"
+    # With review off, the headline subscription drops the reviewer plan (matching
+    # the metered side). Still surface the with-reviewer figure, since you might
+    # keep that plan for interactive use even though this loop won't trigger it.
+    reviewer_plan = SUBSCRIPTION_PLANS_USD.get("reviewer", 0.0)
+    subscription_lines = [
+        "Subscription billing (flat plans)",
+        f"  monthly           {_money(est.subscription_monthly_usd)}"
+        "   (until plan limits; ~$0 marginal per run)",
+    ]
+    if not inputs.review_enabled and reviewer_plan:
+        subscription_lines.append(
+            f"  with reviewer     {_money(est.subscription_monthly_usd + reviewer_plan)}"
+            "   (review is off; add this only if you keep the reviewer plan for "
+            "interactive use)"
+        )
     lines = [
         "Autonomy loop cost estimate",
         f"  source            {source}",
@@ -403,9 +433,7 @@ def format_report(inputs: Inputs, est: Estimate, *, source: str) -> str:
         f"  runs/active day   {est.runs_per_active_day}{active_note}",
         f"  runs/month        {est.runs_per_month:,.0f}",
         "",
-        "Subscription billing (flat plans)",
-        f"  monthly           {_money(est.subscription_monthly_usd)}"
-        "   (until plan limits; ~$0 marginal per run)",
+        *subscription_lines,
         "",
         "Metered API billing (pay per token)",
         f"  per run           {_money(lo_run)} – {_money(hi_run)}",
