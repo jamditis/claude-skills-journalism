@@ -23,7 +23,7 @@ with an `index.md`. Larger bundles group concepts into subdirectories by subject
 
 ## Files
 
-- The bundle-root `index.md` carries `okf_version: "0.1"` in frontmatter — only there.
+- The bundle-root `index.md` carries `okf_version: "0.2"` in frontmatter — only there.
 - Per-directory `index.md`: a heading, an optional one-line preamble, then bullet
   navigation. No frontmatter. (Keep the preamble to one line — it orients, it doesn't narrate.)
 - `log.md` (optional, per directory): dated entries, newest first, no frontmatter.
@@ -33,6 +33,12 @@ with an `index.md`. Larger bundles group concepts into subdirectories by subject
 The validator enforces the frontmatter rules here — reserved files carry no frontmatter, and
 only the bundle-root `index.md` carries `okf_version` (and nothing else). The index/log body
 shapes above are recommendations for human readers, not validator-checked structure.
+
+The current format version is `0.2`. The validator accepts `0.1` and `0.2`, so a newer
+validator still reads an older bundle, and new scaffolds emit `0.2`. Adding allowed types is
+backward compatible and bumps the format version: a bundle using the newer types declares
+`0.2`, so an older validator reports a clear unsupported-version error instead of a misleading
+bad-type one.
 
 ## Concept frontmatter (required keys, all non-empty)
 

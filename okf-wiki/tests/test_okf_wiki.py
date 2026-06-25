@@ -82,7 +82,7 @@ def test_multi_section_scaffold_validates(tmp_path):
 def test_root_index_carries_okf_version(tmp_path):
     scaffold(tmp_path / "kb")
     root = (tmp_path / "kb" / "bundle" / "index.md").read_text()
-    assert 'okf_version: "0.1"' in root
+    assert 'okf_version: "0.2"' in root
 
 
 def test_refuses_nonempty_dir_without_force(tmp_path):
@@ -300,9 +300,20 @@ def test_root_index_missing_okf_version_fails(tmp_path):
 def test_root_index_unsupported_okf_version_fails(tmp_path):
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
-    (b / "index.md").write_text('---\nokf_version: "0.2"\n---\n# root\n', encoding="utf-8")
+    (b / "index.md").write_text('---\nokf_version: "0.9"\n---\n# root\n', encoding="utf-8")
     rc, out = validate(b)
     assert rc == 1 and "not supported" in out
+
+
+def test_root_index_legacy_version_validates(tmp_path):
+    # backward compat: a 0.1 bundle (e.g. the fleet atlas) still validates under the
+    # newer validator, which accepts both 0.1 and the current format version.
+    scaffold(tmp_path / "kb", "--no-validate")
+    root = tmp_path / "kb" / "bundle" / "index.md"
+    root.write_text(root.read_text().replace('okf_version: "0.2"', 'okf_version: "0.1"'),
+                    encoding="utf-8")
+    rc, out = validate(tmp_path / "kb" / "bundle")
+    assert rc == 0, out
 
 
 def build_federated_tree(root, members=("nodeA", "nodeB"), strip_member_markers=True):
