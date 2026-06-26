@@ -12,3 +12,7 @@ tags: [plugin, design]
 Generates self-contained HTML pages with Mermaid diagrams, responsive section
 navigation, KPI cards, slide decks, and zoom/pan controls, via eight commands.
 Adapted from nicobailon/visual-explainer with newsroom design sensibilities.
+
+## Skills
+
+- [visual-explainer](../skills/visual-explainer.md)

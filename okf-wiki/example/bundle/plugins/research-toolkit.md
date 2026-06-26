@@ -12,3 +12,12 @@ tags: [plugin, research]
 Six skills: academic writing, legal paywall-bypass strategies, web archiving,
 page monitoring and change detection, AI-enriched digital archives with entity
 extraction, and a curated free-API catalog with sunset-currency notes.
+
+## Skills
+
+- [academic-writing](../skills/academic-writing.md)
+- [content-access](../skills/content-access.md)
+- [digital-archive](../skills/digital-archive.md)
+- [free-apis-catalog](../skills/free-apis-catalog.md)
+- [page-monitoring](../skills/page-monitoring.md)
+- [web-archiving](../skills/web-archiving.md)
