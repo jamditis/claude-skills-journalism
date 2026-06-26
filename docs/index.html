@@ -382,6 +382,27 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 </a>
             </section>
 
+            <!-- Skill finder -->
+            <style>
+                .filtered-out { display: none !important; }
+                #skill-search-input::-webkit-search-cancel-button { -webkit-appearance: none; }
+            </style>
+            <section class="mb-20" id="skill-finder">
+                <div class="deckle-card-solid p-6 md:p-8">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+                        <h2 class="font-display text-2xl font-light italic">Find a skill</h2>
+                        <span class="section-label" id="finder-count">56 skills, 11 plugins</span>
+                    </div>
+                    <div class="relative">
+                        <i data-lucide="search" class="w-5 h-5 text-mist absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        <input id="skill-search-input" type="search" autocomplete="off" aria-label="Search skills and plugins"
+                            placeholder="Search skills and plugins — try &ldquo;verify&rdquo;, &ldquo;FOIA&rdquo;, &ldquo;accessibility&rdquo;  (press /)"
+                            class="w-full pl-12 pr-4 py-4 bg-white/50 border border-ink/15 rounded-lg font-sans text-base text-ink placeholder:text-mist/70 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition" />
+                    </div>
+                    <p id="skill-search-empty" class="text-sm text-mist mt-4 hidden">No skills or plugins match <span class="font-bold" id="skill-search-term"></span>. Try a broader term, or browse the categories below.</p>
+                </div>
+            </section>
+
             <!-- Plugins -->
             <section id="skills" class="reveal-section mb-32">
                 <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4" style="border-bottom: 2px solid rgba(61, 75, 64, 0.2); background: linear-gradient(90deg, rgba(61, 75, 64, 0.04) 0%, transparent 100%); padding: 1rem; margin-bottom: 2rem;">
@@ -1290,5 +1311,61 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         document.querySelectorAll('.reveal-section').forEach(section => {
             observer.observe(section);
         });
+    </script>
+
+    <script>
+        // Live skill/plugin finder: filters the plugin + skill cards as you type.
+        (function () {
+            const input = document.getElementById('skill-search-input');
+            if (!input) return;
+            const countEl = document.getElementById('finder-count');
+            const emptyEl = document.getElementById('skill-search-empty');
+            const termEl = document.getElementById('skill-search-term');
+            const defaultCount = countEl ? countEl.textContent : '';
+            const cards = Array.from(document.querySelectorAll('a.skill-card')).map(el => ({
+                el,
+                text: (el.textContent || '').toLowerCase().replace(/\s+/g, ' ')
+            }));
+            // Category sections that should collapse their header when empty.
+            const sections = Array.from(document.querySelectorAll('section.reveal-section'))
+                .filter(s => s.querySelector('a.skill-card'));
+            const total = cards.length;
+
+            // Light stemming so "verify" finds "verification", "archiving" finds
+            // "archive", etc. Strip a common trailing suffix to a >=3-char stem.
+            const stem = w => { const s = w.replace(/(ies|ing|ed|es|s|y)$/, ''); return s.length >= 3 ? s : w; };
+            function apply(raw) {
+                const q = raw.trim().toLowerCase();
+                const words = q.split(/\s+/).filter(Boolean);
+                let shown = 0;
+                cards.forEach(c => {
+                    const match = !q || words.every(w => c.text.includes(w) || c.text.includes(stem(w)));
+                    c.el.classList.toggle('filtered-out', !match);
+                    if (match) shown++;
+                });
+                sections.forEach(s => {
+                    const anyVisible = Array.from(s.querySelectorAll('a.skill-card'))
+                        .some(el => !el.classList.contains('filtered-out'));
+                    s.classList.toggle('filtered-out', !anyVisible);
+                });
+                if (countEl) countEl.textContent = q ? (shown + ' of ' + total + ' match') : defaultCount;
+                if (emptyEl) emptyEl.classList.toggle('hidden', !(q && shown === 0));
+                if (termEl) termEl.textContent = '“' + raw.trim() + '”';
+            }
+
+            let t;
+            input.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => apply(input.value), 80); });
+            document.addEventListener('keydown', (e) => {
+                const tag = (document.activeElement && document.activeElement.tagName) || '';
+                if (e.key === '/' && document.activeElement !== input && !/^(INPUT|TEXTAREA|SELECT)$/.test(tag)) {
+                    e.preventDefault();
+                    input.focus();
+                } else if (e.key === 'Escape' && document.activeElement === input) {
+                    input.value = '';
+                    apply('');
+                    input.blur();
+                }
+            });
+        })();
     </script></body>
 </html>
