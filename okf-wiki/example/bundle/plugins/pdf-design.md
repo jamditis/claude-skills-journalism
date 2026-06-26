@@ -11,3 +11,7 @@ tags: [plugin, design]
 
 A brand-variable PDF design system: budget tables and reusable blocks (stats
 strips, three-column, four-tile pillars, partner grids) for reports and proposals.
+
+## Skills
+
+- [pdf-design](../skills/pdf-design.md)

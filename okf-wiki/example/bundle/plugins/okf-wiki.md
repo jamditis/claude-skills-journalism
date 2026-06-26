@@ -12,3 +12,7 @@ tags: [plugin, productivity, okf]
 The skill that built this wiki. It scaffolds a conforming Open Knowledge Format
 bundle, validates it, and writes session-start hooks that orient Claude before it
 works. See [the OKF format](../systems/okf-format.md) and [the session hooks](../systems/session-hooks.md).
+
+## Skills
+
+- [okf-wiki](../skills/okf-wiki.md)

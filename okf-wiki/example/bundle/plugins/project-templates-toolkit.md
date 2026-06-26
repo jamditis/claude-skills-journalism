@@ -12,3 +12,9 @@ tags: [plugin, productivity]
 Three skills: a CLAUDE.md project-memory writer, a LESSONS.md retrospective
 writer, and a template-selector decision tree that picks the right starting
 template for the work at hand.
+
+## Skills
+
+- [project-memory](../skills/project-memory.md)
+- [project-retrospective](../skills/project-retrospective.md)
+- [template-selector](../skills/template-selector.md)

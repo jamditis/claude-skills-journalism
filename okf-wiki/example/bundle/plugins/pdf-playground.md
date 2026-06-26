@@ -12,3 +12,7 @@ tags: [plugin, design, productivity]
 Eight commands (`/proposal`, `/report`, `/onepager`, `/newsletter`, `/slides`,
 `/event`, `/preview`, `/update`) build branded documents with a live design
 control panel for colors, fonts, spacing, and sections.
+
+## Skills
+
+- [Document design](../skills/document-design.md)

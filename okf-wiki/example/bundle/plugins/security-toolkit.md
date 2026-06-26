@@ -12,3 +12,10 @@ tags: [plugin, security]
 Four skills (pre-deployment OWASP checklist, secure authentication, API
 hardening, npm/bun supply-chain hardening) and the `/security-toolkit:hotpatch`
 command for a sandboxed pre-install scan plus cooldown bypass.
+
+## Skills
+
+- [api-hardening](../skills/api-hardening.md)
+- [secure-auth](../skills/secure-auth.md)
+- [security-checklist](../skills/security-checklist.md)
+- [supply-chain-hardening](../skills/supply-chain-hardening.md)
