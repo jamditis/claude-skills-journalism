@@ -173,48 +173,63 @@ def strip_code(text: str) -> str:
     return "\n".join(out)
 
 
-def check_source_quoting(rel, raw_fm, errors):
-    """Enforce the SPEC 'source' quoting rule where YAML's comment stripping would
-    otherwise hide a violation.
+def _plain_scalar_dropped_comment(node, raw_fm):
+    """True if a YAML comment directly truncated this scalar's provenance.
 
-    In block style an unquoted element with an inline '#' is silently truncated:
-        source:
-          - issue #445      -> parses to "issue"; "#445" is dropped as a comment
-    No parse error fires, so the provenance is lost with the build still green. Flow
-    style is self-enforcing (the '#' comments out the closing ']', a parse error
-    caught earlier), so this scan targets block-style items. The trigger is YAML's
-    own comment rule: a '#' preceded by whitespace, with content before it. A bare
-    '#'-first item parses to null (caught by check_lists); 'issue#445' (no space) is a
-    valid string and left alone; a colon-space makes the item a mapping (also caught
-    by check_lists)."""
+    `node` is a scalar node from the parsed frontmatter and `raw_fm` the raw text it was
+    parsed from. Only a plain (unquoted) scalar can lose data: a quoted or block scalar
+    (node.style set to ', ", |, or >) keeps a '#' as string content. For a plain scalar,
+    YAML stops the value at the space before an inline '#', so the comment shows up in the
+    raw text immediately after the scalar's end mark, on the same line. That is exactly the
+    silent-truncation case (`issue #445` -> "issue") the SPEC quoting rule guards against;
+    `issue#445` (no space) is one scalar and a '#' on a later line is a standalone comment,
+    and neither trips this."""
+    if node.style is not None:
+        return False
+    j = node.end_mark.index
+    while j < len(raw_fm) and raw_fm[j] in (" ", "\t"):
+        j += 1
+    return j < len(raw_fm) and raw_fm[j] == "#"
+
+
+def check_source_quoting(rel, raw_fm, errors):
+    """Enforce the SPEC 'source' quoting rule, where YAML's comment stripping would
+    otherwise silently drop part of a provenance pointer.
+
+    Quoting source elements is a hard SPEC rule, but YAML drops an unquoted inline '#'
+    comment with no error: `- issue #445` parses to "issue", losing "#445". The parsed
+    value alone cannot reveal the loss, so this re-parses the frontmatter into its node
+    tree (which carries source position marks) and, for every top-level `source` element,
+    checks whether a comment directly truncated a plain scalar (see
+    _plain_scalar_dropped_comment). Delegating the lexing to YAML covers every shape —
+    block items, single- and multi-line flow lists, wrapped scalars, quoted strings with
+    escapes, anchors/tags, and block scalars — without re-implementing the parser. It is
+    scoped to the top-level `source` key only (a nested `source:` under other metadata is
+    not the OKF provenance list) and inspects every top-level occurrence, since YAML keeps
+    the last of duplicate keys. A real parse error is reported by the schema check."""
     if not raw_fm:
         return
-    in_block = False
-    source_indent = 0
-    for line in raw_fm.splitlines():
-        m = re.match(r"^(\s*)source\s*:(.*)$", line)
-        if m:
-            rest = m.group(2).strip()
-            # block style only when nothing (or just a comment) follows the colon; an
-            # inline flow list or scalar is handled by the YAML parse step.
-            in_block = rest == "" or rest.startswith("#")
-            source_indent = len(m.group(1))
+    try:
+        root = yaml.compose(raw_fm, Loader=yaml.SafeLoader)
+    except yaml.YAMLError:
+        return
+    if not isinstance(root, yaml.MappingNode):
+        return
+    for key_node, val_node in root.value:
+        if not (isinstance(key_node, yaml.ScalarNode) and key_node.value == "source"):
             continue
-        if not in_block:
-            continue
-        stripped = line.strip()
-        if stripped == "":
-            continue
-        indent = len(line) - len(line.lstrip())
-        if not stripped.startswith("-") and indent <= source_indent:
-            in_block = False  # dedented to a sibling key -> the source block ended
-            continue
-        if stripped.startswith("-"):
-            value = stripped[1:].strip()
-            if value[:1] not in ("'", '"') and re.search(r"\S\s+#", value):
-                errors.append(
-                    f"{rel}: 'source' element {value!r} has an unquoted '#' that YAML "
-                    f"reads as a comment, dropping the rest — quote it: - \"{value}\"")
+        if isinstance(val_node, yaml.SequenceNode):
+            scalars = [n for n in val_node.value if isinstance(n, yaml.ScalarNode)]
+        elif isinstance(val_node, yaml.ScalarNode):
+            scalars = [val_node]
+        else:
+            scalars = []
+        if any(_plain_scalar_dropped_comment(n, raw_fm) for n in scalars):
+            errors.append(
+                f"{rel}: a top-level 'source' element has an unquoted '#' that YAML "
+                f"reads as a comment, dropping the rest of the pointer — quote each "
+                f"source element that contains a '#'")
+            return  # one report per concept is enough
 
 
 def check_dates(rel, fm, errors):

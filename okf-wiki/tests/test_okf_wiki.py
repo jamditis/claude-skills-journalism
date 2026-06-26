@@ -1074,6 +1074,183 @@ def test_source_flow_unquoted_hash_still_fails(tmp_path):
     assert rc == 1, out
 
 
+# --- source-quoting hardening: cloud-review edge cases from #166 -------------
+
+def test_source_multiline_flow_unquoted_hash_fails(tmp_path):
+    # a flow list can close on a later line, so the '#' does NOT comment out the ']' and
+    # YAML parses cleanly while dropping "#445". The raw scan must still catch it.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source('source: ["README.md", issue #445\n  ]'))
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "source" in out and "#" in out
+
+
+def test_source_wrapped_scalar_unquoted_hash_fails(tmp_path):
+    # a block item that wraps onto a continuation line is one plain scalar; YAML strips a
+    # '#' comment on the continuation too. The scan must inspect continuation lines.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source('source:\n  - issue\n    tracker #445'))
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "source" in out and "#" in out
+
+
+def test_source_nested_key_not_flagged(tmp_path):
+    # the scan must target only the top-level `source` provenance list. A nested
+    # `source:` inside other (allowed) metadata is not the OKF source and must not make
+    # a bundle with a valid top-level source fail.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source(
+        'source: ["README.md"]\nextra:\n  source:\n    - issue #445'))
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_source_trailing_comment_after_complete_flow_ok(tmp_path):
+    # a YAML comment after a COMPLETE value drops no data, so it must not be flagged:
+    # `source: ["README.md"] # why` keeps ["README.md"].
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source('source: ["README.md"] # provenance'))
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_source_trailing_comment_after_quoted_block_item_ok(tmp_path):
+    # likewise a comment after a quoted block item is benign (the element is complete).
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source('source:\n  - "README.md" # note'))
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_source_duplicate_key_later_unquoted_hash_fails(tmp_path):
+    # YAML keeps the LAST of duplicate keys, so a valid first source followed by a later
+    # source that drops "#445" must still fail — scan every top-level source occurrence.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source(
+        'source: ["README.md"]\nsource:\n  - issue #445'))
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "source" in out and "#" in out
+
+
+def test_source_unquoted_with_apostrophe_then_hash_fails(tmp_path):
+    # a quote mid plain-scalar (the apostrophe in "Joe's") is literal YAML content, so
+    # `- Joe's issue #445` is an unquoted scalar that still drops "#445" — the scan must
+    # not mistake the apostrophe for the start of a quoted string and skip the comment.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source("source:\n  - Joe's issue #445"))
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "source" in out and "#" in out
+
+
+def test_source_block_item_with_comma_then_hash_fails(tmp_path):
+    # a comma is a flow separator only inside `[...]`; in a block scalar it is literal
+    # text, so `- report, #445` keeps "report," and still drops "#445". The scan must
+    # not treat the comma as a completed value the way it does inside flow.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source("source:\n  - report, #445"))
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "source" in out and "#" in out
+
+
+def test_source_single_quoted_doubled_apostrophe_passes(tmp_path):
+    # '' is YAML's escape for a literal apostrophe inside a single-quoted string, so
+    # 'Joe''s issue #445' keeps "#445" inside the (valid, complete) string. The scan must
+    # not close the string on the first quote of the pair and reject a correct pointer.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source("source: ['Joe''s issue #445']"))
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_source_multiline_quoted_scalar_passes(tmp_path):
+    # a quoted scalar may wrap onto the next line; YAML folds it and keeps "#445" inside
+    # the string. The scan must carry quote state across the line break, not treat the
+    # continuation as plain text and reject it.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source('source: ["issue\n  tracker #445"]'))
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_source_indented_frontmatter_unquoted_hash_fails(tmp_path):
+    # a consistently indented frontmatter mapping is valid YAML with top-level keys off
+    # column 0. The scan must anchor to the frontmatter's base indent so it still finds
+    # the real top-level `source` (and still drops its truncated provenance).
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, (
+        "---\n"
+        "  type: Process\n"
+        "  title: t\n"
+        "  description: d\n"
+        "  source:\n"
+        "    - issue #445\n"
+        '  verified: "2026-06-23"\n'
+        '  timestamp: "2026-06-23"\n'
+        '  tags: ["x"]\n'
+        "---\n# t\n"))
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "source" in out and "#" in out
+
+
+def test_source_comment_line_before_unquoted_item_fails(tmp_path):
+    # a benign comment in the source value must not stop the scan: `source: # note` then
+    # `- issue #445` still drops "#445" from the real (later) item.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source("source: # note\n  - issue #445"))
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "source" in out and "#" in out
+
+
+def test_source_flow_wrapped_at_base_indent_fails(tmp_path):
+    # a flow list may wrap with no extra indentation; YAML still parses the continuation,
+    # so `source: [` then a column-0 `"README.md", issue #445` still drops "#445".
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source('source: [\n"README.md", issue #445\n]'))
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "source" in out and "#" in out
+
+
+def test_source_block_scalar_with_hash_passes(tmp_path):
+    # a literal/folded block scalar keeps '#' as string content, not a comment, so a
+    # source written that way is valid and must not be flagged.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source("source:\n  - |\n    issue #445"))
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_source_anchored_quoted_value_passes(tmp_path):
+    # a YAML anchor/tag before a quoted value still protects the '#' inside the string;
+    # the scan must not read the anchor as plain content and reject the quoted pointer.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, _concept_with_source('source: [&p "issue #445"]'))
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
 # --- uppercase .md extension handling (#150 sub-item 2) ----------------------
 
 def test_uppercase_md_file_rejected(tmp_path):
