@@ -25,6 +25,48 @@ in `spec/SPEC.md` (in this skill's directory) — read it before changing struct
 - They want docs structured as one-concept-per-file with provenance, not prose pages.
 - They want to "initialize OKF" in a repo, optionally publishing into its GitHub wiki.
 
+## Start here: scope the wiki with the user
+
+Before you scaffold anything, settle four things with the user. They shape what gets created and
+how it is published, and they are awkward to retrofit once concepts exist. Ask with `AskUserQuestion`
+rather than in prose, in two steps: the first three questions in one call, then the publish question
+as a follow-up call only if the audience came back public or both (it does not apply to an
+internal-only wiki, and its relevant options depend on that answer, so it cannot share the first
+batch). Infer the title from the repo or project and confirm it. Skip any question the user already
+answered in their request — do not re-ask what they have told you.
+
+1. **Audience** — who reads this wiki? This answer sets the others:
+   - **Internal (agents and teammates):** the orientation hooks earn their keep, so keep them on.
+     The bundle may hold infrastructure detail, so it usually lives in a private repo. The in-repo
+     `bundle/` is the source of truth.
+   - **Public (people browsing):** readability and secret-scrubbing come first; the hooks matter
+     less, since people read it and agents do not. Plan a published view (see Publish below).
+   - **Both:** the in-repo `bundle/` is the source of truth with hooks on for agents, plus a
+     published view for people. Default here when the user is unsure.
+2. **Title and sections** — the knowledge-base title (infer it, then confirm) and the starting
+   sections. Offer sections as a use-case preset, not a blank prompt:
+   - Newsroom institutional memory: `people, orgs, sources, decisions, beats`
+   - Research atlas: `concepts, sources, methods, findings`
+   - Infrastructure or fleet map: `machines, services, networks, credentials, processes`
+   - Decision log: `decisions, context, events`
+   The chosen title and list feed `--title` and `--sections` below; the user can edit the list.
+3. **Populate now or later** — author concepts now from existing material (a repo, docs, notes, or a
+   URL: gather it and enter the authoring loop after scaffolding), or scaffold an empty tree the user
+   fills in later.
+4. **Publish target** — a follow-up `AskUserQuestion` call, made only after the audience comes back
+   public or both (skip it entirely for an internal-only wiki):
+   - **In-repo bundle only (default):** the validator and relative links work directly, with no
+     extra surface to maintain. Right for most wikis.
+   - **GitHub wiki:** an optional reading surface. Advanced and manual — see "Optional: publish into
+     a GitHub wiki" below, bootstrapped with `scripts/gh-wiki-bootstrap.py`.
+   - **GitHub Pages:** a browsable site rendered from the bundle. Not built yet — treat it as a
+     goal and keep the in-repo bundle as the source of truth.
+
+Carry the answers into the scaffold command (the title and sections, plus `--no-hooks` if the user
+opts out of the hooks for a public-only wiki) and into the populate step. The audience answer is
+also the visibility decision the "Before finishing" section asks you to make deliberately — you are
+making it here, up front, where it can steer the rest of the setup.
+
 ## What gets created
 
 `scripts/scaffold.py` writes a project that passes its own validator by construction:
@@ -55,8 +97,9 @@ The `.claude/` hooks sit outside `bundle/`, so they never trip the concept check
 `${CLAUDE_SKILL_DIR}` below is this skill's own directory (the folder holding this
 `SKILL.md`). Claude Code substitutes it with the real absolute path before you run the
 command, so it works regardless of the current directory. On Windows, use `python` instead
-of `python3` (stock Windows has no `python3`). Scaffold into a new directory; it validates
-automatically at the end:
+of `python3` (stock Windows has no `python3`). The `--title` and `--sections` come from the
+onboarding answers above, and `--no-hooks` only if the user opted out. Scaffold into a new
+directory; it validates automatically at the end:
 
 ```bash
 python3 "${CLAUDE_SKILL_DIR}/scripts/scaffold.py" ./my-knowledge-base \
@@ -196,5 +239,5 @@ automatic bundle-to-wiki sync is not built yet.)
 ## Before finishing
 
 - Run the validator and confirm it exits 0.
-- Decide visibility deliberately: a bundle documenting real infrastructure is usually
-  internal. OKF takes no position; you must.
+- Confirm the visibility you set during onboarding still fits what got authored: a bundle that
+  ended up documenting real infrastructure is usually internal. OKF takes no position; you must.
