@@ -16,13 +16,15 @@ For a newsroom the stakes are higher than tidiness. Bylines and authorship are a
 
 On a `Bash` tool call whose command writes a message into the project record:
 
-- `git commit` (including `git commit -m`, `git commit -am`, and a `git commit` chained after `&&`), checked against the commit message.
-- `gh pr create`, checked against the title and body.
-- `gh pr comment`, `gh issue comment`, and `gh pr review`, checked against the comment or review body.
+- `git commit`, checked against the commit message whether it is inline (`git commit -m`, `git commit -am`) or read from a file the command names (`git commit -F <file>`, `git commit --file <file>`), and including a `git commit` chained after `&&`.
+- `gh pr create`, checked against the body (inline `--body` or a named `--body-file <file>`). The title is checked only when the command carries one with `--title`: with `--body-file` or `--body` and no `--title`, `gh` prompts for the title interactively after the hook runs, so it is not seen.
+- `gh pr comment`, `gh issue comment`, and `gh pr review`, checked against the comment or review body, including a `--body-file <file>` body.
 
-Anything else passes straight through. The check reads the message text the command is about to submit, not the diff.
+Anything else passes straight through. The check reads the message text the command submits, not the diff: inline, or from a file the command names by path. A file argument of `-` (`git commit -F -`, `gh pr create --body-file -`) reads the message from stdin, which a pre-command hook cannot inspect, so those forms are not checked.
 
 Because the hook binds to the `Bash` tool, it only sees these commands when they run as shell calls. A commit, PR, or comment made through a non-Bash path (an IDE's git integration, the GitHub web UI, or an MCP GitHub connector) does not pass through it, so it guards the command-line workflow rather than every write to the record. The same holds for a message posted through a raw `gh api` call (for example a review-thread reply to `repos/{owner}/{repo}/pulls/{n}/comments/{id}/replies`): the match keys on the `git` and `gh` subcommands listed above, not on arbitrary API URLs.
+
+Two command forms carry no message text for a pre-command check to read, so they pass through: a bare `git commit` that opens an editor for the message (no `-m` or `-F`), and `gh pr create --fill` or `--fill-verbose`, which assemble the title and body from the branch's commits. A filled body is only as clean as those commits. The hook screens the commit messages it can read, but a `--fill` body can also draw on commits it never screened: ones that predate its install, ones made through a path it does not watch (an IDE, the web UI, a connector), and even command-line commits whose message it could not read (a bare-editor commit, or `-F -` from stdin). So `--fill` is not a guarantee that the resulting body was screened.
 
 ## What it flags
 
