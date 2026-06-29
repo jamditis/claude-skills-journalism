@@ -24,7 +24,7 @@ claude-skills-journalism/
 ├── README.md                    # User documentation
 ├── LICENSE
 │
-├── hooks/                       # Automated workflow checks (16 hooks)
+├── hooks/                       # Automated workflow checks (17 hooks)
 │   ├── ap-style-check.md        # Writing: AP Style violations
 │   ├── ai-slop-detector.md      # Writing: AI patterns
 │   ├── accessibility-check.md   # Writing: Alt text, headings
@@ -40,7 +40,8 @@ claude-skills-journalism/
 │   ├── one-way-door-check.md    # Development: Block irreversible decisions
 │   ├── bug-report-detector.md   # Development: Detect bug reports
 │   ├── enforce-test-first.md    # Development: Enforce test-first workflow
-│   └── pre-commit-review.md     # Development: Review staged diff before commit
+│   ├── pre-commit-review.md     # Development: Review staged diff before commit
+│   └── no-ai-attribution.md     # Development: Block AI attribution in commits, PRs, and comments
 │
 ├── # Plugin: journalism-core (14 skills) — registered in marketplace.json
 ├── journalism-core/
@@ -190,7 +191,7 @@ Instructions, templates, and workflows.
 
 ## Hooks
 
-Hooks run automatically at specific workflow events. Most are **non-blocking warnings**, but `one-way-door-check` (shell hook, exits 2) and `enforce-test-first` (prompt-based) block intentionally — see each hook's "Hook behavior" section for details.
+Hooks run automatically at specific workflow events. Most are **non-blocking warnings**, but `one-way-door-check` (shell hook, exits 2), `enforce-test-first` (prompt-based), and `no-ai-attribution` (PreToolUse deny) block intentionally. See each hook's "Hook behavior" section for details.
 
 ### Writing quality
 | Hook | Event | Purpose |
@@ -227,6 +228,7 @@ Hooks run automatically at specific workflow events. Most are **non-blocking war
 | bug-report-detector | UserPromptSubmit | Detect bug reports |
 | enforce-test-first | PreToolUse(Edit,Write) | Block source edits until test written |
 | pre-commit-review | PreToolUse(Bash) | Surface staged diff for review; flag guardrail deletions |
+| no-ai-attribution | PreToolUse(Bash) | Block AI authorship credit in commits, PR bodies, and comments |
 
 ## Installation
 

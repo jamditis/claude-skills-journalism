@@ -88,9 +88,9 @@ Personal site: https://jamditis.com
 - finishing-a-development-branch — decide how to land completed work
 - using-git-worktrees — isolate feature work from current workspace
 
-## Hooks (16 workflow hooks)
+## Hooks (17 workflow hooks)
 
-Hooks run automatically at specific workflow events. Most are non-blocking warnings; two block intentionally — `one-way-door-check` exits 2 to prevent irreversible architectural decisions, and `enforce-test-first` blocks source edits until a failing test exists.
+Hooks run automatically at specific workflow events. Most are non-blocking warnings; three block intentionally: `one-way-door-check` exits 2 to prevent irreversible architectural decisions, `enforce-test-first` blocks source edits until a failing test exists, and `no-ai-attribution` denies a commit, PR, or comment that carries AI authorship credit.
 
 ### Writing quality
 - ap-style-check — flags AP Style violations on write/edit
@@ -117,6 +117,7 @@ Hooks run automatically at specific workflow events. Most are non-blocking warni
 - bug-report-detector — detects when user is describing a bug
 - enforce-test-first — blocks source edits until a test is written
 - pre-commit-review — surfaces the staged diff for review before a commit and flags removed guardrails
+- no-ai-attribution — blocks AI authorship credit in commits, PR bodies, and comments
 
 ## Plugins
 
