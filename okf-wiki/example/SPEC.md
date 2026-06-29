@@ -51,9 +51,22 @@ bad-type one.
 | `title` | the concept name |
 | `description` | one line |
 | `source` | YAML list of provenance pointers (paths, commands, URLs, events) |
-| `verified` | ISO date `YYYY-MM-DD` the concept was last checked against reality |
+| `verified` | ISO date `YYYY-MM-DD` the fact was last confirmed true (see note below) |
 | `timestamp` | ISO date authored/updated |
 | `tags` | YAML list |
+
+`verified` note: it records when the fact was last confirmed true, which is not always today. A
+fact you re-checked against reality now is confirmed today, as is one the user is the authority for
+— a decision, preference, or intent they state directly. But a fact the user is recalling about
+external or system state is a source claim, not a re-check: date it to when that state was last
+checked or to the recollection's own date, not today. A claim copied from a dated source without
+re-checking carries that source's date. A fact taken from an undated record you cannot re-confirm (a
+memory file, an old conversation) carries the oldest date you can evidence — file timestamp,
+introducing commit, or the date it was said — never today; if no date can be evidenced, the fact is
+not yet verifiable, so find a datable source or leave it out. When the date is uncertain, round it
+down: an older `verified` reads as "may be stale," today reads as "just confirmed." The date is the
+contract; a caveat in the concept body does not undo it, because the validator and tools read only
+the date.
 
 `source` quoting rule (hard): QUOTE every element of the `source` list. Source pointers
 routinely carry YAML-significant characters — a `#` (e.g. `"issue #445"`) starts a comment

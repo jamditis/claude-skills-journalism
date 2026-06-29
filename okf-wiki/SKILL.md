@@ -97,10 +97,23 @@ mechanical transform. So you (Claude) author the concepts directly, in this loop
      Org, Source. Plus Reference (the catch-all). The set is closed; an unlisted type fails.
    - `description` is one line. `source` — quote every element — points at where the fact
      actually came from (the origin file path, URL, command, or event), not at this skill.
-   - Set `timestamp` to today. Set `verified` to today only for a fact you actually re-checked
-     now; for a claim copied from the source without re-checking, use the date it was last known
-     true (e.g. the source's own date), not today — stamping today makes stale facts look freshly
-     verified.
+   - Set `timestamp` to today. `verified` is the date the fact was last confirmed true — set it by
+     how you came to know it, not reflexively to today:
+     - You re-checked it against reality now, or the user is the authority for it (a decision,
+       preference, or intent they state in this session): today.
+     - The user is recalling external or system state (a spec, a path, a config): their memory is a
+       source claim, not a re-check, so date it to when that state was last checked or to the
+       recollection's own date — not today just because it came up now.
+     - It was copied from a dated source without re-checking: the date it was last known true (the
+       source's own date), not today.
+     - It came from an undated record you cannot re-confirm (a memory file, an old conversation):
+       the oldest date you can evidence — file timestamp, introducing commit, or the date it was
+       said — never today. If you cannot evidence any date at all, it is not yet a verifiable fact;
+       find a datable source or leave the concept out.
+     When the date is uncertain, round it down: an older `verified` correctly reads as "may be
+     stale, re-check," while today reads as "just confirmed." The frontmatter date is the contract;
+     a caveat in the body does not undo an overstated value, because the validator and tools read
+     only the date.
    - Strip secret values as you go: a credential concept names the key and its retrieval path,
      never the value. The validator fails the build on a leaked secret.
 4. **Place and link.** Put each concept in the right section (create sections as needed), add a
@@ -141,8 +154,10 @@ Full contract in `spec/SPEC.md`. The load-bearing rules:
   (domain-neutral); or Reference (catch-all).
 - **Quote every `source` element** — source pointers carry `#` and `: ` which break YAML
   if unquoted. `source: ["README.md", "issue #445"]`.
-- **`verified`** is the date the fact was last checked against reality; **`timestamp`** is
-  when the concept was authored/updated. Both ISO `YYYY-MM-DD`.
+- **`verified`** is the date the fact was last confirmed true — a re-check against reality, or the
+  user stating a fact they are the authority for (a decision, a preference); a fact they merely
+  recall about external state is a source claim, not a re-check. **`timestamp`** is when the concept
+  was authored/updated. Both ISO `YYYY-MM-DD`. See the authoring loop above for the full date rules.
 - **No secret values, ever.** A credential concept documents the key name and retrieval
   path, never the value. The validator fails the build on a leaked secret.
 - **`index.md` and `log.md` are reserved** — no frontmatter (except the bundle-root
