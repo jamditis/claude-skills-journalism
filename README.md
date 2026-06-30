@@ -160,7 +160,7 @@ These four skills ship together as the [security-toolkit](./security-toolkit/) p
 
 ## Hooks
 
-Hooks are automated checks that run at specific points in your workflow. Most are **non-blocking warnings**, but two — `one-way-door-check` and `enforce-test-first` — block intentionally until you resolve them.
+Hooks are automated checks that run at specific points in your workflow. Most are **non-blocking warnings**, but three block intentionally until you resolve them: `one-way-door-check`, `enforce-test-first`, and `no-ai-attribution`.
 
 ### Writing quality hooks
 
@@ -202,6 +202,7 @@ Hooks are automated checks that run at specific points in your workflow. Most ar
 | [bug-report-detector](./hooks/bug-report-detector.md) | UserPromptSubmit | Detect bug reports and remind to follow test-first workflow |
 | [enforce-test-first](./hooks/enforce-test-first.md) | PreToolUse | Block source code edits until a test file has been written |
 | [pre-commit-review](./hooks/pre-commit-review.md) | PreToolUse | Surface the staged diff for line-by-line review before a commit, and flag deletions of safety-critical guardrails |
+| [no-ai-attribution](./hooks/no-ai-attribution.md) | PreToolUse | Block AI authorship credit in commits, PR bodies, and comments before they land |
 
 ## Skill structure
 
