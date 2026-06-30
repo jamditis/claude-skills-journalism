@@ -3,8 +3,8 @@ type: Reference
 title: "the hooks catalog"
 description: "Seventeen standalone workflow hooks under hooks/, grouped by purpose; three block intentionally."
 source: ["hooks/", "CLAUDE.md"]
-verified: 2026-06-26
-timestamp: 2026-06-26
+verified: 2026-06-30
+timestamp: 2026-06-30
 tags: [hooks, catalog]
 ---
 # the hooks catalog

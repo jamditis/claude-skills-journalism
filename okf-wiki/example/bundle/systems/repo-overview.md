@@ -3,8 +3,8 @@ type: Repo
 title: "claude-skills-journalism"
 description: "A Claude Code plugin marketplace: 11 plugins, 56 skills, 17 hooks."
 source: ["README.md", "CLAUDE.md", ".claude-plugin/marketplace.json"]
-verified: 2026-06-23
-timestamp: 2026-06-23
+verified: 2026-06-30
+timestamp: 2026-06-30
 tags: [repo, overview]
 ---
 # claude-skills-journalism
