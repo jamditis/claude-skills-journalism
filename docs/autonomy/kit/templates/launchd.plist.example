@@ -12,8 +12,9 @@
   wake. The block below covers 7am-7pm; add or remove <dict>s to change the
   cadence (match it to schedule.wake.cron in your config.yaml).
 
-  macOS note: the wake script must call `gtimeout --foreground`, not `timeout`.
-  Install GNU coreutils first:  brew install coreutils
+  macOS note: the wake script must run `gtimeout` (GNU coreutils) in foreground
+  mode, not plain `timeout`, so the kill signal reaches the agent and the log
+  flushes before it dies. Install coreutils first:  brew install coreutils
 
   Untested as of this version. The Linux path is the one that's been run end to
   end; this plist is reasoned from the same design but not yet verified. Load it,
