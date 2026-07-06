@@ -342,9 +342,17 @@ class FOIARequest:
 
     @property
     def statutory_deadline(self) -> date:
-        """Federal FOIA: 20 business days from submission."""
-        # Simplified - should account for business days
-        return self.date_submitted + timedelta(days=28)
+        """Federal FOIA: 20 business days from submission.
+
+        Counts weekdays only. Federal holidays are not excluded, so treat
+        the result as the earliest possible due date, not a guarantee.
+        """
+        remaining, deadline = 20, self.date_submitted
+        while remaining:
+            deadline += timedelta(days=1)
+            if deadline.weekday() < 5:  # Mon-Fri
+                remaining -= 1
+        return deadline
 
     @property
     def is_overdue(self) -> bool:
