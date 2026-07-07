@@ -298,6 +298,8 @@ from datetime import date, timedelta
 from enum import Enum
 from typing import Optional
 
+import holidays  # pip install holidays
+
 class RequestStatus(Enum):
     DRAFTED = "drafted"
     SUBMITTED = "submitted"
@@ -342,9 +344,21 @@ class FOIARequest:
 
     @property
     def statutory_deadline(self) -> date:
-        """Federal FOIA: 20 business days from submission."""
-        # Simplified - should account for business days
-        return self.date_submitted + timedelta(days=28)
+        """Federal FOIA: 20 business days from submission.
+
+        Business days exclude weekends and legal federal holidays, per
+        5 U.S.C. 552(a)(6)(A)(i). The count starts the day after submission.
+        holidays.US() covers only nationwide federal holidays and expands to
+        the queried year on lookup, so windows crossing into a new year (e.g.
+        late December) still exclude the right days.
+        """
+        us_holidays = holidays.US()
+        remaining, deadline = 20, self.date_submitted
+        while remaining:
+            deadline += timedelta(days=1)
+            if deadline.weekday() < 5 and deadline not in us_holidays:  # Mon-Fri, non-holiday
+                remaining -= 1
+        return deadline
 
     @property
     def is_overdue(self) -> bool:
