@@ -382,6 +382,61 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 </a>
             </section>
 
+            <!-- Field notes -->
+            <style>
+              .fn-stamp{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+                border:2px solid #3f6b4f;color:#2b4d38;background:#e7ede2;
+                box-shadow:inset 0 0 0 4px #e7ede2, inset 0 0 0 5px #3f6b4f;
+                padding:14px 18px;transform:rotate(-4deg);border-radius:2px;flex-shrink:0}
+              .fn-stamp b{font-size:.74rem;font-weight:700;letter-spacing:.1em;line-height:1.25;text-transform:uppercase}
+              .fn-stamp span{font-size:.56rem;letter-spacing:.14em;color:#566a5b;margin-top:5px;text-transform:uppercase}
+              .fn-stamp .rule{width:48px;height:1px;background:#3f6b4f;margin:7px 0;opacity:.6}
+              .fn-stamp .yr{font-size:.62rem;font-weight:700;color:#3f6b4f;letter-spacing:.2em;margin-top:6px}
+              .fn-reeds{position:absolute;bottom:0;right:0;height:118%;width:auto;opacity:.13;pointer-events:none}
+              @media (max-width:767px){ .fn-stamp{display:none} }
+            </style>
+            <section class="reveal-section mb-32">
+                <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4" style="border-bottom: 2px solid rgba(63,107,79,0.28); background: linear-gradient(90deg, rgba(63,107,79,0.05) 0%, transparent 100%); padding: 1rem; margin-bottom: 2rem;">
+                    <h2 class="font-display text-4xl font-light italic">Field notes</h2>
+                    <span class="section-label">Writing &amp; experiments</span>
+                </div>
+
+                <a href="https://codex.amditis.tech/" target="_blank" rel="noopener noreferrer" class="block group">
+                    <div class="relative overflow-hidden rounded-2xl" style="background: linear-gradient(135deg, rgba(63,107,79,0.13) 0%, rgba(231,237,226,0.66) 52%, rgba(240,226,211,0.5) 100%); border: 2px solid rgba(63,107,79,0.32);">
+                        <svg class="fn-reeds" viewBox="0 0 240 460" preserveAspectRatio="xMaxYMax meet" aria-hidden="true" fill="none" stroke="#3f6b4f" stroke-linecap="round">
+                            <g transform="translate(150 0)">
+                                <path d="M35 460 C32 330 33 190 35 52" stroke-width="3.4"/>
+                                <path d="M35 300 C11 256 9 182 27 130" stroke-width="2.4"/>
+                                <path d="M35 322 C59 278 61 208 43 158" stroke-width="2.4"/>
+                                <rect x="30.5" y="8" width="9" height="44" rx="4.5" fill="#7a4a22" stroke="none"/>
+                            </g>
+                            <g transform="translate(90 46)" stroke="#2b4d38">
+                                <path d="M35 460 C32 330 33 190 35 52" stroke-width="3.4"/>
+                                <path d="M35 300 C11 256 9 182 27 130" stroke-width="2.4"/>
+                                <path d="M35 322 C59 278 61 208 43 158" stroke-width="2.4"/>
+                                <rect x="30.5" y="8" width="9" height="44" rx="4.5" fill="#7a4a22" stroke="none"/>
+                            </g>
+                        </svg>
+                        <div class="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center gap-8 md:gap-12">
+                            <div class="flex-1">
+                                <div class="inline-block px-3 py-1 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase mb-4" style="background: rgba(63,107,79,0.15); color:#2b4d38;">Field guide &middot; 2026</div>
+                                <h3 class="font-display text-3xl md:text-4xl font-black leading-tight mb-3" style="color:#22423a;">The Codex review setup I run.</h3>
+                                <p class="text-base md:text-lg max-w-xl" style="color:#41544a;">How I set up OpenAI's Codex for code review, how I use it day to day, and the token math behind routing the heavy work to it. A two-audience field guide: the exact command for engineers, the plain version for everyone.</p>
+                            </div>
+                            <div class="flex-shrink-0 flex items-center gap-6 md:gap-8">
+                                <div class="fn-stamp" aria-hidden="true">
+                                    <b>Field-<br>tested</b>
+                                    <span class="rule"></span>
+                                    <span>In daily<br>use</span>
+                                    <span class="yr">2026</span>
+                                </div>
+                                <span class="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-lg" style="background:#2b4d38; color:#fff;">Read the field guide <span class="group-hover:translate-x-1 transition-transform">&rarr;</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </section>
+
             <!-- Skill finder -->
             <style>
                 .filtered-out { display: none !important; }
