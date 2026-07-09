@@ -238,6 +238,20 @@ def test_force_preserve_no_pyyaml_warning_with_include(tmp_path):
     assert "does not list PyYAML" not in out
 
 
+def test_force_preserve_warns_with_constraint_file_and_no_pyyaml(tmp_path):
+    # A "-c constraints.txt" only pins versions of packages installed elsewhere; unlike an
+    # include it cannot supply a missing package, so a preserved file that carries only a
+    # constraint and no PyYAML declaration must still warn. Guards against treating -c as an
+    # include and silently suppressing the note (pip: -c "Constrain versions", not install).
+    target = tmp_path / "kb"
+    scaffold(target)
+    (target / "requirements.txt").write_text("-c constraints.txt\nrequests\n", encoding="utf-8")
+    rc, out = scaffold(target, "--force")
+    assert rc == 0, out
+    assert "does not list PyYAML" in out
+    assert "PyYAML>=5.1" in out
+
+
 @pytest.mark.parametrize("line,expected", [
     ("PyYAML>=5.1", "pyyaml"),              # version specifier stripped, lowercased
     ("pyyaml==6.0.1  # pinned", "pyyaml"),  # pin and inline comment stripped

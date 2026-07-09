@@ -343,18 +343,20 @@ def _canonical_req_name(line: str) -> str | None:
 
 def _preserved_requirements_lacks_pyyaml(path: Path) -> bool:
     """True only when we can say with confidence that a preserved requirements.txt does
-    not declare PyYAML: it is readable, no line names PyYAML, and it carries no include,
-    constraint, or editable directive (-r, -c, -e) that could pull PyYAML from a file we
-    do not read. An unreadable file or such a directive returns False, so the targeted
-    warning fires only when the gap is certain and never nags a user who did declare it."""
+    not declare PyYAML: it is readable, no line names PyYAML, and it carries no include or
+    editable directive (-r, -e) that could pull PyYAML from a file we do not read. An
+    unreadable file or such a directive returns False, so the targeted warning fires only
+    when the gap is certain and never nags a user who did declare it. A constraint file
+    (-c/--constraint) only pins versions of packages installed elsewhere and cannot supply
+    a missing one, so it does not suppress the note."""
     try:
         text = path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError):
         return False
     for raw in text.splitlines():
         s = raw.strip()
-        if s.startswith(("-r", "--requirement", "-c", "--constraint", "-e", "--editable")):
-            return False  # PyYAML may live in the included/constraint/editable target
+        if s.startswith(("-r", "--requirement", "-e", "--editable")):
+            return False  # PyYAML may live in the included (-r) or editable (-e) target
         if _canonical_req_name(raw) == "pyyaml":
             return False
     return True
