@@ -40,6 +40,7 @@ import datetime as dt
 import importlib.util
 import json
 import platform
+import re
 import shlex
 import shutil
 import stat
@@ -324,6 +325,43 @@ def write_claude_hooks(target: Path, hooks_os: str) -> None:
     settings_path.write_text(json.dumps(new_settings, indent=2) + "\n", encoding="utf-8")
 
 
+def _canonical_req_name(line: str) -> str | None:
+    """The PEP 503-normalized distribution name a requirements.txt line pins, or None
+    when the line names no installable package (blank, comment, option, URL, or path).
+    Used only to spot whether PyYAML is declared, so it is a name sniffer, not a full
+    requirements parser."""
+    s = line.split("#", 1)[0].strip()  # drop full-line and inline comments
+    if not s or s.startswith("-") or s.startswith("."):
+        return None  # option/include (-r, -e, ...) or a local path, not a bare name
+    # The project name is the leading token, ending at the first version specifier,
+    # marker, extras bracket, whitespace, or "@" direct-reference separator.
+    name = re.split(r"[<>=!~;,@\[ (]", s, maxsplit=1)[0].strip()
+    if not name or "://" in name or "/" in name:
+        return None  # a bare URL or path names no distribution we can normalize
+    return re.sub(r"[-_.]+", "-", name).lower()
+
+
+def _preserved_requirements_lacks_pyyaml(path: Path) -> bool:
+    """True only when we can say with confidence that a preserved requirements.txt does
+    not declare PyYAML: it is readable, no line names PyYAML, and it carries no include or
+    editable directive (-r, -e) that could pull PyYAML from a file we do not read. An
+    unreadable file or such a directive returns False, so the targeted warning fires only
+    when the gap is certain and never nags a user who did declare it. A constraint file
+    (-c/--constraint) only pins versions of packages installed elsewhere and cannot supply
+    a missing one, so it does not suppress the note."""
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return False
+    for raw in text.splitlines():
+        s = raw.strip()
+        if s.startswith(("-r", "--requirement", "-e", "--editable")):
+            return False  # PyYAML may live in the included (-r) or editable (-e) target
+        if _canonical_req_name(raw) == "pyyaml":
+            return False
+    return True
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Generate a conforming OKF starter bundle.")
     ap.add_argument("target", help="directory to create the project in")
@@ -425,6 +463,15 @@ def main() -> int:
         print("\nScaffold written, but skipping validation: existing files were "
               "preserved, so the bundle is not guaranteed valid by construction and "
               "scripts/validate.py may be your own.", file=sys.stderr)
+        # A preserved requirements.txt is the user's own (#142), so we never edit it. But
+        # if it omits PyYAML, the validate step below fails with ModuleNotFoundError, so
+        # name the exact dependency here rather than leaving them to decode the traceback.
+        req = target / "requirements.txt"
+        if req in preserved and _preserved_requirements_lacks_pyyaml(req):
+            print("  note: the preserved requirements.txt does not list PyYAML, which "
+                  "scripts/validate.py imports. Add PyYAML>=5.1 to it (or run "
+                  "`pip install pyyaml`) before validating. Without it, validation "
+                  "fails with ModuleNotFoundError.", file=sys.stderr)
         print("  reconcile the preserved files, then validate when ready:", file=sys.stderr)
         print(f"    cd {target} && {interpreter_for(hooks_os)} scripts/validate.py --bundle bundle", file=sys.stderr)
         return 0
