@@ -17,6 +17,12 @@ VALIDATE = SKILL / "scripts" / "validate.py"
 TEMPLATE_ANCHOR = SKILL / "templates" / "hooks" / "okf-anchor.py"
 TEMPLATE_ORIENT = SKILL / "templates" / "hooks" / "okf-orient.py"
 
+# Import the scaffolder module to unit-test its pure helpers directly. The CLI tests
+# below drive scaffold.py as a subprocess; the requirements name-sniffing contract is
+# fine-grained enough to pin here without a subprocess round-trip.
+sys.path.insert(0, str(SKILL / "scripts"))
+import scaffold as scaffold_mod  # noqa: E402  the module under test; the local scaffold() helper below shadows the bare name
+
 GOOD = """---
 type: Process
 title: good
@@ -190,6 +196,66 @@ def test_missing_pyyaml_skips_validation(tmp_path):
     assert (target / "bundle" / "index.md").exists()
     # the printed validate command must cd into the target, not the caller's cwd
     assert f"cd {target}" in out
+
+
+def test_force_preserve_warns_when_requirements_lacks_pyyaml(tmp_path):
+    # A preserved requirements.txt is the user's own and stays untouched (#142). When it
+    # omits PyYAML, the skip-validation message must name the exact missing dependency so
+    # the user is not left to decode a later ModuleNotFoundError from validate.py.
+    target = tmp_path / "kb"
+    scaffold(target)
+    (target / "requirements.txt").write_text("requests>=2\n", encoding="utf-8")
+    rc, out = scaffold(target, "--force")
+    assert rc == 0, out
+    assert (target / "requirements.txt").read_text() == "requests>=2\n"  # never edited
+    assert "does not list PyYAML" in out
+    assert "PyYAML>=5.1" in out
+
+
+def test_force_preserve_no_pyyaml_warning_when_declared(tmp_path):
+    # If the preserved requirements.txt already declares PyYAML (any case or pin), the
+    # targeted warning must not fire: validation is still skipped for the preserve, but we
+    # do not nag a user who did the right thing. Lowercase + pin proves name normalization.
+    target = tmp_path / "kb"
+    scaffold(target)
+    (target / "requirements.txt").write_text("pyyaml==6.0.1\n", encoding="utf-8")
+    rc, out = scaffold(target, "--force")
+    assert rc == 0, out
+    assert "skipping validation" in out.lower()  # the preserve still skips validation
+    assert "does not list PyYAML" not in out
+
+
+def test_force_preserve_no_pyyaml_warning_with_include(tmp_path):
+    # A "-r base.txt" include can declare PyYAML in a file the scaffolder does not read, so
+    # an uncertain requirements.txt suppresses the targeted warning rather than making a
+    # false "missing" claim.
+    target = tmp_path / "kb"
+    scaffold(target)
+    (target / "requirements.txt").write_text("-r base.txt\nrequests\n", encoding="utf-8")
+    rc, out = scaffold(target, "--force")
+    assert rc == 0, out
+    assert "skipping validation" in out.lower()
+    assert "does not list PyYAML" not in out
+
+
+@pytest.mark.parametrize("line,expected", [
+    ("PyYAML>=5.1", "pyyaml"),              # version specifier stripped, lowercased
+    ("pyyaml==6.0.1  # pinned", "pyyaml"),  # pin and inline comment stripped
+    ("PyYAML[extra]", "pyyaml"),            # extras bracket stripped
+    ("pyyaml @ https://example.com/p.whl", "pyyaml"),  # direct reference: name kept
+    ("ruamel.yaml", "ruamel-yaml"),         # PEP 503 separator collapse (not PyYAML)
+    ("# a comment", None),                  # comment names no package
+    ("-r base.txt", None),                  # include option names no package
+    ("https://example.com/p.whl", None),    # bare URL names no distribution
+    ("./local/pkg", None),                  # local path names no distribution
+    ("", None),                             # blank line
+])
+def test_canonical_req_name(line, expected):
+    # The pure name sniffer the preserved-requirements PyYAML check relies on: PEP 503
+    # normalization of the leading distribution name, and None for any line that names no
+    # bare package (comment, option, include, URL, or path). Pinned here so a future edit
+    # to the normalization cannot silently break PyYAML detection.
+    assert scaffold_mod._canonical_req_name(line) == expected
 
 
 # --- validator (negative cases) ---------------------------------------------
