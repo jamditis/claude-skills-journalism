@@ -8,6 +8,55 @@ the contract so the knowledge base stays consistent as it grows.
 This is the generic spec. A project may layer its own conventions on top (extra tags,
 naming patterns, a fixed section list), but must not weaken the rules below.
 
+## Relationship to upstream OKF
+
+This spec is a strict fork of Google's Open Knowledge Format v0.1
+([GoogleCloudPlatform/knowledge-catalog](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/ee67a5ca27044ebe7c38385f5b6cffc2305a9c1a/okf/SPEC.md)).
+It keeps the core idea (knowledge as small markdown files with YAML frontmatter and
+`index.md` navigation) and tightens the contract so a validator can enforce it. If you
+already know upstream OKF, these are the intentional differences to author against;
+upstream conventions will otherwise produce files this validator rejects.
+
+- Required keys. Upstream requires only `type` and treats `title`, `description`,
+  `resource`, `tags`, and `timestamp` as recommended, with any extra key allowed. Here all
+  seven of `type`, `title`, `description`, `source`, `verified`, `timestamp`, and `tags`
+  are required and non-empty, so a file that conforms upstream (say, `type` alone) fails
+  validation here.
+- `resource` becomes `source`. Upstream's optional `resource` is one canonical URI for the
+  underlying asset. This spec drops `resource` and requires `source`, a non-empty list of
+  provenance pointers (paths, commands, URLs, events).
+- Citations fold into `source`. Upstream lists sources under a `# Citations` heading and
+  allows a `references/` subdirectory. Here there is neither; all provenance lives in the
+  `source` frontmatter list.
+- `verified` is added. Upstream has no such key. This spec requires `verified`, the ISO
+  date the fact was last confirmed true, kept distinct from `timestamp` (when the file was
+  authored or edited).
+- Dates are date-only. Upstream's `timestamp` is an ISO 8601 datetime. Here `check_dates`
+  parses both `verified` and `timestamp` as `YYYY-MM-DD` only, so an upstream timestamp like
+  `2026-05-28T14:30:00Z` fails validation and must be truncated to its date.
+- The type vocab is closed. Upstream types are freeform and unregistered, and consumers
+  must tolerate unknown ones. Here the set is fixed (see Type vocab) and an unlisted type
+  fails the build, which catches typos; extending it is a deliberate spec edit.
+- Links are strict, and must be relative. Upstream treats a broken link as tolerable
+  ("consumers MUST tolerate broken links") and permits bundle-root-relative targets like
+  `/tables/customers.md`. Here every intra-bundle link must resolve or validation fails, the
+  `[[slug]]` wikilink form is rejected outright, and any target beginning with `/` is
+  rejected as a root-relative link — so an upstream `/tables/customers.md` must be rewritten
+  relative to the file that links it.
+- A root `index.md` declaring `okf_version` is mandatory. Upstream treats `index.md` and
+  `okf_version` as optional. Here the bundle root must contain an `index.md` whose
+  frontmatter declares `okf_version` (and carries nothing else), so an upstream bundle with
+  no root index, or one that omits the version marker, fails validation.
+- Secret values fail the build. Upstream OKF has no secret-scanning rule. Here `validate.py`
+  scans every markdown file for private-key blocks, cloud-token shapes, and `secret=<value>`
+  assignments and fails the bundle on a hit, so an upstream bundle that inlines a credential
+  value passes upstream but is rejected here (see Security).
+
+The format version differs too: upstream is `0.1`, this spec's current version is `0.2`
+(the validator still accepts `0.1`). Every difference above pulls the same direction:
+upstream stays minimal and needs no tooling to stay portable, while this spec adds a
+validator that fails the build when a bundle drifts.
+
 ## Bundle model
 
 A bundle is a directory tree. The simplest bundle is one directory of concept files
