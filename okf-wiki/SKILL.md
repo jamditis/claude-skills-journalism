@@ -189,7 +189,11 @@ that is the actual goal.
 
 ## The format, briefly
 
-Full contract in `spec/SPEC.md`. The load-bearing rules:
+Full contract in `spec/SPEC.md`. This spec is a strict fork of Google's upstream OKF
+v0.1: it requires all seven frontmatter keys, uses a `source` list in place of upstream's
+`resource` and `# Citations`, adds `verified`, closes the type vocab, and enforces link
+resolution. `spec/SPEC.md` ("Relationship to upstream OKF") lists every difference. The
+load-bearing rules:
 
 - **Required frontmatter** on every concept: `type, title, description, source, verified,
   timestamp, tags`. `type` is one of: Machine, Network, Service, Session, Project, Repo,
