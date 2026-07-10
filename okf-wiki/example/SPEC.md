@@ -31,12 +31,26 @@ upstream conventions will otherwise produce files this validator rejects.
 - `verified` is added. Upstream has no such key. This spec requires `verified`, the ISO
   date the fact was last confirmed true, kept distinct from `timestamp` (when the file was
   authored or edited).
+- Dates are date-only. Upstream's `timestamp` is an ISO 8601 datetime. Here `check_dates`
+  parses both `verified` and `timestamp` as `YYYY-MM-DD` only, so an upstream timestamp like
+  `2026-05-28T14:30:00Z` fails validation and must be truncated to its date.
 - The type vocab is closed. Upstream types are freeform and unregistered, and consumers
   must tolerate unknown ones. Here the set is fixed (see Type vocab) and an unlisted type
   fails the build, which catches typos; extending it is a deliberate spec edit.
-- Links are strict. Upstream treats a broken link as tolerable ("consumers MUST tolerate
-  broken links"). Here every intra-bundle link must resolve or validation fails, and the
-  `[[slug]]` wikilink form is rejected outright.
+- Links are strict, and must be relative. Upstream treats a broken link as tolerable
+  ("consumers MUST tolerate broken links") and permits bundle-root-relative targets like
+  `/tables/customers.md`. Here every intra-bundle link must resolve or validation fails, the
+  `[[slug]]` wikilink form is rejected outright, and any target beginning with `/` is
+  rejected as a root-relative link — so an upstream `/tables/customers.md` must be rewritten
+  relative to the file that links it.
+- A root `index.md` declaring `okf_version` is mandatory. Upstream treats `index.md` and
+  `okf_version` as optional. Here the bundle root must contain an `index.md` whose
+  frontmatter declares `okf_version` (and carries nothing else), so an upstream bundle with
+  no root index, or one that omits the version marker, fails validation.
+- Secret values fail the build. Upstream OKF has no secret-scanning rule. Here `validate.py`
+  scans every markdown file for private-key blocks, cloud-token shapes, and `secret=<value>`
+  assignments and fails the bundle on a hit, so an upstream bundle that inlines a credential
+  value passes upstream but is rejected here (see Security).
 
 The format version differs too: upstream is `0.1`, this spec's current version is `0.2`
 (the validator still accepts `0.1`). Every difference above pulls the same direction:
