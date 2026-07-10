@@ -23,6 +23,15 @@ TEMPLATE_ORIENT = SKILL / "templates" / "hooks" / "okf-orient.py"
 sys.path.insert(0, str(SKILL / "scripts"))
 import scaffold as scaffold_mod  # noqa: E402  the module under test; the local scaffold() helper below shadows the bare name
 
+# Load gh-wiki-bootstrap.py by path (its hyphenated name is not importable) so its
+# pure save-detection helper can be unit-tested without a browser. Its playwright
+# import lives inside main(), so importing the module top-level touches only stdlib.
+import importlib.util  # noqa: E402
+_boot_spec = importlib.util.spec_from_file_location(
+    "gh_wiki_bootstrap", SKILL / "scripts" / "gh-wiki-bootstrap.py")
+gh_wiki_bootstrap = importlib.util.module_from_spec(_boot_spec)
+_boot_spec.loader.exec_module(gh_wiki_bootstrap)
+
 GOOD = """---
 type: Process
 title: good
@@ -1364,3 +1373,23 @@ def test_dangling_uppercase_md_link_caught(tmp_path):
     rc, out = validate(b)
     assert rc == 1, out
     assert "ghost.MD" in out
+
+
+@pytest.mark.parametrize("url,on_editor", [
+    # Still on the editor: save has not completed.
+    ("https://github.com/owner/repo/wiki/_new", True),
+    ("https://github.com/owner/repo/wiki/_new/", True),
+    ("https://github.com/owner/repo/wiki/_new?foo=bar", True),
+    ("https://github.com/owner/repo/wiki/_new#section", True),
+    # Redirected to a saved page: save confirmed.
+    ("https://github.com/owner/repo/wiki/Home", False),
+    ("https://github.com/owner/repo/wiki/_new-notes", False),
+    # The regression: a repo whose NAME contains "_new" still redirects to a
+    # saved page, but the old whole-URL substring check read it as a failure.
+    ("https://github.com/owner/service_new/wiki/Home", False),
+    ("https://github.com/owner/service_new/wiki/service_new", False),
+    # ...and that same repo's editor URL is still correctly detected as unsaved.
+    ("https://github.com/owner/service_new/wiki/_new", True),
+])
+def test_still_on_editor_matches_the_editor_path_not_the_substring(url, on_editor):
+    assert gh_wiki_bootstrap._still_on_editor(url) is on_editor
