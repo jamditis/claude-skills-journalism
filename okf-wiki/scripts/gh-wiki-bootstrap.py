@@ -29,8 +29,24 @@ import argparse
 import os
 import re
 import sys
+from urllib.parse import urlsplit
 
 DEFAULT_STATE = os.path.expanduser("~/.cache/gh_state.json")
+
+
+def _still_on_editor(url):
+    """True while the browser is still sitting on the new-page editor.
+
+    The new-wiki-page editor lives at the path `/<owner>/<repo>/wiki/_new` and,
+    on a successful save, GitHub redirects to `/<owner>/<repo>/wiki/<slug>`. The
+    save-success signal is leaving that editor path. Testing the whole URL for
+    the substring "_new" misfires whenever "_new" appears anywhere else in it —
+    the owner, the repo name (e.g. owner/service_new), or a saved page's slug:
+    the redirected URL still contains the substring, so a real save reads as a
+    failure and the tool wrongly reports it never saved. Match the editor by its
+    path suffix instead, ignoring a trailing slash and any query or fragment.
+    """
+    return urlsplit(url).path.rstrip("/").endswith("/wiki/_new")
 
 
 def parse_args():
@@ -130,7 +146,7 @@ def main():
         # slow-but-successful save is not mistaken for a failure.
         saved = True
         try:
-            page.wait_for_url(lambda u: "_new" not in u, timeout=20000)
+            page.wait_for_url(lambda u: not _still_on_editor(u), timeout=20000)
         except PWTimeout:
             saved = False
         final_url = page.url
@@ -140,7 +156,7 @@ def main():
 
     # If we never left the editor, the save was rejected (no wiki write access,
     # bad title, inline validation error) — do not report success.
-    if not saved or "_new" in final_url:
+    if not saved or _still_on_editor(final_url):
         print(f"error: wiki editor never redirected to a created page ({final_url}) — "
               "save not confirmed. Check the saved session has wiki write access and "
               "the title is valid.", file=sys.stderr)
