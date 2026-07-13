@@ -33,14 +33,24 @@ is a code change to the legion source; both are contract decisions.
 
 A newsroom transcript gets quoted, and sometimes disputed later. When that
 happens the question is always the same: does the text match what was actually
-said, and can we prove it. Two facts, written alongside every transcript, answer
-it:
+said, and can we prove it. The answer is a small set of facts written alongside
+every transcript, one for each input that changes the decoded text, so a re-run
+that matches the record cannot silently diverge:
 
 - the exact engine and model build that ran: the engine and version (for example
   `whisper.cpp 1.7.x` or `openai-whisper <version>`) and the model file including
   its quantization, since a `base.en` at `q5_0` and the same model at `f16` decode
-  differently, so the model name alone is not enough, and
-- a hash of the source media (for example the `sha256` of the input file).
+  differently, so the model name alone is not enough,
+- a digest of the model weights themselves (the `sha256` of the model file), not
+  just the name and quantization: a re-download from a different mirror or a fresh
+  re-quantization can carry the same `base.en` / `q5_0` label yet different weights
+  that decode to different text, so the label alone does not pin the model,
+- a hash of the source media (for example the `sha256` of the input file), and
+- for any input that is not already the audio Whisper decodes (a video, or audio
+  that has to be transcoded), the exact extraction command and tool version plus a
+  hash of the normalized audio whisper.cpp actually consumed: two evaluators can
+  verify the same MP4 yet feed Whisper different PCM if their ffmpeg version or
+  extraction flags differ, so the source hash alone does not pin the decoder input.
 
 Write them as a sidecar next to the transcript, `<name>.transcript.meta.json`,
 not buried in a log. The sidecar also records the decode parameters, so a re-run
@@ -52,16 +62,35 @@ reproduces the same timestamps and not just the same words:
   "engine_build": "1.7.6 (b0a5b0c)",
   "model": "base.en",
   "model_quantization": "q5_0",
+  "model_sha256": "5f8c...9d2e",
   "source_sha256": "9f2b8c1d...c41a",
+  "audio": {
+    "extract_command": "ffmpeg -i input.mp4 -ar 16000 -ac 1 -c:a pcm_s16le audio.wav",
+    "tool_version": "ffmpeg 6.1.1",
+    "audio_sha256": "3a1e...77bc"
+  },
   "decode": {
     "beam_size": 5,
     "temperature": 0,
+    "no_fallback": true,
     "no_speech_threshold": 0.6,
     "compression_ratio_threshold": 2.4,
     "threads": 4
   }
 }
 ```
+
+The `no_fallback` flag is load-bearing, not decoration. whisper.cpp's default
+temperature fallback re-decodes a segment at rising temperatures when it trips the
+no-speech or compression-ratio checks, so on a hard segment a run that records
+`temperature: 0` can still leave the deterministic zero-temperature path, and two
+reruns can produce different text while both matching this sidecar. The
+transcript-of-record path sets `--no-fallback` so the recorded parameters actually
+determine the output; a run that deliberately allows fallback records the full
+temperature schedule it used instead. The `audio` block is required only when the
+decoded audio is not the source file itself: for a `.wav` fed straight to
+whisper.cpp, `source_sha256` and `audio_sha256` are equal and the block can be
+omitted.
 
 With those facts anyone can re-run the same engine, model, and parameters over the
 same verified file and compare the result to the quoted text. The sidecar is the
