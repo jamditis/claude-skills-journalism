@@ -9,6 +9,7 @@ must block, which must pass, and how the hook fails open. Run:
     python -m pytest hooks/tests/test_no_ai_attribution.py -q
 """
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -19,12 +20,13 @@ DENY = 2
 ALLOW = 0
 
 
-def run(command, tool_name="Bash", cwd=None, raw_stdin=None, timeout=30):
+def run(command, tool_name="Bash", cwd=None, raw_stdin=None, timeout=30, env=None):
     """Invoke the hook as a subprocess with a PreToolUse payload; return CompletedProcess.
 
     timeout guards the never-wedge contract: if the hook hangs (e.g. reading a FIFO),
     subprocess.run raises TimeoutExpired and kills the child, so a hang fails the test
-    loudly instead of freezing the suite.
+    loudly instead of freezing the suite. `env`, when given, is merged over the current
+    environment for the child, so a test can set HOME to exercise `~` expansion.
     """
     if raw_stdin is None:
         payload = {"tool_name": tool_name, "tool_input": {"command": command}}
@@ -39,6 +41,7 @@ def run(command, tool_name="Bash", cwd=None, raw_stdin=None, timeout=30):
         capture_output=True,
         text=True,
         timeout=timeout,
+        env=({**os.environ, **env} if env else None),
     )
 
 
@@ -587,3 +590,176 @@ def test_allow_cd_clean_file_in_both_dirs(tmp_path):
     (tmp_path / "MSG").write_text("Fix the parser\n")
     r = run("cd repo && git commit -F MSG", cwd=tmp_path)
     assert_allowed(r)
+
+
+# --------------------------------------------------------------------------
+# MUST BLOCK: codex-connector PR #193 review findings (bot round on PR D)
+# --------------------------------------------------------------------------
+
+def test_block_exported_git_identity_across_segments():
+    # `export GIT_AUTHOR_NAME=Claude; git commit` sets the identity in the shell for the
+    # later commit, the same authorship surface as an inline prefix. The export lives in a
+    # separate segment, so the commit segment must pick it up across the `;`.
+    r = run("export GIT_AUTHOR_NAME=Claude; git commit -m Fix")
+    assert_blocked(r)
+
+
+def test_allow_exported_clean_env_then_commit():
+    # A clean export must not poison a later clean commit: only an identity var naming a
+    # tool blocks, and GH_TOKEN is not an identity var.
+    r = run("export GH_TOKEN=abc123; git commit -m 'Fix the parser'")
+    assert_allowed(r)
+
+
+def test_block_commit_tilde_home_message_file(tmp_path):
+    # An unquoted `~/MSG` expands to $HOME/MSG before the command runs; resolving it
+    # against cwd (reading cwd/~/MSG) would miss the byline in the real home file.
+    home = tmp_path / "home"
+    home.mkdir()
+    (home / "MSG").write_text("Generated with Claude Code\n")
+    work = tmp_path / "work"
+    work.mkdir()
+    r = run("git commit -F ~/MSG", cwd=work, env={"HOME": str(home)})
+    assert_blocked(r)
+
+
+def test_block_commit_ansi_c_single_line_byline():
+    # $'Generated with Claude Code' is a whole-message ANSI-C quote: shlex leaves a literal
+    # leading `$` on the token, which defeats the line-start byline anchor unless stripped.
+    r = run("git commit -m $'Generated with Claude Code'")
+    assert_blocked(r)
+
+
+def test_block_commit_gpt_numeric_suffix():
+    # A version-suffixed model name (GPT4, GPT-4o) must match the tool token; a bare `\bgpt\b`
+    # stops at the letter/digit boundary and misses it.
+    for msg in ("Generated with GPT4", "Generated with GPT-4o", "Written by GPT4o"):
+        assert_blocked(run('git commit -m "%s"' % msg))
+
+
+def test_block_commit_behind_shell_control_keyword():
+    # A commit guarded by a control keyword still runs and still writes the byline; the
+    # segment starts with `then`/`if`, hiding the `git` word unless the keyword is peeled.
+    assert_blocked(run('if true; then git commit -m "Generated with Claude Code"; fi'))
+    assert_blocked(run('if git commit -m "Generated with Claude Code"; then :; fi'))
+
+
+def test_allow_keyword_word_inside_message():
+    # A control keyword sitting inside a quoted message ("then run the tests") is an
+    # ordinary word, not a leading keyword: the segment starts with `git`, so nothing is
+    # peeled and the clean message passes.
+    r = run('git commit -m "first do the parse, then run the tests"')
+    assert_allowed(r)
+
+
+def test_block_commit_attached_short_file_equals(tmp_path):
+    # git reads `-F=MSG` as the filename `=MSG` (short options keep a leading `=`); the
+    # parser must read that same file, not a stripped `MSG`.
+    (tmp_path / "=MSG").write_text("Generated with Claude Code\n")
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    r = run("git commit -F=MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_commit_short_message_equals_byline():
+    # `-m="Generated with Claude Code"` commits the message `=Generated with Claude Code`
+    # (git keeps the `=`); the byline anchor must accept a leading `=` marker.
+    r = run('git commit -m="Generated with Claude Code"')
+    assert_blocked(r)
+
+
+def test_allow_commit_attached_short_file_equals_clean(tmp_path):
+    # The mirror of the block case: `-F=MSG` reading a clean `=MSG` must pass.
+    (tmp_path / "=MSG").write_text("Fix the parser\n")
+    r = run("git commit -F=MSG", cwd=tmp_path)
+    assert_allowed(r)
+
+
+def test_block_pr_body_hash_and_bullet_marker_byline():
+    # A verb byline led by a markdown heading (#) or bullet (bullet char, :) marker must
+    # trip the same as one led by * or >, since a PR body uses those markers.
+    for marker in ("#", "•", ":"):
+        body = "%s Generated with Claude Code" % marker
+        assert_blocked(run('gh pr create --body "%s"' % body))
+
+
+# --------------------------------------------------------------------------
+# Spec-aligned boundary: a bare tool name is subject matter in free prose,
+# authorship only in an author/trailer field (PR #193 finding T3).
+# --------------------------------------------------------------------------
+
+def test_allow_bare_tool_name_in_message_body():
+    # A bare "Claude" line in a commit message is ambiguous with subject matter and is not
+    # a form any tool emits (they write "Generated with Claude Code" plus Co-Authored-By,
+    # both caught). Blocking it would false-block legitimate content, so free prose needs
+    # an attribution cue; a bare name passes.
+    r = run('git commit -m "Fix parser\n\nClaude"')
+    assert_allowed(r)
+
+
+def test_allow_pr_body_model_comparison_list():
+    # A model-comparison list is legitimate content in a research/journalism repo. It must
+    # not be mistaken for a byline just because each line is a bare tool name under a
+    # bullet marker.
+    body = "Tested models:\n\n- Claude\n- GPT-4\n- Gemini\n"
+    r = run('gh pr create --body "%s"' % body)
+    assert_allowed(r)
+
+
+def test_block_bare_tool_name_in_author_field():
+    # The strict field check still blocks a bare tool name in --author, because an author
+    # field is a byline by definition (no subject-of-the-work reading).
+    r = run('git commit --author "Claude <noreply@example.com>" -m "Fix parser"')
+    assert_blocked(r)
+
+
+# --------------------------------------------------------------------------
+# Documented limitation: a message file written earlier in the SAME command
+# line cannot be read by a pre-command hook (PR #193 finding T7).
+# --------------------------------------------------------------------------
+
+def test_allow_message_file_written_in_same_command(tmp_path):
+    # A PreToolUse hook runs before the command, so it cannot read a file the same command
+    # line creates: `printf ... >MSG && git commit -F MSG` writes the byline at run time,
+    # and at hook time MSG does not hold it. Catching this would require modeling every
+    # writer's output (printf/echo/tee), which would wreck the subject-matter allowance.
+    # Same category as the command-substitution boundary; it passes by design.
+    r = run("printf 'Generated with Claude Code\\n' >MSG && git commit -F MSG", cwd=tmp_path)
+    assert_allowed(r)
+
+
+# --------------------------------------------------------------------------
+# Local codex 5.5/low findings on the PR #193 fix commit: no false blocks
+# --------------------------------------------------------------------------
+
+def test_allow_exported_identity_overwritten_clean():
+    # A re-export overwrites: the commit is authored by the LATEST value (Joe), so a
+    # stale earlier flagged value must not block. Modeling the env as a last-wins map,
+    # not an append list, is what makes this a clean pass.
+    r = run("export GIT_AUTHOR_NAME=Claude; export GIT_AUTHOR_NAME=Joe; git commit -m Fix")
+    assert_allowed(r)
+
+
+def test_allow_exported_identity_then_unset():
+    # `unset` clears an earlier export before the commit, so the commit carries no tool
+    # identity and must pass.
+    r = run("export GIT_AUTHOR_NAME=Claude; unset GIT_AUTHOR_NAME; git commit -m Fix")
+    assert_allowed(r)
+
+
+def test_allow_inline_prefix_overrides_exported_identity():
+    # An inline prefix overrides an earlier export for that command; the effective author
+    # is the inline clean value, so it passes.
+    r = run("export GIT_AUTHOR_NAME=Claude; GIT_AUTHOR_NAME=Joe git commit -m Fix")
+    assert_allowed(r)
+
+
+def test_block_tilde_quoted_real_target_in_cwd(tmp_path):
+    # A quoted '~/MSG' is a literal path the shell resolves against cwd. Reading both the
+    # literal cwd/~/MSG and the home-expanded path means the real target is still checked:
+    # a byline in cwd/~/MSG blocks, never missed just because the ~ could not be expanded.
+    tilde_dir = tmp_path / "~"
+    tilde_dir.mkdir()
+    (tilde_dir / "MSG").write_text("Generated with Claude Code\n")
+    r = run("git commit -F '~/MSG'", cwd=tmp_path)
+    assert_blocked(r)

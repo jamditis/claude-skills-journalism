@@ -40,8 +40,8 @@ ROBOT_EMOJI = "\U0001F916"  # the sign-off emoji used as an AI byline
 
 # Tokens that name an AI tool, model, or vendor. Used with word boundaries.
 _TOOL_TOKENS = (
-    r"claude|chatgpt|gpt|codex|copilot|gemini|anthropic|openai|cursor|bard|llama|"
-    r"language model|large language model|llm"
+    r"claude|chatgpt|gpt(?:-?[0-9][a-z0-9]*)?|codex|copilot|gemini|anthropic|openai|"
+    r"cursor|bard|llama|language model|large language model|llm"
 )
 # Attribution verbs that, paired with with/by and a tool token, form a byline.
 _ATTR_VERBS = (
@@ -56,7 +56,7 @@ _ATTR_VERBS = (
 # and trailing classes use space/tab, not \s: under re.M an \s* that can eat newlines
 # scans across every line from each ^, which is quadratic on blank-line-heavy input.
 _AI_BYLINE_RE = re.compile(
-    r"(?im)^[ \t>*•:#-]*ai[-\s]?(?:assisted|generated|authored|written)\b[ \t.!)*_-]*$"
+    r"(?im)^[ \t>*•:#=-]*ai[-\s]?(?:assisted|generated|authored|written)\b[ \t.!)*_-]*$"
 )
 # The same phrase anywhere on a line, used only to tell a robot-emoji byline from a
 # decorative or subject-matter emoji (an emoji sharing a line with this phrase is a
@@ -80,7 +80,7 @@ _VERB_TOOL_RE = re.compile(
 # reading as a byline. This is the general prose check; the emoji line already has its
 # own strong cue, so it uses the unanchored form above.
 _VERB_TOOL_BYLINE_RE = re.compile(
-    r"(?im)^[ \t>*_-]*(?:" + _ATTR_VERBS + r")\b[^.\n]{0,40}?\b(?:with|by|using|via)\b"
+    r"(?im)^[ \t>*•:#_=-]*(?:" + _ATTR_VERBS + r")\b[^.\n]{0,40}?\b(?:with|by|using|via)\b"
     r"[^.\n]{0,40}?\b(?:" + _TOOL_TOKENS + r")\b"
 )
 _TOOL_TOKEN_RE = re.compile(r"\b(?:" + _TOOL_TOKENS + r")\b", re.I)
@@ -116,6 +116,26 @@ def _decode_c_escapes(text):
         out.append(ch)
         i += 1
     return "".join(out)
+
+
+def _shell_message_variants(text):
+    """Yield the forms of a message argument to scan for a byline.
+
+    shlex leaves an ANSI-C ($'...') quote as a literal leading `$` on the token and keeps
+    its escapes raw, so `-m $'Generated with Claude'` reaches the hook as `$Generated with
+    Claude` (the `$` defeats the line-start byline anchor) while bash writes `Generated with
+    Claude`. Yield the raw token, the token with a leading ANSI-C `$` removed, and the
+    decoded form of each, so a byline the quoting hides is still seen. Stripping a leading
+    `$` off a non-ANSI-C token (a `$VAR`, a literal `$5`) only adds a scan of harmless text
+    and never causes a false block.
+    """
+    seen = set()
+    bases = (text, text[1:]) if text.startswith("$") else (text,)
+    for base in bases:
+        for form in (base, _decode_c_escapes(base)):
+            if form not in seen:
+                seen.add(form)
+                yield form
 
 
 def value_names_tool(text):
@@ -300,6 +320,22 @@ def _segments(tokens):
     return segs
 
 
+# Shell control keywords that can immediately precede a command word that then runs
+# (`if ok; then git commit ...`, `while git commit ...`, `time git commit ...`). After a
+# split on `;`, a segment can start with one of these, hiding the command word from
+# classification. Peel them so the command is still seen. A keyword appearing mid-segment
+# is an ordinary argument (a word in a commit message) and is left untouched.
+_SHELL_KEYWORDS = {"if", "elif", "then", "else", "while", "until", "do", "!", "time"}
+
+
+def _strip_leading_keywords(seg):
+    """Drop any leading shell control keywords from a segment, returning the remainder."""
+    i = 0
+    while i < len(seg) and seg[i] in _SHELL_KEYWORDS:
+        i += 1
+    return seg[i:]
+
+
 def _git_subcommand(tokens):
     """Return (subcommand, index) for a `git ...` segment, skipping global options."""
     i = 1
@@ -386,7 +422,12 @@ def _collect(tokens, spec):
                 if kind:
                     rest = letters[j + 1:]
                     if rest:
-                        out[kind].append(rest[1:] if rest.startswith("=") else rest)
+                        # A short option keeps a leading `=` as part of its value: git
+                        # parse-options and gh/pflag both read `-F=MSG` as the filename
+                        # `=MSG` and `-m=x` as the message `=x` (only a long `--flag=x`
+                        # splits on `=`). Do not strip it: the byline anchors accept a
+                        # leading `=` marker, and a file is read under the name git reads.
+                        out[kind].append(rest)
                     elif i + 1 < n:
                         out[kind].append(tokens[i + 1])
                         consumed_next = True
@@ -606,6 +647,7 @@ def find_attribution(command, cwd):
     files resolve where the command would read them.
     """
     eff_cwd = cwd
+    exported_identity = {}  # exported identity var -> latest value (shell last-wins)
     for line in _logical_lines(command):
         try:
             tokens = _tokenize(line)
@@ -617,11 +659,33 @@ def find_attribution(command, cwd):
             continue
 
         for seg in _segments(tokens):
+            seg = _strip_leading_keywords(seg)
+            if not seg:
+                continue
             assigns, core, env_chdir = _strip_env_prefix(seg)
             if not core:
                 continue
             if core[0] == "cd":
                 eff_cwd = _apply_cd(core, eff_cwd)
+                continue
+            if core[0] == "export":
+                # `export GIT_AUTHOR_NAME=Claude; git commit` sets the identity in this
+                # shell for the later commit, the same authorship surface as an inline
+                # `GIT_AUTHOR_NAME=Claude git commit` prefix. Track the latest value per
+                # name (a re-export overwrites, an `unset` below clears) so a later clean
+                # value is not shadowed by an earlier flagged one. (A bare `export NAME`
+                # with no value, or an export inside a subshell, is best-effort at worst.)
+                for t in core[1:]:
+                    if _ENV_ASSIGN_RE.match(t):
+                        name, _, val = t.partition("=")
+                        exported_identity[name] = val
+                continue
+            if core[0] == "unset":
+                # `unset GIT_AUTHOR_NAME` clears an earlier export before the commit, so
+                # the commit is clean; drop the name (skip -f/-v flags, keep the operands).
+                for t in core[1:]:
+                    if not t.startswith("-"):
+                        exported_identity.pop(t, None)
                 continue
             base = eff_cwd if env_chdir is None else _resolve_dir(eff_cwd, env_chdir)
             spec, start = _watched_spec(core)
@@ -632,9 +696,14 @@ def find_attribution(command, cwd):
                 # -C composes onto the base, so a relative -F file resolves correctly.
                 seg_cwd = _git_effective_dir(core, start - 1, base)
                 # `GIT_AUTHOR_NAME=Claude git commit ...` sets authorship via the
-                # environment, the same as --author. Read those identity vars as fields.
+                # environment, the same as --author. Effective identity = exported vars,
+                # then the inline prefix overriding them (both last-wins), matching what
+                # the shell hands git. Read those identity vars as fields.
+                effective = dict(exported_identity)
                 for a in assigns:
                     name, _, val = a.partition("=")
+                    effective[name] = val
+                for name, val in effective.items():
                     if name in _GIT_IDENTITY_ENV and value_names_tool(val):
                         return "tool or bot named in a git identity environment variable"
                 # `git -c user.name=Claude commit ...` sets identity via config;
@@ -643,12 +712,10 @@ def find_attribution(command, cwd):
                     return "tool or bot named in a git -c identity config value"
             found = _collect(core[start:], spec)
             for text in found["text"]:
-                # Check the raw token and, if it carries ANSI-C escapes, its decoded form:
-                # `-m $'...\nGenerated with Claude'` commits a real byline the raw token hides.
-                if contains_attribution(text):
-                    return "attribution in message/body text"
-                decoded = _decode_c_escapes(text)
-                if decoded != text and contains_attribution(decoded):
+                # Scan the raw token and its ANSI-C variants (leading `$` removed, escapes
+                # decoded): `-m $'Generated with Claude'` and `-m $'x\n\nGenerated ...'` both
+                # commit a byline the raw token hides behind the `$'...'` quoting.
+                if any(contains_attribution(v) for v in _shell_message_variants(text)):
                     return "attribution in message/body text"
             for field in found["field"]:
                 if value_names_tool(field):
@@ -659,10 +726,20 @@ def find_attribution(command, cwd):
             # the tracked one; reading both makes a wrong guess a false positive, never a miss.
             read_dirs = [seg_cwd] if seg_cwd == cwd else [seg_cwd, cwd]
             for name in found["file"]:
-                for read_dir in read_dirs:
-                    content = _read_named_file(name, read_dir)
-                    if content is not None and contains_attribution(content):
-                        return f"attribution in the file '{name}'"
+                # Read the name as written (resolved against the tracked dir and the payload
+                # cwd) and, for a leading ~, its home-expanded form too. shlex discards
+                # whether the ~ was quoted, so both interpretations are read and either
+                # blocks: a wrong guess is a false positive, never a missed byline (the same
+                # safe-direction tradeoff the cd/dir tracking above makes).
+                candidates = [name]
+                expanded = os.path.expanduser(name)
+                if expanded != name:
+                    candidates.append(expanded)
+                for cand in candidates:
+                    for read_dir in read_dirs:
+                        content = _read_named_file(cand, read_dir)
+                        if content is not None and contains_attribution(content):
+                            return f"attribution in the file '{name}'"
     return None
 
 
