@@ -38,28 +38,44 @@ from pathlib import Path
 HOOK_NAME = "no-ai-attribution"
 ROBOT_EMOJI = "\U0001F916"  # the sign-off emoji used as an AI byline
 
-# Tokens that name an AI tool, model, or vendor. Used with word boundaries.
+# Tokens that name an AI tool, model, or vendor. Used with word boundaries. These are
+# the strict set: any of them in an author/trailer field blocks, because none is a common
+# human name (a person is not named "Anthropic" or "Windsurf"). Coding agents that write
+# commits (aider, windsurf) belong here; agents whose names collide with human names
+# (devin, cline) do not -- they go in the byline-only set below.
 _TOOL_TOKENS = (
     r"claude|chatgpt|gpt(?:-?[0-9][a-z0-9]*)?|codex|copilot|gemini|anthropic|openai|"
-    r"cursor|bard|llama|language model|large language model|llm"
+    r"cursor|bard|llama|language model|large language model|llm|aider|windsurf"
 )
+# Agent names that are also common human names (Devin, Cline). They credit an AI only
+# inside a byline (an attribution verb tied to the name by with/by), never as a bare
+# author-field token, so a real person named Devin Smith still authors a commit. Kept out
+# of _TOOL_TOKENS for exactly that reason.
+_BYLINE_ONLY_TOKENS = r"devin|cline"
 # Attribution verbs that, paired with with/by and a tool token, form a byline.
 _ATTR_VERBS = (
     r"generated|created|written|authored|made|built|produced|assisted|co-authored|"
     r"powered"
 )
-# Byline tool tokens: the named tools above plus a standalone "AI", so a generic-AI
-# credit ("Generated with AI", "Written by AI") blocks. The negative lookahead keeps it
-# to a bare "AI" token and out of the adjective "AI-<noun>" of subject matter ("Built
-# with AI-powered search"), which is not a byline. Kept separate from _TOOL_TOKENS so the
-# strict author-field check (value_names_tool) does not trip on a human named "Ai".
-_BYLINE_TOOL_TOKENS = _TOOL_TOKENS + r"|ai(?![\w-])"
+# Byline tool tokens: the strict tools, the human-name-colliding agents, plus a standalone
+# "AI", so a generic-AI credit ("Generated with AI", "Written by AI") blocks. The negative
+# lookahead keeps it to a bare "AI" token and out of the adjective "AI-<noun>" of subject
+# matter ("Built with AI-powered search"), which is not a byline. Kept separate from
+# _TOOL_TOKENS so the strict author-field check (value_names_tool) does not trip on a human
+# named "Ai" or "Devin".
+_BYLINE_TOOL_TOKENS = _TOOL_TOKENS + r"|" + _BYLINE_ONLY_TOKENS + r"|ai(?![\w-])"
 # Optional "AI-"/"AI " prefix on the attribution verb, so "AI-assisted by Claude" and
 # "AI-generated with GPT" anchor as bylines like the bare verb forms. It only adds a match
 # that also carries a with/by/using/via + named tool, so "add AI-assisted analysis" (no
 # trailing tool credit) still reads as subject matter and passes.
 _AI_VERB_PREFIX = r"(?:ai[-\s])?"
 
+# Leading sign-off / list markers a byline can ride at the start of a line: whitespace,
+# blockquote/comment/bullet markers (`> `, `# `, `* `, `+ `, `• `), and an optional
+# ordered-list number ("1.", "2)"). A credit line in a PR body or changelog often sits
+# behind one of these. The class holds no newline, and the ordered-list group is bounded,
+# so anchoring it under re.M stays linear per line (no newline-crossing quadratic scan).
+_BYLINE_LEAD = r"[ \t>*•:#_=+-]*(?:\d{1,3}[.)][ \t]*)?"
 # "AI-generated"/"AI-assisted" as a byline: a line whose whole content is the tag
 # (optionally with sign-off punctuation), not the phrase embedded in a sentence. This
 # blocks a standalone "AI-assisted" sign-off but allows "detect AI-generated images",
@@ -67,7 +83,7 @@ _AI_VERB_PREFIX = r"(?:ai[-\s])?"
 # and trailing classes use space/tab, not \s: under re.M an \s* that can eat newlines
 # scans across every line from each ^, which is quadratic on blank-line-heavy input.
 _AI_BYLINE_RE = re.compile(
-    r"(?im)^[ \t>*•:#=-]*ai[-\s]?(?:assisted|generated|authored|written)\b[ \t.!)*_-]*$"
+    r"(?im)^" + _BYLINE_LEAD + r"ai[-\s]?(?:assisted|generated|authored|written)\b[ \t.!)*_-]*$"
 )
 # The same phrase anywhere on a line, used only to tell a robot-emoji byline from a
 # decorative or subject-matter emoji (an emoji sharing a line with this phrase is a
@@ -92,7 +108,7 @@ _VERB_TOOL_RE = re.compile(
 # reading as a byline. This is the general prose check; the emoji line already has its
 # own strong cue, so it uses the unanchored form above.
 _VERB_TOOL_BYLINE_RE = re.compile(
-    r"(?im)^[ \t>*•:#_=-]*" + _AI_VERB_PREFIX + r"(?:" + _ATTR_VERBS
+    r"(?im)^" + _BYLINE_LEAD + _AI_VERB_PREFIX + r"(?:" + _ATTR_VERBS
     + r")\b[^.\n]{0,40}?\b(?:with|by|using|via)\b"
     r"[^.\n]{0,40}?\b(?:" + _BYLINE_TOOL_TOKENS + r")\b"
 )
@@ -101,6 +117,13 @@ _TOOL_TOKEN_RE = re.compile(r"\b(?:" + _TOOL_TOKENS + r")\b", re.I)
 # assistant no-reply. A human GitHub no-reply (NNN+user@users.noreply.github.com)
 # deliberately does not match.
 _BOT_MARKER_RE = re.compile(r"\bbot@|\[bot\]|noreply@anthropic|noreply@openai", re.I)
+# A generic-AI identity in an authorship field: "AI Assistant", "AI Bot", "AI Agent",
+# "AI Model", or "artificial intelligence". The separator after "AI" (space/tab/_/-) and
+# the required following noun keep it off a human whose given name is "Ai" (an "Ai
+# Nakamura" author has no such noun after it, so it passes).
+_GENERIC_AI_IDENTITY_RE = re.compile(
+    r"\bai[ \t_-](?:assistant|bot|agent|model)\b|\bartificial intelligence\b", re.I
+)
 
 
 # ANSI-C ($'...') escapes bash decodes before running the command. shlex keeps them as
@@ -153,7 +176,11 @@ def _shell_message_variants(text):
 
 def value_names_tool(text):
     """Strict: does this authorship-field value name a tool/model or a bot identity?"""
-    return bool(_TOOL_TOKEN_RE.search(text) or _BOT_MARKER_RE.search(text))
+    return bool(
+        _TOOL_TOKEN_RE.search(text)
+        or _BOT_MARKER_RE.search(text)
+        or _GENERIC_AI_IDENTITY_RE.search(text)
+    )
 
 
 def contains_attribution(text):
@@ -195,8 +222,16 @@ _OPERATORS = {"&&", "||", ";", ";;", "|", "&", "|&", "(", ")", "{", "}"}
 # token, so a subshell close plus a separator arrives as `);`, not `)` then `;`. Any
 # token made only of these characters is a command boundary, including a glued run not
 # enumerated above (`);`, `)&&`, `|&`); otherwise `(cd x); git commit ...` collapses into
-# one segment and the commit after the glued token is never seen.
-_OPERATOR_CHARS = set("();<>|&")
+# one segment and the commit after the glued token is never seen. Redirection characters
+# (`<`, `>`) are deliberately NOT here: a redirect does not start a new command, it
+# attaches a stream to the current one, so `>/dev/null git commit ...` is one command with
+# git as its word, not two. Redirect operators are stripped from a segment (op plus target,
+# plus any leading fd) by _strip_redirects, so the command word and its flags stay intact.
+_OPERATOR_CHARS = set("();|&")
+# Redirect operator tokens shlex emits (after punctuation gluing): plain and appending
+# file redirects, here-docs/here-strings, fd duplications, and bash's combined forms. A
+# redirect is `[fd]<op>[ ]<target>`; both the op and its one target token are dropped.
+_REDIRECT_OPS = {">", ">>", ">|", "<", "<<", "<<<", ">&", "<&", "&>", "&>>"}
 _GIT_GLOBAL_ARG_OPTS = {
     "-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path", "--config-env",
 }
@@ -276,12 +311,11 @@ _GIT_IDENTITY_CONFIG = {
     "user.name", "user.email", "author.name", "author.email",
     "committer.name", "committer.email",
 }
-# `env` options that take a separate value, so its argument is not mistaken for the
-# command word when peeling an `env NAME=value ... cmd` wrapper. `-S`/`--split-string`
-# (its value is expanded) and `-C`/`--chdir` (its value is captured as the run dir) are
-# handled separately.
-_ENV_ARG_OPTS = {"-u", "--unset"}
 _MAX_FILE_BYTES = 1_000_000  # cap a named-file read so a huge file cannot exhaust memory
+_MAX_STDIN_BYTES = 10_000_000  # cap the payload read: a larger command is not a real one
+# Interpreters whose `-c <script>` argument is a full command line to scan recursively.
+_SHELL_RUNNERS = {"sh", "bash", "dash", "zsh", "ksh", "ash", "mksh"}
+_MAX_SHELL_DEPTH = 5  # bound the `bash -c '...'` recursion so a deep nest cannot run away
 
 # Full set of `git commit` long-option names, used only to resolve unambiguous prefix
 # abbreviations the way git's parse-options does: git accepts `--au` for --author when
@@ -299,6 +333,17 @@ _GIT_COMMIT_LONG_OPTS = frozenset({
     "squash", "status", "template", "trailer", "untracked-files", "verbose",
 })
 
+# Full set of `git merge` long-option names, for the same unambiguous-abbreviation
+# resolution (`--mess` -> --message). Kept complete so an abbreviation git itself would
+# reject as ambiguous does not resolve here either.
+_GIT_MERGE_LONG_OPTS = frozenset({
+    "abort", "allow-unrelated-histories", "autostash", "cleanup", "commit", "continue",
+    "edit", "ff", "ff-only", "file", "gpg-sign", "into-name", "log", "message",
+    "no-verify", "overwrite-ignore", "progress", "quiet", "quit", "rerere-autoupdate",
+    "signoff", "squash", "stat", "strategy", "strategy-option", "summary", "verbose",
+    "verify-signatures",
+})
+
 # Per-subcommand flag spec. 'text' -> scanned with contains_attribution; 'file' ->
 # contents read and scanned; 'field' -> scanned with value_names_tool. 'short' maps
 # a value-taking short-option letter to its kind, for git-style clusters (-am, -F).
@@ -312,6 +357,17 @@ _GIT_COMMIT = {
     "field": {"--author", "--trailer"},
     "short": {"m": "text", "F": "file", "t": "file"},
     "long_opts": _GIT_COMMIT_LONG_OPTS,
+}
+# `git merge` writes a merge commit whose message comes from -m/--message or -F/--file
+# (for a non-fast-forward merge), the same record surfaces as a commit. It has no
+# --author/--trailer, but its identity still comes from the same env / `git -c` config,
+# handled alongside _GIT_COMMIT in find_attribution.
+_GIT_MERGE = {
+    "text": {"-m", "--message"},
+    "file": {"-F", "--file"},
+    "field": set(),
+    "short": {"m": "text", "F": "file"},
+    "long_opts": _GIT_MERGE_LONG_OPTS,
 }
 _GH_PR_CREATE = {
     "text": {"-b", "--body", "-t", "--title"},
@@ -331,6 +387,27 @@ _GH_EDIT = {  # gh pr edit / gh issue edit: title and body are both editable
     "field": set(),
     "short": {"b": "text", "t": "text", "F": "file"},
 }
+_GH_MERGE = {  # gh pr merge: --subject/--body set the merge/squash commit message
+    "text": {"-b", "--body", "-t", "--subject"},
+    "file": {"-F", "--body-file"},
+    "field": set(),
+    # -t is --subject here (text). -m/-s/-r are merge-method flags, not messages, so they
+    # are absent from this map and consume no value.
+    "short": {"b": "text", "t": "text", "F": "file"},
+}
+_GH_COMMENT_ONLY = {  # gh pr/issue close and reopen: a -c/--comment body, no title or file
+    "text": {"-c", "--comment"},
+    "file": set(),
+    "field": set(),
+    "short": {"c": "text"},
+}
+# Sentinel for `gh api`: its record text rides in key=value fields (-f/-F/--field/
+# --raw-field) or a --input request-body file, a different shape from the flag specs, so
+# it is handled by _gh_api_hits rather than _collect.
+_GH_API = "gh-api"
+# gh api field keys whose value is human-visible record prose that could carry a byline.
+# A control field (state=closed, draft=true) is not scanned.
+_GH_API_TEXT_KEYS = {"body", "title", "message", "note", "description"}
 
 
 def _is_boundary(t):
@@ -352,6 +429,31 @@ def _segments(tokens):
     if cur:
         segs.append(cur)
     return segs
+
+
+def _strip_redirects(tokens):
+    """Drop shell redirections from a segment's tokens, leaving the command and its args.
+
+    A redirection is `[fd]<op> <target>` (`>/dev/null`, `2>err.log`, `1>&2`, `>>log`). It
+    does not begin a new command, so it must be removed rather than split on, or a leading
+    redirect (`>/dev/null git commit ...`) hides the command word behind the target and an
+    interspersed one (`git commit >/dev/null -m msg`) strands the message flag. The op and
+    its single target token are dropped together, as is a bare fd digit that precedes the
+    op (shlex emits `2>err` as `2`, `>`, `err`)."""
+    out = []
+    i, n = 0, len(tokens)
+    while i < n:
+        t = tokens[i]
+        # A lone fd number right before a redirect op (`2 > err`): drop fd, op, and target.
+        if t.isdigit() and i + 1 < n and tokens[i + 1] in _REDIRECT_OPS:
+            i += 3 if i + 2 < n else 2  # fd + op (+ target if present)
+            continue
+        if t in _REDIRECT_OPS:
+            i += 2 if i + 1 < n else 1  # op (+ target if present)
+            continue
+        out.append(t)
+        i += 1
+    return out
 
 
 # Shell control keywords that can immediately precede a command word that then runs
@@ -506,7 +608,7 @@ def _collect(tokens, spec):
 
 
 def _strip_env_prefix(seg):
-    """Peel any env-setting prefix off a segment: return (assignments, core, chdir).
+    """Peel any env-setting prefix off a segment: return (assignments, core, chdir, unsets).
 
     Handles both a bare `NAME=value ... cmd` prefix and an `env [opts] NAME=value ... cmd`
     wrapper, so authorship set through the environment (`env GIT_AUTHOR_NAME=Claude git
@@ -514,15 +616,18 @@ def _strip_env_prefix(seg):
     (in the spaced, attached, or `=` form) packs the command into one re-split string,
     which is expanded and reprocessed. `env -C <dir>`/`--chdir <dir>` is returned as
     chdir so a relative message file resolves against the directory the command runs in.
+    `env -u NAME`/`--unset NAME` names are returned as unsets, so the identity check can
+    drop a var an earlier `export` set and this command removes (env -u GIT_AUTHOR_NAME).
     """
     assigns = []
+    unsets = []
     chdir = None
     i = 0
     while i < len(seg) and _ENV_ASSIGN_RE.match(seg[i]):
         assigns.append(seg[i])
         i += 1
     if i >= len(seg) or seg[i] != "env":
-        return assigns, seg[i:], chdir
+        return assigns, seg[i:], chdir, unsets
 
     rest = list(seg[i + 1:])  # tokens after `env`; mutated in place to inline `-S`
     j = 0
@@ -574,16 +679,29 @@ def _strip_env_prefix(seg):
                 else:
                     j += 1
                 continue
-            if name in _ENV_ARG_OPTS and "=" not in t:
-                j += 2
-            else:
+            # env -u NAME / --unset NAME / -uNAME / --unset=NAME removes NAME from the
+            # child environment. Record it so an AI identity an earlier export set, then
+            # this command unsets, is not still counted against the commit.
+            if t.startswith("-u") and not t.startswith("--") and len(t) > 2:
+                unsets.append(t[2:])
                 j += 1
+                continue
+            if t.startswith("--unset="):
+                unsets.append(t.split("=", 1)[1])
+                j += 1
+                continue
+            if t in ("-u", "--unset"):
+                if j + 1 < len(rest):
+                    unsets.append(rest[j + 1])
+                j += 2
+                continue
+            j += 1  # any other env option takes no separate value token we track
         elif _ENV_ASSIGN_RE.match(t):
             assigns.append(t)
             j += 1
         else:
             break  # the command word
-    return assigns, rest[j:], chdir
+    return assigns, rest[j:], chdir, unsets
 
 
 # Command-runner wrappers that execute the command word following them, hiding it from
@@ -618,22 +736,61 @@ def _strip_command_wrappers(core):
     return core
 
 
+def _shell_c_script(core):
+    """If core is a shell interpreter run with `-c <script>`, return the script string.
+
+    `bash -c 'git commit -m "..."'` hides a watched command inside a quoted script token,
+    which shlex keeps whole, so the outer parse sees only `bash`. Return that inner script
+    so find_attribution can recurse into it. The command word is matched by basename
+    (`/bin/bash`), and the `c` may sit anywhere in a short cluster (`bash -lc 'script'`),
+    where bash reads the next argument as the command string. Returns None when core is not
+    a `-c` shell invocation (a bare `bash script.sh` runs a file, out of scope)."""
+    if not core or os.path.basename(core[0]) not in _SHELL_RUNNERS:
+        return None
+    i = 1
+    while i < len(core):
+        t = core[i]
+        if t == "--command" or t == "-c":
+            return core[i + 1] if i + 1 < len(core) else None
+        if t.startswith("--"):
+            i += 1
+            continue
+        if t.startswith("-") and len(t) > 1:
+            if "c" in t[1:]:  # -c in a cluster (e.g. -lc): the script is the next arg
+                return core[i + 1] if i + 1 < len(core) else None
+            i += 1
+            continue
+        return None  # a non-option before any -c: a script-file run, not -c
+    return None
+
+
 def _watched_spec(core):
-    """Return the flag spec for a watched command (env-prefix already stripped), or None."""
+    """Return the flag spec for a watched command (env-prefix already stripped), or None.
+
+    The command word is matched by basename, so an interpreter invoked by an absolute or
+    relative path (/usr/bin/git, ./gh) is still recognized, while a lookalike whose name
+    merely ends in git (mygit) is not."""
     if not core:
         return None, 0
-    if core[0] == "git":
+    cmd = os.path.basename(core[0])
+    if cmd == "git":
         sub, idx = _git_subcommand(core)
         if sub == "commit":
             return _GIT_COMMIT, idx + 1
+        if sub == "merge":
+            return _GIT_MERGE, idx + 1
         return None, 0
-    if core[0] == "gh":
+    if cmd == "gh":
         spec = _gh_spec(core)
         if spec is not None:
             # Scan every token after `gh`: the body/title/file flags are extracted
             # wherever they sit, and the group, subcommand, and global-flag values are
             # ignored as positionals. So the command word need not be at a fixed index.
             return spec, 1
+        if "api" in core[1:]:
+            # gh api writes the record via key=value fields or a --input body file, a
+            # different surface from the flag specs (see _gh_api_hits).
+            return _GH_API, 1
     return None, 0
 
 
@@ -652,8 +809,12 @@ def _gh_spec(core):
             return _GH_PR_CREATE
         if "edit" in toks:
             return _GH_EDIT  # pr edit rewrites title and body, not only body
+        if "merge" in toks:
+            return _GH_MERGE  # pr merge --subject/--body set the merge commit message
         if toks & {"comment", "review"}:
             return _GH_BODY_ONLY
+        if toks & {"close", "reopen"}:
+            return _GH_COMMENT_ONLY  # close/reopen carry a --comment body
     if "issue" in toks:
         if "create" in toks:
             return _GH_PR_CREATE  # issue create carries title + body like pr create
@@ -661,6 +822,66 @@ def _gh_spec(core):
             return _GH_EDIT
         if "comment" in toks:
             return _GH_BODY_ONLY
+        if toks & {"close", "reopen"}:
+            return _GH_COMMENT_ONLY
+    return None
+
+
+def _gh_api_hits(core, read_dirs):
+    """Return a reason if a `gh api` call would write AI attribution, else None.
+
+    gh api writes record text through key=value fields or a whole request-body file:
+      -f/--raw-field key=value : value is always literal text
+      -F/--field key=value     : value is text, or a file when it starts with `@`
+      --input file             : the JSON request body is read from a file (or `-` stdin)
+    Only value-carrying keys that hold visible prose (body/title/message/...) are scanned;
+    a control field like state=closed is ignored. Files resolve against read_dirs; an
+    unreadable file is nothing to scan (fail open)."""
+    args = core[1:]
+    i, n = 0, len(args)
+    while i < n:
+        t = args[i]
+        mode, val = None, None
+        if t in ("-f", "--raw-field"):
+            val, mode = (args[i + 1] if i + 1 < n else None), "raw"
+            i += 2
+        elif t in ("-F", "--field"):
+            val, mode = (args[i + 1] if i + 1 < n else None), "field"
+            i += 2
+        elif t.startswith("--raw-field="):
+            val, mode = t.split("=", 1)[1], "raw"
+            i += 1
+        elif t.startswith("--field="):
+            val, mode = t.split("=", 1)[1], "field"
+            i += 1
+        elif t.startswith("-f") and not t.startswith("--") and len(t) > 2:
+            val, mode = t[2:], "raw"
+            i += 1
+        elif t.startswith("-F") and not t.startswith("--") and len(t) > 2:
+            val, mode = t[2:], "field"
+            i += 1
+        elif t == "--input" or t.startswith("--input="):
+            fname = t.split("=", 1)[1] if "=" in t else (args[i + 1] if i + 1 < n else None)
+            i += 1 if "=" in t else 2
+            if fname and fname != "-" and _input_file_has_attribution(fname, read_dirs):
+                return "attribution in a gh api --input request body file"
+            continue
+        else:
+            i += 1
+            continue
+        if val is None:
+            continue
+        key, sep, v = val.partition("=")
+        if not sep or key.strip().lower() not in _GH_API_TEXT_KEYS:
+            continue
+        # -F/--field reads a file when the value starts with `@` (@- is stdin, skipped).
+        if mode == "field" and v.startswith("@"):
+            fname = v[1:]
+            if fname and fname != "-" and _named_file_has_attribution(fname, read_dirs):
+                return "attribution in a gh api field file"
+            continue
+        if contains_attribution(v):
+            return "attribution in a gh api request field"
     return None
 
 
@@ -685,6 +906,75 @@ def _read_named_file(name, cwd):
             return fh.read(_MAX_FILE_BYTES)
     except OSError:
         return None
+
+
+def _named_file_has_attribution(name, read_dirs):
+    """True if the file `name` holds an AI attribution byline, else False.
+
+    Resolves the name against each run dir and, for a leading ~, its home-expanded form,
+    and blocks if any readable interpretation carries a byline. shlex discards whether a ~
+    was quoted and cd tracking is best-effort, so reading every interpretation makes a
+    wrong guess a false positive, never a missed byline."""
+    candidates = [name]
+    expanded = os.path.expanduser(name)
+    if expanded != name:
+        candidates.append(expanded)
+    for cand in candidates:
+        for read_dir in read_dirs:
+            content = _read_named_file(cand, read_dir)
+            if content is not None and contains_attribution(content):
+                return True
+    return False
+
+
+def _obj_text_has_attribution(obj, depth=0):
+    """True if a parsed gh api --input body names an AI tool in a record-text field.
+
+    The request body is JSON, so a byline sits inside a string value (`{"body": "Generated
+    with Claude"}`) where the line-anchored prose check would not see it. Scan the string
+    value of each record-text key (body/title/message/...) as prose, recursing into nested
+    objects/arrays under a small depth cap."""
+    if depth > 4:
+        return False
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if isinstance(k, str) and isinstance(v, str) and k.lower() in _GH_API_TEXT_KEYS:
+                if contains_attribution(v):
+                    return True
+            elif isinstance(v, (dict, list)):
+                if _obj_text_has_attribution(v, depth + 1):
+                    return True
+    elif isinstance(obj, list):
+        for item in obj:
+            if isinstance(item, (dict, list)) and _obj_text_has_attribution(item, depth + 1):
+                return True
+    return False
+
+
+def _input_file_has_attribution(name, read_dirs):
+    """True if a gh api --input JSON request-body file names an AI tool in a record field.
+
+    Parses the file as JSON and scans its record-text values (see _obj_text_has_attribution).
+    A file that does not parse as JSON is scanned as raw prose, a best effort that never
+    wedges the session."""
+    candidates = [name]
+    expanded = os.path.expanduser(name)
+    if expanded != name:
+        candidates.append(expanded)
+    for cand in candidates:
+        for read_dir in read_dirs:
+            content = _read_named_file(cand, read_dir)
+            if content is None:
+                continue
+            try:
+                obj = json.loads(content)
+            except ValueError:
+                if contains_attribution(content):
+                    return True
+                continue
+            if _obj_text_has_attribution(obj):
+                return True
+    return False
 
 
 def _resolve_dir(base, target):
@@ -735,12 +1025,13 @@ def _git_effective_dir(core, stop, base):
     return d
 
 
-def find_attribution(command, cwd):
+def find_attribution(command, cwd, depth=0):
     """Return a short reason string if the command would write AI attribution, else None.
 
     Walks the command's logical lines (so a newline-separated command is seen), then the
     segments of each, tracking the effective directory across `cd` so relative message
-    files resolve where the command would read them.
+    files resolve where the command would read them. `depth` bounds recursion into a shell
+    runner's `-c` script (bash -c '<script>'), so a pathological nest cannot run away.
     """
     eff_cwd = cwd
     exported_identity = {}  # exported identity var -> latest value (shell last-wins)
@@ -755,14 +1046,25 @@ def find_attribution(command, cwd):
             continue
 
         for seg in _segments(tokens):
+            seg = _strip_redirects(seg)
             seg = _strip_leading_keywords(seg)
             if not seg:
                 continue
-            assigns, core, env_chdir = _strip_env_prefix(seg)
+            assigns, core, env_chdir, unsets = _strip_env_prefix(seg)
             if not core:
                 continue
             core = _strip_command_wrappers(core)
             if not core:
+                continue
+            # `bash -c '<script>'` hides a git/gh command in its script argument. Recurse
+            # into that script (depth-bounded) so an inline byline is caught the same as a
+            # top-level one; the runner itself writes nothing, so stop after recursing.
+            script = _shell_c_script(core)
+            if script is not None:
+                if depth < _MAX_SHELL_DEPTH:
+                    inner = find_attribution(script, eff_cwd, depth + 1)
+                    if inner is not None:
+                        return inner
                 continue
             if core[0] == "cd":
                 eff_cwd = _apply_cd(core, eff_cwd)
@@ -791,14 +1093,16 @@ def find_attribution(command, cwd):
             if spec is None:
                 continue
             seg_cwd = base
-            if spec is _GIT_COMMIT:
+            if spec is _GIT_COMMIT or spec is _GIT_MERGE:
                 # -C composes onto the base, so a relative -F file resolves correctly.
                 seg_cwd = _git_effective_dir(core, start - 1, base)
                 # `GIT_AUTHOR_NAME=Claude git commit ...` sets authorship via the
                 # environment, the same as --author. Effective identity = exported vars,
-                # then the inline prefix overriding them (both last-wins), matching what
-                # the shell hands git. Read those identity vars as fields.
+                # minus any env -u unset, then the inline prefix overriding them (all
+                # last-wins), matching what the shell hands git. Read those vars as fields.
                 effective = dict(exported_identity)
+                for u in unsets:
+                    effective.pop(u, None)
                 for a in assigns:
                     name, _, val = a.partition("=")
                     effective[name] = val
@@ -806,9 +1110,18 @@ def find_attribution(command, cwd):
                     if name in _GIT_IDENTITY_ENV and value_names_tool(val):
                         return "tool or bot named in a git identity environment variable"
                 # `git -c user.name=Claude commit ...` sets identity via config;
-                # core[start-1] is the `commit` token, so globals are core[1:start-1].
+                # core[start-1] is the commit/merge token, so globals are core[1:start-1].
                 if _git_config_identity_hit(core, start - 1):
                     return "tool or bot named in a git -c identity config value"
+            # cd tracking is best-effort (a subshell `(cd x)` does not persist, a failed cd
+            # does not move), so resolve a relative file against both the tracked dir and
+            # the payload cwd; a wrong guess is a false positive, never a miss.
+            read_dirs = [seg_cwd] if seg_cwd == cwd else [seg_cwd, cwd]
+            if spec is _GH_API:
+                reason = _gh_api_hits(core, read_dirs)
+                if reason is not None:
+                    return reason
+                continue
             found = _collect(core[start:], spec)
             for text in found["text"]:
                 # Scan the raw token and its ANSI-C variants (leading `$` removed, escapes
@@ -819,31 +1132,17 @@ def find_attribution(command, cwd):
             for field in found["field"]:
                 if value_names_tool(field):
                     return "tool or bot named in an author/trailer field"
-            # Resolve a relative file against both the tracked dir and the payload cwd, and
-            # block on either. cd tracking is a best effort (a subshell `(cd x)` does not
-            # persist, a failed `cd` does not move) so the shell's real cwd can differ from
-            # the tracked one; reading both makes a wrong guess a false positive, never a miss.
-            read_dirs = [seg_cwd] if seg_cwd == cwd else [seg_cwd, cwd]
             for name in found["file"]:
-                # Read the name as written (resolved against the tracked dir and the payload
-                # cwd) and, for a leading ~, its home-expanded form too. shlex discards
-                # whether the ~ was quoted, so both interpretations are read and either
-                # blocks: a wrong guess is a false positive, never a missed byline (the same
-                # safe-direction tradeoff the cd/dir tracking above makes).
-                candidates = [name]
-                expanded = os.path.expanduser(name)
-                if expanded != name:
-                    candidates.append(expanded)
-                for cand in candidates:
-                    for read_dir in read_dirs:
-                        content = _read_named_file(cand, read_dir)
-                        if content is not None and contains_attribution(content):
-                            return f"attribution in the file '{name}'"
+                if _named_file_has_attribution(name, read_dirs):
+                    return f"attribution in the file '{name}'"
     return None
 
 
 def main():
-    raw = sys.stdin.read()
+    # Bound the read: a command larger than any real one is truncated, so the JSON no
+    # longer parses and the hook fails open fast, instead of spending seconds tokenizing a
+    # payload that cannot be a legitimate command. A never-wedge, never-exhaust safeguard.
+    raw = sys.stdin.read(_MAX_STDIN_BYTES)
     try:
         data = json.loads(raw) if raw.strip() else {}
     except json.JSONDecodeError:

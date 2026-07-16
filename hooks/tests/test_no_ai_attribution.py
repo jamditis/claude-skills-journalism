@@ -911,3 +911,274 @@ def test_allow_wrapper_without_watched_command():
     # A wrapper in front of a non-watched command still passes straight through.
     assert_allowed(run("nohup ./deploy.sh"))
     assert_allowed(run("exec ./run-tests.sh"))
+
+
+# --------------------------------------------------------------------------
+# codex 5.6-sol/xhigh round on head 870c4ee: common-form bypasses.
+# Each block closes a form a normal workflow can produce that slipped past the
+# "first token is literally git/gh, only git commit is watched" model.
+# --------------------------------------------------------------------------
+
+# -- command word reached by a path (/usr/bin/git, ./gh) --
+
+def test_block_absolute_path_git_commit():
+    # Automation invokes the interpreter by absolute path; the command word is still git.
+    assert_blocked(run('/usr/bin/git commit -m "Generated with Claude Code"'))
+
+
+def test_block_relative_path_gh_pr_create():
+    assert_blocked(run('./gh pr create --body "Generated with Claude Code"'))
+
+
+def test_allow_pathed_non_watched_command():
+    assert_allowed(run("/usr/bin/ls -la"))
+
+
+def test_allow_basename_lookalike_is_not_git():
+    # A tool literally named mygit is not git; basename must be exact, not a suffix.
+    assert_allowed(run('mygit commit -m "Generated with Claude Code"'))
+
+
+# -- git merge writes a commit with a message/file, same as git commit --
+
+def test_block_git_merge_message():
+    assert_blocked(run('git merge --no-ff topic -m "Generated with Claude Code"'))
+
+
+def test_block_git_merge_message_abbrev():
+    # git accepts an unambiguous abbreviation of --message on merge too.
+    assert_blocked(run('git merge topic --mess "Generated with Claude Code"'))
+
+
+def test_block_git_merge_file(tmp_path):
+    (tmp_path / "MSG").write_text("Generated with Claude Code\n")
+    assert_blocked(run("git merge topic -F MSG", cwd=tmp_path))
+
+
+def test_block_git_merge_identity_env():
+    assert_blocked(run('GIT_AUTHOR_NAME=Claude git merge --no-ff topic -m "Merge branch"'))
+
+
+def test_allow_git_merge_clean():
+    assert_allowed(run('git merge --no-ff topic -m "Merge topic into main"'))
+
+
+def test_allow_git_merge_no_message():
+    assert_allowed(run("git merge topic"))
+
+
+# -- gh pr merge sets the merge/squash commit message --
+
+def test_block_gh_pr_merge_subject():
+    assert_blocked(run('gh pr merge 123 --merge --subject "Generated with Claude Code" --body ok'))
+
+
+def test_block_gh_pr_merge_body():
+    assert_blocked(run('gh pr merge 123 --squash --body "Written by ChatGPT"'))
+
+
+def test_block_gh_pr_merge_body_file(tmp_path):
+    (tmp_path / "B.md").write_text("Generated with Claude Code\n")
+    assert_blocked(run("gh pr merge 123 --merge --body-file B.md", cwd=tmp_path))
+
+
+def test_allow_gh_pr_merge_method_flag_not_message():
+    # -m here is the merge-method flag, not a message; a clean subject must pass.
+    assert_allowed(run('gh pr merge 123 -m --subject "Merge pull request #123"'))
+
+
+# -- gh pr/issue close and reopen carry a --comment body --
+
+def test_block_gh_pr_close_comment():
+    assert_blocked(run('gh pr close 123 --comment "Generated with Claude Code"'))
+
+
+def test_block_gh_issue_close_comment_short():
+    assert_blocked(run('gh issue close 45 -c "Generated with Claude Code"'))
+
+
+def test_block_gh_pr_reopen_comment():
+    assert_blocked(run('gh pr reopen 123 --comment "Written by ChatGPT"'))
+
+
+def test_allow_gh_pr_close_clean():
+    assert_allowed(run('gh pr close 123 --comment "Closing, superseded by #200"'))
+
+
+def test_allow_gh_pr_close_no_comment():
+    assert_allowed(run("gh pr close 123"))
+
+
+# -- gh api posts record-writing requests via -f/--field/--input --
+
+def test_block_gh_api_raw_field_body():
+    assert_blocked(run(
+        'gh api repos/O/R/issues/123/comments -f body="Generated with Claude Code"'))
+
+
+def test_block_gh_api_field_body_long():
+    assert_blocked(run(
+        'gh api repos/O/R/issues/1/comments --raw-field body="Written by ChatGPT"'))
+
+
+def test_block_gh_api_field_body_at_file(tmp_path):
+    (tmp_path / "B.md").write_text("Generated with Claude Code\n")
+    assert_blocked(run(
+        "gh api repos/O/R/issues/1/comments -F body=@B.md", cwd=tmp_path))
+
+
+def test_block_gh_api_input_file(tmp_path):
+    (tmp_path / "body.json").write_text('{"body": "Generated with Claude Code"}\n')
+    assert_blocked(run(
+        "gh api repos/O/R/issues/1/comments --input body.json", cwd=tmp_path))
+
+
+def test_allow_gh_api_clean_body():
+    assert_allowed(run('gh api repos/O/R/issues/1/comments -f body="Thanks for the fix"'))
+
+
+def test_allow_gh_api_non_body_field():
+    assert_allowed(run("gh api repos/O/R/pulls/1 -f state=closed"))
+
+
+def test_allow_gh_api_read():
+    assert_allowed(run("gh api repos/O/R/pulls/1"))
+
+
+# -- shell -c runners hide a git/gh command inside a script string --
+
+def test_block_bash_c_git_commit():
+    assert_blocked(run('bash -c \'git commit -m "Generated with Claude Code"\''))
+
+
+def test_block_bash_lc_git_commit():
+    assert_blocked(run('bash -lc \'git commit -m "Generated with Claude Code"\''))
+
+
+def test_block_sh_c_git_commit():
+    assert_blocked(run('sh -c \'git commit -m "Generated with Claude Code"\''))
+
+
+def test_block_pathed_shell_c_git_commit():
+    assert_blocked(run('/bin/bash -c \'git commit -m "Generated with Claude Code"\''))
+
+
+def test_block_shell_c_author_field_through_recursion():
+    # The recursion reuses the full matcher, so an author-field credit inside the -c script
+    # is caught the same as an inline one.
+    assert_blocked(run('sh -c "git commit --author=\'Claude <c@anthropic.com>\' -m Fix"'))
+
+
+def test_allow_bash_c_clean():
+    assert_allowed(run('bash -c \'git commit -m "Fix the parser"\''))
+
+
+def test_allow_bash_c_non_watched():
+    assert_allowed(run("bash -c 'ls -la && echo done'"))
+
+
+def test_shell_c_deep_nesting_does_not_hang():
+    # A pathological deep nest must return within the harness timeout (depth-bounded),
+    # not recurse without bound. Correctness of the verdict at the bottom is secondary
+    # to the never-wedge contract; assert it simply completes and exits cleanly.
+    # Depth 8 exceeds any sane recursion cap while keeping the string small: each wrap
+    # re-escapes the inner quotes, so the length grows geometrically and a large depth
+    # would blow up the test itself, not the hook.
+    cmd = "git commit -m ok"
+    for _ in range(8):
+        cmd = "bash -c '%s'" % cmd.replace("'", "'\\''")
+    r = run(cmd)
+    assert r.returncode in (0, 2)
+
+
+# -- tool-token set omits common authorship-capable agents --
+
+def test_block_generated_with_aider():
+    assert_blocked(run('git commit -m "Generated with Aider"'))
+
+
+def test_block_written_by_windsurf():
+    assert_blocked(run('git commit -m "Written by Windsurf"'))
+
+
+def test_block_byline_names_devin():
+    assert_blocked(run('git commit -m "Fix parser\n\nGenerated by Devin"'))
+
+
+def test_allow_human_named_devin_in_author_field():
+    # Devin is a common human first name: a byline token, not a strict author-field token,
+    # so a real person named Devin still authors a commit.
+    assert_allowed(run('git commit --author="Devin Smith <devin@example.com>" -m Fix'))
+
+
+def test_allow_devin_as_subject_matter():
+    assert_allowed(run('git commit -m "Add the Devin integration adapter"'))
+
+
+# -- generic-AI identity in an authorship field --
+
+def test_block_ai_assistant_author():
+    assert_blocked(run('git commit --author="AI Assistant <a@example.com>" -m Fix'))
+
+
+def test_block_ai_bot_trailer():
+    assert_blocked(run('git commit -m Fix --trailer "Co-Authored-By: AI Bot <a@x.com>"'))
+
+
+def test_allow_human_first_name_ai():
+    # A person whose name is Ai (a real given name) is not "AI Assistant"; bare Ai passes.
+    assert_allowed(run('git commit --author="Ai Nakamura <ai@example.com>" -m Fix'))
+
+
+# -- markdown +/ordered-list byline prefixes --
+
+def test_block_plus_bullet_byline():
+    assert_blocked(run('gh pr create --title Fix --body "+ Generated with Claude Code"'))
+
+
+def test_block_ordered_list_byline():
+    assert_blocked(run('gh pr create --title Fix --body "1. Generated with Claude Code"'))
+
+
+def test_allow_plus_in_prose():
+    assert_allowed(run('gh pr create --title Fix --body "Compute a + b for the totals"'))
+
+
+# -- env -u clears an identity var that an earlier export set --
+
+def test_allow_env_unset_clears_flagged_identity():
+    # export sets an AI-looking author, then env -u removes it for the commit, so git uses
+    # the clean configured identity. Blocking here is a false positive.
+    assert_allowed(run(
+        "export GIT_AUTHOR_NAME=Claude; env -u GIT_AUTHOR_NAME git commit -m Fix"))
+
+
+def test_block_env_set_identity_still_blocks():
+    # The unset path must not weaken the real case: an env-set AI identity still blocks.
+    assert_blocked(run("env GIT_AUTHOR_NAME=Claude git commit -m Fix"))
+
+
+# -- redirections must not hide the command word or split off its flags --
+
+def test_block_leading_redirect_before_git():
+    assert_blocked(run('>/dev/null git commit -m "Generated with Claude Code"'))
+
+
+def test_block_interspersed_redirect_splits_message():
+    assert_blocked(run('git commit >/dev/null -m "Generated with Claude Code"'))
+
+
+def test_block_fd_redirect_before_message():
+    assert_blocked(run('git commit 2>/dev/null -m "Generated with Claude Code"'))
+
+
+def test_allow_trailing_redirect_clean_commit():
+    assert_allowed(run('git commit -m "Fix the parser" >/dev/null 2>&1'))
+
+
+# -- fail-open integrity: a giant payload must not exhaust memory or hang --
+
+def test_huge_stdin_payload_fails_open():
+    big = '{"tool_name": "Bash", "tool_input": {"command": "' + ("x" * 12_000_000) + '"}}'
+    r = run("", raw_stdin=big)
+    assert r.returncode == ALLOW
