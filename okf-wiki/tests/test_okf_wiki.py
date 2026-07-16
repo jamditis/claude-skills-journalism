@@ -32,6 +32,13 @@ _boot_spec = importlib.util.spec_from_file_location(
 gh_wiki_bootstrap = importlib.util.module_from_spec(_boot_spec)
 _boot_spec.loader.exec_module(gh_wiki_bootstrap)
 
+# The scaffolder evaluates a PEP 508 environment marker on a preserved requirements.txt's
+# PyYAML line only when `packaging` is importable; without it, it falls back to treating the
+# line as installable. Tests that assert an EXCLUDING marker warns therefore need packaging
+# present, so they guard on this. A matching or absent marker holds either way (the fallback
+# also selects the env), so those need no guard.
+HAS_PACKAGING = importlib.util.find_spec("packaging") is not None
+
 GOOD = """---
 type: Process
 title: good
@@ -259,6 +266,203 @@ def test_force_preserve_warns_with_constraint_file_and_no_pyyaml(tmp_path):
     assert rc == 0, out
     assert "does not list PyYAML" in out
     assert "PyYAML>=5.1" in out
+
+
+@pytest.mark.skipif(not HAS_PACKAGING, reason="marker evaluation needs the packaging library")
+def test_force_preserve_warns_when_pyyaml_marker_excludes_env(tmp_path):
+    # #185: a PyYAML line gated by a PEP 508 marker to another environment installs nothing
+    # here, so the preserved file still lacks an importable PyYAML. The name sniffer alone
+    # reads it as declared and stays silent; the marker must be evaluated so the note fires
+    # when the declaration will not install for the interpreter that runs validate.py.
+    target = tmp_path / "kb"
+    scaffold(target)
+    (target / "requirements.txt").write_text(
+        'PyYAML; sys_platform == "no-such-platform"\n', encoding="utf-8")
+    rc, out = scaffold(target, "--force")
+    assert rc == 0, out
+    assert "does not list PyYAML" in out
+    assert "PyYAML>=5.1" in out
+
+
+def test_force_preserve_no_warning_when_pyyaml_marker_matches(tmp_path):
+    # the other side: a PyYAML line whose marker selects this interpreter installs normally,
+    # so the note must stay silent. Guards against over-nagging on a valid environment gate.
+    # Holds with or without packaging: the marker matches, and the no-packaging fallback also
+    # treats the line as installable.
+    target = tmp_path / "kb"
+    scaffold(target)
+    (target / "requirements.txt").write_text(
+        'PyYAML; python_version >= "3.0"\n', encoding="utf-8")
+    rc, out = scaffold(target, "--force")
+    assert rc == 0, out
+    assert "skipping validation" in out.lower()
+    assert "does not list PyYAML" not in out
+
+
+@pytest.mark.skipif(not HAS_PACKAGING, reason="marker evaluation needs the packaging library")
+def test_force_preserve_warns_when_pyyaml_hash_line_marker_excludes_env(tmp_path):
+    # #185 (review): pip-compile --generate-hashes writes a requirement as a backslash-
+    # continued block: the marker on the first physical line, indented `--hash` options on
+    # following lines. Read physically, the first line keeps a trailing '\' that breaks marker
+    # parsing, so an environment-excluded PyYAML read as installable and the note went silent.
+    # Joining continuations first reconstructs the logical line, drops the hash options, and
+    # the excluding marker fires the note.
+    target = tmp_path / "kb"
+    scaffold(target)
+    (target / "requirements.txt").write_text(
+        'pyyaml==6.0.1 ; sys_platform == "no-such-platform" \\\n'
+        '    --hash=sha256:aaaa \\\n'
+        '    --hash=sha256:bbbb\n', encoding="utf-8")
+    rc, out = scaffold(target, "--force")
+    assert rc == 0, out
+    assert "does not list PyYAML" in out
+
+
+def test_force_preserve_no_warning_when_pyyaml_hash_line_no_marker(tmp_path):
+    # guard on the join: a hash-locked PyYAML with no marker reconstructs to an installable
+    # line, so the note stays silent. Holds with or without packaging.
+    target = tmp_path / "kb"
+    scaffold(target)
+    (target / "requirements.txt").write_text(
+        'pyyaml==6.0.1 \\\n    --hash=sha256:aaaa \\\n    --hash=sha256:bbbb\n', encoding="utf-8")
+    rc, out = scaffold(target, "--force")
+    assert rc == 0, out
+    assert "does not list PyYAML" not in out
+
+
+def test_force_preserve_no_warning_when_comment_ends_in_backslash(tmp_path):
+    # #185 (review): pip does not continue a full-line comment even when it ends in '\'. If the
+    # join treated the comment as continuing, it would swallow the following PyYAML line into
+    # the comment, hiding the declaration and firing a false 'missing PyYAML' note. The comment
+    # must be emitted on its own so the real PyYAML line is read. Holds with or without packaging.
+    target = tmp_path / "kb"
+    scaffold(target)
+    (target / "requirements.txt").write_text(
+        "# a trailing note that ends in a backslash \\\n"
+        "PyYAML==6.0.1\n", encoding="utf-8")
+    rc, out = scaffold(target, "--force")
+    assert rc == 0, out
+    assert "does not list PyYAML" not in out
+
+
+def test_force_preserve_no_warning_when_comment_backslash_precedes_include(tmp_path):
+    # #185 (review): same join bug, higher-impact variant. A comment ending in '\' just before
+    # an `-r` include directive would swallow the directive, so the include (which may supply
+    # PyYAML from a file we do not read) goes unseen and the note wrongly fires. The comment
+    # must not continue, so the `-r` line is read and suppresses the note.
+    target = tmp_path / "kb"
+    scaffold(target)
+    (target / "requirements.txt").write_text(
+        "# via requirements.in \\\n"
+        "-r base.txt\n", encoding="utf-8")
+    rc, out = scaffold(target, "--force")
+    assert rc == 0, out
+    assert "does not list PyYAML" not in out
+
+
+@pytest.mark.parametrize("line,expected", [
+    ("PyYAML>=5.1", True),                       # no marker: installs here
+    ('PyYAML; python_version >= "3.0"', True),   # marker selects this interpreter
+    ("PyYAML  # just a note", True),             # inline comment, no marker
+    ("PyYAML; ", True),                          # empty marker after ';'
+])
+def test_requirement_marker_selects_env_true_cases(line, expected):
+    # a missing, empty, or matching marker selects the current environment. These hold with
+    # or without packaging, since the packaging-absent fallback also returns True, so no
+    # skip guard is needed here (only the excluding case below depends on packaging).
+    assert scaffold_mod._requirement_marker_selects_env(line) == expected
+
+
+@pytest.mark.skipif(not HAS_PACKAGING, reason="marker evaluation needs the packaging library")
+def test_requirement_marker_excludes_env():
+    # an excluding marker returns False only when packaging can evaluate it; the fallback
+    # (packaging absent) returns True, so this case is guarded on packaging being present.
+    assert scaffold_mod._requirement_marker_selects_env(
+        'PyYAML; sys_platform == "no-such-platform"') is False
+
+
+@pytest.mark.skipif(not HAS_PACKAGING, reason="marker evaluation needs the packaging library")
+def test_requirement_marker_hash_inside_quoted_marker_excludes():
+    # a '#' inside a quoted marker string is not a pip comment; stripping at the first '#'
+    # would corrupt the marker. Parsing the full requirement keeps it intact, so the
+    # excluding marker still evaluates (no implementation is named "cpython#not").
+    assert scaffold_mod._requirement_marker_selects_env(
+        'PyYAML; implementation_name == "cpython#not"') is False
+
+
+@pytest.mark.skipif(not HAS_PACKAGING, reason="marker evaluation needs the packaging library")
+def test_requirement_marker_semicolon_inside_url_excludes():
+    # a ';' inside a direct-reference URL is part of the URL, not the marker separator.
+    # Splitting on the first ';' would misread the URL as the marker; parsing the full
+    # requirement extracts the real trailing marker after ' ; ' and evaluates it.
+    assert scaffold_mod._requirement_marker_selects_env(
+        'PyYAML @ https://example.com/pkg;param ; sys_platform == "no-such-platform"') is False
+
+
+@pytest.mark.skipif(not HAS_PACKAGING, reason="marker evaluation needs the packaging library")
+def test_requirement_marker_hashed_requirement_excluded():
+    # a hash-pinned line (pip-compile --generate-hashes) carries pip's per-requirement
+    # `--hash` option, which packaging.requirements.Requirement rejects. The pip option must
+    # be stripped before parsing, or the excluding marker is never seen and the missing-PyYAML
+    # warning is wrongly suppressed. With the option dropped the marker evaluates and excludes.
+    assert scaffold_mod._requirement_marker_selects_env(
+        'PyYAML==6.0.1; sys_platform == "no-such-platform" '
+        '--hash=sha256:aaaa --hash=sha256:bbbb') is False
+
+
+def test_requirement_marker_hashed_requirement_matches():
+    # a hash-pinned PyYAML with no marker still counts as installable: dropping the `--hash`
+    # options leaves a bare, applicable requirement. Holds with or without packaging (the
+    # packaging-absent fallback also returns True), so no skip guard is needed.
+    assert scaffold_mod._requirement_marker_selects_env(
+        'PyYAML==6.0.1 --hash=sha256:aaaa') is True
+
+
+@pytest.mark.skipif(not HAS_PACKAGING, reason="marker evaluation needs the packaging library")
+def test_requirement_marker_whitespace_hash_inside_quoted_marker_excludes():
+    # #185 (review): a '#' preceded by whitespace *inside* a quoted marker value is part of the
+    # marker, not a pip inline comment. Stripping the comment before parsing (the earlier
+    # regex-first approach) corrupts the marker and the line reads as installable, wrongly
+    # suppressing the note. Parsing the whole line first keeps the '#' intact, so the excluding
+    # marker still evaluates (no implementation is named "cpython #not").
+    assert scaffold_mod._requirement_marker_selects_env(
+        'PyYAML; implementation_name == "cpython #not"') is False
+
+
+@pytest.mark.skipif(not HAS_PACKAGING, reason="marker evaluation needs the packaging library")
+def test_requirement_marker_trailing_comment_after_marker_excludes():
+    # guard on the parse-first change: a real pip inline comment after the marker must still be
+    # stripped so the marker evaluates. The whole-line parse fails on the trailing comment, then
+    # the comment is removed on retry and the excluding marker evaluates to False.
+    assert scaffold_mod._requirement_marker_selects_env(
+        'PyYAML; sys_platform == "no-such-platform"  # windows only') is False
+
+
+@pytest.mark.skipif(not HAS_PACKAGING, reason="marker evaluation needs the packaging library")
+def test_requirement_marker_unevaluable_lockfile_marker_does_not_crash():
+    # #185 (review): packaging 26 added lock-file-context marker variables. A line such as
+    # `PyYAML; dependency_groups == "docs"` parses, but Marker.evaluate() raises KeyError in the
+    # default metadata context because that variable is not defined there. Any evaluation failure
+    # must be treated as unjudgeable and fall back to installable, not crash. Asserts the outcome
+    # (True, no exception), which also holds on older packaging that rejects the marker at parse
+    # time (InvalidRequirement, then True via the parse fallback).
+    assert scaffold_mod._requirement_marker_selects_env(
+        'PyYAML; dependency_groups == "docs"') is True
+
+
+@pytest.mark.skipif(not HAS_PACKAGING, reason="marker evaluation needs the packaging library")
+def test_force_preserve_no_crash_on_unevaluable_marker(tmp_path):
+    # #185 (review): a preserved requirements.txt whose PyYAML line carries a marker that parses
+    # but cannot be evaluated in the default context (dependency_groups, a lock-file-only
+    # variable) must not crash the --force run. The marker is unjudgeable, so PyYAML counts as
+    # possibly installable and the note stays silent; the run exits 0.
+    target = tmp_path / "kb"
+    scaffold(target)
+    (target / "requirements.txt").write_text(
+        'PyYAML; dependency_groups == "docs"\n', encoding="utf-8")
+    rc, out = scaffold(target, "--force")
+    assert rc == 0, out
+    assert "does not list PyYAML" not in out
 
 
 @pytest.mark.parametrize("line,expected", [
