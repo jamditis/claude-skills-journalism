@@ -39,7 +39,7 @@ Two command forms carry no message text for a pre-command check to read, so they
 
 The message is refused when it carries author credit to an AI tool, model, or vendor. The patterns it looks for:
 
-- An attribution verb (generated, created, written, authored, made, built, produced, assisted, co-authored, powered) joined by "with", "by", "using", or "via" to an assistant, model, or company name, when it leads a line: "Generated with Claude Code", "Written by ChatGPT", "Generated using Claude Code".
+- An attribution verb (generated, created, written, authored, made, built, produced, assisted, co-authored, powered) joined by "with", "by", "using", or "via" to an assistant, model, or company name, when it leads a line: "Generated with Claude Code", "Written by ChatGPT", "Generated using Claude Code". The credited name can be a bare "AI" with no model ("Generated with AI", "Written by AI"), and the verb can carry an "AI-" prefix ("AI-assisted by Claude", "AI-generated with GPT-4"). The standalone-"AI" credit is distinguished from the adjective "AI-<noun>" of subject matter, so "Built with AI-powered search" describes the feature and passes.
 - A `Co-Authored-By:` trailer whose name or email points at a model or tool rather than a person.
 - "AI-assisted" or "AI-generated" standing on its own as a sign-off line, or a robot-emoji byline (the emoji leading a line, or sharing a line with an attribution phrase). A robot emoji embedded in ordinary prose, such as "fix the robot-emoji glyph in Slack", is subject matter and passes.
 

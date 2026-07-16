@@ -763,3 +763,33 @@ def test_block_tilde_quoted_real_target_in_cwd(tmp_path):
     (tilde_dir / "MSG").write_text("Generated with Claude Code\n")
     r = run("git commit -F '~/MSG'", cwd=tmp_path)
     assert_blocked(r)
+
+
+# --------------------------------------------------------------------------
+# Local codex 5.5/low round on head 6db857f: generic-AI and AI-prefixed bylines
+# --------------------------------------------------------------------------
+
+def test_block_generic_ai_byline_without_tool_name():
+    # A byline can credit generic "AI" with no model name and still be an authorship
+    # credit. "Generated with AI" / "Written by AI" slipped because AI was not a byline
+    # token. Standalone AI (verb + with/by/using/via + AI, leading a line) now blocks.
+    for msg in ("Generated with AI", "Written by AI", "Created by AI", "Produced using AI"):
+        assert_blocked(run('git commit -m "%s"' % msg))
+
+
+def test_block_ai_prefixed_verb_byline_with_named_tool():
+    # "AI-assisted by Claude" slipped: the AI- prefix pushed the verb off the line-start
+    # anchor and the trailing "by Claude" defeated the bare AI-tag full-line anchor. An
+    # optional AI- prefix on the leading verb, still requiring a named-tool credit, closes
+    # it without touching the subject-matter allowance below.
+    for msg in ("AI-assisted by Claude", "AI-generated with GPT-4", "AI-written by ChatGPT"):
+        assert_blocked(run('git commit -m "%s"' % msg))
+
+
+def test_allow_ai_adjective_subject_after_verb():
+    # The standalone-AI byline token must not fire on the adjective "AI-<noun>" of subject
+    # matter, even right after a verb+with: "Built with AI-powered search" describes the
+    # feature. The negative lookahead (AI not followed by a word char or hyphen) keeps the
+    # adjective form out.
+    assert_allowed(run('git commit -m "Built with AI-powered search for the archive"'))
+    assert_allowed(run('gh pr create --body "Add AI-driven ranking to results"'))

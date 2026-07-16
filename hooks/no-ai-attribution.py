@@ -48,6 +48,17 @@ _ATTR_VERBS = (
     r"generated|created|written|authored|made|built|produced|assisted|co-authored|"
     r"powered"
 )
+# Byline tool tokens: the named tools above plus a standalone "AI", so a generic-AI
+# credit ("Generated with AI", "Written by AI") blocks. The negative lookahead keeps it
+# to a bare "AI" token and out of the adjective "AI-<noun>" of subject matter ("Built
+# with AI-powered search"), which is not a byline. Kept separate from _TOOL_TOKENS so the
+# strict author-field check (value_names_tool) does not trip on a human named "Ai".
+_BYLINE_TOOL_TOKENS = _TOOL_TOKENS + r"|ai(?![\w-])"
+# Optional "AI-"/"AI " prefix on the attribution verb, so "AI-assisted by Claude" and
+# "AI-generated with GPT" anchor as bylines like the bare verb forms. It only adds a match
+# that also carries a with/by/using/via + named tool, so "add AI-assisted analysis" (no
+# trailing tool credit) still reads as subject matter and passes.
+_AI_VERB_PREFIX = r"(?:ai[-\s])?"
 
 # "AI-generated"/"AI-assisted" as a byline: a line whose whole content is the tag
 # (optionally with sign-off punctuation), not the phrase embedded in a sentence. This
@@ -69,8 +80,9 @@ _COAUTHOR_LINE_RE = re.compile(r"^[ \t]*co-authored-by\s*:\s*(?P<value>.+)$", re
 # verb ... (with|by|using|via) ... tool, within one line. Bounded, newline-free gaps
 # so there is no catastrophic backtracking. Used to confirm a robot-emoji byline line.
 _VERB_TOOL_RE = re.compile(
-    r"\b(?:" + _ATTR_VERBS + r")\b[^.\n]{0,40}?\b(?:with|by|using|via)\b[^.\n]{0,40}?\b(?:"
-    + _TOOL_TOKENS
+    r"\b" + _AI_VERB_PREFIX + r"(?:" + _ATTR_VERBS
+    + r")\b[^.\n]{0,40}?\b(?:with|by|using|via)\b[^.\n]{0,40}?\b(?:"
+    + _BYLINE_TOOL_TOKENS
     + r")\b",
     re.I,
 )
@@ -80,8 +92,9 @@ _VERB_TOOL_RE = re.compile(
 # reading as a byline. This is the general prose check; the emoji line already has its
 # own strong cue, so it uses the unanchored form above.
 _VERB_TOOL_BYLINE_RE = re.compile(
-    r"(?im)^[ \t>*•:#_=-]*(?:" + _ATTR_VERBS + r")\b[^.\n]{0,40}?\b(?:with|by|using|via)\b"
-    r"[^.\n]{0,40}?\b(?:" + _TOOL_TOKENS + r")\b"
+    r"(?im)^[ \t>*•:#_=-]*" + _AI_VERB_PREFIX + r"(?:" + _ATTR_VERBS
+    + r")\b[^.\n]{0,40}?\b(?:with|by|using|via)\b"
+    r"[^.\n]{0,40}?\b(?:" + _BYLINE_TOOL_TOKENS + r")\b"
 )
 _TOOL_TOKEN_RE = re.compile(r"\b(?:" + _TOOL_TOKENS + r")\b", re.I)
 # Bot identities in an authorship field: a bot email, a [bot] suffix, or a known
