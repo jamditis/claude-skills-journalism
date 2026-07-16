@@ -76,6 +76,10 @@ _AI_VERB_PREFIX = r"(?:ai[-\s])?"
 # behind one of these. The class holds no newline, and the ordered-list group is bounded,
 # so anchoring it under re.M stays linear per line (no newline-crossing quadratic scan).
 _BYLINE_LEAD = r"[ \t>*•:#_=+-]*(?:\d{1,3}[.)][ \t]*)?"
+# The same lead as a standalone anchor, to peel the markers off the front of one line
+# before testing whether a robot emoji leads it. A `- 🤖` or `> 🤖` sign-off rides these
+# markers exactly as the text bylines do, so the emoji check must strip them too.
+_BYLINE_LEAD_RE = re.compile(r"^" + _BYLINE_LEAD)
 # "AI-generated"/"AI-assisted" as a byline: a line whose whole content is the tag
 # (optionally with sign-off punctuation), not the phrase embedded in a sentence. This
 # blocks a standalone "AI-assisted" sign-off but allows "detect AI-generated images",
@@ -198,7 +202,9 @@ def contains_attribution(text):
     # subject matter and does not fire.
     for line in text.splitlines():
         if ROBOT_EMOJI in line:
-            if line.lstrip().startswith(ROBOT_EMOJI):
+            # Peel leading sign-off markers (`- `, `> `, `1. `, whitespace) before asking
+            # whether the emoji leads the line, so a marked-up sign-off is caught too.
+            if _BYLINE_LEAD_RE.sub("", line, count=1).startswith(ROBOT_EMOJI):
                 return True
             if _AI_INLINE_RE.search(line) or _VERB_TOOL_RE.search(line):
                 return True
@@ -296,10 +302,59 @@ def _logical_lines(command):
         buf.append(ch)
     lines.append("".join(buf))
     return lines
+
+
+def _strip_comment(line):
+    """Return the line with any unquoted shell comment removed.
+
+    Bash starts a comment at an unquoted, unescaped `#` that begins a word (the start of
+    the line, or right after whitespace or a command separator) and ignores the rest of the
+    line. A `#` inside quotes (`"Fix #123"`) or glued mid-word (`issue#123`) is literal and
+    stays. Removing the comment matches what the shell runs, so a clean command trailed by
+    an attributed example in a comment is not falsely blocked; nothing the shell would
+    execute is dropped, so no real byline is lost. shlex is left with commenters off, so a
+    surviving quoted/mid-word `#` is still treated as literal text.
+    """
+    if "#" not in line:
+        return line
+    quote = None
+    escaped = False
+    prev = None  # previous raw char, to spot a word-start `#`
+    for idx, ch in enumerate(line):
+        if escaped:
+            escaped = False
+            prev = ch
+            continue
+        if quote == "'":
+            if ch == "'":
+                quote = None
+            prev = ch
+            continue
+        if ch == "\\" and quote != "'":
+            escaped = True
+            prev = ch
+            continue
+        if quote == '"':
+            if ch == '"':
+                quote = None
+            prev = ch
+            continue
+        if ch in ("'", '"'):
+            quote = ch
+            prev = ch
+            continue
+        if ch == "#" and (prev is None or prev in " \t" or prev in _OPERATOR_CHARS):
+            return line[:idx]
+        prev = ch
+    return line
 # A leading `NAME=value` token is a shell environment assignment that prefixes the
 # command (`GH_TOKEN=x gh pr create ...`), not an argument. These must be stepped
 # over to find the real command word, or the whole invocation reads as unwatched.
 _ENV_ASSIGN_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
+# A bare shell variable name with no `=`, as in `export GIT_AUTHOR_NAME` (mark for export
+# now, assign later). Recording the name lets a subsequent standalone `NAME=value` update
+# the exported value the child git process will see.
+_ENV_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 # Env vars that set commit authorship: the environment twin of `git commit --author`.
 _GIT_IDENTITY_ENV = {
     "GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL", "GIT_COMMITTER_NAME", "GIT_COMMITTER_EMAIL",
@@ -471,10 +526,17 @@ _SHELL_KEYWORDS = {"if", "elif", "then", "else", "while", "until", "do", "!", "t
 
 
 def _strip_leading_keywords(seg):
-    """Drop any leading shell control keywords from a segment, returning the remainder."""
+    """Drop any leading shell control keywords from a segment, returning the remainder.
+
+    `time` takes an optional `-p` portability flag before the pipeline
+    (`time -p git commit ...`); skip it too, or the command word after it hides behind the
+    flag and reads as unwatched. A `-p` not following `time` is left untouched."""
     i = 0
     while i < len(seg) and seg[i] in _SHELL_KEYWORDS:
+        kw = seg[i]
         i += 1
+        if kw == "time" and i < len(seg) and seg[i] == "-p":
+            i += 1
     return seg[i:]
 
 
@@ -495,12 +557,17 @@ def _git_subcommand(tokens):
 
 
 def _git_config_identity_hit(core, stop):
-    """True if a `git -c <identity-key>=<tool>` before the subcommand sets an AI name.
+    """True if the effective `git -c <identity-key>=<value>` before the subcommand sets an
+    AI name.
 
     `git -c user.name=Claude -c user.email=bot@example.com commit` sets the commit
     identity inline, the same authorship surface as --author, so the identity config
-    values are read like an author field. Scans only the global options (core[1:stop]).
+    values are read like an author field. git applies the LAST value for a repeated key,
+    so a clean override of an earlier tool name (`-c user.name=Claude -c user.name=Jane`)
+    commits as the human and must not block: collect the last value per identity key, then
+    check only those. Scans only the global options (core[1:stop]).
     """
+    identity = {}  # identity key (lowercased) -> last value, mirroring git last-wins
     i = 1
     while i < stop:
         t = core[i]
@@ -515,9 +582,9 @@ def _git_config_identity_hit(core, stop):
             i += 1
             continue
         name, sep, val = cfg.partition("=")
-        if sep and name.strip().lower() in _GIT_IDENTITY_CONFIG and value_names_tool(val):
-            return True
-    return False
+        if sep and name.strip().lower() in _GIT_IDENTITY_CONFIG:
+            identity[name.strip().lower()] = val
+    return any(value_names_tool(v) for v in identity.values())
 
 
 def _resolve_git_long(name, opts):
@@ -530,6 +597,23 @@ def _resolve_git_long(name, opts):
         return name
     matches = [o for o in opts if o.startswith(name)]
     return matches[0] if len(matches) == 1 else None
+
+
+def _git_commit_is_dry_run(args):
+    """True if a `git commit`'s options name --dry-run (or an unambiguous abbreviation).
+
+    A dry-run previews without creating a commit, so no message, author, or identity enters
+    the record: an attributed dry-run is harmless and blocking it only denies a preview.
+    Stops at `--` (end of options); resolves `--dry` -> --dry-run the way git does, and does
+    not match a short cluster (git commit has no short dry-run flag; -n is --no-verify)."""
+    for t in args:
+        if t == "--":
+            break
+        if t.startswith("--"):
+            name = t[2:].split("=", 1)[0]
+            if _resolve_git_long(name, _GIT_COMMIT_LONG_OPTS) == "dry-run":
+                return True
+    return False
 
 
 def _classify(spec, name):
@@ -1097,7 +1181,10 @@ def find_attribution(command, cwd, depth=0):
     """
     eff_cwd = cwd
     exported_identity = {}  # exported identity var -> latest value (shell last-wins)
-    for line in _logical_lines(command):
+    for raw_line in _logical_lines(command):
+        # Drop an unquoted trailing `#` comment first: the shell never runs it, so a clean
+        # command with an attributed example in a comment must not be blocked.
+        line = _strip_comment(raw_line)
         try:
             tokens = _tokenize(line)
         except ValueError:
@@ -1155,6 +1242,13 @@ def find_attribution(command, cwd, depth=0):
                     if _ENV_ASSIGN_RE.match(t):
                         name, _, val = t.partition("=")
                         exported_identity[name] = val
+                    elif _ENV_NAME_RE.match(t):
+                        # `export NAME` with no value marks NAME for export; a later
+                        # standalone `NAME=value` (handled in the no-core branch above)
+                        # then reaches git. Record the name, keeping any value already
+                        # tracked, so that reassignment is seen and a bare export of a
+                        # clean var does not falsely block.
+                        exported_identity.setdefault(t, "")
                 continue
             if core[0] == "unset":
                 # `unset GIT_AUTHOR_NAME` clears an earlier export before the commit, so
@@ -1167,6 +1261,8 @@ def find_attribution(command, cwd, depth=0):
             spec, start = _watched_spec(core)
             if spec is None:
                 continue
+            if spec is _GIT_COMMIT and _git_commit_is_dry_run(core[start:]):
+                continue  # a dry-run creates no commit, so nothing enters the record
             seg_cwd = base
             if spec is _GIT_COMMIT or spec is _GIT_MERGE:
                 # -C composes onto the base, so a relative -F file resolves correctly.

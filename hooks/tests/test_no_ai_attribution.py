@@ -1306,3 +1306,106 @@ def test_block_gh_api_explicit_post_still_blocks():
     # An explicit POST is a write, so the guard must stay on when the method is named too.
     assert_blocked(run(
         'gh api --method POST repos/O/R/issues/1/comments -f body="Generated with Claude Code"'))
+
+
+# --------------------------------------------------------------------------
+# Round-8 connector re-review: six common-form fixes (three bypasses closed,
+# three clean-command over-blocks removed). Each "allow more" fix ships with a
+# "still blocks" guard so it cannot silently widen into a bypass.
+# --------------------------------------------------------------------------
+
+# -- F1: a robot-emoji byline behind a Markdown quote/bullet marker --
+# _BYLINE_LEAD already lets the text-byline forms ride these markers; the
+# emoji check must strip them too, or `- 🤖` / `> 🤖` slips a sign-off in.
+
+def test_block_markdown_dash_robot_emoji_byline():
+    assert_blocked(run('git commit -m "Fix parser\n\n- \U0001F916"'))
+
+
+def test_block_quote_marker_robot_emoji_byline():
+    assert_blocked(run('git commit -m "Fix parser\n\n> \U0001F916"'))
+
+
+def test_allow_robot_emoji_midline_after_marker_is_subject():
+    # A dash that starts a real list item of prose, with the emoji mid-line and no
+    # attribution cue, is subject matter, not a sign-off: it must still pass.
+    assert_allowed(run('git commit -m "Fix parser\n\n- render the \U0001F916 glyph"'))
+
+
+# -- F4: `time -p` before the command (POSIX portability flag) --
+
+def test_block_time_dash_p_wrapper_commit():
+    assert_blocked(run('time -p git commit -m "Generated with Claude Code"'))
+
+
+def test_allow_time_dash_p_clean_commit():
+    assert_allowed(run('time -p git commit -m "Fix the parser"'))
+
+
+# -- F5: `export NAME` (no value) then a standalone `NAME=value` assignment --
+# The bare export marks NAME for export, so the later assignment reaches git.
+
+def test_block_export_bare_then_assign_identity():
+    assert_blocked(run(
+        "export GIT_AUTHOR_NAME; GIT_AUTHOR_NAME=Claude; git commit -m Fix"))
+
+
+def test_allow_export_bare_then_clean_assign():
+    assert_allowed(run(
+        'export GIT_AUTHOR_NAME; GIT_AUTHOR_NAME="Jane Doe"; git commit -m Fix'))
+
+
+# -- F3: `git -c key=value` identity is last-wins per key --
+
+def test_allow_git_c_identity_last_wins_clean():
+    # git applies the last value, so a clean override of an earlier tool name commits
+    # as the human: the hook must not block on the shadowed earlier value.
+    assert_allowed(run("git -c user.name=Claude -c user.name=Jane commit -m Fix"))
+
+
+def test_block_git_c_identity_last_wins_tool():
+    # The reverse order ends on the tool name, which does author the commit: block.
+    assert_blocked(run("git -c user.name=Jane -c user.name=Claude commit -m Fix"))
+
+
+# -- F7: an unquoted trailing `#` comment is not part of the command --
+
+def test_allow_trailing_comment_with_attributed_example():
+    assert_allowed(run(
+        'git commit -m "Fix parser" # git commit -m "Generated with Claude Code"'))
+
+
+def test_block_hash_inside_quoted_message_still_scanned():
+    # A `#` inside the quoted message is literal, not a comment start, so a byline
+    # after it must still be seen (the comment strip must be quote-aware).
+    assert_blocked(run('git commit -m "Fix #123\n\nGenerated with Claude Code"'))
+
+
+def test_allow_hash_midword_in_message():
+    # A `#` glued mid-word (issue#123) is literal in bash, not a comment: still clean.
+    assert_allowed(run('git commit -m "Fix issue#123 parser"'))
+
+
+# -- F8: `git commit --dry-run` creates no commit, so nothing enters the record --
+
+def test_allow_dry_run_attributed_message():
+    assert_allowed(run('git commit --dry-run -m "Generated with Claude Code"'))
+
+
+def test_allow_dry_run_abbrev_message():
+    # git resolves the unambiguous abbreviation `--dry` to --dry-run.
+    assert_allowed(run('git commit --dry -m "Generated with Claude Code"'))
+
+
+def test_block_no_verify_is_not_dry_run():
+    # --no-verify (and -n) still create a commit, so an attributed message must block:
+    # guard against the dry-run allowance widening to any dash-prefixed option.
+    assert_blocked(run('git commit --no-verify -m "Generated with Claude Code"'))
+    assert_blocked(run('git commit -n -m "Generated with Claude Code"'))
+
+
+def test_block_real_commit_chained_after_dry_run():
+    # The dry-run allowance must skip only its own segment: a real commit chained after
+    # a dry-run still writes the record and must block.
+    assert_blocked(run(
+        'git commit --dry-run -m "preview" && git commit -m "Generated with Claude Code"'))
