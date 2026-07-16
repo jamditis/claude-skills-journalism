@@ -586,6 +586,38 @@ def _strip_env_prefix(seg):
     return assigns, rest[j:], chdir
 
 
+# Command-runner wrappers that execute the command word following them, hiding it from
+# the "first token is git/gh" check. Bare forms run the command (`command git commit`,
+# `exec git commit`, `nohup git commit`, `setsid git commit`); these four take no
+# value-bearing option in normal use (bar `exec -a <name>`, handled below), so they peel
+# cleanly. Value-arg scheduling wrappers (sudo, timeout, nice, ionice, stdbuf) are out of
+# scope on purpose: each needs its own option grammar, an incomplete one would turn a
+# skipped value into a fake command word (a miss), and prefixing an attributed commit with
+# one is a contrived path the global commit guard and human review still cover.
+_CMD_WRAPPERS = {"command", "exec", "nohup", "setsid"}
+
+
+def _strip_command_wrappers(core):
+    """Peel leading command-runner wrappers so the real command word is exposed. Skips each
+    wrapper's own leading option flags (`command -p`, `setsid -w`), and the value of
+    `exec -a <name>`. Leaves `command -v`/`-V <name>` unpeeled: that looks a command up
+    rather than running it, so no commit happens and the segment must stay unwatched."""
+    while core and core[0] in _CMD_WRAPPERS:
+        w = core[0]
+        k = 1
+        while k < len(core) and core[k].startswith("-") and core[k] != "--":
+            if w == "command" and core[k] in ("-v", "-V"):
+                return core  # lookup form, not a run
+            if w == "exec" and core[k] == "-a" and k + 1 < len(core):
+                k += 2  # -a <name> renames argv[0]; skip its value too
+                continue
+            k += 1
+        if k < len(core) and core[k] == "--":
+            k += 1
+        core = core[k:]  # k >= 1 always, so this terminates
+    return core
+
+
 def _watched_spec(core):
     """Return the flag spec for a watched command (env-prefix already stripped), or None."""
     if not core:
@@ -727,6 +759,9 @@ def find_attribution(command, cwd):
             if not seg:
                 continue
             assigns, core, env_chdir = _strip_env_prefix(seg)
+            if not core:
+                continue
+            core = _strip_command_wrappers(core)
             if not core:
                 continue
             if core[0] == "cd":

@@ -875,3 +875,39 @@ def test_allow_git_commit_template_file_clean(tmp_path):
     # same as --file. This guards against the template classification over-blocking.
     (tmp_path / "MSG").write_text("Refactor the tokenizer for clarity\n")
     assert_allowed(run("git commit --template MSG", cwd=tmp_path))
+
+
+# --------------------------------------------------------------------------
+# Local codex 5.5/low round on head 87478f6: command-runner wrappers that
+# hide the git/gh command word (command / exec / nohup / setsid)
+# --------------------------------------------------------------------------
+
+def test_block_command_wrapper_hiding_git_commit():
+    # `command`, `exec`, `nohup`, `setsid` all run the command word that follows them, so
+    # the watched `git commit` is still the real command and must still be seen.
+    for w in ("command", "exec", "nohup", "setsid"):
+        assert_blocked(run('%s git commit -m "Generated with Claude Code"' % w))
+
+
+def test_block_command_wrapper_with_flags_and_nesting():
+    # A wrapper's own leading flags are skipped, exec -a takes a value, and wrappers nest.
+    assert_blocked(run('command -p git commit -m "Generated with Claude Code"'))
+    assert_blocked(run('exec -a mygit git commit -m "Generated with Claude Code"'))
+    assert_blocked(run('nohup command git commit -m "Generated with Claude Code"'))
+
+
+def test_block_command_wrapper_on_gh():
+    assert_blocked(run('command gh pr create --body "Generated with Claude Code"'))
+
+
+def test_allow_command_v_lookup_is_not_a_run():
+    # `command -v git` / `command -V git` look git up; they do not run a commit, so a
+    # commit-shaped tail is not a real commit and must not block.
+    assert_allowed(run("command -v git commit"))
+    assert_allowed(run("command -V git"))
+
+
+def test_allow_wrapper_without_watched_command():
+    # A wrapper in front of a non-watched command still passes straight through.
+    assert_allowed(run("nohup ./deploy.sh"))
+    assert_allowed(run("exec ./run-tests.sh"))
