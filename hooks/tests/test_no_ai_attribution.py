@@ -793,3 +793,68 @@ def test_allow_ai_adjective_subject_after_verb():
     # adjective form out.
     assert_allowed(run('git commit -m "Built with AI-powered search for the archive"'))
     assert_allowed(run('gh pr create --body "Add AI-driven ranking to results"'))
+
+
+# --------------------------------------------------------------------------
+# Local codex 5.5/low round on head 5fe4c87: git long-option abbreviations
+# and the `--` end-of-options terminator
+# --------------------------------------------------------------------------
+
+def test_block_abbreviated_author_option():
+    # git parse-options accepts any unambiguous prefix of a long option, so --au / --auth
+    # / --autho all set --author. The field value naming a tool must still block, whether
+    # the value is a separate token or attached with `=`.
+    for cmd in (
+        'git commit --au "Claude <c@example.com>" -m Fix',
+        'git commit --auth "Claude <c@example.com>" -m Fix',
+        'git commit --autho="Claude <c@example.com>" -m Fix',
+    ):
+        assert_blocked(run(cmd))
+
+
+def test_block_abbreviated_message_and_trailer_options():
+    # --mess / --messag resolve to --message (text surface); --trail resolves to --trailer
+    # (field surface). Both are unambiguous prefixes git accepts.
+    assert_blocked(run('git commit --mess "Generated with Claude Code"'))
+    assert_blocked(run('git commit --messag "Written by ChatGPT"'))
+    assert_blocked(run('git commit -m Fix --trail "Co-authored-by: Claude <ai@example.com>"'))
+
+
+def test_allow_abbreviated_nonattribution_option():
+    # --am resolves to --amend (a boolean), not --message: an abbreviation that lands on an
+    # untracked option must not be misclassified. The real message here is clean.
+    assert_allowed(run('git commit --am -m "fix parser edge case"'))
+
+
+def test_allow_ambiguous_abbreviation_not_classified():
+    # --a is ambiguous (git rejects it: --all / --allow-empty / --amend / --author ...), so
+    # the matcher resolves it to nothing and does not block. git would error before running,
+    # so allowing it introduces no miss.
+    assert_allowed(run('git commit --a "Claude <c@example.com>"'))
+
+
+def test_allow_gh_unknown_abbrev_not_treated_as_flag():
+    # gh/pflag does NOT do prefix matching, so --bod is an unknown flag gh rejects, not a
+    # stand-in for --body. Abbreviation resolution is git-only; the matcher must not block
+    # this as if it were a body credit (that would be a false positive on a command gh
+    # itself refuses to run).
+    assert_allowed(run('gh pr create --bod "Generated with Claude Code"'))
+
+
+def test_allow_attribution_looking_pathspec_after_double_dash():
+    # After a bare `--`, every token is a pathspec (a filename), never a message/option
+    # value. `git commit -- --message "Generated with Claude Code"` commits paths literally
+    # named `--message` and `Generated with Claude Code`; it sets no message, so blocking it
+    # is a false positive. Scanning must stop at `--`.
+    for cmd in (
+        'git commit -- --message "Generated with Claude Code"',
+        'git commit -- -m "Generated with Claude Code"',
+        'git commit -m "real fix" -- "Generated with Claude Code.txt"',
+    ):
+        assert_allowed(run(cmd))
+
+
+def test_block_attribution_before_double_dash_still_caught():
+    # Stopping at `--` must only ignore what follows it: a real -m credit before the
+    # terminator is still collected and blocked, so the terminator fix adds no miss.
+    assert_blocked(run('git commit -m "Generated with Claude Code" -- somefile.txt'))

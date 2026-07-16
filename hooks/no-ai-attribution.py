@@ -283,14 +283,32 @@ _GIT_IDENTITY_CONFIG = {
 _ENV_ARG_OPTS = {"-u", "--unset"}
 _MAX_FILE_BYTES = 1_000_000  # cap a named-file read so a huge file cannot exhaust memory
 
+# Full set of `git commit` long-option names, used only to resolve unambiguous prefix
+# abbreviations the way git's parse-options does: git accepts `--au` for --author when
+# no other option shares that prefix, and rejects an ambiguous prefix (`--a`) outright.
+# Kept complete (not just the tracked options) so ambiguity is judged correctly -- an
+# abbreviation git itself would reject as ambiguous must not resolve here either. gh
+# uses cobra/pflag, which does not prefix-match, so only the git spec opts in via
+# 'long_opts'.
+_GIT_COMMIT_LONG_OPTS = frozenset({
+    "ahead-behind", "all", "allow-empty", "allow-empty-message", "amend", "author",
+    "branch", "cleanup", "date", "dry-run", "edit", "file", "fixup", "gpg-sign",
+    "include", "interactive", "long", "message", "no-post-rewrite", "no-verify",
+    "null", "only", "patch", "pathspec-file-nul", "pathspec-from-file", "porcelain",
+    "quiet", "reedit-message", "reset-author", "reuse-message", "short", "signoff",
+    "squash", "status", "template", "trailer", "untracked-files", "verbose",
+})
+
 # Per-subcommand flag spec. 'text' -> scanned with contains_attribution; 'file' ->
 # contents read and scanned; 'field' -> scanned with value_names_tool. 'short' maps
 # a value-taking short-option letter to its kind, for git-style clusters (-am, -F).
+# 'long_opts', when present, enables git-style unambiguous prefix abbreviation.
 _GIT_COMMIT = {
     "text": {"-m", "--message"},
     "file": {"-F", "--file"},
     "field": {"--author", "--trailer"},
     "short": {"m": "text", "F": "file"},
+    "long_opts": _GIT_COMMIT_LONG_OPTS,
 }
 _GH_PR_CREATE = {
     "text": {"-b", "--body", "-t", "--title"},
@@ -391,6 +409,18 @@ def _git_config_identity_hit(core, stop):
     return False
 
 
+def _resolve_git_long(name, opts):
+    """Canonical git long-option for a `--`-stripped token, mirroring git parse-options:
+    an exact match wins; otherwise a prefix of exactly one known option resolves to it;
+    an ambiguous (>1) or unknown (0) prefix resolves to None, because git itself rejects
+    those before running -- so the matcher neither over-blocks nor claims coverage git
+    would refuse to give."""
+    if name in opts:
+        return name
+    matches = [o for o in opts if o.startswith(name)]
+    return matches[0] if len(matches) == 1 else None
+
+
 def _classify(spec, name):
     if name in spec["text"]:
         return "text"
@@ -398,6 +428,21 @@ def _classify(spec, name):
         return "file"
     if name in spec["field"]:
         return "field"
+    # git accepts unambiguous long-option abbreviations (--au -> --author). Resolve only
+    # for specs that opt in via 'long_opts' (git); gh/pflag requires exact names. The
+    # exact-match cases above already covered a spelled-out option, so only a shorter
+    # abbreviation that lands on a *tracked* option adds anything here.
+    opts = spec.get("long_opts")
+    if opts and name.startswith("--"):
+        canon = _resolve_git_long(name[2:], opts)
+        if canon is not None:
+            full = "--" + canon
+            if full in spec["text"]:
+                return "text"
+            if full in spec["file"]:
+                return "file"
+            if full in spec["field"]:
+                return "field"
     return None
 
 
@@ -413,6 +458,9 @@ def _collect(tokens, spec):
     n = len(tokens)
     while i < n:
         t = tokens[i]
+        if t == "--":
+            break  # end-of-options: every following token is a pathspec/positional, not a
+            # flag value, so a byline-looking filename after `--` must not be scanned.
         if t.startswith("--"):
             if "=" in t:
                 name, val = t.split("=", 1)
