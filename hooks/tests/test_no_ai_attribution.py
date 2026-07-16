@@ -1182,3 +1182,127 @@ def test_huge_stdin_payload_fails_open():
     big = '{"tool_name": "Bash", "tool_input": {"command": "' + ("x" * 12_000_000) + '"}}'
     r = run("", raw_stdin=big)
     assert r.returncode == ALLOW
+
+
+# --------------------------------------------------------------------------
+# codex-connector re-review on head c643296: nine P2s, each a real form the
+# round-6 fixes left uncovered. All resolvable from the command string, so
+# each is fixed rather than documented.
+# --------------------------------------------------------------------------
+
+# -- env invoked by an absolute/relative path must be peeled like git/gh --
+
+def test_block_pathed_env_identity_prefix():
+    # /usr/bin/env is the canonical way to run a command with a set var; its basename is
+    # env, so it must be peeled to reach the inner git commit's identity.
+    assert_blocked(run('/usr/bin/env GIT_AUTHOR_NAME=Claude git commit -m Fix'))
+
+
+def test_block_pathed_env_before_attributed_commit():
+    assert_blocked(run('/usr/bin/env git commit -m "Generated with Claude Code"'))
+
+
+def test_allow_pathed_env_clean_commit():
+    assert_allowed(run('/usr/bin/env git commit -m "Fix the parser"'))
+
+
+# -- env -C must move the run dir for a file read inside bash -c too --
+
+def test_block_env_C_before_shell_c_file(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "MSG").write_text("Generated with Claude Code\n")
+    assert_blocked(run("env -C repo bash -c 'git commit -F MSG'", cwd=tmp_path))
+
+
+# -- gh pr merge --author-email writes the merge commit author identity --
+
+def test_block_gh_pr_merge_author_email_long():
+    assert_blocked(run('gh pr merge 123 --squash --author-email noreply@openai.com --subject Fix'))
+
+
+def test_block_gh_pr_merge_author_email_short():
+    assert_blocked(run('gh pr merge 123 --merge -A "Claude <c@anthropic.com>" --subject Fix'))
+
+
+def test_allow_gh_pr_merge_author_email_human():
+    assert_allowed(run('gh pr merge 123 --merge -A jane@example.com --subject "Merge #123"'))
+
+
+# -- gh api nested/bracketed prose keys (GraphQL variables) --
+
+def test_block_gh_api_nested_input_body():
+    assert_blocked(run(
+        'gh api graphql -f query=mutation -f input[body]="Generated with Claude Code"'))
+
+
+def test_allow_gh_api_nested_non_prose_key():
+    assert_allowed(run('gh api graphql -f query=q -f input[state]=closed'))
+
+
+# -- ANSI-C quoting must be decoded on the gh api field path too --
+
+def test_block_gh_api_ansi_c_field():
+    assert_blocked(run(
+        "gh api repos/O/R/issues/1/comments -f body=$'Generated with Claude Code'"))
+
+
+# -- reassigning an already-exported identity var updates the exported value --
+
+def test_block_reassigned_exported_identity():
+    # export sets a clean value, a later standalone assignment (same var, still exported)
+    # overwrites it with a tool name, and the commit is authored as that.
+    assert_blocked(run(
+        "export GIT_AUTHOR_NAME=Joe; GIT_AUTHOR_NAME=Claude; git commit -m Fix"))
+
+
+def test_allow_unexported_local_assignment():
+    # A bare assignment with no prior export is shell-local, not passed to git, so a tool
+    # name there does not author the commit and must not block.
+    assert_allowed(run("GIT_AUTHOR_NAME=Claude; git commit -m Fix"))
+
+
+# -- env -i starts an empty environment, dropping an earlier exported identity --
+
+def test_allow_env_i_clears_exported_identity():
+    assert_allowed(run(
+        "export GIT_AUTHOR_NAME=Claude; env -i git commit -m Fix"))
+
+
+def test_block_env_i_with_inline_identity_still_blocks():
+    # -i wipes the inherited env, but an inline assignment after it is still passed to git.
+    assert_blocked(run("env -i GIT_AUTHOR_NAME=Claude git commit -m Fix"))
+
+
+# -- shell value-options before -c must not hide the script --
+
+def test_block_bash_o_pipefail_before_c():
+    assert_blocked(run(
+        'bash -o pipefail -c \'git commit -m "Generated with Claude Code"\''))
+
+
+def test_block_bash_rcfile_before_c(tmp_path):
+    assert_blocked(run(
+        'bash --rcfile /dev/null -c \'git commit -m "Generated with Claude Code"\''))
+
+
+def test_allow_bash_o_pipefail_clean():
+    assert_allowed(run('bash -o pipefail -c \'git commit -m "Fix the parser"\''))
+
+
+# -- an explicit GET turns gh api fields into read-only query params --
+
+def test_allow_gh_api_explicit_get_method():
+    assert_allowed(run(
+        'gh api --method GET repos/O/R/issues -f title="Generated with Claude Code"'))
+
+
+def test_allow_gh_api_get_short_flag():
+    assert_allowed(run(
+        'gh api -X GET repos/O/R/issues -f title="Generated with Claude Code"'))
+
+
+def test_block_gh_api_explicit_post_still_blocks():
+    # An explicit POST is a write, so the guard must stay on when the method is named too.
+    assert_blocked(run(
+        'gh api --method POST repos/O/R/issues/1/comments -f body="Generated with Claude Code"'))

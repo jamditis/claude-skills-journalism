@@ -316,6 +316,10 @@ _MAX_STDIN_BYTES = 10_000_000  # cap the payload read: a larger command is not a
 # Interpreters whose `-c <script>` argument is a full command line to scan recursively.
 _SHELL_RUNNERS = {"sh", "bash", "dash", "zsh", "ksh", "ash", "mksh"}
 _MAX_SHELL_DEPTH = 5  # bound the `bash -c '...'` recursion so a deep nest cannot run away
+# Shell options that take a following value token, so the `-c` script is not the next arg:
+# `bash -o pipefail -c '...'`, `bash --rcfile f -c '...'`. Skipping the value keeps the scan
+# from stopping at it and missing the script. `--rcfile=`/`--init-file=` glue their value.
+_SHELL_C_VALUE_OPTS = {"-o", "+o", "-O", "+O", "--rcfile", "--init-file"}
 
 # Full set of `git commit` long-option names, used only to resolve unambiguous prefix
 # abbreviations the way git's parse-options does: git accepts `--au` for --author when
@@ -390,10 +394,12 @@ _GH_EDIT = {  # gh pr edit / gh issue edit: title and body are both editable
 _GH_MERGE = {  # gh pr merge: --subject/--body set the merge/squash commit message
     "text": {"-b", "--body", "-t", "--subject"},
     "file": {"-F", "--body-file"},
-    "field": set(),
+    # -A/--author-email sets the merge commit author, an authorship surface like
+    # git commit --author, so it is read strictly (a tool/vendor/bot email blocks).
+    "field": {"-A", "--author-email"},
     # -t is --subject here (text). -m/-s/-r are merge-method flags, not messages, so they
     # are absent from this map and consume no value.
-    "short": {"b": "text", "t": "text", "F": "file"},
+    "short": {"b": "text", "t": "text", "F": "file", "A": "field"},
 }
 _GH_COMMENT_ONLY = {  # gh pr/issue close and reopen: a -c/--comment body, no title or file
     "text": {"-c", "--comment"},
@@ -608,7 +614,7 @@ def _collect(tokens, spec):
 
 
 def _strip_env_prefix(seg):
-    """Peel any env-setting prefix off a segment: return (assignments, core, chdir, unsets).
+    """Peel any env-setting prefix: return (assignments, core, chdir, unsets, ignore_env).
 
     Handles both a bare `NAME=value ... cmd` prefix and an `env [opts] NAME=value ... cmd`
     wrapper, so authorship set through the environment (`env GIT_AUTHOR_NAME=Claude git
@@ -622,12 +628,15 @@ def _strip_env_prefix(seg):
     assigns = []
     unsets = []
     chdir = None
+    ignore_env = False  # env -i / --ignore-environment: the command starts with an empty env
     i = 0
     while i < len(seg) and _ENV_ASSIGN_RE.match(seg[i]):
         assigns.append(seg[i])
         i += 1
-    if i >= len(seg) or seg[i] != "env":
-        return assigns, seg[i:], chdir, unsets
+    # Match `env` by basename, so a pathed wrapper (`/usr/bin/env NAME=val cmd`) is peeled the
+    # same as a bare `env`, mirroring the basename match the git/gh detection uses.
+    if i >= len(seg) or os.path.basename(seg[i]) != "env":
+        return assigns, seg[i:], chdir, unsets, ignore_env
 
     rest = list(seg[i + 1:])  # tokens after `env`; mutated in place to inline `-S`
     j = 0
@@ -695,13 +704,21 @@ def _strip_env_prefix(seg):
                     unsets.append(rest[j + 1])
                 j += 2
                 continue
+            # env -i / --ignore-environment starts the command with an empty environment, so
+            # an identity an earlier export set is not inherited by it. Record it so the
+            # identity check drops the exported map for this command (its own inline
+            # assignments after -i are still passed and still checked).
+            if t in ("-i", "--ignore-environment"):
+                ignore_env = True
+                j += 1
+                continue
             j += 1  # any other env option takes no separate value token we track
         elif _ENV_ASSIGN_RE.match(t):
             assigns.append(t)
             j += 1
         else:
             break  # the command word
-    return assigns, rest[j:], chdir, unsets
+    return assigns, rest[j:], chdir, unsets, ignore_env
 
 
 # Command-runner wrappers that execute the command word following them, hiding it from
@@ -752,6 +769,14 @@ def _shell_c_script(core):
         t = core[i]
         if t == "--command" or t == "-c":
             return core[i + 1] if i + 1 < len(core) else None
+        # Options that consume the next token as a value, so the script does not start there:
+        # `bash -o pipefail -c '...'`, `bash --rcfile f -c '...'`. Skip the option and its value.
+        if t in _SHELL_C_VALUE_OPTS:
+            i += 2
+            continue
+        if t.startswith("--rcfile=") or t.startswith("--init-file="):
+            i += 1
+            continue
         if t.startswith("--"):
             i += 1
             continue
@@ -827,6 +852,36 @@ def _gh_spec(core):
     return None
 
 
+def _gh_api_method(args):
+    """Return the explicit HTTP method of a gh api call (upper-cased), or None if unset.
+
+    `-X`/`--method GET` (attached, spaced, or `=`) names the verb. gh defaults to GET with
+    no fields and POST once a field is present, so only an explicit method is reported here;
+    the caller treats an explicit GET/HEAD as read-only."""
+    for i, t in enumerate(args):
+        if t in ("-X", "--method") and i + 1 < len(args):
+            return args[i + 1].upper()
+        if t.startswith("--method="):
+            return t.split("=", 1)[1].upper()
+        if t.startswith("-X") and not t.startswith("--") and len(t) > 2:
+            return t[2:].upper()
+    return None
+
+
+def _gh_api_key_is_prose(key):
+    """True if a gh api field key names visible record prose (body/title/...), else False.
+
+    Handles nested/bracketed keys (`input[body]`, `data[attributes][title]`), which gh sends
+    as structured parameters and GraphQL turns into variables: the leading segment or any
+    bracketed segment naming a prose key makes the value record text."""
+    key = key.strip().lower()
+    if key in _GH_API_TEXT_KEYS:
+        return True
+    lead = key.split("[", 1)[0]
+    brackets = re.findall(r"\[([^\]]*)\]", key)
+    return any(seg in _GH_API_TEXT_KEYS for seg in [lead, *brackets])
+
+
 def _gh_api_hits(core, read_dirs):
     """Return a reason if a `gh api` call would write AI attribution, else None.
 
@@ -835,9 +890,14 @@ def _gh_api_hits(core, read_dirs):
       -F/--field key=value     : value is text, or a file when it starts with `@`
       --input file             : the JSON request body is read from a file (or `-` stdin)
     Only value-carrying keys that hold visible prose (body/title/message/...) are scanned;
-    a control field like state=closed is ignored. Files resolve against read_dirs; an
-    unreadable file is nothing to scan (fail open)."""
+    a control field like state=closed is ignored. An explicit GET/HEAD makes the fields
+    read-only query parameters, not a write body, so nothing is scanned. Files resolve
+    against read_dirs; an unreadable file is nothing to scan (fail open)."""
     args = core[1:]
+    # An explicit GET/HEAD turns -f/-F into query params (a read), so there is no record
+    # text to guard. Only an explicit method skips; the POST-by-default write path stays on.
+    if _gh_api_method(args) in ("GET", "HEAD"):
+        return None
     i, n = 0, len(args)
     while i < n:
         t = args[i]
@@ -872,7 +932,7 @@ def _gh_api_hits(core, read_dirs):
         if val is None:
             continue
         key, sep, v = val.partition("=")
-        if not sep or key.strip().lower() not in _GH_API_TEXT_KEYS:
+        if not sep or not _gh_api_key_is_prose(key):
             continue
         # -F/--field reads a file when the value starts with `@` (@- is stdin, skipped).
         if mode == "field" and v.startswith("@"):
@@ -880,7 +940,9 @@ def _gh_api_hits(core, read_dirs):
             if fname and fname != "-" and _named_file_has_attribution(fname, read_dirs):
                 return "attribution in a gh api field file"
             continue
-        if contains_attribution(v):
+        # Scan the value and its ANSI-C variants, the same as a commit/body message: a
+        # `-f body=$'Generated with Claude'` decodes to a byline the raw token hides.
+        if any(contains_attribution(x) for x in _shell_message_variants(v)):
             return "attribution in a gh api request field"
     return None
 
@@ -1050,8 +1112,17 @@ def find_attribution(command, cwd, depth=0):
             seg = _strip_leading_keywords(seg)
             if not seg:
                 continue
-            assigns, core, env_chdir, unsets = _strip_env_prefix(seg)
+            assigns, core, env_chdir, unsets, ignore_env = _strip_env_prefix(seg)
             if not core:
+                # A segment that is only assignments (`GIT_AUTHOR_NAME=Claude` on its own).
+                # A bare assignment is shell-local and not passed to a later command UNLESS
+                # the name is already exported, in which case reassigning it updates the
+                # exported value the child sees. So update only names already tracked as
+                # exported; a never-exported local assignment is correctly ignored.
+                for a in assigns:
+                    name, _, val = a.partition("=")
+                    if name in exported_identity:
+                        exported_identity[name] = val
                 continue
             core = _strip_command_wrappers(core)
             if not core:
@@ -1062,7 +1133,11 @@ def find_attribution(command, cwd, depth=0):
             script = _shell_c_script(core)
             if script is not None:
                 if depth < _MAX_SHELL_DEPTH:
-                    inner = find_attribution(script, eff_cwd, depth + 1)
+                    # `env -C dir bash -c '...'` runs the script in dir, so a relative file
+                    # the inner command reads (git commit -F MSG) resolves there. Recurse
+                    # with the env -C-adjusted cwd, not the bare tracked cwd.
+                    rec_cwd = eff_cwd if env_chdir is None else _resolve_dir(eff_cwd, env_chdir)
+                    inner = find_attribution(script, rec_cwd, depth + 1)
                     if inner is not None:
                         return inner
                 continue
@@ -1097,10 +1172,11 @@ def find_attribution(command, cwd, depth=0):
                 # -C composes onto the base, so a relative -F file resolves correctly.
                 seg_cwd = _git_effective_dir(core, start - 1, base)
                 # `GIT_AUTHOR_NAME=Claude git commit ...` sets authorship via the
-                # environment, the same as --author. Effective identity = exported vars,
-                # minus any env -u unset, then the inline prefix overriding them (all
-                # last-wins), matching what the shell hands git. Read those vars as fields.
-                effective = dict(exported_identity)
+                # environment, the same as --author. Effective identity = exported vars
+                # (or none under env -i, which starts with an empty environment), minus any
+                # env -u unset, then the inline prefix overriding them (all last-wins),
+                # matching what the shell hands git. Read those vars as fields.
+                effective = {} if ignore_env else dict(exported_identity)
                 for u in unsets:
                     effective.pop(u, None)
                 for a in assigns:
