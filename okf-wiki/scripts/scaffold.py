@@ -341,24 +341,122 @@ def _canonical_req_name(line: str) -> str | None:
     return re.sub(r"[-_.]+", "-", name).lower()
 
 
+def _strip_pip_options(text: str) -> str:
+    """Drop pip's per-requirement options (`--hash`, `--global-option`, ...) from a
+    requirements line so packaging.requirements.Requirement, which accepts only PEP 508 and
+    rejects these options, can parse the requirement. Mirrors pip's own break_args_options:
+    split on spaces and keep tokens up to the first that starts with '-'. Rejoining the
+    original space-split tokens preserves the requirement's quotes (unlike shlex, which would
+    strip a marker string's quotes and make a valid marker unparseable); a hash digest and a
+    marker value never begin a bare '-' token, so the requirement is kept whole while the
+    trailing options are dropped."""
+    kept = []
+    for token in text.split(" "):
+        if token.startswith("-"):
+            break
+        kept.append(token)
+    return " ".join(kept)
+
+
+def _requirement_marker_selects_env(line: str) -> bool:
+    """True if a requirements line has no PEP 508 environment marker, or one that selects the
+    current interpreter, so pip would install it here. A marker that excludes this
+    environment returns False: pip installs nothing from that line, so a PyYAML declaration
+    gated to another platform (`PyYAML; sys_platform == "win32"` read on Linux) does not give
+    validate.py the yaml module it imports on every platform. The full PEP 508 grammar (name,
+    extras, direct-reference URL, marker) is parsed by `packaging`, so a '#' inside a quoted
+    marker or a ';' inside a URL is not mistaken for a comment or the marker separator; pip's
+    per-requirement options (`--hash` from a --generate-hashes lock file, etc.) are stripped
+    first, since packaging rejects them. A trailing pip inline comment (which PEP 508 does not
+    define) is only removed if the whole line fails to parse, so a '#' that is really inside a
+    quoted marker value survives. If packaging is absent or the line does not parse as a
+    requirement, returns True, so an unjudgeable line never becomes a false 'missing PyYAML'
+    note (the behavior from before markers were read)."""
+    # Drop pip per-requirement options (--hash, ...) first so packaging can parse the marker:
+    # each is a space-separated token starting with '-', never part of a name or marker value.
+    text = _strip_pip_options(line.strip())
+    if not text:
+        return True
+    try:
+        from packaging.requirements import Requirement, InvalidRequirement
+    except ImportError:
+        return True  # cannot parse without packaging: assume it installs, do not nag
+    # A '#' inside a quoted marker value is valid PEP 508, so parse the whole line first; only
+    # if that fails treat a trailing whitespace-'#' as a pip inline comment, strip it, and retry
+    # -- removing a real comment without corrupting a marker value that legitimately holds '#'.
+    try:
+        req = Requirement(text)
+    except InvalidRequirement:
+        stripped = re.sub(r"(^|\s)#.*$", "", text).strip()
+        if not stripped or stripped == text:
+            return True  # unparseable even without a trailing comment: do not nag
+        try:
+            req = Requirement(stripped)
+        except InvalidRequirement:
+            return True  # not a parseable requirement line: do not nag
+    if req.marker is None:
+        return True  # no marker: the line always applies
+    try:
+        return bool(req.marker.evaluate())
+    except Exception:
+        # Any evaluation failure means the marker cannot be judged in this context: an undefined
+        # variable or comparison, or a lock-file-only variable (dependency_groups) that raises a
+        # raw KeyError in the default metadata context. Fall back to treating the line as
+        # installable instead of crashing the --force path. The function is fail-open, so an
+        # unjudgeable line never becomes a false missing-PyYAML note.
+        return True
+
+
+def _join_continuations(text: str):
+    """Yield logical requirement lines, joining pip's backslash line-continuations the way
+    pip's requirements parser does: a physical line ending in '\\' continues onto the next, so
+    a hash-locked entry (its marker on the first physical line, indented `--hash` options on
+    the following lines) is reassembled into one logical line before its name, directives, and
+    marker are read. Without it, the first physical line keeps a trailing '\\' that breaks
+    marker parsing, and a marker split across the continuation would be missed entirely. A
+    full-line comment never continues, even when it ends in '\\': pip's parser treats it as a
+    standalone comment, so it is emitted on its own rather than swallowing the next line (which
+    would hide a PyYAML declaration or an -r/-e include directive)."""
+    buf = []
+    for raw in text.splitlines():
+        if raw.lstrip().startswith("#"):
+            if buf:  # flush a pending continuation before the standalone comment
+                yield "".join(buf)
+                buf = []
+            yield raw
+            continue
+        if raw.endswith("\\"):
+            buf.append(raw[:-1])
+            continue
+        buf.append(raw)
+        yield "".join(buf)
+        buf = []
+    if buf:  # a final physical line ending in '\' with nothing after it
+        yield "".join(buf)
+
+
 def _preserved_requirements_lacks_pyyaml(path: Path) -> bool:
     """True only when we can say with confidence that a preserved requirements.txt does
-    not declare PyYAML: it is readable, no line names PyYAML, and it carries no include or
-    editable directive (-r, -e) that could pull PyYAML from a file we do not read. An
-    unreadable file or such a directive returns False, so the targeted warning fires only
-    when the gap is certain and never nags a user who did declare it. A constraint file
-    (-c/--constraint) only pins versions of packages installed elsewhere and cannot supply
-    a missing one, so it does not suppress the note."""
+    not declare an installable PyYAML: it is readable, no line names PyYAML that would
+    install here, and it carries no include or editable directive (-r, -e) that could pull
+    PyYAML from a file we do not read. An unreadable file or such a directive returns False,
+    so the targeted warning fires only when the gap is certain and never nags a user who did
+    declare it. A constraint file (-c/--constraint) only pins versions of packages installed
+    elsewhere and cannot supply a missing one, so it does not suppress the note. A PyYAML
+    line gated by a PEP 508 environment marker counts only when the marker selects this
+    interpreter: one gated to another platform installs nothing here, so it does not (see
+    _requirement_marker_selects_env). Physical lines are first joined on pip's backslash
+    continuations, so a hash-locked entry split across lines is read as one requirement."""
     try:
         text = path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError):
         return False
-    for raw in text.splitlines():
+    for raw in _join_continuations(text):
         s = raw.strip()
         if s.startswith(("-r", "--requirement", "-e", "--editable")):
             return False  # PyYAML may live in the included (-r) or editable (-e) target
-        if _canonical_req_name(raw) == "pyyaml":
-            return False
+        if _canonical_req_name(raw) == "pyyaml" and _requirement_marker_selects_env(raw):
+            return False  # PyYAML declared and its marker (if any) installs here
     return True
 
 
