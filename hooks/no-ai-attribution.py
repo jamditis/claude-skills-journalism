@@ -305,9 +305,12 @@ _GIT_COMMIT_LONG_OPTS = frozenset({
 # 'long_opts', when present, enables git-style unambiguous prefix abbreviation.
 _GIT_COMMIT = {
     "text": {"-m", "--message"},
-    "file": {"-F", "--file"},
+    # -t/--template preloads the message editor with a file whose contents become the
+    # commit if kept, so it is a named message-file surface like -F/--file (and matches
+    # how gh's --template is already read).
+    "file": {"-F", "--file", "-t", "--template"},
     "field": {"--author", "--trailer"},
-    "short": {"m": "text", "F": "file"},
+    "short": {"m": "text", "F": "file", "t": "file"},
     "long_opts": _GIT_COMMIT_LONG_OPTS,
 }
 _GH_PR_CREATE = {

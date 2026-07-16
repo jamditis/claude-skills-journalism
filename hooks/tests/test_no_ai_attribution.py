@@ -858,3 +858,20 @@ def test_block_attribution_before_double_dash_still_caught():
     # Stopping at `--` must only ignore what follows it: a real -m credit before the
     # terminator is still collected and blocked, so the terminator fix adds no miss.
     assert_blocked(run('git commit -m "Generated with Claude Code" -- somefile.txt'))
+
+
+def test_block_git_commit_template_file_with_attribution(tmp_path):
+    # git commit -t/--template <file> preloads the message editor with the file's contents,
+    # which become the commit if the editor keeps them. It is another named message file, so
+    # it is read like -F/--file -- and consistently with gh, whose --template is already read.
+    (tmp_path / "MSG").write_text("Generated with Claude Code\n")
+    assert_blocked(run("git commit --template MSG", cwd=tmp_path))
+    assert_blocked(run("git commit -t MSG", cwd=tmp_path))
+    assert_blocked(run("git commit --templ MSG", cwd=tmp_path))  # abbreviation resolves too
+
+
+def test_allow_git_commit_template_file_clean(tmp_path):
+    # A template with no attribution passes: the file surface only blocks on a byline, the
+    # same as --file. This guards against the template classification over-blocking.
+    (tmp_path / "MSG").write_text("Refactor the tokenizer for clarity\n")
+    assert_allowed(run("git commit --template MSG", cwd=tmp_path))
