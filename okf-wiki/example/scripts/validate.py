@@ -192,7 +192,108 @@ def _plain_scalar_dropped_comment(node, raw_fm):
     return j < len(raw_fm) and raw_fm[j] == "#"
 
 
-def check_source_quoting(rel, raw_fm, errors):
+# PyYAML resolves both `<<` and an explicit `!!merge` tag to this tag; a key carrying it is a
+# merge directive regardless of how it is spelled, so it is never a real mapping key.
+_MERGE_TAG = "tag:yaml.org,2002:merge"
+
+
+def _child_ref_counts(root):
+    """Map id(node) -> how many times it is referenced as a child across the tree.
+
+    A YAML alias makes the composer reuse the anchor's node object, so an alias TARGET
+    is the one node referenced 2+ times. Each unique node is traversed once (guarded by
+    a seen set) so a recursive anchor cannot loop; references are still counted with
+    multiplicity."""
+    counts: dict[int, int] = {}
+    seen: set[int] = set()
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        if id(node) in seen:
+            continue
+        seen.add(id(node))
+        children: list = []
+        if isinstance(node, yaml.MappingNode):
+            for k, v in node.value:
+                children += (k, v)
+        elif isinstance(node, yaml.SequenceNode):
+            children += list(node.value)
+        for c in children:
+            counts[id(c)] = counts.get(id(c), 0) + 1
+            stack.append(c)
+    return counts
+
+
+def _value_uses_alias(val_node, counts):
+    """True if any node in this value's subtree is reached via a YAML alias.
+
+    An alias target is the same node object referenced 2+ times in the whole frontmatter
+    (counts), or reached twice while walking this one subtree (a cycle). An unused anchor
+    is referenced once, so an anchored literal is not flagged — consistent with allowing
+    `source: [&p "x"]`. Rejecting alias USES closes #169: an aliased scalar shares its
+    anchor's position marks, so the end-mark quoting check cannot see a comment dropped
+    after the alias."""
+    seen: set[int] = set()
+    stack = [val_node]
+    while stack:
+        node = stack.pop()
+        if id(node) in seen:
+            return True  # reached twice within source -> an alias points back into it
+        seen.add(id(node))
+        if counts.get(id(node), 0) >= 2:
+            return True  # shared with another reference -> an alias target
+        if isinstance(node, yaml.MappingNode):
+            for k, v in node.value:
+                stack += (k, v)
+        elif isinstance(node, yaml.SequenceNode):
+            stack += list(node.value)
+    return False
+
+
+def _mapping_yields_source(node, seen):
+    """True if this mapping node's effective keys include 'source', counting keys reached
+    through its own (possibly nested) merge keys.
+
+    A merged mapping can itself merge in another mapping ('<<: *d' where d is '<<: {source:
+    ...}'), so checking only the immediate keys misses a source that safe_load still
+    materializes. Recurse through each merge key's mapping(s). The seen set guards a
+    recursive anchor (&d {<<: *d}) from looping."""
+    if not isinstance(node, yaml.MappingNode) or id(node) in seen:
+        return False
+    seen.add(id(node))
+    for key, val in node.value:
+        if not isinstance(key, yaml.ScalarNode):
+            continue
+        if key.tag == _MERGE_TAG:
+            for merged in (val.value if isinstance(val, yaml.SequenceNode) else [val]):
+                if _mapping_yields_source(merged, seen):
+                    return True
+        elif key.value == "source":
+            return True
+    return False
+
+
+def _merge_supplies_source(root):
+    """True if a top-level YAML merge key (<<) merges in a mapping that yields its own
+    'source' key, directly or through a further nested merge.
+
+    YAML lets a literal 'source:' override a merged one, so a source smuggled in through
+    '<<: {source: ...}' (or a chain of merges that resolves to source) beside a literal is
+    silently dropped and the top-level source-key scan (which keys on literal 'source'
+    nodes) never sees it. A merge value is a mapping, or a sequence of mappings ('<<: [*a,
+    *b]'); compose resolves an alias to the shared node, so an aliased merge map is a
+    MappingNode here. Detecting it lets a merge-supplied source be rejected whether or not
+    a literal source sits beside it."""
+    for key, val in root.value:
+        if not (isinstance(key, yaml.ScalarNode) and key.tag == _MERGE_TAG):
+            continue
+        for node in (val.value if isinstance(val, yaml.SequenceNode) else [val]):
+            if _mapping_yields_source(node, set()):
+                return True
+    return False
+
+
+def check_source_quoting(rel, fm, raw_fm, errors):
     """Enforce the SPEC 'source' quoting rule, where YAML's comment stripping would
     otherwise silently drop part of a provenance pointer.
 
@@ -205,8 +306,15 @@ def check_source_quoting(rel, raw_fm, errors):
     block items, single- and multi-line flow lists, wrapped scalars, quoted strings with
     escapes, anchors/tags, and block scalars — without re-implementing the parser. It is
     scoped to the top-level `source` key only (a nested `source:` under other metadata is
-    not the OKF provenance list) and inspects every top-level occurrence, since YAML keeps
-    the last of duplicate keys. A real parse error is reported by the schema check."""
+    not the OKF provenance list). A real parse error is reported by the schema check.
+
+    `fm` is the safe_load result the caller already parsed. A `source` can enter it through
+    a YAML merge key (`<<: {source: *r}`), a whole-node alias, an alias in key position, or a
+    duplicate `source` key — each materializes the field, but YAML keeps the LAST of duplicate
+    keys, so the value safe_load returns is not necessarily the first clean `source:` the scan
+    finds. OKF source must be one literal top-level list, so this requires the effective source
+    to come from exactly one literal, unshared `source:` key and rejects every indirection
+    (merge, alias, duplicate) up front — which also keeps the node-tree quoting scan total."""
     if not raw_fm:
         return
     try:
@@ -215,9 +323,46 @@ def check_source_quoting(rel, raw_fm, errors):
         return
     if not isinstance(root, yaml.MappingNode):
         return
-    for key_node, val_node in root.value:
-        if not (isinstance(key_node, yaml.ScalarNode) and key_node.value == "source"):
-            continue
+    counts = _child_ref_counts(root)
+    # YAML keeps the LAST of duplicate keys, so the value safe_load returns for `source` is
+    # decided by the last top-level key that resolves to "source" — not the first clean one.
+    # Collect every such key. An alias in key position (`*k` resolving to "source") makes
+    # compose reuse the anchor's node, so the key reads as a "source" scalar while the written
+    # key is an alias — count >= 2 marks that sharing, so an aliased key is not unshared. A key
+    # SPELLED "source" but carrying the explicit merge tag (`!!merge source:`) is a merge
+    # directive, not a source key — PyYAML classifies merge by the tag, not the spelling — so
+    # exclude it here: counting it would both falsely reject a file whose only real source is a
+    # separate literal, and let a source merged in through it bypass the scan below.
+    source_keys = [
+        (k, v) for k, v in root.value
+        if isinstance(k, yaml.ScalarNode) and k.value == "source"
+        and k.tag != _MERGE_TAG
+    ]
+    unshared = [(k, v) for k, v in source_keys if counts.get(id(k), 0) < 2]
+    if fm.get("source") is not None and (
+        len(source_keys) != 1 or not unshared or _merge_supplies_source(root)
+    ):
+        errors.append(
+            f"{rel}: 'source' is not a single literal top-level 'source:' key — it enters "
+            f"through a YAML merge key (<<), an alias, or a duplicate 'source' key; OKF "
+            f"'source' must be one literal top-level list of provenance pointers — declare "
+            f"it directly instead of merging, aliasing, or duplicating it")
+        return
+    for key_node, val_node in source_keys:
+        # A YAML anchor/alias that entangles source with the rest of the frontmatter
+        # shares node identity and position marks, so the dropped-comment scan below
+        # reads the anchor's definition line, not the use site, and can miss a truncated
+        # pointer (#169). OKF source is a flat list of literal, self-contained pointers
+        # anyway, so any anchor/alias SHARING is invalid here — reject it, which keeps the
+        # quoting scan total. An unused anchor definition (`[&p "x"]`) shares nothing and
+        # stays allowed.
+        if _value_uses_alias(val_node, counts):
+            errors.append(
+                f"{rel}: a top-level 'source' value shares a YAML anchor/alias (& or *) "
+                f"with the rest of the frontmatter; OKF 'source' must be a flat list of "
+                f"literal provenance pointers — write each pointer out literally instead "
+                f"of anchoring or aliasing it")
+            return
         if isinstance(val_node, yaml.SequenceNode):
             scalars = [n for n in val_node.value if isinstance(n, yaml.ScalarNode)]
         elif isinstance(val_node, yaml.ScalarNode):
@@ -384,7 +529,7 @@ def main() -> int:
 
         check_lists(rel, fm, errors)
         check_dates(rel, fm, errors)
-        check_source_quoting(rel, frontmatter_block(text), errors)
+        check_source_quoting(rel, fm, frontmatter_block(text), errors)
 
     # Link resolution: every internal link to a .md file must resolve to a file
     # that exists inside the bundle. A link escaping the bundle root or pointing at
