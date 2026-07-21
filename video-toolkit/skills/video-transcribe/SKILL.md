@@ -55,7 +55,7 @@ The CPU path needs `whisper.cpp` and a model file:
 
 ```bash
 whisper-cli --help                       # or ./main -h in an older build
-ls ggml-base.en-q5_0.bin                 # the model weights
+ls ggml-base.en.bin                      # the model weights
 ffmpeg -version                          # only if inputs are video, not wav
 ```
 
@@ -79,9 +79,9 @@ before use. Keep both values in the project, not only in terminal history:
 MODEL_REVISION="<FULL_HF_COMMIT_SHA>"
 MODEL_SHA256="<REVIEWED_MODEL_SHA256>"
 curl --fail --location --proto '=https' \
-  "https://huggingface.co/ggerganov/whisper.cpp/resolve/${MODEL_REVISION}/ggml-base.en-q5_0.bin" \
-  --output ggml-base.en-q5_0.bin
-printf '%s  %s\n' "$MODEL_SHA256" ggml-base.en-q5_0.bin | sha256sum --check
+  "https://huggingface.co/ggerganov/whisper.cpp/resolve/${MODEL_REVISION}/ggml-base.en.bin" \
+  --output ggml-base.en.bin
+printf '%s  %s\n' "$MODEL_SHA256" ggml-base.en.bin | sha256sum --check
 ```
 
 `base.en` is adequate for short accountability clips; `small.en` trades speed
@@ -108,7 +108,8 @@ than mutating the environment with a broad version constraint.
 
 ### Step 1: Locate videos
 
-Read the project's `metadata.json` (written by `/video-download`) or scan a
+Read the project's `metadata.json` (written by
+`/video-toolkit:video-download`) or scan a
 directory:
 
 ```python
@@ -150,7 +151,7 @@ the same machine:
 
 ```bash
 whisper-cli \
-  -m ggml-base.en-q5_0.bin \
+  -m ggml-base.en.bin \
   -f "{audio}.wav" \
   --no-gpu \
   --language en \
@@ -161,6 +162,7 @@ whisper-cli \
   --logprob-thold -1.0 \
   --no-speech-thold 0.6 \
   --threads 4 \
+  --output-file "transcripts/{platform}/{video_id}" \
   --output-txt --output-json
 ```
 
@@ -189,9 +191,9 @@ input that changes the decoded text:
   "engine": "whisper.cpp",
   "engine_build": "1.7.6 (b0a5b0c)",
   "model": "base.en",
-  "model_quantization": "q5_0",
+  "model_quantization": "unquantized ggml",
   "model_sha256": "5f8c...9d2e",
-  "model_source": "https://huggingface.co/ggerganov/whisper.cpp/resolve/<FULL_HF_COMMIT_SHA>/ggml-base.en-q5_0.bin",
+  "model_source": "https://huggingface.co/ggerganov/whisper.cpp/resolve/<FULL_HF_COMMIT_SHA>/ggml-base.en.bin",
   "source_sha256": "9f2b8c1d...c41a",
   "audio": {
     "extract_command": "ffmpeg -nostdin -v error -i input.mp4 -ar 16000 -ac 1 -c:a pcm_s16le audio.wav",
@@ -215,8 +217,8 @@ input that changes the decoded text:
 
 Notes on the fields that are easy to get wrong:
 
-- **Record the quantization, not just the model name.** A `base.en` at `q5_0` and
-  the same model at `f16` decode differently.
+- **Record the quantization, not just the model name.** The unquantized
+  `ggml-base.en.bin` and a quantized `base.en` file decode differently.
 - **Record both a digest and a source for the weights.** A re-download from a
   different mirror, or a fresh re-quantization, can carry the same `base.en` /
   `q5_0` label and still hold different weights. The digest verifies a file
@@ -249,9 +251,10 @@ So the promise is "re-runnable and checkable on the CPU path any evaluator has,"
 not "one canonical transcript for a clip regardless of engine." The second is not
 true of Whisper, and claiming it would mislead anyone auditing a quote.
 
-Repeatable timestamps are also what lets the later stages work: `/video-frames`
-and `/video-dashboard` point back at timecodes this transcript produced, so if
-those move on a re-run the downstream references break.
+Repeatable timestamps are also what lets the later stages work:
+`/video-toolkit:video-frames` and `/video-toolkit:video-dashboard` point back at
+timecodes this transcript produced, so if those move on a re-run the downstream
+references break.
 
 ## Optional: GPU fast path
 

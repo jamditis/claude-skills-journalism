@@ -65,6 +65,7 @@ Ask the user or use defaults:
 For each video in metadata.json:
 
 ```bash
+mkdir -p "{frames_dir}/{platform}/{video_id}"
 ffmpeg -nostdin -v error -i "{video_path}" \
   -vf "fps=1/{interval},scale='min({max_width},iw)':-1" \
   -q:v 2 -start_number 0 \
@@ -84,6 +85,7 @@ Grid composites let Claude analyze 9 frames at once and see visual transitions b
 
 ```python
 import warnings
+from pathlib import Path
 from PIL import Image
 
 GRID_SIZE = 3
@@ -91,6 +93,8 @@ CELL_W, CELL_H = 640, 360
 Image.MAX_IMAGE_PIXELS = 40_000_000
 warnings.simplefilter("error", Image.DecompressionBombWarning)
 
+grid_dir = Path("frame-grids/{platform}/{video_id}")
+grid_dir.mkdir(parents=True, exist_ok=True)
 frames = sorted(frame_dir.glob("frame_*.jpg"))
 for batch_start in range(0, len(frames), GRID_SIZE * GRID_SIZE):
     batch = frames[batch_start:batch_start + 9]

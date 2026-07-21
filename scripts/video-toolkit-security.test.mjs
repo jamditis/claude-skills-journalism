@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SKILL_NAMES = [
   'video-dashboard',
   'video-download',
@@ -58,7 +59,31 @@ test('transcription and frame processing sandbox untrusted media and pin inputs'
   assert.doesNotMatch(transcribe, /resolve\/main/iu);
   assert.match(transcribe, /full (?:commit|revision) SHA/iu);
   assert.match(transcribe, /--require-hashes/iu);
+  assert.match(transcribe, /ggml-base\.en\.bin/u);
+  assert.doesNotMatch(transcribe, /ggml-base\.en-q5_0\.bin/u);
+  assert.match(transcribe, /--output-file\s+"transcripts\/\{platform\}\/\{video_id\}"/u);
   assert.match(frames, /on-screen text.*untrusted/isu);
+  assert.match(frames, /mkdir -p "\{frames_dir\}\/\{platform\}\/\{video_id\}"/u);
+  assert.match(frames, /grid_dir\.mkdir\(parents=True, exist_ok=True\)/u);
+});
+
+test('cross-skill handoffs use the installed plugin namespace', () => {
+  for (const name of SKILL_NAMES) {
+    assert.doesNotMatch(
+      skill(name),
+      /\/(?:video-download|video-transcribe|video-frames|video-dashboard)(?![\w-])/u,
+      name,
+    );
+  }
+  assert.match(skill('video-dashboard'), /\/video-toolkit:video-transcribe/u);
+  assert.match(skill('video-transcribe'), /\/video-toolkit:video-dashboard/u);
+});
+
+test('marketplace version advances when the plugin catalog changes', () => {
+  const marketplace = JSON.parse(
+    readFileSync(join(ROOT, '.claude-plugin/marketplace.json'), 'utf8'),
+  );
+  assert.equal(marketplace.version, '2.3.0');
 });
 
 test('dashboard uses local reviewed code, DOM-safe rendering, and loopback preview', () => {
