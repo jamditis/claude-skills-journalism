@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const DOCS = join(ROOT, 'docs');
 const PLAY_CDN_SCRIPT = /<script\b[^>]*\bsrc\s*=\s*(["'])https:\/\/cdn\.tailwindcss\.com(?:\/[^"']*)?\1[^>]*>/iu;
 const INLINE_CONFIG = /\btailwind\.config\s*=/u;
@@ -53,4 +54,8 @@ test('docs Tailwind build inputs and CI freshness gate are pinned', () => {
   const workflow = readFileSync(join(ROOT, '.github/workflows/docs-tailwind.yml'), 'utf8');
   assert.match(workflow, /npm ci/);
   assert.match(workflow, /npm run check:docs-css/);
+
+  const builder = readFileSync(join(ROOT, 'scripts/docs-tailwind.mjs'), 'utf8');
+  assert.match(builder, /fileURLToPath\(new URL\('\.\.', import\.meta\.url\)\)/u);
+  assert.doesNotMatch(builder, /import\.meta\.url\)\.pathname/u);
 });
