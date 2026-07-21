@@ -104,7 +104,7 @@ def test_multi_section_scaffold_validates(tmp_path):
 def test_root_index_carries_okf_version(tmp_path):
     scaffold(tmp_path / "kb")
     root = (tmp_path / "kb" / "bundle" / "index.md").read_text()
-    assert 'okf_version: "0.2"' in root
+    assert 'okf_version: "0.3"' in root
 
 
 def test_refuses_nonempty_dir_without_force(tmp_path):
@@ -598,13 +598,14 @@ def test_root_index_unsupported_okf_version_fails(tmp_path):
     assert rc == 1 and "not supported" in out
 
 
-def test_root_index_legacy_version_validates(tmp_path):
-    # backward compat: a 0.1 bundle (e.g. the fleet atlas) still validates under the
-    # newer validator, which accepts both 0.1 and the current format version.
+@pytest.mark.parametrize("version", ["0.1", "0.2"])
+def test_root_index_legacy_version_validates(tmp_path, version):
+    # Backward compatibility: older date-only bundles still validate under the
+    # newer validator.
     scaffold(tmp_path / "kb", "--no-validate")
     root = tmp_path / "kb" / "bundle" / "index.md"
-    root.write_text(root.read_text().replace('okf_version: "0.2"', 'okf_version: "0.1"'),
-                    encoding="utf-8")
+    root.write_text(root.read_text().replace(
+        'okf_version: "0.3"', f'okf_version: "{version}"'), encoding="utf-8")
     rc, out = validate(tmp_path / "kb" / "bundle")
     assert rc == 0, out
 
@@ -1858,3 +1859,122 @@ def test_dangling_uppercase_md_link_caught(tmp_path):
 ])
 def test_still_on_editor_matches_the_editor_path_not_the_substring(url, on_editor):
     assert gh_wiki_bootstrap._still_on_editor(url) is on_editor
+
+
+def _validate_module():
+    """Import validate.py as a module.
+
+    The module-level `validate` in this file is a subprocess runner, not the
+    module, so unit-testing a single check has to load the file directly.
+    """
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("okf_validate", VALIDATE)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+class TestTimestampAcceptsIsoDatetime:
+    """Upstream OKF writes `timestamp` as a full ISO 8601 datetime.
+
+    Rejecting it only forced a truncation pass over every imported bundle, so it
+    is accepted and carried. `verified` is this spec's own key and stays
+    date-only -- a time of day there is false precision about when a fact was
+    confirmed true.
+    """
+
+    def _errors(self, key, value, version="0.3", quoted=False):
+        mod = _validate_module()
+        scalar = f'"{value}"' if quoted or value == "" else value
+        raw_fm = f"{key}: {scalar}\n"
+        try:
+            fm = mod.yaml.safe_load(raw_fm)
+        except ValueError:
+            # The CLI reports an invalid YAML timestamp constructor cleanly
+            # before check_dates; keep this unit helper focused on the checker.
+            fm = {key: value}
+        errors = []
+        mod.check_dates("f.md", fm, raw_fm, version, errors)
+        return errors
+
+    @pytest.mark.parametrize("value", [
+        "2026-05-28",
+        "2026-05-28T14:30:00Z",
+        "2026-05-28T14:30:00+00:00",
+        "2026-05-28T14:30:00-04:00",
+        "2026-05-28T14:30:00",
+        "2026-05-28T14:30:00.123456Z",
+        "2026-05-28 14:30:00",  # RFC 3339's by-agreement space separator
+    ])
+    def test_timestamp_accepts_date_and_datetime(self, value):
+        assert self._errors("timestamp", value) == []
+
+    def test_verified_stays_date_only(self):
+        errors = self._errors("verified", "2026-05-28T14:30:00Z")
+        assert len(errors) == 1
+        assert "YYYY-MM-DD" in errors[0]
+        # The message must not offer the datetime form for a key that rejects it.
+        assert "datetime" not in errors[0]
+
+    def test_quoted_datetime_is_accepted(self):
+        assert self._errors(
+            "timestamp", "2026-05-28T14:30:00Z", quoted=True) == []
+
+    @pytest.mark.parametrize("value", [
+        "2026-5-8T4:03:02Z",
+        "2026-05-28 14:30:00 Z",
+    ])
+    def test_timestamp_rejects_yaml_normalised_spelling(self, value):
+        # PyYAML constructs both source spellings as datetime objects. Validation
+        # must inspect the scalar text instead of accepting datetime.isoformat().
+        errors = self._errors("timestamp", value)
+        assert len(errors) == 1
+        assert value in errors[0]
+
+    @pytest.mark.parametrize("version", ["0.1", "0.2"])
+    def test_legacy_version_rejects_datetime(self, version):
+        errors = self._errors("timestamp", "2026-05-28T14:30:00Z", version)
+        assert len(errors) == 1
+        assert "require okf_version 0.3" in errors[0]
+
+    @pytest.mark.parametrize("value", [
+        "2026-05-28x14:30:00",  # fromisoformat takes any single separator; ISO does not
+        "2026-05-28T",
+        "2026-05-2814:30:00",
+    ])
+    def test_timestamp_rejects_a_non_iso_separator(self, value):
+        # The parser is not the contract. fromisoformat parses '...x14:30:00'
+        # clean, so the separator is checked before it is called -- otherwise
+        # widening to datetimes would quietly accept malformed metadata.
+        assert len(self._errors("timestamp", value)) == 1
+
+    @pytest.mark.parametrize("value", ["2026-13-99", "nonsense", "2026/05/28", ""])
+    def test_timestamp_still_rejects_garbage(self, value):
+        # Widening to datetimes must not turn the check into a rubber stamp.
+        assert len(self._errors("timestamp", value)) == 1
+
+    def test_timestamp_error_names_both_accepted_forms(self):
+        errors = self._errors("timestamp", "nonsense")
+        assert "YYYY-MM-DD" in errors[0] and "ISO 8601 datetime" in errors[0]
+
+    def test_root_level_concept_uses_declared_version_before_index(self, tmp_path):
+        scaffold(tmp_path / "kb", "--no-validate")
+        bundle = tmp_path / "kb" / "bundle"
+        concept = GOOD.replace(
+            "timestamp: 2026-06-23", "timestamp: 2026-06-23T14:30:00Z")
+        write_concept(bundle, concept, name="a.md")
+        rc, out = validate(bundle)
+        assert rc == 0, out
+
+    def test_legacy_bundle_rejects_datetime_end_to_end(self, tmp_path):
+        scaffold(tmp_path / "kb", "--no-validate")
+        bundle = tmp_path / "kb" / "bundle"
+        root = bundle / "index.md"
+        root.write_text(root.read_text().replace(
+            'okf_version: "0.3"', 'okf_version: "0.2"'), encoding="utf-8")
+        concept = GOOD.replace(
+            "timestamp: 2026-06-23", "timestamp: 2026-06-23T14:30:00Z")
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "require okf_version 0.3" in out

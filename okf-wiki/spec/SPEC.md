@@ -31,9 +31,11 @@ upstream conventions will otherwise produce files this validator rejects.
 - `verified` is added. Upstream has no such key. This spec requires `verified`, the ISO
   date the fact was last confirmed true, kept distinct from `timestamp` (when the file was
   authored or edited).
-- Dates are date-only. Upstream's `timestamp` is an ISO 8601 datetime. Here `check_dates`
-  parses both `verified` and `timestamp` as `YYYY-MM-DD` only, so an upstream timestamp like
-  `2026-05-28T14:30:00Z` fails validation and must be truncated to its date.
+- `verified` is date-only. Upstream's `timestamp` is an ISO 8601 datetime, and `check_dates`
+  accepts that form for `timestamp` (with or without an offset, including a trailing `Z`), so
+  an upstream bundle validates here unchanged. `verified` takes `YYYY-MM-DD` only: it records
+  the day a fact was last confirmed true, and a time of day there is false precision about
+  the confirmation.
 - The type vocab is closed. Upstream types are freeform and unregistered, and consumers
   must tolerate unknown ones. Here the set is fixed (see Type vocab) and an unlisted type
   fails the build, which catches typos; extending it is a deliberate spec edit.
@@ -52,8 +54,8 @@ upstream conventions will otherwise produce files this validator rejects.
   assignments and fails the bundle on a hit, so an upstream bundle that inlines a credential
   value passes upstream but is rejected here (see Security).
 
-The format version differs too: upstream is `0.1`, this spec's current version is `0.2`
-(the validator still accepts `0.1`). Every difference above pulls the same direction:
+The format version differs too: upstream is `0.1`, this spec's current version is `0.3`
+(the validator still accepts `0.1` and `0.2`). Every difference above pulls the same direction:
 upstream stays minimal and needs no tooling to stay portable, while this spec adds a
 validator that fails the build when a bundle drifts.
 
@@ -72,7 +74,7 @@ with an `index.md`. Larger bundles group concepts into subdirectories by subject
 
 ## Files
 
-- The bundle-root `index.md` carries `okf_version: "0.2"` in frontmatter — only there.
+- The bundle-root `index.md` carries `okf_version: "0.3"` in frontmatter — only there.
 - Per-directory `index.md`: a heading, an optional one-line preamble, then bullet
   navigation. No frontmatter. (Keep the preamble to one line — it orients, it doesn't narrate.)
 - `log.md` (optional, per directory): dated entries, newest first, no frontmatter.
@@ -86,11 +88,11 @@ The validator enforces the frontmatter rules here — reserved files carry no fr
 only the bundle-root `index.md` carries `okf_version` (and nothing else). The index/log body
 shapes above are recommendations for human readers, not validator-checked structure.
 
-The current format version is `0.2`. The validator accepts `0.1` and `0.2`, so a newer
-validator still reads an older bundle, and new scaffolds emit `0.2`. Adding allowed types is
-backward compatible and bumps the format version: a bundle using the newer types declares
-`0.2`, so an older validator reports a clear unsupported-version error instead of a misleading
-bad-type one.
+The current format version is `0.3`. The validator accepts `0.1`, `0.2`, and `0.3`, so a
+newer validator still reads an older bundle, and new scaffolds emit `0.3`. Version `0.2`
+added allowed types. Version `0.3` admits a full datetime in `timestamp`; a `0.1` or `0.2`
+bundle remains date-only. The marker makes these grammar changes explicit, so an older
+validator reports a clear unsupported-version error instead of a misleading field error.
 
 ## Concept frontmatter (required keys, all non-empty)
 
@@ -101,7 +103,7 @@ bad-type one.
 | `description` | one line |
 | `source` | YAML list of provenance pointers (paths, commands, URLs, events) |
 | `verified` | ISO date `YYYY-MM-DD` the fact was last confirmed true (see note below) |
-| `timestamp` | ISO date authored/updated |
+| `timestamp` | ISO date authored/updated, or in a `0.3` bundle a full ISO 8601 datetime |
 | `tags` | YAML list |
 
 `verified` note: it records when the fact was last confirmed true, which is not always today. A
@@ -116,6 +118,11 @@ not yet verifiable, so find a datable source or leave it out. When the date is u
 down: an older `verified` reads as "may be stale," today reads as "just confirmed." The date is the
 contract; a caveat in the concept body does not undo it, because the validator and tools read only
 the date.
+
+`timestamp` may be an ISO date (`YYYY-MM-DD`) in every supported format version. A `0.3`
+bundle may instead preserve a full datetime in the exact form
+`YYYY-MM-DDTHH:MM:SS[.fraction][Z|+HH:MM|-HH:MM]`; a space may replace `T`. Versions `0.1`
+and `0.2` remain date-only. `verified` is always date-only.
 
 `source` quoting rule (hard): QUOTE every element of the `source` list. Source pointers
 routinely carry YAML-significant characters — a `#` (e.g. `"issue #445"`) starts a comment
