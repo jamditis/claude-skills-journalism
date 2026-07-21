@@ -18,6 +18,7 @@ test('video toolkit docs explain the four-stage reporting pipeline and its bound
     /<link rel="stylesheet" href="\.\.\/assets\/tailwind\/video-toolkit\.css" data-tailwind-build="3\.4\.19">/u,
   );
   assert.doesNotMatch(page, /cdn\.tailwindcss\.com|\btailwind\.config\s*=/u);
+  assert.match(page, /Plugin · v1\.0\.1/u);
   assert.match(page, /\/plugin install video-toolkit@claude-skills-journalism/u);
   assert.match(page, /data-updated-slug="video-toolkit"/u);
 
@@ -30,6 +31,7 @@ test('video toolkit docs explain the four-stage reporting pipeline and its bound
   assert.match(page, /private-network access blocked/iu);
   assert.match(page, /exact Chart\.js asset/iu);
   assert.match(page, /provenance sidecar/iu);
+  assert.match(page, /Node\.js[\s\S]*npm/iu);
 });
 
 test('homepage lists video toolkit once, before visual explainer, with accurate counts', () => {
