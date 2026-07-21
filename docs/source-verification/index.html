@@ -10,29 +10,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/tailwind/source-verification.css" data-tailwind-build="3.4.19">
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        display: ['Fraunces', 'serif'],
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                    },
-                    colors: {
-                        canvas: '#ede6d4',
-                        ink: '#121212',
-                        clay: '#d6cdb7',
-                        mist: '#525252',
-                        accent: '#1e40af',
-                        accentDark: '#1e3a8a',
-                    },
-                }
-            }
-        }
-    </script>
 
     <style>
         body { background-color: #ede6d4; color: #121212; line-height: 1.7; }
@@ -129,6 +109,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
     <meta name="twitter:image" content="https://skills.amditis.tech/source-verification/og-image.png">
 <script src="../ask-ai.js" defer></script>
     <!-- a11y-patch-v1 -->
+<link rel="stylesheet" href="../updated.css">
 </head>
 <body class="font-sans">
     <a href="#main" class="skip-link">Skip to main content</a>
@@ -164,6 +145,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <h1 class="font-display text-5xl md:text-7xl font-black leading-[0.9] mb-6">
                 Source<br>Verification
             </h1>
+            <p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-05-08T18:18:25-04:00" data-updated-slug="source-verification">Updated <time datetime="2026-05-08T18:18:25-04:00">May 8, 2026</time></p>
             <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-10 font-light">
                 Systematic approaches for verifying sources, claims, and digital content. Essential for reporters, fact-checkers, and researchers.
             </p>
@@ -476,5 +458,6 @@ cp -r claude-skills-journalism/journalism-core/skills/source-verification ~/.cla
             });
         });
     </script>
+<script defer src="../updated.js"></script>
 </body>
 </html>

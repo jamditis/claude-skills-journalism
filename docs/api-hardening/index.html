@@ -6,30 +6,10 @@
     <meta name="description" content="API security hardening patterns. Use when implementing rate limiting, input validation, CORS configuration, API key management, request throttling, or protecting endpoints from abuse. Covers defense-in-depth strategies for REST APIs with practical implementations for Express, FastAPI, and serverless, oriented around the OWASP API Security Top 10:2023.">
     <title>API hardening - Claude skills for journalism</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/tailwind/api-hardening.css" data-tailwind-build="3.4.19">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'display': ['Fraunces', 'serif'],
-                        'body': ['Plus Jakarta Sans', 'sans-serif'],
-                    },
-                    colors: {
-                        'canvas': '#ede6d4',
-                        'ink': '#121212',
-                        'clay': '#2d2a26',
-                        'mist': '#c4bfb4',
-                        'accent': '#dc2626',
-                        'accentDark': '#b91c1c',
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         h1, h2, h3 { font-family: 'Fraunces', serif; }
@@ -146,6 +126,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
     <meta name="twitter:image" content="https://skills.amditis.tech/api-hardening/og-image.png">
 <script src="../ask-ai.js" defer></script>
     <!-- a11y-patch-v1 -->
+<link rel="stylesheet" href="../updated.css">
 </head>
 <body class="bg-canvas text-ink">
     <a href="#main" class="skip-link">Skip to main content</a>
@@ -178,6 +159,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 Security skill
             </div>
             <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">API hardening</h1>
+            <p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-05-09T12:31:40-04:00" data-updated-slug="api-hardening">Updated <time datetime="2026-05-09T12:31:40-04:00">May 9, 2026</time></p>
             <p class="text-xl text-white/90 max-w-2xl">
                 Defense-in-depth patterns for protecting APIs from abuse, injection attacks, and data leakage. Oriented around the OWASP API Security Top 10:2023, with practical implementations for Express, FastAPI, and serverless.
             </p>
@@ -407,5 +389,6 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             </div>
         </div>
     </footer>
+<script defer src="../updated.js"></script>
 </body>
 </html>
