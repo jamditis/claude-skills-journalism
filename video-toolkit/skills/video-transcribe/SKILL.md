@@ -55,7 +55,7 @@ The CPU path needs `whisper.cpp` and a model file:
 
 ```bash
 whisper-cli --help                       # or ./main -h in an older build
-ls ggml-base.en.bin                      # the model weights
+ls ggml-base.en-q5_1.bin                 # the model weights
 ffmpeg -version                          # only if inputs are video, not wav
 ```
 
@@ -79,13 +79,15 @@ before use. Keep both values in the project, not only in terminal history:
 MODEL_REVISION="<FULL_HF_COMMIT_SHA>"
 MODEL_SHA256="<REVIEWED_MODEL_SHA256>"
 curl --fail --location --proto '=https' \
-  "https://huggingface.co/ggerganov/whisper.cpp/resolve/${MODEL_REVISION}/ggml-base.en.bin" \
-  --output ggml-base.en.bin
-printf '%s  %s\n' "$MODEL_SHA256" ggml-base.en.bin | sha256sum --check
+  "https://huggingface.co/ggerganov/whisper.cpp/resolve/${MODEL_REVISION}/ggml-base.en-q5_1.bin" \
+  --output ggml-base.en-q5_1.bin
+printf '%s  %s\n' "$MODEL_SHA256" ggml-base.en-q5_1.bin | sha256sum --check
 ```
 
-`base.en` is adequate for short accountability clips; `small.en` trades speed
-for a little accuracy.
+Only the quantizations upstream actually publishes are downloadable (`q5_1` and
+`q8_0` for `base.en`), so pick one of those rather than assuming a name like
+`q5_0` exists. `base.en-q5_1` is adequate for short accountability clips;
+`small.en-q5_1` trades speed for a little accuracy.
 
 The optional GPU path needs Python Whisper instead:
 
@@ -151,7 +153,7 @@ the same machine:
 
 ```bash
 whisper-cli \
-  -m ggml-base.en.bin \
+  -m ggml-base.en-q5_1.bin \
   -f "{audio}.wav" \
   --no-gpu \
   --language en \
@@ -166,7 +168,13 @@ whisper-cli \
   --output-txt --output-json
 ```
 
-Three of those are load-bearing and easy to drop by accident:
+`--output-file` (short form `-of`) is what puts the outputs where the later
+stages look. whisper.cpp writes
+`--output-txt` and `--output-json` next to the input wav unless you name a base
+path, so drop it and the transcripts land in the audio staging directory while
+`/video-toolkit:video-dashboard` reports zero transcripts found.
+
+Three more are load-bearing and easy to drop by accident:
 
 - **`--no-fallback`.** By default whisper.cpp re-decodes a hard segment at rising
   temperatures when it trips the no-speech, entropy, or log-probability checks. A
@@ -191,9 +199,9 @@ input that changes the decoded text:
   "engine": "whisper.cpp",
   "engine_build": "1.7.6 (b0a5b0c)",
   "model": "base.en",
-  "model_quantization": "unquantized ggml",
+  "model_quantization": "q5_1",
   "model_sha256": "5f8c...9d2e",
-  "model_source": "https://huggingface.co/ggerganov/whisper.cpp/resolve/<FULL_HF_COMMIT_SHA>/ggml-base.en.bin",
+  "model_source": "https://huggingface.co/ggerganov/whisper.cpp/resolve/<FULL_HF_COMMIT_SHA>/ggml-base.en-q5_1.bin",
   "source_sha256": "9f2b8c1d...c41a",
   "audio": {
     "extract_command": "ffmpeg -nostdin -v error -i input.mp4 -ar 16000 -ac 1 -c:a pcm_s16le audio.wav",
@@ -217,11 +225,11 @@ input that changes the decoded text:
 
 Notes on the fields that are easy to get wrong:
 
-- **Record the quantization, not just the model name.** The unquantized
-  `ggml-base.en.bin` and a quantized `base.en` file decode differently.
+- **Record the quantization, not just the model name.** A `base.en` at `q5_1` and
+  the same model at `f16` decode differently.
 - **Record both a digest and a source for the weights.** A re-download from a
   different mirror, or a fresh re-quantization, can carry the same `base.en` /
-  `q5_0` label and still hold different weights. The digest verifies a file
+  `q5_1` label and still hold different weights. The digest verifies a file
   someone already has; the source tells them where to get the identical one.
 - **The `audio` block is required only when the decoded audio is not the source
   file.** For a `.wav` fed straight in, `source_sha256` and `audio_sha256` are
