@@ -53,9 +53,10 @@ across engines or model quantizations.
 ## Requirements
 
 `yt-dlp` and `ffmpeg` for the download and audio stages, `whisper.cpp` (with a
-`ggml` model) for the transcript of record, and Python for the analysis stage.
-The GPU fast path additionally needs `openai-whisper` and CUDA; nothing in the
-pipeline requires it.
+`ggml` model) for the transcript of record, Python for the analysis stage, and
+Node.js 20 or later with `npm` to vendor Chart.js for the dashboard. The GPU
+fast path additionally needs `openai-whisper` and CUDA; nothing in the pipeline
+requires it.
 
 Downloading video from social platforms is subject to those platforms' terms and
 to local law. These skills collect from public accounts for reporting and

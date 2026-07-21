@@ -120,7 +120,7 @@
     {
       "name": "video-toolkit",
       "description": "Four composable skills for social-video accountability reporting: downloading public video from Twitter/X, TikTok, YouTube, Instagram, and Facebook; transcribing it with a re-runnable provenance record; extracting and vision-analyzing frames; and aggregating the result into an interactive dashboard.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"

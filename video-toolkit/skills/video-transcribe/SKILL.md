@@ -109,8 +109,8 @@ than mutating the environment with a broad version constraint.
 ### Step 1: Locate videos
 
 Read the project's `metadata.json` (written by
-`/video-toolkit:video-download`) or scan a
-directory:
+`/video-toolkit:video-download`, or `/video-download` when that skill was copied
+without the plugin) or scan a directory:
 
 ```python
 videos = metadata["videos"]              # has id, platform, local_path
@@ -253,8 +253,9 @@ true of Whisper, and claiming it would mislead anyone auditing a quote.
 
 Repeatable timestamps are also what lets the later stages work:
 `/video-toolkit:video-frames` and `/video-toolkit:video-dashboard` point back at
-timecodes this transcript produced, so if those move on a re-run the downstream
-references break.
+timecodes this transcript produced. Copied-skill installs use `/video-frames`
+and `/video-dashboard` instead. If those timecodes move on a re-run, the
+downstream references break.
 
 ## Optional: GPU fast path
 

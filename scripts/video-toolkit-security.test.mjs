@@ -67,23 +67,28 @@ test('transcription and frame processing sandbox untrusted media and pin inputs'
   assert.match(frames, /grid_dir\.mkdir\(parents=True, exist_ok=True\)/u);
 });
 
-test('cross-skill handoffs use the installed plugin namespace', () => {
-  for (const name of SKILL_NAMES) {
-    assert.doesNotMatch(
-      skill(name),
-      /\/(?:video-download|video-transcribe|video-frames|video-dashboard)(?![\w-])/u,
-      name,
-    );
-  }
-  assert.match(skill('video-dashboard'), /\/video-toolkit:video-transcribe/u);
-  assert.match(skill('video-transcribe'), /\/video-toolkit:video-dashboard/u);
+test('cross-skill handoffs cover plugin and copied-skill installs', () => {
+  const dashboard = skill('video-dashboard');
+  const transcribe = skill('video-transcribe');
+  assert.match(dashboard, /\/video-toolkit:video-transcribe/u);
+  assert.match(dashboard, /\/video-transcribe(?![\w-])/u);
+  assert.match(dashboard, /\/video-frames(?![\w-])/u);
+  assert.match(transcribe, /\/video-toolkit:video-dashboard/u);
+  assert.match(transcribe, /\/video-download(?![\w-])/u);
+  assert.match(transcribe, /\/video-dashboard(?![\w-])/u);
 });
 
-test('marketplace version advances when the plugin catalog changes', () => {
+test('catalog and installable video plugin versions advance together', () => {
   const marketplace = JSON.parse(
     readFileSync(join(ROOT, '.claude-plugin/marketplace.json'), 'utf8'),
   );
+  const plugin = JSON.parse(
+    readFileSync(join(ROOT, 'video-toolkit/.claude-plugin/plugin.json'), 'utf8'),
+  );
+  const listing = marketplace.plugins.find(({ name }) => name === 'video-toolkit');
   assert.equal(marketplace.version, '2.3.0');
+  assert.equal(plugin.version, '1.0.1');
+  assert.equal(listing?.version, plugin.version);
 });
 
 test('dashboard uses local reviewed code, DOM-safe rendering, and loopback preview', () => {
@@ -92,6 +97,7 @@ test('dashboard uses local reviewed code, DOM-safe rendering, and loopback previ
   assert.match(source, /do not fetch Google Fonts/iu);
   assert.match(source, /chart\.js@4\.5\.1/u);
   assert.match(source, /chart-4\.5\.1\.umd\.min\.js/u);
+  assert.match(source, /## Prerequisites[\s\S]*Node\.js[\s\S]*npm/iu);
   assert.match(source, /textContent/u);
   assert.match(source, /never interpolate[\s\S]{0,100}innerHTML/iu);
   assert.match(source, /--bind 127\.0\.0\.1 8888/u);
@@ -101,6 +107,8 @@ test('skill CI discovers nested plugin skills and runs regression tests', () => 
   const workflow = readFileSync(join(ROOT, '.github/workflows/skill-lint.yml'), 'utf8');
   assert.match(workflow, /'\*\*\/SKILL\.md'/u);
   assert.match(workflow, /'scripts\/\*\*\/\*\.mjs'/u);
+  assert.match(workflow, /'\.claude-plugin\/marketplace\.json'/u);
+  assert.match(workflow, /'\*\*\/\.claude-plugin\/plugin\.json'/u);
   assert.match(workflow, /find \. -type f -name SKILL\.md/u);
   assert.match(workflow, /npm test/u);
 });

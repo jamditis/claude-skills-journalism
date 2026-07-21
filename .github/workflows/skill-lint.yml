@@ -6,6 +6,8 @@ on:
       - '**/SKILL.md'
       - 'hooks/*.md'
       - 'scripts/**/*.mjs'
+      - '.claude-plugin/marketplace.json'
+      - '**/.claude-plugin/plugin.json'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/skill-lint.yml'
