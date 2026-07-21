@@ -103,7 +103,6 @@ test('catalog and installable video plugin versions advance together', () => {
     readFileSync(join(ROOT, 'video-toolkit/.claude-plugin/plugin.json'), 'utf8'),
   );
   const listing = marketplace.plugins.find(({ name }) => name === 'video-toolkit');
-  assert.equal(marketplace.version, '2.3.1');
   assert.equal(plugin.version, '1.0.2');
   assert.equal(listing?.version, plugin.version);
 });

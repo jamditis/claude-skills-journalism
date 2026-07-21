@@ -1,6 +1,6 @@
 {
   "name": "claude-skills-journalism",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "Claude Code plugins for journalism, research, and media organizations",
   "owner": {
     "name": "Joe Amditis",
@@ -21,7 +21,7 @@
     {
       "name": "dev-toolkit",
       "description": "Eleven development-focused skills for journalists, researchers, and small newsroom dev teams. Covers accessibility (WCAG 2.2), Electron app patterns, mobile/remote debugging, irreversible-decision discipline, Python data pipelines, test-first bug fixing, AI-assisted development workflows, ethical web scraping, no-build frontend patterns, signs-of-taste guidance for web UI, and CLAUDE.md context maintenance.",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"
@@ -43,7 +43,7 @@
     {
       "name": "okf-wiki",
       "description": "Scaffold an Open Knowledge Format (OKF) knowledge base and populate it from existing material: one-concept-per-file markdown with YAML frontmatter, directory navigation, and a validator. Authors concepts from your existing docs, plans, notes, or a repo, generates a starter wiki that passes its own conformance and secret-leak checks, ships session-start hooks that orient Claude on the knowledge base before it works, and includes an optional GitHub-wiki bootstrap. Built for newsroom institutional memory, research atlases, decision logs, and infrastructure maps.",
-      "version": "0.6.0",
+      "version": "0.6.1",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"
