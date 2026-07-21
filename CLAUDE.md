@@ -287,6 +287,52 @@ git pull
 4. Update README.md skills table
 5. Test with Claude Code
 
+A new skill picks up its last-updated stamp automatically once it is on master
+(see below). Slugs have to stay unique across the repo: the stamper refuses to
+run on a duplicate rather than guessing which skill a stamp belongs to.
+
+## Last-updated stamps
+
+Every skill and plugin shows when it last changed: a strip of tape on its card
+and page at skills.amditis.tech, and an `Updated` column in the README tables.
+Readers use it to judge whether an installed copy has gone stale.
+
+- `scripts/updated-stamp.mjs` writes the stamps. Git history is the source of
+  truth (`git log -1 --format=%cI -- <path>`), so no date is ever hand-typed.
+  Run it with no arguments to write, `--check` to see if anything is out of date.
+- `docs/updated.css` draws the tape; `docs/updated.js` turns the absolute date
+  into "3 days ago" and ages the tape (fresh under 90 days, yellowed under 270,
+  browned past that). Relative time is computed in the browser because a
+  stamped "3 days ago" would be wrong the day after the build.
+- `.github/workflows/updated-stamp.yml` re-runs the stamper on pushes to master
+  and commits the result. Nothing to do by hand.
+
+Six rules keep it honest, all covered by tests in
+`scripts/updated-stamp.test.mjs`:
+
+1. **Dates come only from source paths, never from `docs/`.** A date derived
+   from the page it is stamped into would make the CI commit bump the date,
+   which would stamp again, forever.
+2. **Only the absolute date goes in the HTML.** The relative age belongs to the
+   reader's clock, not the build's.
+3. **A surface that could not be stamped exits 1.** A page with no `<h1>`, a
+   page missing the stylesheet or script, or a path with no commit history is
+   reported as a problem and stops the run, because the workflow commits
+   whatever the stamper leaves behind. A card pointing at something that is not
+   a skill (`workflows/`, `about/`) is a note instead: that one is expected.
+4. **A slug is lowercase letters, digits, and hyphens, checked when the entry
+   is built.** The same string addresses an HTML attribute, a `docs/<slug>/`
+   path, and a README link, so anything else is rejected rather than escaped.
+5. **A stamp destination has to resolve to the path that names it.** A symlink
+   at any segment of `docs/<slug>/index.html` would write through to a
+   different page under this slug's date, and CI would commit an edit that
+   appears nowhere in the diff.
+6. **A README table is reshaped whole or not at all.** Adding a column to a
+   table holding a row with an unescaped pipe makes that row exactly as wide as
+   a good one, and the next run could no longer tell its last cell from a
+   stamp. Such a table is skipped and every ragged row reported, so the cost is
+   a missing stamp rather than deleted text.
+
 ## Style guidelines
 
 - Use sentence case for headings, not title case
