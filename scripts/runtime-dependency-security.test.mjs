@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { existsSync, lstatSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { extname, join, posix, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SKIP = new Set(['.git', 'docs', 'node_modules', 'plans', 'research']);
 const CDN_URL = /https:\/\/(?:cdn\.jsdelivr\.net\/npm|unpkg\.com|esm\.sh|cdnjs\.cloudflare\.com\/ajax\/libs|cdn\.tailwindcss\.com)[^'"`\s<>)]*/gi;
 
@@ -37,6 +38,24 @@ function globMatches(pattern, value) {
     let result;
     if (patternIndex === pattern.length) {
       result = valueIndex === value.length;
+    } else if (pattern[patternIndex] === '\\' && patternIndex + 1 < pattern.length) {
+      result = value[valueIndex] === pattern[patternIndex + 1]
+        && match(patternIndex + 2, valueIndex + 1);
+    } else if (
+      pattern.startsWith('**/', patternIndex)
+      && (patternIndex === 0 || pattern[patternIndex - 1] === '/')
+    ) {
+      result = match(patternIndex + 3, valueIndex);
+      for (let cursor = valueIndex; !result && cursor < value.length; cursor += 1) {
+        if (value[cursor] === '/') result = match(patternIndex + 3, cursor + 1);
+      }
+    } else if (
+      pattern.startsWith('**', patternIndex)
+      && (patternIndex === 0 || pattern[patternIndex - 1] === '/')
+      && patternIndex + 2 === pattern.length
+    ) {
+      result = match(patternIndex + 2, valueIndex)
+        || (valueIndex < value.length && match(patternIndex, valueIndex + 1));
     } else if (pattern[patternIndex] === '*') {
       result = match(patternIndex + 1, valueIndex)
         || (valueIndex < value.length
@@ -80,23 +99,128 @@ function globMatches(pattern, value) {
   return match(0, 0);
 }
 
+const GLOB_META = new Set(['*', '?', '[', ']', '{', '}', '\\']);
+
+function shellWords(input) {
+  const words = [];
+  let text = '';
+  let pattern = '';
+  let quote = null;
+  let started = false;
+
+  function append(character, active) {
+    text += character;
+    pattern += !active && GLOB_META.has(character) ? `\\${character}` : character;
+    started = true;
+  }
+
+  function finish() {
+    if (started) words.push({ text, pattern });
+    text = '';
+    pattern = '';
+    started = false;
+  }
+
+  for (let index = 0; index < input.length; index += 1) {
+    const character = input[index];
+    if (quote) {
+      if (character === quote) {
+        quote = null;
+        started = true;
+      } else if (character === '\\' && quote === '"' && index + 1 < input.length) {
+        append(input[index + 1], false);
+        index += 1;
+      } else {
+        append(character, false);
+      }
+    } else if (character === '"' || character === "'") {
+      quote = character;
+      started = true;
+    } else if (character === '\\' && index + 1 < input.length) {
+      append(input[index + 1], false);
+      index += 1;
+    } else if (/\s/u.test(character)) {
+      finish();
+    } else {
+      append(character, true);
+    }
+  }
+  finish();
+  return words;
+}
+
+function isEscaped(pattern, index) {
+  let backslashes = 0;
+  for (let cursor = index - 1; cursor >= 0 && pattern[cursor] === '\\'; cursor -= 1) {
+    backslashes += 1;
+  }
+  return backslashes % 2 === 1;
+}
+
+function expandBraces(pattern) {
+  let open = -1;
+  for (let index = 0; index < pattern.length; index += 1) {
+    if (pattern[index] === '{' && !isEscaped(pattern, index)) {
+      open = index;
+      break;
+    }
+  }
+  if (open === -1) return [pattern];
+
+  let depth = 0;
+  let close = -1;
+  const commas = [];
+  for (let index = open + 1; index < pattern.length; index += 1) {
+    if (isEscaped(pattern, index)) continue;
+    if (pattern[index] === '{') depth += 1;
+    else if (pattern[index] === '}' && depth === 0) {
+      close = index;
+      break;
+    } else if (pattern[index] === '}') depth -= 1;
+    else if (pattern[index] === ',' && depth === 0) commas.push(index);
+  }
+  if (close === -1 || commas.length === 0) return [pattern];
+
+  const parts = [];
+  let start = open + 1;
+  for (const comma of [...commas, close]) {
+    parts.push(pattern.slice(start, comma));
+    start = comma + 1;
+  }
+
+  return parts.flatMap((part) => expandBraces(
+    pattern.slice(0, open) + part + pattern.slice(close + 1),
+  ));
+}
+
+function hasActiveGlob(pattern) {
+  for (let index = 0; index < pattern.length; index += 1) {
+    if (pattern[index] === '\\') index += 1;
+    else if (pattern[index] === '*' || pattern[index] === '?' || pattern[index] === '[') {
+      return true;
+    }
+  }
+  return false;
+}
+
 function selfIncludingChecksumGlobs(source) {
   const flattened = source.replace(/\\\r?\n\s*/g, ' ');
   const violations = [];
-  const command = /\bsha256sum\b\s+([^>\n]*?)\s*>\s*((?:"[^"]+"|'[^']+'|[^\s;|&]+))/gu;
+  const command = /\bsha256sum\b\s+([^>\n]*?)\s*(>>?)\s*((?:"[^"]+"|'[^']+'|[^\s;|&]+))/gu;
 
   for (const match of flattened.matchAll(command)) {
     const inputs = match[1].trim();
-    const rawOutput = match[2];
-    const output = rawOutput.replace(/^(["'])(.*)\1$/u, '$2');
+    const redirect = match[2];
+    const rawOutput = match[3];
+    const output = shellWords(rawOutput)[0]?.text || '';
     if (posix.basename(output) !== 'SHA256SUMS') continue;
 
-    const tokens = inputs.match(/(?:"[^"]*"|'[^']*'|[^\s]+)/gu) || [];
-    const includesOutput = tokens.some((token) => {
-      if (token.startsWith('-') || /["']/.test(token) || !/[*?[]/u.test(token)) return false;
-      return globMatches(posix.normalize(token), posix.normalize(output));
+    const includesOutput = shellWords(inputs).some((word) => {
+      if (word.text.startsWith('-')) return false;
+      return expandBraces(posix.normalize(word.pattern)).some((pattern) =>
+        hasActiveGlob(pattern) && globMatches(pattern, posix.normalize(output)));
     });
-    if (includesOutput) violations.push(`${inputs} > ${rawOutput}`);
+    if (includesOutput) violations.push(`${inputs} ${redirect} ${rawOutput}`);
   }
 
   return violations;
@@ -187,6 +311,38 @@ test('checksum-manifest classifier catches the bug class without flagging narrow
   );
   assert.deepEqual(
     selfIncludingChecksumGlobs('sha256sum public/assets/*.js > public/assets/SHA256SUMS'),
+    [],
+  );
+  assert.deepEqual(
+    selfIncludingChecksumGlobs('sha256sum "public/assets"/* > public/assets/SHA256SUMS'),
+    ['"public/assets"/* > public/assets/SHA256SUMS'],
+  );
+  assert.deepEqual(
+    selfIncludingChecksumGlobs('sha256sum public/assets/**/* > public/assets/SHA256SUMS'),
+    ['public/assets/**/* > public/assets/SHA256SUMS'],
+  );
+  assert.deepEqual(
+    selfIncludingChecksumGlobs('sha256sum public/assets/**/SUMS > public/assets/SHA256SUMS'),
+    [],
+  );
+  assert.deepEqual(
+    selfIncludingChecksumGlobs('sha256sum public/assets/* >> public/assets/SHA256SUMS'),
+    ['public/assets/* >> public/assets/SHA256SUMS'],
+  );
+  assert.deepEqual(
+    selfIncludingChecksumGlobs('sha256sum public/assets/{*,.*} > public/assets/SHA256SUMS'),
+    ['public/assets/{*,.*} > public/assets/SHA256SUMS'],
+  );
+  assert.deepEqual(
+    selfIncludingChecksumGlobs('sha256sum "public/assets/*" > public/assets/SHA256SUMS'),
+    [],
+  );
+  assert.deepEqual(
+    selfIncludingChecksumGlobs('sha256sum public/assets/\\* > public/assets/SHA256SUMS'),
+    [],
+  );
+  assert.deepEqual(
+    selfIncludingChecksumGlobs('sha256sum public/assets/{*.js,*.css} > public/assets/SHA256SUMS'),
     [],
   );
   assert.deepEqual(
