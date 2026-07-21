@@ -6,30 +6,10 @@
     <meta name="description" content="API security hardening patterns. Use when implementing rate limiting, input validation, CORS configuration, API key management, request throttling, or protecting endpoints from abuse. Covers defense-in-depth strategies for REST APIs with practical implementations for Express, FastAPI, and serverless, oriented around the OWASP API Security Top 10:2023.">
     <title>API hardening - Claude skills for journalism</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/tailwind/api-hardening.css" data-tailwind-build="3.4.19">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'display': ['Fraunces', 'serif'],
-                        'body': ['Plus Jakarta Sans', 'sans-serif'],
-                    },
-                    colors: {
-                        'canvas': '#ede6d4',
-                        'ink': '#121212',
-                        'clay': '#2d2a26',
-                        'mist': '#c4bfb4',
-                        'accent': '#dc2626',
-                        'accentDark': '#b91c1c',
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         h1, h2, h3 { font-family: 'Fraunces', serif; }
