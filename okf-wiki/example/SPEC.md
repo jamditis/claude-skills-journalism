@@ -31,9 +31,11 @@ upstream conventions will otherwise produce files this validator rejects.
 - `verified` is added. Upstream has no such key. This spec requires `verified`, the ISO
   date the fact was last confirmed true, kept distinct from `timestamp` (when the file was
   authored or edited).
-- Dates are date-only. Upstream's `timestamp` is an ISO 8601 datetime. Here `check_dates`
-  parses both `verified` and `timestamp` as `YYYY-MM-DD` only, so an upstream timestamp like
-  `2026-05-28T14:30:00Z` fails validation and must be truncated to its date.
+- `verified` is date-only. Upstream's `timestamp` is an ISO 8601 datetime, and `check_dates`
+  accepts that form for `timestamp` (with or without an offset, including a trailing `Z`), so
+  an upstream bundle validates here unchanged. `verified` takes `YYYY-MM-DD` only: it records
+  the day a fact was last confirmed true, and a time of day there is false precision about
+  the confirmation.
 - The type vocab is closed. Upstream types are freeform and unregistered, and consumers
   must tolerate unknown ones. Here the set is fixed (see Type vocab) and an unlisted type
   fails the build, which catches typos; extending it is a deliberate spec edit.

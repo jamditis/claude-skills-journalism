@@ -1858,3 +1858,69 @@ def test_dangling_uppercase_md_link_caught(tmp_path):
 ])
 def test_still_on_editor_matches_the_editor_path_not_the_substring(url, on_editor):
     assert gh_wiki_bootstrap._still_on_editor(url) is on_editor
+
+
+def _validate_module():
+    """Import validate.py as a module.
+
+    The module-level `validate` in this file is a subprocess runner, not the
+    module, so unit-testing a single check has to load the file directly.
+    """
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("okf_validate", VALIDATE)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+class TestTimestampAcceptsIsoDatetime:
+    """Upstream OKF writes `timestamp` as a full ISO 8601 datetime.
+
+    Rejecting it only forced a truncation pass over every imported bundle, so it
+    is accepted and carried. `verified` is this spec's own key and stays
+    date-only -- a time of day there is false precision about when a fact was
+    confirmed true.
+    """
+
+    def _errors(self, key, value):
+        errors = []
+        _validate_module().check_dates("f.md", {key: value}, errors)
+        return errors
+
+    @pytest.mark.parametrize("value", [
+        "2026-05-28",
+        "2026-05-28T14:30:00Z",
+        "2026-05-28T14:30:00+00:00",
+        "2026-05-28T14:30:00-04:00",
+        "2026-05-28T14:30:00",
+        "2026-05-28 14:30:00",  # RFC 3339's by-agreement space separator
+    ])
+    def test_timestamp_accepts_date_and_datetime(self, value):
+        assert self._errors("timestamp", value) == []
+
+    def test_verified_stays_date_only(self):
+        errors = self._errors("verified", "2026-05-28T14:30:00Z")
+        assert len(errors) == 1
+        assert "YYYY-MM-DD" in errors[0]
+        # The message must not offer the datetime form for a key that rejects it.
+        assert "datetime" not in errors[0]
+
+    @pytest.mark.parametrize("value", [
+        "2026-05-28x14:30:00",  # fromisoformat takes any single separator; ISO does not
+        "2026-05-28T",
+        "2026-05-2814:30:00",
+    ])
+    def test_timestamp_rejects_a_non_iso_separator(self, value):
+        # The parser is not the contract. fromisoformat parses '...x14:30:00'
+        # clean, so the separator is checked before it is called -- otherwise
+        # widening to datetimes would quietly accept malformed metadata.
+        assert len(self._errors("timestamp", value)) == 1
+
+    @pytest.mark.parametrize("value", ["2026-13-99", "nonsense", "2026/05/28", ""])
+    def test_timestamp_still_rejects_garbage(self, value):
+        # Widening to datetimes must not turn the check into a rubber stamp.
+        assert len(self._errors("timestamp", value)) == 1
+
+    def test_timestamp_error_names_both_accepted_forms(self):
+        errors = self._errors("timestamp", "nonsense")
+        assert "YYYY-MM-DD" in errors[0] and "ISO 8601 datetime" in errors[0]

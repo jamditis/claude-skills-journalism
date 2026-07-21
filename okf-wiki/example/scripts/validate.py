@@ -17,7 +17,9 @@ Checks:
                   An unquoted '#' in a block-style element (which YAML would silently
                   drop as a comment, losing the rest) is rejected — quote it.
        - tags     is a list.
-       - verified, timestamp parse as ISO dates (YYYY-MM-DD).
+       - verified   parses as an ISO date (YYYY-MM-DD).
+       - timestamp parses as an ISO date or a full ISO 8601 datetime
+                    (upstream OKF writes a datetime).
   3. Reserved filenames (index.md, log.md) name no concept and carry no
      frontmatter — except the bundle-root index.md may carry okf_version only.
   4. Internal markdown links resolve. Links must be relative — a root-relative
@@ -49,6 +51,8 @@ import yaml
 REQUIRED_KEYS = ("type", "title", "description", "source", "verified", "timestamp", "tags")
 LIST_KEYS = ("source", "tags")
 DATE_KEYS = ("verified", "timestamp")
+# Keys that may also carry a full ISO 8601 datetime (see check_dates).
+DATETIME_KEYS = ("timestamp",)
 ALLOWED_TYPES = {
     # Infrastructure / ops (fleet maps, system docs)
     "Machine", "Network", "Service", "Session", "Project",
@@ -377,6 +381,28 @@ def check_source_quoting(rel, fm, raw_fm, errors):
             return  # one report per concept is enough
 
 
+def _is_iso_datetime(s):
+    """True for an ISO 8601 datetime, with or without an offset.
+
+    fromisoformat is the parser but not the contract: it accepts ANY single
+    character between the date and the time, so '2026-05-28x14:30:00' parses
+    clean and malformed metadata would sail through. The separator is checked
+    first and only 'T' (ISO 8601) or a space (RFC 3339's by-agreement form) is
+    allowed.
+
+    fromisoformat also only learned to read a trailing 'Z' in 3.11, and upstream
+    OKF writes UTC that way, so normalise it rather than gate the check on a
+    Python version the scaffold does not control.
+    """
+    if len(s) < 11 or s[10] not in ("T", " "):
+        return False
+    try:
+        dt.datetime.fromisoformat(s[:-1] + "+00:00" if s.endswith("Z") else s)
+    except ValueError:
+        return False
+    return True
+
+
 def check_dates(rel, fm, errors):
     for key in DATE_KEYS:
         val = fm.get(key)
@@ -385,8 +411,20 @@ def check_dates(rel, fm, errors):
         s = val.isoformat() if isinstance(val, dt.date) else str(val)
         try:
             dt.datetime.strptime(s, "%Y-%m-%d")
+            continue
         except ValueError:
-            errors.append(f"{rel}: '{key}' must be an ISO date YYYY-MM-DD, got {val!r}")
+            pass
+        # `timestamp` is upstream OKF's key and upstream writes it as a full ISO
+        # 8601 datetime. Rejecting that bought nothing -- it only forced a
+        # truncation pass over every imported bundle -- so the extra precision is
+        # accepted and carried. `verified` is this spec's own key and stays
+        # date-only: it records the day a fact was confirmed true, where a time
+        # of day is noise that invites false precision about the confirmation.
+        if key in DATETIME_KEYS and _is_iso_datetime(s):
+            continue
+        expected = ("an ISO date YYYY-MM-DD or an ISO 8601 datetime"
+                    if key in DATETIME_KEYS else "an ISO date YYYY-MM-DD")
+        errors.append(f"{rel}: '{key}' must be {expected}, got {val!r}")
 
 
 def check_lists(rel, fm, errors):
