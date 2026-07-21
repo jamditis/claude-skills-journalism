@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Zero-build frontend development with CDN-loaded React, Tailwind CSS, and vanilla JavaScript. Use when building static web apps without bundlers, creating Leaflet maps, integrating Google Sheets as database, or developing browser extensions. Covers patterns from rosen-frontend, NJCIC map, and PocketLink projects.">
+    <meta name="description" content="Zero-build frontend development with locally vendored React, Tailwind CSS, and vanilla JavaScript. Use when building static web apps without a deployment build step, creating Leaflet maps, integrating Google Sheets as a database, or developing browser extensions. Covers lockfile-verified browser dependencies and patterns from rosen-frontend, NJCIC map, and PocketLink projects.">
     <title>Zero-build frontend - Claude skills for journalism</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -132,7 +132,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
     <!-- Open Graph -->
     <meta property="og:title" content="Zero-build frontend - Claude skills for journalism">
-    <meta property="og:description" content="Zero-build frontend development with CDN-loaded React, Tailwind CSS, and vanilla JavaScript. Use when building static web apps without bundlers, creating Leaflet maps, integrating Google Sheets as database, or developing browser extensions. Covers patterns from rosen-frontend, NJCIC map, and PocketLink projects.">
+    <meta property="og:description" content="Zero-build frontend development with locally vendored React, Tailwind CSS, and vanilla JavaScript. Use when building static web apps without a deployment build step, creating Leaflet maps, integrating Google Sheets as a database, or developing browser extensions. Covers lockfile-verified browser dependencies and patterns from rosen-frontend, NJCIC map, and PocketLink projects.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://skills.amditis.tech/zero-build-frontend/">
     <meta property="og:image" content="https://skills.amditis.tech/zero-build-frontend/og-image.png">
@@ -142,7 +142,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Zero-build frontend - Claude skills for journalism">
-    <meta name="twitter:description" content="Zero-build frontend development with CDN-loaded React, Tailwind CSS, and vanilla JavaScript. Use when building static web apps without bundlers, creating Leaflet maps, integrating Google Sheets as database, or developing browser extensions. Covers patterns from rosen-frontend, NJCIC map, and PocketLink projects.">
+    <meta name="twitter:description" content="Zero-build frontend development with locally vendored React, Tailwind CSS, and vanilla JavaScript. Use when building static web apps without a deployment build step, creating Leaflet maps, integrating Google Sheets as a database, or developing browser extensions. Covers lockfile-verified browser dependencies and patterns from rosen-frontend, NJCIC map, and PocketLink projects.">
     <meta name="twitter:image" content="https://skills.amditis.tech/zero-build-frontend/og-image.png">
 <script src="../ask-ai.js" defer></script>
     <!-- a11y-patch-v1 -->
@@ -217,7 +217,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
-                    CDN-loaded React with htm (no JSX, no build)
+                    Locally vendored React with htm (no JSX or deployment build)
                 </li>
             </ul>
         </section>
@@ -227,7 +227,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <h2 class="font-display text-2xl font-semibold mb-6">What's included</h2>
             <div class="grid md:grid-cols-2 gap-4">
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
-                    <h3 class="font-semibold mb-2">React via CDN (esm.sh)</h3>
+                    <h3 class="font-semibold mb-2">React from a local ESM bundle</h3>
                     <p class="text-sm text-clay/70">Use React 18 with htm template literals instead of JSX. No transpilation needed.</p>
                 </div>
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
@@ -253,33 +253,33 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <thead>
                         <tr class="bg-mist/10 border-b border-mist/30">
                             <th class="text-left px-5 py-3 font-semibold">Component</th>
-                            <th class="text-left px-5 py-3 font-semibold">CDN source</th>
+                            <th class="text-left px-5 py-3 font-semibold">Local asset</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-mist/20">
                         <tr>
-                            <td class="px-5 py-3 font-medium">React 18</td>
-                            <td class="px-5 py-3 text-clay/70 text-sm">esm.sh/react@18.2.0</td>
+                            <td class="px-5 py-3 font-medium">React 19 + htm</td>
+                            <td class="px-5 py-3 text-clay/70 text-sm">/vendor/react-runtime-19.2.8.mjs</td>
                         </tr>
                         <tr>
-                            <td class="px-5 py-3 font-medium">htm (JSX alternative)</td>
-                            <td class="px-5 py-3 text-clay/70 text-sm">esm.sh/htm@3.1.1</td>
+                            <td class="px-5 py-3 font-medium">lodash-es</td>
+                            <td class="px-5 py-3 text-clay/70 text-sm">/vendor/lodash-es-4.18.1.mjs</td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3 font-medium">Tailwind CSS</td>
-                            <td class="px-5 py-3 text-clay/70 text-sm">cdn.tailwindcss.com</td>
+                            <td class="px-5 py-3 text-clay/70 text-sm">Compiled index.css</td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3 font-medium">Leaflet.js</td>
-                            <td class="px-5 py-3 text-clay/70 text-sm">unpkg.com/leaflet@1.9.4</td>
+                            <td class="px-5 py-3 text-clay/70 text-sm">/vendor/leaflet-1.9.4.js</td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3 font-medium">MarkerCluster</td>
-                            <td class="px-5 py-3 text-clay/70 text-sm">unpkg.com/leaflet.markercluster@1.4.1</td>
+                            <td class="px-5 py-3 text-clay/70 text-sm">/vendor/leaflet.markercluster-1.5.3.js</td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3 font-medium">PapaParse (CSV)</td>
-                            <td class="px-5 py-3 text-clay/70 text-sm">cdn.jsdelivr.net/npm/papaparse</td>
+                            <td class="px-5 py-3 text-clay/70 text-sm">Lockfile-verified local bundle</td>
                         </tr>
                     </tbody>
                 </table>
@@ -313,7 +313,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         <span class="bg-accent/10 text-ink text-xs font-semibold px-2.5 py-1 rounded">Perf</span>
                         <div>
                             <h3 class="font-semibold">Performance tips</h3>
-                            <p class="text-sm text-clay/70 mt-1">Debounce search inputs, virtualize long lists, preconnect to CDNs, use CSS containment.</p>
+                            <p class="text-sm text-clay/70 mt-1">Debounce search inputs, virtualize long lists, preload local vendor assets, use CSS containment.</p>
                         </div>
                     </div>
                 </div>
@@ -351,7 +351,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <div class="bg-gradient-to-br from-accent to-accentDark rounded-xl p-8 text-white">
                 <h2 class="font-display text-xl font-bold mb-3">Ship without npm install</h2>
                 <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
-                    CDN-loaded React, Leaflet maps, Google Sheets data, and browser extensions in one skill.
+                    Lockfile-verified React and Leaflet assets, Google Sheets data, and browser extensions in one skill.
                 </p>
                 <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/dev-toolkit/skills/zero-build-frontend" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors" rel="noopener noreferrer">
                     View on GitHub

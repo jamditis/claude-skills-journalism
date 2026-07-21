@@ -862,10 +862,28 @@ app.post('/auth/passkey/register/verify', requireAuth(), async (req, res) => {
 });
 ```
 
+Install and bundle the browser helper locally. Commit the lockfile and generated
+asset, verify its checksum during deployment, and keep the page under a CSP such
+as `script-src 'self'`. A remote module graph cannot be secured by adding SRI to
+only its first import.
+
+```bash
+npm install --save-exact @simplewebauthn/browser@13.3.0
+npm install --save-dev --save-exact esbuild@0.28.1
+npm ci
+mkdir -p public/vendor
+npx esbuild @simplewebauthn/browser --bundle --format=esm --platform=browser \
+  --outfile=public/vendor/simplewebauthn-browser-13.3.0.mjs
+sha256sum public/vendor/simplewebauthn-browser-13.3.0.mjs \
+  > public/vendor/SHA256SUMS
+sha256sum -c public/vendor/SHA256SUMS
+```
+
 ```html
-<!-- Browser — @simplewebauthn/browser -->
+<!-- Browser — local @simplewebauthn/browser bundle -->
 <script type="module">
-  import { startRegistration } from 'https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.js';
+  import { startRegistration }
+    from '/vendor/simplewebauthn-browser-13.3.0.mjs';
 
   async function enrollPasskey() {
     const optsRes = await fetch('/auth/passkey/register/options', { method: 'POST', credentials: 'include' });
@@ -969,7 +987,7 @@ app.post('/auth/passkey/login/verify', async (req, res) => {
 <input type="email" name="email" autocomplete="username webauthn">
 <script type="module">
   import { startAuthentication, browserSupportsWebAuthnAutofill }
-    from 'https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.js';
+    from '/vendor/simplewebauthn-browser-13.3.0.mjs';
 
   if (await browserSupportsWebAuthnAutofill()) {
     const optsRes = await fetch('/auth/passkey/login/options', { method: 'POST' });
