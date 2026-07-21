@@ -512,18 +512,24 @@ class AlertManager:
         if channel:
             payload['channel'] = channel
 
-        response = requests.post(self.slack_webhook, json=payload, timeout=15)
-        response.raise_for_status()
+        try:
+            response = requests.post(self.slack_webhook, json=payload, timeout=15)
+            response.raise_for_status()
+        except requests.RequestException:
+            raise RuntimeError('Slack webhook request failed') from None
 
     def send_discord(self, message: str):
         """Send Discord notification."""
         if not self.discord_webhook:
             return
 
-        response = requests.post(
-            self.discord_webhook, json={'content': message}, timeout=15
-        )
-        response.raise_for_status()
+        try:
+            response = requests.post(
+                self.discord_webhook, json={'content': message}, timeout=15
+            )
+            response.raise_for_status()
+        except requests.RequestException:
+            raise RuntimeError('Discord webhook request failed') from None
 
     def send_email(self, subject: str, body: str, to: str):
         """Send email notification."""
