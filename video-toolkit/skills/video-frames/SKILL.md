@@ -37,6 +37,7 @@ Ask the user or use defaults:
 For each video in metadata.json:
 
 ```bash
+mkdir -p {frames_dir}/{platform}/{video_id}
 ffmpeg -i {video_path} \
   -vf "fps=1/{interval},scale='min({max_width},iw)':-1" \
   -q:v 2 -start_number 0 \
@@ -60,6 +61,7 @@ from PIL import Image
 GRID_SIZE = 3
 CELL_W, CELL_H = 640, 360
 
+grid_dir.mkdir(parents=True, exist_ok=True)
 frames = sorted(frame_dir.glob("frame_*.jpg"))
 for batch_start in range(0, len(frames), GRID_SIZE * GRID_SIZE):
     batch = frames[batch_start:batch_start + 9]

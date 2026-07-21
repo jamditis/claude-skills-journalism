@@ -32,13 +32,22 @@ The CPU path needs `whisper.cpp` and a model file:
 
 ```bash
 whisper-cli --help                       # or ./main -h in an older build
-ls ggml-base.en-q5_0.bin                 # the model weights
+ls ggml-base.en-q5_1.bin                 # the model weights
 ffmpeg -version                          # only if inputs are video, not wav
 ```
 
-Build from https://github.com/ggerganov/whisper.cpp and fetch a model with the
-repo's `models/download-ggml-model.sh`. `base.en` is adequate for short
-accountability clips; `small.en` trades speed for a little accuracy.
+Build from https://github.com/ggerganov/whisper.cpp, then fetch the weights by
+their exact model name — the bare name gets you the unquantized file, so ask for
+the quantization you intend to record:
+
+```bash
+./models/download-ggml-model.sh base.en-q5_1    # -> models/ggml-base.en-q5_1.bin
+```
+
+Only the quantizations upstream actually publishes are downloadable (`q5_1` and
+`q8_0` for `base.en`), so pick one of those rather than assuming a name like
+`q5_0` exists. `base.en-q5_1` is adequate for short accountability clips;
+`small.en-q5_1` trades speed for a little accuracy.
 
 The optional GPU path needs Python Whisper instead:
 
@@ -54,8 +63,8 @@ requires NumPy < 2.4, so `pip install "numpy<2.4"`.
 
 ### Step 1: Locate videos
 
-Read the project's `metadata.json` (written by `/video-download`) or scan a
-directory:
+Read the project's `metadata.json` (written by
+`/video-toolkit:video-download`) or scan a directory:
 
 ```python
 videos = metadata["videos"]              # has id, platform, local_path
@@ -96,8 +105,9 @@ the same machine:
 
 ```bash
 whisper-cli \
-  -m ggml-base.en-q5_0.bin \
+  -m ggml-base.en-q5_1.bin \
   -f "{audio}.wav" \
+  -of "transcripts/{platform}/{video-id}" \
   --no-gpu \
   --language en \
   --beam-size 5 \
@@ -110,7 +120,12 @@ whisper-cli \
   --output-txt --output-json
 ```
 
-Three of those are load-bearing and easy to drop by accident:
+`-of` is what puts the outputs where the later stages look. whisper.cpp writes
+`--output-txt` and `--output-json` next to the input wav unless you name a base
+path, so drop it and the transcripts land in the audio staging directory while
+`/video-toolkit:video-dashboard` reports zero transcripts found.
+
+Three more are load-bearing and easy to drop by accident:
 
 - **`--no-fallback`.** By default whisper.cpp re-decodes a hard segment at rising
   temperatures when it trips the no-speech, entropy, or log-probability checks. A
@@ -135,9 +150,9 @@ input that changes the decoded text:
   "engine": "whisper.cpp",
   "engine_build": "1.7.6 (b0a5b0c)",
   "model": "base.en",
-  "model_quantization": "q5_0",
+  "model_quantization": "q5_1",
   "model_sha256": "5f8c...9d2e",
-  "model_source": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en-q5_0.bin",
+  "model_source": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en-q5_1.bin",
   "source_sha256": "9f2b8c1d...c41a",
   "audio": {
     "extract_command": "ffmpeg -i input.mp4 -ar 16000 -ac 1 -c:a pcm_s16le audio.wav",
@@ -161,7 +176,7 @@ input that changes the decoded text:
 
 Notes on the fields that are easy to get wrong:
 
-- **Record the quantization, not just the model name.** A `base.en` at `q5_0` and
+- **Record the quantization, not just the model name.** A `base.en` at `q5_1` and
   the same model at `f16` decode differently.
 - **Record both a digest and a source for the weights.** A re-download from a
   different mirror, or a fresh re-quantization, can carry the same `base.en` /
@@ -195,9 +210,10 @@ So the promise is "re-runnable and checkable on the CPU path any evaluator has,"
 not "one canonical transcript for a clip regardless of engine." The second is not
 true of Whisper, and claiming it would mislead anyone auditing a quote.
 
-Repeatable timestamps are also what lets the later stages work: `/video-frames`
-and `/video-dashboard` point back at timecodes this transcript produced, so if
-those move on a re-run the downstream references break.
+Repeatable timestamps are also what lets the later stages work:
+`/video-toolkit:video-frames` and `/video-toolkit:video-dashboard` point back at
+timecodes this transcript produced, so if those move on a re-run the downstream
+references break.
 
 ## Optional: GPU fast path
 

@@ -11,8 +11,8 @@ Aggregate transcripts and frame analysis data into structured analysis JSONs, th
 
 ## Prerequisites
 
-- Transcripts in `transcripts/{platform}/{id}.txt` (from /video-transcribe)
-- Optionally: frame analysis in `frame-analysis/{platform}/{id}.json` (from /video-frames)
+- Transcripts in `transcripts/{platform}/{id}.txt` (from `/video-toolkit:video-transcribe`)
+- Optionally: frame analysis in `frame-analysis/{platform}/{id}.json` (from `/video-toolkit:video-frames`)
 - `metadata.json` with video entries
 
 ## Workflow
