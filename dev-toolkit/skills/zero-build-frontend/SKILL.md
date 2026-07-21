@@ -30,7 +30,8 @@ once, commit those assets with checksums, and serve them under a CSP such as
 
 ```bash
 npm install --save-exact react@19.2.8 react-dom@19.2.8 htm@3.1.1 \
-  lodash-es@4.18.1 htmx.org@2.0.10 alpinejs@3.15.12 \
+  lodash-es@4.18.1 htmx.org@2.0.10 @alpinejs/csp@3.15.12 \
+  papaparse@5.5.4 \
   leaflet@1.9.4 leaflet.markercluster@1.5.3
 npm install --save-dev --save-exact esbuild@0.28.1 \
   tailwindcss@4.3.3 @tailwindcss/cli@4.3.3
@@ -57,7 +58,8 @@ npx esbuild src/vendor-entry.js --bundle --format=esm --platform=browser \
 npx esbuild lodash-es --bundle --format=esm --platform=browser \
   --outfile=public/vendor/lodash-es-4.18.1.mjs
 cp node_modules/htmx.org/dist/htmx.min.js public/vendor/htmx-2.0.10.min.js
-cp node_modules/alpinejs/dist/cdn.min.js public/vendor/alpine-3.15.12.min.js
+cp node_modules/@alpinejs/csp/dist/cdn.min.js public/vendor/alpine-csp-3.15.12.min.js
+cp node_modules/papaparse/papaparse.min.js public/vendor/papaparse-5.5.4.min.js
 cp node_modules/leaflet/dist/leaflet.js public/vendor/leaflet-1.9.4.js
 cp node_modules/leaflet/dist/leaflet.css public/vendor/leaflet-1.9.4.css
 cp -R node_modules/leaflet/dist/images public/vendor/images
@@ -126,33 +128,62 @@ htmx 2.0 (released June 2024) lets you add AJAX, WebSockets, and SSE to plain HT
 
 htmx 2.x dropped IE support and tightened the API; if you're on htmx 1.x and don't need to migrate, 1.x still receives security patches. New code should target 2.x.
 
-## Alpine.js 3.x — client-side reactivity in HTML
+## Alpine.js 3.x — CSP-compatible client-side reactivity
 
-Alpine.js (current 3.14+) is a minimal alternative to Vue/React for sprinkles of interactivity. State and behavior live as `x-*` attributes in the markup.
+Alpine.js is a minimal alternative to Vue/React for sprinkles of interactivity.
+Use its dedicated [CSP build](https://alpinejs.dev/advanced/csp), which avoids
+the standard build's `Function`-style evaluation and works without
+`'unsafe-eval'`. Keep complex behavior in a same-origin external component file;
+simple property and method references remain in `x-*` attributes.
 
 ```html
-<script defer src="/vendor/alpine-3.15.12.min.js"></script>
+<script defer src="/js/alpine-components.js"></script>
+<script defer src="/vendor/alpine-csp-3.15.12.min.js"></script>
 
 <!-- Toggle visibility -->
-<div x-data="{ open: false }">
-  <button @click="open = !open">Toggle</button>
+<div x-data="togglePanel">
+  <button @click="toggle">Toggle</button>
   <div x-show="open" x-transition>Content here</div>
 </div>
 
 <!-- Two-way binding + computed -->
-<div x-data="{ first: '', last: '' }">
+<div x-data="nameForm">
   <input x-model="first" placeholder="First">
   <input x-model="last" placeholder="Last">
-  <p x-text="`Hello, ${first} ${last}`"></p>
+  <p x-text="fullName"></p>
 </div>
 
 <!-- Fetch on mount -->
-<div x-data="{ items: [] }"
-     x-init="items = await (await fetch('/api/items')).json()">
+<div x-data="itemList" x-init="load">
   <template x-for="item in items" :key="item.id">
     <li x-text="item.title"></li>
   </template>
 </div>
+```
+
+```javascript
+// public/js/alpine-components.js — loaded before the deferred CSP runtime
+document.addEventListener('alpine:init', () => {
+  Alpine.data('togglePanel', () => ({
+    open: false,
+    toggle() { this.open = !this.open; }
+  }));
+
+  Alpine.data('nameForm', () => ({
+    first: '',
+    last: '',
+    get fullName() { return `Hello, ${this.first} ${this.last}`; }
+  }));
+
+  Alpine.data('itemList', () => ({
+    items: [],
+    async load() {
+      const response = await fetch('/api/items');
+      if (!response.ok) throw new Error('Item request failed');
+      this.items = await response.json();
+    }
+  }));
+});
 ```
 
 Alpine pairs naturally with htmx: htmx swaps a server-rendered fragment in, Alpine handles whatever client-side state that fragment needs (open/close, optimistic toggles, form validation).
@@ -504,6 +535,12 @@ document.addEventListener('DOMContentLoaded', () => {
 ## Google Sheets as database
 
 ### Fetching published CSV
+
+Load the exact, lockfile-verified local build once before the application code:
+
+```html
+<script defer src="/vendor/papaparse-5.5.4.min.js"></script>
+```
 
 ```javascript
 // Google Sheets published as CSV

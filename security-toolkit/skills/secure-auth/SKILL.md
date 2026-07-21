@@ -863,9 +863,13 @@ app.post('/auth/passkey/register/verify', requireAuth(), async (req, res) => {
 ```
 
 Install and bundle the browser helper locally. Commit the lockfile and generated
-asset, verify its checksum during deployment, and keep the page under a CSP such
-as `script-src 'self'`. A remote module graph cannot be secured by adding SRI to
-only its first import.
+asset, and verify its checksum during deployment. If the module code remains
+inline as in the examples below, generate a fresh nonce for every response and
+send a CSP such as `script-src 'self' 'nonce-{{CSP_NONCE}}'`; replace the
+placeholder in both the header and tag, and never reuse a nonce. Alternatively,
+move the module code into a same-origin external file and use `script-src
+'self'` without a nonce. A remote module graph cannot be secured by adding SRI
+to only its first import.
 
 ```bash
 npm install --save-exact @simplewebauthn/browser@13.3.0
@@ -881,7 +885,7 @@ sha256sum -c public/vendor/SHA256SUMS
 
 ```html
 <!-- Browser — local @simplewebauthn/browser bundle -->
-<script type="module">
+<script type="module" nonce="{{CSP_NONCE}}">
   import { startRegistration }
     from '/vendor/simplewebauthn-browser-13.3.0.mjs';
 
@@ -985,7 +989,7 @@ app.post('/auth/passkey/login/verify', async (req, res) => {
 ```html
 <!-- Browser — discoverable credential + conditional UI -->
 <input type="email" name="email" autocomplete="username webauthn">
-<script type="module">
+<script type="module" nonce="{{CSP_NONCE}}">
   import { startAuthentication, browserSupportsWebAuthnAutofill }
     from '/vendor/simplewebauthn-browser-13.3.0.mjs';
 

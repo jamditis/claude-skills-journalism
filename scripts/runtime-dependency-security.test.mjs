@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { lstatSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, lstatSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { extname, join, relative } from 'node:path';
 import test from 'node:test';
 
@@ -79,6 +79,37 @@ test('audited security examples execute dependencies only from local paths', () 
   assert.match(mobileDocs, /\/debug\/eruda-3\.4\.3\.js/);
   assert.doesNotMatch(zeroBuildDocs, /esm\.sh\/(?:react|htm)|unpkg\.com\/leaflet/);
   assert.match(zeroBuildDocs, /\/vendor\/react-runtime-19\.2\.8\.mjs/);
+});
+
+test('local dependency instructions are complete and CSP-compatible', () => {
+  const mobile = readFileSync(join(ROOT, 'dev-toolkit/skills/mobile-debugging/SKILL.md'), 'utf8');
+  const secureAuth = readFileSync(join(ROOT, 'security-toolkit/skills/secure-auth/SKILL.md'), 'utf8');
+  const zeroBuild = readFileSync(join(ROOT, 'dev-toolkit/skills/zero-build-frontend/SKILL.md'), 'utf8');
+
+  assert.match(mobile, /find public\/debug -type f ! -name SHA256SUMS/);
+  assert.doesNotMatch(mobile, /sha256sum public\/debug\/\*/);
+
+  assert.match(secureAuth, /script-src 'self' 'nonce-/);
+  assert.equal(
+    [...secureAuth.matchAll(/<script type="module" nonce="\{\{CSP_NONCE\}\}">/g)].length,
+    2,
+  );
+
+  assert.match(zeroBuild, /@alpinejs\/csp@3\.15\.12/);
+  assert.match(zeroBuild, /alpine-csp-3\.15\.12\.min\.js/);
+  assert.doesNotMatch(zeroBuild, /node_modules\/alpinejs\/dist\/cdn\.min\.js/);
+  assert.match(zeroBuild, /papaparse@5\.5\.4/);
+  assert.match(zeroBuild, /papaparse-5\.5\.4\.min\.js/);
+});
+
+test('visual-explainer templates ship the Mermaid module they import', () => {
+  const bundle = join(ROOT, 'visual-explainer/templates/vendor/mermaid-11.16.0.mjs');
+  const legal = bundle + '.LEGAL.txt';
+  const mermaidLicense = join(ROOT, 'visual-explainer/templates/vendor/MERMAID-LICENSE');
+  assert.equal(existsSync(bundle), true);
+  assert.equal(existsSync(legal), true);
+  assert.equal(existsSync(mermaidLicense), true);
+  assert.ok(statSync(bundle).size > 100_000);
 });
 
 test('CDN version parser distinguishes exact versions from mutable tags', () => {

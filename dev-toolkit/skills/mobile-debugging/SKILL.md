@@ -24,7 +24,8 @@ npm ci
 mkdir -p public/debug
 cp node_modules/eruda/eruda.js public/debug/eruda-3.4.3.js
 cp node_modules/vconsole/dist/vconsole.min.js public/debug/vconsole-3.15.1.min.js
-sha256sum public/debug/* > public/debug/SHA256SUMS
+find public/debug -type f ! -name SHA256SUMS -print0 | sort -z | \
+  xargs -0 sha256sum > public/debug/SHA256SUMS
 sha256sum -c public/debug/SHA256SUMS
 ```
 

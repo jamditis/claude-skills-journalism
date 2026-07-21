@@ -7,6 +7,12 @@ Install exact packages, commit `package-lock.json`, build or copy the browser
 assets once, and ship them beside the generated page. Run `npm ci` in
 automation and verify the committed checksums before deployment.
 
+The repository's `templates/mermaid-flowchart.html` and
+`templates/slide-deck.html` already ship with the pinned Mermaid core bundle in
+`templates/vendor/`. Copy that sibling directory with either template. Use the
+commands below when rebuilding the committed asset, adding ELK, or creating a
+standalone page elsewhere.
+
 ```bash
 npm install --save-exact mermaid@11.16.0 \
   @mermaid-js/layout-elk@0.2.2 chart.js@4.5.1 animejs@3.2.2
