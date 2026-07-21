@@ -1042,6 +1042,32 @@
       }
     }
   },
+  "video-toolkit/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Georgia",
+            "serif"
+          ],
+          "body": [
+            "ui-sans-serif",
+            "system-ui",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#f3f1ea",
+          "ink": "#111827",
+          "clay": "#334155",
+          "mist": "#64748b",
+          "accent": "#4f46e5",
+          "accentDark": "#3730a3",
+          "accentLight": "#e0e7ff"
+        }
+      }
+    }
+  },
   "visual-explainer/index.html": {
     "theme": {
       "extend": {
