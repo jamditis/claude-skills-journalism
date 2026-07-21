@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Web scraping with anti-bot bypass, content extraction, undocumented APIs and poison pill detection. Use when extracting content from websites, handling paywalls, implementing scraping cascades or processing social media. Covers requests, trafilatura, Playwright with stealth mode, yt-dlp and instaloader patterns.">
+    <meta name="description" content="Authorized web content extraction with trust-boundary controls, scraping cascades, poison-pill detection, browser rendering, observed API analysis, and social-media archiving. Use when extracting public content, diagnosing access failures, implementing respectful scrapers, or processing social-media sources with requests, trafilatura, Playwright, yt-dlp, or instaloader.">
     <title>Web scraping - Claude skills for journalism</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <link rel="stylesheet" href="../assets/tailwind/web-scraping.css" data-tailwind-build="3.4.19">
@@ -112,7 +112,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
     <!-- Open Graph -->
     <meta property="og:title" content="Web scraping - Claude skills for journalism">
-    <meta property="og:description" content="Web scraping with anti-bot bypass, content extraction, undocumented APIs and poison pill detection. Use when extracting content from websites, handling paywalls, implementing scraping cascades or processing social media. Covers requests, trafilatura, Playwright with stealth mode, yt-dlp and instaloader patterns.">
+    <meta property="og:description" content="Authorized web content extraction with trust-boundary controls, scraping cascades, poison-pill detection, browser rendering, observed API analysis, and social-media archiving. Use when extracting public content, diagnosing access failures, implementing respectful scrapers, or processing social-media sources with requests, trafilatura, Playwright, yt-dlp, or instaloader.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://skills.amditis.tech/web-scraping/">
     <meta property="og:image" content="https://skills.amditis.tech/web-scraping/og-image.png">
@@ -122,7 +122,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Web scraping - Claude skills for journalism">
-    <meta name="twitter:description" content="Web scraping with anti-bot bypass, content extraction, undocumented APIs and poison pill detection. Use when extracting content from websites, handling paywalls, implementing scraping cascades or processing social media. Covers requests, trafilatura, Playwright with stealth mode, yt-dlp and instaloader patterns.">
+    <meta name="twitter:description" content="Authorized web content extraction with trust-boundary controls, scraping cascades, poison-pill detection, browser rendering, observed API analysis, and social-media archiving. Use when extracting public content, diagnosing access failures, implementing respectful scrapers, or processing social-media sources with requests, trafilatura, Playwright, yt-dlp, or instaloader.">
     <meta name="twitter:image" content="https://skills.amditis.tech/web-scraping/og-image.png">
 <script src="../ask-ai.js" defer></script>
     <!-- a11y-patch-v1 -->
@@ -161,7 +161,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">Web scraping</h1>
             <p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-05-08T21:46:38-04:00" data-updated-slug="web-scraping">Updated <time datetime="2026-05-08T21:46:38-04:00">May 8, 2026</time></p>
             <p class="text-xl text-white/90 max-w-2xl">
-                Reliable, ethical web scraping with fallback strategies, anti-bot handling, and social media extraction.
+                Reliable, ethical web scraping with fallback strategies, access-failure handling, and social media extraction.
             </p>
         </div>
     </header>
@@ -181,7 +181,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
-                    Handling paywalls and anti-bot measures
+                    Diagnosing paywalls and bot-protection blocks
                 </li>
                 <li class="flex items-start gap-3">
                     <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,7 +210,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <div class="grid md:grid-cols-2 gap-4">
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <h3 class="font-semibold mb-2">Scraping cascade</h3>
-                    <p class="text-sm text-clay/70">Three-tier fallback: Trafilatura (fast) to Requests (HTTP) to Playwright (JavaScript rendering with stealth).</p>
+                    <p class="text-sm text-clay/70">Three-tier fallback: Trafilatura (fast) to Requests (HTTP) to Playwright (JavaScript rendering). An access-denied response is a stop signal, not a reason to escalate.</p>
                 </div>
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <h3 class="font-semibold mb-2">Poison pill detection</h3>
@@ -254,8 +254,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <div class="flex items-start gap-4">
                         <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-1 rounded">Heavy</span>
                         <div>
-                            <h3 class="font-semibold">Playwright with stealth</h3>
-                            <p class="text-sm text-clay/70 mt-1">Full JavaScript rendering with anti-bot bypass. For SPAs and protected sites.</p>
+                            <h3 class="font-semibold">Playwright rendering</h3>
+                            <p class="text-sm text-clay/70 mt-1">Full JavaScript rendering for SPAs and other pages that need JavaScript to show authorized content. Run it in an isolated environment with private-network egress blocked.</p>
                         </div>
                     </div>
                 </div>
