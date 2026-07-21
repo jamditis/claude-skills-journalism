@@ -100,6 +100,7 @@ test('dashboard uses local reviewed code, DOM-safe rendering, and loopback previ
 test('skill CI discovers nested plugin skills and runs regression tests', () => {
   const workflow = readFileSync(join(ROOT, '.github/workflows/skill-lint.yml'), 'utf8');
   assert.match(workflow, /'\*\*\/SKILL\.md'/u);
+  assert.match(workflow, /'scripts\/\*\*\/\*\.mjs'/u);
   assert.match(workflow, /find \. -type f -name SKILL\.md/u);
   assert.match(workflow, /npm test/u);
 });

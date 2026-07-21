@@ -5,7 +5,7 @@ on:
     paths:
       - '**/SKILL.md'
       - 'hooks/*.md'
-      - 'scripts/**/*.test.mjs'
+      - 'scripts/**/*.mjs'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/skill-lint.yml'
