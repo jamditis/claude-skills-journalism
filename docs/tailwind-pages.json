@@ -1,0 +1,1189 @@
+{
+  "about/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#3d4b40"
+        }
+      }
+    }
+  },
+  "academic-writing/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#059669",
+          "accentDark": "#047857"
+        }
+      }
+    }
+  },
+  "accessibility-compliance/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#0891b2",
+          "accentDark": "#0e7490",
+          "accentDeep": "#155e75"
+        }
+      }
+    }
+  },
+  "ai-writing-detox/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#475569",
+          "accentDark": "#334155",
+          "accentDeep": "#1e293b"
+        }
+      }
+    }
+  },
+  "api-hardening/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#dc2626",
+          "accentDark": "#b91c1c"
+        }
+      }
+    }
+  },
+  "autocontext/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "sans": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ],
+          "mono": [
+            "JetBrains Mono",
+            "monospace"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#d6cdb7",
+          "mist": "#525252",
+          "accent": "#1a6b5a",
+          "accentDark": "#135346",
+          "accentLight": "#e8f4f0"
+        }
+      }
+    }
+  },
+  "claude-md-updater/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#4f46e5",
+          "accentDark": "#4338ca"
+        }
+      }
+    }
+  },
+  "content-access/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#059669",
+          "accentDark": "#047857"
+        }
+      }
+    }
+  },
+  "crisis-communications/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#ea580c",
+          "accentDark": "#c2410c"
+        }
+      }
+    }
+  },
+  "data-journalism/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "sans": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#d6cdb7",
+          "mist": "#525252",
+          "accent": "#059669",
+          "accentDark": "#047857"
+        }
+      }
+    }
+  },
+  "digital-archive/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#059669",
+          "accentDark": "#047857"
+        }
+      }
+    }
+  },
+  "editorial-workflow/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#0d9488",
+          "accentDark": "#0f766e"
+        }
+      }
+    }
+  },
+  "electron-dev/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#4f46e5",
+          "accentDark": "#4338ca"
+        }
+      }
+    }
+  },
+  "fact-check-workflow/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#0d9488",
+          "accentDark": "#0f766e"
+        }
+      }
+    }
+  },
+  "foia-requests/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "sans": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#d6cdb7",
+          "mist": "#525252",
+          "accent": "#7c3aed",
+          "accentDark": "#6d28d9"
+        }
+      }
+    }
+  },
+  "free-apis-catalog/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "sans": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#d6cdb7",
+          "mist": "#525252",
+          "accent": "#059669",
+          "accentDark": "#047857"
+        }
+      }
+    }
+  },
+  "index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "sans": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#d6cdb7",
+          "mist": "#525252",
+          "accent": "#3d4b40"
+        },
+        "animation": {
+          "page-in": "pageIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+          "drift": "drift 25s ease-in-out infinite"
+        },
+        "keyframes": {
+          "pageIn": {
+            "0%": {
+              "opacity": "0",
+              "transform": "translateY(15px)"
+            },
+            "100%": {
+              "opacity": "1",
+              "transform": "translateY(0)"
+            }
+          },
+          "drift": {
+            "0%, 100%": {
+              "transform": "translate(0, 0)"
+            },
+            "50%": {
+              "transform": "translate(-1%, 1%)"
+            }
+          }
+        }
+      }
+    }
+  },
+  "interview-prep/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#0d9488",
+          "accentDark": "#0f766e"
+        }
+      }
+    }
+  },
+  "interview-transcription/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#0d9488",
+          "accentDark": "#0f766e"
+        }
+      }
+    }
+  },
+  "mobile-debugging/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#4f46e5",
+          "accentDark": "#4338ca"
+        }
+      }
+    }
+  },
+  "newsletter-publishing/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#d97706",
+          "accentDark": "#b45309"
+        }
+      }
+    }
+  },
+  "newsroom-style/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#0d9488",
+          "accentDark": "#0f766e"
+        }
+      }
+    }
+  },
+  "okf-wiki/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#e11d48",
+          "accentDark": "#be123c"
+        }
+      }
+    }
+  },
+  "one-way-door/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#b45309",
+          "accentDark": "#92400e"
+        }
+      }
+    }
+  },
+  "page-monitoring/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#059669",
+          "accentDark": "#047857"
+        }
+      }
+    }
+  },
+  "pdf-design/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#e11d48",
+          "accentDark": "#be123c"
+        }
+      }
+    }
+  },
+  "pdf-playground/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "sans": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#d6cdb7",
+          "mist": "#525252",
+          "accent": "#CA3553",
+          "accentDark": "#a82a44"
+        }
+      }
+    }
+  },
+  "persistent-sessions/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#059669",
+          "accentDark": "#047857"
+        }
+      }
+    }
+  },
+  "photo-metadata/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#0d9488",
+          "accentDark": "#0f766e"
+        }
+      }
+    }
+  },
+  "project-memory/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#7c3aed",
+          "accentDark": "#6d28d9"
+        }
+      }
+    }
+  },
+  "project-retrospective/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#d97706",
+          "accentDark": "#b45309",
+          "accentDeep": "#92400e"
+        }
+      }
+    }
+  },
+  "python-pipeline/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#4f46e5",
+          "accentDark": "#4338ca"
+        }
+      }
+    }
+  },
+  "secure-auth/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#dc2626",
+          "accentDark": "#b91c1c"
+        }
+      }
+    }
+  },
+  "security-checklist/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#dc2626",
+          "accentDark": "#b91c1c"
+        }
+      }
+    }
+  },
+  "social-media-intelligence/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#0d9488",
+          "accentDark": "#0f766e"
+        }
+      }
+    }
+  },
+  "source-verification/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "sans": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#d6cdb7",
+          "mist": "#525252",
+          "accent": "#1e40af",
+          "accentDark": "#1e3a8a"
+        }
+      }
+    }
+  },
+  "story-pitch/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#0d9488",
+          "accentDark": "#0f766e"
+        }
+      }
+    }
+  },
+  "superjawn/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "sans": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ],
+          "mono": [
+            "JetBrains Mono",
+            "monospace"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#d6cdb7",
+          "mist": "#525252",
+          "accent": "#1e3a8a",
+          "accentDark": "#1e40af",
+          "accentLight": "#dbeafe"
+        }
+      }
+    }
+  },
+  "supply-chain-hardening/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#dc2626",
+          "accentDark": "#b91c1c"
+        }
+      }
+    }
+  },
+  "template-selector/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#7c3aed",
+          "accentDark": "#6d28d9"
+        }
+      }
+    }
+  },
+  "test-first-bugs/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#4f46e5",
+          "accentDark": "#4338ca"
+        }
+      }
+    }
+  },
+  "vibe-coding/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "sans": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#d6cdb7",
+          "mist": "#525252",
+          "accent": "#4f46e5",
+          "accentDark": "#4338ca"
+        }
+      }
+    }
+  },
+  "visual-explainer/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#3cc4b8",
+          "accentDark": "#2a9a90"
+        }
+      }
+    }
+  },
+  "web-archiving/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#059669",
+          "accentDark": "#047857"
+        }
+      }
+    }
+  },
+  "web-scraping/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#4f46e5",
+          "accentDark": "#4338ca"
+        }
+      }
+    }
+  },
+  "web-ui-best-practices/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#0d9488",
+          "accentDark": "#0f766e"
+        }
+      }
+    }
+  },
+  "workflows/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#0d9488",
+          "accentDark": "#0f766e"
+        }
+      }
+    }
+  },
+  "zero-build-frontend/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#4f46e5",
+          "accentDark": "#4338ca"
+        }
+      }
+    }
+  }
+}

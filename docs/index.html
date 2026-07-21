@@ -5,7 +5,7 @@
   A dev/journalism crossover: modular instruction sets that extend
   Claude's capabilities for verification, data work, FOIA, and more.
 
-  stack: zero-build HTML, Tailwind CDN, Lucide icons, Google Fonts
+  stack: static HTML, precompiled Tailwind CSS, Lucide icons, Google Fonts
   built by: joe amditis  —  jamditis@gmail.com
 -->
 <html lang="en" class="scroll-smooth">
@@ -24,42 +24,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,900;1,9..144,300&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
 
     <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/tailwind/index.css" data-tailwind-build="3.4.19">
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        display: ['Fraunces', 'serif'],
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                    },
-                    colors: {
-                        canvas: '#ede6d4',
-                        ink: '#121212',
-                        clay: '#d6cdb7',
-                        mist: '#525252',
-                        accent: '#3d4b40',
-                    },
-                    animation: {
-                        'page-in': 'pageIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'drift': 'drift 25s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        pageIn: {
-                            '0%': { opacity: '0', transform: 'translateY(15px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        drift: {
-                            '0%, 100%': { transform: 'translate(0, 0)' },
-                            '50%': { transform: 'translate(-1%, 1%)' },
-                        },
-                    }
-                }
-            }
-        }
-    </script>
 
     <style>
         body {

@@ -1,0 +1,26 @@
+name: Docs Tailwind build
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'scripts/docs-tailwind.mjs'
+      - 'scripts/docs-tailwind-security.test.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/docs-tailwind.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-docs-css:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check:docs-css

@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "node --test \"scripts/**/*.test.mjs\"",
-    "a11y": "node scripts/verify_a11y.mjs"
+    "a11y": "node scripts/verify_a11y.mjs",
+    "build:docs-css": "node scripts/docs-tailwind.mjs --write",
+    "check:docs-css": "node scripts/docs-tailwind.mjs --check"
   },
   "repository": {
     "type": "git",
@@ -18,6 +20,8 @@
     "playwright": "^1.57.0"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.3"
+    "@axe-core/playwright": "^4.11.3",
+    "postcss": "8.5.21",
+    "tailwindcss": "3.4.19"
   }
 }
