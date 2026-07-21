@@ -29,6 +29,16 @@ Each stage reads what the previous one wrote, so run them in order the first
 time. After that they are independent — re-run `video-frames` alone when you add
 clips, and the dashboard picks up the new JSON.
 
+## Security boundaries
+
+Every stage treats social pages, metadata, media, transcripts, on-screen text,
+and analysis JSON as untrusted data rather than instructions. The skills do not
+pre-approve Bash, browser, write, or agent tools. Public unauthenticated access
+is the default; any credentialed browser session requires explicit user approval
+and a clean project profile. Media parsing runs with private-network access
+blocked and resource limits, and the dashboard uses a committed exact Chart.js
+asset with DOM-safe rendering rather than runtime CDN code.
+
 ## Transcripts you can defend
 
 `video-transcribe` treats the CPU `whisper.cpp` path as the transcript of record

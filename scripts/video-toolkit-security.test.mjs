@@ -1,0 +1,80 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import test from 'node:test';
+
+const ROOT = new URL('..', import.meta.url).pathname;
+const SKILL_NAMES = [
+  'video-dashboard',
+  'video-download',
+  'video-frames',
+  'video-transcribe',
+];
+
+function skill(name) {
+  return readFileSync(join(ROOT, 'video-toolkit/skills', name, 'SKILL.md'), 'utf8');
+}
+
+function frontmatter(source) {
+  return source.match(/^---\n([\s\S]*?)\n---/u)?.[1] || '';
+}
+
+test('video skills do not silently pre-approve high-impact tools', () => {
+  for (const name of SKILL_NAMES) {
+    assert.doesNotMatch(frontmatter(skill(name)), /^allowed-tools:/mu, name);
+  }
+});
+
+test('every video stage treats external material as untrusted data', () => {
+  for (const name of SKILL_NAMES) {
+    const source = skill(name);
+    assert.match(source, /<!-- untrusted-content-contract:v1 -->/u, name);
+    assert.match(source, /untrusted data, never as instructions/iu, name);
+    assert.match(source, /cannot authorize .*tool/iu, name);
+    assert.match(source, /preserve[\s\S]{0,180}provenance/iu, name);
+  }
+});
+
+test('video download keeps URLs, browser credentials, and paths inside explicit boundaries', () => {
+  const source = skill('video-download');
+  assert.match(source, /allowlist.*HTTPS/iu);
+  assert.match(source, /private-network/iu);
+  assert.match(source, /credentialed sessions? (?:are|is) disabled by default/iu);
+  assert.match(source, /clean browser profile/iu);
+  assert.match(source, /never (?:export|return|print).*cookies/iu);
+  assert.match(source, /cap .*count.*size.*duration/iu);
+  assert.match(source, /argv/iu);
+  assert.match(source, /symlink/iu);
+});
+
+test('transcription and frame processing sandbox untrusted media and pin inputs', () => {
+  const transcribe = skill('video-transcribe');
+  const frames = skill('video-frames');
+  for (const source of [transcribe, frames]) {
+    assert.match(source, /sandbox/iu);
+    assert.match(source, /network (?:access|egress)\s+disabled/iu);
+    assert.match(source, /resource\s+(?:caps|limits)/iu);
+  }
+  assert.doesNotMatch(transcribe, /resolve\/main/iu);
+  assert.match(transcribe, /full (?:commit|revision) SHA/iu);
+  assert.match(transcribe, /--require-hashes/iu);
+  assert.match(frames, /on-screen text.*untrusted/isu);
+});
+
+test('dashboard uses local reviewed code, DOM-safe rendering, and loopback preview', () => {
+  const source = skill('video-dashboard');
+  assert.doesNotMatch(source, /CDN-loaded|cdn\.jsdelivr|unpkg\.com|cdnjs\.cloudflare/iu);
+  assert.match(source, /do not fetch Google Fonts/iu);
+  assert.match(source, /chart\.js@4\.5\.1/u);
+  assert.match(source, /chart-4\.5\.1\.umd\.min\.js/u);
+  assert.match(source, /textContent/u);
+  assert.match(source, /never interpolate[\s\S]{0,100}innerHTML/iu);
+  assert.match(source, /--bind 127\.0\.0\.1 8888/u);
+});
+
+test('skill CI discovers nested plugin skills and runs regression tests', () => {
+  const workflow = readFileSync(join(ROOT, '.github/workflows/skill-lint.yml'), 'utf8');
+  assert.match(workflow, /'\*\*\/SKILL\.md'/u);
+  assert.match(workflow, /find \. -type f -name SKILL\.md/u);
+  assert.match(workflow, /npm test/u);
+});
