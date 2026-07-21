@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, lstatSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { extname, join, relative } from 'node:path';
+import { extname, join, posix, relative } from 'node:path';
 import test from 'node:test';
 
 const ROOT = new URL('..', import.meta.url).pathname;
@@ -25,6 +25,81 @@ function executableSource(path) {
   return [...source.matchAll(/```[^\n]*\n([\s\S]*?)```/g)]
     .map((match) => match[1])
     .join('\n');
+}
+
+function globMatches(pattern, value) {
+  const memo = new Map();
+
+  function match(patternIndex, valueIndex) {
+    const key = `${patternIndex}:${valueIndex}`;
+    if (memo.has(key)) return memo.get(key);
+
+    let result;
+    if (patternIndex === pattern.length) {
+      result = valueIndex === value.length;
+    } else if (pattern[patternIndex] === '*') {
+      result = match(patternIndex + 1, valueIndex)
+        || (valueIndex < value.length
+          && value[valueIndex] !== '/'
+          && match(patternIndex, valueIndex + 1));
+    } else if (pattern[patternIndex] === '?') {
+      result = valueIndex < value.length
+        && value[valueIndex] !== '/'
+        && match(patternIndex + 1, valueIndex + 1);
+    } else if (pattern[patternIndex] === '[') {
+      const end = pattern.indexOf(']', patternIndex + 1);
+      if (end === -1) {
+        result = value[valueIndex] === '[' && match(patternIndex + 1, valueIndex + 1);
+      } else {
+        let body = pattern.slice(patternIndex + 1, end);
+        const negated = body.startsWith('!') || body.startsWith('^');
+        if (negated) body = body.slice(1);
+        let included = false;
+        for (let index = 0; index < body.length; index += 1) {
+          if (index + 2 < body.length && body[index + 1] === '-') {
+            included ||= value[valueIndex] >= body[index] && value[valueIndex] <= body[index + 2];
+            index += 2;
+          } else {
+            included ||= value[valueIndex] === body[index];
+          }
+        }
+        result = valueIndex < value.length
+          && value[valueIndex] !== '/'
+          && (negated ? !included : included)
+          && match(end + 1, valueIndex + 1);
+      }
+    } else {
+      result = value[valueIndex] === pattern[patternIndex]
+        && match(patternIndex + 1, valueIndex + 1);
+    }
+
+    memo.set(key, result);
+    return result;
+  }
+
+  return match(0, 0);
+}
+
+function selfIncludingChecksumGlobs(source) {
+  const flattened = source.replace(/\\\r?\n\s*/g, ' ');
+  const violations = [];
+  const command = /\bsha256sum\b\s+([^>\n]*?)\s*>\s*((?:"[^"]+"|'[^']+'|[^\s;|&]+))/gu;
+
+  for (const match of flattened.matchAll(command)) {
+    const inputs = match[1].trim();
+    const rawOutput = match[2];
+    const output = rawOutput.replace(/^(["'])(.*)\1$/u, '$2');
+    if (posix.basename(output) !== 'SHA256SUMS') continue;
+
+    const tokens = inputs.match(/(?:"[^"]*"|'[^']*'|[^\s]+)/gu) || [];
+    const includesOutput = tokens.some((token) => {
+      if (token.startsWith('-') || /["']/.test(token) || !/[*?[]/u.test(token)) return false;
+      return globMatches(posix.normalize(token), posix.normalize(output));
+    });
+    if (includesOutput) violations.push(`${inputs} > ${rawOutput}`);
+  }
+
+  return violations;
 }
 
 function packageVersion(url) {
@@ -87,7 +162,6 @@ test('local dependency instructions are complete and CSP-compatible', () => {
   const zeroBuild = readFileSync(join(ROOT, 'dev-toolkit/skills/zero-build-frontend/SKILL.md'), 'utf8');
 
   assert.match(mobile, /find public\/debug -type f ! -name SHA256SUMS/);
-  assert.doesNotMatch(mobile, /sha256sum public\/debug\/\*/);
 
   assert.match(secureAuth, /script-src 'self' 'nonce-/);
   assert.equal(
@@ -100,6 +174,37 @@ test('local dependency instructions are complete and CSP-compatible', () => {
   assert.doesNotMatch(zeroBuild, /node_modules\/alpinejs\/dist\/cdn\.min\.js/);
   assert.match(zeroBuild, /papaparse@5\.5\.4/);
   assert.match(zeroBuild, /papaparse-5\.5\.4\.min\.js/);
+});
+
+test('checksum-manifest classifier catches the bug class without flagging narrower globs', () => {
+  assert.deepEqual(
+    selfIncludingChecksumGlobs('sha256sum public/assets/* > public/assets/SHA256SUMS'),
+    ['public/assets/* > public/assets/SHA256SUMS'],
+  );
+  assert.deepEqual(
+    selfIncludingChecksumGlobs('sha256sum public/assets/SHA* > public/assets/SHA256SUMS'),
+    ['public/assets/SHA* > public/assets/SHA256SUMS'],
+  );
+  assert.deepEqual(
+    selfIncludingChecksumGlobs('sha256sum public/assets/*.js > public/assets/SHA256SUMS'),
+    [],
+  );
+  assert.deepEqual(
+    selfIncludingChecksumGlobs(
+      'find public/assets -type f ! -name SHA256SUMS -print0 | xargs -0 sha256sum > public/assets/SHA256SUMS',
+    ),
+    [],
+  );
+});
+
+test('checksum manifests are not generated from globs that include themselves', () => {
+  const violations = [];
+  for (const path of sourceFiles()) {
+    for (const command of selfIncludingChecksumGlobs(executableSource(path))) {
+      violations.push(`${relative(ROOT, path)}: ${command}`);
+    }
+  }
+  assert.deepEqual(violations, []);
 });
 
 test('visual-explainer templates ship the Mermaid module they import', () => {
