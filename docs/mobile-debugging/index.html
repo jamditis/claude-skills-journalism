@@ -6,30 +6,10 @@
     <meta name="description" content="Remote JavaScript console access and debugging on mobile devices. Use when debugging web pages on phones/tablets, accessing console errors without desktop DevTools, testing responsive designs on real devices, or diagnosing mobile-specific issues. Covers locally hosted Eruda and vConsole, Chrome/Safari remote debugging, and cloud testing platforms.">
     <title>Mobile debugging - Claude skills for journalism</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/tailwind/mobile-debugging.css" data-tailwind-build="3.4.19">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'display': ['Fraunces', 'serif'],
-                        'body': ['Plus Jakarta Sans', 'sans-serif'],
-                    },
-                    colors: {
-                        'canvas': '#ede6d4',
-                        'ink': '#121212',
-                        'clay': '#2d2a26',
-                        'mist': '#c4bfb4',
-                        'accent': '#4f46e5',
-                        'accentDark': '#4338ca',
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         h1, h2, h3 { font-family: 'Fraunces', serif; }
@@ -146,6 +126,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
     <meta name="twitter:image" content="https://skills.amditis.tech/mobile-debugging/og-image.png">
 <script src="../ask-ai.js" defer></script>
     <!-- a11y-patch-v1 -->
+<link rel="stylesheet" href="../updated.css">
 </head>
 <body class="bg-canvas text-ink">
     <a href="#main" class="skip-link">Skip to main content</a>
@@ -178,6 +159,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 Development skill
             </div>
             <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">Mobile debugging</h1>
+            <p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-07-21T17:31:42-04:00" data-updated-slug="mobile-debugging">Updated <time datetime="2026-07-21T17:31:42-04:00">Jul 21, 2026</time></p>
             <p class="text-xl text-white/90 max-w-2xl">
                 Remote JavaScript console access and debugging on mobile devices without desktop DevTools.
             </p>
@@ -403,5 +385,6 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             </div>
         </div>
     </footer>
+<script defer src="../updated.js"></script>
 </body>
 </html>

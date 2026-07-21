@@ -1,0 +1,80 @@
+/* Last-updated stamps: a strip of tape stuck to the card.
+ *
+ * The site's vocabulary is paper: cream canvas, deckle edges, a serif face.
+ * So freshness is labeled the way you would label a physical folder, not with
+ * a status chip. Age is carried by the tape itself: fresh tape is a clean tan,
+ * older tape yellows, old tape browns. The words say the age too, so the color
+ * is never the only signal (WCAG 1.4.1).
+ *
+ * Every tier clears 4.5:1 against all card and hero backgrounds on the site,
+ * including after the multiply blend the card variant uses.
+ *
+ * Written by scripts/updated-stamp.mjs, upgraded to relative time by updated.js.
+ */
+
+.updated-tape {
+    display: inline-block;
+    max-width: 100%;
+    font-family: Fraunces, Georgia, serif;
+    font-style: italic;
+    font-size: 11px;
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+    padding: 6px 15px 7px;
+    white-space: nowrap;
+    color: #33402f;
+    background-color: rgba(220, 212, 192, 0.93);
+    /* The fibrous sheen of masking tape. */
+    background-image: repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.20) 0 4px,
+        rgba(255, 255, 255, 0) 4px 11px
+    );
+    /* Torn ends: the long edges come off the roll straight, the ends tear in a
+       sawtooth. clip-path also clips box-shadow, which is why the lift below is
+       a drop-shadow filter. That follows the torn silhouette instead of the
+       original rectangle. */
+    clip-path: polygon(
+        3% 0%, 97% 0%,
+        100% 17%, 96% 33%, 100% 50%, 96% 67%, 100% 83%, 97% 100%,
+        3% 100%, 0% 83%, 4% 67%, 0% 50%, 4% 33%, 0% 17%
+    );
+    filter: drop-shadow(0 1px 2px rgba(18, 18, 18, 0.22));
+    transform: rotate(-1.8deg);
+}
+
+/* On a card the tape sits over paper, so it multiplies into the stock. */
+.updated-tape-card {
+    mix-blend-mode: multiply;
+}
+
+/* On a hero it sits over a saturated gradient, where multiply would turn it to
+   mud, so it stays an opaque strip. Sized up to hold its own under a display
+   headline, where it reads as the dateline it effectively is. */
+.updated-tape-hero {
+    font-size: 13px;
+    padding: 8px 20px 9px;
+    filter: drop-shadow(0 2px 3px rgba(18, 18, 18, 0.3));
+}
+
+.updated-tape[data-tier="aging"] {
+    color: #5e3f00;
+    background-color: rgba(228, 211, 168, 0.93);
+}
+
+.updated-tape[data-tier="stale"] {
+    color: #571c1c;
+    background-color: rgba(210, 184, 153, 0.93);
+    /* Old tape lifts at the corner. */
+    transform: rotate(-2.6deg);
+}
+
+/* Hand-torn tape is never applied at the same angle twice. */
+.skill-card:nth-of-type(2n) .updated-tape { transform: rotate(1.5deg); }
+.skill-card:nth-of-type(3n) .updated-tape { transform: rotate(-0.9deg); }
+.skill-card:nth-of-type(5n) .updated-tape { transform: rotate(2.2deg); }
+.skill-card:nth-of-type(2n) .updated-tape[data-tier="stale"] { transform: rotate(2.9deg); }
+
+@media (prefers-reduced-motion: reduce) {
+    .updated-tape { transition: none; }
+}

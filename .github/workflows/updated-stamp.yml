@@ -1,0 +1,77 @@
+name: Refresh last-updated stamps
+
+# Rewrites the "last updated" tape on the site and the Updated column in the
+# README from git history, then commits the result.
+#
+# This runs after the merge rather than as a pull-request check on purpose. A
+# branch that edits a skill changes that skill's last-commit date, so a check
+# demanding an up-to-date stamp could never pass: regenerating would itself be
+# a new commit with a new date. Stamping after the fact converges instead: the
+# commit this job makes touches only docs/ and README.md, which are not date
+# sources, so the next run finds nothing to change.
+#
+# The trigger is push rather than a merged pull_request because a pull_request
+# event raised by a fork's PR gets a read-only token no matter what the
+# permissions block says, so the push below would 403 the first time an outside
+# contribution lands. push also catches commits made straight to master.
+#
+# paths-ignore keeps it off the pushes that cannot have moved a date: the
+# stamped surfaces themselves, and CI config. That also means this job's own
+# commit can never trigger another run.
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - '.github/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: updated-stamp
+  cancel-in-progress: false
+
+jobs:
+  stamp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Dates come from `git log` per path. A shallow clone would report the
+          # checkout commit for every skill, stamping them all with one date.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      # This one file, not `npm test`: the a11y suite pulls in playwright, and
+      # this job has no reason to install it. These tests use only builtins, so
+      # the job needs no dependency step at all.
+      - run: node --test scripts/updated-stamp.test.mjs
+
+      - name: Commit refreshed stamps
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            git fetch origin master
+            git reset --hard origin/master
+            node scripts/updated-stamp.mjs
+            if git diff --quiet -- docs README.md; then
+              echo "stamps already current"
+              exit 0
+            fi
+            git add docs README.md
+            git commit -m 'Refresh last-updated stamps from git history'
+            if git push origin HEAD:master; then
+              exit 0
+            fi
+            echo "push raced with another master update; retrying ($attempt/3)"
+          done
+          echo "could not push refreshed stamps after 3 attempts" >&2
+          exit 1
