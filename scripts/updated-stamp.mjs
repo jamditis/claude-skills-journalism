@@ -369,7 +369,7 @@ function indent(html, index) {
  * pointing somewhere that is not a skill or plugin (about/, workflows/) is
  * left alone.
  */
-export function stampIndex(html, entries, { onSkip } = {}) {
+export function stampIndex(html, entries, { onSkip, onStamp } = {}) {
   const bySlug = new Map(entries.map((e) => [e.slug, e]));
   const { tags, pairs } = tokenizeHTML(html);
   let out = '';
@@ -391,6 +391,7 @@ export function stampIndex(html, entries, { onSkip } = {}) {
       block = removeOwnedTapes(block);
       const pad = indent(html, anchor.start);
       block = `${block.replace(/\s*$/, '')}\n${pad}    ${tape(entry, 'card')}\n${pad}`;
+      if (onStamp) onStamp(entry);
     } else if (slug && !entry && onSkip) {
       onSkip({ href, slug });
     }
@@ -487,7 +488,7 @@ export function ensureStyleLink(html, href) {
  * A row is stamped when its first cell links to a known skill or plugin
  * directory, so hand-written prose tables are untouched.
  */
-export function stampReadme(md, entries, { onUnstamped } = {}) {
+export function stampReadme(md, entries, { onUnstamped, onStamp } = {}) {
   const byPath = new Map(entries.map((e) => [e.path, e]));
   // Split on either ending and write back whatever the file used. Splitting on
   // "\n" alone leaves a "\r" on each line, which stops cells() from seeing the
@@ -590,6 +591,7 @@ export function stampReadme(md, entries, { onUnstamped } = {}) {
       out.push(rebuild(
         [...parts, entry && entry.updated ? formatAbsolute(entry.updated) : ''], parseRow(row),
       ));
+      if (entry?.updated && onStamp) onStamp(entry);
     }
     i = j;
   }
@@ -648,6 +650,7 @@ function isRegularDestination(repoRoot, file) {
 export function run({ repoRoot = REPO_ROOT, check = false, quiet = false, log = console.log } = {}) {
   const entries = collectEntries({ repoRoot });
   const undated = entries.filter((e) => !e.updated);
+  const covered = new Set();
   const changed = [];
   const write = (file, next) => {
     const path = join(repoRoot, file);
@@ -675,7 +678,10 @@ export function run({ repoRoot = REPO_ROOT, check = false, quiet = false, log = 
   if (isRegularDestination(repoRoot, indexPath)) {
     const indexHtml = readFileSync(join(repoRoot, indexPath), 'utf8');
     write(indexPath, withAssets(
-      stampIndex(indexHtml, entries, { onSkip: (s) => skipped.push(s.slug) }),
+      stampIndex(indexHtml, entries, {
+        onSkip: (s) => skipped.push(s.slug),
+        onStamp: (entry) => covered.add(entry.slug),
+      }),
       '',
       indexPath,
     ));
@@ -690,6 +696,7 @@ export function run({ repoRoot = REPO_ROOT, check = false, quiet = false, log = 
     const file = relative(repoRoot, page);
     const stamped = stampSkillPage(readFileSync(page, 'utf8'), entry);
     if (stamped === null) { missingH1.push(file); continue; }
+    covered.add(entry.slug);
     write(file, withAssets(stamped, '../', file));
   }
 
@@ -699,7 +706,10 @@ export function run({ repoRoot = REPO_ROOT, check = false, quiet = false, log = 
     write(readmePath, stampReadme(
       readFileSync(join(repoRoot, readmePath), 'utf8'),
       entries,
-      { onUnstamped: (row) => unstampedRows.push(row.trim()) },
+      {
+        onUnstamped: (row) => unstampedRows.push(row.trim()),
+        onStamp: (entry) => covered.add(entry.slug),
+      },
     ));
   } else {
     notFiles.push(readmePath);
@@ -714,18 +724,23 @@ export function run({ repoRoot = REPO_ROOT, check = false, quiet = false, log = 
   // rides along inside the CI commit that was supposed to stamp it. A card
   // pointing at a non-skill (workflows/, about/) is not in here: that is
   // expected, and an error nobody can act on is an error nobody reads.
+  const uncovered = entries.filter((entry) => entry.updated && !covered.has(entry.slug));
   const problems = [
     ...missingH1.map((f) => `${f} has no <h1>, not stamped`),
     ...undated.map((e) => `${e.path} has no commit history, not stamped`),
     ...missingAssets.map((f) => `${f} is missing updated.css or updated.js`),
     ...notFiles.map((f) => `${f} does not resolve to a regular file at that path, not stamped`),
     ...unstampedRows.map((r) => `README row not stamped, its cells are not this tool's to rewrite: ${r}`),
+    ...uncovered.map((e) => `${e.path} (${e.slug}) reaches no public stamp surface`),
   ];
 
   for (const slug of skipped) log(`note: card links to ${slug}/ which is not a skill or plugin`);
   for (const problem of problems) log(`problem: ${problem}`);
 
-  return { entries, changed, skipped, missingH1, undated, missingAssets, notFiles, unstampedRows, problems };
+  return {
+    entries, changed, skipped, missingH1, undated, missingAssets,
+    notFiles, unstampedRows, uncovered, problems,
+  };
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

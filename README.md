@@ -127,6 +127,35 @@ These six skills ship together as the [research-toolkit](./research-toolkit/) pl
 | [pdf-design](./pdf-design/) | Professional PDF reports and proposals with brand system, budget tables, and multi-page layouts. For the full interactive experience, use [pdf-playground](./pdf-playground/) instead | Apr 14, 2026 |
 | [visual-explainer](./visual-explainer/) | Turn complex data into styled HTML pages — architecture diagrams, data tables, flowcharts, timelines, source maps, and dashboards with dark/light theme support. Now registered as a plugin (`/plugin install visual-explainer@claude-skills-journalism`) | May 10, 2026 |
 
+### PDF Playground skill
+
+This skill ships inside the [pdf-playground](./pdf-playground/) plugin.
+
+| Skill | Description | Updated |
+|-------|-------------|--------|
+| [document-design](./pdf-playground/skills/document-design/) | Create print-ready HTML proposals, reports, one-pagers, newsletters, slides, flyers, and other PDF-ready documents with reusable brand and layout patterns | Mar 17, 2026 |
+
+### Superjawn skills
+
+These fourteen skills ship inside the [superjawn](./superjawn/) plugin.
+
+| Skill | Description | Updated |
+|-------|-------------|--------|
+| [brainstorming](./superjawn/skills/brainstorming/) | Explore intent, requirements, design, and relevant research before creative implementation work | May 7, 2026 |
+| [dispatching-parallel-agents](./superjawn/skills/dispatching-parallel-agents/) | Divide independent tasks among parallel agents without shared-state conflicts | May 7, 2026 |
+| [executing-plans](./superjawn/skills/executing-plans/) | Execute a written implementation plan with freshness and review checkpoints | May 7, 2026 |
+| [finishing-a-development-branch](./superjawn/skills/finishing-a-development-branch/) | Verify completed work and choose a safe integration, pull request, or cleanup path | May 7, 2026 |
+| [receiving-code-review](./superjawn/skills/receiving-code-review/) | Evaluate review feedback against the code before implementing it | May 7, 2026 |
+| [requesting-code-review](./superjawn/skills/requesting-code-review/) | Request focused review before integration or after a major implementation | May 8, 2026 |
+| [subagent-driven-development](./superjawn/skills/subagent-driven-development/) | Execute independent plan tasks with agents in the current session | May 8, 2026 |
+| [systematic-debugging](./superjawn/skills/systematic-debugging/) | Investigate root cause and relevant evidence before proposing a bug fix | May 7, 2026 |
+| [test-driven-development](./superjawn/skills/test-driven-development/) | Write a failing test before implementing a feature or bug fix | May 7, 2026 |
+| [using-git-worktrees](./superjawn/skills/using-git-worktrees/) | Create isolated worktrees with safe directory selection and verification | May 7, 2026 |
+| [using-superjawn](./superjawn/skills/using-superjawn/) | Discover and invoke the right Superjawn skill for the current task | May 7, 2026 |
+| [verification-before-completion](./superjawn/skills/verification-before-completion/) | Run and inspect verification evidence before claiming work is complete | May 7, 2026 |
+| [writing-plans](./superjawn/skills/writing-plans/) | Turn a specification or requirements into a checked implementation plan | May 7, 2026 |
+| [writing-skills](./superjawn/skills/writing-skills/) | Research, create, edit, and verify reusable skills | May 7, 2026 |
+
 ### Project documentation skills (in `project-templates-toolkit` plugin)
 
 These three skills ship together as the [project-templates-toolkit](./project-templates-toolkit/) plugin. Install via `/plugin install project-templates-toolkit@claude-skills-journalism` to get all of them at once.

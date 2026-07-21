@@ -305,9 +305,10 @@ Readers use it to judge whether an installed copy has gone stale.
   browned past that). Relative time is computed in the browser because a
   stamped "3 days ago" would be wrong the day after the build.
 - `.github/workflows/updated-stamp.yml` re-runs the stamper on pushes to master
-  and commits the result. Nothing to do by hand.
+  and commits the result. It synchronizes with the latest master and regenerates
+  before each push attempt, so a concurrent update cannot strand stale stamps.
 
-Six rules keep it honest, all covered by tests in
+Seven rules keep it honest, all covered by tests in
 `scripts/updated-stamp.test.mjs`:
 
 1. **Dates come only from source paths, never from `docs/`.** A date derived
@@ -333,6 +334,9 @@ Six rules keep it honest, all covered by tests in
    a good one, and the next run could no longer tell its last cell from a
    stamp. Such a table is skipped and every ragged row reported, so the cost is
    a missing stamp rather than deleted text.
+7. **Every dated entry reaches a public surface.** A skill or plugin with no
+   card, page, or root README row is reported as a problem. Bundled skills still
+   need their own README rows so a change to one is visible under its own date.
 
 ## Style guidelines
 

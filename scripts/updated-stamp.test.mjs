@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import {
-  formatAbsolute, collectEntries, slugFromHref,
+  REPO_ROOT, formatAbsolute, collectEntries, slugFromHref,
   stampIndex, stampSkillPage, hasScriptTag, hasStyleLink,
   ensureScriptTag, ensureStyleLink, stampReadme, run,
 } from './updated-stamp.mjs';
@@ -573,6 +573,46 @@ test('stampReadme supports GFM tables without outer pipes', () => {
     '[foia-requests](./p/foia-requests/) | Records | Jul 7, 2026',
   ].join('\n'));
   assert.equal(stampReadme(once, [entryFor('foia-requests')]), once);
+});
+
+test('stampReadme ignores whitespace after a closing table pipe', () => {
+  const md = [
+    '| Skill | Description |   ',
+    '|---|---|   ',
+    '| [foia-requests](./p/foia-requests/) | Records |   ',
+  ].join('\n');
+  const once = stampReadme(md, [entryFor('foia-requests')]);
+
+  assert.equal(once, [
+    '| Skill | Description | Updated |',
+    '|---|---|--------|',
+    '| [foia-requests](./p/foia-requests/) | Records | Jul 7, 2026 |',
+  ].join('\n'));
+  assert.equal(stampReadme(once, [entryFor('foia-requests')]), once);
+});
+
+test('run reports a dated entry that reaches no public stamp surface', () => {
+  const files = siteFiles('<h1>FOIA requests</h1>');
+  files['hidden/skills/unadvertised/SKILL.md'] = skill;
+  const root = committedRepo(files);
+  const result = run({ repoRoot: root, quiet: true, log: () => {} });
+  rmSync(root, { recursive: true, force: true });
+
+  assert.deepEqual(result.uncovered.map((entry) => entry.slug), ['unadvertised']);
+  assert.match(result.problems.join('\n'), /\(unadvertised\) reaches no public stamp surface/);
+});
+
+test('stamp workflow regenerates from latest master before each push attempt', () => {
+  const workflow = readFileSync(join(REPO_ROOT, '.github/workflows/updated-stamp.yml'), 'utf8');
+  const retry = workflow.indexOf('for attempt in 1 2 3');
+  const reset = workflow.indexOf('git reset --hard origin/master', retry);
+  const regenerate = workflow.indexOf('node scripts/updated-stamp.mjs', reset);
+  const push = workflow.indexOf('git push origin HEAD:master', regenerate);
+
+  assert.ok(retry >= 0, 'workflow retries a raced push');
+  assert.ok(reset > retry, 'each attempt starts from the latest remote master');
+  assert.ok(regenerate > reset, 'stamps are regenerated after synchronizing');
+  assert.ok(push > regenerate, 'only regenerated stamps are pushed');
 });
 
 test('slugFromHref resolves a dot-relative local card link', () => {
