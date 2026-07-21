@@ -5,7 +5,7 @@
   A dev/journalism crossover: modular instruction sets that extend
   Claude's capabilities for verification, data work, FOIA, and more.
 
-  stack: zero-build HTML, Tailwind CDN, Lucide icons, Google Fonts
+  stack: static HTML, precompiled Tailwind CSS, Lucide icons, Google Fonts
   built by: joe amditis  —  jamditis@gmail.com
 -->
 <html lang="en" class="scroll-smooth">
@@ -24,42 +24,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,900;1,9..144,300&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
 
     <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/tailwind/index.css" data-tailwind-build="3.4.19">
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        display: ['Fraunces', 'serif'],
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                    },
-                    colors: {
-                        canvas: '#ede6d4',
-                        ink: '#121212',
-                        clay: '#d6cdb7',
-                        mist: '#525252',
-                        accent: '#3d4b40',
-                    },
-                    animation: {
-                        'page-in': 'pageIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'drift': 'drift 25s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        pageIn: {
-                            '0%': { opacity: '0', transform: 'translateY(15px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        drift: {
-                            '0%, 100%': { transform: 'translate(0, 0)' },
-                            '50%': { transform: 'translate(-1%, 1%)' },
-                        },
-                    }
-                }
-            }
-        }
-    </script>
 
     <style>
         body {
@@ -295,6 +262,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 .reveal-section, .reveal { opacity: 1; transform: none; }
 </style></noscript>
     <!-- a11y-patch-v1 -->
+<link rel="stylesheet" href="updated.css">
 </head>
 <body class="font-sans overflow-x-hidden">
     <a href="#main" class="skip-link">Skip to main content</a>
@@ -455,6 +423,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             class="w-full pl-12 pr-4 py-4 bg-white/50 border border-ink/15 rounded-lg font-sans text-base text-ink placeholder:text-mist/70 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition" />
                     </div>
                     <p id="skill-search-empty" class="text-sm text-mist mt-4 hidden">No skills or plugins match <span class="font-bold" id="skill-search-term"></span>. Try a broader term, or browse the categories below.</p>
+                    <p class="text-sm text-mist mt-5 leading-relaxed">Every card is taped with the date that skill or plugin last changed. The tape yellows as it ages: <span class="updated-tape" data-tier="fresh">under 3 months</span> <span class="updated-tape" data-tier="aging">3 to 9 months</span> <span class="updated-tape" data-tier="stale">older than 9 months</span>. Use it to spot which ones to check against their sources, or refresh, after you install them.</p>
                 </div>
             </section>
 
@@ -478,6 +447,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <span class="text-[8px] bg-[#2563eb]/10 text-[#2563eb] px-2 py-1 rounded font-semibold">Provenance</span>
                             <span class="text-[8px] bg-[#2563eb]/10 text-[#2563eb] px-2 py-1 rounded font-semibold">Validator</span>
                         </div>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-07-15T22:09:17-04:00" data-updated-slug="okf-wiki">Updated <time datetime="2026-07-15T22:09:17-04:00">Jul 15, 2026</time></p>
                     </a>
 
                     <a href="autocontext/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
@@ -492,6 +462,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <span class="text-[8px] bg-[#1a6b5a]/10 text-[#1a6b5a] px-2 py-1 rounded font-semibold">Hooks</span>
                             <span class="text-[8px] bg-[#1a6b5a]/10 text-[#1a6b5a] px-2 py-1 rounded font-semibold">Confidence</span>
                         </div>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-04-27T11:17:29-04:00" data-updated-slug="autocontext">Updated <time datetime="2026-04-27T11:17:29-04:00">Apr 27, 2026</time></p>
                     </a>
 
                     <a href="superjawn/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group" data-keywords="brainstorming dispatching-parallel-agents executing-plans finishing-a-development-branch receiving-code-review requesting-code-review subagent-driven-development systematic-debugging test-driven-development tdd using-git-worktrees using-superjawn verification-before-completion writing-plans writing-skills">
@@ -506,6 +477,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <span class="text-[8px] bg-[#1e3a8a]/10 text-[#1e3a8a] px-2 py-1 rounded font-semibold">Subagents</span>
                             <span class="text-[8px] bg-[#1e3a8a]/10 text-[#1e3a8a] px-2 py-1 rounded font-semibold">Skip protocol</span>
                         </div>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T11:20:33-04:00" data-updated-slug="superjawn">Updated <time datetime="2026-05-08T11:20:33-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="pdf-playground/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group" data-keywords="document-design proposal report one-pager onepager newsletter slides event flyer">
@@ -520,6 +492,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <span class="text-[8px] bg-[#CA3553]/10 text-[#CA3553] px-2 py-1 rounded font-semibold">Preview</span>
                             <span class="text-[8px] bg-[#CA3553]/10 text-[#CA3553] px-2 py-1 rounded font-semibold">Branding</span>
                         </div>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-04-14T15:55:35-04:00" data-updated-slug="pdf-playground">Updated <time datetime="2026-04-14T15:55:35-04:00">Apr 14, 2026</time></p>
                     </a>
 
                     <a href="pdf-design/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
@@ -534,6 +507,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <span class="text-[8px] bg-[#CA3553]/10 text-[#CA3553] px-2 py-1 rounded font-semibold">Layouts</span>
                             <span class="text-[8px] bg-[#CA3553]/10 text-[#CA3553] px-2 py-1 rounded font-semibold">Brand system</span>
                         </div>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-04-14T15:42:56-04:00" data-updated-slug="pdf-design">Updated <time datetime="2026-04-14T15:42:56-04:00">Apr 14, 2026</time></p>
                     </a>
 
                     <a target="_blank" rel="noopener noreferrer" href="https://github.com/jamditis/claude-skills-journalism/tree/master/journalism-core" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
@@ -548,6 +522,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <span class="text-[8px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">FOIA</span>
                             <span class="text-[8px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Verification</span>
                         </div>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-07-07T09:17:25-04:00" data-updated-slug="journalism-core">Updated <time datetime="2026-07-07T09:17:25-04:00">Jul 7, 2026</time></p>
                     </a>
 
                     <a target="_blank" rel="noopener noreferrer" href="https://github.com/jamditis/claude-skills-journalism/tree/master/research-toolkit" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
@@ -562,6 +537,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <span class="text-[8px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Archiving</span>
                             <span class="text-[8px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">APIs</span>
                         </div>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-10T16:45:04-04:00" data-updated-slug="research-toolkit">Updated <time datetime="2026-05-10T16:45:04-04:00">May 10, 2026</time></p>
                     </a>
 
                     <a target="_blank" rel="noopener noreferrer" href="https://github.com/jamditis/claude-skills-journalism/tree/master/dev-toolkit" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
@@ -576,6 +552,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <span class="text-[8px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Pipelines</span>
                             <span class="text-[8px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Test-first</span>
                         </div>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-06-24T15:59:11-04:00" data-updated-slug="dev-toolkit">Updated <time datetime="2026-06-24T15:59:11-04:00">Jun 24, 2026</time></p>
                     </a>
 
                     <a target="_blank" rel="noopener noreferrer" href="https://github.com/jamditis/claude-skills-journalism/tree/master/project-templates-toolkit" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
@@ -590,6 +567,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <span class="text-[8px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">LESSONS.md</span>
                             <span class="text-[8px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Templates</span>
                         </div>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-06-24T15:59:11-04:00" data-updated-slug="project-templates-toolkit">Updated <time datetime="2026-06-24T15:59:11-04:00">Jun 24, 2026</time></p>
                     </a>
 
                     <a target="_blank" rel="noopener noreferrer" href="https://github.com/jamditis/claude-skills-journalism/tree/master/security-toolkit" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
@@ -604,6 +582,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <span class="text-[8px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Auth</span>
                             <span class="text-[8px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Supply chain</span>
                         </div>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-06-24T15:59:11-04:00" data-updated-slug="security-toolkit">Updated <time datetime="2026-06-24T15:59:11-04:00">Jun 24, 2026</time></p>
                     </a>
 
                     <a href="visual-explainer/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
@@ -618,6 +597,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <span class="text-[8px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Tables</span>
                             <span class="text-[8px] bg-accent/10 text-accent px-2 py-1 rounded font-semibold">Dashboards</span>
                         </div>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-10T11:49:55-04:00" data-updated-slug="visual-explainer">Updated <time datetime="2026-05-10T11:49:55-04:00">May 10, 2026</time></p>
                     </a>
                 </div>
             </section>
@@ -638,6 +618,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#1e40af] transition-colors">source-verification</h3>
                         <p class="text-sm text-mist leading-relaxed">SIFT method, digital verification, reverse image search, social media account analysis, building verification trails.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T18:18:25-04:00" data-updated-slug="source-verification">Updated <time datetime="2026-05-08T18:18:25-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="foia-requests/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
@@ -647,6 +628,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#7c3aed] transition-colors">foia-requests</h3>
                         <p class="text-sm text-mist leading-relaxed">Public records request drafting, tracking systems, appeals process, state-specific guidance.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-07-07T09:17:25-04:00" data-updated-slug="foia-requests">Updated <time datetime="2026-07-07T09:17:25-04:00">Jul 7, 2026</time></p>
                     </a>
 
                     <a href="data-journalism/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
@@ -656,6 +638,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#059669] transition-colors">data-journalism</h3>
                         <p class="text-sm text-mist leading-relaxed">Data acquisition, cleaning, analysis, visualization, and storytelling for newsrooms.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T19:33:13-04:00" data-updated-slug="data-journalism">Updated <time datetime="2026-05-08T19:33:13-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="newsroom-style/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -665,6 +648,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">newsroom-style</h3>
                         <p class="text-sm text-mist leading-relaxed">AP Style enforcement, attribution rules, headline formatting, number conventions.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T18:18:25-04:00" data-updated-slug="newsroom-style">Updated <time datetime="2026-05-08T18:18:25-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="interview-prep/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -674,6 +658,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">interview-prep</h3>
                         <p class="text-sm text-mist leading-relaxed">Pre-interview research, question frameworks, recording consent, attribution guidelines.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T18:18:25-04:00" data-updated-slug="interview-prep">Updated <time datetime="2026-05-08T18:18:25-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="interview-transcription/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -683,6 +668,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">interview-transcription</h3>
                         <p class="text-sm text-mist leading-relaxed">Recording workflows, transcription, quote management, source databases.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T18:18:25-04:00" data-updated-slug="interview-transcription">Updated <time datetime="2026-05-08T18:18:25-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="story-pitch/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -692,6 +678,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">story-pitch</h3>
                         <p class="text-sm text-mist leading-relaxed">Pitch templates for daily news, features, investigations, op-eds, and freelance queries.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T18:18:25-04:00" data-updated-slug="story-pitch">Updated <time datetime="2026-05-08T18:18:25-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="fact-check-workflow/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -701,6 +688,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">fact-check-workflow</h3>
                         <p class="text-sm text-mist leading-relaxed">Claim extraction, evidence gathering, rating scales, correction protocols.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T18:18:25-04:00" data-updated-slug="fact-check-workflow">Updated <time datetime="2026-05-08T18:18:25-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="editorial-workflow/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -710,6 +698,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">editorial-workflow</h3>
                         <p class="text-sm text-mist leading-relaxed">Story assignment tracking, deadline management, editorial calendars, handoff protocols.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T18:18:25-04:00" data-updated-slug="editorial-workflow">Updated <time datetime="2026-05-08T18:18:25-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="social-media-intelligence/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -719,6 +708,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">social-media-intelligence</h3>
                         <p class="text-sm text-mist leading-relaxed">Social monitoring, narrative tracking, account analysis, coordination detection, OSINT.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-06-18T14:50:17-04:00" data-updated-slug="social-media-intelligence">Updated <time datetime="2026-06-18T14:50:17-04:00">Jun 18, 2026</time></p>
                     </a>
 
                     <a href="photo-metadata/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -728,6 +718,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">photo-metadata</h3>
                         <p class="text-sm text-mist leading-relaxed">Embed caption, byline, credit, alt text, keywords, and license into a photo's IPTC/EXIF/XMP metadata for a news wire.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-06-20T14:10:33-04:00" data-updated-slug="photo-metadata">Updated <time datetime="2026-06-20T14:10:33-04:00">Jun 20, 2026</time></p>
                     </a>
 
                 </div>
@@ -748,6 +739,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">newsletter-publishing</h3>
                         <p class="text-sm text-mist leading-relaxed">Email newsletter creation, subscriber management, deliverability, A/B testing.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T18:18:25-04:00" data-updated-slug="newsletter-publishing">Updated <time datetime="2026-05-08T18:18:25-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="crisis-communications/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -757,6 +749,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">crisis-communications</h3>
                         <p class="text-sm text-mist leading-relaxed">Breaking news protocol, rapid verification, crisis response, misinformation countering.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T18:18:25-04:00" data-updated-slug="crisis-communications">Updated <time datetime="2026-05-08T18:18:25-04:00">May 8, 2026</time></p>
                     </a>
                 </div>
             </section>
@@ -776,6 +769,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#2a9a90] transition-colors">visual-explainer</h3>
                         <p class="text-sm text-mist leading-relaxed">Turn complex data into styled HTML pages with diagrams, data tables, flowcharts, timelines, and dashboards.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-10T11:49:55-04:00" data-updated-slug="visual-explainer">Updated <time datetime="2026-05-10T11:49:55-04:00">May 10, 2026</time></p>
                     </a>
                 </div>
             </section>
@@ -795,6 +789,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#475569] transition-colors">ai-writing-detox</h3>
                         <p class="text-sm text-mist leading-relaxed">Eliminate AI-generated patterns that erode reader trust. Banned words, phrases, and structures with alternatives.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T18:18:25-04:00" data-updated-slug="ai-writing-detox">Updated <time datetime="2026-05-08T18:18:25-04:00">May 8, 2026</time></p>
                     </a>
                 </div>
             </section>
@@ -814,6 +809,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">project-memory</h3>
                         <p class="text-sm text-mist leading-relaxed">Generate CLAUDE.md files that capture project-specific knowledge. Includes 6 project type templates.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-11T10:02:32-04:00" data-updated-slug="project-memory">Updated <time datetime="2026-05-11T10:02:32-04:00">May 11, 2026</time></p>
                     </a>
 
                     <a href="project-retrospective/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
@@ -823,6 +819,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#d97706] transition-colors">project-retrospective</h3>
                         <p class="text-sm text-mist leading-relaxed">Generate LESSONS.md files that document what worked and what didn't. 4 project type templates.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-10T14:46:50-04:00" data-updated-slug="project-retrospective">Updated <time datetime="2026-05-10T14:46:50-04:00">May 10, 2026</time></p>
                     </a>
 
                     <a href="template-selector/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -832,6 +829,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">template-selector</h3>
                         <p class="text-sm text-mist leading-relaxed">Decision tree for choosing the right project documentation template.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-10T14:46:50-04:00" data-updated-slug="template-selector">Updated <time datetime="2026-05-10T14:46:50-04:00">May 10, 2026</time></p>
                     </a>
                 </div>
             </section>
@@ -851,6 +849,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">academic-writing</h3>
                         <p class="text-sm text-mist leading-relaxed">Research design, literature reviews, IMRaD structure, peer review responses, grant proposals.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T20:36:51-04:00" data-updated-slug="academic-writing">Updated <time datetime="2026-05-08T20:36:51-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="digital-archive/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -860,6 +859,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">digital-archive</h3>
                         <p class="text-sm text-mist leading-relaxed">Building archives with AI enrichment, entity extraction, knowledge graphs.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T20:36:51-04:00" data-updated-slug="digital-archive">Updated <time datetime="2026-05-08T20:36:51-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="web-archiving/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -869,6 +869,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">web-archiving</h3>
                         <p class="text-sm text-mist leading-relaxed">Wayback Machine, Archive.today, legal evidence preservation, multi-archive redundancy.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T20:36:51-04:00" data-updated-slug="web-archiving">Updated <time datetime="2026-05-08T20:36:51-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="content-access/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -878,6 +879,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">content-access</h3>
                         <p class="text-sm text-mist leading-relaxed">Unpaywall, CORE, Semantic Scholar APIs, library databases, ethical access patterns.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T20:36:51-04:00" data-updated-slug="content-access">Updated <time datetime="2026-05-08T20:36:51-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="page-monitoring/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -887,6 +889,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">page-monitoring</h3>
                         <p class="text-sm text-mist leading-relaxed">Change detection, RSS generation, webhook alerts, automatic archiving on changes.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T20:36:51-04:00" data-updated-slug="page-monitoring">Updated <time datetime="2026-05-08T20:36:51-04:00">May 8, 2026</time></p>
                     </a>
                 </div>
             </section>
@@ -906,6 +909,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#4f46e5] transition-colors">vibe-coding</h3>
                         <p class="text-sm text-mist leading-relaxed">AI-assisted software development methodology based on YC best practices.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T21:46:38-04:00" data-updated-slug="vibe-coding">Updated <time datetime="2026-05-08T21:46:38-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="one-way-door/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group" style="background: linear-gradient(135deg, rgba(180, 83, 9, 0.08) 0%, rgba(255, 255, 255, 0.5) 100%); border: 2px solid rgba(180, 83, 9, 0.3);">
@@ -915,6 +919,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#b45309] transition-colors">one-way-door</h3>
                         <p class="text-sm text-mist leading-relaxed">Flag irreversible architectural decisions before you commit. Includes PreToolUse hook for automated enforcement.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-06-10T16:49:35-04:00" data-updated-slug="one-way-door">Updated <time datetime="2026-06-10T16:49:35-04:00">Jun 10, 2026</time></p>
                     </a>
 
                     <a href="electron-dev/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -924,6 +929,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">electron-dev</h3>
                         <p class="text-sm text-mist leading-relaxed">Electron + React desktop application development patterns.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T21:46:38-04:00" data-updated-slug="electron-dev">Updated <time datetime="2026-05-08T21:46:38-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="python-pipeline/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -933,6 +939,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">python-pipeline</h3>
                         <p class="text-sm text-mist leading-relaxed">Data processing pipelines with modular architecture.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T21:46:38-04:00" data-updated-slug="python-pipeline">Updated <time datetime="2026-05-08T21:46:38-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="web-scraping/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -942,6 +949,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">web-scraping</h3>
                         <p class="text-sm text-mist leading-relaxed">Content extraction with anti-bot handling and poison pill detection.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T21:46:38-04:00" data-updated-slug="web-scraping">Updated <time datetime="2026-05-08T21:46:38-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="zero-build-frontend/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -951,6 +959,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">zero-build-frontend</h3>
                         <p class="text-sm text-mist leading-relaxed">Static web apps without build tools, CDN-loaded frameworks.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T21:46:38-04:00" data-updated-slug="zero-build-frontend">Updated <time datetime="2026-05-08T21:46:38-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="mobile-debugging/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -960,6 +969,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">mobile-debugging</h3>
                         <p class="text-sm text-mist leading-relaxed">Eruda, vConsole, remote debugging, iOS debugging, console capture.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T21:46:38-04:00" data-updated-slug="mobile-debugging">Updated <time datetime="2026-05-08T21:46:38-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="accessibility-compliance/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group">
@@ -969,6 +979,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#0891b2] transition-colors">accessibility-compliance</h3>
                         <p class="text-sm text-mist leading-relaxed">WCAG compliance, alt text, accessible charts, keyboard navigation.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T21:46:38-04:00" data-updated-slug="accessibility-compliance">Updated <time datetime="2026-05-08T21:46:38-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="web-ui-best-practices/" class="skill-card skill-card-featured p-6 transition-all duration-300 block group" style="background: linear-gradient(135deg, rgba(13, 148, 136, 0.08) 0%, rgba(255, 255, 255, 0.5) 100%); border: 2px solid rgba(13, 148, 136, 0.3);">
@@ -978,6 +989,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-[#0d9488] transition-colors">web-ui-best-practices</h3>
                         <p class="text-sm text-mist leading-relaxed">Signs of taste in web UI. 18 principles covering speed, restraint, honest cancellation, and optical alignment.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-08T21:46:38-04:00" data-updated-slug="web-ui-best-practices">Updated <time datetime="2026-05-08T21:46:38-04:00">May 8, 2026</time></p>
                     </a>
 
                     <a href="persistent-sessions/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -996,6 +1008,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">claude-md-updater</h3>
                         <p class="text-sm text-mist leading-relaxed">Propose scoped CLAUDE.md edits as a diff for approval: durable lessons, infra facts, and workflows, never transient session notes.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-06-24T15:59:11-04:00" data-updated-slug="claude-md-updater">Updated <time datetime="2026-06-24T15:59:11-04:00">Jun 24, 2026</time></p>
                     </a>
                 </div>
             </section>
@@ -1015,6 +1028,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">security-checklist</h3>
                         <p class="text-sm text-mist leading-relaxed">Pre-deployment security audit covering auth, input validation, secrets, and compliance.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-09T12:31:40-04:00" data-updated-slug="security-checklist">Updated <time datetime="2026-05-09T12:31:40-04:00">May 9, 2026</time></p>
                     </a>
 
                     <a href="secure-auth/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -1024,6 +1038,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">secure-auth</h3>
                         <p class="text-sm text-mist leading-relaxed">Production-ready authentication patterns (sessions, JWTs, OAuth, MFA).</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-09T12:31:40-04:00" data-updated-slug="secure-auth">Updated <time datetime="2026-05-09T12:31:40-04:00">May 9, 2026</time></p>
                     </a>
 
                     <a href="api-hardening/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -1033,6 +1048,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">api-hardening</h3>
                         <p class="text-sm text-mist leading-relaxed">Rate limiting, input validation, CORS, API key management.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-09T12:31:40-04:00" data-updated-slug="api-hardening">Updated <time datetime="2026-05-09T12:31:40-04:00">May 9, 2026</time></p>
                     </a>
 
                     <a href="supply-chain-hardening/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -1042,6 +1058,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">supply-chain-hardening</h3>
                         <p class="text-sm text-mist leading-relaxed">npm/bun install-time cooldown plus a sandboxed pre-install scan. Defends against Mini Shai-Hulud-class supply-chain worms; bundles the <code>/security-toolkit:hotpatch</code> command.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-11T20:48:27-04:00" data-updated-slug="supply-chain-hardening">Updated <time datetime="2026-05-11T20:48:27-04:00">May 11, 2026</time></p>
                     </a>
                 </div>
             </section>
@@ -1061,6 +1078,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <h3 class="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors">free-apis-catalog</h3>
                         <p class="text-sm text-mist leading-relaxed">Curated free-API catalog organized by journalism use-case. Currency notes for major API sunsets (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) and an evaluation rubric.</p>
+                        <p class="updated-tape updated-tape-card mt-4" data-updated-at="2026-05-10T16:45:04-04:00" data-updated-slug="free-apis-catalog">Updated <time datetime="2026-05-10T16:45:04-04:00">May 10, 2026</time></p>
                     </a>
 
                     <a href="workflows/" class="skill-card deckle-card p-6 transition-all duration-300 block group">
@@ -1388,9 +1406,16 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             // let a parent plugin card (e.g. superjawn, pdf-playground) match the
             // sub-skills it bundles but doesn't render as their own card, so all 56
             // advertised skills are findable, not just the cards on the page.
+            // The last-updated tape is excluded: it would otherwise make every
+            // card match "updated", and any card match the month it changed.
+            const searchableText = (el) => {
+                const copy = el.cloneNode(true);
+                copy.querySelectorAll('.updated-tape').forEach(tape => tape.remove());
+                return copy.textContent || '';
+            };
             const cards = Array.from(document.querySelectorAll('a.skill-card')).map(el => ({
                 el,
-                text: ((el.textContent || '') + ' ' + (el.dataset.keywords || ''))
+                text: (searchableText(el) + ' ' + (el.dataset.keywords || ''))
                     .toLowerCase().replace(/\s+/g, ' ')
             }));
             // Category sections that should collapse their header when empty.
@@ -1434,5 +1459,6 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 }
             });
         })();
-    </script></body>
+    </script><script defer src="updated.js"></script>
+</body>
 </html>

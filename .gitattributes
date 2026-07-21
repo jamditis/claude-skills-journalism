@@ -1,0 +1,4 @@
+# Generated third-party bundle and retained notices contain upstream whitespace.
+visual-explainer/templates/vendor/mermaid-11.16.0.mjs -whitespace
+visual-explainer/templates/vendor/mermaid-11.16.0.mjs.LEGAL.txt -whitespace
+docs/assets/tailwind/*.css linguist-generated=true

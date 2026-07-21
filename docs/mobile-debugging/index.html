@@ -3,33 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Remote JavaScript console access and debugging on mobile devices. Use when debugging web pages on phones/tablets, accessing console errors without desktop DevTools, testing responsive designs on real devices, or diagnosing mobile-specific issues. Covers Eruda, vConsole, Chrome/Safari remote debugging, and cloud testing platforms.">
+    <meta name="description" content="Remote JavaScript console access and debugging on mobile devices. Use when debugging web pages on phones/tablets, accessing console errors without desktop DevTools, testing responsive designs on real devices, or diagnosing mobile-specific issues. Covers locally hosted Eruda and vConsole, Chrome/Safari remote debugging, and cloud testing platforms.">
     <title>Mobile debugging - Claude skills for journalism</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/tailwind/mobile-debugging.css" data-tailwind-build="3.4.19">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'display': ['Fraunces', 'serif'],
-                        'body': ['Plus Jakarta Sans', 'sans-serif'],
-                    },
-                    colors: {
-                        'canvas': '#ede6d4',
-                        'ink': '#121212',
-                        'clay': '#2d2a26',
-                        'mist': '#c4bfb4',
-                        'accent': '#4f46e5',
-                        'accentDark': '#4338ca',
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         h1, h2, h3 { font-family: 'Fraunces', serif; }
@@ -132,7 +112,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
     <!-- Open Graph -->
     <meta property="og:title" content="Mobile debugging - Claude skills for journalism">
-    <meta property="og:description" content="Remote JavaScript console access and debugging on mobile devices. Use when debugging web pages on phones/tablets, accessing console errors without desktop DevTools, testing responsive designs on real devices, or diagnosing mobile-specific issues. Covers Eruda, vConsole, Chrome/Safari remote debugging, and cloud testing platforms.">
+    <meta property="og:description" content="Remote JavaScript console access and debugging on mobile devices. Use when debugging web pages on phones/tablets, accessing console errors without desktop DevTools, testing responsive designs on real devices, or diagnosing mobile-specific issues. Covers locally hosted Eruda and vConsole, Chrome/Safari remote debugging, and cloud testing platforms.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://skills.amditis.tech/mobile-debugging/">
     <meta property="og:image" content="https://skills.amditis.tech/mobile-debugging/og-image.png">
@@ -142,10 +122,11 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Mobile debugging - Claude skills for journalism">
-    <meta name="twitter:description" content="Remote JavaScript console access and debugging on mobile devices. Use when debugging web pages on phones/tablets, accessing console errors without desktop DevTools, testing responsive designs on real devices, or diagnosing mobile-specific issues. Covers Eruda, vConsole, Chrome/Safari remote debugging, and cloud testing platforms.">
+    <meta name="twitter:description" content="Remote JavaScript console access and debugging on mobile devices. Use when debugging web pages on phones/tablets, accessing console errors without desktop DevTools, testing responsive designs on real devices, or diagnosing mobile-specific issues. Covers locally hosted Eruda and vConsole, Chrome/Safari remote debugging, and cloud testing platforms.">
     <meta name="twitter:image" content="https://skills.amditis.tech/mobile-debugging/og-image.png">
 <script src="../ask-ai.js" defer></script>
     <!-- a11y-patch-v1 -->
+<link rel="stylesheet" href="../updated.css">
 </head>
 <body class="bg-canvas text-ink">
     <a href="#main" class="skip-link">Skip to main content</a>
@@ -178,6 +159,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 Development skill
             </div>
             <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">Mobile debugging</h1>
+            <p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-05-08T21:46:38-04:00" data-updated-slug="mobile-debugging">Updated <time datetime="2026-05-08T21:46:38-04:00">May 8, 2026</time></p>
             <p class="text-xl text-white/90 max-w-2xl">
                 Remote JavaScript console access and debugging on mobile devices without desktop DevTools.
             </p>
@@ -228,7 +210,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <div class="grid md:grid-cols-2 gap-4">
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <h3 class="font-semibold mb-2">Eruda and vConsole</h3>
-                    <p class="text-sm text-clay/70">In-page DevTools with console, elements, network, and storage panels. Bookmarklet injection.</p>
+                    <p class="text-sm text-clay/70">In-page DevTools with console, elements, network, and storage panels. Use same-origin, lockfile-verified debug assets only on pages you own.</p>
                 </div>
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <h3 class="font-semibold mb-2">Native remote debugging</h3>
@@ -247,10 +229,10 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
         <!-- Quick start -->
         <section class="mb-12">
-            <h2 class="font-display text-2xl font-semibold mb-4">Quick start: Eruda bookmarklet</h2>
-            <p class="text-clay/80 mb-4">Add this as a bookmark on your mobile browser, then tap it on any page to inject a DevTools panel:</p>
+            <h2 class="font-display text-2xl font-semibold mb-4">Quick start: Local Eruda bookmarklet</h2>
+            <p class="text-clay/80 mb-4">For a development page you own, serve Eruda 3.4.3 from a same-origin debug directory. Never load a public-CDN console into an authenticated or sensitive page:</p>
             <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
-                <code class="text-white">javascript:(function(){var script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/eruda';document.body.append(script);script.onload=function(){eruda.init();}})();</code>
+                <code class="text-white">javascript:(function(){var script=document.createElement('script');script.src='/debug/eruda-3.4.3.js';document.body.append(script);script.onload=function(){eruda.init();}})();</code>
             </div>
         </section>
 
@@ -403,5 +385,6 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             </div>
         </div>
     </footer>
+<script defer src="../updated.js"></script>
 </body>
 </html>

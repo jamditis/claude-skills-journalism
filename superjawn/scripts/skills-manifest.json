@@ -68,7 +68,7 @@
     },
     "using-git-worktrees": {
       "category": "consumer",
-      "skill_md_parity": true,
+      "skill_md_parity": false,
       "supporting_file_overrides": {}
     },
     "finishing-a-development-branch": {

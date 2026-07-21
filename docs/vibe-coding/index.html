@@ -15,29 +15,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/tailwind/vibe-coding.css" data-tailwind-build="3.4.19">
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        display: ['Fraunces', 'serif'],
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                    },
-                    colors: {
-                        canvas: '#ede6d4',
-                        ink: '#121212',
-                        clay: '#d6cdb7',
-                        mist: '#525252',
-                        accent: '#4f46e5',
-                        accentDark: '#4338ca',
-                    },
-                }
-            }
-        }
-    </script>
 
     <style>
         body {
@@ -168,6 +148,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
     <meta name="twitter:image" content="https://skills.amditis.tech/vibe-coding/og-image.png">
 <script src="../ask-ai.js" defer></script>
     <!-- a11y-patch-v1 -->
+<link rel="stylesheet" href="../updated.css">
 </head>
 <body class="font-sans">
     <a href="#main" class="skip-link">Skip to main content</a>
@@ -205,6 +186,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <h1 class="font-display text-5xl md:text-7xl font-black leading-[0.9] mb-6">
                 Vibe<br>Coding
             </h1>
+            <p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-05-08T21:46:38-04:00" data-updated-slug="vibe-coding">Updated <time datetime="2026-05-08T21:46:38-04:00">May 8, 2026</time></p>
             <p class="text-xl md:text-2xl text-white/90 max-w-2xl mb-10 font-light">
                 Practical strategies for building software effectively with AI coding assistants like Claude Code, Cursor, and Windsurf.
             </p>
@@ -559,5 +541,6 @@ cp -r claude-skills-journalism/dev-toolkit/skills/vibe-coding ~/.claude/skills/<
     <script>
         lucide.createIcons();
     </script>
+<script defer src="../updated.js"></script>
 </body>
 </html>
