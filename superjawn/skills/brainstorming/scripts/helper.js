@@ -1,6 +1,6 @@
 (function() {
   const WS_URL = (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/';
-  const MAX_QUEUE = 50;
+  const MAX_QUEUE = 30;
   let ws = null;
   let eventQueue = [];
   let reconnectTimer = null;

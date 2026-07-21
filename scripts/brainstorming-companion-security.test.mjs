@@ -14,6 +14,7 @@ process.env.BRAINSTORM_URL_HOST = 'localhost';
 const {
   consumeEventAllowance,
   createSecurityContext,
+  decodeAvailableFrames,
   decodeFrame,
   handleRequest,
   normalizeEvent,
@@ -22,6 +23,24 @@ const {
 } = require('../superjawn/skills/brainstorming/scripts/server.cjs');
 
 const KEY = Buffer.alloc(16, 7).toString('base64');
+
+function clientFrame(text) {
+  const payload = Buffer.from(text);
+  assert.ok(payload.length < 65536, 'test helper only builds 16-bit frames');
+  const mask = Buffer.from([1, 2, 3, 4]);
+  const extended = payload.length >= 126;
+  const maskOffset = extended ? 4 : 2;
+  const dataOffset = maskOffset + 4;
+  const frame = Buffer.alloc(dataOffset + payload.length);
+  frame[0] = 0x81;
+  frame[1] = 0x80 | (extended ? 126 : payload.length);
+  if (extended) frame.writeUInt16BE(payload.length, 2);
+  mask.copy(frame, maskOffset);
+  for (let index = 0; index < payload.length; index += 1) {
+    frame[dataOffset + index] = payload[index] ^ mask[index % 4];
+  }
+  return frame;
+}
 
 function responseRecorder() {
   return {
@@ -76,6 +95,12 @@ test('WebSocket validation requires the expected origin, host, and capability', 
     sessionToken: TOKEN,
     urlHost: '192.0.2.10',
   }), /must use HTTPS/i);
+  assert.doesNotThrow(() => createSecurityContext({
+    host: '127.0.0.2',
+    port: 54321,
+    sessionToken: TOKEN,
+    urlHost: '127.0.0.2',
+  }));
 
   assert.deepEqual(validateWebSocketRequest(websocketRequest(security.cookieName), security), { ok: true });
   assert.equal(
@@ -128,6 +153,22 @@ test('frame decoder rejects malformed, fragmented, and oversized client frames',
   assert.throws(() => decodeFrame(oversizedHeader), /maximum/i);
 });
 
+test('buffer decoder drains coalesced valid frames before applying the incomplete-frame cap', () => {
+  const frames = Array.from({ length: 30 }, (_, index) =>
+    clientFrame(JSON.stringify({ type: 'click', choice: `choice-${index}`, text: 'x'.repeat(300) })));
+  const coalesced = Buffer.concat(frames);
+  assert.ok(coalesced.length > 8 * 1024);
+
+  const decoded = decodeAvailableFrames(coalesced);
+  assert.equal(decoded.frames.length, 30);
+  assert.equal(decoded.remaining.length, 0);
+
+  const oversizedBurst = Buffer.concat(
+    Array.from({ length: 31 }, () => clientFrame('x'.repeat(8 * 1024))),
+  );
+  assert.throws(() => decodeAvailableFrames(oversizedBurst), /maximum/i);
+});
+
 test('event validation allowlists persisted fields and bounds attacker-controlled text', () => {
   assert.deepEqual(
     normalizeEvent(JSON.stringify({
@@ -171,6 +212,20 @@ test('event rate limiter caps each WebSocket independently', () => {
   }
   assert.equal(consumeEventAllowance(state, 1030), false);
   assert.equal(consumeEventAllowance(state, 12001), true);
+});
+
+test('browser reconnect queue cannot exceed one server allowance window', () => {
+  const server = readFileSync(
+    new URL('../superjawn/skills/brainstorming/scripts/server.cjs', import.meta.url),
+    'utf8',
+  );
+  const helper = readFileSync(
+    new URL('../superjawn/skills/brainstorming/scripts/helper.js', import.meta.url),
+    'utf8',
+  );
+  const serverLimit = Number(server.match(/const MAX_EVENTS_PER_WINDOW = (\d+);/u)?.[1]);
+  const queueLimit = Number(helper.match(/const MAX_QUEUE = (\d+);/u)?.[1]);
+  assert.equal(queueLimit, serverLimit);
 });
 
 test('file resolver accepts one regular basename and rejects traversal or symlink escape', () => {

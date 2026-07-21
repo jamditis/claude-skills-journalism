@@ -11,6 +11,7 @@ const MAX_MESSAGE_BYTES = 4 * 1024;
 const WS_MAGIC = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 const EVENT_WINDOW_MS = 10 * 1000;
 const MAX_EVENTS_PER_WINDOW = 30;
+const MAX_BUFFER_BYTES = (MAX_FRAME_BYTES + 14) * MAX_EVENTS_PER_WINDOW;
 
 function computeAcceptKey(clientKey) {
   return crypto.createHash('sha1').update(clientKey + WS_MAGIC).digest('base64');
@@ -91,6 +92,30 @@ function decodeFrame(buffer) {
   return { opcode, payload: data, bytesConsumed: totalLen };
 }
 
+function decodeAvailableFrames(input) {
+  if (input.length > MAX_BUFFER_BYTES) {
+    const error = new Error('Buffered frame burst exceeds maximum');
+    error.closeCode = 1009;
+    throw error;
+  }
+  const frames = [];
+  let remaining = input;
+  while (remaining.length > 0) {
+    const result = decodeFrame(remaining);
+    if (!result) {
+      if (remaining.length > MAX_FRAME_BYTES + 14) {
+        const error = new Error('Incomplete frame buffer exceeds maximum');
+        error.closeCode = 1009;
+        throw error;
+      }
+      break;
+    }
+    frames.push(result);
+    remaining = remaining.slice(result.bytesConsumed);
+  }
+  return { frames, remaining };
+}
+
 // ========== Configuration ==========
 
 const PORT = Number(process.env.BRAINSTORM_PORT || (49152 + Math.floor(Math.random() * 16383)));
@@ -117,7 +142,11 @@ const MIME_TYPES = {
 
 function isLoopbackHost(hostname) {
   const normalized = String(hostname).replace(/^\[|\]$/g, '').toLowerCase();
-  return normalized === 'localhost' || normalized === '::1' || normalized === '127.0.0.1';
+  if (normalized === 'localhost' || normalized === '::1') return true;
+  const octets = normalized.split('.');
+  return octets.length === 4
+    && octets[0] === '127'
+    && octets.every(octet => /^\d{1,3}$/u.test(octet) && Number(octet) <= 255);
 }
 
 function formatHostname(hostname) {
@@ -403,20 +432,16 @@ function handleUpgrade(req, socket, head = Buffer.alloc(0)) {
 
   function processChunk(chunk) {
     buffer = Buffer.concat([buffer, chunk]);
-    if (buffer.length > MAX_FRAME_BYTES + 14) {
-      closeConnection(socket, 1009);
+    let decoded;
+    try {
+      decoded = decodeAvailableFrames(buffer);
+    } catch (error) {
+      closeConnection(socket, error.closeCode === 1009 ? 1009 : 1002);
       return;
     }
-    while (buffer.length > 0) {
-      let result;
-      try {
-        result = decodeFrame(buffer);
-      } catch {
-        closeConnection(socket, 1002);
-        return;
-      }
-      if (!result) break;
-      buffer = buffer.slice(result.bytesConsumed);
+    buffer = decoded.remaining;
+
+    for (const result of decoded.frames) {
 
       switch (result.opcode) {
         case OPCODES.TEXT: {
@@ -654,6 +679,7 @@ module.exports = {
   computeAcceptKey,
   consumeEventAllowance,
   createSecurityContext,
+  decodeAvailableFrames,
   decodeFrame,
   encodeFrame,
   handleRequest,
