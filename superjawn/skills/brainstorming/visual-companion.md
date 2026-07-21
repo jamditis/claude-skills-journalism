@@ -28,6 +28,8 @@ A question *about* a UI topic is not automatically a visual question. "What kind
 
 The server watches a directory for HTML files and serves the newest one to the browser. You write HTML content to `screen_dir`, the user sees it in their browser and can click to select options. Selections are recorded to `state_dir/events` that you read on your next turn.
 
+Each server process generates a high-entropy capability URL. The first authorized request exchanges that token for an HttpOnly, SameSite cookie and redirects to a clean URL; HTTP files and the WebSocket both require the cookie. Keep the startup URL and `state_dir/server-info` private. The server also checks the exact HTTP Host and WebSocket Origin, accepts only bounded `click`/`choice` events, and assigns persisted timestamps itself.
+
 **Content fragments vs full documents:** If your HTML file starts with `<!DOCTYPE` or `<html`, the server serves it as-is (just injects the helper script). Otherwise, the server automatically wraps your content in the frame template — adding the header, CSS theme, selection indicator, and all interactive infrastructure. **Write content fragments by default.** Only write full documents when you need complete control over the page.
 
 ## Starting a Session
@@ -36,12 +38,13 @@ The server watches a directory for HTML files and serves the newest one to the b
 # Start server with persistence (mockups saved to project)
 scripts/start-server.sh --project-dir /path/to/project
 
-# Returns: {"type":"server-started","port":52341,"url":"http://localhost:52341",
+# Returns: {"type":"server-started","port":52341,
+#           "url":"http://localhost:52341/?token=<session-capability>",
 #           "screen_dir":"/path/to/project/.superpowers/brainstorm/12345-1706000000/content",
 #           "state_dir":"/path/to/project/.superpowers/brainstorm/12345-1706000000/state"}
 ```
 
-Save `screen_dir` and `state_dir` from the response. Tell user to open the URL.
+Save `screen_dir` and `state_dir` from the response. Tell the user to open the full capability URL, but do not paste it into public logs, issues, or chat rooms.
 
 **Finding connection info:** The server writes its startup JSON to `$STATE_DIR/server-info`. If you launched the server in the background and didn't capture stdout, read that file to get the URL and port. When using `--project-dir`, check `<project>/.superpowers/brainstorm/` for the session directory.
 
@@ -80,16 +83,18 @@ scripts/start-server.sh --project-dir /path/to/project --foreground
 
 **Other environments:** The server must keep running in the background across conversation turns. If your environment reaps detached processes, use `--foreground` and launch the command with your platform's background execution mechanism.
 
-If the URL is unreachable from your browser (common in remote/containerized setups), bind a non-loopback host:
+If the URL is unreachable from your browser (common in remote/containerized setups), prefer an SSH tunnel or a container port published only to the local loopback interface. Those approaches let the server keep its default `127.0.0.1` binding.
+
+Binding a non-loopback interface is an explicit exposure decision. Remote exposure requires TLS (so the browser uses `wss://`) and access control through a trusted reverse proxy or authenticated tunnel. Set the exact public HTTPS origin so Host/Origin validation remains effective:
 
 ```bash
 scripts/start-server.sh \
   --project-dir /path/to/project \
   --host 0.0.0.0 \
-  --url-host localhost
+  --public-origin https://brainstorm.example.com
 ```
 
-Use `--url-host` to control what hostname is printed in the returned URL JSON.
+Never expose the raw HTTP port directly to a LAN or the internet. The startup script prints a prominent security warning for every non-loopback binding, and the server refuses a plaintext non-loopback public origin. `--url-host` remains available for local port-forwarding setups; `--public-origin` is the authoritative origin when TLS terminates at a trusted proxy.
 
 ## The Loop
 
@@ -248,10 +253,12 @@ The frame template provides these CSS classes for your content:
 When the user clicks options in the browser, their interactions are recorded to `$STATE_DIR/events` (one JSON object per line). The file is cleared automatically when you push a new screen.
 
 ```jsonl
-{"type":"click","choice":"a","text":"Option A - Simple Layout","timestamp":1706000101}
-{"type":"click","choice":"c","text":"Option C - Complex Grid","timestamp":1706000108}
-{"type":"click","choice":"b","text":"Option B - Hybrid","timestamp":1706000115}
+{"type":"click","choice":"a","text":"Option A - Simple Layout","timestamp":1706000101000}
+{"type":"click","choice":"c","text":"Option C - Complex Grid","timestamp":1706000108000}
+{"type":"click","choice":"b","text":"Option B - Hybrid","timestamp":1706000115000}
 ```
+
+Only `type`, `choice`, optional `text`, optional `id`, and the server-assigned `timestamp` are persisted. Unknown event types or fields, control characters, oversized values, malformed frames, and over-rate clients are rejected. Browser clients cannot send reload/control messages; reload is emitted only by the server's file watcher.
 
 The full event stream shows the user's exploration path — they may click multiple options before settling. The last `choice` event is typically the final selection, but the pattern of clicks can reveal hesitation or preferences worth asking about.
 

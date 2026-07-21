@@ -1,6 +1,40 @@
-# External Libraries (CDN)
+# Local browser libraries
 
-Optional CDN libraries for cases where pure CSS/HTML isn't enough. Only include what the diagram actually needs — most diagrams need zero external JS.
+Optional libraries for cases where pure CSS/HTML isn't enough. Only include
+what the diagram actually needs — most diagrams need zero external JS.
+
+Install exact packages, commit `package-lock.json`, build or copy the browser
+assets once, and ship them beside the generated page. Run `npm ci` in
+automation and verify the committed checksums before deployment.
+
+The repository's `templates/mermaid-flowchart.html` and
+`templates/slide-deck.html` already ship with the pinned Mermaid core bundle in
+`templates/vendor/`. Copy that sibling directory with either template. Use the
+commands below when rebuilding the committed asset, adding ELK, or creating a
+standalone page elsewhere.
+
+```bash
+npm install --save-exact mermaid@11.16.0 \
+  @mermaid-js/layout-elk@0.2.2 chart.js@4.5.1 animejs@3.2.2
+npm install --save-dev --save-exact esbuild@0.28.1
+npm ci
+mkdir -p vendor
+npx esbuild node_modules/mermaid/dist/mermaid.esm.min.mjs --bundle \
+  --format=esm --platform=browser --outfile=vendor/mermaid-11.16.0.mjs
+npx esbuild node_modules/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs \
+  --bundle --format=esm --platform=browser \
+  --outfile=vendor/mermaid-layout-elk-0.2.2.mjs
+cp node_modules/chart.js/dist/chart.umd.js vendor/chart-4.5.1.umd.js
+cp node_modules/animejs/lib/anime.min.js vendor/anime-3.2.2.min.js
+find vendor -type f ! -name SHA256SUMS -print0 | sort -z | \
+  xargs -0 sha256sum > vendor/SHA256SUMS
+sha256sum -c vendor/SHA256SUMS
+```
+
+Serve generated pages with `script-src 'self'`. SRI can authenticate one
+classic remote script, but it does not authenticate the transitive imports in
+a dynamic ESM graph. Do not use a remote module graph for pages containing
+sensitive, embargoed, or unpublished information.
 
 ## Mermaid.js — Diagramming Engine
 
@@ -8,10 +42,10 @@ Use for flowcharts, sequence diagrams, ER diagrams, state machines, mind maps, c
 
 Do NOT use for dashboards — CSS Grid card layouts with Chart.js look better for those. Data tables use `<table>` elements.
 
-**CDN:**
+**Local bundle:**
 ```html
 <script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  import mermaid from './vendor/mermaid-11.16.0.mjs';
 
   mermaid.initialize({ startOnLoad: true, /* ... */ });
 </script>
@@ -20,8 +54,8 @@ Do NOT use for dashboards — CSS Grid card layouts with Chart.js look better fo
 **With ELK layout** (required for `layout: 'elk'` — it's a separate package, not bundled in core):
 ```html
 <script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-  import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+  import mermaid from './vendor/mermaid-11.16.0.mjs';
+  import elkLayouts from './vendor/mermaid-layout-elk-0.2.2.mjs';
 
   mermaid.registerLayoutLoaders(elkLayouts);
   mermaid.initialize({ startOnLoad: true, layout: 'elk', /* ... */ });
@@ -36,7 +70,7 @@ Always use `theme: 'base'` — it's the only theme where all `themeVariables` ar
 
 ```html
 <script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  import mermaid from './vendor/mermaid-11.16.0.mjs';
 
   const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   mermaid.initialize({
@@ -449,7 +483,7 @@ The CSS overrides on the container (`.mermaid-wrap`) and page will still respond
 Use for bar charts, line charts, pie/doughnut charts, radar charts, and other data-driven visualizations in dashboard-type diagrams. Overkill for static numbers — use pure SVG/CSS for simple progress bars and sparklines.
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="./vendor/chart-4.5.1.umd.js"></script>
 
 <canvas id="myChart" width="600" height="300"></canvas>
 
@@ -507,7 +541,7 @@ Wrap the canvas in a styled container:
 Use when a diagram has 10+ elements and you want a choreographed entrance sequence (staggered reveals, path drawing, count-up numbers). For simpler diagrams, CSS `animation-delay` staggering is sufficient.
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+<script src="./vendor/anime-3.2.2.min.js"></script>
 
 <script>
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

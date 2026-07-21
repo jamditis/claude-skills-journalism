@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Start the brainstorm server and output connection info
-# Usage: start-server.sh [--project-dir <path>] [--host <bind-host>] [--url-host <display-host>] [--foreground] [--background]
+# Usage: start-server.sh [--project-dir <path>] [--host <bind-host>] [--url-host <display-host>] [--public-origin <origin>] [--foreground] [--background]
 #
 # Starts server on a random high port, outputs JSON with URL.
 # Each session gets its own directory to avoid conflicts.
@@ -11,9 +11,11 @@
 #   --host <bind-host>    Host/interface to bind (default: 127.0.0.1).
 #                         Use 0.0.0.0 in remote/containerized environments.
 #   --url-host <host>     Hostname shown in returned URL JSON.
+#   --public-origin <url> Exact HTTPS origin used through a trusted proxy/tunnel.
 #   --foreground          Run server in the current terminal (no backgrounding).
 #   --background          Force background mode (overrides Codex auto-foreground).
 
+umask 077
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Parse arguments
@@ -22,6 +24,7 @@ FOREGROUND="false"
 FORCE_BACKGROUND="false"
 BIND_HOST="127.0.0.1"
 URL_HOST=""
+PUBLIC_ORIGIN=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --project-dir)
@@ -34,6 +37,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --url-host)
       URL_HOST="$2"
+      shift 2
+      ;;
+    --public-origin)
+      PUBLIC_ORIGIN="$2"
       shift 2
       ;;
     --foreground|--no-daemon)
@@ -58,6 +65,15 @@ if [[ -z "$URL_HOST" ]]; then
     URL_HOST="$BIND_HOST"
   fi
 fi
+
+case "$BIND_HOST" in
+  127.0.0.1|localhost|::1) ;;
+  *)
+    printf '%s\n' \
+      'SECURITY WARNING: non-loopback binding exposes the companion server.' \
+      'Use TLS (wss://) and access control through a trusted proxy or authenticated tunnel.' >&2
+    ;;
+esac
 
 # Some environments reap detached/background processes. Auto-foreground when detected.
 if [[ -n "${CODEX_CI:-}" && "$FOREGROUND" != "true" && "$FORCE_BACKGROUND" != "true" ]]; then
@@ -112,12 +128,12 @@ fi
 # already written to PID_FILE refers to the actual server process.
 if [[ "$FOREGROUND" == "true" ]]; then
   echo "$$" > "$PID_FILE"
-  exec env BRAINSTORM_DIR="$SESSION_DIR" BRAINSTORM_HOST="$BIND_HOST" BRAINSTORM_URL_HOST="$URL_HOST" BRAINSTORM_OWNER_PID="$OWNER_PID" node server.cjs
+  exec env BRAINSTORM_DIR="$SESSION_DIR" BRAINSTORM_HOST="$BIND_HOST" BRAINSTORM_URL_HOST="$URL_HOST" BRAINSTORM_PUBLIC_ORIGIN="$PUBLIC_ORIGIN" BRAINSTORM_OWNER_PID="$OWNER_PID" node server.cjs
 fi
 
 # Start server, capturing output to log file
 # Use nohup to survive shell exit; disown to remove from job table
-nohup env BRAINSTORM_DIR="$SESSION_DIR" BRAINSTORM_HOST="$BIND_HOST" BRAINSTORM_URL_HOST="$URL_HOST" BRAINSTORM_OWNER_PID="$OWNER_PID" node server.cjs > "$LOG_FILE" 2>&1 &
+nohup env BRAINSTORM_DIR="$SESSION_DIR" BRAINSTORM_HOST="$BIND_HOST" BRAINSTORM_URL_HOST="$URL_HOST" BRAINSTORM_PUBLIC_ORIGIN="$PUBLIC_ORIGIN" BRAINSTORM_OWNER_PID="$OWNER_PID" node server.cjs > "$LOG_FILE" 2>&1 &
 SERVER_PID=$!
 disown "$SERVER_PID" 2>/dev/null
 echo "$SERVER_PID" > "$PID_FILE"
@@ -135,7 +151,7 @@ for i in {1..50}; do
       sleep 0.1
     done
     if [[ "$alive" != "true" ]]; then
-      echo "{\"error\": \"Server started but was killed. Retry in a persistent terminal with: $SCRIPT_DIR/start-server.sh${PROJECT_DIR:+ --project-dir $PROJECT_DIR} --host $BIND_HOST --url-host $URL_HOST --foreground\"}"
+      echo "{\"error\": \"Server started but was killed. Retry in a persistent terminal with: $SCRIPT_DIR/start-server.sh${PROJECT_DIR:+ --project-dir $PROJECT_DIR} --host $BIND_HOST --url-host $URL_HOST${PUBLIC_ORIGIN:+ --public-origin $PUBLIC_ORIGIN} --foreground\"}"
       exit 1
     fi
     grep "server-started" "$LOG_FILE" | head -1
