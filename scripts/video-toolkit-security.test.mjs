@@ -59,7 +59,7 @@ test('transcription and frame processing sandbox untrusted media and pin inputs'
   assert.doesNotMatch(transcribe, /resolve\/main/iu);
   assert.match(transcribe, /full (?:commit|revision) SHA/iu);
   assert.match(transcribe, /--require-hashes/iu);
-  assert.match(transcribe, /ggml-base\.en\.bin/u);
+  assert.match(transcribe, /ggml-base\.en-q5_1\.bin/u);
   assert.doesNotMatch(transcribe, /ggml-base\.en-q5_0\.bin/u);
   assert.match(transcribe, /--output-file\s+"transcripts\/\{platform\}\/\{video_id\}"/u);
   assert.match(frames, /on-screen text.*untrusted/isu);
