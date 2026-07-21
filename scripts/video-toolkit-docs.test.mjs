@@ -19,6 +19,7 @@ test('video toolkit docs explain the four-stage reporting pipeline and its bound
   );
   assert.doesNotMatch(page, /cdn\.tailwindcss\.com|\btailwind\.config\s*=/u);
   assert.match(page, /\/plugin install video-toolkit@claude-skills-journalism/u);
+  assert.match(page, /data-updated-slug="video-toolkit"/u);
 
   for (const skill of ['video-download', 'video-transcribe', 'video-frames', 'video-dashboard']) {
     assert.match(page, new RegExp(`\\b${skill}\\b`, 'u'));
@@ -48,6 +49,7 @@ test('homepage lists video toolkit once, before visual explainer, with accurate 
   assert.ok(video < visual, 'video-toolkit card must appear before visual-explainer');
 
   const videoCard = plugins.slice(video, plugins.indexOf('</a>', video));
+  assert.match(videoCard, /data-updated-slug="video-toolkit"/u);
   assert.match(
     videoCard,
     /data-keywords="[^"]*video-download[^"]*video-transcribe[^"]*video-frames[^"]*video-dashboard[^"]*"/u,
