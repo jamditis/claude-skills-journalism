@@ -2,11 +2,18 @@ name: Skill linter
 
 on:
   pull_request:
-    branches: [master]
     paths:
-      - '*/SKILL.md'
+      - '**/SKILL.md'
       - 'hooks/*.md'
+      - 'scripts/**/*.mjs'
+      - '.claude-plugin/marketplace.json'
+      - '**/.claude-plugin/plugin.json'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/skill-lint.yml'
+
+permissions:
+  contents: read
 
 jobs:
   lint-skills:
@@ -18,10 +25,9 @@ jobs:
         run: |
           errors=0
 
-          # Check all SKILL.md files
-          for skill_file in */SKILL.md; do
-            [ -f "$skill_file" ] || continue
-            dir=$(dirname "$skill_file")
+          # Check all top-level and plugin-nested SKILL.md files.
+          while IFS= read -r -d '' skill_file; do
+            skill_file="${skill_file#./}"
 
             # Check frontmatter exists
             if ! head -1 "$skill_file" | grep -q '^---$'; then
@@ -45,7 +51,10 @@ jobs:
             fi
 
             echo "OK: $skill_file"
-          done
+          done < <(find . -type f -name SKILL.md \
+            -not -path './.git/*' \
+            -not -path './node_modules/*' \
+            -print0)
 
           # Check hook files
           for hook_file in hooks/*.md; do
@@ -114,3 +123,14 @@ jobs:
           fi
 
           echo "All skills listed in README.md"
+
+  security-regressions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
