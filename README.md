@@ -47,7 +47,7 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | [research-toolkit](./research-toolkit/) | Six skills for research, source preservation, and academic workflows: academic writing, legal paywall-bypass via Unpaywall and library databases, web archiving (Wayback / Archive.today / ArchiveBox), web page change monitoring, AI-enriched digital archive construction, and a curated free-API catalog with sunset currency notes (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) | n/a — skills only | May 10, 2026 |
 | [security-toolkit](./security-toolkit/) | Four defensive security skills covering OWASP Top 10 fundamentals and supply-chain hardening: pre-deployment audit checklists (auth, input validation, secrets management), secure authentication patterns (password hashing, session management, JWT, OAuth, passkeys), API hardening (rate limiting, CORS, request throttling, defense-in-depth for Express, FastAPI, and serverless), and npm/bun supply-chain hardening with install-time cooldown plus a sandboxed pre-install scan for the bypass case (defends against Mini Shai-Hulud-class worms) | `/security-toolkit:hotpatch` | Jun 24, 2026 |
 | [superjawn](./superjawn/) | Research-augmented fork of obra/superpowers. Default-on research phase fires before brainstorming, systematic-debugging, and writing-skills. v1.0.0 ships all 14 skills with no soft dependencies on the upstream `superpowers` plugin | invoked indirectly via skills (e.g. `superjawn:brainstorming`, `superjawn:systematic-debugging`, `superjawn:writing-plans`) | May 8, 2026 |
-| [video-toolkit](./video-toolkit/) | Four composable skills for social-video accountability reporting: downloading public video from Twitter/X, TikTok, YouTube, Instagram, and Facebook; transcribing it with a provenance sidecar and a CPU path any evaluator can re-run; extracting and vision-analyzing frames; and aggregating the result into an interactive dashboard | n/a — skills only | |
+| [video-toolkit](./video-toolkit/) | Four composable skills for social-video accountability reporting: downloading public video from Twitter/X, TikTok, YouTube, Instagram, and Facebook; transcribing it with a provenance sidecar and a CPU path any evaluator can re-run; extracting and vision-analyzing frames; and aggregating the result into an interactive dashboard | n/a — skills only | Jul 21, 2026 |
 | [visual-explainer](./visual-explainer/) | HTML diagrams, data tables, architecture views, slide decks, and KPI dashboards adapted from nicobailon/visual-explainer with journalism, newsroom, and academic design sensibilities | `/visual-explainer:project-recap` | May 10, 2026 |
 
 ### Skills (manual installation)
@@ -200,12 +200,12 @@ These four skills ship together as the [security-toolkit](./security-toolkit/) p
 
 These four skills ship together as the [video-toolkit](./video-toolkit/) plugin and compose into one pipeline. Install via `/plugin install video-toolkit@claude-skills-journalism`, or copy individual skills from `video-toolkit/skills/<name>/`.
 
-| Skill | What it does |
-|-------|--------------|
-| [video-download](./video-toolkit/skills/video-download/) | Collect public video from Twitter/X, TikTok, YouTube, Instagram, and Facebook via yt-dlp, with a browser-automation fallback for broken extractors |
-| [video-transcribe](./video-toolkit/skills/video-transcribe/) | Batch Whisper transcription with a provenance sidecar per transcript; the CPU `whisper.cpp` path is the transcript of record so an auditor can re-run it without a GPU |
-| [video-frames](./video-toolkit/skills/video-frames/) | Extract frames, build 3x3 grid composites, and run vision analysis over on-screen text, setting, and presentation style |
-| [video-dashboard](./video-toolkit/skills/video-dashboard/) | Aggregate transcripts and frame analysis into topic, tone, and cross-platform views behind a single-page dashboard |
+| Skill | What it does | Updated |
+|-------|--------------|--------|
+| [video-download](./video-toolkit/skills/video-download/) | Collect public video from Twitter/X, TikTok, YouTube, Instagram, and Facebook via yt-dlp, with a browser-automation fallback for broken extractors | Jul 21, 2026 |
+| [video-transcribe](./video-toolkit/skills/video-transcribe/) | Batch Whisper transcription with a provenance sidecar per transcript; the CPU `whisper.cpp` path is the transcript of record so an auditor can re-run it without a GPU | Jul 21, 2026 |
+| [video-frames](./video-toolkit/skills/video-frames/) | Extract frames, build 3x3 grid composites, and run vision analysis over on-screen text, setting, and presentation style | Jul 21, 2026 |
+| [video-dashboard](./video-toolkit/skills/video-dashboard/) | Aggregate transcripts and frame analysis into topic, tone, and cross-platform views behind a single-page dashboard | Jul 21, 2026 |
 
 ## Hooks
 
