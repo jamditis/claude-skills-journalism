@@ -31,6 +31,75 @@ function executableSource(path) {
 function globMatches(pattern, value) {
   const memo = new Map();
 
+  function posixClassMatches(name, character) {
+    if (character === undefined) return false;
+    const code = character.codePointAt(0);
+    const classes = {
+      alnum: /[A-Za-z0-9]/u,
+      alpha: /[A-Za-z]/u,
+      blank: /[\t ]/u,
+      digit: /[0-9]/u,
+      lower: /[a-z]/u,
+      space: /\s/u,
+      upper: /[A-Z]/u,
+      xdigit: /[A-Fa-f0-9]/u,
+    };
+    if (classes[name]) return classes[name].test(character);
+    if (name === 'cntrl') return code < 32 || code === 127;
+    if (name === 'graph') return code >= 33 && code <= 126;
+    if (name === 'print') return code >= 32 && code <= 126;
+    if (name === 'punct') return code >= 33 && code <= 126 && !/[A-Za-z0-9]/u.test(character);
+    return false;
+  }
+
+  function bracketMatch(start, character) {
+    let cursor = start + 1;
+    let negated = false;
+    if (pattern[cursor] === '!' || pattern[cursor] === '^') {
+      negated = true;
+      cursor += 1;
+    }
+    const bodyStart = cursor;
+    if (pattern[cursor] === ']') cursor += 1;
+
+    let end = -1;
+    while (cursor < pattern.length) {
+      if (pattern.startsWith('[:', cursor)) {
+        const posixEnd = pattern.indexOf(':]', cursor + 2);
+        if (posixEnd !== -1) {
+          cursor = posixEnd + 2;
+          continue;
+        }
+      }
+      if (pattern[cursor] === ']') {
+        end = cursor;
+        break;
+      }
+      cursor += 1;
+    }
+    if (end === -1) return null;
+
+    let included = false;
+    for (let index = bodyStart; index < end;) {
+      if (pattern.startsWith('[:', index)) {
+        const posixEnd = pattern.indexOf(':]', index + 2);
+        if (posixEnd !== -1 && posixEnd < end) {
+          included ||= posixClassMatches(pattern.slice(index + 2, posixEnd), character);
+          index = posixEnd + 2;
+          continue;
+        }
+      }
+      if (index + 2 < end && pattern[index + 1] === '-') {
+        included ||= character >= pattern[index] && character <= pattern[index + 2];
+        index += 3;
+      } else {
+        included ||= character === pattern[index];
+        index += 1;
+      }
+    }
+    return { end, matches: negated ? !included : included };
+  }
+
   function match(patternIndex, valueIndex) {
     const key = `${patternIndex}:${valueIndex}`;
     if (memo.has(key)) return memo.get(key);
@@ -66,26 +135,14 @@ function globMatches(pattern, value) {
         && value[valueIndex] !== '/'
         && match(patternIndex + 1, valueIndex + 1);
     } else if (pattern[patternIndex] === '[') {
-      const end = pattern.indexOf(']', patternIndex + 1);
-      if (end === -1) {
+      const bracket = bracketMatch(patternIndex, value[valueIndex]);
+      if (!bracket) {
         result = value[valueIndex] === '[' && match(patternIndex + 1, valueIndex + 1);
       } else {
-        let body = pattern.slice(patternIndex + 1, end);
-        const negated = body.startsWith('!') || body.startsWith('^');
-        if (negated) body = body.slice(1);
-        let included = false;
-        for (let index = 0; index < body.length; index += 1) {
-          if (index + 2 < body.length && body[index + 1] === '-') {
-            included ||= value[valueIndex] >= body[index] && value[valueIndex] <= body[index + 2];
-            index += 2;
-          } else {
-            included ||= value[valueIndex] === body[index];
-          }
-        }
         result = valueIndex < value.length
           && value[valueIndex] !== '/'
-          && (negated ? !included : included)
-          && match(end + 1, valueIndex + 1);
+          && bracket.matches
+          && match(bracket.end + 1, valueIndex + 1);
       }
     } else {
       result = value[valueIndex] === pattern[patternIndex]
@@ -101,52 +158,83 @@ function globMatches(pattern, value) {
 
 const GLOB_META = new Set(['*', '?', '[', ']', '{', '}', '\\']);
 
-function shellWords(input) {
-  const words = [];
+function shellTokens(input) {
+  const tokens = [];
   let text = '';
   let pattern = '';
+  let raw = '';
   let quote = null;
   let started = false;
 
-  function append(character, active) {
+  function append(character, active, source = character) {
     text += character;
     pattern += !active && GLOB_META.has(character) ? `\\${character}` : character;
+    raw += source;
     started = true;
   }
 
-  function finish() {
-    if (started) words.push({ text, pattern });
+  function reset() {
     text = '';
     pattern = '';
+    raw = '';
     started = false;
+  }
+
+  function finish() {
+    if (started) tokens.push({ type: 'word', text, pattern, raw });
+    reset();
   }
 
   for (let index = 0; index < input.length; index += 1) {
     const character = input[index];
     if (quote) {
       if (character === quote) {
+        raw += character;
         quote = null;
         started = true;
       } else if (character === '\\' && quote === '"' && index + 1 < input.length) {
-        append(input[index + 1], false);
+        append(input[index + 1], false, character + input[index + 1]);
         index += 1;
       } else {
         append(character, false);
       }
     } else if (character === '"' || character === "'") {
       quote = character;
+      raw += character;
       started = true;
     } else if (character === '\\' && index + 1 < input.length) {
-      append(input[index + 1], false);
+      append(input[index + 1], false, character + input[index + 1]);
       index += 1;
     } else if (/\s/u.test(character)) {
       finish();
+    } else if (character === '>') {
+      let fileDescriptor = '';
+      if (started && /^\d+$/u.test(text)) {
+        fileDescriptor = text;
+        reset();
+      } else {
+        finish();
+      }
+      let operator = '>';
+      if (input[index + 1] === '>') {
+        operator = '>>';
+        index += 1;
+      }
+      tokens.push({ type: 'operator', text: fileDescriptor + operator, raw: fileDescriptor + operator });
+    } else if (character === '|' || character === ';' || character === '&') {
+      finish();
+      let operator = character;
+      if (input[index + 1] === character && character !== ';') {
+        operator += character;
+        index += 1;
+      }
+      tokens.push({ type: 'operator', text: operator, raw: operator });
     } else {
       append(character, true);
     }
   }
   finish();
-  return words;
+  return tokens;
 }
 
 function isEscaped(pattern, index) {
@@ -206,21 +294,57 @@ function hasActiveGlob(pattern) {
 function selfIncludingChecksumGlobs(source) {
   const flattened = source.replace(/\\\r?\n\s*/g, ' ');
   const violations = [];
-  const command = /\bsha256sum\b\s+([^>\n]*?)\s*(>>?)\s*((?:"[^"]+"|'[^']+'|[^\s;|&]+))/gu;
+  for (const line of flattened.split(/\r?\n/u)) {
+    const tokens = shellTokens(line);
+    for (let start = 0; start < tokens.length; start += 1) {
+      if (tokens[start].type !== 'word' || posix.basename(tokens[start].text) !== 'sha256sum') {
+        continue;
+      }
 
-  for (const match of flattened.matchAll(command)) {
-    const inputs = match[1].trim();
-    const redirect = match[2];
-    const rawOutput = match[3];
-    const output = shellWords(rawOutput)[0]?.text || '';
-    if (posix.basename(output) !== 'SHA256SUMS') continue;
+      const inputs = [];
+      const outputs = [];
+      let index = start + 1;
 
-    const includesOutput = shellWords(inputs).some((word) => {
-      if (word.text.startsWith('-')) return false;
-      return expandBraces(posix.normalize(word.pattern)).some((pattern) =>
-        hasActiveGlob(pattern) && globMatches(pattern, posix.normalize(output)));
-    });
-    if (includesOutput) violations.push(`${inputs} ${redirect} ${rawOutput}`);
+      while (index < tokens.length) {
+        const token = tokens[index];
+        if (token.type === 'operator' && ['|', ';', '&&', '||'].includes(token.text)) break;
+        if (token.type === 'operator' && />/u.test(token.text)) {
+          const target = tokens[index + 1];
+          if (/^(?:1)?>>?$/u.test(token.text) && target?.type === 'word') {
+            outputs.push({ label: `${token.text.replace(/^1/u, '')} ${target.raw}`, target });
+          }
+          index += 2;
+          continue;
+        }
+        if (token.type === 'word') inputs.push(token);
+        index += 1;
+      }
+
+      if (tokens[index]?.text === '|') {
+        const tee = tokens[index + 1];
+        if (tee?.type === 'word' && posix.basename(tee.text) === 'tee') {
+          for (let cursor = index + 2; cursor < tokens.length; cursor += 1) {
+            const target = tokens[cursor];
+            if (target.type === 'operator') break;
+            if (!target.text.startsWith('-')) {
+              outputs.push({ label: `| tee ${target.raw}`, target });
+            }
+          }
+        }
+      }
+
+      const inputLabel = inputs.map((word) => word.raw).join(' ');
+      for (const { label, target } of outputs) {
+        const output = posix.normalize(target.text);
+        if (posix.basename(output) !== 'SHA256SUMS') continue;
+        const includesOutput = inputs.some((word) => {
+          if (word.text.startsWith('-')) return false;
+          return expandBraces(posix.normalize(word.pattern)).some((pattern) =>
+            hasActiveGlob(pattern) && globMatches(pattern, output));
+        });
+        if (includesOutput) violations.push(`${inputLabel} ${label}`);
+      }
+    }
   }
 
   return violations;
@@ -344,6 +468,34 @@ test('checksum-manifest classifier catches the bug class without flagging narrow
   assert.deepEqual(
     selfIncludingChecksumGlobs('sha256sum public/assets/{*.js,*.css} > public/assets/SHA256SUMS'),
     [],
+  );
+  assert.deepEqual(
+    selfIncludingChecksumGlobs('sha256sum "$dir"/* > "$dir"/SHA256SUMS'),
+    ['"$dir"/* > "$dir"/SHA256SUMS'],
+  );
+  assert.deepEqual(
+    selfIncludingChecksumGlobs(
+      'sha256sum public/assets/* 2>/dev/null > public/assets/SHA256SUMS',
+    ),
+    ['public/assets/* > public/assets/SHA256SUMS'],
+  );
+  assert.deepEqual(
+    selfIncludingChecksumGlobs(
+      'sha256sum public/assets/[[:upper:]]* > public/assets/SHA256SUMS',
+    ),
+    ['public/assets/[[:upper:]]* > public/assets/SHA256SUMS'],
+  );
+  assert.deepEqual(
+    selfIncludingChecksumGlobs(
+      'sha256sum public/assets/* | tee public/assets/SHA256SUMS',
+    ),
+    ['public/assets/* | tee public/assets/SHA256SUMS'],
+  );
+  assert.deepEqual(
+    selfIncludingChecksumGlobs(
+      'sha256sum public/assets/*.js > public/assets/JS-SHA; sha256sum public/assets/* > public/assets/SHA256SUMS',
+    ),
+    ['public/assets/* > public/assets/SHA256SUMS'],
   );
   assert.deepEqual(
     selfIncludingChecksumGlobs(
