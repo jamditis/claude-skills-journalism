@@ -73,12 +73,15 @@ test('transcription uses preprovisioned artifacts instead of fetching executable
   assert.match(source, /If either artifact is\s+missing, stop/iu);
   assert.match(source, /WHISPER_BINARY_SHA256/u);
   assert.match(source, /engine_binary_sha256/u);
-  assert.match(source, /MODEL_REVISION/u);
-  assert.match(source, /MODEL_SHA256/u);
+  assert.match(source, /"revision": "<FULL_HF_COMMIT_SHA>"/u);
+  assert.match(source, /"sha256": "<REVIEWED_MODEL_SHA256>"/u);
+  assert.match(source, /whisper-artifacts\.json/u);
+  assert.ok(source.includes('"$WHISPER_BIN" \\\n  -m "$MODEL_FILE"'));
+  assert.match(source, /directly from the verified manifest/iu);
   assert.doesNotMatch(source, /git\s+(?:clone|fetch)/iu);
   assert.doesNotMatch(source, /git\s+-C\s+whisper\.cpp\s+(?:fetch|remote|checkout)/iu);
-  assert.doesNotMatch(source, /https:\/\/github\.com\/ggerganov\/whisper\.cpp/iu);
-  assert.doesNotMatch(source, /curl[\s\\\n]{0,80}[^\n]*(?:whisper\.cpp|huggingface)/iu);
+  assert.doesNotMatch(source, /\bcurl\b/iu);
+  assert.doesNotMatch(source, /https?:\/\/[^\s<>"']*(?:github\.com\/ggerganov\/whisper\.cpp|huggingface\.co)/iu);
 });
 
 test('cross-skill handoffs cover plugin and copied-skill installs', () => {

@@ -61,35 +61,75 @@ code.
 ```bash
 WHISPER_BIN="$(command -v whisper-cli)"
 test -n "$WHISPER_BIN"
-whisper-cli --help
-test -f ggml-base.en-q5_1.bin
+"$WHISPER_BIN" --help
+MODEL_FILE="ggml-base.en-q5_1.bin"
+test -f "$MODEL_FILE"
 ffmpeg -version                          # only if inputs are video, not wav
 ```
 
 Before activating the skill, the user or a trusted internal build pipeline must
-record the reviewed engine's full commit SHA and binary digest. Verify the
-installed binary against those approved values; a version string alone is not
-an integrity check:
+create and review a project-local `whisper-artifacts.json`. Keep each artifact's
+identity, immutable source revision, file name, and digest together in that one
+manifest. Record the full commit SHA for the engine and the full revision SHA
+for the model; do not assemble those values ad hoc during a run:
 
-```bash
-WHISPER_CPP_COMMIT="<FULL_WHISPER_CPP_COMMIT_SHA>"
-WHISPER_BINARY_SHA256="<REVIEWED_WHISPER_BINARY_SHA256>"
-printf '%s  %s\n' "$WHISPER_BINARY_SHA256" "$WHISPER_BIN" | sha256sum --check
-whisper-cli --version
+```json
+{
+  "engine": {
+    "artifact": "whisper.cpp:whisper-cli",
+    "revision": "<FULL_WHISPER_CPP_COMMIT_SHA>",
+    "filename": "whisper-cli",
+    "sha256": "<REVIEWED_WHISPER_BINARY_SHA256>"
+  },
+  "model": {
+    "artifact": "ggerganov/whisper.cpp:ggml-base.en-q5_1.bin",
+    "revision": "<FULL_HF_COMMIT_SHA>",
+    "filename": "ggml-base.en-q5_1.bin",
+    "sha256": "<REVIEWED_MODEL_SHA256>"
+  }
+}
 ```
 
-Provision the model separately from an artifact whose source is pinned to a full
-revision, then verify its reviewed digest before use. Keep the artifact identity,
-revision, and digest in the project, not only in terminal history. The skill
-does not fetch a missing model:
+Verify both local files against that reviewed manifest before use. This check
+fails when an identity, full revision, file name, or digest is missing or
+malformed, or when the selected file does not match its bound digest. A version
+string alone is not an integrity check:
 
 ```bash
-MODEL_ARTIFACT="ggerganov/whisper.cpp:ggml-base.en-q5_1.bin"
-MODEL_REVISION="<FULL_HF_COMMIT_SHA>"
-MODEL_SHA256="<REVIEWED_MODEL_SHA256>"
-test -f ggml-base.en-q5_1.bin
-printf '%s  %s\n' "$MODEL_SHA256" ggml-base.en-q5_1.bin | sha256sum --check
+ARTIFACT_MANIFEST="whisper-artifacts.json"
+python - "$ARTIFACT_MANIFEST" "$WHISPER_BIN" "$MODEL_FILE" <<'PY'
+import hashlib, json, pathlib, re, sys
+
+manifest_path, engine_path, model_path = map(pathlib.Path, sys.argv[1:])
+manifest = json.loads(manifest_path.read_text())
+for kind, path in (("engine", engine_path), ("model", model_path)):
+    record = manifest.get(kind)
+    if not isinstance(record, dict):
+        raise SystemExit(f"missing {kind} artifact record")
+    for field in ("artifact", "revision", "filename", "sha256"):
+        if not isinstance(record.get(field), str) or not record[field]:
+            raise SystemExit(f"missing {kind}.{field}")
+    if not re.fullmatch(r"[0-9a-f]{40,64}", record["revision"]):
+        raise SystemExit(f"{kind}.revision is not a full immutable revision")
+    if not re.fullmatch(r"[0-9a-f]{64}", record["sha256"]):
+        raise SystemExit(f"{kind}.sha256 is not a SHA-256 digest")
+    if path.name != record["filename"]:
+        raise SystemExit(f"{kind} filename does not match reviewed manifest")
+    digest = hashlib.sha256()
+    with path.open("rb") as artifact_file:
+        for chunk in iter(lambda: artifact_file.read(1024 * 1024), b""):
+            digest.update(chunk)
+    if digest.hexdigest() != record["sha256"]:
+        raise SystemExit(f"{kind} digest does not match reviewed manifest")
+print("reviewed Whisper engine and model verified")
+PY
+"$WHISPER_BIN" --version
 ```
+
+Provision the model separately from the artifact and full revision recorded in
+the reviewed manifest. The skill does not fetch a missing model. Copy provenance
+identity fields into each transcript sidecar directly from the verified manifest;
+do not retype them or substitute environment values.
 
 Only the quantizations upstream actually publishes are downloadable (`q5_1` and
 `q8_0` for `base.en`), so pick one of those rather than assuming a name like
@@ -159,8 +199,8 @@ versions and hosts, so leaving them unset makes the run unreproducible even on
 the same machine:
 
 ```bash
-whisper-cli \
-  -m ggml-base.en-q5_1.bin \
+"$WHISPER_BIN" \
+  -m "$MODEL_FILE" \
   -f "{audio}.wav" \
   --no-gpu \
   --language en \
