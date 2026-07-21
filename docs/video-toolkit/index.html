@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A four-stage plugin for collecting public social video, producing traceable transcripts, analyzing frames, and building reporting dashboards.">
+    <title>Video toolkit - Claude skills for journalism</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="stylesheet" href="../assets/tailwind/video-toolkit.css" data-tailwind-build="3.4.19">
+    <link rel="stylesheet" href="../updated.css">
+    <style>
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        h1, h2, h3 {
+            font-family: Georgia, "Times New Roman", serif;
+        }
+        .signal-grid {
+            background-image:
+                linear-gradient(rgba(79, 70, 229, 0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(79, 70, 229, 0.06) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+        .skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+        .skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #111827; color: white; font-weight: 700; text-decoration: none; }
+        :focus-visible { outline: 2px solid #3730a3; outline-offset: 4px; }
+        .content-link { text-decoration: underline; text-underline-offset: 0.18em; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+    <meta property="og:title" content="Video toolkit - Claude skills for journalism">
+    <meta property="og:description" content="Collect public social video, create traceable transcripts, analyze frames, and build reporting dashboards with one four-stage plugin.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/video-toolkit/">
+    <meta property="og:image" content="https://skills.amditis.tech/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Video toolkit - Claude skills for journalism">
+    <meta name="twitter:description" content="A four-stage social-video accountability reporting pipeline.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/og-image.png">
+    <script src="../ask-ai.js" defer></script>
+</head>
+<body class="bg-canvas text-ink">
+    <a href="#main" class="skip-link">Skip to main content</a>
+
+    <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/95 backdrop-blur-md border-b border-clay/20">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="../" class="text-sm font-semibold text-clay hover:text-ink transition-colors flex items-center gap-2">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                All skills
+            </a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/video-toolkit" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-clay hover:text-ink transition-colors">GitHub</a>
+        </div>
+    </nav>
+
+    <header class="signal-grid pt-28 pb-20 border-b border-clay/20">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="inline-flex items-center gap-2 bg-accentLight text-accentDark rounded-full px-3 py-1 text-sm font-semibold mb-6">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                Plugin · v1.0.1
+            </div>
+            <h1 class="font-display text-5xl md:text-7xl font-bold tracking-tight mb-5">Video toolkit</h1>
+            <p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-07-21T17:37:14-04:00" data-updated-slug="video-toolkit">Updated <time datetime="2026-07-21T17:37:14-04:00">Jul 21, 2026</time></p>
+            <p class="text-xl md:text-2xl text-clay leading-relaxed max-w-3xl">
+                Turn public social video into a traceable reporting record: collect clips, transcribe the audio, inspect what appears on screen, and read the whole set through one dashboard.
+            </p>
+        </div>
+    </header>
+
+    <main id="main" class="max-w-5xl mx-auto px-6 py-14">
+        <section class="mb-16" aria-labelledby="pipeline-heading">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-accentDark mb-2">One reporting pipeline</p>
+                    <h2 id="pipeline-heading" class="text-3xl md:text-4xl font-bold">Four stages, one evidence trail</h2>
+                </div>
+                <p class="text-sm text-clay max-w-sm">Run the stages in order for a new subject. Re-run one stage later when the collection changes.</p>
+            </div>
+
+            <ol class="grid md:grid-cols-2 gap-5">
+                <li class="bg-white rounded-2xl border border-clay/20 p-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <span class="w-9 h-9 rounded-full bg-accent text-white font-bold flex items-center justify-center">1</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-mist">Collect</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2"><code>video-download</code></h3>
+                    <p class="text-clay leading-relaxed">Pull public video from Twitter/X, TikTok, YouTube, Instagram, and Facebook with <code>yt-dlp</code>, with a browser fallback when an extractor breaks.</p>
+                </li>
+                <li class="bg-white rounded-2xl border border-clay/20 p-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <span class="w-9 h-9 rounded-full bg-accent text-white font-bold flex items-center justify-center">2</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-mist">Transcribe</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2"><code>video-transcribe</code></h3>
+                    <p class="text-clay leading-relaxed">Create the transcript of record with Whisper on CPU and write a provenance sidecar that connects every transcript to its source media and decode settings.</p>
+                </li>
+                <li class="bg-white rounded-2xl border border-clay/20 p-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <span class="w-9 h-9 rounded-full bg-accent text-white font-bold flex items-center justify-center">3</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-mist">Inspect</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2"><code>video-frames</code></h3>
+                    <p class="text-clay leading-relaxed">Extract frames, assemble 3×3 contact sheets, and analyze on-screen text, setting, presentation style, and other visual evidence.</p>
+                </li>
+                <li class="bg-white rounded-2xl border border-clay/20 p-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <span class="w-9 h-9 rounded-full bg-accent text-white font-bold flex items-center justify-center">4</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-mist">Compare</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2"><code>video-dashboard</code></h3>
+                    <p class="text-clay leading-relaxed">Aggregate transcript and frame analysis into topic, tone, and cross-platform views in a local single-page dashboard.</p>
+                </li>
+            </ol>
+        </section>
+
+        <section class="mb-16 grid lg:grid-cols-5 gap-8 items-start" aria-labelledby="record-heading">
+            <div class="lg:col-span-3">
+                <p class="text-xs font-bold uppercase tracking-widest text-accentDark mb-2">Transcripts you can defend</p>
+                <h2 id="record-heading" class="text-3xl md:text-4xl font-bold mb-5">Keep the quote connected to the audio</h2>
+                <div class="space-y-4 text-clay leading-relaxed">
+                    <p>The CPU <code>whisper.cpp</code> path is the transcript of record. A GPU path is available as an accelerator, but the workflow does not assume another reporter has the same hardware.</p>
+                    <p>Each <code>.transcript.meta.json</code> file records the engine and model build, a source-media hash, and pinned decode parameters. The record also states that GPU runs and different model quantizations are not byte-identical.</p>
+                </div>
+            </div>
+            <aside class="lg:col-span-2 bg-ink text-white rounded-2xl p-6" aria-label="Example provenance record">
+                <p class="text-xs font-bold uppercase tracking-widest text-white/60 mb-4">Provenance sidecar</p>
+                <pre class="text-xs leading-6 overflow-x-auto" tabindex="0"><code>{
+  "engine": "whisper.cpp",
+  "model": "ggml-base.en.bin",
+  "source_sha256": "…",
+  "language": "en",
+  "decode": { "temperature": 0 }
+}</code></pre>
+            </aside>
+        </section>
+
+        <section class="mb-16 bg-accentLight rounded-3xl p-7 md:p-10" aria-labelledby="security-heading">
+            <div class="grid lg:grid-cols-3 gap-8">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-accentDark mb-2">Security boundaries</p>
+                    <h2 id="security-heading" class="text-3xl font-bold mb-3">Media stays data</h2>
+                    <p class="text-clay">The pipeline handles adversarial pages and files without granting them authority over the agent.</p>
+                </div>
+                <ul class="lg:col-span-2 grid sm:grid-cols-2 gap-4">
+                    <li class="bg-white/80 rounded-xl p-5 text-sm leading-relaxed"><strong class="block text-ink mb-1">Untrusted by default</strong>Social pages, metadata, media, transcripts, OCR, and analysis JSON remain untrusted data, never instructions.</li>
+                    <li class="bg-white/80 rounded-xl p-5 text-sm leading-relaxed"><strong class="block text-ink mb-1">No silent credentials</strong>Public unauthenticated access is the default. A clean credentialed browser profile requires explicit user approval.</li>
+                    <li class="bg-white/80 rounded-xl p-5 text-sm leading-relaxed"><strong class="block text-ink mb-1">Contained parsing</strong>Media processing runs with private-network access blocked, plus resource and file-size limits.</li>
+                    <li class="bg-white/80 rounded-xl p-5 text-sm leading-relaxed"><strong class="block text-ink mb-1">Local dashboard code</strong>The dashboard uses a committed exact Chart.js asset and DOM-safe rendering instead of runtime CDN code.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="mb-16 grid md:grid-cols-2 gap-8" aria-labelledby="requirements-heading">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-widest text-accentDark mb-2">Requirements</p>
+                <h2 id="requirements-heading" class="text-3xl font-bold mb-5">A local, inspectable toolchain</h2>
+                <ul class="space-y-3 text-clay">
+                    <li class="flex gap-3"><span aria-hidden="true" class="text-accentDark font-bold">01</span><span><code>yt-dlp</code> for public platform downloads</span></li>
+                    <li class="flex gap-3"><span aria-hidden="true" class="text-accentDark font-bold">02</span><span><code>ffmpeg</code> for audio and frame extraction</span></li>
+                    <li class="flex gap-3"><span aria-hidden="true" class="text-accentDark font-bold">03</span><span><code>whisper.cpp</code> with a <code>ggml</code> model</span></li>
+                    <li class="flex gap-3"><span aria-hidden="true" class="text-accentDark font-bold">04</span><span>Python for analysis and orchestration</span></li>
+                    <li class="flex gap-3"><span aria-hidden="true" class="text-accentDark font-bold">05</span><span>Node.js 20 or later with <code>npm</code> for the dashboard asset</span></li>
+                </ul>
+                <p class="text-sm text-clay mt-5">CUDA and <code>openai-whisper</code> are optional. Nothing in the pipeline requires a GPU.</p>
+            </div>
+            <div class="bg-white border border-clay/20 rounded-2xl p-6">
+                <h3 class="text-xl font-bold mb-4">Responsible collection</h3>
+                <p class="text-clay leading-relaxed mb-4">The skills are designed for reporting and analysis of public accounts. They do not bypass access controls, automate credential reuse, or scrape at scale.</p>
+                <p class="text-clay leading-relaxed">Platform terms and local law still apply. Confirm that the collection is lawful and proportionate before downloading media.</p>
+            </div>
+        </section>
+
+        <section class="mb-16" aria-labelledby="install-heading">
+            <p class="text-xs font-bold uppercase tracking-widest text-accentDark mb-2">Installation</p>
+            <h2 id="install-heading" class="text-3xl md:text-4xl font-bold mb-6">Install all four skills together</h2>
+            <div class="bg-ink rounded-2xl p-6 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Video toolkit installation commands">
+                <p class="text-white/50 mb-2"># Add the marketplace once</p>
+                <p class="text-white mb-5">/plugin marketplace add jamditis/claude-skills-journalism</p>
+                <p class="text-white/50 mb-2"># Install the plugin</p>
+                <p class="text-white">/plugin install video-toolkit@claude-skills-journalism</p>
+            </div>
+            <p class="text-sm text-clay mt-4">Browse the source and setup notes in the <a class="content-link text-accentDark font-semibold" href="https://github.com/jamditis/claude-skills-journalism/tree/master/video-toolkit" target="_blank" rel="noopener noreferrer">GitHub repository</a>.</p>
+        </section>
+
+        <section class="mb-16" aria-labelledby="related-heading">
+            <h2 id="related-heading" class="text-2xl font-bold mb-5">Related skills</h2>
+            <div class="flex flex-wrap gap-3">
+                <a href="../social-media-intelligence/" class="bg-white rounded-full px-4 py-2 text-sm border border-clay/20 hover:border-accent transition-colors">Social media intelligence</a>
+                <a href="../interview-transcription/" class="bg-white rounded-full px-4 py-2 text-sm border border-clay/20 hover:border-accent transition-colors">Interview transcription</a>
+                <a href="../source-verification/" class="bg-white rounded-full px-4 py-2 text-sm border border-clay/20 hover:border-accent transition-colors">Source verification</a>
+                <a href="../visual-explainer/" class="bg-white rounded-full px-4 py-2 text-sm border border-clay/20 hover:border-accent transition-colors">Visual explainer</a>
+            </div>
+        </section>
+
+        <section class="bg-gradient-to-br from-accent to-accentDark rounded-3xl p-8 md:p-12 text-white text-center">
+            <h2 class="text-3xl font-bold mb-4">Start with the public record</h2>
+            <p class="text-white/85 max-w-2xl mx-auto mb-7">Build a collection that another reporter can inspect, rerun, and trace back to the source media.</p>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/video-toolkit" target="_blank" rel="noopener noreferrer" class="inline-flex items-center bg-white text-accentDark px-6 py-3 rounded-full font-bold hover:bg-white/90 transition-colors">View video toolkit on GitHub</a>
+        </section>
+    </main>
+
+    <footer class="border-t border-clay/20 mt-10">
+        <div class="max-w-5xl mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-clay">
+            <p>Built by <a class="content-link font-semibold" href="https://centerforcooperativemedia.org" target="_blank" rel="noopener noreferrer">Center for Cooperative Media</a></p>
+            <div class="flex gap-6">
+                <a href="../" class="hover:text-ink">All skills</a>
+                <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" rel="noopener noreferrer" class="hover:text-ink">GitHub</a>
+            </div>
+        </div>
+    </footer>
+    <script defer src="../updated.js"></script>
+</body>
+</html>
