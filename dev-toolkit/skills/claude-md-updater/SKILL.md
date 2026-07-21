@@ -1,6 +1,12 @@
 ---
 name: claude-md-updater
-description: Use this skill when the user asks to update CLAUDE.md, save a lesson, or persist something from the current session: phrases like "update claude.md", "what should we remember", "save this lesson", or "add to context". Scans the conversation for hard-won lessons, new file paths, infrastructure changes, and new workflows, then proposes scoped edits to the project's CLAUDE.md for approval before writing.
+description: >-
+  Use this skill when the user asks to update CLAUDE.md, save a lesson, or
+  persist something from the current session: phrases like "update claude.md",
+  "what should we remember", "save this lesson", or "add to context". Scans the
+  conversation for hard-won lessons, new file paths, infrastructure changes,
+  and new workflows, then proposes scoped edits to the project's CLAUDE.md for
+  approval before writing.
 ---
 
 # CLAUDE.md auto-updater

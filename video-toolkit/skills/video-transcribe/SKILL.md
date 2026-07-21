@@ -51,38 +51,85 @@ matter, re-run it on the CPU path and keep that transcript.
 
 ## Prerequisites
 
-The CPU path needs `whisper.cpp` and a model file:
+The CPU path needs a locally provisioned, reviewed `whisper-cli` binary and
+model file. Acquiring or building either artifact is an administrator/user
+setup task outside this skill. The agent must not download, clone, fetch, build,
+or install whisper.cpp during a transcription run. If either artifact is
+missing, stop and report the prerequisite instead of retrieving executable
+code.
 
 ```bash
-whisper-cli --help                       # or ./main -h in an older build
-ls ggml-base.en-q5_1.bin                 # the model weights
+WHISPER_BIN="$(command -v whisper-cli)"
+test -n "$WHISPER_BIN"
+"$WHISPER_BIN" --help
+MODEL_FILE="ggml-base.en-q5_1.bin"
+test -f "$MODEL_FILE"
 ffmpeg -version                          # only if inputs are video, not wav
 ```
 
-Pin whisper.cpp to a reviewed full commit SHA and check it out detached; do not
-build whatever a mutable default branch points to:
+Before activating the skill, the user or a trusted internal build pipeline must
+create and review a project-local `whisper-artifacts.json`. Keep each artifact's
+identity, immutable source revision, file name, and digest together in that one
+manifest. Record the full commit SHA for the engine and the full revision SHA
+for the model; do not assemble those values ad hoc during a run:
 
-```bash
-WHISPER_CPP_COMMIT="<FULL_WHISPER_CPP_COMMIT_SHA>"
-mkdir whisper.cpp
-git -C whisper.cpp init
-git -C whisper.cpp remote add origin https://github.com/ggerganov/whisper.cpp
-git -C whisper.cpp fetch --depth 1 origin "$WHISPER_CPP_COMMIT"
-git -C whisper.cpp checkout --detach FETCH_HEAD
-test "$(git -C whisper.cpp rev-parse HEAD)" = "$WHISPER_CPP_COMMIT"
+```json
+{
+  "engine": {
+    "artifact": "whisper.cpp:whisper-cli",
+    "revision": "<FULL_WHISPER_CPP_COMMIT_SHA>",
+    "filename": "whisper-cli",
+    "sha256": "<REVIEWED_WHISPER_BINARY_SHA256>"
+  },
+  "model": {
+    "artifact": "ggerganov/whisper.cpp:ggml-base.en-q5_1.bin",
+    "revision": "<FULL_HF_COMMIT_SHA>",
+    "filename": "ggml-base.en-q5_1.bin",
+    "sha256": "<REVIEWED_MODEL_SHA256>"
+  }
+}
 ```
 
-Pin the model URL to a full Hugging Face revision and verify a reviewed digest
-before use. Keep both values in the project, not only in terminal history:
+Verify both local files against that reviewed manifest before use. This check
+fails when an identity, full revision, file name, or digest is missing or
+malformed, or when the selected file does not match its bound digest. A version
+string alone is not an integrity check:
 
 ```bash
-MODEL_REVISION="<FULL_HF_COMMIT_SHA>"
-MODEL_SHA256="<REVIEWED_MODEL_SHA256>"
-curl --fail --location --proto '=https' \
-  "https://huggingface.co/ggerganov/whisper.cpp/resolve/${MODEL_REVISION}/ggml-base.en-q5_1.bin" \
-  --output ggml-base.en-q5_1.bin
-printf '%s  %s\n' "$MODEL_SHA256" ggml-base.en-q5_1.bin | sha256sum --check
+ARTIFACT_MANIFEST="whisper-artifacts.json"
+python - "$ARTIFACT_MANIFEST" "$WHISPER_BIN" "$MODEL_FILE" <<'PY'
+import hashlib, json, pathlib, re, sys
+
+manifest_path, engine_path, model_path = map(pathlib.Path, sys.argv[1:])
+manifest = json.loads(manifest_path.read_text())
+for kind, path in (("engine", engine_path), ("model", model_path)):
+    record = manifest.get(kind)
+    if not isinstance(record, dict):
+        raise SystemExit(f"missing {kind} artifact record")
+    for field in ("artifact", "revision", "filename", "sha256"):
+        if not isinstance(record.get(field), str) or not record[field]:
+            raise SystemExit(f"missing {kind}.{field}")
+    if not re.fullmatch(r"[0-9a-f]{40,64}", record["revision"]):
+        raise SystemExit(f"{kind}.revision is not a full immutable revision")
+    if not re.fullmatch(r"[0-9a-f]{64}", record["sha256"]):
+        raise SystemExit(f"{kind}.sha256 is not a SHA-256 digest")
+    if path.name != record["filename"]:
+        raise SystemExit(f"{kind} filename does not match reviewed manifest")
+    digest = hashlib.sha256()
+    with path.open("rb") as artifact_file:
+        for chunk in iter(lambda: artifact_file.read(1024 * 1024), b""):
+            digest.update(chunk)
+    if digest.hexdigest() != record["sha256"]:
+        raise SystemExit(f"{kind} digest does not match reviewed manifest")
+print("reviewed Whisper engine and model verified")
+PY
+"$WHISPER_BIN" --version
 ```
+
+Provision the model separately from the artifact and full revision recorded in
+the reviewed manifest. The skill does not fetch a missing model. Copy provenance
+identity fields into each transcript sidecar directly from the verified manifest;
+do not retype them or substitute environment values.
 
 Only the quantizations upstream actually publishes are downloadable (`q5_1` and
 `q8_0` for `base.en`), so pick one of those rather than assuming a name like
@@ -152,8 +199,8 @@ versions and hosts, so leaving them unset makes the run unreproducible even on
 the same machine:
 
 ```bash
-whisper-cli \
-  -m ggml-base.en-q5_1.bin \
+"$WHISPER_BIN" \
+  -m "$MODEL_FILE" \
   -f "{audio}.wav" \
   --no-gpu \
   --language en \
@@ -198,10 +245,13 @@ input that changes the decoded text:
 {
   "engine": "whisper.cpp",
   "engine_build": "1.7.6 (b0a5b0c)",
+  "engine_revision": "<FULL_WHISPER_CPP_COMMIT_SHA>",
+  "engine_binary_sha256": "2c91...7ba0",
   "model": "base.en",
   "model_quantization": "q5_1",
   "model_sha256": "5f8c...9d2e",
-  "model_source": "https://huggingface.co/ggerganov/whisper.cpp/resolve/<FULL_HF_COMMIT_SHA>/ggml-base.en-q5_1.bin",
+  "model_artifact": "ggerganov/whisper.cpp:ggml-base.en-q5_1.bin",
+  "model_revision": "<FULL_HF_COMMIT_SHA>",
   "source_sha256": "9f2b8c1d...c41a",
   "audio": {
     "extract_command": "ffmpeg -nostdin -v error -i input.mp4 -ar 16000 -ac 1 -c:a pcm_s16le audio.wav",
@@ -230,7 +280,8 @@ Notes on the fields that are easy to get wrong:
 - **Record both a digest and a source for the weights.** A re-download from a
   different mirror, or a fresh re-quantization, can carry the same `base.en` /
   `q5_1` label and still hold different weights. The digest verifies a file
-  someone already has; the source tells them where to get the identical one.
+  someone already has; the artifact identity and immutable revision identify
+  the reviewed source without authorizing this skill to fetch it.
 - **The `audio` block is required only when the decoded audio is not the source
   file.** For a `.wav` fed straight in, `source_sha256` and `audio_sha256` are
   equal and the block can be omitted.

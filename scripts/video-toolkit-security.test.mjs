@@ -67,6 +67,23 @@ test('transcription and frame processing sandbox untrusted media and pin inputs'
   assert.match(frames, /grid_dir\.mkdir\(parents=True, exist_ok=True\)/u);
 });
 
+test('transcription uses preprovisioned artifacts instead of fetching executable code', () => {
+  const source = skill('video-transcribe');
+  assert.match(source, /must not download, clone, fetch, build,[\s\S]{0,40}or install whisper\.cpp/iu);
+  assert.match(source, /If either artifact is\s+missing, stop/iu);
+  assert.match(source, /WHISPER_BINARY_SHA256/u);
+  assert.match(source, /engine_binary_sha256/u);
+  assert.match(source, /"revision": "<FULL_HF_COMMIT_SHA>"/u);
+  assert.match(source, /"sha256": "<REVIEWED_MODEL_SHA256>"/u);
+  assert.match(source, /whisper-artifacts\.json/u);
+  assert.ok(source.includes('"$WHISPER_BIN" \\\n  -m "$MODEL_FILE"'));
+  assert.match(source, /directly from the verified manifest/iu);
+  assert.doesNotMatch(source, /git\s+(?:clone|fetch)/iu);
+  assert.doesNotMatch(source, /git\s+-C\s+whisper\.cpp\s+(?:fetch|remote|checkout)/iu);
+  assert.doesNotMatch(source, /\bcurl\b/iu);
+  assert.doesNotMatch(source, /https?:\/\/[^\s<>"']*(?:github\.com\/ggerganov\/whisper\.cpp|huggingface\.co)/iu);
+});
+
 test('cross-skill handoffs cover plugin and copied-skill installs', () => {
   const dashboard = skill('video-dashboard');
   const transcribe = skill('video-transcribe');
@@ -86,8 +103,7 @@ test('catalog and installable video plugin versions advance together', () => {
     readFileSync(join(ROOT, 'video-toolkit/.claude-plugin/plugin.json'), 'utf8'),
   );
   const listing = marketplace.plugins.find(({ name }) => name === 'video-toolkit');
-  assert.equal(marketplace.version, '2.3.0');
-  assert.equal(plugin.version, '1.0.1');
+  assert.equal(plugin.version, '1.0.2');
   assert.equal(listing?.version, plugin.version);
 });
 
