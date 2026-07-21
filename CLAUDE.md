@@ -323,10 +323,11 @@ Six rules keep it honest, all covered by tests in
 4. **A slug is lowercase letters, digits, and hyphens, checked when the entry
    is built.** The same string addresses an HTML attribute, a `docs/<slug>/`
    path, and a README link, so anything else is rejected rather than escaped.
-5. **A stamp destination has to resolve to the path that names it.** A symlink
-   at any segment of `docs/<slug>/index.html` would write through to a
-   different page under this slug's date, and CI would commit an edit that
-   appears nowhere in the diff.
+5. **A stamp destination has to resolve to the regular file that names it.**
+   This includes `docs/index.html`, `README.md`, and every
+   `docs/<slug>/index.html`. A symlink at any path segment could write through
+   to an unrelated file while CI commits an edit that appears nowhere in the
+   diff.
 6. **A README table is reshaped whole or not at all.** Adding a column to a
    table holding a row with an unescaped pipe makes that row exactly as wide as
    a good one, and the next run could no longer tell its last cell from a

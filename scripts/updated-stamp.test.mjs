@@ -7,7 +7,8 @@ import { join } from 'node:path';
 
 import {
   formatAbsolute, collectEntries, slugFromHref,
-  stampIndex, stampSkillPage, ensureScriptTag, ensureStyleLink, stampReadme, run,
+  stampIndex, stampSkillPage, hasScriptTag, hasStyleLink,
+  ensureScriptTag, ensureStyleLink, stampReadme, run,
 } from './updated-stamp.mjs';
 
 const ISO = '2026-07-07T09:17:25-04:00';
@@ -408,7 +409,7 @@ test('stampReadme leaves an untracked row blank rather than typing a placeholder
   const out = stampReadme(md, [entryFor('foia-requests')]).split('\n');
   assert.match(out[2], /\| Jul 7, 2026 \|$/);
   assert.match(out[3], /\|\s*\|$/);
-  assert.ok(!out[3].includes('—'), 'no em dash in a generated cell');
+  assert.ok(!out[3].includes('\u2014'), 'no em dash in a generated cell');
 });
 
 test('a healthy site stamps clean and reports no problems', () => {
@@ -505,4 +506,115 @@ test('stampReadme does not eat a date-like cell in a ragged row on the second pa
   assert.equal(once, md, 'first pass leaves it alone');
   assert.equal(twice, once, 'and so does the second');
   assert.ok(twice.includes('| Released | Jan 2, 2020 |'), 'the date-like text survives');
+});
+
+test('attribute lookup ignores attribute-shaped text inside quoted values', () => {
+  assert.equal(
+    hasScriptTag(`<script title='example src="../updated.js"'></script>`, '../updated.js'),
+    false,
+  );
+
+  const html = `<a title="x class='skill-card' href='foia-requests/'">not a card</a>`;
+  assert.equal(stampIndex(html, [entryFor('foia-requests')]), html);
+});
+
+test('top-level stamp destinations are refused when they are symlinks', () => {
+  const root = committedRepo(siteFiles('<h1>FOIA requests</h1>'));
+  const outside = mkdtempSync(join(tmpdir(), 'updated-stamp-victim-'));
+  const victimIndex = join(outside, 'index.html');
+  const victimReadme = join(outside, 'README.md');
+  const indexBefore = page('<h1>Unrelated index</h1>');
+  const readmeBefore = '# Unrelated README\n';
+  writeFileSync(victimIndex, indexBefore);
+  writeFileSync(victimReadme, readmeBefore);
+  rmSync(join(root, 'docs/index.html'));
+  rmSync(join(root, 'README.md'));
+  symlinkSync(victimIndex, join(root, 'docs/index.html'));
+  symlinkSync(victimReadme, join(root, 'README.md'));
+
+  const result = run({ repoRoot: root, quiet: true, log: () => {} });
+
+  assert.deepEqual(readFileSync(victimIndex, 'utf8'), indexBefore);
+  assert.deepEqual(readFileSync(victimReadme, 'utf8'), readmeBefore);
+  assert.ok(result.notFiles.includes('docs/index.html'));
+  assert.ok(result.notFiles.includes('README.md'));
+  assert.match(result.problems.join('\n'), /docs\/index\.html/);
+  assert.match(result.problems.join('\n'), /README\.md/);
+  rmSync(root, { recursive: true, force: true });
+  rmSync(outside, { recursive: true, force: true });
+});
+
+test('stylesheet detection treats rel as a whitespace-separated token list', () => {
+  assert.equal(hasStyleLink('<link rel="not-stylesheet" href="u.css">', 'u.css'), false);
+  assert.equal(hasStyleLink('<link rel="alternate-stylesheet" href="u.css">', 'u.css'), false);
+  assert.equal(hasStyleLink('<link rel="alternate stylesheet" href="u.css">', 'u.css'), true);
+});
+
+test('stampSkillPage replaces an uppercase owned tape instead of stacking it', () => {
+  const html = '<h1>x</h1>\n<P DATA-UPDATED-SLUG="foia-requests">Updated Jan 1, 2020</P>\n';
+  const out = stampSkillPage(html, entryFor('foia-requests'));
+
+  assert.equal((out.match(/data-updated-slug=/gi) || []).length, 1);
+  assert.ok(!out.includes('Jan 1, 2020'));
+  assert.match(out, /Jul 7, 2026/);
+});
+
+test('stampReadme supports GFM tables without outer pipes', () => {
+  const md = [
+    'Skill | Description',
+    '--- | ---',
+    '[foia-requests](./p/foia-requests/) | Records',
+  ].join('\n');
+  const once = stampReadme(md, [entryFor('foia-requests')]);
+
+  assert.equal(once, [
+    'Skill | Description | Updated',
+    '---|---|--------',
+    '[foia-requests](./p/foia-requests/) | Records | Jul 7, 2026',
+  ].join('\n'));
+  assert.equal(stampReadme(once, [entryFor('foia-requests')]), once);
+});
+
+test('slugFromHref resolves a dot-relative local card link', () => {
+  assert.equal(slugFromHref('./foia-requests/'), 'foia-requests');
+});
+
+test('script detection requires the exact script tag name', () => {
+  assert.equal(
+    hasScriptTag('<script-loader src="../updated.js"></script-loader>', '../updated.js'),
+    false,
+  );
+});
+
+test('stampIndex handles uppercase anchor tags and closing tags', () => {
+  const html = '<A class="skill-card" href="foia-requests/"><h3>FOIA</h3></A>';
+  const out = stampIndex(html, [entryFor('foia-requests')]);
+  assert.match(out, /data-updated-slug="foia-requests"/);
+  assert.ok(out.indexOf('updated-tape') < out.indexOf('</A>'));
+});
+
+test('stampSkillPage ignores headings inside inert template content', () => {
+  const html = '<template><h1>example</h1></template><header><h1>FOIA</h1></header>';
+  const out = stampSkillPage(html, entryFor('foia-requests'));
+
+  assert.ok(out.indexOf('updated-tape') > out.indexOf('<h1>FOIA</h1>'));
+  assert.ok(out.indexOf('updated-tape') > out.indexOf('</template>'));
+});
+
+test('asset detection ignores tags inside inert template content', () => {
+  const html = '<template><link rel="stylesheet" href="updated.css">'
+    + '<script src="updated.js"></script></template>';
+  assert.equal(hasStyleLink(html, 'updated.css'), false);
+  assert.equal(hasScriptTag(html, 'updated.js'), false);
+});
+
+test('tokenization ignores comments and raw script text', () => {
+  const comment = '<!-- <script src="updated.js"></script> -->';
+  const raw = '<script>const example = `<script src="updated.js"></script>`;</script>';
+  assert.equal(hasScriptTag(comment, 'updated.js'), false);
+  assert.equal(hasScriptTag(raw, 'updated.js'), false);
+
+  const pageWithExamples = `${comment}${raw}<main><h1>Real heading</h1></main>`;
+  const out = stampSkillPage(pageWithExamples, entryFor('foia-requests'));
+  assert.ok(out.indexOf('updated-tape') > out.indexOf('<h1>Real heading</h1>'));
 });

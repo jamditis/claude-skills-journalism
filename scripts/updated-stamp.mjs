@@ -163,7 +163,8 @@ export function collectEntries({ repoRoot = REPO_ROOT, dates = lastCommitISO } =
 export function slugFromHref(href) {
   const tree = href.match(/\/tree\/[^/]+\/([^/?#]+)\/?$/);
   if (tree) return decodeURIComponent(tree[1]);
-  if (/^[a-z0-9][a-z0-9-]*\/$/i.test(href)) return href.slice(0, -1);
+  const local = href.match(/^(?:\.\/)?([a-z0-9][a-z0-9-]*)\/$/i);
+  if (local) return local[1];
   return null;
 }
 
@@ -179,36 +180,174 @@ function tape(entry, variant) {
     + `Updated <time datetime="${entry.updated}">${absolute}</time></p>`;
 }
 
-// One attribute, consumed whole: either a run of plain characters, or a
-// complete quoted value. Scanning with [^>]* instead reads the inside of a
-// quoted value as if it were markup, so an unrelated attribute that merely
-// quotes the text `class="skill-card"` is mistaken for the real thing. Every
-// tag pattern in this file is built from it for that reason.
-const ATTRS = '(?:[^>"\']|"[^"]*"|\'[^\']*\')*';
+const RAW_TEXT_ELEMENTS = new Set(['script', 'style']);
+const VOID_ELEMENTS = new Set([
+  'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+  'link', 'meta', 'param', 'source', 'track', 'wbr',
+]);
 
-// Anchored on (?:^|\s) rather than \b, which sits between the "-" and the "s"
-// of data-src and so never excluded a prefixed attribute. An attribute can only
-// begin at the start of the run or after whitespace.
-const attr = (name, value) => `(?:^|\\s)${name}=(?:"${value}"|'${value}')`;
+/** Parse one tag's attributes without scanning inside quoted values. */
+function parseAttributes(source) {
+  const attrs = new Map();
+  let i = 0;
 
-/** Value of `name` within a tag's attribute text, or '' if it has none. */
-function attrValue(attrs, name) {
-  const m = attrs.match(new RegExp(`(?:^|\\s)${name}=(?:"([^"]*)"|'([^']*)')`, 'i'));
-  return m ? (m[1] ?? m[2]) : '';
+  while (i < source.length) {
+    while (/\s/.test(source[i] || '')) i += 1;
+    if (i >= source.length || source[i] === '/') break;
+
+    const start = i;
+    while (i < source.length && !/[\s=/>]/.test(source[i])) i += 1;
+    if (i === start) { i += 1; continue; }
+    const name = source.slice(start, i).toLowerCase();
+
+    while (/\s/.test(source[i] || '')) i += 1;
+    let value = '';
+    if (source[i] === '=') {
+      i += 1;
+      while (/\s/.test(source[i] || '')) i += 1;
+      if (source[i] === '"' || source[i] === "'") {
+        const quote = source[i++];
+        const valueStart = i;
+        while (i < source.length && source[i] !== quote) i += 1;
+        value = source.slice(valueStart, i);
+        if (source[i] === quote) i += 1;
+      } else {
+        const valueStart = i;
+        while (i < source.length && !/[\s>]/.test(source[i])) i += 1;
+        value = source.slice(valueStart, i);
+      }
+    }
+
+    // Browsers keep the first duplicate attribute. Matching that behavior
+    // prevents a later decoy from changing what this tool thinks the DOM sees.
+    if (!attrs.has(name)) attrs.set(name, value);
+  }
+  return attrs;
 }
 
-// Matches a stamp this tool owns, so a rewrite replaces rather than stacks.
-// Global: if a page somehow carried two stamps, clearing only the first would
-// leave a duplicate behind and quietly break idempotence.
-//
-// Keyed on the data attribute this tool owns, not on the exact serialization it
-// writes. Attribute order and quote style carry no meaning in HTML, so matching
-// the literal output would miss a tape a formatter had touched and append a
-// second one beside it, leaving a stale date with nothing reporting it.
-const TAPE_RE = new RegExp(
-  `[ \\t]*<p\\b${ATTRS}?${attr('data-updated-slug', '[^"\']*')}${ATTRS}>.*?</p>\\n?`,
-  'gs',
-);
+/** Find the closing angle bracket for a tag, respecting quoted values. */
+function tagEnd(html, from) {
+  let quote = null;
+  for (let i = from; i < html.length; i += 1) {
+    const char = html[i];
+    if (quote) {
+      if (char === quote) quote = null;
+    } else if (char === '"' || char === "'") {
+      quote = char;
+    } else if (char === '>') {
+      return i;
+    }
+  }
+  return -1;
+}
+
+/** Find an exact raw-text closing tag without treating script text as markup. */
+function rawTextClose(html, name, from) {
+  const lower = html.toLowerCase();
+  const needle = `</${name}`;
+  let at = lower.indexOf(needle, from);
+  while (at !== -1) {
+    if (/[\s/>]/.test(lower[at + needle.length] || '')) return at;
+    at = lower.indexOf(needle, at + needle.length);
+  }
+  return -1;
+}
+
+/**
+ * Tokenize the HTML surfaces this repository owns.
+ *
+ * This is deliberately small rather than a browser-grade parser: it recognizes
+ * real tag and attribute boundaries, skips comments and raw script/style text,
+ * pairs elements, and marks inert template content. Every stamper lookup uses
+ * these tokens so quoting, casing, and custom-element boundaries agree.
+ */
+function tokenizeHTML(html) {
+  const tags = [];
+  const pairs = new Map();
+  const stacks = new Map();
+  let templateDepth = 0;
+  let rawText = null;
+  let cursor = 0;
+
+  while (cursor < html.length) {
+    const start = rawText
+      ? rawTextClose(html, rawText, cursor)
+      : html.indexOf('<', cursor);
+    if (start === -1) break;
+
+    if (!rawText && html.startsWith('<!--', start)) {
+      const end = html.indexOf('-->', start + 4);
+      cursor = end === -1 ? html.length : end + 3;
+      continue;
+    }
+
+    let at = start + 1;
+    let closing = false;
+    if (html[at] === '/') { closing = true; at += 1; }
+    const nameStart = at;
+    while (/[A-Za-z0-9:-]/.test(html[at] || '')) at += 1;
+    if (at === nameStart || !/[\s/>]/.test(html[at] || '')) {
+      cursor = start + 1;
+      continue;
+    }
+
+    const name = html.slice(nameStart, at).toLowerCase();
+    const end = tagEnd(html, at);
+    if (end === -1) break;
+    const selfClosing = /\/\s*$/.test(html.slice(at, end)) || VOID_ELEMENTS.has(name);
+
+    if (closing && name === 'template') templateDepth = Math.max(0, templateDepth - 1);
+    const tag = {
+      name,
+      start,
+      end: end + 1,
+      closing,
+      selfClosing,
+      templateDepth,
+      attrs: closing ? new Map() : parseAttributes(html.slice(at, end)),
+    };
+    const index = tags.push(tag) - 1;
+
+    if (closing) {
+      const stack = stacks.get(name);
+      if (stack?.length) pairs.set(stack.pop(), index);
+      if (rawText === name) rawText = null;
+    } else if (!selfClosing) {
+      if (!stacks.has(name)) stacks.set(name, []);
+      stacks.get(name).push(index);
+      if (name === 'template') templateDepth += 1;
+      if (RAW_TEXT_ELEMENTS.has(name)) rawText = name;
+    }
+    cursor = end + 1;
+  }
+
+  return { tags, pairs };
+}
+
+/** Remove every stale stamp owned by this tool, regardless of tag casing. */
+function removeOwnedTapes(html) {
+  const { tags, pairs } = tokenizeHTML(html);
+  const ranges = [];
+  for (let i = 0; i < tags.length; i += 1) {
+    const tag = tags[i];
+    if (tag.closing || tag.name !== 'p' || !tag.attrs.has('data-updated-slug')) continue;
+    const closeIndex = pairs.get(i);
+    if (closeIndex === undefined) continue;
+
+    let start = tag.start;
+    const lineStart = html.lastIndexOf('\n', Math.max(0, start - 1)) + 1;
+    if (/^[ \t]*$/.test(html.slice(lineStart, start))) start = lineStart;
+    let end = tags[closeIndex].end;
+    if (html.startsWith('\r\n', end)) end += 2;
+    else if (html[end] === '\n') end += 1;
+    ranges.push([start, end]);
+  }
+
+  for (const [start, end] of ranges.sort((a, b) => b[0] - a[0])) {
+    html = html.slice(0, start) + html.slice(end);
+  }
+  return html;
+}
 
 /**
  * Leading whitespace of the line `index` sits on.
@@ -232,35 +371,31 @@ function indent(html, index) {
  */
 export function stampIndex(html, entries, { onSkip } = {}) {
   const bySlug = new Map(entries.map((e) => [e.slug, e]));
-  // Attribute-aware, like every other tag pattern here: an <a> carrying
-  // title="class='skill-card'" is not a card, and reading its class list as a
-  // list rather than a substring is what tells the two apart. Nested cards are
-  // not handled, because an <a> inside an <a> is invalid HTML no parser keeps.
-  const anchor = new RegExp(`<a\\b(${ATTRS})>`, 'g');
+  const { tags, pairs } = tokenizeHTML(html);
   let out = '';
   let cursor = 0;
-  let match;
 
-  while ((match = anchor.exec(html)) !== null) {
-    const attrs = match[1];
-    if (!attrValue(attrs, 'class').split(/\s+/).includes('skill-card')) continue;
-    const close = html.indexOf('</a>', match.index);
-    if (close === -1) continue;
-    const href = attrValue(attrs, 'href');
+  for (let i = 0; i < tags.length; i += 1) {
+    const anchor = tags[i];
+    if (anchor.closing || anchor.name !== 'a' || anchor.templateDepth > 0) continue;
+    if (!(anchor.attrs.get('class') || '').split(/\s+/).includes('skill-card')) continue;
+    const closeIndex = pairs.get(i);
+    if (closeIndex === undefined) continue;
+    const close = tags[closeIndex];
+    const href = anchor.attrs.get('href') || '';
     const slug = slugFromHref(href);
     const entry = slug ? bySlug.get(slug) : null;
 
-    let block = html.slice(match.index, close);
+    let block = html.slice(anchor.start, close.start);
     if (entry && entry.updated) {
-      block = block.replace(TAPE_RE, '');
-      const pad = indent(html, match.index);
+      block = removeOwnedTapes(block);
+      const pad = indent(html, anchor.start);
       block = `${block.replace(/\s*$/, '')}\n${pad}    ${tape(entry, 'card')}\n${pad}`;
     } else if (slug && !entry && onSkip) {
       onSkip({ href, slug });
     }
-    out += html.slice(cursor, match.index) + block;
-    cursor = close;
-    anchor.lastIndex = close;
+    out += html.slice(cursor, anchor.start) + block;
+    cursor = close.start;
   }
   return out + html.slice(cursor);
 }
@@ -272,10 +407,18 @@ export function stampIndex(html, entries, { onSkip } = {}) {
  * landmark every page shares.
  */
 export function stampSkillPage(html, entry) {
-  const cleaned = html.replace(TAPE_RE, '');
-  const close = cleaned.indexOf('</h1>');
-  if (close === -1) return null;
-  const at = close + '</h1>'.length;
+  const cleaned = removeOwnedTapes(html);
+  const { tags, pairs } = tokenizeHTML(cleaned);
+  let close;
+  for (let i = 0; i < tags.length; i += 1) {
+    const heading = tags[i];
+    if (heading.closing || heading.name !== 'h1' || heading.templateDepth > 0) continue;
+    const closeIndex = pairs.get(i);
+    if (closeIndex !== undefined) close = tags[closeIndex];
+    break;
+  }
+  if (!close) return null;
+  const at = close.end;
   const pad = indent(cleaned, at);
   const rest = cleaned.slice(at);
   // The tape always ends its own line, whatever the page looked like going in.
@@ -286,40 +429,45 @@ export function stampSkillPage(html, entry) {
   return `${cleaned.slice(0, at)}\n${pad}${tape(entry, 'hero')}${tail}`;
 }
 
-/** The attribute text of every <name ...> tag in the page. */
-function tags(html, name) {
-  const re = new RegExp(`<${name}\\b(${ATTRS})>`, 'gi');
-  return [...html.matchAll(re)].map((m) => m[1]);
-}
-
-/** Escapes a literal string for use inside a RegExp. */
-const reEscape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
 /**
  * Whether a page already loads this script.
  *
  * Looks for a real script element rather than the bare path, so a page that
- * merely mentions updated.js in prose does not read as one that loads it. A
- * tag written inside an HTML comment would still count; ruling that out needs
- * a parser, and these pages are generated, so the substring case is the one
- * worth closing. The insert and the later verify share this, so they cannot
- * disagree about whether the asset landed.
+ * merely mentions updated.js in prose, a comment, raw script text, or inert
+ * template content does not read as one that loads it. The insert and later
+ * verify share the tokenizer, so they cannot disagree about whether it landed.
  */
-export const hasScriptTag = (html, src) =>
-  tags(html, 'script').some((a) => new RegExp(attr('src', reEscape(src)), 'i').test(a));
+export const hasScriptTag = (html, src) => tokenizeHTML(html).tags.some((tag) =>
+  !tag.closing && tag.templateDepth === 0
+  && tag.name === 'script' && tag.attrs.get('src') === src);
+
+function insertBeforeClosingTag(html, name, markup) {
+  const tags = tokenizeHTML(html).tags;
+  let closing;
+  for (let i = tags.length - 1; i >= 0; i -= 1) {
+    if (tags[i].closing && tags[i].name === name && tags[i].templateDepth === 0) {
+      closing = tags[i];
+      break;
+    }
+  }
+  if (!closing) return html;
+  const pad = indent(html, closing.start);
+  return `${html.slice(0, closing.start)}${markup}\n${pad}${html.slice(closing.start)}`;
+}
 
 /** Adds <script src="../updated.js"> once, right before </body>. */
 export function ensureScriptTag(html, src) {
   if (hasScriptTag(html, src)) return html;
   const tag = `<script defer src="${src}"></script>`;
-  if (!html.includes('</body>')) return html;
-  return html.replace(/([ \t]*)<\/body>/, (_m, pad) => `${pad}${tag}\n${pad}</body>`);
+  return insertBeforeClosingTag(html, 'body', tag);
 }
 
 /** Whether a page already links this stylesheet. See hasScriptTag. */
-export const hasStyleLink = (html, href) => tags(html, 'link').some((a) =>
-  new RegExp(attr('href', reEscape(href)), 'i').test(a)
-  && new RegExp(attr('rel', '[^"\']*\\bstylesheet\\b[^"\']*'), 'i').test(a));
+export const hasStyleLink = (html, href) => tokenizeHTML(html).tags.some((tag) => {
+  if (tag.closing || tag.templateDepth > 0
+    || tag.name !== 'link' || tag.attrs.get('href') !== href) return false;
+  return (tag.attrs.get('rel') || '').toLowerCase().split(/\s+/).includes('stylesheet');
+});
 
 /**
  * Adds <link rel="stylesheet" href="../updated.css"> once, before </head>.
@@ -330,8 +478,7 @@ export const hasStyleLink = (html, href) => tags(html, 'link').some((a) =>
 export function ensureStyleLink(html, href) {
   if (hasStyleLink(html, href)) return html;
   const tag = `<link rel="stylesheet" href="${href}">`;
-  if (!html.includes('</head>')) return html;
-  return html.replace(/([ \t]*)<\/head>/, (_m, pad) => `${pad}${tag}\n${pad}</head>`);
+  return insertBeforeClosingTag(html, 'head', tag);
 }
 
 /**
@@ -351,21 +498,41 @@ export function stampReadme(md, entries, { onUnstamped } = {}) {
   const out = [];
   let i = 0;
 
-  const cells = (line) => line.replace(/^\||\|$/g, '').split(/(?<!\\)\|/);
-  const rebuild = (parts) => `| ${parts.map((p) => p.trim()).join(' | ')} |`;
+  const parseRow = (line) => {
+    const trimmed = line.trim();
+    if (!trimmed.includes('|')) return null;
+    const leading = trimmed.startsWith('|');
+    const trailing = /(?<!\\)\|$/.test(trimmed);
+    let content = trimmed;
+    if (leading) content = content.slice(1);
+    if (trailing) content = content.slice(0, -1);
+    return { cells: content.split(/(?<!\\)\|/), leading, trailing };
+  };
+  const cells = (line) => parseRow(line)?.cells || [];
+  const rebuild = (parts, shape) => {
+    const content = parts.map((part) => part.trim()).join(' | ');
+    return `${shape.leading ? '| ' : ''}${content}${shape.trailing ? ' |' : ''}`;
+  };
   // Separator rows keep the repo's unpadded style, so adding a column shows up
   // as one changed cell rather than a reformatted line.
-  const rebuildSeparator = (parts) => `|${parts.map((p) => p.trim()).join('|')}|`;
+  const rebuildSeparator = (parts, shape) => {
+    const content = parts.map((part) => part.trim()).join('|');
+    return `${shape.leading ? '|' : ''}${content}${shape.trailing ? '|' : ''}`;
+  };
+  const separator = (parsed) => parsed && parsed.cells.length > 1
+    && parsed.cells.every((cell) => /^\s*:?-{3,}:?\s*$/.test(cell));
 
   while (i < lines.length) {
     const header = lines[i];
     const sep = lines[i + 1] || '';
-    const isTable = /^\|.*\|$/.test(header.trim()) && /^\|[\s:|-]+\|$/.test(sep.trim());
+    const headerRow = parseRow(header);
+    const sepRow = parseRow(sep);
+    const isTable = headerRow && headerRow.cells.length > 1 && separator(sepRow);
     if (!isTable) { out.push(lines[i++]); continue; }
 
     const body = [];
     let j = i + 2;
-    while (j < lines.length && /^\|.*\|$/.test(lines[j].trim())) body.push(lines[j++]);
+    while (j < lines.length && (parseRow(lines[j])?.cells.length || 0) > 1) body.push(lines[j++]);
 
     const entryFor = (row) => {
       const first = cells(row)[0] || '';
@@ -398,8 +565,10 @@ export function stampReadme(md, entries, { onUnstamped } = {}) {
       continue;
     }
 
-    out.push(hasColumn ? header : rebuild([...headerCells, 'Updated']));
-    out.push(hasColumn ? sep : rebuildSeparator([...cells(sep).map((c) => c.trim()), '--------']));
+    out.push(hasColumn ? header : rebuild([...headerCells, 'Updated'], headerRow));
+    out.push(hasColumn ? sep : rebuildSeparator(
+      [...cells(sep).map((c) => c.trim()), '--------'], sepRow,
+    ));
 
     for (const row of body) {
       const parts = cells(row).map((c) => c.trim());
@@ -418,7 +587,9 @@ export function stampReadme(md, entries, { onUnstamped } = {}) {
       const entry = entryFor(row);
       // A row this tool does not track gets an empty cell, not a typed
       // placeholder glyph: blank reads as "no date" and adds no character.
-      out.push(rebuild([...parts, entry && entry.updated ? formatAbsolute(entry.updated) : '']));
+      out.push(rebuild(
+        [...parts, entry && entry.updated ? formatAbsolute(entry.updated) : ''], parseRow(row),
+      ));
     }
     i = j;
   }
@@ -461,6 +632,19 @@ function docsPagesFor(entries, repoRoot) {
   return { pages, notFiles };
 }
 
+/** Whether a top-level output is the regular file named by its repository path. */
+function isRegularDestination(repoRoot, file) {
+  let root;
+  let real;
+  try {
+    root = realpathSync(repoRoot);
+    real = realpathSync(join(repoRoot, file));
+  } catch {
+    return false;
+  }
+  return real === join(root, file) && statSync(real).isFile();
+}
+
 export function run({ repoRoot = REPO_ROOT, check = false, quiet = false, log = console.log } = {}) {
   const entries = collectEntries({ repoRoot });
   const undated = entries.filter((e) => !e.updated);
@@ -474,9 +658,9 @@ export function run({ repoRoot = REPO_ROOT, check = false, quiet = false, log = 
   };
 
   const indexPath = 'docs/index.html';
-  const indexHtml = readFileSync(join(repoRoot, indexPath), 'utf8');
   const skipped = [];
   const missingAssets = [];
+  const notFiles = [];
   // A page with no </head> or </body> would silently come back without the
   // stylesheet or script, leaving a stamp that never ages. Check rather than
   // trust the insertion.
@@ -488,14 +672,20 @@ export function run({ repoRoot = REPO_ROOT, check = false, quiet = false, log = 
     return next;
   };
 
-  write(indexPath, withAssets(
-    stampIndex(indexHtml, entries, { onSkip: (s) => skipped.push(s.slug) }),
-    '',
-    indexPath,
-  ));
+  if (isRegularDestination(repoRoot, indexPath)) {
+    const indexHtml = readFileSync(join(repoRoot, indexPath), 'utf8');
+    write(indexPath, withAssets(
+      stampIndex(indexHtml, entries, { onSkip: (s) => skipped.push(s.slug) }),
+      '',
+      indexPath,
+    ));
+  } else {
+    notFiles.push(indexPath);
+  }
 
   const missingH1 = [];
-  const { pages: docsPages, notFiles } = docsPagesFor(entries, repoRoot);
+  const { pages: docsPages, notFiles: unsafeDocsPages } = docsPagesFor(entries, repoRoot);
+  notFiles.push(...unsafeDocsPages);
   for (const { entry, page } of docsPages) {
     const file = relative(repoRoot, page);
     const stamped = stampSkillPage(readFileSync(page, 'utf8'), entry);
@@ -504,11 +694,16 @@ export function run({ repoRoot = REPO_ROOT, check = false, quiet = false, log = 
   }
 
   const unstampedRows = [];
-  write('README.md', stampReadme(
-    readFileSync(join(repoRoot, 'README.md'), 'utf8'),
-    entries,
-    { onUnstamped: (row) => unstampedRows.push(row.trim()) },
-  ));
+  const readmePath = 'README.md';
+  if (isRegularDestination(repoRoot, readmePath)) {
+    write(readmePath, stampReadme(
+      readFileSync(join(repoRoot, readmePath), 'utf8'),
+      entries,
+      { onUnstamped: (row) => unstampedRows.push(row.trim()) },
+    ));
+  } else {
+    notFiles.push(readmePath);
+  }
 
   if (!quiet) {
     log(`${entries.length} entries (${entries.filter((e) => e.type === 'plugin').length} plugins)`);
