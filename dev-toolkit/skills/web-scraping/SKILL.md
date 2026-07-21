@@ -57,6 +57,7 @@ from typing import Optional
 import requests
 from bs4 import BeautifulSoup
 import trafilatura
+from urllib.parse import urljoin
 
 #for .py files
 from playwright.sync_api import sync_playwright
@@ -64,6 +65,38 @@ from playwright.sync_api import sync_playwright
 #for .ipynb files
 import asyncio
 from playwright.async_api import async_playwright
+
+STOP_STATUS_CODES = {401, 403, 429}
+MAX_REDIRECTS = 5
+
+class AccessDeniedError(RuntimeError):
+    """The origin denied access; do not escalate to another scraper."""
+
+def fetch_public_response(url: str, *, headers: dict,
+                          timeout: int = 30) -> requests.Response:
+    """Follow a small redirect chain, validating every hop before fetching."""
+    current_url = url
+    for _ in range(MAX_REDIRECTS + 1):
+        current_url = validate_public_url(current_url)
+        response = requests.get(
+            current_url,
+            headers=headers,
+            timeout=timeout,
+            allow_redirects=False,
+        )
+        if response.status_code in STOP_STATUS_CODES:
+            response.close()
+            raise AccessDeniedError('The origin denied automated access')
+        if response.is_redirect:
+            location = response.headers.get('Location')
+            response.close()
+            if not location:
+                raise ValueError('Redirect response has no Location header')
+            current_url = urljoin(current_url, location)
+            continue
+        response.raise_for_status()
+        return response
+    raise ValueError('Redirect limit exceeded')
 
 class ScrapingResult:
     def __init__(self, content: str, title: str, method: str):
@@ -80,16 +113,11 @@ class TrafilaturaScraper(Scraper):
 
     def fetch(self, url: str) -> Optional[ScrapingResult]:
         try:
-            url = validate_public_url(url)
-            response = requests.get(
+            response = fetch_public_response(
                 url,
                 headers={'User-Agent': 'ResearchScraper/1.0 (+https://example.org/contact)'},
                 timeout=30,
-                allow_redirects=False,
             )
-            if response.is_redirect:
-                raise ValueError('Redirect target must be validated before fetching')
-            response.raise_for_status()
             downloaded = response.text
 
             content = trafilatura.extract(
@@ -108,6 +136,8 @@ class TrafilaturaScraper(Scraper):
             title_text = title.get_text() if title else ''
 
             return ScrapingResult(content, title_text, 'trafilatura')
+        except AccessDeniedError:
+            raise
         except Exception:
             return None
 
@@ -124,13 +154,7 @@ class RequestsScraper(Scraper):
         }
 
         try:
-            url = validate_public_url(url)
-            response = requests.get(
-                url, headers=headers, timeout=30, allow_redirects=False
-            )
-            if response.is_redirect:
-                raise ValueError('Redirect target must be validated before fetching')
-            response.raise_for_status()
+            response = fetch_public_response(url, headers=headers, timeout=30)
 
             soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -149,6 +173,8 @@ class RequestsScraper(Scraper):
                 return None
 
             return ScrapingResult(content, title_text, 'requests')
+        except AccessDeniedError:
+            raise
         except Exception:
             return None
 
@@ -162,11 +188,22 @@ class PlaywrightScraper(Scraper):
                 browser = p.chromium.launch(headless=True)
                 context = browser.new_context(
                     viewport={'width': 1920, 'height': 1080},
-                    user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    user_agent='ResearchScraper/1.0 (+https://example.org/contact)'
                 )
                 page = context.new_page()
 
-                page.goto(url, wait_until='networkidle', timeout=60000)
+                def allow_public_route(route):
+                    try:
+                        validate_public_url(route.request.url)
+                    except (OSError, ValueError):
+                        route.abort('blockedbyclient')
+                        return
+                    route.continue_()
+
+                page.route('**/*', allow_public_route)
+                response = page.goto(url, wait_until='networkidle', timeout=60000)
+                if response and response.status in STOP_STATUS_CODES:
+                    raise AccessDeniedError('The origin denied automated access')
                 validate_public_url(page.url)
 
                 # Wait for content to load
@@ -186,6 +223,8 @@ class PlaywrightScraper(Scraper):
                     return None
 
                 return ScrapingResult(content, title, 'playwright')
+        except AccessDeniedError:
+            raise
         except Exception:
             return None
 
@@ -203,11 +242,22 @@ class PlaywrightScraperAsync:
                 browser = await p.chromium.launch(headless=True)
                 context = await browser.new_context(
                     viewport={'width': 1920, 'height': 1080},
-                    user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    user_agent='ResearchScraper/1.0 (+https://example.org/contact)'
                 )
                 page = await context.new_page()
 
-                await page.goto(url, wait_until='networkidle', timeout=60000)
+                async def allow_public_route(route):
+                    try:
+                        validate_public_url(route.request.url)
+                    except (OSError, ValueError):
+                        await route.abort('blockedbyclient')
+                        return
+                    await route.continue_()
+
+                await page.route('**/*', allow_public_route)
+                response = await page.goto(url, wait_until='networkidle', timeout=60000)
+                if response and response.status in STOP_STATUS_CODES:
+                    raise AccessDeniedError('The origin denied automated access')
                 validate_public_url(page.url)
 
                 # Wait for content to load
@@ -227,6 +277,8 @@ class PlaywrightScraperAsync:
                     return None
 
                 return ScrapingResult(content, title, 'playwright_async')
+        except AccessDeniedError:
+            raise
         except Exception:
             return None
 
