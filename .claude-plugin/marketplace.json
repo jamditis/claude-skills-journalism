@@ -1,6 +1,6 @@
 {
   "name": "claude-skills-journalism",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Claude Code plugins for journalism, research, and media organizations",
   "owner": {
     "name": "Joe Amditis",
@@ -108,7 +108,7 @@
     },
     {
       "name": "superjawn",
-      "description": "Research-augmented fork of obra/superpowers. Default-on research phase at entry-point stages, narrow freshness check on stale-artifact consumers, pure consumer ports for the rest. v1.0.0 ships all 14 skills with no soft dependencies on the upstream superpowers plugin — code-reviewer agent dispatches now target pr-review-toolkit:code-reviewer.",
+      "description": "Research-augmented fork of obra/superpowers. Default-on research phase at entry-point stages, narrow freshness check on stale-artifact consumers, pure consumer ports for the rest. v1.0.0 ships all 14 skills with no soft dependencies on the upstream superpowers plugin \u2014 code-reviewer agent dispatches now target pr-review-toolkit:code-reviewer.",
       "version": "1.0.0",
       "author": {
         "name": "Joe Amditis",
@@ -118,8 +118,19 @@
       "category": "Productivity"
     },
     {
+      "name": "video-toolkit",
+      "description": "Four composable skills for social-video accountability reporting: downloading public video from Twitter/X, TikTok, YouTube, Instagram, and Facebook; transcribing it with a re-runnable provenance record; extracting and vision-analyzing frames; and aggregating the result into an interactive dashboard.",
+      "version": "1.0.1",
+      "author": {
+        "name": "Joe Amditis",
+        "email": "jamditis@gmail.com"
+      },
+      "source": "./video-toolkit",
+      "category": "Journalism"
+    },
+    {
       "name": "visual-explainer",
-      "description": "HTML diagrams, data tables, and architecture views — adapted from nicobailon/visual-explainer with journalism, newsroom, and academic design sensibilities. Generates self-contained HTML pages with Mermaid diagrams, responsive section navigation, KPI cards, slide decks, and zoom/pan controls. Useful for project recaps, architecture snapshots, post-mortem visualizations, and editorial dashboards.",
+      "description": "HTML diagrams, data tables, and architecture views \u2014 adapted from nicobailon/visual-explainer with journalism, newsroom, and academic design sensibilities. Generates self-contained HTML pages with Mermaid diagrams, responsive section navigation, KPI cards, slide decks, and zoom/pan controls. Useful for project recaps, architecture snapshots, post-mortem visualizations, and editorial dashboards.",
       "version": "0.7.1",
       "author": {
         "name": "Joe Amditis",
