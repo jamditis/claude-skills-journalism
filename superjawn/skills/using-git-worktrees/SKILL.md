@@ -9,6 +9,8 @@ v0.5.0 ports as a consumer category — no research phase per the v0.2.0
 architecture, since git worktree setup is a mechanical workspace utility, not
 a strategic decision; the strategic decisions belong to the skill that
 invokes this one.
+v0.6.0 adds the repository-wide standalone untrusted-content contract, so
+SKILL.md intentionally diverges from upstream parity.
 See CREDITS.md.
 -->
 

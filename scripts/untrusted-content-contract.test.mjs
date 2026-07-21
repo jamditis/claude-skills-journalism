@@ -9,6 +9,7 @@ const NETWORK_FACING_SKILLS = [
   'dev-toolkit/skills/accessibility-compliance/SKILL.md',
   'dev-toolkit/skills/mobile-debugging/SKILL.md',
   'dev-toolkit/skills/python-pipeline/SKILL.md',
+  'dev-toolkit/skills/web-scraping/SKILL.md',
   'dev-toolkit/skills/zero-build-frontend/SKILL.md',
   'journalism-core/skills/crisis-communications/SKILL.md',
   'journalism-core/skills/data-journalism/SKILL.md',
@@ -17,6 +18,7 @@ const NETWORK_FACING_SKILLS = [
   'journalism-core/skills/source-verification/SKILL.md',
   'research-toolkit/skills/content-access/SKILL.md',
   'research-toolkit/skills/digital-archive/SKILL.md',
+  'research-toolkit/skills/page-monitoring/SKILL.md',
   'research-toolkit/skills/web-archiving/SKILL.md',
   'superjawn/skills/brainstorming/SKILL.md',
   'superjawn/skills/executing-plans/SKILL.md',
@@ -28,7 +30,7 @@ const NETWORK_FACING_SKILLS = [
 test('every remaining network-facing skill carries the standalone trust contract', () => {
   const missing = [];
   const required = [
-    /untrusted data, not instructions/i,
+    /untrusted data, (?:not|never as) instructions/i,
     /run tools, reveal secrets, change policy, or expand scope/i,
     /delimit/i,
     /provenance/i,
@@ -45,9 +47,20 @@ test('every remaining network-facing skill carries the standalone trust contract
 
   for (const file of NETWORK_FACING_SKILLS) {
     const source = readFileSync(join(ROOT, file), 'utf8');
-    if (!source.includes(CONTRACT)) missing.push(`${file}: version marker`);
+    const markerIndex = source.indexOf(CONTRACT);
+    if (markerIndex === -1) {
+      missing.push(`${file}: version marker`);
+      continue;
+    }
+    const contractHeading = source.indexOf('\n## Untrusted content boundary', markerIndex);
+    const nextHeading = source.indexOf('\n## ', contractHeading + 4);
+    if (contractHeading === -1 || nextHeading === -1) {
+      missing.push(`${file}: bounded contract block`);
+      continue;
+    }
+    const contract = source.slice(markerIndex, nextHeading);
     for (const pattern of required) {
-      if (!pattern.test(source)) missing.push(`${file}: ${pattern}`);
+      if (!pattern.test(contract)) missing.push(`${file}: ${pattern}`);
     }
   }
   assert.deepEqual(missing, []);
