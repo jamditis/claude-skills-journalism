@@ -94,7 +94,7 @@ def copy_if_absent(src: Path, dst: Path, preserved: list[Path]) -> None:
 def root_index(title: str, sections: list[str]) -> str:
     nav = "\n".join(f"- [{s}]({s}/index.md)" for s in sections)
     return (
-        '---\nokf_version: "0.2"\n---\n'
+        '---\nokf_version: "0.3"\n---\n'
         f"# {title}\n\n"
         "An Open Knowledge Format bundle. One concept per file; provenance in each file's frontmatter.\n\n"
         "## Sections\n\n"

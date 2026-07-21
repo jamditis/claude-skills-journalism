@@ -88,7 +88,7 @@ making it here, up front, where it can steer the rest of the setup.
     hooks/okf-anchor.py   SessionStart: load the index into context
     hooks/okf-orient.py   PreToolUse: gate the first action on orientation
   bundle/                 the OKF bundle (the validated tree)
-    index.md              carries okf_version: "0.2"
+    index.md              carries okf_version: "0.3"
     <section>/
       index.md
       example-concept.md  a starter concept with full frontmatter
