@@ -105,11 +105,11 @@ Vary the choice each time. If the last diagram was dark and technical, make the 
 | Investigation map | CSS Grid cards + Mermaid | Connect entities, documents, and events in investigative work |
 | Story structure | CSS Grid | Visualize narrative arc, sections, sourcing distribution before publication |
 
-**Mermaid theming.** Always use `theme: 'base'` with custom `themeVariables` so colors match your page palette. Use `layout: 'elk'` for complex graphs (requires the `@mermaid-js/layout-elk` package — see `./references/libraries.md` for the CDN import). Override Mermaid's SVG classes with CSS for pixel-perfect control. See `./references/libraries.md` for full theming guide.
+**Mermaid theming.** Always use `theme: 'base'` with custom `themeVariables` so colors match your page palette. Use `layout: 'elk'` for complex graphs (requires the locally bundled `@mermaid-js/layout-elk` package — see `./references/libraries.md`). Override Mermaid's SVG classes with CSS for pixel-perfect control. See `./references/libraries.md` for the full theming guide.
 
 **Mermaid containers.** Always center Mermaid diagrams with `display: flex; justify-content: center;`. Add zoom controls (+/−/reset/expand) to every `.mermaid-wrap` container. Include the click-to-expand JavaScript so clicking the diagram (or the ⛶ button) opens it full-size in a new tab.
 
-**Never use bare `<pre class="mermaid">`.** It renders but has no zoom/pan controls — diagrams become tiny and unusable. Always use the journalism `mermaid-flowchart.html` pattern: a `.mermaid-wrap` container with `.zoom-controls` (+/−/reset/expand buttons) wrapping a `.mermaid` element. The container's CSS handles overflow and pan affordances; the bundled JS wires zoom buttons, ctrl+scroll wheel zoom, click-and-drag panning, and click-to-expand into a new tab. Copy the template wholesale rather than reconstructing the pattern.
+**Never use bare `<pre class="mermaid">`.** It renders but has no zoom/pan controls — diagrams become tiny and unusable. Always use the journalism `mermaid-flowchart.html` pattern: a `.mermaid-wrap` container with `.zoom-controls` (+/−/reset/expand buttons) wrapping a `.mermaid` element. The container's CSS handles overflow and pan affordances; the bundled JS wires zoom buttons, ctrl+scroll wheel zoom, click-and-drag panning, and click-to-expand into a new tab. Copy the template wholesale rather than reconstructing the pattern, and copy its sibling `templates/vendor/` directory so the pinned Mermaid import remains resolvable.
 
 **Mermaid scaling.** Diagrams with 10+ nodes render too small by default. For 10–12 nodes, increase `fontSize` in themeVariables to 18–20px and set `INITIAL_ZOOM` to 1.5–1.6. For 15+ elements, don't try to scale — use the hybrid pattern instead (simple Mermaid overview + CSS Grid cards). See "Architecture / system diagrams" below.
 
@@ -197,7 +197,7 @@ Put your primary aesthetic in `:root` and the alternate in the media query:
 
 **Surface depth creates hierarchy.** Vary card depth to signal what matters. Hero sections get elevated shadows and accent-tinted backgrounds (`ve-card--hero` pattern). Body content stays flat (default `.ve-card`). Code blocks and secondary content feel recessed (`ve-card--recessed`). See the depth tiers in `./references/css-patterns.md`. Don't make everything elevated — when everything pops, nothing does.
 
-**Animation earns its place.** Staggered fade-ins on page load are almost always worth it — they guide the eye through the diagram's hierarchy. Mix animation types by role: `fadeUp` for cards, `fadeScale` for KPIs and badges, `drawIn` for SVG connectors, `countUp` for hero numbers. Hover transitions on interactive-feeling elements make the diagram feel alive. Always respect `prefers-reduced-motion`. CSS transitions and keyframes handle most cases. For orchestrated multi-element sequences, anime.js via CDN is available (see `./references/libraries.md`).
+**Animation earns its place.** Staggered fade-ins on page load are almost always worth it — they guide the eye through the diagram's hierarchy. Mix animation types by role: `fadeUp` for cards, `fadeScale` for KPIs and badges, `drawIn` for SVG connectors, `countUp` for hero numbers. Hover transitions on interactive-feeling elements make the diagram feel alive. Always respect `prefers-reduced-motion`. CSS transitions and keyframes handle most cases. For orchestrated multi-element sequences, use the locally vendored anime.js asset in `./references/libraries.md`.
 
 **Forbidden animations:**
 - Animated glowing box-shadows (`@keyframes glow { box-shadow: 0 0 20px... }`) — this is AI slop
@@ -292,7 +292,7 @@ Cell content:
 Vertical or horizontal timeline with a central line (CSS pseudo-element). Phase markers as circles on the line. Content cards branching left/right (alternating) or all to one side. Date labels on the line. Color progression from past (muted) to future (vivid). Good for investigation timelines, event chronologies, project histories.
 
 ### Dashboard / metrics overview
-Card grid layout. Hero numbers large and prominent. Sparklines via inline SVG `<polyline>`. Progress bars via CSS `linear-gradient` on a div. For real charts (bar, line, pie), use **Chart.js via CDN** (see `./references/libraries.md`). KPI cards with trend indicators (up/down arrows, percentage deltas). Good for newsroom analytics, grant reporting dashboards, audience metrics.
+Card grid layout. Hero numbers large and prominent. Sparklines via inline SVG `<polyline>`. Progress bars via CSS `linear-gradient` on a div. For real charts (bar, line, pie), use the **locally vendored Chart.js asset** in `./references/libraries.md`. KPI cards with trend indicators (up/down arrows, percentage deltas). Good for newsroom analytics, grant reporting dashboards, audience metrics.
 
 ### Source network
 Map relationships between sources in an investigation or story. Can use Mermaid for connection-heavy maps or CSS Grid cards for detail-heavy source profiles. Include: source name, role, credibility indicators, what they provided, cross-references to other sources. Color-code by source category (official records, named human, anonymous, document, expert).
@@ -374,7 +374,11 @@ An alternative output format for presenting content as a magazine-quality slide 
 
 ## File structure
 
-Every diagram is a single self-contained `.html` file. No external assets except CDN links (fonts, optional libraries). Structure:
+Every diagram is a deployable `.html` file plus an optional local `vendor/`
+directory for lockfile-verified libraries. The Mermaid reference templates ship
+their required core bundle in `templates/vendor/`; preserve that sibling
+directory when copying a template. Do not fetch executable code from a runtime
+CDN. Structure:
 
 ```html
 <!DOCTYPE html>
@@ -512,7 +516,7 @@ If two or more of these are present, the page is slop. Regenerate with a differe
 - **journalism-core/editorial-workflow** — assignment tracking, deadline management
 - **journalism-core/fact-check-workflow** — claim verification
 - **dev-toolkit/accessibility-compliance** — WCAG compliance, accessible charts
-- **dev-toolkit/zero-build-frontend** — CDN patterns, React via esm.sh, Leaflet maps
+- **dev-toolkit/zero-build-frontend** — local dependency vendoring, React runtime bundles, Leaflet maps
 - **pdf-design** — print-ready documents with brand system
 
 ---
