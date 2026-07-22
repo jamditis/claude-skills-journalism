@@ -1,10 +1,15 @@
 {
   "name": "claude-skills-journalism",
   "version": "1.0.0",
-  "description": "A curated collection of Claude Code skills designed for journalists, researchers, academics, media professionals, and communications practitioners.",
+  "description": "Agent Skills for journalists, researchers, academics, media professionals, and communications practitioners.",
   "main": "index.js",
   "scripts": {
     "test": "node --test \"scripts/**/*.test.mjs\"",
+    "validate:agent-skills": "node scripts/validate-agent-skills.mjs",
+    "validate:agent-skills:upstream": "node scripts/validate-agent-skills.mjs --upstream",
+    "canary:journalism-core:claude": "node scripts/journalism-core-install-canary.mjs claude",
+    "canary:journalism-core:codex": "node scripts/journalism-core-install-canary.mjs codex",
+    "canary:journalism-core:codex-skills": "node scripts/journalism-core-install-canary.mjs codex-skills",
     "a11y": "node scripts/verify_a11y.mjs",
     "build:docs-css": "node scripts/docs-tailwind.mjs --write",
     "check:docs-css": "node scripts/docs-tailwind.mjs --check"

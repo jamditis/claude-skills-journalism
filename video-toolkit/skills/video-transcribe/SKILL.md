@@ -1,7 +1,6 @@
 ---
 name: video-transcribe
 description: This skill should be used when the user asks to "transcribe videos", "transcribe audio", "run Whisper on videos", "generate transcripts", "extract text from video audio", or needs batch audio transcription of downloaded video files with a re-runnable provenance record.
-argument-hint: "[optional: path to video directory or metadata.json]"
 ---
 
 # Video transcription with Whisper

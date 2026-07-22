@@ -1,7 +1,6 @@
 ---
 name: video-frames
 description: This skill should be used when the user asks to "extract frames", "analyze video frames", "get screenshots from videos", "run vision analysis on videos", "analyze on-screen text in videos", "create frame grids", or needs to extract and visually analyze frames from downloaded video files.
-argument-hint: "[optional: path to video directory or metadata.json]"
 ---
 
 # Frame extraction and vision analysis

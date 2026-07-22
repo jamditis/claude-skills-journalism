@@ -1,0 +1,60 @@
+name: Client compatibility canary
+
+on:
+  pull_request:
+    paths:
+      - '.claude-plugin/marketplace.json'
+      - 'journalism-core/**'
+      - 'scripts/journalism-core-install-canary.mjs'
+      - 'scripts/journalism-core-install-canary.test.mjs'
+      - '.github/workflows/compatibility-canary.yml'
+  schedule:
+    - cron: '23 11 * * 2'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  journalism-core-install:
+    name: ${{ matrix.client }} clean install
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - client: claude
+            package: '@anthropic-ai/claude-code@latest'
+            binary: claude
+          - client: codex
+            package: '@openai/codex@latest'
+            binary: codex
+          - client: codex-skills
+            package: 'skills@latest'
+            binary: skills
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22.20.0
+      - name: Install current client release
+        run: npm install --global "${{ matrix.package }}"
+      - name: Record client version
+        run: ${{ matrix.binary }} --version
+      - name: Run isolated package canary
+        run: node scripts/journalism-core-install-canary.mjs ${{ matrix.client }}
+
+  upstream-agent-skills:
+    name: Current upstream Agent Skills validator
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22.20.0
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+      - name: Validate with the current upstream revision
+        run: npm run validate:agent-skills:upstream

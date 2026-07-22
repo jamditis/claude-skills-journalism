@@ -8,8 +8,14 @@ on:
       - 'scripts/**/*.mjs'
       - '.claude-plugin/marketplace.json'
       - '**/.claude-plugin/plugin.json'
+      - '.agents/plugins/**'
+      - '**/.codex-plugin/**'
+      - '**/agents/openai.yaml'
+      - 'README.md'
+      - 'plans/codex-compatibility-matrix.md'
       - 'package.json'
       - 'package-lock.json'
+      - '.github/workflows/compatibility-canary.yml'
       - '.github/workflows/skill-lint.yml'
 
 permissions:
@@ -20,43 +26,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
 
-      - name: Validate skill frontmatter
+      - name: Validate Agent Skills metadata
+        run: npm run validate:agent-skills
+
+      - name: Validate hook frontmatter
         run: |
           errors=0
 
-          # Check all top-level and plugin-nested SKILL.md files.
-          while IFS= read -r -d '' skill_file; do
-            skill_file="${skill_file#./}"
-
-            # Check frontmatter exists
-            if ! head -1 "$skill_file" | grep -q '^---$'; then
-              echo "ERROR: $skill_file - missing YAML frontmatter"
-              errors=$((errors + 1))
-              continue
-            fi
-
-            # Extract frontmatter
-            frontmatter=$(sed -n '/^---$/,/^---$/p' "$skill_file" | sed '1d;$d')
-
-            # Check required fields
-            if ! echo "$frontmatter" | grep -q '^name:'; then
-              echo "ERROR: $skill_file - missing 'name' in frontmatter"
-              errors=$((errors + 1))
-            fi
-
-            if ! echo "$frontmatter" | grep -q '^description:'; then
-              echo "ERROR: $skill_file - missing 'description' in frontmatter"
-              errors=$((errors + 1))
-            fi
-
-            echo "OK: $skill_file"
-          done < <(find . -type f -name SKILL.md \
-            -not -path './.git/*' \
-            -not -path './node_modules/*' \
-            -print0)
-
-          # Check hook files
+          # Check hook files.
           for hook_file in hooks/*.md; do
             [ -f "$hook_file" ] || continue
 
@@ -88,7 +70,7 @@ jobs:
           fi
 
           echo ""
-          echo "All skills and hooks validated"
+          echo "All hooks validated"
 
   check-readme:
     runs-on: ubuntu-latest

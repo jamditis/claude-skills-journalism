@@ -76,7 +76,7 @@ test('transcription uses preprovisioned artifacts instead of fetching executable
   assert.match(source, /"revision": "<FULL_HF_COMMIT_SHA>"/u);
   assert.match(source, /"sha256": "<REVIEWED_MODEL_SHA256>"/u);
   assert.match(source, /whisper-artifacts\.json/u);
-  assert.ok(source.includes('"$WHISPER_BIN" \\\n  -m "$MODEL_FILE"'));
+  assert.match(source, /"\$WHISPER_BIN" \\\r?\n  -m "\$MODEL_FILE"/u);
   assert.match(source, /directly from the verified manifest/iu);
   assert.doesNotMatch(source, /git\s+(?:clone|fetch)/iu);
   assert.doesNotMatch(source, /git\s+-C\s+whisper\.cpp\s+(?:fetch|remote|checkout)/iu);
@@ -103,7 +103,7 @@ test('catalog and installable video plugin versions advance together', () => {
     readFileSync(join(ROOT, 'video-toolkit/.claude-plugin/plugin.json'), 'utf8'),
   );
   const listing = marketplace.plugins.find(({ name }) => name === 'video-toolkit');
-  assert.equal(plugin.version, '1.0.2');
+  assert.equal(plugin.version, '1.0.3');
   assert.equal(listing?.version, plugin.version);
 });
 
@@ -119,12 +119,13 @@ test('dashboard uses local reviewed code, DOM-safe rendering, and loopback previ
   assert.match(source, /--bind 127\.0\.0\.1 8888/u);
 });
 
-test('skill CI discovers nested plugin skills and runs regression tests', () => {
+test('skill CI runs pinned standards validation and regression tests', () => {
   const workflow = readFileSync(join(ROOT, '.github/workflows/skill-lint.yml'), 'utf8');
   assert.match(workflow, /'\*\*\/SKILL\.md'/u);
   assert.match(workflow, /'scripts\/\*\*\/\*\.mjs'/u);
   assert.match(workflow, /'\.claude-plugin\/marketplace\.json'/u);
   assert.match(workflow, /'\*\*\/\.claude-plugin\/plugin\.json'/u);
-  assert.match(workflow, /find \. -type f -name SKILL\.md/u);
+  assert.match(workflow, /astral-sh\/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9/u);
+  assert.match(workflow, /npm run validate:agent-skills/u);
   assert.match(workflow, /npm test/u);
 });

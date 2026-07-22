@@ -1,5 +1,15 @@
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
@@ -58,4 +68,48 @@ test('docs Tailwind build inputs and CI freshness gate are pinned', () => {
   const builder = readFileSync(join(ROOT, 'scripts/docs-tailwind.mjs'), 'utf8');
   assert.match(builder, /fileURLToPath\(new URL\('\.\.', import\.meta\.url\)\)/u);
   assert.doesNotMatch(builder, /import\.meta\.url\)\.pathname/u);
+});
+
+test('docs Tailwind freshness check accepts a CRLF checkout', () => {
+  const fixtureRoot = mkdtempSync(join(ROOT, '.tmp-docs-tailwind-'));
+
+  try {
+    mkdirSync(join(fixtureRoot, 'scripts'));
+    mkdirSync(join(fixtureRoot, 'docs', 'assets', 'tailwind'), { recursive: true });
+
+    const manifest = JSON.parse(readFileSync(join(DOCS, 'tailwind-pages.json'), 'utf8'));
+    const lf = (source) => source.replaceAll('\r\n', '\n');
+    const crlf = (source) => lf(source).replaceAll('\n', '\r\n');
+
+    writeFileSync(
+      join(fixtureRoot, 'scripts', 'docs-tailwind.mjs'),
+      readFileSync(join(ROOT, 'scripts', 'docs-tailwind.mjs'), 'utf8'),
+    );
+    writeFileSync(
+      join(fixtureRoot, 'docs', 'tailwind-pages.json'),
+      JSON.stringify({ 'index.html': manifest['index.html'] }),
+    );
+    writeFileSync(
+      join(fixtureRoot, 'docs', 'tailwind-input.css'),
+      lf(readFileSync(join(DOCS, 'tailwind-input.css'), 'utf8')),
+    );
+    writeFileSync(
+      join(fixtureRoot, 'docs', 'index.html'),
+      lf(readFileSync(join(DOCS, 'index.html'), 'utf8')),
+    );
+    writeFileSync(
+      join(fixtureRoot, 'docs', 'assets', 'tailwind', 'index.css'),
+      crlf(readFileSync(join(DOCS, 'assets', 'tailwind', 'index.css'), 'utf8')),
+    );
+
+    const result = spawnSync(process.execPath, ['scripts/docs-tailwind.mjs', '--check'], {
+      cwd: fixtureRoot,
+      encoding: 'utf8',
+    });
+
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /Verified 1 page-specific Tailwind stylesheet/u);
+  } finally {
+    rmSync(fixtureRoot, { recursive: true, force: true });
+  }
 });
