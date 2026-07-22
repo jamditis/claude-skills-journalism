@@ -83,7 +83,7 @@ Do not clone the repo directly into `~/.claude/skills/journalism-skills/` — th
 
 ### Codex
 
-**Prerequisite:** Install [Codex](https://learn.chatgpt.com/docs/get-started). Run `codex --version` in your terminal to check.
+**Prerequisite:** Install [Codex CLI](https://learn.chatgpt.com/docs/codex/cli). Run `codex --version` in your terminal to check.
 
 For a new Codex setup, install standards-based skills with the `skills` CLI. This user-level command makes the 14 core skills available across your Codex projects:
 
@@ -92,7 +92,7 @@ npx skills@latest add https://github.com/jamditis/claude-skills-journalism/tree/
   --skill '*' --agent codex --copy -g -y
 ```
 
-That command installs `journalism-core` through the shared `.agents/skills` location. Remove `-g` to keep the skills in one project and record their source and content hashes in that project's `skills-lock.json`. To install one skill instead:
+That command installs `journalism-core` in Codex's documented user skill directory, `~/.agents/skills`. The clean-install canary checks that exact global destination. Remove `-g` to install into the current project's `.agents/skills` directory and record the source and content hashes in that project's `skills-lock.json`. To install one skill instead:
 
 ```bash
 npx skills@latest add jamditis/claude-skills-journalism \

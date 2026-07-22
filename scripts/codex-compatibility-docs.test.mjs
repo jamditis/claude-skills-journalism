@@ -65,7 +65,10 @@ test('the README routes Codex users without implying mixed-install support', () 
   const readme = readFileSync(join(ROOT, 'README.md'), 'utf8');
 
   assert.match(readme, /^# Journalism agent skills$/mu);
+  assert.match(readme, /https:\/\/learn\.chatgpt\.com\/docs\/codex\/cli/u);
+  assert.doesNotMatch(readme, /https:\/\/learn\.chatgpt\.com\/docs\/get-started/u);
   assert.match(readme, /npx skills@latest add[\s\S]*journalism-core[\s\S]*--agent codex --copy -g -y/u);
+  assert.match(readme, /`~\/\.agents\/skills`/u);
   assert.match(readme, /codex plugin marketplace add jamditis\/claude-skills-journalism/u);
   assert.match(readme, /codex plugin add journalism-core@claude-skills-journalism/u);
   assert.match(readme, /use only one Codex installation path/u);

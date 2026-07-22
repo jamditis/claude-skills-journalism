@@ -1,7 +1,7 @@
 # Codex compatibility matrix
 
 - Status: phase-one installation baseline; runtime pilots pending
-- Last evidence update: July 21, 2026
+- Last evidence update: July 22, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
 ## How to read this matrix
@@ -145,6 +145,22 @@ manual check used the public GitHub `journalism-core` subdirectory URL and
 produced the same installed set. The scheduled workflow exercises the current
 skills CLI release.
 
+### S-global-phase-1: user-level journalism-core standards canary
+
+Environment: a disposable home directory and a separate disposable project
+directory. The canary sets both `HOME` and `USERPROFILE` so the install cannot
+write to the runner's real user directory.
+
+```bash
+npm run canary:journalism-core:codex-skills-global
+```
+
+Result on skills CLI 1.5.20: all 14 skills and 17 files were copied to
+`~/.agents/skills`, their hashes matched the source, and no file was written to
+the disposable project's `.agents/skills` directory. This is Codex's documented
+user-level discovery path. The scheduled workflow exercises the current skills
+CLI release.
+
 ### V-base-1: Agent Skills validation
 
 Environment: disposable checkout at the source baseline. Windows runs set
@@ -230,12 +246,14 @@ npm test
 npm run check:docs-css
 ```
 
-Result: 110 of 110 tests passed on Linux and all 49 page-specific Tailwind
-stylesheets were current. The Windows staging run passed 109 tests with the one
-NTFS-impossible colon fixture skipped. Actionlint 1.7.12 accepted both changed
-workflow files, `git diff --check` passed, and strict Claude marketplace
-validation passed on Claude Code 2.1.215. The Windows CSS freshness check also
-verified all 49 stylesheets after line endings were normalized for comparison.
+Result: 114 of 114 tests passed on Linux and all 49 page-specific Tailwind
+stylesheets were current. The added adversarial fixtures reject linked install
+roots, linked skill resources, and Windows shell parsing of client arguments.
+The earlier Windows staging run passed 109 tests with the one NTFS-impossible
+colon fixture skipped. Actionlint 1.7.12 accepted both changed workflow files,
+`git diff --check` passed, and strict Claude marketplace validation passed on
+Claude Code 2.1.215. The Windows CSS freshness check also verified all 49
+stylesheets after line endings were normalized for comparison.
 
 ## Package matrix
 
@@ -243,7 +261,7 @@ verified all 49 stylesheets after line endings were normalized for comparison.
 |---|---|---|---|---|---|
 | `autocontext` | 1.1.0; no skills; five commands; one agent; six hook files | Claude-only surface | Include nothing in the Codex claim. Commands, curator agent, hook lifecycle, persisted data, and compatibility environment variables need a separate design. | [I-phase-1](#i-phase-1-package-inventory) | Define state, lifecycle, authority, and uninstall contracts in a separate accepted decision. |
 | `dev-toolkit` | 1.1.1; 11 nested skills | Candidate with adapter review | Instruction-led skills may be shared. Exclude Claude tool vocabulary, `CLAUDE.md` updates, hook wiring, and Claude subagent syntax until tested. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Classify each skill; add explicit trigger and non-trigger fixtures for the portable subset. |
-| `journalism-core` | 1.2.0; 14 nested skills | Baseline installed through three paths | Include the 14 shared skills. No commands, agents, or hooks are part of this package. Runtime support remains unclaimed. | [C-phase-1](#c-phase-1-repeatable-claude-install-canary), [K-phase-1](#k-phase-1-repeatable-codex-legacy-package-canary), [S-phase-1](#s-phase-1-full-journalism-core-standards-canary), [V-phase-1](#v-phase-1-repaired-standards-baseline) | Run J-core-1 through J-core-3 in fresh Claude and Codex sessions and verify installed resource resolution. |
+| `journalism-core` | 1.2.0; 14 nested skills | Baseline installed through four paths | Include the 14 shared skills. No commands, agents, or hooks are part of this package. Runtime support remains unclaimed. | [C-phase-1](#c-phase-1-repeatable-claude-install-canary), [K-phase-1](#k-phase-1-repeatable-codex-legacy-package-canary), [S-phase-1](#s-phase-1-full-journalism-core-standards-canary), [S-global-phase-1](#s-global-phase-1-user-level-journalism-core-standards-canary), [V-phase-1](#v-phase-1-repaired-standards-baseline) | Run J-core-1 through J-core-3 in fresh Claude and Codex sessions and verify installed resource resolution. |
 | `okf-wiki` | 0.6.1; one root skill; scripts and generated Claude settings | Adapter required | Preserve OKF scaffolding, validation, examples, and tests. Exclude Codex project settings until the no-Claude behavior test defines the needed branch. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; [R-phase-1](#r-phase-1-phase-one-repository-checks) covers package tests | Run Okf-1 without Claude installed; record generated files, trust behavior, and cleanup. |
 | `pdf-design` | 1.1.0; one root skill | Adapter required | Shared design guidance and assets are candidates. Hard-coded `~/.claude` and host-specific browser paths are excluded from a Codex claim. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add a no-Claude path-resolution fixture before editing paths. |
 | `pdf-playground` | 1.3.2; one nested skill; eight commands; one hook file | Candidate plus Claude-only surfaces | `document-design` is shared. Commands and hook behavior remain Claude-only until mapped. | [V-phase-1](#v-phase-1-repaired-standards-baseline) and [F-phase-1](#f-phase-1-affected-claude-package-regression); standards, Claude install, and argument delivery pass | Test Codex activation, non-activation, resource loading, and output before a runtime claim. |

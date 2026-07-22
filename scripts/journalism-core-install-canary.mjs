@@ -1,5 +1,14 @@
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
-import { basename, isAbsolute, join, relative, resolve } from 'node:path';
+import {
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+} from 'node:fs';
+import { basename, isAbsolute, join, relative, resolve, sep, win32 } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
@@ -69,6 +78,27 @@ export function buildCommandPlan(client, repoRoot, tempRoot) {
     };
   }
 
+  if (client === 'codex-skills-global') {
+    return {
+      cwd: join(tempRoot, 'project'),
+      globalHome: join(tempRoot, 'home'),
+      commands: [[
+        'skills',
+        [
+          'add',
+          join(repoRoot, 'journalism-core'),
+          '--skill',
+          '*',
+          '--agent',
+          'codex',
+          '--copy',
+          '-g',
+          '-y',
+        ],
+      ]],
+    };
+  }
+
   throw new Error(`Unsupported client: ${client}`);
 }
 
@@ -86,6 +116,11 @@ function findFiles(directory, root = directory, files = []) {
     const path = join(directory, entry.name);
     if (entry.isDirectory()) findFiles(path, root, files);
     else if (entry.isFile()) files.push(relative(root, path).replaceAll('\\', '/'));
+    else if (entry.isSymbolicLink()) {
+      throw new Error(
+        `Found linked skill resource: ${relative(root, path).replaceAll('\\', '/')}`,
+      );
+    }
   }
   return files.sort();
 }
@@ -108,9 +143,30 @@ export function verifyCopiedSkillTree(sourceSkillsPath, installedSkillsPath) {
   return { fileCount: sourceFiles.length };
 }
 
-function assertPathInside(root, candidate) {
-  const pathFromRoot = relative(resolve(root), resolve(candidate));
+export function assertPathInside(root, candidate) {
+  const resolvedRoot = resolve(root);
+  const resolvedCandidate = resolve(candidate);
+  const pathFromRoot = relative(resolvedRoot, resolvedCandidate);
   if (!pathFromRoot || pathFromRoot.startsWith('..') || isAbsolute(pathFromRoot)) {
+    throw new Error(`Install path escaped the disposable client home: ${candidate}`);
+  }
+
+  let current = resolvedRoot;
+  for (const component of ['', ...pathFromRoot.split(sep)]) {
+    if (component) current = join(current, component);
+    if (lstatSync(current).isSymbolicLink()) {
+      throw new Error(`Install path used a linked path component: ${current}`);
+    }
+  }
+
+  const realRoot = realpathSync(resolvedRoot);
+  const realCandidate = realpathSync(resolvedCandidate);
+  const realPathFromRoot = relative(realRoot, realCandidate);
+  if (
+    !realPathFromRoot
+    || realPathFromRoot.startsWith('..')
+    || isAbsolute(realPathFromRoot)
+  ) {
     throw new Error(`Install path escaped the disposable client home: ${candidate}`);
   }
 }
@@ -176,24 +232,26 @@ function verifySourceContract(repoRoot) {
   if (nativeManifest) throw new Error(`Phase one must not add a native Codex manifest: ${nativeManifest}`);
 }
 
-function verifyStandardsInstall(tempRoot, sourceSkillsPath) {
-  const skillsPath = join(tempRoot, '.agents', 'skills');
+export function verifyStandardsInstall(installRoot, sourceSkillsPath, lockPath) {
+  const skillsPath = join(installRoot, '.agents', 'skills');
   if (!existsSync(skillsPath)) throw new Error('Standards install did not create .agents/skills');
+  assertPathInside(installRoot, skillsPath);
   const skillNames = findSkillNames(skillsPath);
   if (JSON.stringify(skillNames) !== JSON.stringify(EXPECTED_SKILL_NAMES)) {
     throw new Error(`The installed skill set did not match journalism-core: ${skillNames.join(', ')}`);
   }
 
-  const lockPath = join(tempRoot, 'skills-lock.json');
-  if (!existsSync(lockPath)) throw new Error('Standards install did not create skills-lock.json');
-  const lock = JSON.parse(readFileSync(lockPath, 'utf8'));
-  const lockNames = Object.keys(lock.skills ?? {}).sort();
-  if (JSON.stringify(lockNames) !== JSON.stringify(EXPECTED_SKILL_NAMES)) {
-    throw new Error(`The standards lock did not match journalism-core: ${lockNames.join(', ')}`);
-  }
-  for (const [name, record] of Object.entries(lock.skills)) {
-    if (!/^[a-f0-9]{64}$/u.test(record.computedHash ?? '')) {
-      throw new Error(`The standards lock has no content hash for ${name}`);
+  if (lockPath) {
+    if (!existsSync(lockPath)) throw new Error('Standards install did not create skills-lock.json');
+    const lock = JSON.parse(readFileSync(lockPath, 'utf8'));
+    const lockNames = Object.keys(lock.skills ?? {}).sort();
+    if (JSON.stringify(lockNames) !== JSON.stringify(EXPECTED_SKILL_NAMES)) {
+      throw new Error(`The standards lock did not match journalism-core: ${lockNames.join(', ')}`);
+    }
+    for (const [name, record] of Object.entries(lock.skills)) {
+      if (!/^[a-f0-9]{64}$/u.test(record.computedHash ?? '')) {
+        throw new Error(`The standards lock has no content hash for ${name}`);
+      }
     }
   }
 
@@ -202,12 +260,52 @@ function verifyStandardsInstall(tempRoot, sourceSkillsPath) {
   return { installPath: skillsPath, skillNames, fileCount: copied.fileCount };
 }
 
+function findWindowsPowerShellShim(command, env) {
+  const searchPath = env.Path ?? env.PATH ?? '';
+  for (const rawDirectory of searchPath.split(';')) {
+    const directory = rawDirectory.replace(/^"|"$/gu, '');
+    if (!directory) continue;
+    const candidate = win32.join(directory, `${command}.ps1`);
+    if (existsSync(candidate)) return candidate;
+  }
+  throw new Error(`Could not find the Windows PowerShell shim for ${command}`);
+}
+
+export function buildCommandInvocation(
+  command,
+  args,
+  {
+    platform = process.platform,
+    env = process.env,
+    findShim = findWindowsPowerShellShim,
+  } = {},
+) {
+  if (platform !== 'win32') return { command, args };
+  const powershell = env.SystemRoot
+    ? win32.join(env.SystemRoot, 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe')
+    : 'powershell.exe';
+  return {
+    command: powershell,
+    args: [
+      '-NoLogo',
+      '-NoProfile',
+      '-NonInteractive',
+      '-ExecutionPolicy',
+      'Bypass',
+      '-File',
+      findShim(command, env),
+      ...args,
+    ],
+  };
+}
+
 function runCommand(command, args, env, cwd) {
-  const result = spawnSync(command, args, {
+  const invocation = buildCommandInvocation(command, args, { env });
+  const result = spawnSync(invocation.command, invocation.args, {
     cwd,
     encoding: 'utf8',
     env,
-    shell: process.platform === 'win32',
+    shell: false,
     timeout: SUBPROCESS_TIMEOUT_MS,
     windowsHide: true,
   });
@@ -240,14 +338,34 @@ export function runInstallCanary(client, repoRoot) {
   const plan = buildCommandPlan(client, sourceRoot, tempRoot);
   const env = { ...process.env, DISABLE_TELEMETRY: '1', DO_NOT_TRACK: '1' };
   if (plan.envName) env[plan.envName] = tempRoot;
+  if (plan.cwd) mkdirSync(plan.cwd, { recursive: true });
+  if (plan.globalHome) {
+    mkdirSync(plan.globalHome, { recursive: true });
+    env.HOME = plan.globalHome;
+    env.USERPROFILE = plan.globalHome;
+  }
 
   try {
     const outputs = plan.commands.map(([command, args]) => runCommand(command, args, env, plan.cwd));
     const sourceSkillsPath = join(sourceRoot, 'journalism-core', 'skills');
     if (client === 'codex-skills') {
-      const result = verifyStandardsInstall(tempRoot, sourceSkillsPath);
+      const result = verifyStandardsInstall(
+        tempRoot,
+        sourceSkillsPath,
+        join(tempRoot, 'skills-lock.json'),
+      );
       console.log(
         `PASS codex standards path: ${result.skillNames.length} skills and ${result.fileCount} files`,
+      );
+      return result;
+    }
+    if (client === 'codex-skills-global') {
+      if (existsSync(join(plan.cwd, '.agents', 'skills'))) {
+        throw new Error('Global standards install wrote into the disposable project');
+      }
+      const result = verifyStandardsInstall(plan.globalHome, sourceSkillsPath);
+      console.log(
+        `PASS codex global standards path: ${result.skillNames.length} skills and ${result.fileCount} files`,
       );
       return result;
     }
@@ -279,8 +397,11 @@ export function runInstallCanary(client, repoRoot) {
 
 function runCli() {
   const client = process.argv[2];
-  if (!['claude', 'codex', 'codex-skills'].includes(client)) {
-    console.error('Usage: node scripts/journalism-core-install-canary.mjs <claude|codex|codex-skills>');
+  if (!['claude', 'codex', 'codex-skills', 'codex-skills-global'].includes(client)) {
+    console.error(
+      'Usage: node scripts/journalism-core-install-canary.mjs '
+      + '<claude|codex|codex-skills|codex-skills-global>',
+    );
     process.exitCode = 2;
     return;
   }

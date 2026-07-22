@@ -1,5 +1,12 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import test from 'node:test';
@@ -7,9 +14,12 @@ import test from 'node:test';
 import {
   EXPECTED_SKILL_NAMES,
   SUBPROCESS_TIMEOUT_MS,
+  assertPathInside,
+  buildCommandInvocation,
   buildCommandPlan,
   verifyCopiedSkillTree,
   verifyInstalledPackage,
+  verifyStandardsInstall,
 } from './journalism-core-install-canary.mjs';
 
 test('Claude and Codex canaries use isolated config homes and local source', () => {
@@ -47,6 +57,25 @@ test('Claude and Codex canaries use isolated config homes and local source', () 
         '--agent',
         'codex',
         '--copy',
+        '-y',
+      ],
+    ]],
+  });
+
+  assert.deepEqual(buildCommandPlan('codex-skills-global', repo, home), {
+    cwd: join(home, 'project'),
+    globalHome: join(home, 'home'),
+    commands: [[
+      'skills',
+      [
+        'add',
+        join(repo, 'journalism-core'),
+        '--skill',
+        '*',
+        '--agent',
+        'codex',
+        '--copy',
+        '-g',
         '-y',
       ],
     ]],
@@ -126,6 +155,86 @@ test('the canary rejects missing or changed installed resources', (t) => {
   );
 });
 
+test('install containment rejects linked paths that escape the disposable home', (t) => {
+  const root = mkdtempSync(join(tmpdir(), 'journalism-core-containment-test-'));
+  const outside = mkdtempSync(join(tmpdir(), 'journalism-core-outside-test-'));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  t.after(() => rmSync(outside, { recursive: true, force: true }));
+  mkdirSync(join(outside, 'journalism-core'));
+  symlinkSync(outside, join(root, 'plugins'), 'dir');
+
+  assert.throws(
+    () => assertPathInside(root, join(root, 'plugins', 'journalism-core')),
+    /linked path|escaped the disposable client home/u,
+  );
+});
+
+test('standards installs reject a linked destination outside the disposable root', (t) => {
+  const root = mkdtempSync(join(tmpdir(), 'journalism-core-standards-containment-test-'));
+  const outside = mkdtempSync(join(tmpdir(), 'journalism-core-standards-outside-test-'));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  t.after(() => rmSync(outside, { recursive: true, force: true }));
+  mkdirSync(join(outside, 'skills'));
+  symlinkSync(outside, join(root, '.agents'), 'dir');
+
+  assert.throws(
+    () => verifyStandardsInstall(root, join(root, 'source')),
+    /linked path|escaped the disposable client home/u,
+  );
+});
+
+test('exact tree verification rejects linked skill resources', (t) => {
+  const root = mkdtempSync(join(tmpdir(), 'journalism-core-symlink-test-'));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const source = join(root, 'source');
+  const installed = join(root, 'installed');
+  mkdirSync(source);
+  mkdirSync(installed);
+  writeFileSync(join(source, 'SKILL.md'), 'same');
+  writeFileSync(join(installed, 'SKILL.md'), 'same');
+  symlinkSync('SKILL.md', join(source, 'linked.md'));
+
+  assert.throws(
+    () => verifyCopiedSkillTree(source, installed),
+    /linked skill resource/u,
+  );
+});
+
+test('Windows canaries invoke npm command shims without a shell', () => {
+  const args = ['add', 'C:\\Users\\Joe & Team\\repo', '--skill', '*'];
+  assert.deepEqual(
+    buildCommandInvocation('skills', args, {
+      platform: 'win32',
+      env: {},
+      findShim: () => 'C:\\npm\\skills.ps1',
+    }),
+    {
+      command: 'powershell.exe',
+      args: [
+        '-NoLogo',
+        '-NoProfile',
+        '-NonInteractive',
+        '-ExecutionPolicy',
+        'Bypass',
+        '-File',
+        'C:\\npm\\skills.ps1',
+        ...args,
+      ],
+    },
+  );
+  assert.deepEqual(
+    buildCommandInvocation('skills', args, { platform: 'linux' }),
+    { command: 'skills', args },
+  );
+
+  const runner = readFileSync(
+    new URL('./journalism-core-install-canary.mjs', import.meta.url),
+    'utf8',
+  );
+  assert.doesNotMatch(runner, /shell:\s*process\.platform/u);
+  assert.match(runner, /shell:\s*false/u);
+});
+
 test('CI runs clean install canaries against current Claude and Codex releases', () => {
   const workflow = readFileSync(
     new URL('../.github/workflows/compatibility-canary.yml', import.meta.url),
@@ -137,6 +246,7 @@ test('CI runs clean install canaries against current Claude and Codex releases',
   assert.match(workflow, /@anthropic-ai\/claude-code@latest/u);
   assert.match(workflow, /@openai\/codex@latest/u);
   assert.match(workflow, /package: 'skills@latest'/u);
+  assert.match(workflow, /client: codex-skills-global/u);
   assert.match(workflow, /journalism-core-install:[\s\S]*timeout-minutes: 15/u);
   assert.match(workflow, /node scripts\/journalism-core-install-canary\.mjs \$\{\{ matrix\.client \}\}/u);
 
