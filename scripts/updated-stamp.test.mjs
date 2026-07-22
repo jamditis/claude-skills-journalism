@@ -203,7 +203,9 @@ test('stampIndex converges on a card that sits on one line', () => {
   assert.equal(stampIndex(once, [entryFor('foia-requests')]), once);
 });
 
-test('a directory carrying pathspec magic does not hijack the date', () => {
+test('a directory carrying pathspec magic does not hijack the date', {
+  skip: process.platform === 'win32' && 'NTFS does not allow colons in file names',
+}, () => {
   // ":(exclude)x/evil/SKILL.md" has a clean slug, so the slug check cannot see
   // it. Without --literal-pathspecs git reads the parent as "everything else"
   // and the skill takes the repo's newest date.

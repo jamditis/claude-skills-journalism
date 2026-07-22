@@ -1,7 +1,6 @@
 ---
 name: video-dashboard
 description: This skill should be used when the user asks to "build a dashboard", "create a video analysis dashboard", "generate content analysis", "run topic analysis on transcripts", "analyze sentiment", "compare cross-platform messaging", or needs to aggregate transcript and frame data into an interactive web dashboard.
-argument-hint: "[optional: path to project directory]"
 ---
 
 # Content analysis and interactive dashboard

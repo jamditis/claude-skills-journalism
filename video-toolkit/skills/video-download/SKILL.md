@@ -1,7 +1,6 @@
 ---
 name: video-download
 description: This skill should be used when the user asks to "download videos", "scrape videos from social media", "pull videos from Twitter/TikTok/YouTube/Instagram/Facebook", "download someone's social media videos", or needs to collect video content from public social media accounts for analysis.
-argument-hint: "[optional: subject name or platform URLs]"
 ---
 
 # Video download from social media

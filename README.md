@@ -1,6 +1,6 @@
-# Claude skills for journalism, media, and academia
+# Journalism agent skills
 
-A curated collection of Claude Code skills designed for journalists, researchers, academics, media professionals, and communications practitioners.
+A collection of Agent Skills for journalists, researchers, academics, media professionals, and communications practitioners. The same repository serves Claude Code and Codex while keeping Claude-only commands, agents, and hooks clearly labeled.
 
 **Docs site:** [skills.amditis.tech](https://skills.amditis.tech) — interactive skill browser, setup guides, and full documentation.
 
@@ -14,15 +14,19 @@ Setup and workflow guides, separate from the skills themselves:
 | [Multi-agent workflows](https://skills.amditis.tech/workflows/) | Plain-language guide to running many AI agents on one job — fan-out, pipeline, and adversarial-verify patterns, with real examples from ICIJ, The Markup, Full Fact, and Elicit, plus honest cautions |
 | [Persistent sessions](https://skills.amditis.tech/persistent-sessions/) | Keep Claude Code sessions alive through disconnects using tmux — setup, key bindings, activity notifications, and scheduler coexistence |
 
-## What are Claude skills?
+## What are agent skills?
 
-Skills are modular instruction sets that extend Claude's capabilities for specialized tasks. Each skill contains domain-specific knowledge, workflows, templates, and best practices that Claude loads automatically when relevant to your work.
+Skills are modular instruction sets that an AI coding agent loads when relevant to a task. Each skill contains domain knowledge, workflows, templates, and supporting files. Shared skills in this repository follow the [Agent Skills specification](https://agentskills.io/specification); Claude and Codex provide their own installation and runtime layers around that shared content.
 
 ## Installation
 
+Choose the section for your client. During the Codex pilot, use only one Codex installation path for a given skill or package.
+
+### Claude Code
+
 **Prerequisite:** You need [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) installed. Run `claude --version` in your terminal to check.
 
-### Plugins (recommended)
+#### Plugins (recommended)
 
 Plugins give you slash commands you can run directly inside Claude Code. Run these two commands inside a Claude Code session:
 
@@ -42,7 +46,7 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | [journalism-core](./journalism-core/) | Fourteen core journalism skills, including AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, fact-checking, interview prep + transcription, story pitches, editorial workflow, crisis communications, newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements, and embedded photo metadata for wire distribution | n/a — skills only | Jul 21, 2026 |
 | [okf-wiki](./okf-wiki/) | Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with YAML frontmatter, directory navigation, and a validator. Generates a starter wiki that passes its own conformance and secret-leak checks, ships session-start hooks that orient Claude on the knowledge base before it works, and includes an optional GitHub-wiki bootstrap. For newsroom institutional memory, research atlases, decision logs, and infrastructure maps | n/a — skill only | Jul 21, 2026 |
 | [pdf-design](./pdf-design/) | PDF report and proposal design system with brand variables, budget tables, and reusable content blocks (stats strips, three-column, four-tile pillars, partner grids) | n/a — skill-only | Jul 21, 2026 |
-| [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials with an interactive control panel for live design editing (colors, fonts, spacing, sections) and a guided wizard for proposals | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` | Apr 14, 2026 |
+| [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials with an interactive control panel for live design editing (colors, fonts, spacing, sections) and a guided wizard for proposals | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` | Jul 21, 2026 |
 | [project-templates-toolkit](./project-templates-toolkit/) | Three skills for setting up and closing out journalism projects: a CLAUDE.md project-memory writer (institutional knowledge), a LESSONS.md retrospective writer (failures and decisions), and a template-selector decision tree across 6 project types | n/a — skills only | Jun 24, 2026 |
 | [research-toolkit](./research-toolkit/) | Six skills for research, source preservation, and academic workflows: academic writing, legal paywall-bypass via Unpaywall and library databases, web archiving (Wayback / Archive.today / ArchiveBox), web page change monitoring, AI-enriched digital archive construction, and a curated free-API catalog with sunset currency notes (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) | n/a — skills only | Jul 21, 2026 |
 | [security-toolkit](./security-toolkit/) | Four defensive security skills covering OWASP Top 10 fundamentals and supply-chain hardening: pre-deployment audit checklists (auth, input validation, secrets management), secure authentication patterns (password hashing, session management, JWT, OAuth, passkeys), API hardening (rate limiting, CORS, request throttling, defense-in-depth for Express, FastAPI, and serverless), and npm/bun supply-chain hardening with install-time cooldown plus a sandboxed pre-install scan for the bypass case (defends against Mini Shai-Hulud-class worms) | `/security-toolkit:hotpatch` | Jul 21, 2026 |
@@ -50,9 +54,9 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | [video-toolkit](./video-toolkit/) | Four composable skills for social-video accountability reporting: downloading public video from Twitter/X, TikTok, YouTube, Instagram, and Facebook; transcribing it with a provenance sidecar and a CPU path any evaluator can re-run; extracting and vision-analyzing frames; and aggregating the result into an interactive dashboard | n/a — skills only | Jul 21, 2026 |
 | [visual-explainer](./visual-explainer/) | HTML diagrams, data tables, architecture views, slide decks, and KPI dashboards adapted from nicobailon/visual-explainer with journalism, newsroom, and academic design sensibilities | `/visual-explainer:project-recap` | Jul 21, 2026 |
 
-### Skills (manual installation)
+#### Skills (manual installation)
 
-Every skill in this repo now lives inside a plugin's `skills/` directory. To install just one without taking the whole plugin, clone the repo and copy or symlink the nested skill folder. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
+Most skills live inside a plugin's `skills/` directory. The `okf-wiki/SKILL.md`, `pdf-design/SKILL.md`, and `visual-explainer/SKILL.md` root-skill packages keep the skill at the package root. To install one skill without taking a whole plugin, clone the repo and copy or symlink the directory that directly contains its `SKILL.md`. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
 
 ```
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
@@ -67,13 +71,50 @@ cp -r dev-toolkit/skills/web-scraping ~/.claude/skills/
 cp -r security-toolkit/skills/secure-auth ~/.claude/skills/
 cp -r project-templates-toolkit/skills/project-memory ~/.claude/skills/
 
+# A root-skill package is already the directory to copy:
+cp -r okf-wiki ~/.claude/skills/
+
 # Or symlink so git pull updates them in place (ln -sfn replaces an existing link):
 ln -sfn "$PWD/research-toolkit/skills/free-apis-catalog" ~/.claude/skills/free-apis-catalog
+ln -sfn "$PWD/visual-explainer" ~/.claude/skills/visual-explainer
 ```
 
 Do not clone the repo directly into `~/.claude/skills/journalism-skills/` — that nests each `SKILL.md` too deep and Claude Code won't find them.
 
-### For Claude.ai users
+### Codex
+
+**Prerequisite:** Install [Codex CLI](https://learn.chatgpt.com/docs/codex/cli). Run `codex --version` in your terminal to check.
+
+For a new Codex setup, install standards-based skills with the `skills` CLI. This user-level command makes the 14 core skills available across your Codex projects:
+
+```bash
+npx skills@latest add https://github.com/jamditis/claude-skills-journalism/tree/master/journalism-core \
+  --skill '*' --agent codex --copy -g -y
+```
+
+That command installs `journalism-core` in Codex's documented user skill directory, `~/.agents/skills`. The clean-install canary checks that exact global destination. Remove `-g` to install into the current project's `.agents/skills` directory and record the source and content hashes in that project's `skills-lock.json`. To install one skill instead:
+
+```bash
+npx skills@latest add jamditis/claude-skills-journalism \
+  --skill fact-check-workflow --agent codex --copy -g -y
+```
+
+Codex can also install the full package through this repository's existing Claude marketplace metadata:
+
+```bash
+codex plugin marketplace add jamditis/claude-skills-journalism
+codex plugin add journalism-core@claude-skills-journalism
+```
+
+The package route is covered by a clean-install canary, but it uses Codex's legacy Claude-manifest reader. It exposes the 14 nested skills in `journalism-core`; it does not convert Claude commands, agents, hooks, or root-level skills into Codex components. This repository does not ship native Codex manifests yet.
+
+Codex desktop can [import skills from another agent](https://learn.chatgpt.com/docs/import.md). Import leaves the source installation in place. Until duplicate-identity and uninstall behavior has been tested for this repository, do not import a skill and also install the same skill through `npx skills` or the package route.
+
+Codex's bundled skill installer writes to a different Codex-specific directory and is not a tested installation path for this repository. Codex does not deduplicate same-name skills across install roots, so don't combine it with the `.agents/skills` route above.
+
+See the checked-in [Codex compatibility matrix](./plans/codex-compatibility-matrix.md) for tested versions, package boundaries, and pending runtime gates. A valid install is not yet a package-wide runtime support claim.
+
+### Claude.ai
 
 Skills can be added via the Claude.ai interface under Settings > Skills.
 
@@ -134,7 +175,7 @@ This skill ships inside the [pdf-playground](./pdf-playground/) plugin.
 
 | Skill | Description | Updated |
 |-------|-------------|--------|
-| [document-design](./pdf-playground/skills/document-design/) | Create print-ready HTML proposals, reports, one-pagers, newsletters, slides, flyers, and other PDF-ready documents with reusable brand and layout patterns | Mar 17, 2026 |
+| [document-design](./pdf-playground/skills/document-design/) | Create print-ready HTML proposals, reports, one-pagers, newsletters, slides, flyers, and other PDF-ready documents with reusable brand and layout patterns | Jul 21, 2026 |
 
 ### Superjawn skills
 
@@ -255,7 +296,7 @@ Hooks are automated checks that run at specific points in your workflow. Most ar
 
 ## Skill structure
 
-Each skill follows the Claude Agent Skills standard:
+Each shared skill follows the Agent Skills standard:
 
 ```
 skill-name/
@@ -354,7 +395,7 @@ When preserving or tracking content:
 
 Contributions welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide — skill structure, testing, and style guidelines.
 
-Quick version: fork, create your skill with a `SKILL.md` frontmatter file, test with Claude Code, submit a PR.
+Quick version: fork, create your skill with a `SKILL.md` frontmatter file, run `npm run validate:agent-skills`, test the clients affected by your change, and submit a PR.
 
 ## Target audiences
 
@@ -371,7 +412,8 @@ Quick version: fork, create your skill with a `SKILL.md` frontmatter file, test 
 
 - [Anthropic official skills](https://github.com/anthropics/skills)
 - [Claude Code documentation](https://docs.anthropic.com/claude-code)
-- [Agent Skills Standard](http://agentskills.io)
+- [Codex skills documentation](https://learn.chatgpt.com/docs/build-skills)
+- [Agent Skills specification](https://agentskills.io/specification)
 - [autopunk-media-skills](https://github.com/ur-grue/autopunk-media-skills) — broadcast, TV, podcast, and radio production skills; complements this repo's investigative focus. Free library, paired with a paid product ([autopunk.io](https://autopunk.io))
 - [NICAR (Investigative Reporters & Editors)](https://www.ire.org/nicar/)
 - [First Draft News](https://firstdraftnews.org/)

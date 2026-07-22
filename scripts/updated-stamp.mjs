@@ -27,6 +27,10 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = join(__dirname, '..');
 
+function repoRelativePath(repoRoot, file) {
+  return relative(repoRoot, file).split(sep).join('/');
+}
+
 // Never walked, at any depth.
 const SKIP_ANYWHERE = new Set(['.git', 'node_modules', '.pytest_cache']);
 // Never walked at the repo root. Anchored there so a nested directory that
@@ -626,7 +630,7 @@ function docsPagesFor(entries, repoRoot) {
     let real;
     try { real = realpathSync(page); } catch { continue; }
     if (real !== join(docsRoot, entry.slug, 'index.html') || !statSync(real).isFile()) {
-      notFiles.push(relative(repoRoot, page));
+      notFiles.push(repoRelativePath(repoRoot, page));
       continue;
     }
     pages.push({ entry, page });
@@ -693,7 +697,7 @@ export function run({ repoRoot = REPO_ROOT, check = false, quiet = false, log = 
   const { pages: docsPages, notFiles: unsafeDocsPages } = docsPagesFor(entries, repoRoot);
   notFiles.push(...unsafeDocsPages);
   for (const { entry, page } of docsPages) {
-    const file = relative(repoRoot, page);
+    const file = repoRelativePath(repoRoot, page);
     const stamped = stampSkillPage(readFileSync(page, 'utf8'), entry);
     if (stamped === null) { missingH1.push(file); continue; }
     covered.add(entry.slug);

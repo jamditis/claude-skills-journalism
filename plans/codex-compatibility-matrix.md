@@ -1,0 +1,373 @@
+# Codex compatibility matrix
+
+- Status: phase-one installation baseline; runtime pilots pending
+- Last evidence update: July 22, 2026
+- Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
+
+## How to read this matrix
+
+This file records what has been proved for each package. Installation alone is
+not a support claim. A package becomes **tested for Codex** only after its
+install, discovery, activation, non-activation, resource, runtime, and
+no-Claude-environment gates pass.
+
+Status labels:
+
+- **Baseline installed:** a clean client installed the package or skill, but
+  runtime behavior is not yet proved.
+- **Candidate:** the shared skills appear portable from static review, but the
+  runtime gates are pending.
+- **Adapter required:** static review found a platform-bound path, instruction,
+  layout, or generated artifact.
+- **Standards blocked:** shared frontmatter fails the Agent Skills validator.
+- **Claude-only surface:** the component has no approved Codex mapping.
+- **Not assessed:** no runtime claim has been tested.
+
+## Tool baseline
+
+| Tool | Version or revision | Role |
+|---|---|---|
+| Repository | `b0617649515d24ebfcd51f15bceb1d76b03db668` | Architecture commit used as the phase-one worktree base |
+| Claude Code | 2.1.215 | Marketplace validation and clean `journalism-core` install |
+| Codex CLI | 0.145.0 | Legacy-compatible marketplace and clean `journalism-core` install |
+| skills CLI | 1.5.19 | Standards-based repository discovery and Codex skill install |
+| Agent Skills validator | `agentskills/agentskills@38a2ff82958afee88dadf4831509e6f7e9d8ef4e` | Shared frontmatter contract |
+| Agent Skills validator, scheduled | Default-branch head (`38a2ff82958afee88dadf4831509e6f7e9d8ef4e` on July 21, 2026) | Upstream drift signal |
+| Claude marketplace | 2.3.3 | Catalog version after the phase-one frontmatter release bumps |
+| Node.js on Legion | 22.17.0 | Local test and matrix tooling |
+| Node.js on LOJ | 22.23.1 | Repository verification |
+
+Update this table whenever newer client behavior is used as evidence. Do not
+rewrite an older result as if it ran on the newer version.
+
+## Baseline evidence
+
+### I-phase-1: package inventory
+
+Environment: the authoritative LOJ worktree at the phase-one branch tip.
+
+Result: the Claude marketplace contained 12 packages and the repository
+contained 60 root or nested skills. Package component counts, versions, and
+included or excluded surfaces were checked against the marketplace, child
+manifests, and discovered `SKILL.md` paths. The package matrix below records the
+inventory. Its linked validator and repository results provide the structural
+proof for packages that contain shared skills.
+
+### C-base-1: clean Claude package install
+
+Environment: disposable empty `CLAUDE_CONFIG_DIR` on Windows.
+
+```powershell
+$env:CLAUDE_CONFIG_DIR = '<empty-temp-directory>'
+claude plugin validate '<checkout>'
+claude plugin marketplace add '<checkout>'
+claude plugin install journalism-core@claude-skills-journalism --scope user
+claude plugin list
+```
+
+Result: marketplace validation passed; `journalism-core` 1.2.0 installed and
+enabled; 14 installed `SKILL.md` files were present. Activation and output were
+not tested in this evidence item.
+
+### C-phase-1: repeatable Claude install canary
+
+Environment: a temporary `CLAUDE_CONFIG_DIR` created and removed by the Node
+canary. The canary uses the local checkout as the marketplace source.
+
+```bash
+npm run canary:journalism-core:claude
+```
+
+Result on Claude Code 2.1.215: the current marketplace passed strict validation;
+`journalism-core` 1.2.0 installed and enabled; the installed skill names matched
+the expected 14-name set and all 17 installed files matched the source hashes.
+The canary runs on relevant pull requests, weekly, and on manual dispatch
+against the current Claude Code release.
+
+### K-base-1: clean Codex package install through the legacy path
+
+Environment: disposable empty `CODEX_HOME` on Windows.
+
+```powershell
+$env:CODEX_HOME = '<empty-temp-directory>'
+codex plugin marketplace add jamditis/claude-skills-journalism --json
+codex plugin add journalism-core@claude-skills-journalism --json
+```
+
+Result: Codex read `.claude-plugin/marketplace.json`, used the package-level
+Claude manifest fallback, installed `journalism-core` 1.2.0, and copied all 14
+nested skills. No `.codex-plugin/plugin.json` was present. Root skills, Claude
+commands, Claude agents, and Claude hooks were not mapped by this test.
+
+### K-phase-1: repeatable Codex legacy-package canary
+
+Environment: a temporary `CODEX_HOME` created and removed by the Node canary.
+The canary uses the local checkout as the marketplace source and refuses a
+native Codex marketplace or `journalism-core` plugin manifest.
+
+```bash
+npm run canary:journalism-core:codex
+```
+
+Result on Codex 0.145.0: `journalism-core` 1.2.0 installed and enabled through
+the Claude marketplace and package manifests; the installed skill names matched
+the expected 14-name set and all 17 installed files matched the source hashes.
+The same workflow runs against the current Codex release to warn when this
+fallback changes.
+
+### S-base-1: standards-based Codex skill install
+
+Environment: disposable empty project directory on Windows.
+
+```powershell
+$env:DISABLE_TELEMETRY = '1'
+npx -y skills@1.5.19 add jamditis/claude-skills-journalism `
+  --skill fact-check-workflow --agent codex --copy -y
+```
+
+Result: the CLI found 60 skills and installed `fact-check-workflow` under
+`.agents/skills`. Its lock record preserved the GitHub source, path, and content
+hash. Activation and mixed-install behavior were not tested.
+
+### S-phase-1: full journalism-core standards canary
+
+Environment: a disposable project directory with the local
+`journalism-core` directory as the standards source.
+
+```bash
+npm run canary:journalism-core:codex-skills
+```
+
+Result on skills CLI 1.5.19: all 14 skills and 17 files were copied to
+`.agents/skills`, their hashes matched the source, and `skills-lock.json`
+contained the same 14 names with content hashes. A second
+manual check used the public GitHub `journalism-core` subdirectory URL and
+produced the same installed set. The scheduled workflow exercises the current
+skills CLI release.
+
+### S-global-phase-1: user-level journalism-core standards canary
+
+Environment: a disposable home directory and a separate disposable project
+directory. The canary sets both `HOME` and `USERPROFILE` so the install cannot
+write to the runner's real user directory.
+
+```bash
+npm run canary:journalism-core:codex-skills-global
+```
+
+Result on skills CLI 1.5.20: all 14 skills and 17 files were copied to
+`~/.agents/skills`, their hashes matched the source, and no file was written to
+the disposable project's `.agents/skills` directory. This is Codex's documented
+user-level discovery path. The scheduled workflow exercises the current skills
+CLI release.
+
+### V-base-1: Agent Skills validation
+
+Environment: disposable checkout at the source baseline. Windows runs set
+`PYTHONUTF8=1` because the pinned validator otherwise follows the legacy system
+code page.
+
+```powershell
+$env:PYTHONUTF8 = '1'
+uvx --from "git+https://github.com/agentskills/agentskills.git@38a2ff82958afee88dadf4831509e6f7e9d8ef4e#subdirectory=skills-ref" `
+  skills-ref validate '<skill-directory>'
+```
+
+Result: 55 of 60 skills passed. `document-design` failed its name, directory,
+and `version` checks. The four video skills failed because `argument-hint` is
+not an Agent Skills field.
+
+### V-phase-1: repaired standards baseline
+
+```bash
+npm run validate:agent-skills
+```
+
+Result: all 60 skills passed the pinned official validator. The wrapper finds
+root and nested skills, skips installed copies, sets `PYTHONUTF8=1`, and reports
+each skill result. Linux pull-request CI runs this command.
+
+### V-upstream-1: current upstream validator canary
+
+```bash
+npm run validate:agent-skills:upstream
+```
+
+Result on July 21, 2026: all 60 skills passed the current Agent Skills
+default-branch validator. Its head was still the pinned revision above. A
+separate weekly and manually dispatched job follows the current upstream head;
+pull-request validation stays pinned so upstream changes cannot alter a PR gate
+without review.
+
+### F-phase-1: affected Claude package regression
+
+Environment: disposable Claude marketplace install plus read-only `--plugin-dir`
+invocations with built-in tools disabled.
+
+Result: Claude validated the marketplace, installed `pdf-playground` 1.3.2 and
+`video-toolkit` 1.0.3, and found one and four skills respectively. Explicit
+`document-design` and `video-download` invocations received their supplied
+arguments after the nonstandard `argument-hint` fields were removed. No files
+or external tool requests were allowed during the invocations. The affected
+package versions were patch-bumped because [Claude uses the declared plugin
+version to resolve cached installs](https://code.claude.com/docs/en/plugin-marketplaces#version-resolution-and-release-channels).
+
+### Cv-base-1: Codex creator-helper comparison
+
+```powershell
+python "$env:USERPROFILE\.codex\skills\.system\skill-creator\scripts\quick_validate.py" `
+  '<skill-directory>'
+```
+
+Result: 54 of 60 passed. The helper rejected the five failures above and also
+rejected the standards-valid `compatibility` field in `visual-explainer`. This
+extra failure is an expected client/spec difference, not permission to weaken
+the shared standard.
+
+### R-base-1: repository checks
+
+Environment: LOJ clean worktree after `npm ci --ignore-scripts`.
+
+```bash
+npm test
+npm run check:docs-css
+```
+
+Result: 93 of 93 tests passed and 49 page-specific Tailwind stylesheets were
+current after the architecture record was added.
+
+### R-phase-1: phase-one repository checks
+
+Environment: authoritative LOJ worktree after the phase-one files were synced
+with LF line endings.
+
+```bash
+npm test
+npm run check:docs-css
+```
+
+Result: 114 of 114 tests passed on Linux and all 49 page-specific Tailwind
+stylesheets were current. The added adversarial fixtures reject linked install
+roots, linked skill resources, and Windows shell parsing of client arguments.
+The earlier Windows staging run passed 109 tests with the one NTFS-impossible
+colon fixture skipped. Actionlint 1.7.12 accepted both changed workflow files,
+`git diff --check` passed, and strict Claude marketplace validation passed on
+Claude Code 2.1.215. The Windows CSS freshness check also verified all 49
+stylesheets after line endings were normalized for comparison.
+
+## Package matrix
+
+| Package | Version and components | Current classification | Included and excluded scope | Evidence | Next proof |
+|---|---|---|---|---|---|
+| `autocontext` | 1.1.0; no skills; five commands; one agent; six hook files | Claude-only surface | Include nothing in the Codex claim. Commands, curator agent, hook lifecycle, persisted data, and compatibility environment variables need a separate design. | [I-phase-1](#i-phase-1-package-inventory) | Define state, lifecycle, authority, and uninstall contracts in a separate accepted decision. |
+| `dev-toolkit` | 1.1.1; 11 nested skills | Candidate with adapter review | Instruction-led skills may be shared. Exclude Claude tool vocabulary, `CLAUDE.md` updates, hook wiring, and Claude subagent syntax until tested. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Classify each skill; add explicit trigger and non-trigger fixtures for the portable subset. |
+| `journalism-core` | 1.2.0; 14 nested skills | Baseline installed through four paths | Include the 14 shared skills. No commands, agents, or hooks are part of this package. Runtime support remains unclaimed. | [C-phase-1](#c-phase-1-repeatable-claude-install-canary), [K-phase-1](#k-phase-1-repeatable-codex-legacy-package-canary), [S-phase-1](#s-phase-1-full-journalism-core-standards-canary), [S-global-phase-1](#s-global-phase-1-user-level-journalism-core-standards-canary), [V-phase-1](#v-phase-1-repaired-standards-baseline) | Run J-core-1 through J-core-3 in fresh Claude and Codex sessions and verify installed resource resolution. |
+| `okf-wiki` | 0.6.1; one root skill; scripts and generated Claude settings | Adapter required | Preserve OKF scaffolding, validation, examples, and tests. Exclude Codex project settings until the no-Claude behavior test defines the needed branch. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; [R-phase-1](#r-phase-1-phase-one-repository-checks) covers package tests | Run Okf-1 without Claude installed; record generated files, trust behavior, and cleanup. |
+| `pdf-design` | 1.1.0; one root skill | Adapter required | Shared design guidance and assets are candidates. Hard-coded `~/.claude` and host-specific browser paths are excluded from a Codex claim. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add a no-Claude path-resolution fixture before editing paths. |
+| `pdf-playground` | 1.3.2; one nested skill; eight commands; one hook file | Candidate plus Claude-only surfaces | `document-design` is shared. Commands and hook behavior remain Claude-only until mapped. | [V-phase-1](#v-phase-1-repaired-standards-baseline) and [F-phase-1](#f-phase-1-affected-claude-package-regression); standards, Claude install, and argument delivery pass | Test Codex activation, non-activation, resource loading, and output before a runtime claim. |
+| `project-templates-toolkit` | 1.0.0; three nested skills | Adapter required | Retrospective and template selection may be shared. `project-memory` must distinguish `CLAUDE.md` from `AGENTS.md` scope. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add paired Claude/Codex project-memory fixtures before changing generated instructions. |
+| `research-toolkit` | 1.1.0; six nested skills | Candidate | Include shared instruction-led skills. Network and external-content trust boundaries stay unchanged. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add representative activation, non-activation, network-boundary, and resource checks. |
+| `security-toolkit` | 1.2.0; four nested skills; one command | Candidate plus Claude-only surface | The four shared skills are candidates. `/security-toolkit:hotpatch` and its sandbox lifecycle remain Claude-only. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; [R-phase-1](#r-phase-1-phase-one-repository-checks) covers security tests | Test skill activation separately; do not map `hotpatch` without authority and failure-semantics tests. |
+| `superjawn` | 1.0.0; 14 nested skills | Not assessed | No package-wide claim. Each skill needs review for Claude tool names, namespacing, agent dispatch, and parallel-agent assumptions. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure only | Evaluate one skill at a time with client-specific tool traces. Do not bulk-port. |
+| `video-toolkit` | 1.0.3; four nested skills; external media runtimes | Candidate; runtime dependencies pending | Shared frontmatter and Claude argument delivery pass. GPU, CPU, browser, media sandbox, and hosted-API behavior remain unclaimed. | [V-phase-1](#v-phase-1-repaired-standards-baseline), [F-phase-1](#f-phase-1-affected-claude-package-regression), and [R-phase-1](#r-phase-1-phase-one-repository-checks) | Run dependency, no-GPU, activation, non-activation, and output fixtures. |
+| `visual-explainer` | 0.7.1; one root skill; eight commands | Adapter required | The root skill and assets are candidates through standards installation. Eight Claude commands remain Claude-only. | [V-phase-1](#v-phase-1-repaired-standards-baseline) passes; [Cv-base-1](#cv-base-1-codex-creator-helper-comparison) records the `compatibility` difference | Run V-ex-1 through standards install and record the expected legacy-package omission. |
+
+## Pilot fixtures
+
+These fixtures define the minimum behavior to test. Store raw outputs or CI
+links beside the matrix result when each one runs.
+
+### J-core-1: explicit verification workflow
+
+Prompt:
+
+> Use the installed fact-check workflow to build a verification plan for an
+> unsigned screenshot claiming that a city budget doubled in 2025. Treat the
+> claim as unverified and do not invent sources.
+
+Expected result: the intended skill is selected; the response separates the
+claim, evidence needed, primary sources, corroboration, status, and uncertainty;
+no unsupported factual verdict is produced.
+
+### J-core-2: implicit verification trigger
+
+Prompt:
+
+> I received an unsigned screenshot with a public-spending claim. What should I
+> verify before publication?
+
+Expected result: a relevant journalism-core verification skill activates without
+an explicit skill name and follows its sourcing and uncertainty rules.
+
+### J-core-3: non-trigger
+
+Prompt:
+
+> Calculate an 18% tip on a $42 meal.
+
+Expected result: no journalism-core skill activates.
+
+### V-ex-1: root-skill layout
+
+Install `visual-explainer` through the standards path, then ask for a small HTML
+architecture diagram from supplied text.
+
+Expected result: the root skill is discovered, reads its relative references and
+assets from the installed copy, and produces the requested file. The legacy
+package path is expected not to expose this root skill until evidence says
+otherwise.
+
+### Okf-1: no-Claude scaffold
+
+Run the installed `okf-wiki` skill against an empty temporary project with no
+Claude configuration directory available.
+
+Expected result: portable OKF files validate and no missing `~/.claude` path
+causes the run to fail. Generated Claude settings are recorded as a Claude
+adapter rather than silently treated as Codex configuration.
+
+## Known differences and allowlist
+
+| Difference | Scope | Policy | Removal condition |
+|---|---|---|---|
+| Codex `quick_validate.py` rejects `compatibility` | `visual-explainer/SKILL.md` on Codex 0.145.0 | Allow only this validator difference while the official validator and installed Codex runtime accept the skill. | Codex aligns its helper, the installed runtime rejects the skill, or the field is no longer needed. |
+| Official validator uses the Windows legacy code page by default | Windows validation at validator commit `38a2ff8` | Set `PYTHONUTF8=1`; run the required CI gate on Ubuntu. | Upstream reads `SKILL.md` as UTF-8 explicitly. |
+| Legacy Codex plugin install omits root skills and Claude-only components | Root-skill packages, commands, agents, and hooks | Do not claim those components through the legacy package path. Prefer standards installation for skills. | A documented and tested Codex adapter exposes the component. |
+| [Codex does not deduplicate same-name skills across install roots](https://github.com/openai/codex/issues/22626#issuecomment-4452261501) | `.agents/skills`, `$CODEX_HOME/skills`, legacy plugin cache, and desktop import | Recommend `.agents/skills` through `npx skills` for new Codex users and one Codex path per skill. Do not recommend the bundled installer or mixed paths during phase one. | Duplicate identity, precedence, update, uninstall, recovery, and drift tests pass for the paths being combined. |
+
+Do not add an expected difference merely to make CI green. Each entry needs a
+standards or runtime citation, the narrow affected path, and a condition for
+removal.
+
+## Public catalog watch
+
+On July 21, 2026, [skills.sh listed this repository](https://www.skills.sh/jamditis/claude-skills-journalism)
+with 56 indexed skills and 13.6K aggregate installs while the checkout contained
+60 skills. The four video skills were absent, matching their pre-fix validator
+failures. `document-design` appeared in the aggregate but its
+[detail page](https://www.skills.sh/jamditis/claude-skills-journalism/document-design)
+did not show first-seen or install data. Other aggregate and detail counts also
+differed, so these numbers are a dated catalog snapshot rather than a stable
+user total.
+
+After the phase-one release, monitor whether the indexed count moves from 56 to
+60 and whether the existing `document-design` slug keeps its catalog history.
+The frontmatter repair normalizes the name to the same lowercase slug; it does
+not rename the directory, repository, or package. Also test an update fixture
+whose old lock key is `Document design` so normalization cannot leave two lock
+entries for one directory.
+
+## Mixed-install cases still pending
+
+Desktop import has not been exercised for this repository. Before recommending
+more than one Codex installation path in the same profile, test:
+
+1. import into a clean Codex profile;
+2. import when the same skill exists under `.agents/skills`;
+3. import when the containing plugin is installed from the legacy marketplace;
+4. update one copy while another remains stale;
+5. uninstall one path and confirm discovery, recovery, and lock data.
+
+Record duplicate identity, precedence, activation, update, uninstall, recovery,
+and drift results here. Until then, documentation must recommend one Codex
+installation path per skill or package.

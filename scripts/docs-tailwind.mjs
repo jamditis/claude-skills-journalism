@@ -37,6 +37,10 @@ function stylesheetHref(file) {
   return relative(dirname(file), target).split(sep).join('/');
 }
 
+function normalizeNewlines(source) {
+  return source.replace(/\r\n?/gu, '\n');
+}
+
 async function compilePage(file, config) {
   const html = readFileSync(file, 'utf8');
   const input = readFileSync(INPUT, 'utf8');
@@ -46,7 +50,9 @@ async function compilePage(file, config) {
       content: [{ raw: html, extension: 'html' }],
     }),
   ]).process(input, { from: INPUT, to: undefined });
-  return `/* Generated for ${relativePage(file)} by Tailwind CSS ${BUILD_VERSION}. */\n${result.css}`;
+  return normalizeNewlines(
+    `/* Generated for ${relativePage(file)} by Tailwind CSS ${BUILD_VERSION}. */\n${result.css}`,
+  );
 }
 
 function readManifest() {
@@ -89,7 +95,7 @@ async function checkBuild() {
     if (!linkedPages.has(page)) problems.push(`${page}: generated stylesheet link missing`);
     const output = join(OUTPUT_DIR, outputName(page));
     let current = null;
-    try { current = readFileSync(output, 'utf8'); } catch {}
+    try { current = normalizeNewlines(readFileSync(output, 'utf8')); } catch {}
     const expected = await compilePage(file, config);
     if (current !== expected) problems.push(`${page}: generated CSS is stale or missing`);
   }

@@ -1,12 +1,21 @@
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { basename, dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { parse } from 'yaml';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SKIP_DIRS = new Set(['.git', '.agents', 'node_modules']);
+const ALLOWED_FIELDS = new Set([
+  'name',
+  'description',
+  'license',
+  'compatibility',
+  'metadata',
+  'allowed-tools',
+]);
+const NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 
 function findSkillFiles(dir = ROOT, files = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -18,7 +27,7 @@ function findSkillFiles(dir = ROOT, files = []) {
   return files;
 }
 
-test('every SKILL.md has parseable YAML frontmatter required for CLI discovery', () => {
+test('every SKILL.md follows the Agent Skills frontmatter contract', () => {
   const files = findSkillFiles().sort();
   const names = new Map();
   const errors = [];
@@ -52,12 +61,73 @@ test('every SKILL.md has parseable YAML frontmatter required for CLI discovery',
       }
     }
 
+    const unexpected = Object.keys(data).filter((field) => !ALLOWED_FIELDS.has(field)).sort();
+    if (unexpected.length > 0) {
+      errors.push(`${displayPath}: unexpected frontmatter field(s): ${unexpected.join(', ')}`);
+    }
+
     if (typeof data.name === 'string' && data.name.trim()) {
+      if (data.name.length > 64) errors.push(`${displayPath}: name must be at most 64 characters`);
+      if (!NAME_PATTERN.test(data.name)) {
+        errors.push(`${displayPath}: name must use lowercase letters, digits, and single hyphens`);
+      }
+      const directoryName = basename(dirname(path));
+      if (data.name !== directoryName) {
+        errors.push(`${displayPath}: name must match directory ${directoryName}`);
+      }
       const existing = names.get(data.name);
       if (existing) errors.push(`${displayPath}: duplicate skill name ${data.name} (also ${existing})`);
       else names.set(data.name, displayPath);
     }
+
+    if (typeof data.description === 'string' && data.description.length > 1024) {
+      errors.push(`${displayPath}: description must be at most 1024 characters`);
+    }
+    for (const field of ['license', 'compatibility']) {
+      if (field in data && (typeof data[field] !== 'string' || !data[field].trim())) {
+        errors.push(`${displayPath}: ${field} must be a non-empty string`);
+      }
+    }
+    if (typeof data.compatibility === 'string' && data.compatibility.length > 500) {
+      errors.push(`${displayPath}: compatibility must be at most 500 characters`);
+    }
+    if ('allowed-tools' in data && typeof data['allowed-tools'] !== 'string') {
+      errors.push(`${displayPath}: allowed-tools must be a string`);
+    }
+    if ('metadata' in data) {
+      const metadata = data.metadata;
+      if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
+        errors.push(`${displayPath}: metadata must be a mapping`);
+      } else {
+        for (const [key, value] of Object.entries(metadata)) {
+          if (typeof key !== 'string' || typeof value !== 'string') {
+            errors.push(`${displayPath}: metadata keys and values must be strings`);
+            break;
+          }
+        }
+      }
+    }
   }
 
   assert.deepEqual(errors, []);
+});
+
+test('frontmatter repairs advance the affected Claude package versions', () => {
+  const marketplace = JSON.parse(
+    readFileSync(join(ROOT, '.claude-plugin', 'marketplace.json'), 'utf8'),
+  );
+  assert.equal(marketplace.version, '2.3.3', 'marketplace version');
+  const expected = new Map([
+    ['pdf-playground', '1.3.2'],
+    ['video-toolkit', '1.0.3'],
+  ]);
+
+  for (const [name, version] of expected) {
+    const manifest = JSON.parse(
+      readFileSync(join(ROOT, name, '.claude-plugin', 'plugin.json'), 'utf8'),
+    );
+    const listing = marketplace.plugins.find((plugin) => plugin.name === name);
+    assert.equal(manifest.version, version, `${name} manifest version`);
+    assert.equal(listing?.version, version, `${name} marketplace version`);
+  }
 });

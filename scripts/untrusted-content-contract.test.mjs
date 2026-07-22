@@ -2,8 +2,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const CONTRACT = '<!-- untrusted-content-contract:v1 -->';
 const NETWORK_FACING_SKILLS = [
   'dev-toolkit/skills/accessibility-compliance/SKILL.md',
