@@ -553,6 +553,66 @@ def test_secret_value_fails(tmp_path):
     assert rc == 1 and "secret leak" in out
 
 
+# A labeled base64url secret value: URL-safe (- and _), so the base64-standard
+# generic pattern misses it. Built from fragments so no secret-shaped token lives
+# in this file. Its Shannon entropy is ~4.84 bits/char, well above the 4.0 floor.
+URLSAFE_SECRET = "Zk9" + "_qX2" + "-Lm7" + "vB4t" + "Nc1w" + "Rp8h" + "Ej6" + "-uYs"
+
+
+def test_urlsafe_secret_passes_without_entropy_scan(tmp_path):
+    # Default behavior is unchanged: the opt-in scan is off, and the generic
+    # base64 pattern deliberately does not match a hyphen/underscore value.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + f"\napi_key: {URLSAFE_SECRET}\n")
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_entropy_scan_flags_urlsafe_secret(tmp_path):
+    # With the opt-in flag, the same URL-safe value is caught by entropy.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + f"\napi_key: {URLSAFE_SECRET}\n")
+    rc, out = validate(b, "--secret-entropy-scan")
+    assert rc == 1 and "high-entropy assignment" in out
+
+
+def test_entropy_scan_keeps_okf_key_path(tmp_path):
+    # The precision the earlier review round asked us to keep: a slash-delimited
+    # OKF key path is not a secret even under the strict scan. Its own entropy
+    # (~4.07) clears the floor, so this proves the structural `/` exclusion, not
+    # just the threshold, is what protects documented key paths.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + "\nsecret: services/api/production-primary-key-path\n")
+    rc, out = validate(b, "--secret-entropy-scan")
+    assert rc == 0, out
+
+
+def test_entropy_scan_ignores_low_entropy_name(tmp_path):
+    # A slashless but human-readable hyphenated value stays under the floor, so
+    # the strict scan does not flag it.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + "\napi_key: prod-key-path-name-placeholder\n")
+    rc, out = validate(b, "--secret-entropy-scan")
+    assert rc == 0, out
+
+
+def test_entropy_scan_flags_secret_just_above_floor(tmp_path):
+    # Recall is the flag's whole reason to exist, so pin it at the knife-edge: a
+    # 24-char base64url value whose entropy is 4.054, just over the 4.0 floor,
+    # must still flag. Below this the scan silently misses — the acknowledged
+    # precision-for-recall tradeoff — so this marks where that boundary sits.
+    marginal = "Ab-Cd" + "_Ef-Gh" + "_Ij-Kl" + "_Mn-Op1"
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + f"\napi_key: {marginal}\n")
+    rc, out = validate(b, "--secret-entropy-scan")
+    assert rc == 1 and "high-entropy assignment" in out
+
+
 def test_dangling_link_fails(tmp_path):
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
