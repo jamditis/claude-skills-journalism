@@ -41,6 +41,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import math
 import re
 import sys
 from collections import Counter
@@ -88,6 +89,14 @@ WIKILINK_RE = re.compile(r"\[\[([^\[\]]+)\]\]")
 # a credential concept is allowed to document. The generic assignment pattern
 # requires a separator (`:`/`=`) directly before a high-entropy blob, so a
 # documented key name like `service/api/...-secret` does not trip it.
+#
+# The key labels that mark a value as a credential, shared by the generic base64
+# assignment pattern and the opt-in entropy scan so the two agree on what counts
+# as a labeled secret.
+SECRET_LABEL = (
+    r"(?:password|passwd|secret|api[_-]?key|apikey|client[_-]?secret"
+    r"|access[_-]?token|auth[_-]?token)")
+
 SECRET_PATTERNS = [
     ("Tailscale key", re.compile(r"tskey-(?:api|auth|client)-[A-Za-z0-9]+-[A-Za-z0-9]{10,}")),
     ("private-key block", re.compile(r"-----BEGIN (?:RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY-----")),
@@ -97,14 +106,61 @@ SECRET_PATTERNS = [
     ("GitHub token", re.compile(r"\bgh[pousr]_[0-9A-Za-z]{36,}\b")),
     ("GitHub fine-grained PAT", re.compile(r"\bgithub_pat_[0-9A-Za-z_]{22,}\b")),
     ("secret assignment", re.compile(
-        r"(?i)(?:password|passwd|secret|api[_-]?key|apikey|client[_-]?secret|access[_-]?token|auth[_-]?token)"
+        r"(?i)" + SECRET_LABEL +
         # Base64-standard value charset only -- deliberately excludes - and _. A
         # credential concept documents key paths like `secret: svc/api/prod-key-path`,
         # and a hyphen/underscore-rich path must not read as a high-entropy value.
         # Structured tokens that use -/_ (fine-grained PATs, Slack, etc.) have their
-        # own specific patterns above.
+        # own specific patterns above; the opt-in entropy scan below covers the rest.
         r"\s*[:=]\s*['\"]?[A-Za-z0-9+/]{24,}['\"]?")),
 ]
+
+# Opt-in entropy scan (--secret-entropy-scan). The generic assignment pattern
+# above uses a base64-standard value charset that excludes - and _, so a labeled
+# secret whose value is URL-safe (base64url: - _ =) slips past it. Widening that
+# charset would re-flag OKF key paths like `secret: svc/api/prod-key-path`, the
+# precision an earlier review round asked us to keep. This optional pass instead
+# matches only the base64url charset -- base64-standard values with `/` stay the
+# generic pattern's job -- and keeps precision two ways. Structurally (the primary
+# guard), the captured run must be a complete token: the trailing lookahead rejects
+# a run that is followed by another value char (we truncated a longer token) or a
+# `/` (it is a path segment, not a standalone value), so a documented key path like
+# `secret: prd-usw2-...-key-path/service` cannot leak its first segment as a value.
+# Excluding `/` from the class alone did not do this -- it stopped the match at the
+# separator but still captured a >=24-char leading segment. Statistically, a
+# Shannon-entropy floor backstops the slashless case: a random token scores above a
+# short dictionary-and-separator name (measured: 24-char base64url secrets land
+# ~4.05-4.4 bits/char, short human-readable names stay under 4.0). The floor is
+# imperfect -- a long, varied slashless name can clear it, the acknowledged
+# precision-for-recall tradeoff -- which is why the structural check, not this
+# threshold, is the primary guard. It is off by default so a normal run keeps the
+# narrow, zero-false-positive base64 behavior; the flag trades some precision for
+# recall.
+SECRET_ENTROPY_RE = re.compile(
+    r"(?i)" + SECRET_LABEL + r"\s*[:=]\s*['\"]?([A-Za-z0-9_=-]{24,})"
+    r"(?![A-Za-z0-9_=/-])['\"]?")
+SECRET_ENTROPY_MIN_BITS = 4.0
+
+
+def shannon_entropy(s: str) -> float:
+    """Shannon entropy of s in bits per character (0.0 for the empty string)."""
+    if not s:
+        return 0.0
+    n = len(s)
+    return -sum((c / n) * math.log2(c / n) for c in Counter(s).values())
+
+
+def entropy_secret_values(text: str):
+    """Yield the labeled, high-entropy base64url values in text that the generic
+    base64 pattern misses. A value must carry a base64url-only character (- _ =) --
+    otherwise the generic pattern already covers it -- and clear the entropy floor,
+    so a low-entropy hyphenated name is left alone."""
+    for m in SECRET_ENTROPY_RE.finditer(text):
+        value = m.group(1)
+        if not any(ch in value for ch in "-_="):
+            continue  # plain base64/alnum -- already covered by SECRET_PATTERNS
+        if shannon_entropy(value) >= SECRET_ENTROPY_MIN_BITS:
+            yield value
 
 
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n?(.*)$", re.DOTALL)
@@ -531,6 +587,11 @@ def declared_bundle_version(bundle):
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--bundle", default="bundle", help="path to the OKF bundle directory (default: bundle)")
+    ap.add_argument(
+        "--secret-entropy-scan", action="store_true",
+        help="also flag a labeled URL-safe/base64url value whose Shannon entropy "
+             "clears the secret floor (opt-in; trades some precision for recall on "
+             "hyphenated secret values the base64 pattern misses)")
     args = ap.parse_args()
     bundle = Path(args.bundle).resolve()
 
@@ -575,6 +636,11 @@ def main() -> int:
                 errors.append(
                     f"{rel}: possible secret leak ({label}) — remove the value, "
                     f"document the key name/path instead")
+        if args.secret_entropy_scan and next(entropy_secret_values(text), None):
+            errors.append(
+                f"{rel}: possible secret leak (high-entropy assignment flagged by "
+                f"--secret-entropy-scan) — remove the value, document the key "
+                f"name/path instead")
 
         # OKF concept and index files use a lowercase .md extension. A non-lowercase
         # extension (Foo.MD) is non-conforming: it was discovered case-insensitively
