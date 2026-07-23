@@ -169,10 +169,13 @@ python3 -m venv '<disposable-home>/okf-python'
   -r '<checkout>/okf-wiki/requirements.txt'
 ```
 
-Place that environment first on `PATH` for the pilot:
+The runner also resolves `claude` on `PATH` without executing it and refuses
+the pilot if one is available. Build a reviewed `<allowlisted-bin>` containing
+Codex, Node/npm, and the required shell utilities but no Claude executable,
+then place the Python environment and that directory on `PATH`:
 
 ```bash
-PATH='<disposable-home>/okf-python/bin:'"$PATH" \
+PATH='<disposable-home>/okf-python/bin:<allowlisted-bin>' \
 CODEX_HOME='<disposable-home>/.codex' \
   npm run pilot:okf-wiki -- codex okf-1 \
   --project '<disposable-project>' \
@@ -193,5 +196,6 @@ CODEX_HOME='<disposable-home>/.codex' \
 The focused tests pin the accepted prompt, exact portable and adapter
 inventories, empty-Claude preconditions, install and output containment,
 copied-resource equality, title and section navigation, the PyYAML preflight,
-environment stripping, sandbox plan, authorized fallback, validator
-invocation, timeout, shell avoidance, and adversarial CLI inputs.
+the no-Claude executable preflight, environment stripping, sandbox plan,
+authorized fallback, validator invocation, timeout, shell avoidance, and
+adversarial CLI inputs.

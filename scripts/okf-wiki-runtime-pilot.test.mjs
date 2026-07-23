@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {
+  chmodSync,
   copyFileSync,
   mkdirSync,
   mkdtempSync,
@@ -24,6 +25,7 @@ import {
   runOkfPilot,
   runOkfValidation,
   verifyNoClaudePreconditions,
+  verifyNoClaudeExecutable,
   verifyOkfInstall,
   verifyOkfOutput,
   verifyOkfPythonDependencies,
@@ -413,6 +415,27 @@ test('Python dependency preflight requires PyYAML without using a shell', () => 
       run: () => ({ status: 1, stdout: '', stderr: 'missing yaml' }),
     }),
     /PyYAML is required before running the okf-wiki pilot/u,
+  );
+});
+
+test('no-Claude preflight rejects a Claude executable on PATH', () => {
+  const root = mkdtempSync(join(tmpdir(), 'okf-wiki-claude-path-test-'));
+  disposableRoots.push(root);
+  const bin = join(root, 'bin');
+  mkdirSync(bin);
+  const executable = join(
+    bin,
+    process.platform === 'win32' ? 'claude.cmd' : 'claude',
+  );
+  writeFileSync(executable, '#!/bin/sh\nexit 0\n');
+  if (process.platform !== 'win32') chmodSync(executable, 0o755);
+
+  assert.throws(
+    () => verifyNoClaudeExecutable({ env: { PATH: bin } }),
+    /Claude executable must not be available on PATH/u,
+  );
+  assert.doesNotThrow(
+    () => verifyNoClaudeExecutable({ env: { PATH: join(root, 'empty-bin') } }),
   );
 });
 

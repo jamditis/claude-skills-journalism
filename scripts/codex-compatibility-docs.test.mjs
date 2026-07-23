@@ -106,6 +106,7 @@ test('okf-wiki no-Claude evidence keeps Claude adapters outside Codex behavior',
   assert.match(record, /no Claude executable/u);
   assert.match(record, /byte-for-byte identical to the first run/u);
   assert.match(record, /runner now checks this before invoking Codex/u);
+  assert.match(record, /runner also resolves `claude` on `PATH` without executing it/u);
   assert.match(record, /`AskUserQuestion` and `\$\{CLAUDE_SKILL_DIR\}` remain outside/u);
   assert.match(record, /removed the installed skill without touching the generated OKF project/u);
   assert.match(record, /The three `.claude\/` files are Claude adapter output/u);

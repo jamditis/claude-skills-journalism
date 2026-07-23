@@ -1,12 +1,16 @@
 import { spawnSync } from 'node:child_process';
 import {
+  accessSync,
+  constants,
   existsSync,
   lstatSync,
   readFileSync,
   readdirSync,
   realpathSync,
+  statSync,
 } from 'node:fs';
 import {
+  delimiter,
   isAbsolute,
   relative,
   resolve,
@@ -163,6 +167,40 @@ export function verifyNoClaudePreconditions(
   }
   if (allowOutput) requireDirectory(target, 'generated fixture target');
   return { project, home, target };
+}
+
+export function verifyNoClaudeExecutable({ env = process.env } = {}) {
+  const pathValue = env.PATH ?? env.Path ?? env.path ?? '';
+  const extensions = process.platform === 'win32'
+    ? (env.PATHEXT ?? '.COM;.EXE;.BAT;.CMD').split(';')
+    : [''];
+  const accessMode = process.platform === 'win32'
+    ? constants.F_OK
+    : constants.X_OK;
+
+  for (const directory of pathValue.split(delimiter)) {
+    const searchDirectory = directory || '.';
+    for (const extension of extensions) {
+      const candidate = resolve(
+        searchDirectory,
+        `claude${extension.toLowerCase()}`,
+      );
+      let available = false;
+      try {
+        if (statSync(candidate).isFile()) {
+          accessSync(candidate, accessMode);
+          available = true;
+        }
+      } catch {
+        // Missing, non-executable, and inaccessible candidates are unavailable.
+      }
+      if (available) {
+        throw new Error(
+          `Claude executable must not be available on PATH: ${candidate}`,
+        );
+      }
+    }
+  }
 }
 
 export function verifyOkfInstall(projectDir, fixtureId) {
@@ -561,6 +599,7 @@ function runCli() {
     return;
   }
 
+  verifyNoClaudeExecutable();
   verifyNoClaudePreconditions(projectDir, clientHome, fixtureId);
   verifyOkfInstall(projectDir, fixtureId);
   verifyOkfPythonDependencies();
