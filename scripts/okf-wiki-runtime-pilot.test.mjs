@@ -11,7 +11,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { delimiter, join } from 'node:path';
 import {
   afterEach,
   test,
@@ -21,12 +21,15 @@ import {
   OKF_PILOT_FIXTURES,
   OKF_PILOT_TIMEOUT_MS,
   buildOkfInvocation,
+  parseCodexTranscript,
   parseCliArgs,
   runOkfPilot,
   runOkfValidation,
+  snapshotOkfInstall,
   verifyNoClaudePreconditions,
   verifyNoClaudeExecutable,
   verifyOkfInstall,
+  verifyOkfInstallUnchanged,
   verifyOkfOutput,
   verifyOkfPythonDependencies,
 } from './okf-wiki-runtime-pilot.mjs';
@@ -125,6 +128,52 @@ function writePilotOutput(project) {
   return target;
 }
 
+function validCodexTranscript() {
+  const installedFilesRead = [
+    '.agents/skills/okf-wiki/SKILL.md',
+    '.agents/skills/okf-wiki/spec/SPEC.md',
+  ];
+  const commandsRun = [
+    `sed -n '1,220p' ${installedFilesRead[0]}`,
+    `sed -n '1,220p' ${installedFilesRead[1]}`,
+    'python3 .agents/skills/okf-wiki/scripts/scaffold.py ./okf-1 '
+      + '--title "Codex no-Claude pilot" --sections concepts,decisions',
+    '(from ./okf-1) python3 scripts/validate.py --bundle bundle',
+  ];
+  const capturedCommands = [
+    ...commandsRun.slice(0, 3),
+    'python3 scripts/validate.py --bundle bundle',
+  ];
+  const events = [
+    { type: 'thread.started', thread_id: 'fixture-thread' },
+    ...capturedCommands.map((command, index) => ({
+      type: 'item.completed',
+      item: {
+        id: `command-${index}`,
+        type: 'command_execution',
+        command,
+        status: 'completed',
+        exit_code: 0,
+      },
+    })),
+    {
+      type: 'item.completed',
+      item: {
+        id: 'report',
+        type: 'agent_message',
+        text: JSON.stringify({
+          installed_files_read: installedFilesRead,
+          commands_run: commandsRun,
+          trust_or_approval_prompt: false,
+          notes: 'Scaffolded and validated the requested fixture.',
+        }),
+      },
+    },
+    { type: 'turn.completed' },
+  ];
+  return `${events.map((event) => JSON.stringify(event)).join('\n')}\n`;
+}
+
 afterEach(() => {
   for (const root of disposableRoots.splice(0)) {
     rmSync(root, { recursive: true, force: true });
@@ -140,6 +189,10 @@ test('Okf-1 preserves the accepted no-Claude prompt and output inventory', () =>
   assert.match(fixture.prompt, /No Claude configuration is available/u);
   assert.match(fixture.prompt, /do not invoke any Claude executable/u);
   assert.match(fixture.prompt, /Keep the default Claude hook generation enabled/u);
+  assert.match(
+    fixture.prompt,
+    /list only resources you inspected with a read command/u,
+  );
   assert.deepEqual(fixture.claudeAdapterFiles, [
     '.claude/hooks/okf-anchor.py',
     '.claude/hooks/okf-orient.py',
@@ -167,6 +220,20 @@ test('Codex invocation isolates HOME and defaults to a writable sandbox', () => 
   assert.ok(invocation.args.includes('--ignore-user-config'));
   assert.ok(invocation.args.includes('--ignore-rules'));
   assert.ok(invocation.args.includes('--ephemeral'));
+  assert.deepEqual(
+    invocation.args.slice(
+      invocation.args.indexOf('--output-schema'),
+      invocation.args.indexOf('--output-schema') + 2,
+    ),
+    [
+      '--output-schema',
+      join(clientHome, 'okf-wiki-runtime-report-schema.json'),
+    ],
+  );
+  assert.equal(
+    invocation.transcriptPath,
+    join(clientHome, 'okf-wiki-runtime-transcript.jsonl'),
+  );
   assert.deepEqual(
     invocation.args.slice(
       invocation.args.indexOf('--sandbox'),
@@ -290,14 +357,21 @@ test('pilot and validator runners avoid a shell and remove Claude environment', 
   const calls = [];
   const run = (command, args, options) => {
     calls.push({ command, args, options });
-    return { status: 0, stdout: 'PASS\n', stderr: '' };
+    return {
+      status: 0,
+      stdout: command === 'python-fixture' ? 'PASS\n' : validCodexTranscript(),
+      stderr: '',
+    };
   };
+  const { project, home } = createInstalledFixture();
+  const isolatedCodexHome = join(home, '.codex');
+  mkdirSync(isolatedCodexHome);
   const invocation = buildOkfInvocation('codex', 'okf-1', {
-    projectDir,
-    clientHome,
-    codexHome,
+    projectDir: project,
+    clientHome: home,
+    codexHome: isolatedCodexHome,
   });
-  runOkfPilot(invocation, {
+  const evidence = runOkfPilot(invocation, {
     env: {
       PATH: '/bin',
       CLAUDE_CONFIG_DIR: '/real/claude',
@@ -308,14 +382,20 @@ test('pilot and validator runners avoid a shell and remove Claude environment', 
   assert.equal(OKF_PILOT_TIMEOUT_MS, 300_000);
   assert.equal(calls[0].options.shell, false);
   assert.equal(calls[0].options.timeout, OKF_PILOT_TIMEOUT_MS);
+  assert.deepEqual(calls[0].options.stdio, ['ignore', 'pipe', 'pipe']);
   assert.deepEqual(calls[0].options.env, {
     PATH: '/bin',
-    CODEX_HOME: codexHome,
-    HOME: clientHome,
-    USERPROFILE: clientHome,
+    CODEX_HOME: isolatedCodexHome,
+    HOME: home,
+    USERPROFILE: home,
   });
+  assert.equal(
+    readFileSync(invocation.transcriptPath, 'utf8'),
+    validCodexTranscript(),
+  );
+  assert.equal(evidence.scaffoldCommands.length, 1);
+  assert.equal(evidence.report.trust_or_approval_prompt, false);
 
-  const { project } = createInstalledFixture();
   writePilotOutput(project);
   runOkfValidation(project, 'okf-1', {
     pythonCommand: 'python-fixture',
@@ -356,6 +436,33 @@ test('output verifier rejects generated resources that diverge from the install'
   assert.throws(
     () => verifyOkfOutput(project, 'okf-1'),
     /generated file differs from installed source: \.claude\/hooks\/okf-anchor\.py/u,
+  );
+});
+
+test('runtime verification compares output with an immutable pre-run install snapshot', () => {
+  const { project, skill } = createInstalledFixture();
+  const snapshot = snapshotOkfInstall(project, 'okf-1');
+  const target = writePilotOutput(project);
+  writeFileSync(join(skill, 'post-run-extra.txt'), 'unexpected\n');
+  assert.throws(
+    () => verifyOkfInstallUnchanged(project, 'okf-1', snapshot),
+    /installed skill inventory changed during the Codex run/u,
+  );
+  unlinkSync(join(skill, 'post-run-extra.txt'));
+
+  writeFileSync(join(skill, 'scripts', 'validate.py'), '# post-run mutation\n');
+  writeFileSync(
+    join(target, 'scripts', 'validate.py'),
+    '# post-run mutation\n',
+  );
+
+  assert.throws(
+    () => verifyOkfInstallUnchanged(project, 'okf-1', snapshot),
+    /installed resource changed during the Codex run: scripts\/validate\.py/u,
+  );
+  assert.throws(
+    () => verifyOkfOutput(project, 'okf-1', { installSnapshot: snapshot }),
+    /installed resource changed during the Codex run: scripts\/validate\.py/u,
   );
 });
 
@@ -436,6 +543,76 @@ test('no-Claude preflight rejects a Claude executable on PATH', () => {
   );
   assert.doesNotThrow(
     () => verifyNoClaudeExecutable({ env: { PATH: join(root, 'empty-bin') } }),
+  );
+  assert.throws(
+    () => verifyNoClaudeExecutable({
+      env: { PATH: `${join(root, 'empty-bin')}${delimiter}` },
+    }),
+    /PATH must not contain empty entries/u,
+  );
+  assert.throws(
+    () => verifyNoClaudeExecutable({ env: { PATH: '.' } }),
+    /PATH entries must be absolute/u,
+  );
+});
+
+test('Codex transcript pins installed reads, actual commands, and no prompts', () => {
+  const evidence = parseCodexTranscript(validCodexTranscript(), 'okf-1');
+  assert.equal(evidence.scaffoldCommands.length, 1);
+  assert.equal(evidence.report.commands_run.length, evidence.commands.length);
+  assert.match(evidence.report.commands_run.at(-1), /^\(from \.\/okf-1\)/u);
+  assert.deepEqual(evidence.report.installed_files_read, [
+    '.agents/skills/okf-wiki/SKILL.md',
+    '.agents/skills/okf-wiki/spec/SPEC.md',
+  ]);
+
+  const withoutScaffold = validCodexTranscript()
+    .split('\n')
+    .filter((line) => !line.includes('scaffold.py ./okf-1'))
+    .join('\n');
+  assert.throws(
+    () => parseCodexTranscript(withoutScaffold, 'okf-1'),
+    /exactly one accepted scaffold command/u,
+  );
+
+  const loopedScaffold = validCodexTranscript().replace(
+    'python3 .agents/skills/okf-wiki/scripts/scaffold.py ./okf-1 '
+      + '--title \\"Codex no-Claude pilot\\" --sections concepts,decisions',
+    'for pass in 1 2; do python3 '
+      + '.agents/skills/okf-wiki/scripts/scaffold.py ./okf-1 '
+      + '--title \\"Codex no-Claude pilot\\" '
+      + '--sections concepts,decisions; done',
+  );
+  assert.throws(
+    () => parseCodexTranscript(loopedScaffold, 'okf-1'),
+    /exactly one accepted scaffold command/u,
+  );
+
+  const echoedRead = validCodexTranscript().replace(
+    "sed -n '1,220p' .agents/skills/okf-wiki/SKILL.md",
+    'echo .agents/skills/okf-wiki/SKILL.md',
+  );
+  assert.throws(
+    () => parseCodexTranscript(echoedRead, 'okf-1'),
+    /missing installed resource read/u,
+  );
+
+  const promptReported = validCodexTranscript()
+    .split('\n')
+    .filter(Boolean)
+    .map((line) => {
+      const event = JSON.parse(line);
+      if (event.item?.type === 'agent_message') {
+        const report = JSON.parse(event.item.text);
+        report.trust_or_approval_prompt = true;
+        event.item.text = JSON.stringify(report);
+      }
+      return JSON.stringify(event);
+    })
+    .join('\n');
+  assert.throws(
+    () => parseCodexTranscript(promptReported, 'okf-1'),
+    /trust or approval prompt/u,
   );
 });
 

@@ -59,6 +59,14 @@ no Claude executable. `command -v claude` failed before the session, no Claude
 command appeared in the command record, and the generated tree was
 byte-for-byte identical to the first run.
 
+The final transcript-enforced rerun at
+`/tmp/okf-wiki-runtime-20260723-transcript-final-2Dvarw` used absolute
+allowlisted `PATH` entries and the same baseline install. Before Codex started,
+the harness took an immutable pre-run snapshot of the complete 114-file
+installed skill. After Codex finished, it verified that the inventory and every
+digest were unchanged and compared each copied output resource with that
+snapshot rather than with the live post-run install.
+
 ## Okf-1 runtime result
 
 The exact accepted prompt and verifier live in
@@ -67,14 +75,25 @@ choice: internal audience, title `Codex no-Claude pilot`, sections `concepts`
 and `decisions`, scaffold-only population, no publishing, and default hook
 generation retained only so its output could be classified.
 
-Codex read the installed `SKILL.md`, `spec/SPEC.md`, and
-`scripts/scaffold.py`; the scaffolder read or copied the installed validator
-and hook templates. It invoked the scaffolder exactly once:
+Codex directly read the installed `SKILL.md` and `spec/SPEC.md`. It then
+executed the installed `scripts/scaffold.py`, which read or copied the installed
+validator and hook templates. It invoked the scaffolder exactly once:
 
 ```bash
 python3 .agents/skills/okf-wiki/scripts/scaffold.py ./okf-1 \
   --title 'Codex no-Claude pilot' \
   --sections concepts,decisions
+```
+
+The final run captured a JSONL transcript before certifying the result. The
+harness parsed six completed command events, required the two direct
+installed-resource reads above, required exactly one scaffold command with the
+accepted target, title, and ordered sections, cross-checked the structured
+final command report, and rejected any reported trust or approval prompt. The
+captured transcript had SHA-256 digest:
+
+```text
+e1c6fdd895c0fff28f22c092604ac0fbc4f7cd3543458dbd10458bb8bf9a50f5
 ```
 
 The generated project contained exactly 12 files:
@@ -127,12 +146,14 @@ touching a project file because nested Bubblewrap could not configure loopback:
 bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
 ```
 
-The accepted run used `--unboxed` only under the repository's `AGENTS.md`
-exception for a top-level session already running in external isolation with
-sandbox bypass. The disposable `HOME`, ignored config and rules, ephemeral
-session, new-target precondition, project path, and exact output verifier
-remained in force. This fallback is a harness constraint, not broader
-authority for an ordinary shell.
+The accepted run used `--unboxed` because the invoking session supplied an
+external-isolation policy: a top-level Codex session already running in
+external isolation with sandbox bypass may grant the same fallback to a nested
+Codex process when Bubblewrap cannot create another namespace. The disposable
+`HOME`, ignored config and rules, ephemeral session, new-target precondition,
+project path, transcript verifier, and exact output verifier remained in force.
+This fallback is a harness constraint, not broader authority for an ordinary
+shell.
 
 ## Uninstall and cleanup
 
@@ -153,8 +174,9 @@ separate lifecycles:
    adapter; and
 3. keep or delete the generated OKF project independently as user data.
 
-Both disposable projects, generated bundles, npm caches, authentication
-symlinks, and client homes were moved to the desktop trash after verification.
+All original and transcript-enforced disposable roots, generated bundles, npm
+caches, authentication symlinks, and client homes were moved to the desktop
+trash after verification.
 
 ## Repeatable harness
 
@@ -170,9 +192,11 @@ python3 -m venv '<disposable-home>/okf-python'
 ```
 
 The runner also resolves `claude` on `PATH` without executing it and refuses
-the pilot if one is available. Build a reviewed `<allowlisted-bin>` containing
-Codex, Node/npm, and the required shell utilities but no Claude executable,
-then place the Python environment and that directory on `PATH`:
+the pilot if one is available. Empty and relative `PATH` entries are rejected
+because a child process could otherwise resolve them against its project
+working directory. Build a reviewed `<allowlisted-bin>` containing Codex,
+Node/npm, and the required shell utilities but no Claude executable, then place
+the Python environment and that directory on `PATH`:
 
 ```bash
 PATH='<disposable-home>/okf-python/bin:<allowlisted-bin>' \
@@ -182,8 +206,9 @@ CODEX_HOME='<disposable-home>/.codex' \
   --client-home '<disposable-home>'
 ```
 
-Use `--unboxed` only under the `AGENTS.md` condition described above. Recheck
-an existing artifact without invoking Codex:
+Use `--unboxed` only when the invoking environment's governing policy expressly
+provides the external-isolation exception described above. Recheck an existing
+artifact without invoking Codex:
 
 ```bash
 CODEX_HOME='<disposable-home>/.codex' \
@@ -195,7 +220,8 @@ CODEX_HOME='<disposable-home>/.codex' \
 
 The focused tests pin the accepted prompt, exact portable and adapter
 inventories, empty-Claude preconditions, install and output containment,
-copied-resource equality, title and section navigation, the PyYAML preflight,
-the no-Claude executable preflight, environment stripping, sandbox plan,
-authorized fallback, validator invocation, timeout, shell avoidance, and
-adversarial CLI inputs.
+immutable installed-resource snapshots, copied-resource equality, title and
+section navigation, the PyYAML preflight, absolute non-empty `PATH` handling,
+the no-Claude executable preflight, captured transcript requirements,
+environment stripping, sandbox plan, authorized fallback, validator
+invocation, timeout, shell avoidance, and adversarial CLI inputs.

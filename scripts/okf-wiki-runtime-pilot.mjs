@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import {
   accessSync,
   constants,
@@ -8,6 +9,7 @@ import {
   readdirSync,
   realpathSync,
   statSync,
+  writeFileSync,
 } from 'node:fs';
 import {
   delimiter,
@@ -53,6 +55,34 @@ const COPIED_RESOURCES = Object.freeze([
   }),
 ]);
 
+const REQUIRED_INSTALLED_READS = Object.freeze([
+  '.agents/skills/okf-wiki/SKILL.md',
+  '.agents/skills/okf-wiki/spec/SPEC.md',
+]);
+
+const OKF_REPORT_SCHEMA = Object.freeze({
+  type: 'object',
+  additionalProperties: false,
+  required: [
+    'installed_files_read',
+    'commands_run',
+    'trust_or_approval_prompt',
+    'notes',
+  ],
+  properties: {
+    installed_files_read: {
+      type: 'array',
+      items: { type: 'string' },
+    },
+    commands_run: {
+      type: 'array',
+      items: { type: 'string' },
+    },
+    trust_or_approval_prompt: { type: 'boolean' },
+    notes: { type: 'string' },
+  },
+});
+
 export const OKF_PILOT_FIXTURES = Object.freeze({
   'okf-1': Object.freeze({
     target: 'okf-1',
@@ -74,7 +104,9 @@ export const OKF_PILOT_FIXTURES = Object.freeze({
       + 'this disposable project and its supplied client home. Run the '
       + 'scaffolder once, validate the portable bundle, and report the exact '
       + 'installed files read, commands run, files created, and any trust or '
-      + 'approval prompt. Leave the generated project in place for verification.',
+      + 'approval prompt. In installed_files_read, list only resources you '
+      + 'inspected with a read command; list executed scripts only in '
+      + 'commands_run. Leave the generated project in place for verification.',
   }),
 });
 
@@ -144,6 +176,24 @@ function relativeFiles(root) {
   return files.sort();
 }
 
+function sha256File(path) {
+  return createHash('sha256').update(readFileSync(path)).digest('hex');
+}
+
+function installedResourceFiles(skillRoot) {
+  const resources = relativeFiles(skillRoot);
+  for (const resource of resources) {
+    const resourcePath = resolve(skillRoot, resource);
+    requireRegularFile(resourcePath, `installed resource ${resource}`);
+    requireContainedRealPath(
+      resourcePath,
+      skillRoot,
+      `installed resource ${resource}`,
+    );
+  }
+  return resources;
+}
+
 export function verifyNoClaudePreconditions(
   projectDir,
   clientHome,
@@ -179,7 +229,17 @@ export function verifyNoClaudeExecutable({ env = process.env } = {}) {
     : constants.X_OK;
 
   for (const directory of pathValue.split(delimiter)) {
-    const searchDirectory = directory || '.';
+    if (!directory) {
+      throw new Error(
+        'PATH must not contain empty entries for the no-Claude pilot',
+      );
+    }
+    if (!isAbsolute(directory)) {
+      throw new Error(
+        `PATH entries must be absolute for the no-Claude pilot: ${directory}`,
+      );
+    }
+    const searchDirectory = directory;
     for (const extension of extensions) {
       const candidate = resolve(
         searchDirectory,
@@ -235,7 +295,52 @@ export function verifyOkfInstall(projectDir, fixtureId) {
   return { project, skillRoot, resources };
 }
 
-export function verifyOkfOutput(projectDir, fixtureId) {
+export function snapshotOkfInstall(projectDir, fixtureId) {
+  const install = verifyOkfInstall(projectDir, fixtureId);
+  const resources = installedResourceFiles(install.skillRoot);
+  const digests = {};
+  for (const resource of resources) {
+    digests[resource] = sha256File(resolve(install.skillRoot, resource));
+  }
+  return Object.freeze({
+    skillRoot: install.skillRoot,
+    resources: Object.freeze(resources),
+    digests: Object.freeze(digests),
+  });
+}
+
+export function verifyOkfInstallUnchanged(
+  projectDir,
+  fixtureId,
+  snapshot,
+) {
+  if (!snapshot || typeof snapshot !== 'object') {
+    throw new Error('A pre-run installed resource snapshot is required');
+  }
+  const install = verifyOkfInstall(projectDir, fixtureId);
+  const resources = installedResourceFiles(install.skillRoot);
+  if (
+    snapshot.skillRoot !== install.skillRoot
+    || !isDeepStrictEqual(snapshot.resources, resources)
+  ) {
+    throw new Error('installed skill inventory changed during the Codex run');
+  }
+  for (const resource of resources) {
+    const digest = sha256File(resolve(install.skillRoot, resource));
+    if (digest !== snapshot.digests?.[resource]) {
+      throw new Error(
+        `installed resource changed during the Codex run: ${resource}`,
+      );
+    }
+  }
+  return install;
+}
+
+export function verifyOkfOutput(
+  projectDir,
+  fixtureId,
+  { installSnapshot } = {},
+) {
   const fixture = fixtureFor(fixtureId);
   const project = resolve(projectDir);
   const target = childPath(project, fixture.target, 'Fixture target');
@@ -260,18 +365,17 @@ export function verifyOkfOutput(projectDir, fixtureId) {
     }
   }
 
-  const skillRoot = childPath(
+  const snapshot = installSnapshot ?? snapshotOkfInstall(project, fixtureId);
+  const { skillRoot } = verifyOkfInstallUnchanged(
     project,
-    '.agents/skills/okf-wiki',
-    'Installed skill root',
+    fixtureId,
+    snapshot,
   );
-  requireDirectory(skillRoot, 'installed skill root');
-  requireContainedRealPath(skillRoot, project, 'Installed skill root');
   for (const { source, output } of COPIED_RESOURCES) {
     const sourcePath = resolve(skillRoot, source);
     requireRegularFile(sourcePath, `installed resource ${source}`);
     requireContainedRealPath(sourcePath, skillRoot, `Installed resource ${source}`);
-    if (!readFileSync(sourcePath).equals(readFileSync(resolve(target, output)))) {
+    if (sha256File(resolve(target, output)) !== snapshot.digests[source]) {
       throw new Error(`generated file differs from installed source: ${output}`);
     }
   }
@@ -382,6 +486,16 @@ export function buildOkfInvocation(
   const isolationArgs = unboxed
     ? ['--dangerously-bypass-approvals-and-sandbox']
     : ['--sandbox', 'workspace-write'];
+  const reportSchemaPath = childPath(
+    home,
+    'okf-wiki-runtime-report-schema.json',
+    'Report schema',
+  );
+  const transcriptPath = childPath(
+    home,
+    'okf-wiki-runtime-transcript.jsonl',
+    'Transcript',
+  );
   return {
     command: 'codex',
     args: [
@@ -393,6 +507,8 @@ export function buildOkfInvocation(
       '--skip-git-repo-check',
       '-C',
       cwd,
+      '--output-schema',
+      reportSchemaPath,
       '--json',
       fixture.prompt,
     ],
@@ -403,6 +519,9 @@ export function buildOkfInvocation(
       USERPROFILE: home,
     },
     unsetEnv: ['CLAUDE_CONFIG_DIR', 'CLAUDE_PROJECT_DIR'],
+    fixtureId,
+    reportSchemaPath,
+    transcriptPath,
   };
 }
 
@@ -412,6 +531,166 @@ function isolatedEnvironment(invocation, env) {
   return childEnv;
 }
 
+function commandMatchesReport(actual, reported) {
+  const normalizedActual = actual.trim().replace(/\s+/gu, ' ');
+  const normalizedReported = reported
+    .trim()
+    .replace(/^\(from [^)]+\)\s+/u, '')
+    .replace(/^cd\s+\S+\s+&&\s+/u, '')
+    .replace(/\s+/gu, ' ');
+  return normalizedActual === normalizedReported
+    || normalizedActual.includes(normalizedReported)
+    || normalizedReported.includes(normalizedActual);
+}
+
+function shellCommandBody(command) {
+  let body = command.trim();
+  const shellPrefix = /^\/(?:usr\/)?bin\/bash\s+-lc\s+/u;
+  if (shellPrefix.test(body)) {
+    body = body.replace(shellPrefix, '');
+    const quote = body[0];
+    if ((quote === '"' || quote === "'") && body.at(-1) === quote) {
+      body = body.slice(1, -1);
+    }
+  }
+  return body.replace(/\s+/gu, ' ').trim();
+}
+
+function escapeRegularExpression(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&');
+}
+
+export function parseCodexTranscript(transcript, fixtureId) {
+  const fixture = fixtureFor(fixtureId);
+  const lines = transcript.split(/\r?\n/u).filter((line) => line.trim());
+  if (lines.length === 0) {
+    throw new Error('Codex JSONL transcript is empty');
+  }
+  const events = lines.map((line, index) => {
+    try {
+      return JSON.parse(line);
+    } catch (error) {
+      throw new Error(
+        `Codex transcript line ${index + 1} is not valid JSON: ${error.message}`,
+      );
+    }
+  });
+  for (const event of events) {
+    const eventType = `${event?.type ?? ''} ${event?.item?.type ?? ''}`;
+    if (/\b(?:approval|trust)(?:_|\.|-|$)/iu.test(eventType)) {
+      throw new Error('Codex transcript contains a trust or approval prompt event');
+    }
+  }
+
+  const completedItems = events
+    .filter((event) => event?.type === 'item.completed')
+    .map((event) => event.item);
+  const commands = completedItems
+    .filter((item) => item?.type === 'command_execution')
+    .map((item) => item.command)
+    .filter((command) => typeof command === 'string');
+  const scaffoldPrefixPattern = new RegExp(
+    String.raw`(?:^|&&\s+)python3\s+`
+      + String.raw`\.agents/skills/okf-wiki/scripts/scaffold\.py\s+`,
+    'u',
+  );
+  const scaffoldCommands = commands.filter((command) =>
+    scaffoldPrefixPattern.test(shellCommandBody(command)),
+  );
+  const acceptedScaffoldPattern = new RegExp(
+    String.raw`^(?:test\s+!\s+-e\s+\./`
+      + `${escapeRegularExpression(fixture.target)}`
+      + String.raw`\s+&&\s+)?python3\s+`
+      + String.raw`\.agents/skills/okf-wiki/scripts/scaffold\.py\s+`
+      + String.raw`\./${escapeRegularExpression(fixture.target)}\s+`
+      + String.raw`--title\s+(["'])`
+      + `${escapeRegularExpression(fixture.title)}`
+      + String.raw`\1\s+--sections\s+`
+      + `${fixture.sections.map(escapeRegularExpression).join(',')}$`,
+    'u',
+  );
+  if (
+    scaffoldCommands.length !== 1
+    || !acceptedScaffoldPattern.test(shellCommandBody(scaffoldCommands[0]))
+  ) {
+    throw new Error('Codex transcript must contain exactly one accepted scaffold command');
+  }
+
+  for (const path of REQUIRED_INSTALLED_READS) {
+    const readPattern = new RegExp(
+      String.raw`\b(?:awk|cat|head|less|more|rg|sed|tail|wc)\b`
+        + String.raw`[^\r\n]*`
+        + escapeRegularExpression(path),
+      'u',
+    );
+    if (!commands.some((command) => readPattern.test(shellCommandBody(command)))) {
+      throw new Error(`Codex transcript is missing installed resource read: ${path}`);
+    }
+  }
+
+  const reportItems = completedItems.filter(
+    (item) => item?.type === 'agent_message' && typeof item.text === 'string',
+  );
+  if (reportItems.length === 0) {
+    throw new Error('Codex transcript is missing the structured final report');
+  }
+  for (const item of reportItems) {
+    try {
+      const candidate = JSON.parse(item.text);
+      if (candidate?.trust_or_approval_prompt === true) {
+        throw new Error('Codex reported a trust or approval prompt');
+      }
+    } catch (error) {
+      if (error.message === 'Codex reported a trust or approval prompt') {
+        throw error;
+      }
+      // Only the final agent message is required to be the structured report.
+    }
+  }
+  let report;
+  try {
+    report = JSON.parse(reportItems.at(-1).text);
+  } catch (error) {
+    throw new Error(`Codex final report is not valid JSON: ${error.message}`);
+  }
+  if (
+    !report
+    || !Array.isArray(report.installed_files_read)
+    || !Array.isArray(report.commands_run)
+    || typeof report.trust_or_approval_prompt !== 'boolean'
+    || typeof report.notes !== 'string'
+  ) {
+    throw new Error('Codex final report does not match the required evidence shape');
+  }
+  if (report.trust_or_approval_prompt) {
+    throw new Error('Codex reported a trust or approval prompt');
+  }
+  const reportedReads = [...new Set(report.installed_files_read)].sort();
+  if (
+    !isDeepStrictEqual(
+      reportedReads,
+      [...REQUIRED_INSTALLED_READS].sort(),
+    )
+  ) {
+    throw new Error('Codex final report does not list the exact installed files read');
+  }
+  if (
+    report.commands_run.length !== commands.length
+    || !report.commands_run.every(
+      (reported, index) => typeof reported === 'string'
+        && commandMatchesReport(commands[index], reported),
+    )
+  ) {
+    throw new Error('Codex final report does not match the captured command log');
+  }
+  return {
+    commands,
+    events,
+    report,
+    scaffoldCommands,
+  };
+}
+
 export function runOkfPilot(
   invocation,
   {
@@ -419,20 +698,46 @@ export function runOkfPilot(
     env = process.env,
   } = {},
 ) {
+  if (existsSync(invocation.reportSchemaPath)) {
+    throw new Error(
+      `Refusing to replace an existing report schema: ${invocation.reportSchemaPath}`,
+    );
+  }
+  if (existsSync(invocation.transcriptPath)) {
+    throw new Error(
+      `Refusing to replace an existing transcript: ${invocation.transcriptPath}`,
+    );
+  }
+  writeFileSync(
+    invocation.reportSchemaPath,
+    `${JSON.stringify(OKF_REPORT_SCHEMA, null, 2)}\n`,
+    { encoding: 'utf8', flag: 'wx', mode: 0o600 },
+  );
   const result = run(invocation.command, invocation.args, {
     cwd: invocation.cwd,
     env: isolatedEnvironment(invocation, env),
+    encoding: 'utf8',
     shell: false,
-    stdio: 'inherit',
+    stdio: ['ignore', 'pipe', 'pipe'],
     timeout: OKF_PILOT_TIMEOUT_MS,
     windowsHide: true,
   });
+  const transcript = result.stdout ?? '';
+  writeFileSync(
+    invocation.transcriptPath,
+    transcript,
+    { encoding: 'utf8', flag: 'wx', mode: 0o600 },
+  );
   if (result.status !== 0) {
     throw new Error(
       `${invocation.command} okf-wiki pilot failed with status `
-      + `${result.status ?? 'unknown'}`,
+      + `${result.status ?? 'unknown'}: ${result.stderr ?? ''}`.trim(),
     );
   }
+  return {
+    ...parseCodexTranscript(transcript, invocation.fixtureId),
+    transcriptPath: invocation.transcriptPath,
+  };
 }
 
 export function runOkfValidation(
@@ -601,16 +906,27 @@ function runCli() {
 
   verifyNoClaudeExecutable();
   verifyNoClaudePreconditions(projectDir, clientHome, fixtureId);
-  verifyOkfInstall(projectDir, fixtureId);
+  const installSnapshot = snapshotOkfInstall(projectDir, fixtureId);
   verifyOkfPythonDependencies();
-  runOkfPilot(invocation);
-  const output = verifyOkfOutput(projectDir, fixtureId);
+  const evidence = runOkfPilot(invocation);
+  verifyOkfInstallUnchanged(
+    projectDir,
+    fixtureId,
+    installSnapshot,
+  );
+  const output = verifyOkfOutput(projectDir, fixtureId, {
+    installSnapshot,
+  });
   const validation = runOkfValidation(projectDir, fixtureId);
   console.log(JSON.stringify({
     fixture: fixtureId,
     target: output.target,
     portableFiles: output.portableFiles,
     claudeAdapterFiles: output.claudeAdapterFiles,
+    transcript: evidence.transcriptPath,
+    commands: evidence.commands,
+    installedFilesRead: evidence.report.installed_files_read,
+    trustOrApprovalPrompt: evidence.report.trust_or_approval_prompt,
     validation: validation.stdout.trim(),
   }, null, 2));
 }
