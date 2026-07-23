@@ -7,42 +7,126 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+## [2.3.3] - 2026-07-23
 
-- **Codex phase-one installation baseline:** added a checked-in 12-package compatibility matrix, a pinned Agent Skills validator, clean `journalism-core` canaries for Claude, Codex's legacy package reader, the project `.agents/skills` path, and the user `~/.agents/skills` path, plus client-specific installation guidance. The canaries require the exact 14-skill and 17-file package, compare installed file hashes with the source, and add no native Codex manifest.
-- **Compatibility drift gates:** added a scheduled check against the current upstream Agent Skills validator while keeping pull-request validation pinned, bounded client canary runtimes, linked package evidence records, native Codex manifest path guards, and catalog-to-child metadata equality checks.
-- **Windows verification portability:** normalized repository-relative result paths and line endings in cross-platform checks, preserved the one NTFS-impossible path fixture as a Windows-only skip, and added CRLF regression coverage for the docs CSS freshness gate.
-- **Last-updated stamps on every skill and plugin (this PR)**: each card and skill page at skills.amditis.tech now carries the date that skill or plugin last changed, and the README tables gained an `Updated` column. Readers installing a skill can see whether their copy is likely to have drifted from its sources. Dates come from git history (`git log -1 --format=%cI -- <path>`), never from a hand-maintained field, so a stamp cannot silently rot. `scripts/updated-stamp.mjs` writes all three surfaces and is idempotent; `docs/updated.css` draws the date as a strip of tape that yellows with age (fresh under 90 days, yellowed under 270, browned past that) and `docs/updated.js` converts the stamped absolute date to a relative one in the reader's browser, because a relative age baked into a static file is wrong the day after the build. `.github/workflows/updated-stamp.yml` re-runs the stamper on pushes to master that touch a date source and commits the result. Six invariants are covered by tests in `scripts/updated-stamp.test.mjs`: dates are never derived from `docs/` (a date read from the page it is stamped into would make the CI commit bump the date and stamp again, forever); a duplicate skill slug stops the run rather than letting two skills stamp each other; a slug is checked to be lowercase letters, digits, and hyphens where the entry is built, because the same string addresses an HTML attribute, a `docs/<slug>/` path, and a README link; any surface that could not be stamped exits 1 rather than logging a warning the CI commit would ride past; a stamp destination has to resolve to the path that names it, so a symlink at any segment cannot write through to another page; and a README table holding a row with an unescaped pipe is skipped whole and reported, because widening it would make that row indistinguishable from a stamped one on the next pass. The index finder excludes tape text from its search corpus so a card cannot match on its own date. Every tier clears WCAG AA contrast on all card and hero backgrounds, and the age is stated in words as well as color.
-- **`photo-metadata` skill (journalism-core, this PR)**: new `journalism-core/skills/photo-metadata/` skill for embedding wire- and archive-ready metadata into image files — caption, byline, credit, alt text, keywords, location, and copyright or Creative Commons license written across the IPTC, EXIF, and XMP layers with exiftool. Leads with the newsroom discipline a capable model otherwise skips: caption only what is visible, label people from visible evidence, always write a screen-reader `AltTextAccessibility` field, keep editorial framing in `Headline` rather than the structured location or caption fields, and verify the round-trip by reading the metadata back from the file. Ships `SKILL.md`, a `reference.md` field map (IPTC-IIM byte limits, the Creative Commons field set, the AP caption recipe, and the alt-text-versus-caption distinction), and a generic `embed.py` that batch-tags a local folder from a JSON manifest and reads each file back to confirm. journalism-core `1.1.0 → 1.2.0`; the plugin and marketplace descriptions move Thirteen → Fourteen skills. Built test-first per `writing-skills`: the RED baseline without the skill omitted alt text, wrote caption detail not visible in the frame, and set an incomplete license; GREEN with the skill closed all three and refused an unverifiable bystander claim. The marketplace rollup version stays `2.1.0` until the next release cut.
-- **`one-way-door` Windows (PowerShell) port** (this PR): `dev-toolkit/skills/one-way-door/one-way-door-check.ps1` and `one-way-door-approve.ps1`, behavior-matched to the shell hooks for Windows, where Claude Code runs hooks through PowerShell and `tool_input.file_path` can arrive with backslashes (which `basename` does not split on, so the shell safelist would misfire). The ports share the same session ledger (`%USERPROFILE%\.claude\hooks\state\one-way-door\`), early-exit safelist, and one-way-door categories; filename and directory splitting goes through `[System.IO.Path]` and directory patterns are matched after normalizing `\` to `/`, so the check is correct for backslash and forward-slash paths alike. Verified against a block / safelist / stateful-approve test matrix. Documented with the PowerShell `settings.json` wiring in `SKILL.md`, `hooks/one-way-door-check.md`, and `docs/one-way-door/index.html`.
-
-### Changed
-
-- **Shared frontmatter now passes the Agent Skills specification:** normalized `document-design`, removed its stale duplicate version field, and removed Claude-only `argument-hint` fields from the four video skills. Claude invocation and argument delivery remain tested. `pdf-playground` advanced to 1.3.2, `video-toolkit` to 1.0.3, and the Claude marketplace to 2.3.3 so existing installs can receive the repaired files.
-- **`one-way-door` hook is now stateful** (this PR): the check (`PreToolUse:Write`) gained a session-scoped approval ledger, and a companion `one-way-door-approve.sh` (`PostToolUse:AskUserQuestion`) promotes pending files to approved once the user answers an `AskUserQuestion`. The old stateless check re-blocked the same file on the retry, so its own "ask, then retry" instruction never terminated. The retried write now passes; every other unapproved one-way-door file still blocks. The ledger lives in `~/.claude/hooks/state/one-way-door/` (`<session_id>.pending` / `.approved`), and a new session starts clean.
-- **`one-way-door` check gained a false-positive safelist and tighter auth matching** (this PR): the documented script is now the best-of-both version running locally — it early-exits an explicit safelist (test files by convention, `tests/`/`__tests__/`/`fixtures/`/`mocks/` directories, all Markdown, and `*.txt`/`*.rst` under `plans`/`docs`/`notes`/`superpowers`) before any pattern check, and the auth/security patterns are extension-qualified (`security.{ts,js,py,json,rules,yaml,yml}`, `rbac.{ts,js,py,json}`, `permissions.{ts,js,py,json}`) so a file that merely contains a keyword no longer trips. Updated `dev-toolkit/skills/one-way-door/SKILL.md`, `hooks/one-way-door-check.md`, and `docs/one-way-door/index.html` to document both hooks, the safelist, and the new `settings.json` wiring.
-
-## [2.1.0] - 2026-05-12
-
-The security-toolkit supply-chain release. Marketplace bumped 2.0.0 → 2.1.0 to roll up PR #77 (security-toolkit 1.1.0) and the docs-surface follow-up.
+This release catches the public GitHub history up to marketplace `2.3.3`. It adds
+the video toolkit, hardens executable and remote-content boundaries, and records
+the first verified Codex installation and package-runtime evidence. The Codex
+work is a phase-one baseline, not a repository-wide support declaration; commands,
+agents, hooks, and packages without completed runtime gates remain outside the
+claim.
 
 ### Added
 
-- **security-toolkit plugin v1.2.0 (#77, #80, this PR)**: new `supply-chain-hardening` skill plus a `/security-toolkit:hotpatch` slash command that runs a sandboxed pre-install scan of npm/bun packages (bwrap on Linux, sandbox-exec on macOS). The skill ships install-time cooldown configuration (npm `min-release-age`, bun `[install] minimumReleaseAge`) plus a reference shell script (`scripts/hotpatch.example.sh`) with a `--self-test` mode that verifies against synthetic malicious tarballs in `test-fixtures/`. Defends against the Mini Shai-Hulud-class TanStack supply-chain worm pattern.
-- **Docs landing page** at `docs/supply-chain-hardening/index.html` (#80) mirroring the security-checklist template with a red gradient hero, threat-model two-column grid, scan-heuristics table, and `aria-labelledby` / `scope="col"` accessibility additions beyond the cohort baseline.
-- **`docs/supply-chain-hardening/og-image.png`** (#80) — 1200×630 OG image matching the security cohort palette.
-- **CI hotpatch self-test workflow** (this PR): `.github/workflows/security-toolkit-hotpatch-selftest.yml` runs `bash security-toolkit/scripts/hotpatch.example.sh --self-test` on every PR that touches `security-toolkit/scripts/` or `security-toolkit/test-fixtures/`.
+- **video-toolkit 1.0.3:** added `video-dashboard`, `video-download`,
+  `video-frames`, and `video-transcribe`, with a docs page and marketplace
+  registration. The transcription workflow records source, model, build, and
+  decode provenance; CPU `whisper.cpp` remains the reproducible transcript of
+  record while GPU paths are optional accelerators (#189, #213, #218, #222).
+- **Codex phase-one baseline:** added a checked-in 12-package compatibility
+  matrix, a pinned official Agent Skills validator, install canaries for Claude
+  and the tested Codex paths, and client-specific installation guidance. The
+  canaries verify the exact installed file set and hashes without adding a
+  native Codex manifest (#225, #246).
+- **Paired runtime pilots:** recorded successful Claude and standards-based
+  Codex runs for all 14 `journalism-core` skills, plus a standards-based Codex
+  run for the `visual-explainer` root skill and its relative resources. The
+  legacy package route, generated wrappers, source commands, and broader
+  package claims retain their documented limits (#247, #249).
+- **Compatibility drift gates:** added current-client scheduled checks, bounded
+  canary runtimes, catalog-to-child metadata checks, native-manifest path
+  guards, and Windows line-ending and path portability coverage (#225).
+- **Editorial hooks:** added `copywriting-preflight`, `pre-commit-review`, and
+  an executable `no-ai-attribution` hook with tests for common Git and GitHub
+  CLI invocation paths (#135, #160, #176, #193).
+- **Last-updated stamps:** every skill and plugin card now shows its last source
+  change from Git history. A scheduled writer keeps the README and docs
+  surfaces synchronized, and the docs finder excludes the stamp text from
+  search results (#202).
 
 ### Changed
 
-- **`security-toolkit/scripts/hotpatch.example.sh` is now cross-platform** (this PR): detects host OS via `uname` and selects a sandbox backend per platform — `bwrap` on Linux, `sandbox-exec` on macOS with a deny-default profile that restricts reads to system dirs + the tarball file, restricts writes to the scan-dir, allows `process-exec` of `/usr/bin/tar` only, and denies network. The Linux path also probes `bwrap` with a no-op `--bind / / -- true` before use; if AppArmor/seccomp policy on the host blocks unprivileged user namespaces (common on GitHub Actions runners and inside Docker containers), the script falls back to an unsandboxed `tar` extract with a loud warning. The static scan still runs identically either way. Falls back to a clearly-flagged unsandboxed extract on platforms with neither backend.
-- **`docs/index.html`** (#80): `09 / Security` cluster header `3 Skills` → `4 Skills`; new `supply-chain-hardening` card with the `package-check` lucide icon.
-- **`docs/llms.txt`** (this PR): rebuilt from the filesystem — `31 → 53` skills, added "Project templates", "Documents and explainers", and "Workflow patterns (superjawn)" sections that were missing entirely. Closes the count drift noted in #83.
-- **`docs/sitemap.xml`** (this PR): regenerated from the filesystem — 6 → 43 URLs, every page under `docs/<slug>/index.html` now listed with current `<lastmod>`. Closes the staleness noted in #82.
+- **okf-wiki 0.2.0 → 0.6.1:** added an author-from-existing-sources
+  workflow, an onboarding interview, format version 0.2 with backward reading
+  support, domain-neutral concept types, documented upstream divergences, and
+  opt-in entropy checks for URL-safe secrets. Validator and scaffold fixes cover
+  provenance quoting, dead wikilinks, aliases and merges, ISO 8601 timestamps,
+  PyYAML requirements, canonical/example drift, and safe `--force` behavior
+  (#136, #147-#149, #159, #163-#168, #174, #184, #186, #190, #192, #204,
+  #243).
+- **Agent Skills metadata:** restored official CLI discovery, normalized
+  `document-design`, removed its duplicate version field, and removed
+  Claude-only `argument-hint` keys from the four video skills. Claude invocation
+  and argument delivery remain tested (#224, #225).
+- **Security boundaries:** high-risk skills now state trust boundaries for
+  untrusted content and remote input. Runtime CDN execution, the Tailwind Play
+  CDN, and runtime Whisper source fetching were removed; checksum and video
+  dependency checks were tightened (#201, #206, #207, #209, #212, #215, #217,
+  #222).
+- **Published versions:** marketplace `2.2.0 → 2.3.3`; dev-toolkit
+  `1.1.0 → 1.1.1`; okf-wiki `0.2.0 → 0.6.1`; pdf-playground
+  `1.3.1 → 1.3.2`; and the new video-toolkit at `1.0.3`.
 
 ### Fixed
 
-- **a11y color-contrast on `docs/persistent-sessions/index.html`** (this PR): three nodes using `text-clay/50` and `text-clay/60` fell below WCAG AA 4.5:1 against the white card background; bumped to the cohort-standard `text-clay/70`. axe-core 4.x scan now reports zero severe and zero minor violations across all 43 docs pages. Closes #81.
+- **FOIA deadlines:** the federal deadline helper now counts 20 business days
+  and excludes federal holidays as documented (#180).
+- **Autonomy kit:** corrected subscription estimates when review is disabled,
+  fixed the launchd template, and added Python and template checks to CI (#134,
+  #178, #191).
+- **Docs and examples:** fixed okf-wiki contrast and mobile table clipping,
+  replaced runtime Tailwind compilation with committed CSS, and hardened scraper
+  redirects and webhook failure handling (#133, #183, #206, #212).
+
+## [2.2.0] - 2026-06-24
+
+### Added
+
+- **claude-md-updater skill:** added a dev-toolkit workflow that extracts
+  durable lessons from a session and proposes a scoped `CLAUDE.md` edit as an
+  exact diff before writing. Transient notes stay in auto memory or a local,
+  ignored file. The release also added the skill's docs page and synchronized
+  the catalog to 56 skills and 11 plugins (#127).
+
+## [2.1.0] - 2026-06-24
+
+The marketplace rollup added okf-wiki and the work shipped between the bundling
+release and its June catalog cut.
+
+### Added
+
+- **okf-wiki 0.2.0:** added an Open Knowledge Format scaffolder,
+  validator, example bundle, docs page, optional GitHub-wiki bootstrap, and
+  session-orientation hooks that merge safely into existing Claude settings
+  (#129-#131).
+- **photo-metadata:** added a fourteenth journalism-core skill for writing and
+  verifying wire-ready IPTC, EXIF, and XMP captions, credits, alt text, location,
+  keywords, and licensing fields (#119).
+- **Guides and workflows:** added the autonomy issue-workhorse kit and cost
+  estimator, a multi-agent workflows guide, and a vendor-neutral X/Twitter
+  evidence-packet workflow (#91, #97-#100, #103, #108, #117).
+- **supply-chain-hardening:** added the security-toolkit skill, hotpatch
+  command, sandboxed package scanner, docs page, and CI self-test (#77, #80,
+  #84).
+
+### Changed
+
+- **one-way-door:** made approval stateful, narrowed false-positive matching, and
+  added behavior-matched PowerShell hooks for Windows (#114).
+- **Supply-chain scanner:** added Linux `bwrap`, macOS `sandbox-exec`, and
+  PowerShell paths with explicit fallback behavior when a sandbox backend is
+  unavailable (#77, #84).
+- **Docs:** synchronized catalog counts and sitemap coverage, tightened page
+  copy, hardened external links, and fixed mobile diagrams and contrast across
+  the autonomy, workflows, and skill pages (#81-#83, #92, #95, #100-#101,
+  #122-#124).
+
+### Fixed
+
+- **Autonomy schedules:** corrected named-weekday cron estimates and native
+  Windows scheduling guidance (#109, #113).
+- **Docs verification:** fixed an intermittent undici failure in the
+  accessibility gate and restored accurate hook and install claims (#94, #123).
 
 ## [2.0.0] - 2026-05-11
 
@@ -483,6 +567,10 @@ Initial commit with foundational skills.
 
 ---
 
+[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.3.3...HEAD
+[2.3.3]: https://github.com/jamditis/claude-skills-journalism/compare/v2.2.0...v2.3.3
+[2.2.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.1.0...v2.2.0
+[2.1.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.9.0...v2.0.0
 [1.9.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/jamditis/claude-skills-journalism/compare/v1.7.0...v1.8.0
