@@ -51,10 +51,16 @@ test('the compatibility matrix classifies every marketplace package', () => {
   assert.match(matrix, /`video-toolkit` \| 1\.0\.3/u);
   assert.match(matrix, /V-phase-1: repaired standards baseline/u);
   assert.match(matrix, /J-release-1: paired journalism-core runtime pilot/u);
+  assert.match(matrix, /V-ex-release-1: visual-explainer root-skill runtime pilot/u);
   assert.match(
     matrix,
     /`journalism-core` \| 1\.2\.0; 14 nested skills \| Runtime pilot passed on the Claude package and Codex project-standards paths/u,
   );
+  assert.match(
+    matrix,
+    /`visual-explainer` \| 0\.7\.1; one root skill; eight source commands \| Runtime pilot passed on the Codex project-standards path; command surfaces unclaimed/u,
+  );
+  assert.match(matrix, /scripts\/visual-explainer-runtime-pilot\.mjs/u);
 
   const evidenceCells = matrix
     .split('\n')
@@ -64,6 +70,26 @@ test('the compatibility matrix classifies every marketplace package', () => {
   for (const evidence of evidenceCells) {
     assert.match(evidence, /\[[^\]]+\]\(#[^)]+\)/u);
   }
+});
+
+test('visual-explainer runtime evidence stays scoped to the tested Codex path', () => {
+  const record = readFileSync(
+    join(ROOT, 'plans', '2026-07-23-visual-explainer-runtime-pilot.md'),
+    'utf8',
+  );
+
+  assert.match(record, /Tracking issue: \[#228\]/u);
+  assert.match(record, /Codex CLI 0\.145\.0/u);
+  assert.match(record, /skills CLI 1\.5\.20/u);
+  assert.match(record, /project's `\.agents\/skills\/visual-explainer` directory/u);
+  assert.match(
+    record,
+    /83e44cc015b0ebb5b3c19cb5e5f2127b873dec8f5b07d3dc0e3e865d082b6215/u,
+  );
+  assert.match(record, /did not register it under a standards skill root/u);
+  assert.match(record, /three untested migrated-command wrapper skills/u);
+  assert.match(record, /outside this root-skill pilot/u);
+  assert.doesNotMatch(record, /repository-wide Codex support/u);
 });
 
 test('the README routes Codex users without implying mixed-install support', () => {
