@@ -105,6 +105,23 @@ SECRET_PATTERNS = [
     ("Slack token", re.compile(r"\bxox[baprs]-[0-9A-Za-z-]{10,}")),
     ("GitHub token", re.compile(r"\bgh[pousr]_[0-9A-Za-z]{36,}\b")),
     ("GitHub fine-grained PAT", re.compile(r"\bgithub_pat_[0-9A-Za-z_]{22,}\b")),
+    # More provider tokens, each anchored on a fixed literal prefix like the
+    # detectors above. Because they key on a prefix (not a widened value charset),
+    # none can fire on a documented key path such as `secret: svc/api/prod-key-path`
+    # -- so they raise default recall on real leaked tokens at zero precision cost,
+    # and unlike the opt-in entropy scan they run on every validation and match a
+    # token whether or not it sits after a credential label.
+    ("Stripe secret key", re.compile(r"\b[sr]k_(?:live|test)_[0-9A-Za-z]{24,}\b")),
+    ("Stripe webhook secret", re.compile(r"\bwhsec_[0-9A-Za-z]{32,}\b")),
+    ("GitLab token", re.compile(r"\bglpat-[0-9A-Za-z_-]{20,}")),
+    ("npm token", re.compile(r"\bnpm_[0-9A-Za-z]{36}\b")),
+    ("SendGrid API key", re.compile(r"\bSG\.[0-9A-Za-z_-]{22}\.[0-9A-Za-z_-]{43}")),
+    ("Anthropic API key", re.compile(r"\bsk-ant-[0-9A-Za-z_-]{20,}")),
+    ("OpenAI project key", re.compile(r"\bsk-(?:proj|svcacct)-[0-9A-Za-z_-]{20,}")),
+    # Legacy personal OpenAI keys carry no project/service segment. `sk-` alone is a
+    # weak prefix, so the 40-char solid-base62 run does the signal work; it stays
+    # disjoint from the project-key line above, whose `-` breaks the run.
+    ("OpenAI legacy key", re.compile(r"\bsk-[0-9A-Za-z]{40,}\b")),
     ("secret assignment", re.compile(
         r"(?i)" + SECRET_LABEL +
         # Base64-standard value charset only -- deliberately excludes - and _. A

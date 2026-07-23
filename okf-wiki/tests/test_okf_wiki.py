@@ -864,6 +864,48 @@ def test_github_pat_secret_detected(tmp_path):
     assert rc == 1 and "secret leak" in out
 
 
+@pytest.mark.parametrize("label, token", [
+    ("Stripe secret key", "sk_" + "live_" + "A1b2C3d4E5f6G7h8I9j0K1L2"),
+    ("Stripe webhook secret", "whsec_" + "A1b2C3d4E5f6G7h8I9j0K1L2M3n4O5p6"),
+    ("GitLab token", "glpat-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("npm token", "npm_" + "A1b2C3d4E5f6G7h8" + "I9j0K1L2M3n4O5p6Q7r8"),
+    ("SendGrid API key", "SG." + "A" * 22 + "." + "B" * 43),
+    ("Anthropic API key", "sk-" + "ant-" + "api03-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("OpenAI project key", "sk-" + "proj-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("OpenAI legacy key", "sk-" + "A1b2C3d4E5f6G7h8I9j0" + "K1L2M3n4O5p6Q7r8S9t0"),
+])
+def test_provider_token_secret_detected(tmp_path, label, token):
+    # Prefix-anchored provider detectors (issue #150 move A). Each token is built
+    # from fragments so no real-looking secret lives in this file. They run on the
+    # default validate (no flag) and raise recall at no precision cost -- the
+    # negative test below proves they leave documentation alone.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + f"\nkey = {token}\n")
+    rc, out = validate(b)
+    # Assert the specific detector, not just that some leak fired, so a token that
+    # matched the wrong pattern would still be caught.
+    assert rc == 1 and f"secret leak ({label})" in out
+
+
+def test_provider_prefixes_do_not_flag_prose(tmp_path):
+    # The provider prefixes must not fire on documentation: a placeholder ellipsis,
+    # an env-var name, words that merely contain an rk_/sk_ substring (the \b anchor
+    # guards these), and an OKF key path (the invariant the provider block promises)
+    # all stay clean on the default validate.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    prose = (
+        "Set your sk_test_... key from the dashboard.\n"
+        "The npm_config_registry env var points at the mirror.\n"
+        "Use the work_live and mark_live feature flags.\n"
+        "The pointer secret: svc/api/prod-key-path names a vault key, not a value.\n"
+    )
+    write_concept(b, GOOD.rstrip() + "\n" + prose)
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
 def test_link_to_existing_uppercase_md_fails(tmp_path):
     # the case the prior case-sensitive design worried about: a link to an existing
     # Foo.MD used to "resolve" as valid while discovery never scanned that file. Now
