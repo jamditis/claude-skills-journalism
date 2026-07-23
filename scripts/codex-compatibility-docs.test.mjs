@@ -109,6 +109,9 @@ test('okf-wiki no-Claude evidence keeps Claude adapters outside Codex behavior',
   assert.match(record, /runner also resolves `claude` on `PATH` without executing it/u);
   assert.match(record, /immutable pre-run snapshot/u);
   assert.match(record, /captured a JSONL transcript/u);
+  assert.match(record, /required the two direct\s+installed-resource reads above to succeed/u);
+  assert.match(record, /required the structured\s+command report to match/u);
+  assert.match(record, /rejected any Claude executable/u);
   assert.match(
     record,
     /invoking session supplied an\s+external-isolation policy/u,

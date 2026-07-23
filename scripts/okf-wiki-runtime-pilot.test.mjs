@@ -144,6 +144,12 @@ function validCodexTranscript() {
     ...commandsRun.slice(0, 3),
     'python3 scripts/validate.py --bundle bundle',
   ];
+  const capturedOutputs = [
+    'name: okf-wiki\n# okf-wiki: scaffold an Open Knowledge Format knowledge base\n',
+    '# OKF spec v1\n## Bundle model\n',
+    'Scaffolded OKF project\nPASS\n',
+    'PASS\n',
+  ];
   const events = [
     { type: 'thread.started', thread_id: 'fixture-thread' },
     ...capturedCommands.map((command, index) => ({
@@ -152,6 +158,7 @@ function validCodexTranscript() {
         id: `command-${index}`,
         type: 'command_execution',
         command,
+        aggregated_output: capturedOutputs[index],
         status: 'completed',
         exit_code: 0,
       },
@@ -171,6 +178,15 @@ function validCodexTranscript() {
     },
     { type: 'turn.completed' },
   ];
+  return `${events.map((event) => JSON.stringify(event)).join('\n')}\n`;
+}
+
+function mutateCodexTranscript(mutator) {
+  const events = validCodexTranscript()
+    .split('\n')
+    .filter(Boolean)
+    .map((line) => JSON.parse(line));
+  mutator(events);
   return `${events.map((event) => JSON.stringify(event)).join('\n')}\n`;
 }
 
@@ -594,7 +610,93 @@ test('Codex transcript pins installed reads, actual commands, and no prompts', (
   );
   assert.throws(
     () => parseCodexTranscript(echoedRead, 'okf-1'),
-    /missing installed resource read/u,
+    /missing successful installed resource read/u,
+  );
+
+  const windowsTranscript = validCodexTranscript().replaceAll(
+    'python3 .agents/skills/okf-wiki/scripts/scaffold.py',
+    'python .agents/skills/okf-wiki/scripts/scaffold.py',
+  );
+  assert.doesNotThrow(
+    () => parseCodexTranscript(windowsTranscript, 'okf-1', {
+      platform: 'win32',
+    }),
+  );
+  assert.throws(
+    () => parseCodexTranscript(windowsTranscript, 'okf-1', {
+      platform: 'linux',
+    }),
+    /exactly one accepted scaffold command/u,
+  );
+
+  const hiddenCompound = mutateCodexTranscript((events) => {
+    const command = events.find(
+      (event) => event.item?.command?.includes('/SKILL.md'),
+    );
+    command.item.command += ' && cat /etc/passwd';
+  });
+  assert.throws(
+    () => parseCodexTranscript(hiddenCompound, 'okf-1'),
+    /final report does not exactly match the captured command log/u,
+  );
+
+  const failedRead = mutateCodexTranscript((events) => {
+    const command = events.find(
+      (event) => event.item?.command?.includes('/SKILL.md'),
+    );
+    command.item.status = 'failed';
+    command.item.exit_code = 1;
+  });
+  assert.throws(
+    () => parseCodexTranscript(failedRead, 'okf-1'),
+    /missing successful installed resource read/u,
+  );
+
+  const countOnly = mutateCodexTranscript((events) => {
+    const command = events.find(
+      (event) => event.item?.command?.includes('/SKILL.md'),
+    );
+    command.item.command = 'wc -l .agents/skills/okf-wiki/SKILL.md';
+  });
+  assert.throws(
+    () => parseCodexTranscript(countOnly, 'okf-1'),
+    /missing successful installed resource read/u,
+  );
+
+  const claudeCommand = mutateCodexTranscript((events) => {
+    events.splice(-2, 0, {
+      type: 'item.completed',
+      item: {
+        id: 'forbidden-claude',
+        type: 'command_execution',
+        command: '/opt/claude --version',
+        aggregated_output: 'Claude Code\n',
+        status: 'completed',
+        exit_code: 0,
+      },
+    });
+  });
+  assert.throws(
+    () => parseCodexTranscript(claudeCommand, 'okf-1'),
+    /transcript invokes a Claude executable/u,
+  );
+
+  const hookCommand = mutateCodexTranscript((events) => {
+    events.splice(-2, 0, {
+      type: 'item.completed',
+      item: {
+        id: 'forbidden-hook',
+        type: 'command_execution',
+        command: 'python3 okf-1/.claude/hooks/okf-anchor.py',
+        aggregated_output: '',
+        status: 'completed',
+        exit_code: 0,
+      },
+    });
+  });
+  assert.throws(
+    () => parseCodexTranscript(hookCommand, 'okf-1'),
+    /transcript accesses generated Claude adapter files/u,
   );
 
   const promptReported = validCodexTranscript()

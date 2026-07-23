@@ -86,14 +86,17 @@ python3 .agents/skills/okf-wiki/scripts/scaffold.py ./okf-1 \
 ```
 
 The final run captured a JSONL transcript before certifying the result. The
-harness parsed six completed command events, required the two direct
-installed-resource reads above, required exactly one scaffold command with the
-accepted target, title, and ordered sections, cross-checked the structured
-final command report, and rejected any reported trust or approval prompt. The
+harness parsed seven completed command events, required the two direct
+installed-resource reads above to succeed and emit file-specific content,
+required exactly one scaffold command with the platform interpreter and the
+accepted target, title, and ordered sections, and required the structured
+command report to match the captured commands exactly after normalizing only
+the recorded working directory. It also rejected any Claude executable,
+generated `.claude/` adapter access, or reported trust or approval prompt. The
 captured transcript had SHA-256 digest:
 
 ```text
-e1c6fdd895c0fff28f22c092604ac0fbc4f7cd3543458dbd10458bb8bf9a50f5
+d4aa3475f886aebef124a180550c5f6f096f85f8e0e56e6b9c0062f2166da9fb
 ```
 
 The generated project contained exactly 12 files:
@@ -222,6 +225,8 @@ The focused tests pin the accepted prompt, exact portable and adapter
 inventories, empty-Claude preconditions, install and output containment,
 immutable installed-resource snapshots, copied-resource equality, title and
 section navigation, the PyYAML preflight, absolute non-empty `PATH` handling,
-the no-Claude executable preflight, captured transcript requirements,
-environment stripping, sandbox plan, authorized fallback, validator
-invocation, timeout, shell avoidance, and adversarial CLI inputs.
+the no-Claude executable preflight, POSIX and Windows scaffold interpreters,
+successful content-bearing reads, exact command reports, forbidden Claude and
+hook commands, captured transcript requirements, environment stripping,
+sandbox plan, authorized fallback, validator invocation, timeout, shell
+avoidance, and adversarial CLI inputs.

@@ -56,8 +56,14 @@ const COPIED_RESOURCES = Object.freeze([
 ]);
 
 const REQUIRED_INSTALLED_READS = Object.freeze([
-  '.agents/skills/okf-wiki/SKILL.md',
-  '.agents/skills/okf-wiki/spec/SPEC.md',
+  Object.freeze({
+    path: '.agents/skills/okf-wiki/SKILL.md',
+    marker: 'name: okf-wiki',
+  }),
+  Object.freeze({
+    path: '.agents/skills/okf-wiki/spec/SPEC.md',
+    marker: '# OKF spec v1',
+  }),
 ]);
 
 const OKF_REPORT_SCHEMA = Object.freeze({
@@ -532,15 +538,13 @@ function isolatedEnvironment(invocation, env) {
 }
 
 function commandMatchesReport(actual, reported) {
-  const normalizedActual = actual.trim().replace(/\s+/gu, ' ');
+  const normalizedActual = shellCommandBody(actual);
   const normalizedReported = reported
     .trim()
     .replace(/^\(from [^)]+\)\s+/u, '')
     .replace(/^cd\s+\S+\s+&&\s+/u, '')
     .replace(/\s+/gu, ' ');
-  return normalizedActual === normalizedReported
-    || normalizedActual.includes(normalizedReported)
-    || normalizedReported.includes(normalizedActual);
+  return normalizedActual === normalizedReported;
 }
 
 function shellCommandBody(command) {
@@ -551,6 +555,11 @@ function shellCommandBody(command) {
     const quote = body[0];
     if ((quote === '"' || quote === "'") && body.at(-1) === quote) {
       body = body.slice(1, -1);
+      if (quote === '"') {
+        body = body
+          .replace(/\\(["\\$`])/gu, '$1')
+          .replace(/\\\r?\n/gu, '');
+      }
     }
   }
   return body.replace(/\s+/gu, ' ').trim();
@@ -560,7 +569,11 @@ function escapeRegularExpression(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&');
 }
 
-export function parseCodexTranscript(transcript, fixtureId) {
+export function parseCodexTranscript(
+  transcript,
+  fixtureId,
+  { platform = process.platform } = {},
+) {
   const fixture = fixtureFor(fixtureId);
   const lines = transcript.split(/\r?\n/u).filter((line) => line.trim());
   if (lines.length === 0) {
@@ -585,22 +598,49 @@ export function parseCodexTranscript(transcript, fixtureId) {
   const completedItems = events
     .filter((event) => event?.type === 'item.completed')
     .map((event) => event.item);
-  const commands = completedItems
-    .filter((item) => item?.type === 'command_execution')
-    .map((item) => item.command)
-    .filter((command) => typeof command === 'string');
+  const commandRecords = completedItems.filter(
+    (item) => item?.type === 'command_execution'
+      && typeof item.command === 'string',
+  );
+  const commands = commandRecords.map((item) => item.command);
+  const normalizedAdapterRoot = `${fixture.target.toLowerCase()}/.claude/`;
+  const claudeExecutablePattern = new RegExp(
+    String.raw`(?:^|[\s;&|()"'\x60])`
+      + String.raw`(?:[^\s;&|()"'\x60]*[/\\])?`
+      + String.raw`claude(?:-code)?(?:\.(?:exe|cmd|bat|com))?`
+      + String.raw`(?=$|[\s;&|()"'\x60])`,
+    'iu',
+  );
+  for (const command of commands) {
+    const body = shellCommandBody(command);
+    const normalizedBody = body.replaceAll('\\', '/').toLowerCase();
+    if (normalizedBody.includes(normalizedAdapterRoot)) {
+      throw new Error(
+        'Codex transcript accesses generated Claude adapter files',
+      );
+    }
+    if (claudeExecutablePattern.test(body)) {
+      throw new Error('Codex transcript invokes a Claude executable');
+    }
+  }
+
+  const pythonCommand = platform === 'win32' ? 'python' : 'python3';
   const scaffoldPrefixPattern = new RegExp(
-    String.raw`(?:^|&&\s+)python3\s+`
+    String.raw`(?:^|&&\s+)`
+      + `${escapeRegularExpression(pythonCommand)}`
+      + String.raw`\s+`
       + String.raw`\.agents/skills/okf-wiki/scripts/scaffold\.py\s+`,
     'u',
   );
-  const scaffoldCommands = commands.filter((command) =>
-    scaffoldPrefixPattern.test(shellCommandBody(command)),
+  const scaffoldRecords = commandRecords.filter((item) =>
+    scaffoldPrefixPattern.test(shellCommandBody(item.command)),
   );
   const acceptedScaffoldPattern = new RegExp(
     String.raw`^(?:test\s+!\s+-e\s+\./`
       + `${escapeRegularExpression(fixture.target)}`
-      + String.raw`\s+&&\s+)?python3\s+`
+      + String.raw`\s+&&\s+)?`
+      + `${escapeRegularExpression(pythonCommand)}`
+      + String.raw`\s+`
       + String.raw`\.agents/skills/okf-wiki/scripts/scaffold\.py\s+`
       + String.raw`\./${escapeRegularExpression(fixture.target)}\s+`
       + String.raw`--title\s+(["'])`
@@ -610,21 +650,35 @@ export function parseCodexTranscript(transcript, fixtureId) {
     'u',
   );
   if (
-    scaffoldCommands.length !== 1
-    || !acceptedScaffoldPattern.test(shellCommandBody(scaffoldCommands[0]))
+    scaffoldRecords.length !== 1
+    || scaffoldRecords[0].status !== 'completed'
+    || scaffoldRecords[0].exit_code !== 0
+    || !acceptedScaffoldPattern.test(
+      shellCommandBody(scaffoldRecords[0].command),
+    )
   ) {
     throw new Error('Codex transcript must contain exactly one accepted scaffold command');
   }
+  const scaffoldCommands = scaffoldRecords.map((item) => item.command);
 
-  for (const path of REQUIRED_INSTALLED_READS) {
+  for (const { path, marker } of REQUIRED_INSTALLED_READS) {
     const readPattern = new RegExp(
-      String.raw`\b(?:awk|cat|head|less|more|rg|sed|tail|wc)\b`
+      String.raw`\b(?:awk|cat|get-content|head|less|more|sed|tail|type)\b`
         + String.raw`[^\r\n]*`
         + escapeRegularExpression(path),
-      'u',
+      'iu',
     );
-    if (!commands.some((command) => readPattern.test(shellCommandBody(command)))) {
-      throw new Error(`Codex transcript is missing installed resource read: ${path}`);
+    const successfulRead = commandRecords.some(
+      (item) => item.status === 'completed'
+        && item.exit_code === 0
+        && readPattern.test(shellCommandBody(item.command))
+        && typeof item.aggregated_output === 'string'
+        && item.aggregated_output.includes(marker),
+    );
+    if (!successfulRead) {
+      throw new Error(
+        `Codex transcript is missing successful installed resource read: ${path}`,
+      );
     }
   }
 
@@ -669,19 +723,28 @@ export function parseCodexTranscript(transcript, fixtureId) {
   if (
     !isDeepStrictEqual(
       reportedReads,
-      [...REQUIRED_INSTALLED_READS].sort(),
+      REQUIRED_INSTALLED_READS.map(({ path }) => path).sort(),
     )
   ) {
     throw new Error('Codex final report does not list the exact installed files read');
   }
+  const commandMismatchIndex = report.commands_run.findIndex(
+    (reported, index) => index >= commands.length
+      || typeof reported !== 'string'
+      || !commandMatchesReport(commands[index], reported),
+  );
   if (
     report.commands_run.length !== commands.length
-    || !report.commands_run.every(
-      (reported, index) => typeof reported === 'string'
-        && commandMatchesReport(commands[index], reported),
-    )
+    || commandMismatchIndex !== -1
   ) {
-    throw new Error('Codex final report does not match the captured command log');
+    throw new Error(
+      'Codex final report does not exactly match the captured command log'
+      + (
+        commandMismatchIndex === -1
+          ? ''
+          : ` at command ${commandMismatchIndex + 1}`
+      ),
+    );
   }
   return {
     commands,
