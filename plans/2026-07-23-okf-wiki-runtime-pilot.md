@@ -59,13 +59,14 @@ no Claude executable. `command -v claude` failed before the session, no Claude
 command appeared in the command record, and the generated tree was
 byte-for-byte identical to the first run.
 
-The final transcript-enforced rerun at
-`/tmp/okf-wiki-runtime-20260723-transcript-final-2Dvarw` used absolute
-allowlisted `PATH` entries and the same baseline install. Before Codex started,
-the harness took an immutable pre-run snapshot of the complete 114-file
-installed skill. After Codex finished, it verified that the inventory and every
-digest were unchanged and compared each copied output resource with that
-snapshot rather than with the live post-run install.
+The final created-inventory rerun at
+`/tmp/okf-wiki-runtime-20260723-files-rerun-JEZlnX` used absolute allowlisted
+`PATH` entries and the same baseline install. Before Codex started, the harness
+took an immutable pre-run snapshot of the complete 114-file installed skill.
+After Codex finished, it verified that the inventory and every digest were
+unchanged, compared each copied output resource with that snapshot rather than
+with the live post-run install, and required the structured report to name all
+12 generated files exactly.
 
 ## Okf-1 runtime result
 
@@ -86,22 +87,23 @@ python3 .agents/skills/okf-wiki/scripts/scaffold.py ./okf-1 \
 ```
 
 The final run captured a JSONL transcript before certifying the result. The
-harness parsed seven completed command events, required the two direct
+harness parsed six completed command events, required the two direct
 installed-resource reads above to name the exact files, succeed, and emit
-file-specific content,
-required exactly one scaffold command with the platform interpreter and the
-accepted target, title, and ordered sections, and required the structured
-command report to match the captured commands exactly after decoding an
-optional Bash wrapper and normalizing whitespace. It did not accept invented
+file-specific content, required exactly one scaffold command with the platform
+interpreter and the accepted target, title, and ordered sections, and required
+exactly one successful direct validator command. The structured command report
+had to match the captured commands exactly after decoding an optional Bash
+wrapper and normalizing whitespace, and its `files_created` field had to match
+the 12-file generated inventory exactly. It did not accept invented
 working-directory annotations. Every captured command also had to match the
 fixture's narrow read, precheck, scaffold, validator, or inventory allowlist,
 which keeps the unboxed fallback inside the disposable task boundary. The
 harness rejected any Claude executable, any relative or target-qualified
-`.claude/` adapter access, or any reported trust or approval prompt. The captured
-transcript had SHA-256 digest:
+`.claude/` adapter access, or any reported trust or approval prompt. The
+captured transcript had SHA-256 digest:
 
 ```text
-d4aa3475f886aebef124a180550c5f6f096f85f8e0e56e6b9c0062f2166da9fb
+ba5535afaf39641c6e7cbcea48902da91833d905fd4bb8bd53962544d6d0f762
 ```
 
 The generated project contained exactly 12 files:
@@ -229,11 +231,12 @@ CODEX_HOME='<disposable-home>/.codex' \
 
 The focused tests pin the accepted prompt, exact portable and adapter
 inventories, empty-Claude preconditions, install and output containment,
+non-overlapping project and client homes,
 immutable installed-resource snapshots, copied-resource equality, title and
 section navigation, the PyYAML preflight, absolute non-empty `PATH` handling,
 the no-Claude executable preflight, POSIX and Windows scaffold interpreters,
 successful exact-file content reads, the disposable command allowlist, exact
-command reports, forbidden Claude and relative or target-qualified hook
-commands, captured transcript requirements, environment stripping, sandbox
-plan, authorized fallback, validator invocation, timeout, shell avoidance, and
-adversarial CLI inputs.
+command and created-file reports, one required validator invocation, forbidden
+Claude and relative or target-qualified hook commands, captured transcript
+requirements, environment stripping, sandbox plan, authorized fallback,
+timeout, shell avoidance, and adversarial CLI inputs.

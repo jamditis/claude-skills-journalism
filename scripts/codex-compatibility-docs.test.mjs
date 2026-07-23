@@ -101,6 +101,10 @@ test('okf-wiki no-Claude evidence keeps Claude adapters outside Codex behavior',
     record,
     /4a4689788d8d28e5b4d2a778dad5a246dd449abe56bb6a3fe05465e2256a47bd/u,
   );
+  assert.match(
+    record,
+    /ba5535afaf39641c6e7cbcea48902da91833d905fd4bb8bd53962544d6d0f762/u,
+  );
   assert.match(record, /No interactive trust or approval prompt appeared/u);
   assert.match(record, /allowlisted executable path containing Codex/u);
   assert.match(record, /no Claude executable/u);
@@ -118,9 +122,14 @@ test('okf-wiki no-Claude evidence keeps Claude adapters outside Codex behavior',
   );
   assert.match(
     record,
+    /required\s+exactly one successful direct validator command/u,
+  );
+  assert.match(record, /`files_created` field had to match/u);
+  assert.match(
+    record,
     /fixture's narrow read, precheck, scaffold, validator, or inventory allowlist/u,
   );
-  assert.match(record, /required the structured\s+command report to match/u);
+  assert.match(record, /structured command report\s+had to match/u);
   assert.match(record, /rejected any Claude executable/u);
   assert.match(
     record,

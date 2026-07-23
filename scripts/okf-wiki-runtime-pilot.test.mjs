@@ -129,10 +129,15 @@ function writePilotOutput(project) {
 }
 
 function validCodexTranscript() {
+  const fixture = OKF_PILOT_FIXTURES['okf-1'];
   const installedFilesRead = [
     '.agents/skills/okf-wiki/SKILL.md',
     '.agents/skills/okf-wiki/spec/SPEC.md',
   ];
+  const filesCreated = [
+    ...fixture.portableFiles,
+    ...fixture.claudeAdapterFiles,
+  ].sort().map((path) => `./${fixture.target}/${path}`);
   const commandsRun = [
     `sed -n '1,220p' ${installedFilesRead[0]}`,
     `sed -n '1,220p' ${installedFilesRead[1]}`,
@@ -168,6 +173,7 @@ function validCodexTranscript() {
         text: JSON.stringify({
           installed_files_read: installedFilesRead,
           commands_run: commandsRun,
+          files_created: filesCreated,
           trust_or_approval_prompt: false,
           notes: 'Scaffolded and validated the requested fixture.',
         }),
@@ -206,6 +212,11 @@ test('Okf-1 preserves the accepted no-Claude prompt and output inventory', () =>
     fixture.prompt,
     /list only resources you inspected with a read command/u,
   );
+  assert.match(
+    fixture.prompt,
+    /SKILL\.md and \.agents\/skills\/okf-wiki\/spec\/SPEC\.md in separate read commands/u,
+  );
+  assert.match(fixture.prompt, /without a leading \.\//u);
   assert.deepEqual(fixture.claudeAdapterFiles, [
     '.claude/hooks/okf-anchor.py',
     '.claude/hooks/okf-orient.py',
@@ -273,6 +284,20 @@ test('Codex invocation isolates HOME and defaults to a writable sandbox', () => 
     }),
     /CODEX_HOME must resolve below the disposable client home/u,
   );
+  for (const overlappingHome of [
+    projectDir,
+    join(projectDir, 'client-home'),
+    '/tmp/okf-wiki-runtime',
+  ]) {
+    assert.throws(
+      () => buildOkfInvocation('codex', 'okf-1', {
+        projectDir,
+        clientHome: overlappingHome,
+        codexHome: join(overlappingHome, '.codex'),
+      }),
+      /project and client home must not overlap/u,
+    );
+  }
 });
 
 test('preconditions require a clean target and no project or home Claude state', () => {
@@ -594,6 +619,25 @@ test('Codex transcript pins installed reads, actual commands, and no prompts', (
     /exactly one accepted scaffold command/u,
   );
 
+  const withoutValidation = mutateCodexTranscript((events) => {
+    const commandIndex = events.findIndex(
+      (event) => event.item?.command === 'python3 scripts/validate.py --bundle bundle',
+    );
+    events.splice(commandIndex, 1);
+    const reportEvent = events.find(
+      (event) => event.item?.type === 'agent_message',
+    );
+    const report = JSON.parse(reportEvent.item.text);
+    report.commands_run = report.commands_run.filter(
+      (command) => command !== 'python3 scripts/validate.py --bundle bundle',
+    );
+    reportEvent.item.text = JSON.stringify(report);
+  });
+  assert.throws(
+    () => parseCodexTranscript(withoutValidation, 'okf-1'),
+    /exactly one accepted validator command/u,
+  );
+
   const loopedScaffold = validCodexTranscript().replace(
     'python3 .agents/skills/okf-wiki/scripts/scaffold.py ./okf-1 '
       + '--title \\"Codex no-Claude pilot\\" --sections concepts,decisions',
@@ -783,6 +827,32 @@ test('Codex transcript pins installed reads, actual commands, and no prompts', (
   assert.throws(
     () => parseCodexTranscript(externalRead, 'okf-1'),
     /outside the accepted disposable command boundary/u,
+  );
+
+  const missingCreatedFiles = mutateCodexTranscript((events) => {
+    const reportEvent = events.find(
+      (event) => event.item?.type === 'agent_message',
+    );
+    const report = JSON.parse(reportEvent.item.text);
+    delete report.files_created;
+    reportEvent.item.text = JSON.stringify(report);
+  });
+  assert.throws(
+    () => parseCodexTranscript(missingCreatedFiles, 'okf-1'),
+    /final report does not match the required evidence shape/u,
+  );
+
+  const wrongCreatedFiles = mutateCodexTranscript((events) => {
+    const reportEvent = events.find(
+      (event) => event.item?.type === 'agent_message',
+    );
+    const report = JSON.parse(reportEvent.item.text);
+    report.files_created.pop();
+    reportEvent.item.text = JSON.stringify(report);
+  });
+  assert.throws(
+    () => parseCodexTranscript(wrongCreatedFiles, 'okf-1'),
+    /final report does not list the exact generated file inventory/u,
   );
 
   const promptReported = validCodexTranscript()

@@ -340,9 +340,11 @@ Result: Codex CLI 0.145.0 discovered `$okf-wiki` after skills CLI 1.5.20
 copied the 114-file root skill into `.agents/skills`. The skill read its
 installed instructions, spec, scaffolder, validator, and hook templates;
 invoked the scaffolder once; created exactly nine portable/project files and
-three Claude adapter files; and passed portable validation twice. No Claude
-configuration directory was available outside the generated output, no
-interactive prompt appeared, and no hook executed.
+three Claude adapter files; and reported that exact inventory. Codex passed the
+scaffolder's built-in validation and one direct portable validation, then the
+harness repeated validation after the session. No Claude configuration
+directory was available outside the generated output, no interactive prompt
+appeared, and no hook executed.
 
 The `.claude/` settings and hooks are recorded as a Claude Code adapter, not
 Codex project behavior. Removing the installed skill left the generated

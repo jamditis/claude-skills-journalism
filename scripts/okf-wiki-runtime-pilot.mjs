@@ -72,6 +72,7 @@ const OKF_REPORT_SCHEMA = Object.freeze({
   required: [
     'installed_files_read',
     'commands_run',
+    'files_created',
     'trust_or_approval_prompt',
     'notes',
   ],
@@ -81,6 +82,10 @@ const OKF_REPORT_SCHEMA = Object.freeze({
       items: { type: 'string' },
     },
     commands_run: {
+      type: 'array',
+      items: { type: 'string' },
+    },
+    files_created: {
       type: 'array',
       items: { type: 'string' },
     },
@@ -112,7 +117,12 @@ export const OKF_PILOT_FIXTURES = Object.freeze({
       + 'installed files read, commands run, files created, and any trust or '
       + 'approval prompt. In installed_files_read, list only resources you '
       + 'inspected with a read command; list executed scripts only in '
-      + 'commands_run. Leave the generated project in place for verification.',
+      + 'commands_run. Read .agents/skills/okf-wiki/SKILL.md and '
+      + '.agents/skills/okf-wiki/spec/SPEC.md in separate read commands, and '
+      + 'report those exact paths without a leading ./. In files_created, '
+      + 'list every generated file as a '
+      + 'project-relative path beginning with ./okf-1/. Leave the generated '
+      + 'project in place for verification.',
   }),
 });
 
@@ -482,6 +492,14 @@ export function buildOkfInvocation(
   if (!codexHome) throw new Error('CODEX_HOME is required for the okf-wiki pilot');
   const cwd = resolve(projectDir);
   const home = resolve(clientHome);
+  const homeFromProject = relative(cwd, home);
+  const projectFromHome = relative(home, cwd);
+  const isSameOrBelow = (pathFromRoot) =>
+    !pathFromRoot
+      || (!pathFromRoot.startsWith('..') && !isAbsolute(pathFromRoot));
+  if (isSameOrBelow(homeFromProject) || isSameOrBelow(projectFromHome)) {
+    throw new Error('disposable project and client home must not overlap');
+  }
   const resolvedCodexHome = resolve(codexHome);
   const codexHomeFromClient = relative(home, resolvedCodexHome);
   if (
@@ -716,6 +734,18 @@ export function parseCodexTranscript(
       + String.raw`\|\s+LC_ALL=C\s+sort$`,
     'u',
   );
+  const validatorRecords = commandRecords.filter((item) =>
+    acceptedValidator.test(shellCommandBody(item.command)),
+  );
+  if (
+    validatorRecords.length !== 1
+    || validatorRecords[0].status !== 'completed'
+    || validatorRecords[0].exit_code !== 0
+  ) {
+    throw new Error(
+      'Codex transcript must contain exactly one accepted validator command',
+    );
+  }
   const disallowedRecord = commandRecords.find((item) => {
     const body = shellCommandBody(item.command);
     return item.status !== 'completed'
@@ -764,6 +794,7 @@ export function parseCodexTranscript(
     !report
     || !Array.isArray(report.installed_files_read)
     || !Array.isArray(report.commands_run)
+    || !Array.isArray(report.files_created)
     || typeof report.trust_or_approval_prompt !== 'boolean'
     || typeof report.notes !== 'string'
   ) {
@@ -771,6 +802,20 @@ export function parseCodexTranscript(
   }
   if (report.trust_or_approval_prompt) {
     throw new Error('Codex reported a trust or approval prompt');
+  }
+  const expectedFilesCreated = [
+    ...fixture.portableFiles,
+    ...fixture.claudeAdapterFiles,
+  ].sort().map((path) => `./${fixture.target}/${path}`);
+  const reportedFilesCreated = report.files_created.every(
+    (path) => typeof path === 'string',
+  )
+    ? [...report.files_created].sort()
+    : [];
+  if (!isDeepStrictEqual(reportedFilesCreated, expectedFilesCreated)) {
+    throw new Error(
+      'Codex final report does not list the exact generated file inventory',
+    );
   }
   const reportedReads = [...new Set(report.installed_files_read)].sort();
   if (
@@ -1042,6 +1087,7 @@ function runCli() {
     transcript: evidence.transcriptPath,
     commands: evidence.commands,
     installedFilesRead: evidence.report.installed_files_read,
+    filesCreated: evidence.report.files_created,
     trustOrApprovalPrompt: evidence.report.trust_or_approval_prompt,
     validation: validation.stdout.trim(),
   }, null, 2));
