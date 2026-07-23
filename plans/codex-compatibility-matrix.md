@@ -1,7 +1,7 @@
 # Codex compatibility matrix
 
 - Status: phase-one installation baseline; runtime pilots pending
-- Last evidence update: July 22, 2026
+- Last evidence update: July 23, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
 ## How to read this matrix
@@ -28,11 +28,12 @@ Status labels:
 | Tool | Version or revision | Role |
 |---|---|---|
 | Repository | `b0617649515d24ebfcd51f15bceb1d76b03db668` | Architecture commit used as the phase-one worktree base |
-| Claude Code | 2.1.215 | Marketplace validation and clean `journalism-core` install |
+| Repository release verification | [`9eef57629edbaa19bf47ec35296acebdd7b4ab1f`](https://github.com/jamditis/claude-skills-journalism/commit/9eef57629edbaa19bf47ec35296acebdd7b4ab1f) | July 23 post-merge `master` head used for the phase-one release evidence |
+| Claude Code | 2.1.215; 2.1.218 | Phase-one marketplace validation, then the post-merge clean `journalism-core` install |
 | Codex CLI | 0.145.0 | Legacy-compatible marketplace and clean `journalism-core` install |
-| skills CLI | 1.5.19 | Standards-based repository discovery and Codex skill install |
+| skills CLI | 1.5.19; 1.5.20 | Phase-one standards discovery, then post-merge project and user install canaries |
 | Agent Skills validator | `agentskills/agentskills@38a2ff82958afee88dadf4831509e6f7e9d8ef4e` | Shared frontmatter contract |
-| Agent Skills validator, scheduled | Default-branch head (`38a2ff82958afee88dadf4831509e6f7e9d8ef4e` on July 21, 2026) | Upstream drift signal |
+| Agent Skills validator, scheduled | Default-branch head (`38a2ff82958afee88dadf4831509e6f7e9d8ef4e` on July 23, 2026) | Upstream drift signal |
 | Claude marketplace | 2.3.3 | Catalog version after the phase-one frontmatter release bumps |
 | Node.js on Legion | 22.17.0 | Local test and matrix tooling |
 | Node.js on LOJ | 22.23.1 | Repository verification |
@@ -255,6 +256,32 @@ colon fixture skipped. Actionlint 1.7.12 accepted both changed workflow files,
 Claude Code 2.1.215. The Windows CSS freshness check also verified all 49
 stylesheets after line endings were normalized for comparison.
 
+### P-release-1: post-merge master verification
+
+Environment: public `master` at
+[`9eef57629edbaa19bf47ec35296acebdd7b4ab1f`](https://github.com/jamditis/claude-skills-journalism/commit/9eef57629edbaa19bf47ec35296acebdd7b4ab1f)
+on July 23, 2026.
+
+The manually dispatched
+[Client compatibility canary run 30026490472](https://github.com/jamditis/claude-skills-journalism/actions/runs/30026490472)
+passed all five jobs from `master`:
+
+- Claude Code 2.1.218 installed `journalism-core` 1.2.0 with the expected 14
+  skills and 17 source-matching files.
+- Codex CLI 0.145.0 installed the same package, skill set, and files through
+  the legacy-compatible marketplace path.
+- skills CLI 1.5.20 installed the expected 14 skills and 17 files through both
+  the project and user standards paths.
+- The current upstream Agent Skills validator passed all 60 skills. Its
+  default-branch revision remained
+  [`38a2ff82958afee88dadf4831509e6f7e9d8ef4e`](https://github.com/agentskills/agentskills/commit/38a2ff82958afee88dadf4831509e6f7e9d8ef4e).
+
+A separate empty `CLAUDE_CONFIG_DIR` cloned the public repository and confirmed
+marketplace 2.3.3 exposes installable `pdf-playground` 1.3.2 and
+`video-toolkit` 1.0.3. Both installed and were enabled. A fresh
+`skills@1.5.20` public-repository discovery found exactly 60 source skills.
+The disposable configurations were not reused as runtime evidence.
+
 ## Package matrix
 
 | Package | Version and components | Current classification | Included and excluded scope | Evidence | Next proof |
@@ -350,12 +377,26 @@ did not show first-seen or install data. Other aggregate and detail counts also
 differed, so these numbers are a dated catalog snapshot rather than a stable
 user total.
 
-After the phase-one release, monitor whether the indexed count moves from 56 to
-60 and whether the existing `document-design` slug keeps its catalog history.
-The frontmatter repair normalizes the name to the same lowercase slug; it does
-not rename the directory, repository, or package. Also test an update fixture
-whose old lock key is `Document design` so normalization cannot leave two lock
-entries for one directory.
+On July 23, 2026, a cache-revalidated public fetch listed 62 catalog rows while
+the same public repository produced exactly 60 skills through
+`skills@1.5.20`. Comparing the two name sets found all 60 current skills plus
+only the deleted `animated-sprite-gen` and `nano-banana-image-gen` rows. This is
+a catalog deletion discrepancy rather than a missing-source problem. It is
+tracked in [repository issue #219](https://github.com/jamditis/claude-skills-journalism/issues/219)
+and the existing upstream stale-snapshot report
+[`vercel-labs/skills#1189`](https://github.com/vercel-labs/skills/issues/1189).
+
+The existing `document-design` URL now serves the normalized lowercase identity
+and current skill content, but the catalog shows 2 installs and “First Seen:
+Today.” Its earlier catalog history was therefore not preserved across the
+frontmatter-name repair. Recovery requires a catalog-side identity/metrics
+alias or restoration for the same repository, path, and slug; another source
+rename would create more identity churn and is not a recovery. Track that
+catalog-side request with #219 and the upstream stale-snapshot report above.
+
+Issue #230 separately tests an update fixture whose old lock key is
+`Document design` so local normalization cannot leave two lock entries for one
+directory.
 
 ## Mixed-install cases still pending
 
