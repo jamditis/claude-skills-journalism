@@ -1,6 +1,6 @@
 # Codex compatibility matrix
 
-- Status: phase-one installation baseline; runtime pilots pending
+- Status: phase-two runtime pilots; journalism-core and visual-explainer have scoped passes
 - Last evidence update: July 23, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
@@ -15,6 +15,9 @@ Status labels:
 
 - **Baseline installed:** a clean client installed the package or skill, but
   runtime behavior is not yet proved.
+- **Runtime pilot passed:** paired client behavior passed for the named install
+  paths. Other install paths and package-wide support gates remain unclaimed
+  unless their evidence says otherwise.
 - **Candidate:** the shared skills appear portable from static review, but the
   runtime gates are pending.
 - **Adapter required:** static review found a platform-bound path, instruction,
@@ -29,6 +32,7 @@ Status labels:
 |---|---|---|
 | Repository | `b0617649515d24ebfcd51f15bceb1d76b03db668` | Architecture commit used as the phase-one worktree base |
 | Repository release verification | [`9eef57629edbaa19bf47ec35296acebdd7b4ab1f`](https://github.com/jamditis/claude-skills-journalism/commit/9eef57629edbaa19bf47ec35296acebdd7b4ab1f) | July 23 post-merge `master` head used for the phase-one release evidence |
+| Repository visual-explainer pilot | [`f6a4b84dd2e9feafc6c2bf067f873e9301a083c2`](https://github.com/jamditis/claude-skills-journalism/commit/f6a4b84dd2e9feafc6c2bf067f873e9301a083c2) | July 23 `master` head installed for the V-ex-1 runtime evidence |
 | Claude Code | 2.1.215; 2.1.218 | Phase-one marketplace validation, then the post-merge clean `journalism-core` install |
 | Codex CLI | 0.145.0 | Legacy-compatible marketplace and clean `journalism-core` install |
 | skills CLI | 1.5.19; 1.5.20 | Phase-one standards discovery, then post-merge project and user install canaries |
@@ -282,13 +286,52 @@ marketplace 2.3.3 exposes installable `pdf-playground` 1.3.2 and
 `skills@1.5.20` public-repository discovery found exactly 60 source skills.
 The disposable configurations were not reused as runtime evidence.
 
+### J-release-1: paired journalism-core runtime pilot
+
+Environment: public `master` at
+[`9eef57629edbaa19bf47ec35296acebdd7b4ab1f`](https://github.com/jamditis/claude-skills-journalism/commit/9eef57629edbaa19bf47ec35296acebdd7b4ab1f)
+installed into separate disposable Claude and Codex profiles on July 23, 2026.
+The [paired runtime record](2026-07-23-journalism-core-runtime-pilot.md)
+contains the exact scope, prompts, selection evidence, output summaries,
+resource hash, harness adjustments, verification, and cleanup.
+
+Result: Claude Code 2.1.218 passed explicit activation through the installed
+namespaced command, implicit `source-verification` selection, unrelated
+non-trigger behavior, and installed `photo-metadata/reference.md` resolution.
+Codex CLI 0.145.0 passed the same behavior through a skills CLI 1.5.20 project
+standards install. The legacy-compatible Codex package path and user-level
+standards path remain install-only evidence.
+
+### V-ex-release-1: visual-explainer root-skill runtime pilot
+
+Environment: public `master` at
+[`f6a4b84dd2e9feafc6c2bf067f873e9301a083c2`](https://github.com/jamditis/claude-skills-journalism/commit/f6a4b84dd2e9feafc6c2bf067f873e9301a083c2)
+installed into a disposable Codex project on July 23, 2026. The
+[runtime record](2026-07-23-visual-explainer-runtime-pilot.md) contains the
+exact scope, install command, file-manifest digest, prompt, installed resource
+reads, output digest, render review, validator difference, legacy omission,
+harness behavior, and cleanup.
+
+Result: Codex CLI 0.145.0 discovered `$visual-explainer` after skills CLI
+1.5.20 copied the 24-file root skill into `.agents/skills`. V-ex-1 read the
+installed `references/css-patterns.md` and `templates/architecture.html`, then
+produced the requested four-stage newsroom architecture HTML. Desktop, mobile,
+light, and dark checks found no overflow or runtime errors; the automated axe
+checks found no WCAG 2.2 A or AA violations.
+
+The legacy-compatible Codex plugin route cached the source root `SKILL.md` but
+did not register it as a root skill. Codex generated three untested command
+wrappers; they remain outside this root-skill runtime claim. The official
+validator accepted the standards copy, while the creator helper produced only
+the already-allowlisted `compatibility`-field difference.
+
 ## Package matrix
 
 | Package | Version and components | Current classification | Included and excluded scope | Evidence | Next proof |
 |---|---|---|---|---|---|
 | `autocontext` | 1.1.0; no skills; five commands; one agent; six hook files | Claude-only surface | Include nothing in the Codex claim. Commands, curator agent, hook lifecycle, persisted data, and compatibility environment variables need a separate design. | [I-phase-1](#i-phase-1-package-inventory) | Define state, lifecycle, authority, and uninstall contracts in a separate accepted decision. |
 | `dev-toolkit` | 1.1.1; 11 nested skills | Candidate with adapter review | Instruction-led skills may be shared. Exclude Claude tool vocabulary, `CLAUDE.md` updates, hook wiring, and Claude subagent syntax until tested. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Classify each skill; add explicit trigger and non-trigger fixtures for the portable subset. |
-| `journalism-core` | 1.2.0; 14 nested skills | Baseline installed through four paths | Include the 14 shared skills. No commands, agents, or hooks are part of this package. Runtime support remains unclaimed. | [C-phase-1](#c-phase-1-repeatable-claude-install-canary), [K-phase-1](#k-phase-1-repeatable-codex-legacy-package-canary), [S-phase-1](#s-phase-1-full-journalism-core-standards-canary), [S-global-phase-1](#s-global-phase-1-user-level-journalism-core-standards-canary), [V-phase-1](#v-phase-1-repaired-standards-baseline) | Run J-core-1 through J-core-3 in fresh Claude and Codex sessions and verify installed resource resolution. |
+| `journalism-core` | 1.2.0; 14 nested skills | Runtime pilot passed on the Claude package and Codex project-standards paths | Include the 14 shared skills. No commands, agents, or hooks are part of this package. The legacy-compatible Codex package and user-level standards paths remain install-only. | [J-release-1](#j-release-1-paired-journalism-core-runtime-pilot), [C-phase-1](#c-phase-1-repeatable-claude-install-canary), [K-phase-1](#k-phase-1-repeatable-codex-legacy-package-canary), [S-phase-1](#s-phase-1-full-journalism-core-standards-canary), [S-global-phase-1](#s-global-phase-1-user-level-journalism-core-standards-canary), [V-phase-1](#v-phase-1-repaired-standards-baseline) | Add a no-Claude-environment gate and scheduled runtime regression before a broader package support claim. |
 | `okf-wiki` | 0.6.1; one root skill; scripts and generated Claude settings | Adapter required | Preserve OKF scaffolding, validation, examples, and tests. Exclude Codex project settings until the no-Claude behavior test defines the needed branch. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; [R-phase-1](#r-phase-1-phase-one-repository-checks) covers package tests | Run Okf-1 without Claude installed; record generated files, trust behavior, and cleanup. |
 | `pdf-design` | 1.1.0; one root skill | Adapter required | Shared design guidance and assets are candidates. Hard-coded `~/.claude` and host-specific browser paths are excluded from a Codex claim. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add a no-Claude path-resolution fixture before editing paths. |
 | `pdf-playground` | 1.3.2; one nested skill; eight commands; one hook file | Candidate plus Claude-only surfaces | `document-design` is shared. Commands and hook behavior remain Claude-only until mapped. | [V-phase-1](#v-phase-1-repaired-standards-baseline) and [F-phase-1](#f-phase-1-affected-claude-package-regression); standards, Claude install, and argument delivery pass | Test Codex activation, non-activation, resource loading, and output before a runtime claim. |
@@ -297,7 +340,7 @@ The disposable configurations were not reused as runtime evidence.
 | `security-toolkit` | 1.2.0; four nested skills; one command | Candidate plus Claude-only surface | The four shared skills are candidates. `/security-toolkit:hotpatch` and its sandbox lifecycle remain Claude-only. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; [R-phase-1](#r-phase-1-phase-one-repository-checks) covers security tests | Test skill activation separately; do not map `hotpatch` without authority and failure-semantics tests. |
 | `superjawn` | 1.0.0; 14 nested skills | Not assessed | No package-wide claim. Each skill needs review for Claude tool names, namespacing, agent dispatch, and parallel-agent assumptions. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure only | Evaluate one skill at a time with client-specific tool traces. Do not bulk-port. |
 | `video-toolkit` | 1.0.3; four nested skills; external media runtimes | Candidate; runtime dependencies pending | Shared frontmatter and Claude argument delivery pass. GPU, CPU, browser, media sandbox, and hosted-API behavior remain unclaimed. | [V-phase-1](#v-phase-1-repaired-standards-baseline), [F-phase-1](#f-phase-1-affected-claude-package-regression), and [R-phase-1](#r-phase-1-phase-one-repository-checks) | Run dependency, no-GPU, activation, non-activation, and output fixtures. |
-| `visual-explainer` | 0.7.1; one root skill; eight commands | Adapter required | The root skill and assets are candidates through standards installation. Eight Claude commands remain Claude-only. | [V-phase-1](#v-phase-1-repaired-standards-baseline) passes; [Cv-base-1](#cv-base-1-codex-creator-helper-comparison) records the `compatibility` difference | Run V-ex-1 through standards install and record the expected legacy-package omission. |
+| `visual-explainer` | 0.7.1; one root skill; eight source commands | Runtime pilot passed on the Codex project-standards path; command surfaces unclaimed | Include the root skill and its relative resources only through `.agents/skills`. The legacy route omits root-skill registration. Its three client-generated command wrappers and all eight source commands remain outside this claim. | [V-ex-release-1](#v-ex-release-1-visual-explainer-root-skill-runtime-pilot), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [Cv-base-1](#cv-base-1-codex-creator-helper-comparison) | Add a no-Claude-environment gate and scheduled runtime regression before a broader package claim; test command wrappers only in a separately scoped issue. |
 
 ## Pilot fixtures
 
@@ -343,6 +386,15 @@ Expected result: the root skill is discovered, reads its relative references and
 assets from the installed copy, and produces the requested file. The legacy
 package path is expected not to expose this root skill until evidence says
 otherwise.
+
+The exact accepted prompt and semantic output verifier live in
+`scripts/visual-explainer-runtime-pilot.mjs`. Run them with:
+
+```bash
+CODEX_HOME='<disposable-codex-home>' \
+  npm run pilot:visual-explainer -- codex v-ex-1 \
+  --project '<disposable-project>'
+```
 
 ### Okf-1: no-Claude scaffold
 
