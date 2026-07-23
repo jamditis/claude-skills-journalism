@@ -11,6 +11,8 @@
     "canary:journalism-core:codex": "node scripts/journalism-core-install-canary.mjs codex",
     "canary:journalism-core:codex-skills": "node scripts/journalism-core-install-canary.mjs codex-skills",
     "canary:journalism-core:codex-skills-global": "node scripts/journalism-core-install-canary.mjs codex-skills-global",
+    "canary:document-design-lock": "node scripts/document-design-lock-update-canary.mjs",
+    "migrate:document-design-lock": "node scripts/document-design-lock-migration.mjs",
     "pilot:journalism-core": "node scripts/journalism-core-runtime-pilot.mjs",
     "pilot:okf-wiki": "node scripts/okf-wiki-runtime-pilot.mjs",
     "pilot:visual-explainer": "node scripts/visual-explainer-runtime-pilot.mjs",

@@ -53,6 +53,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
   assert.match(matrix, /J-release-1: paired journalism-core runtime pilot/u);
   assert.match(matrix, /V-ex-release-1: visual-explainer root-skill runtime pilot/u);
   assert.match(matrix, /Okf-release-1: okf-wiki no-Claude runtime pilot/u);
+  assert.match(matrix, /D-lock-release-1: Document design standards lock migration/u);
   assert.match(
     matrix,
     /`journalism-core` \| 1\.2\.0; 14 nested skills \| Runtime pilot passed on the Claude package and Codex project-standards paths/u,
@@ -71,6 +72,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
   );
   assert.match(matrix, /scripts\/okf-wiki-runtime-pilot\.mjs/u);
   assert.match(matrix, /scripts\/visual-explainer-runtime-pilot\.mjs/u);
+  assert.match(matrix, /2026-07-23-document-design-lock-migration\.md/u);
 
   const evidenceCells = matrix
     .split('\n')
@@ -80,6 +82,34 @@ test('the compatibility matrix classifies every marketplace package', () => {
   for (const evidence of evidenceCells) {
     assert.match(evidence, /\[[^\]]+\]\(#[^)]+\)/u);
   }
+});
+
+test('Document design lock evidence stays separate from catalog history', () => {
+  const record = readFileSync(
+    join(ROOT, 'plans', '2026-07-23-document-design-lock-migration.md'),
+    'utf8',
+  );
+  const matrix = readFileSync(
+    join(ROOT, 'plans', 'codex-compatibility-matrix.md'),
+    'utf8',
+  );
+
+  assert.match(record, /Tracking issue: \[#230\]/u);
+  assert.match(record, /Codex CLI 0\.145\.0/u);
+  assert.match(record, /skills CLI 1\.5\.20/u);
+  assert.match(record, /64dc95d8584d66e35ceb79e3c43e7fa3d201d3e4/u);
+  assert.match(record, /d49ed1022a012269a237f7749b0e47c099e7add6/u);
+  assert.match(record, /06c6f36f29dfae539e856456786642047c0bc742c4d231c5460fe58aeecc3ebc/u);
+  assert.match(record, /1a388f259e5894a04617d8b599719ec5e1adcf778eec81dbdf8324816b1ed8dc/u);
+  assert.match(record, /129514adfe5f81dd3095ff4e92cec3a5b86a05103bf6386c0d761ddba74bc335/u);
+  assert.match(record, /a586c9e6d61b960a0f9f3438efaedfab2a16d6187b5f3b514c530d27e6bcd5d8/u);
+  assert.match(record, /Both\s+updates exited 0/u);
+  assert.match(record, /independent of public catalog slug history/u);
+  assert.match(matrix, /This is local lock\s+migration evidence, not public catalog history/u);
+  assert.match(
+    matrix,
+    /That project\s+migration neither restores nor changes public catalog metrics/u,
+  );
 });
 
 test('okf-wiki no-Claude evidence keeps Claude adapters outside Codex behavior', () => {
