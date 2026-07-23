@@ -120,15 +120,25 @@ SECRET_PATTERNS = [
 # secret whose value is URL-safe (base64url: - _ =) slips past it. Widening that
 # charset would re-flag OKF key paths like `secret: svc/api/prod-key-path`, the
 # precision an earlier review round asked us to keep. This optional pass instead
-# matches only the base64url charset -- note the absence of `/`, so slash-delimited
-# key paths break out and are never captured, and base64-standard values with `/`
-# stay the generic pattern's job -- and keeps precision with a Shannon-entropy
-# floor. A random token scores well above a dictionary-and-separator name (measured:
-# 24-char base64url secrets land ~4.05-4.4 bits/char, slashless human-readable names
-# stay under 4.0). It is off by default so a normal run keeps the narrow, zero-
-# false-positive base64 behavior; the flag trades some precision for recall.
+# matches only the base64url charset -- base64-standard values with `/` stay the
+# generic pattern's job -- and keeps precision two ways. Structurally (the primary
+# guard), the captured run must be a complete token: the trailing lookahead rejects
+# a run that is followed by another value char (we truncated a longer token) or a
+# `/` (it is a path segment, not a standalone value), so a documented key path like
+# `secret: prd-usw2-...-key-path/service` cannot leak its first segment as a value.
+# Excluding `/` from the class alone did not do this -- it stopped the match at the
+# separator but still captured a >=24-char leading segment. Statistically, a
+# Shannon-entropy floor backstops the slashless case: a random token scores above a
+# short dictionary-and-separator name (measured: 24-char base64url secrets land
+# ~4.05-4.4 bits/char, short human-readable names stay under 4.0). The floor is
+# imperfect -- a long, varied slashless name can clear it, the acknowledged
+# precision-for-recall tradeoff -- which is why the structural check, not this
+# threshold, is the primary guard. It is off by default so a normal run keeps the
+# narrow, zero-false-positive base64 behavior; the flag trades some precision for
+# recall.
 SECRET_ENTROPY_RE = re.compile(
-    r"(?i)" + SECRET_LABEL + r"\s*[:=]\s*['\"]?([A-Za-z0-9_=-]{24,})['\"]?")
+    r"(?i)" + SECRET_LABEL + r"\s*[:=]\s*['\"]?([A-Za-z0-9_=-]{24,})"
+    r"(?![A-Za-z0-9_=/-])['\"]?")
 SECRET_ENTROPY_MIN_BITS = 4.0
 
 

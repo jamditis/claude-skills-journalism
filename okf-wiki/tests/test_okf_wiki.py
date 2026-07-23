@@ -590,6 +590,21 @@ def test_entropy_scan_keeps_okf_key_path(tmp_path):
     assert rc == 0, out
 
 
+def test_entropy_scan_keeps_key_path_with_long_first_segment(tmp_path):
+    # Regression for the #150 review: the `/` exclusion stops the match at the
+    # separator, but a first path segment of >=24 url-safe chars was still captured
+    # and entropy-checked on its own. Here `prd-usw2-mysql-rw-20260722-key-path`
+    # (35 chars, entropy 4.01, above the floor) precedes the `/service` suffix, so
+    # the old pattern flagged the segment as a value. The trailing lookahead now
+    # requires a complete token, so a documented key path stays clean regardless of
+    # how long its leading segment is.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + "\nsecret: prd-usw2-mysql-rw-20260722-key-path/service\n")
+    rc, out = validate(b, "--secret-entropy-scan")
+    assert rc == 0, out
+
+
 def test_entropy_scan_ignores_low_entropy_name(tmp_path):
     # A slashless but human-readable hyphenated value stays under the floor, so
     # the strict scan does not flag it.
