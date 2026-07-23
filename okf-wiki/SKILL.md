@@ -83,7 +83,7 @@ making it here, up front, where it can steer the rest of the setup.
   SPEC.md                 the OKF format contract
   README.md               how to use and validate the bundle
   scripts/validate.py     the validator
-  .claude/                session hooks that orient Claude on the bundle
+  .claude/                Claude Code adapter: session-orientation hooks
     settings.json         registers the hooks (Claude Code approves them once)
     hooks/okf-anchor.py   SessionStart: load the index into context
     hooks/okf-orient.py   PreToolUse: gate the first action on orientation
@@ -235,6 +235,24 @@ Claude Code treats a checked-in `.claude/settings.json` as untrusted, so the fir
 project is opened it asks the user to approve the hooks; they run automatically after that.
 To turn them off, scaffold with `--no-hooks`, or delete `.claude/` (or set `disableAllHooks`)
 in an existing project.
+
+### Client boundary
+
+The portable OKF surface is `SPEC.md`, `requirements.txt`, `scripts/validate.py`, and the
+`bundle/` tree. The generated `README.md` documents both that shared surface and any enabled
+client adapter. The three generated `.claude/` files are a Claude Code adapter, not part of
+the OKF format and not shared Codex behavior. Codex does not read them as project configuration,
+and this skill must not claim that their `SessionStart` or `PreToolUse` lifecycle runs there.
+
+The general onboarding route above still names Claude Code's `AskUserQuestion` and
+`${CLAUDE_SKILL_DIR}` surfaces. The recorded Codex pilot pre-set every onboarding choice and
+used an explicit project-relative installed path; it does not establish that the unadapted
+general route is portable.
+
+For a mixed Claude Code and Codex project, keep `.claude/` so Claude Code can request trust
+and use the hooks; Codex leaves it inert. For a Codex-only project, pass `--no-hooks` while
+scaffolding or delete `.claude/` afterward. Either choice leaves the portable bundle and
+validator unchanged.
 
 ## Optional: publish into a GitHub wiki
 
