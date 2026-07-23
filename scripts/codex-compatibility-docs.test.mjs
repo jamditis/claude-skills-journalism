@@ -52,6 +52,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
   assert.match(matrix, /V-phase-1: repaired standards baseline/u);
   assert.match(matrix, /J-release-1: paired journalism-core runtime pilot/u);
   assert.match(matrix, /V-ex-release-1: visual-explainer root-skill runtime pilot/u);
+  assert.match(matrix, /Okf-release-1: okf-wiki no-Claude runtime pilot/u);
   assert.match(
     matrix,
     /`journalism-core` \| 1\.2\.0; 14 nested skills \| Runtime pilot passed on the Claude package and Codex project-standards paths/u,
@@ -60,6 +61,11 @@ test('the compatibility matrix classifies every marketplace package', () => {
     matrix,
     /`visual-explainer` \| 0\.7\.1; one root skill; eight source commands \| Runtime pilot passed on the Codex project-standards path; command surfaces unclaimed/u,
   );
+  assert.match(
+    matrix,
+    /`okf-wiki` \| 0\.6\.1; one root skill; scripts and generated Claude settings \| Portable runtime pilot passed; Claude adapter output recorded/u,
+  );
+  assert.match(matrix, /scripts\/okf-wiki-runtime-pilot\.mjs/u);
   assert.match(matrix, /scripts\/visual-explainer-runtime-pilot\.mjs/u);
 
   const evidenceCells = matrix
@@ -70,6 +76,37 @@ test('the compatibility matrix classifies every marketplace package', () => {
   for (const evidence of evidenceCells) {
     assert.match(evidence, /\[[^\]]+\]\(#[^)]+\)/u);
   }
+});
+
+test('okf-wiki no-Claude evidence keeps Claude adapters outside Codex behavior', () => {
+  const record = readFileSync(
+    join(ROOT, 'plans', '2026-07-23-okf-wiki-runtime-pilot.md'),
+    'utf8',
+  );
+  const skill = readFileSync(join(ROOT, 'okf-wiki', 'SKILL.md'), 'utf8');
+
+  assert.match(record, /Tracking issue: \[#226\]/u);
+  assert.match(record, /Codex CLI 0\.145\.0/u);
+  assert.match(record, /skills CLI 1\.5\.20/u);
+  assert.match(record, /`cabb43bc2515c6c30a3d0839909f786e7afbcba8`/u);
+  assert.match(
+    record,
+    /f0af5c80f9daa4afcc71fa8e8919afa2098e59fe2f584bb85cc08df9807c99f1/u,
+  );
+  assert.match(
+    record,
+    /4a4689788d8d28e5b4d2a778dad5a246dd449abe56bb6a3fe05465e2256a47bd/u,
+  );
+  assert.match(record, /No interactive trust or approval prompt appeared/u);
+  assert.match(record, /allowlisted executable path containing Codex/u);
+  assert.match(record, /no Claude executable/u);
+  assert.match(record, /byte-for-byte identical to the first run/u);
+  assert.match(record, /removed the installed skill without touching the generated OKF project/u);
+  assert.match(record, /The three `.claude\/` files are Claude adapter output/u);
+  assert.doesNotMatch(record, /repository-wide Codex support/u);
+
+  assert.match(skill, /The three generated `.claude\/` files are a Claude Code adapter/u);
+  assert.match(skill, /Codex does not read them as project configuration/u);
 });
 
 test('visual-explainer runtime evidence stays scoped to the tested Codex path', () => {
