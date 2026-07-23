@@ -1,6 +1,6 @@
 # Codex compatibility matrix
 
-- Status: phase-one installation baseline; runtime pilots pending
+- Status: phase-two runtime pilots; journalism-core passed on two scoped paths
 - Last evidence update: July 23, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
@@ -15,6 +15,9 @@ Status labels:
 
 - **Baseline installed:** a clean client installed the package or skill, but
   runtime behavior is not yet proved.
+- **Runtime pilot passed:** paired client behavior passed for the named install
+  paths. Other install paths and package-wide support gates remain unclaimed
+  unless their evidence says otherwise.
 - **Candidate:** the shared skills appear portable from static review, but the
   runtime gates are pending.
 - **Adapter required:** static review found a platform-bound path, instruction,
@@ -282,13 +285,29 @@ marketplace 2.3.3 exposes installable `pdf-playground` 1.3.2 and
 `skills@1.5.20` public-repository discovery found exactly 60 source skills.
 The disposable configurations were not reused as runtime evidence.
 
+### J-release-1: paired journalism-core runtime pilot
+
+Environment: public `master` at
+[`9eef57629edbaa19bf47ec35296acebdd7b4ab1f`](https://github.com/jamditis/claude-skills-journalism/commit/9eef57629edbaa19bf47ec35296acebdd7b4ab1f)
+installed into separate disposable Claude and Codex profiles on July 23, 2026.
+The [paired runtime record](2026-07-23-journalism-core-runtime-pilot.md)
+contains the exact scope, prompts, selection evidence, output summaries,
+resource hash, harness adjustments, verification, and cleanup.
+
+Result: Claude Code 2.1.218 passed explicit activation through the installed
+namespaced command, implicit `source-verification` selection, unrelated
+non-trigger behavior, and installed `photo-metadata/reference.md` resolution.
+Codex CLI 0.145.0 passed the same behavior through a skills CLI 1.5.20 project
+standards install. The legacy-compatible Codex package path and user-level
+standards path remain install-only evidence.
+
 ## Package matrix
 
 | Package | Version and components | Current classification | Included and excluded scope | Evidence | Next proof |
 |---|---|---|---|---|---|
 | `autocontext` | 1.1.0; no skills; five commands; one agent; six hook files | Claude-only surface | Include nothing in the Codex claim. Commands, curator agent, hook lifecycle, persisted data, and compatibility environment variables need a separate design. | [I-phase-1](#i-phase-1-package-inventory) | Define state, lifecycle, authority, and uninstall contracts in a separate accepted decision. |
 | `dev-toolkit` | 1.1.1; 11 nested skills | Candidate with adapter review | Instruction-led skills may be shared. Exclude Claude tool vocabulary, `CLAUDE.md` updates, hook wiring, and Claude subagent syntax until tested. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Classify each skill; add explicit trigger and non-trigger fixtures for the portable subset. |
-| `journalism-core` | 1.2.0; 14 nested skills | Baseline installed through four paths | Include the 14 shared skills. No commands, agents, or hooks are part of this package. Runtime support remains unclaimed. | [C-phase-1](#c-phase-1-repeatable-claude-install-canary), [K-phase-1](#k-phase-1-repeatable-codex-legacy-package-canary), [S-phase-1](#s-phase-1-full-journalism-core-standards-canary), [S-global-phase-1](#s-global-phase-1-user-level-journalism-core-standards-canary), [V-phase-1](#v-phase-1-repaired-standards-baseline) | Run J-core-1 through J-core-3 in fresh Claude and Codex sessions and verify installed resource resolution. |
+| `journalism-core` | 1.2.0; 14 nested skills | Runtime pilot passed on the Claude package and Codex project-standards paths | Include the 14 shared skills. No commands, agents, or hooks are part of this package. The legacy-compatible Codex package and user-level standards paths remain install-only. | [J-release-1](#j-release-1-paired-journalism-core-runtime-pilot), [C-phase-1](#c-phase-1-repeatable-claude-install-canary), [K-phase-1](#k-phase-1-repeatable-codex-legacy-package-canary), [S-phase-1](#s-phase-1-full-journalism-core-standards-canary), [S-global-phase-1](#s-global-phase-1-user-level-journalism-core-standards-canary), [V-phase-1](#v-phase-1-repaired-standards-baseline) | Add a no-Claude-environment gate and scheduled runtime regression before a broader package support claim. |
 | `okf-wiki` | 0.6.1; one root skill; scripts and generated Claude settings | Adapter required | Preserve OKF scaffolding, validation, examples, and tests. Exclude Codex project settings until the no-Claude behavior test defines the needed branch. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; [R-phase-1](#r-phase-1-phase-one-repository-checks) covers package tests | Run Okf-1 without Claude installed; record generated files, trust behavior, and cleanup. |
 | `pdf-design` | 1.1.0; one root skill | Adapter required | Shared design guidance and assets are candidates. Hard-coded `~/.claude` and host-specific browser paths are excluded from a Codex claim. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add a no-Claude path-resolution fixture before editing paths. |
 | `pdf-playground` | 1.3.2; one nested skill; eight commands; one hook file | Candidate plus Claude-only surfaces | `document-design` is shared. Commands and hook behavior remain Claude-only until mapped. | [V-phase-1](#v-phase-1-repaired-standards-baseline) and [F-phase-1](#f-phase-1-affected-claude-package-regression); standards, Claude install, and argument delivery pass | Test Codex activation, non-activation, resource loading, and output before a runtime claim. |

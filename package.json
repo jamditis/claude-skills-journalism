@@ -11,6 +11,7 @@
     "canary:journalism-core:codex": "node scripts/journalism-core-install-canary.mjs codex",
     "canary:journalism-core:codex-skills": "node scripts/journalism-core-install-canary.mjs codex-skills",
     "canary:journalism-core:codex-skills-global": "node scripts/journalism-core-install-canary.mjs codex-skills-global",
+    "pilot:journalism-core": "node scripts/journalism-core-runtime-pilot.mjs",
     "a11y": "node scripts/verify_a11y.mjs",
     "build:docs-css": "node scripts/docs-tailwind.mjs --write",
     "check:docs-css": "node scripts/docs-tailwind.mjs --check"
