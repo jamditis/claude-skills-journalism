@@ -106,10 +106,20 @@ test('okf-wiki no-Claude evidence keeps Claude adapters outside Codex behavior',
   assert.match(record, /no Claude executable/u);
   assert.match(record, /byte-for-byte identical to the first run/u);
   assert.match(record, /runner now checks this before invoking Codex/u);
-  assert.match(record, /runner also resolves `claude` on `PATH` without executing it/u);
+  assert.match(
+    record,
+    /runner also resolves both `claude` and `claude-code` on `PATH` without/u,
+  );
   assert.match(record, /immutable pre-run snapshot/u);
   assert.match(record, /captured a JSONL transcript/u);
-  assert.match(record, /required the two direct\s+installed-resource reads above to succeed/u);
+  assert.match(
+    record,
+    /installed-resource reads above to name the exact files, succeed/u,
+  );
+  assert.match(
+    record,
+    /fixture's narrow read, precheck, scaffold, validator, or inventory allowlist/u,
+  );
   assert.match(record, /required the structured\s+command report to match/u);
   assert.match(record, /rejected any Claude executable/u);
   assert.match(

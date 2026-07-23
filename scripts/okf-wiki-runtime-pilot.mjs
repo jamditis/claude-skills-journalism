@@ -246,24 +246,26 @@ export function verifyNoClaudeExecutable({ env = process.env } = {}) {
       );
     }
     const searchDirectory = directory;
-    for (const extension of extensions) {
-      const candidate = resolve(
-        searchDirectory,
-        `claude${extension.toLowerCase()}`,
-      );
-      let available = false;
-      try {
-        if (statSync(candidate).isFile()) {
-          accessSync(candidate, accessMode);
-          available = true;
-        }
-      } catch {
-        // Missing, non-executable, and inaccessible candidates are unavailable.
-      }
-      if (available) {
-        throw new Error(
-          `Claude executable must not be available on PATH: ${candidate}`,
+    for (const executableName of ['claude', 'claude-code']) {
+      for (const extension of extensions) {
+        const candidate = resolve(
+          searchDirectory,
+          `${executableName}${extension.toLowerCase()}`,
         );
+        let available = false;
+        try {
+          if (statSync(candidate).isFile()) {
+            accessSync(candidate, accessMode);
+            available = true;
+          }
+        } catch {
+          // Missing, non-executable, and inaccessible candidates are unavailable.
+        }
+        if (available) {
+          throw new Error(
+            `Claude executable must not be available on PATH: ${candidate}`,
+          );
+        }
       }
     }
   }
@@ -567,6 +569,30 @@ function escapeRegularExpression(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&');
 }
 
+function exactInstalledReadPath(command) {
+  const body = shellCommandBody(command);
+  for (const { path } of REQUIRED_INSTALLED_READS) {
+    const resource = escapeRegularExpression(path);
+    const acceptedPatterns = [
+      new RegExp(`^cat\\s+${resource}$`, 'iu'),
+      new RegExp(
+        `^sed\\s+-n\\s+(["'])\\d+(?:,\\d+)?p\\1\\s+${resource}$`,
+        'iu',
+      ),
+      new RegExp(`^head\\s+-n\\s+\\d+\\s+${resource}$`, 'iu'),
+      new RegExp(`^tail\\s+-n\\s+\\+?\\d+\\s+${resource}$`, 'iu'),
+      new RegExp(
+        `^get-content\\s+(?:-literalpath\\s+)?${resource}`
+          + String.raw`(?:\s+-totalcount\s+\d+)?$`,
+        'iu',
+      ),
+      new RegExp(`^type\\s+${resource}$`, 'iu'),
+    ];
+    if (acceptedPatterns.some((pattern) => pattern.test(body))) return path;
+  }
+  return undefined;
+}
+
 export function parseCodexTranscript(
   transcript,
   fixtureId,
@@ -601,7 +627,6 @@ export function parseCodexTranscript(
       && typeof item.command === 'string',
   );
   const commands = commandRecords.map((item) => item.command);
-  const normalizedAdapterRoot = `${fixture.target.toLowerCase()}/.claude/`;
   const claudeExecutablePattern = new RegExp(
     String.raw`(?:^|[\s;&|()"'\x60])`
       + String.raw`(?:[^\s;&|()"'\x60]*[/\\])?`
@@ -612,7 +637,7 @@ export function parseCodexTranscript(
   for (const command of commands) {
     const body = shellCommandBody(command);
     const normalizedBody = body.replaceAll('\\', '/').toLowerCase();
-    if (normalizedBody.includes(normalizedAdapterRoot)) {
+    if (normalizedBody.includes('.claude/')) {
       throw new Error(
         'Codex transcript accesses generated Claude adapter files',
       );
@@ -660,16 +685,10 @@ export function parseCodexTranscript(
   const scaffoldCommands = scaffoldRecords.map((item) => item.command);
 
   for (const { path, marker } of REQUIRED_INSTALLED_READS) {
-    const readPattern = new RegExp(
-      String.raw`\b(?:awk|cat|get-content|head|less|more|sed|tail|type)\b`
-        + String.raw`[^\r\n]*`
-        + escapeRegularExpression(path),
-      'iu',
-    );
     const successfulRead = commandRecords.some(
       (item) => item.status === 'completed'
         && item.exit_code === 0
-        && readPattern.test(shellCommandBody(item.command))
+        && exactInstalledReadPath(item.command) === path
         && typeof item.aggregated_output === 'string'
         && item.aggregated_output.includes(marker),
     );
@@ -678,6 +697,42 @@ export function parseCodexTranscript(
         `Codex transcript is missing successful installed resource read: ${path}`,
       );
     }
+  }
+
+  const target = escapeRegularExpression(fixture.target);
+  const acceptedTargetPrecheck = new RegExp(
+    String.raw`^test\s+!\s+-e\s+\./${target}$`,
+    'u',
+  );
+  const acceptedValidator = new RegExp(
+    `^${escapeRegularExpression(pythonCommand)}\\s+`
+      + String.raw`(?:scripts/validate\.py\s+--bundle\s+bundle`
+      + `|\\./${target}/scripts/validate\\.py\\s+`
+      + `--bundle\\s+\\./${target}/bundle)$`,
+    'u',
+  );
+  const acceptedInventory = new RegExp(
+    String.raw`^find\s+\./${target}\s+-type\s+f\s+-print\s+`
+      + String.raw`\|\s+LC_ALL=C\s+sort$`,
+    'u',
+  );
+  const disallowedRecord = commandRecords.find((item) => {
+    const body = shellCommandBody(item.command);
+    return item.status !== 'completed'
+      || item.exit_code !== 0
+      || !(
+        exactInstalledReadPath(body)
+        || acceptedScaffoldPattern.test(body)
+        || acceptedTargetPrecheck.test(body)
+        || acceptedValidator.test(body)
+        || acceptedInventory.test(body)
+      );
+  });
+  if (disallowedRecord) {
+    throw new Error(
+      'Codex transcript command falls outside the accepted disposable command boundary: '
+        + shellCommandBody(disallowedRecord.command),
+    );
   }
 
   const reportItems = completedItems.filter(

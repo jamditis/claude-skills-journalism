@@ -87,14 +87,18 @@ python3 .agents/skills/okf-wiki/scripts/scaffold.py ./okf-1 \
 
 The final run captured a JSONL transcript before certifying the result. The
 harness parsed seven completed command events, required the two direct
-installed-resource reads above to succeed and emit file-specific content,
+installed-resource reads above to name the exact files, succeed, and emit
+file-specific content,
 required exactly one scaffold command with the platform interpreter and the
 accepted target, title, and ordered sections, and required the structured
 command report to match the captured commands exactly after decoding an
 optional Bash wrapper and normalizing whitespace. It did not accept invented
-working-directory annotations. It also rejected any Claude executable,
-generated `.claude/` adapter access, or reported trust or approval prompt. The
-captured transcript had SHA-256 digest:
+working-directory annotations. Every captured command also had to match the
+fixture's narrow read, precheck, scaffold, validator, or inventory allowlist,
+which keeps the unboxed fallback inside the disposable task boundary. The
+harness rejected any Claude executable, any relative or target-qualified
+`.claude/` adapter access, or any reported trust or approval prompt. The captured
+transcript had SHA-256 digest:
 
 ```text
 d4aa3475f886aebef124a180550c5f6f096f85f8e0e56e6b9c0062f2166da9fb
@@ -195,12 +199,13 @@ python3 -m venv '<disposable-home>/okf-python'
   -r '<checkout>/okf-wiki/requirements.txt'
 ```
 
-The runner also resolves `claude` on `PATH` without executing it and refuses
-the pilot if one is available. Empty and relative `PATH` entries are rejected
-because a child process could otherwise resolve them against its project
-working directory. Build a reviewed `<allowlisted-bin>` containing Codex,
-Node/npm, and the required shell utilities but no Claude executable, then place
-the Python environment and that directory on `PATH`:
+The runner also resolves both `claude` and `claude-code` on `PATH` without
+executing either one and refuses the pilot if either is available. Empty and
+relative `PATH` entries are rejected because a child process could otherwise
+resolve them against its project working directory. Build a reviewed
+`<allowlisted-bin>` containing Codex, Node/npm, and the required shell utilities
+but no Claude executable, then place the Python environment and that directory
+on `PATH`:
 
 ```bash
 PATH='<disposable-home>/okf-python/bin:<allowlisted-bin>' \
@@ -227,7 +232,8 @@ inventories, empty-Claude preconditions, install and output containment,
 immutable installed-resource snapshots, copied-resource equality, title and
 section navigation, the PyYAML preflight, absolute non-empty `PATH` handling,
 the no-Claude executable preflight, POSIX and Windows scaffold interpreters,
-successful content-bearing reads, exact command reports, forbidden Claude and
-hook commands, captured transcript requirements, environment stripping,
-sandbox plan, authorized fallback, validator invocation, timeout, shell
-avoidance, and adversarial CLI inputs.
+successful exact-file content reads, the disposable command allowlist, exact
+command reports, forbidden Claude and relative or target-qualified hook
+commands, captured transcript requirements, environment stripping, sandbox
+plan, authorized fallback, validator invocation, timeout, shell avoidance, and
+adversarial CLI inputs.

@@ -543,17 +543,20 @@ test('no-Claude preflight rejects a Claude executable on PATH', () => {
   disposableRoots.push(root);
   const bin = join(root, 'bin');
   mkdirSync(bin);
-  const executable = join(
-    bin,
-    process.platform === 'win32' ? 'claude.cmd' : 'claude',
-  );
-  writeFileSync(executable, '#!/bin/sh\nexit 0\n');
-  if (process.platform !== 'win32') chmodSync(executable, 0o755);
+  for (const name of ['claude', 'claude-code']) {
+    const executable = join(
+      bin,
+      process.platform === 'win32' ? `${name}.cmd` : name,
+    );
+    writeFileSync(executable, '#!/bin/sh\nexit 0\n');
+    if (process.platform !== 'win32') chmodSync(executable, 0o755);
 
-  assert.throws(
-    () => verifyNoClaudeExecutable({ env: { PATH: bin } }),
-    /Claude executable must not be available on PATH/u,
-  );
+    assert.throws(
+      () => verifyNoClaudeExecutable({ env: { PATH: bin } }),
+      /Claude executable must not be available on PATH/u,
+    );
+    unlinkSync(executable);
+  }
   assert.doesNotThrow(
     () => verifyNoClaudeExecutable({ env: { PATH: join(root, 'empty-bin') } }),
   );
@@ -613,9 +616,30 @@ test('Codex transcript pins installed reads, actual commands, and no prompts', (
     /missing successful installed resource read/u,
   );
 
+  const spoofedRead = mutateCodexTranscript((events) => {
+    const command = events.find(
+      (event) => event.item?.command?.includes('/SKILL.md'),
+    );
+    const reportEvent = events.find(
+      (event) => event.item?.type === 'agent_message',
+    );
+    const report = JSON.parse(reportEvent.item.text);
+    const spoof = 'cat .agents/skills/okf-wiki/SKILL.md.bak '
+      + "|| printf 'name: okf-wiki'";
+    const commandIndex = report.commands_run.indexOf(command.item.command);
+    command.item.command = spoof;
+    command.item.aggregated_output = 'name: okf-wiki\n';
+    report.commands_run[commandIndex] = spoof;
+    reportEvent.item.text = JSON.stringify(report);
+  });
+  assert.throws(
+    () => parseCodexTranscript(spoofedRead, 'okf-1'),
+    /missing successful installed resource read/u,
+  );
+
   const windowsTranscript = validCodexTranscript().replaceAll(
-    'python3 .agents/skills/okf-wiki/scripts/scaffold.py',
-    'python .agents/skills/okf-wiki/scripts/scaffold.py',
+    'python3 ',
+    'python ',
   );
   assert.doesNotThrow(
     () => parseCodexTranscript(windowsTranscript, 'okf-1', {
@@ -637,7 +661,7 @@ test('Codex transcript pins installed reads, actual commands, and no prompts', (
   });
   assert.throws(
     () => parseCodexTranscript(hiddenCompound, 'okf-1'),
-    /final report does not exactly match the captured command log/u,
+    /missing successful installed resource read/u,
   );
 
   for (const forgedLocation of [
@@ -715,6 +739,50 @@ test('Codex transcript pins installed reads, actual commands, and no prompts', (
   assert.throws(
     () => parseCodexTranscript(hookCommand, 'okf-1'),
     /transcript accesses generated Claude adapter files/u,
+  );
+
+  const relativeHookCommand = mutateCodexTranscript((events) => {
+    events.splice(-2, 0, {
+      type: 'item.completed',
+      item: {
+        id: 'forbidden-relative-hook',
+        type: 'command_execution',
+        command: 'python3 .claude/hooks/okf-anchor.py',
+        aggregated_output: '',
+        status: 'completed',
+        exit_code: 0,
+      },
+    });
+  });
+  assert.throws(
+    () => parseCodexTranscript(relativeHookCommand, 'okf-1'),
+    /transcript accesses generated Claude adapter files/u,
+  );
+
+  const externalRead = mutateCodexTranscript((events) => {
+    const reportEvent = events.find(
+      (event) => event.item?.type === 'agent_message',
+    );
+    const report = JSON.parse(reportEvent.item.text);
+    const command = 'cat /etc/passwd';
+    const reportIndex = events.indexOf(reportEvent);
+    events.splice(reportIndex, 0, {
+      type: 'item.completed',
+      item: {
+        id: 'forbidden-external-read',
+        type: 'command_execution',
+        command,
+        aggregated_output: 'root:x:0:0\n',
+        status: 'completed',
+        exit_code: 0,
+      },
+    });
+    report.commands_run.push(command);
+    reportEvent.item.text = JSON.stringify(report);
+  });
+  assert.throws(
+    () => parseCodexTranscript(externalRead, 'okf-1'),
+    /outside the accepted disposable command boundary/u,
   );
 
   const promptReported = validCodexTranscript()
