@@ -105,22 +105,17 @@ SECRET_PATTERNS = [
     ("Slack token", re.compile(r"\bxox[baprs]-[0-9A-Za-z-]{10,}")),
     ("GitHub token", re.compile(r"\bgh[pousr]_[0-9A-Za-z]{36,}\b")),
     ("GitHub fine-grained PAT", re.compile(r"\bgithub_pat_[0-9A-Za-z_]{22,}\b")),
-    # More provider tokens, each anchored on a fixed literal prefix like the
-    # detectors above. Because they key on a prefix (not a widened value charset),
-    # none can fire on a documented key path such as `secret: svc/api/prod-key-path`
-    # -- so they raise default recall on real leaked tokens at zero precision cost,
-    # and unlike the opt-in entropy scan they run on every validation and match a
-    # token whether or not it sits after a credential label.
+    # More provider tokens with fixed literal prefixes and exact or narrow shapes.
+    # Providers whose token bodies allow path-like hyphens and underscores use the
+    # entropy-gated patterns below instead.
     ("Stripe secret key", re.compile(r"\b[sr]k_(?:live|test)_[0-9A-Za-z]{24,}\b")),
     ("Stripe webhook secret", re.compile(r"\bwhsec_[0-9A-Za-z]{32,}\b")),
-    ("GitLab token", re.compile(r"\bglpat-[0-9A-Za-z_-]{20,}")),
     ("npm token", re.compile(r"\bnpm_[0-9A-Za-z]{36}\b")),
     ("SendGrid API key", re.compile(r"\bSG\.[0-9A-Za-z_-]{22}\.[0-9A-Za-z_-]{43}")),
-    ("Anthropic API key", re.compile(r"\bsk-ant-[0-9A-Za-z_-]{20,}")),
-    ("OpenAI project key", re.compile(r"\bsk-(?:proj|svcacct)-[0-9A-Za-z_-]{20,}")),
     # Legacy personal OpenAI keys carry no project/service segment. `sk-` alone is a
     # weak prefix, so the 40-char solid-base62 run does the signal work; it stays
-    # disjoint from the project-key line above, whose `-` breaks the run.
+    # disjoint from the entropy-gated project-key detector below, whose `-` breaks
+    # the run.
     ("OpenAI legacy key", re.compile(r"\bsk-[0-9A-Za-z]{40,}\b")),
     ("secret assignment", re.compile(
         r"(?i)" + SECRET_LABEL +
@@ -130,6 +125,26 @@ SECRET_PATTERNS = [
         # Structured tokens that use -/_ (fine-grained PATs, Slack, etc.) have their
         # own specific patterns above; the opt-in entropy scan below covers the rest.
         r"\s*[:=]\s*['\"]?[A-Za-z0-9+/]{24,}['\"]?")),
+]
+
+# Some provider token bodies allow the same hyphens and underscores used in
+# human-readable vault paths. A prefix alone would therefore flag documentation
+# such as `openai/sk-proj-production-primary-key-path`. These patterns capture a
+# complete base64url-like body; prefixed_secret_labels applies the same 4.0
+# bits/character floor as the opt-in generic entropy scan. They still run by
+# default because the provider prefix is strong, but the entropy gate keeps path
+# documentation clean.
+#
+# GitLab prefixes are from its token overview (checked 2026-07-23):
+# https://docs.gitlab.com/security/tokens/#token-prefixes
+PREFIXED_SECRET_PATTERNS = [
+    ("GitLab token", re.compile(
+        r"\b(?:glpat|gloas|gldt|glrtr?|glcbt|glptt|glft|glimt|glagent|glwt"
+        r"|glsoat|glffct)-([0-9A-Za-z_-]{20,})(?![0-9A-Za-z_/-])")),
+    ("Anthropic API key", re.compile(
+        r"\bsk-ant-([0-9A-Za-z_-]{20,})(?![0-9A-Za-z_/-])")),
+    ("OpenAI project key", re.compile(
+        r"\bsk-(?:proj|svcacct)-([0-9A-Za-z_-]{20,})(?![0-9A-Za-z_/-])")),
 ]
 
 # Opt-in entropy scan (--secret-entropy-scan). The generic assignment pattern
@@ -165,6 +180,16 @@ def shannon_entropy(s: str) -> float:
         return 0.0
     n = len(s)
     return -sum((c / n) * math.log2(c / n) for c in Counter(s).values())
+
+
+def prefixed_secret_labels(text: str):
+    """Yield each provider label with a complete, random-looking token body."""
+    for label, pattern in PREFIXED_SECRET_PATTERNS:
+        if any(
+            shannon_entropy(match.group(1)) >= SECRET_ENTROPY_MIN_BITS
+            for match in pattern.finditer(text)
+        ):
+            yield label
 
 
 def entropy_secret_values(text: str):
@@ -653,6 +678,10 @@ def main() -> int:
                 errors.append(
                     f"{rel}: possible secret leak ({label}) — remove the value, "
                     f"document the key name/path instead")
+        for label in prefixed_secret_labels(text):
+            errors.append(
+                f"{rel}: possible secret leak ({label}) — remove the value, "
+                f"document the key name/path instead")
         if args.secret_entropy_scan and next(entropy_secret_values(text), None):
             errors.append(
                 f"{rel}: possible secret leak (high-entropy assignment flagged by "

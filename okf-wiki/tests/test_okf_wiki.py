@@ -868,6 +868,18 @@ def test_github_pat_secret_detected(tmp_path):
     ("Stripe secret key", "sk_" + "live_" + "A1b2C3d4E5f6G7h8I9j0K1L2"),
     ("Stripe webhook secret", "whsec_" + "A1b2C3d4E5f6G7h8I9j0K1L2M3n4O5p6"),
     ("GitLab token", "glpat-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "gloas-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "gldt-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glrt-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glrtr-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glcbt-" + "abc_" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glptt-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glft-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glimt-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glagent-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glwt-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glsoat-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glffct-" + "A1b2C3d4E5f6G7h8I9j0"),
     ("npm token", "npm_" + "A1b2C3d4E5f6G7h8" + "I9j0K1L2M3n4O5p6Q7r8"),
     ("SendGrid API key", "SG." + "A" * 22 + "." + "B" * 43),
     ("Anthropic API key", "sk-" + "ant-" + "api03-" + "A1b2C3d4E5f6G7h8I9j0"),
@@ -877,8 +889,8 @@ def test_github_pat_secret_detected(tmp_path):
 def test_provider_token_secret_detected(tmp_path, label, token):
     # Prefix-anchored provider detectors (issue #150 move A). Each token is built
     # from fragments so no real-looking secret lives in this file. They run on the
-    # default validate (no flag) and raise recall at no precision cost -- the
-    # negative test below proves they leave documentation alone.
+    # default validate (no flag); the negative test below pins the path-documentation
+    # precision boundary.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
     write_concept(b, GOOD.rstrip() + f"\nkey = {token}\n")
@@ -891,8 +903,8 @@ def test_provider_token_secret_detected(tmp_path, label, token):
 def test_provider_prefixes_do_not_flag_prose(tmp_path):
     # The provider prefixes must not fire on documentation: a placeholder ellipsis,
     # an env-var name, words that merely contain an rk_/sk_ substring (the \b anchor
-    # guards these), and an OKF key path (the invariant the provider block promises)
-    # all stay clean on the default validate.
+    # guards these), and provider-specific OKF key paths all stay clean on the
+    # default validate.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
     prose = (
@@ -900,6 +912,10 @@ def test_provider_prefixes_do_not_flag_prose(tmp_path):
         "The npm_config_registry env var points at the mirror.\n"
         "Use the work_live and mark_live feature flags.\n"
         "The pointer secret: svc/api/prod-key-path names a vault key, not a value.\n"
+        "The pointer secret: openai/sk-proj-production-primary-key-path is a vault path.\n"
+        "The pointer secret: anthropic/sk-ant-production-primary-key-path is a vault path.\n"
+        "The pointer secret: gitlab/gldt-production-deploy-token-path is a vault path.\n"
+        "The pointer secret: openai/sk-proj-A1b2C3d4E5f6G7h8I9j0/key-path is a vault path.\n"
     )
     write_concept(b, GOOD.rstrip() + "\n" + prose)
     rc, out = validate(b)
