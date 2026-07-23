@@ -91,7 +91,7 @@ claims.
 
 ## Verification and cleanup
 
-The repeatable harness passed its five focused tests. The repository suite
-passed 119 of 119 tests, all 49 page-specific Tailwind stylesheets were current,
+The repeatable harness passed its six focused tests. The repository suite
+passed 120 of 120 tests, all 49 page-specific Tailwind stylesheets were current,
 and `git diff --check` passed. The disposable test root was removed after the
 final verification run.

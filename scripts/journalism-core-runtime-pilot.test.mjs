@@ -5,6 +5,7 @@ import {
   RUNTIME_PILOT_FIXTURES,
   RUNTIME_PILOT_TIMEOUT_MS,
   buildRuntimeInvocation,
+  parseCliArgs,
   runRuntimePilot,
 } from './journalism-core-runtime-pilot.mjs';
 
@@ -144,5 +145,30 @@ test('runtime pilot plans require explicit disposable client homes', () => {
   assert.throws(
     () => buildRuntimeInvocation('codex', 'unknown', { projectDir, codexHome }),
     /Unsupported runtime pilot fixture/u,
+  );
+  assert.throws(
+    () => buildRuntimeInvocation('codex', 'toString', { projectDir, codexHome }),
+    /Unsupported runtime pilot fixture/u,
+  );
+});
+
+test('runtime pilot CLI rejects missing option values and client-mismatched bypasses', () => {
+  assert.throws(
+    () => parseCliArgs(['codex', 'j-core-1', '--project', '--unboxed']),
+    /--project requires a directory value/u,
+  );
+  assert.throws(
+    () => parseCliArgs(['claude', 'j-core-1', '--project', projectDir, '--unboxed']),
+    /--unboxed is supported only for the Codex runtime pilot/u,
+  );
+  assert.deepEqual(
+    parseCliArgs(['codex', 'j-core-1', '--project', projectDir, '--unboxed', '--dry-run']),
+    {
+      client: 'codex',
+      fixtureId: 'j-core-1',
+      projectDir,
+      unboxed: true,
+      dryRun: true,
+    },
   );
 });

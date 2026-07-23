@@ -35,9 +35,10 @@ export const RUNTIME_PILOT_FIXTURES = Object.freeze({
 });
 
 function fixtureFor(id) {
-  const fixture = RUNTIME_PILOT_FIXTURES[id];
-  if (!fixture) throw new Error(`Unsupported runtime pilot fixture: ${id}`);
-  return fixture;
+  if (!Object.hasOwn(RUNTIME_PILOT_FIXTURES, id)) {
+    throw new Error(`Unsupported runtime pilot fixture: ${id}`);
+  }
+  return RUNTIME_PILOT_FIXTURES[id];
 }
 
 function promptFor(client, fixture) {
@@ -152,7 +153,7 @@ export function runRuntimePilot(
   }
 }
 
-function parseCliArgs(args) {
+export function parseCliArgs(args) {
   const [client, fixtureId, ...options] = args;
   let projectDir;
   let unboxed = false;
@@ -161,7 +162,11 @@ function parseCliArgs(args) {
   for (let index = 0; index < options.length; index += 1) {
     const option = options[index];
     if (option === '--project') {
-      projectDir = options[index + 1];
+      const value = options[index + 1];
+      if (!value || value.startsWith('--')) {
+        throw new Error('--project requires a directory value');
+      }
+      projectDir = value;
       index += 1;
     } else if (option === '--unboxed') {
       unboxed = true;
@@ -177,6 +182,9 @@ function parseCliArgs(args) {
       'Usage: node scripts/journalism-core-runtime-pilot.mjs '
       + '<claude|codex> <fixture-id> --project <disposable-project> [--unboxed] [--dry-run]',
     );
+  }
+  if (unboxed && client !== 'codex') {
+    throw new Error('--unboxed is supported only for the Codex runtime pilot');
   }
   return { client, fixtureId, projectDir, unboxed, dryRun };
 }
