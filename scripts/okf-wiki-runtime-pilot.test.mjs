@@ -138,12 +138,9 @@ function validCodexTranscript() {
     `sed -n '1,220p' ${installedFilesRead[1]}`,
     'python3 .agents/skills/okf-wiki/scripts/scaffold.py ./okf-1 '
       + '--title "Codex no-Claude pilot" --sections concepts,decisions',
-    '(from ./okf-1) python3 scripts/validate.py --bundle bundle',
-  ];
-  const capturedCommands = [
-    ...commandsRun.slice(0, 3),
     'python3 scripts/validate.py --bundle bundle',
   ];
+  const capturedCommands = [...commandsRun];
   const capturedOutputs = [
     'name: okf-wiki\n# okf-wiki: scaffold an Open Knowledge Format knowledge base\n',
     '# OKF spec v1\n## Bundle model\n',
@@ -576,7 +573,10 @@ test('Codex transcript pins installed reads, actual commands, and no prompts', (
   const evidence = parseCodexTranscript(validCodexTranscript(), 'okf-1');
   assert.equal(evidence.scaffoldCommands.length, 1);
   assert.equal(evidence.report.commands_run.length, evidence.commands.length);
-  assert.match(evidence.report.commands_run.at(-1), /^\(from \.\/okf-1\)/u);
+  assert.equal(
+    evidence.report.commands_run.at(-1),
+    'python3 scripts/validate.py --bundle bundle',
+  );
   assert.deepEqual(evidence.report.installed_files_read, [
     '.agents/skills/okf-wiki/SKILL.md',
     '.agents/skills/okf-wiki/spec/SPEC.md',
@@ -639,6 +639,24 @@ test('Codex transcript pins installed reads, actual commands, and no prompts', (
     () => parseCodexTranscript(hiddenCompound, 'okf-1'),
     /final report does not exactly match the captured command log/u,
   );
+
+  for (const forgedLocation of [
+    '(from /tmp/forged) ',
+    'cd /tmp/forged && ',
+  ]) {
+    const forgedWorkingDirectory = mutateCodexTranscript((events) => {
+      const reportEvent = events.find(
+        (event) => event.item?.type === 'agent_message',
+      );
+      const report = JSON.parse(reportEvent.item.text);
+      report.commands_run[3] = forgedLocation + report.commands_run[3];
+      reportEvent.item.text = JSON.stringify(report);
+    });
+    assert.throws(
+      () => parseCodexTranscript(forgedWorkingDirectory, 'okf-1'),
+      /final report does not exactly match the captured command log/u,
+    );
+  }
 
   const failedRead = mutateCodexTranscript((events) => {
     const command = events.find(

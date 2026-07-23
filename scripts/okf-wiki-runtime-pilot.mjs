@@ -541,8 +541,6 @@ function commandMatchesReport(actual, reported) {
   const normalizedActual = shellCommandBody(actual);
   const normalizedReported = reported
     .trim()
-    .replace(/^\(from [^)]+\)\s+/u, '')
-    .replace(/^cd\s+\S+\s+&&\s+/u, '')
     .replace(/\s+/gu, ' ');
   return normalizedActual === normalizedReported;
 }

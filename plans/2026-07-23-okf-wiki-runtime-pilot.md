@@ -90,8 +90,9 @@ harness parsed seven completed command events, required the two direct
 installed-resource reads above to succeed and emit file-specific content,
 required exactly one scaffold command with the platform interpreter and the
 accepted target, title, and ordered sections, and required the structured
-command report to match the captured commands exactly after normalizing only
-the recorded working directory. It also rejected any Claude executable,
+command report to match the captured commands exactly after decoding an
+optional Bash wrapper and normalizing whitespace. It did not accept invented
+working-directory annotations. It also rejected any Claude executable,
 generated `.claude/` adapter access, or reported trust or approval prompt. The
 captured transcript had SHA-256 digest:
 
