@@ -99,7 +99,7 @@ function assertContainedPath(projectRoot, path, label) {
   return realPath;
 }
 
-function verifyProjectPaths(project) {
+function verifyLockPath(project) {
   const projectRoot = realpathSync(resolve(project));
   const lockPath = join(projectRoot, LOCK_FILE_NAME);
   const lockStat = lstatSync(lockPath);
@@ -107,6 +107,10 @@ function verifyProjectPaths(project) {
   if (!lockStat.isFile()) throw new Error(`${LOCK_FILE_NAME} must be a regular file`);
   assertContainedPath(projectRoot, lockPath, LOCK_FILE_NAME);
 
+  return { lockPath, lockStat, projectRoot };
+}
+
+function verifyInstalledPath(projectRoot) {
   const installedPath = join(
     projectRoot,
     '.agents',
@@ -122,7 +126,7 @@ function verifyProjectPaths(project) {
   }
   assertContainedPath(projectRoot, installedPath, `installed ${CANONICAL_SKILL_NAME} path`);
 
-  return { installedPath, lockPath, lockStat, projectRoot };
+  return installedPath;
 }
 
 function readProjectLock(lockPath) {
@@ -168,7 +172,7 @@ export function computeSkillFolderHash(skillPath) {
 }
 
 export function verifyCanonicalDocumentDesignProject(project) {
-  const { installedPath, lockPath } = verifyProjectPaths(project);
+  const { lockPath, projectRoot } = verifyLockPath(project);
   const lock = readProjectLock(lockPath);
   assertLockShape(lock);
   if (lock.skills[LEGACY_SKILL_NAME] !== undefined) {
@@ -180,8 +184,13 @@ export function verifyCanonicalDocumentDesignProject(project) {
   }
   assertExpectedIdentity(record);
 
+  const installedPath = verifyInstalledPath(projectRoot);
   const skill = readFileSync(join(installedPath, 'SKILL.md'), 'utf8');
-  if (!/^name: document-design$/mu.test(skill)) {
+  const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/u.exec(skill)?.[1];
+  const nameLines = frontmatter
+    ?.split(/\r?\n/u)
+    .filter((line) => /^name:/u.test(line)) ?? [];
+  if (nameLines.length !== 1 || !/^name:[ \t]*document-design[ \t]*$/u.test(nameLines[0])) {
     throw new Error(`installed ${CANONICAL_SKILL_NAME} frontmatter is not canonical`);
   }
   const computedHash = computeSkillFolderHash(installedPath);
@@ -206,9 +215,12 @@ function writeLockAtomically(lockPath, lock, mode) {
 }
 
 export function migrateDocumentDesignProject(project, { write = true } = {}) {
-  const { installedPath, lockPath, lockStat } = verifyProjectPaths(project);
+  const { lockPath, lockStat, projectRoot } = verifyLockPath(project);
   const parsed = readProjectLock(lockPath);
   const result = migrateDocumentDesignLock(parsed);
+  if (result.status === 'absent') return result;
+
+  const installedPath = verifyInstalledPath(projectRoot);
   if (result.status === 'migrated' || result.status === 'collapsed') {
     const installedHash = computeSkillFolderHash(installedPath);
     const lockedHash = parsed.skills[LEGACY_SKILL_NAME].computedHash;

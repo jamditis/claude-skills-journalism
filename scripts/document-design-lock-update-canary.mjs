@@ -65,9 +65,9 @@ function assertStatus(result, expected, label) {
   }
 }
 
-function runGit(args, { encoding = 'utf8' } = {}) {
+function runGit(args, { cwd = ROOT, encoding = 'utf8' } = {}) {
   const result = spawnSync('git', args, {
-    cwd: ROOT,
+    cwd,
     encoding,
     maxBuffer: 10 * 1024 * 1024,
     shell: false,
@@ -86,19 +86,64 @@ function remoteMasterCommit() {
   return commit;
 }
 
-function materializeHistoricalSkill(project) {
+function prepareSourceRepository(canaryRoot, sourceCommit) {
+  const repository = join(canaryRoot, 'source.git');
+  runGit(['init', '--bare', repository]);
+
+  runGit([
+    '--git-dir',
+    repository,
+    'fetch',
+    '--no-tags',
+    '--depth=1',
+    REMOTE_URL,
+    REMOTE_REF,
+  ]);
+  const fetchedSource = runGit([
+    '--git-dir',
+    repository,
+    'rev-parse',
+    'FETCH_HEAD^{commit}',
+  ]).trim();
+  if (fetchedSource !== sourceCommit) {
+    throw new Error(`fetched source moved from ${sourceCommit} to ${fetchedSource}`);
+  }
+
+  runGit([
+    '--git-dir',
+    repository,
+    'fetch',
+    '--no-tags',
+    '--depth=1',
+    REMOTE_URL,
+    HISTORICAL_SOURCE_COMMIT,
+  ]);
+  const fetchedHistorical = runGit([
+    '--git-dir',
+    repository,
+    'rev-parse',
+    'FETCH_HEAD^{commit}',
+  ]).trim();
+  if (fetchedHistorical !== HISTORICAL_SOURCE_COMMIT) {
+    throw new Error('fetched historical source commit did not match the pinned fixture');
+  }
+  return repository;
+}
+
+function materializeSkillTree(repository, commit, destinationRoot) {
   const list = runGit([
+    '--git-dir',
+    repository,
     'ls-tree',
     '-r',
     '--name-only',
-    HISTORICAL_SOURCE_COMMIT,
+    commit,
     '--',
     SOURCE_SKILL_PATH,
   ]);
   const repoPaths = list.trim().split('\n').filter(Boolean);
-  if (repoPaths.length === 0) throw new Error('historical document-design tree is empty');
+  if (repoPaths.length === 0) throw new Error(`document-design tree is empty at ${commit}`);
 
-  const installedRoot = join(project, '.agents', 'skills', 'document-design');
   for (const repoPath of repoPaths) {
     const relativePath = relative(SOURCE_SKILL_PATH, repoPath);
     if (
@@ -108,19 +153,15 @@ function materializeHistoricalSkill(project) {
     ) {
       throw new Error(`historical skill path escaped its source root: ${repoPath}`);
     }
-    const destination = join(installedRoot, relativePath);
+    const destination = join(destinationRoot, relativePath);
     mkdirSync(resolve(destination, '..'), { recursive: true });
     const content = runGit(
-      ['show', `${HISTORICAL_SOURCE_COMMIT}:${repoPath}`],
+      ['--git-dir', repository, 'show', `${commit}:${repoPath}`],
       { encoding: null },
     );
     writeFileSync(destination, content);
   }
-  const contentHash = computeSkillFolderHash(installedRoot);
-  if (contentHash !== HISTORICAL_CONTENT_HASH) {
-    throw new Error(`historical content hash drifted: ${contentHash}`);
-  }
-  return installedRoot;
+  return destinationRoot;
 }
 
 function removeCanaryRoot(directory) {
@@ -147,7 +188,22 @@ export function runDocumentDesignLockCanary() {
     mkdirSync(project);
     mkdirSync(cache);
     mkdirSync(clientHome);
-    const installedRoot = materializeHistoricalSkill(project);
+    const sourceCommit = remoteMasterCommit();
+    const sourceRepository = prepareSourceRepository(canaryRoot, sourceCommit);
+    const installedRoot = materializeSkillTree(
+      sourceRepository,
+      HISTORICAL_SOURCE_COMMIT,
+      join(project, '.agents', 'skills', 'document-design'),
+    );
+    const historicalHash = computeSkillFolderHash(installedRoot);
+    if (historicalHash !== HISTORICAL_CONTENT_HASH) {
+      throw new Error(`historical content hash drifted: ${historicalHash}`);
+    }
+    const sourceSnapshot = materializeSkillTree(
+      sourceRepository,
+      sourceCommit,
+      join(canaryRoot, 'source-snapshot'),
+    );
     const fixtureBytes = readFileSync(FIXTURE_PATH);
     const lockPath = join(project, 'skills-lock.json');
     writeFileSync(lockPath, fixtureBytes);
@@ -161,8 +217,7 @@ export function runDocumentDesignLockCanary() {
       npm_config_cache: cache,
     };
     const npxArgs = ['--yes', `skills@${SKILLS_CLI_VERSION}`];
-    const sourceCommit = remoteMasterCommit();
-    const sourceHash = computeSkillFolderHash(join(ROOT, SOURCE_SKILL_PATH));
+    const sourceHash = computeSkillFolderHash(sourceSnapshot);
     const initialLockDigest = digest(fixtureBytes);
 
     const codexVersion = runCommand('codex', ['--version'], { env });

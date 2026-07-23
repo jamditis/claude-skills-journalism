@@ -217,6 +217,54 @@ test('post-update verification checks the canonical path, source, frontmatter, a
   );
 });
 
+test('verification reads only the leading frontmatter name', (t) => {
+  const project = makeProject(t);
+  const installedPath = join(project, '.agents', 'skills', CANONICAL_SKILL_NAME);
+  writeFileSync(
+    join(installedPath, 'SKILL.md'),
+    [
+      '---',
+      'name: Document design',
+      'description: Stale frontmatter fixture',
+      '---',
+      '',
+      'Example:',
+      'name: document-design',
+      '',
+    ].join('\n'),
+  );
+  const fixture = readFixture();
+  const record = {
+    ...fixture.skills[LEGACY_SKILL_NAME],
+    computedHash: computeSkillFolderHash(installedPath),
+  };
+  writeFileSync(
+    join(project, 'skills-lock.json'),
+    `${JSON.stringify({
+      version: 1,
+      skills: { [CANONICAL_SKILL_NAME]: record },
+    }, null, 2)}\n`,
+  );
+
+  assert.throws(
+    () => verifyCanonicalDocumentDesignProject(project),
+    /frontmatter is not canonical/u,
+  );
+});
+
+test('a project without either lock identity is a no-op without an installed directory', (t) => {
+  const project = mkdtempSync(join(tmpdir(), 'document-design-lock-absent-'));
+  t.after(() => rmSync(project, { recursive: true, force: true }));
+  writeFileSync(
+    join(project, 'skills-lock.json'),
+    '{\n  "version": 1,\n  "skills": {}\n}\n',
+  );
+
+  const result = migrateDocumentDesignProject(project);
+  assert.equal(result.status, 'absent');
+  assert.deepEqual(result.lock.skills, {});
+});
+
 test('package scripts keep migration explicit and the live updater canary separate', () => {
   const packageJson = JSON.parse(
     readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
@@ -241,6 +289,12 @@ test('package scripts keep migration explicit and the live updater canary separa
   assert.match(canary, /assertStatus\(secondUpdate, 0/u);
   assert.match(canary, /HOME: clientHome/u);
   assert.match(canary, /USERPROFILE: clientHome/u);
+  assert.match(canary, /git[\s\S]*fetch[\s\S]*HISTORICAL_SOURCE_COMMIT/u);
+  assert.match(canary, /materializeSkillTree\([\s\S]*sourceCommit/u);
+  assert.doesNotMatch(
+    canary,
+    /computeSkillFolderHash\(join\(ROOT, SOURCE_SKILL_PATH\)\)/u,
+  );
   assert.match(canary, /removeCanaryRoot\(canaryRoot\)/u);
   assert.doesNotMatch(canary, /shell:\s*true/u);
 });

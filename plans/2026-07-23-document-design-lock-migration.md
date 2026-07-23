@@ -94,8 +94,12 @@ lock SHA-256: a586c9e6d61b960a0f9f3438efaedfab2a16d6187b5f3b514c530d27e6bcd5d8
 source master: d49ed1022a012269a237f7749b0e47c099e7add6
 ```
 
-The canary checked the public source commit before, between, and after the
-updates, then removed its disposable project, client home, and npm cache:
+The canary resolved the public source first, fetched both source commits into a
+disposable bare repository, and derived the expected tree hash from that
+resolved source rather than the local checkout. This also makes the historical
+replay work from a shallow checkout. It checked the public source commit
+between and after the updates, then removed its disposable project, source
+repository, client home, and npm cache:
 
 ```bash
 npm run canary:document-design-lock
