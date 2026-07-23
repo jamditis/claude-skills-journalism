@@ -864,6 +864,81 @@ def test_github_pat_secret_detected(tmp_path):
     assert rc == 1 and "secret leak" in out
 
 
+@pytest.mark.parametrize("label, token", [
+    ("Stripe secret key", "sk_" + "live_" + "A1b2C3d4E5f6G7h8I9j0K1L2"),
+    ("Stripe organization key", "sk_" + "org_" + "A1b2C3d4E5f6G7h8I9j0K1L2"),
+    ("Stripe webhook secret", "whsec_" + "A1b2C3d4E5f6G7h8I9j0K1L2M3n4O5p6"),
+    ("GitLab token", "glpat-" + "A1b2C3d4E5f6G7h8I9j0"),
+    # A valid 20-character GitLab token body can repeat characters and land just
+    # below the generic 4.0-bit entropy floor (3.984 bits/character here).
+    ("GitLab token", "glpat-" + "5lRDXNfPxOMFQmlFCcFZ"),
+    ("GitLab token", "gloas-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "gldt-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glrt-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glrtr-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glcbt-" + "abc_" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glptt-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glft-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glimt-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glagent-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glwt-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glsoat-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("GitLab token", "glffct-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("npm token", "npm_" + "A1b2C3d4E5f6G7h8" + "I9j0K1L2M3n4O5p6Q7r8"),
+    ("SendGrid API key", "SG." + "A" * 22 + "." + "B" * 43),
+    ("Anthropic API key", "sk-" + "ant-" + "api03-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("OpenAI project key", "sk-" + "proj-" + "A1b2C3d4E5f6G7h8I9j0"),
+    ("OpenAI legacy key", "sk-" + "A1b2C3d4E5f6G7h8I9j0" + "K1L2M3n4O5p6Q7r8S9t0"),
+])
+def test_provider_token_secret_detected(tmp_path, label, token):
+    # Prefix-anchored provider detectors (issue #150 move A). Each token is built
+    # from fragments so no real-looking secret lives in this file. They run on the
+    # default validate (no flag); the negative test below pins the path-documentation
+    # precision boundary.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + f"\nkey = {token}\n")
+    rc, out = validate(b)
+    # Assert the specific detector, not just that some leak fired, so a token that
+    # matched the wrong pattern would still be caught.
+    assert rc == 1 and f"secret leak ({label})" in out
+
+
+def test_gitlab_session_cookie_secret_detected(tmp_path):
+    # GitLab lists the session-cookie assignment itself alongside its fixed token
+    # prefixes. Build the fake cookie from fragments so no real-looking value
+    # lives in this test file.
+    fake = "_gitlab_" + "session=" + "A1b2C3d4E5f6G7h8I9j0K1L2M3n4O5p6"
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + f"\nCookie: {fake}\n")
+    rc, out = validate(b)
+    assert rc == 1 and "secret leak (GitLab session cookie)" in out
+
+
+def test_provider_prefixes_do_not_flag_prose(tmp_path):
+    # The provider prefixes must not fire on documentation: a placeholder ellipsis,
+    # an env-var name, words that merely contain an rk_/sk_ substring (the \b anchor
+    # guards these), and provider-specific OKF key paths all stay clean on the
+    # default validate.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    prose = (
+        "Set your sk_test_... key from the dashboard.\n"
+        "The npm_config_registry env var points at the mirror.\n"
+        "Use the work_live and mark_live feature flags.\n"
+        "The pointer secret: svc/api/prod-key-path names a vault key, not a value.\n"
+        "The pointer secret: openai/sk-proj-production-primary-key-path is a vault path.\n"
+        "The pointer secret: anthropic/sk-ant-production-primary-key-path is a vault path.\n"
+        "The pointer secret: gitlab/gldt-production-deploy-token-path is a vault path.\n"
+        "The pointer secret: openai/sk-proj-A1b2C3d4E5f6G7h8I9j0/key-path is a vault path.\n"
+        "GitLab documents the placeholder _gitlab_session=... for browser sessions.\n"
+    )
+    write_concept(b, GOOD.rstrip() + "\n" + prose)
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
 def test_link_to_existing_uppercase_md_fails(tmp_path):
     # the case the prior case-sensitive design worried about: a link to an existing
     # Foo.MD used to "resolve" as valid while discovery never scanned that file. Now
