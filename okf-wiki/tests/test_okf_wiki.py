@@ -866,8 +866,12 @@ def test_github_pat_secret_detected(tmp_path):
 
 @pytest.mark.parametrize("label, token", [
     ("Stripe secret key", "sk_" + "live_" + "A1b2C3d4E5f6G7h8I9j0K1L2"),
+    ("Stripe organization key", "sk_" + "org_" + "A1b2C3d4E5f6G7h8I9j0K1L2"),
     ("Stripe webhook secret", "whsec_" + "A1b2C3d4E5f6G7h8I9j0K1L2M3n4O5p6"),
     ("GitLab token", "glpat-" + "A1b2C3d4E5f6G7h8I9j0"),
+    # A valid 20-character GitLab token body can repeat characters and land just
+    # below the generic 4.0-bit entropy floor (3.984 bits/character here).
+    ("GitLab token", "glpat-" + "5lRDXNfPxOMFQmlFCcFZ"),
     ("GitLab token", "gloas-" + "A1b2C3d4E5f6G7h8I9j0"),
     ("GitLab token", "gldt-" + "A1b2C3d4E5f6G7h8I9j0"),
     ("GitLab token", "glrt-" + "A1b2C3d4E5f6G7h8I9j0"),
@@ -900,6 +904,18 @@ def test_provider_token_secret_detected(tmp_path, label, token):
     assert rc == 1 and f"secret leak ({label})" in out
 
 
+def test_gitlab_session_cookie_secret_detected(tmp_path):
+    # GitLab lists the session-cookie assignment itself alongside its fixed token
+    # prefixes. Build the fake cookie from fragments so no real-looking value
+    # lives in this test file.
+    fake = "_gitlab_" + "session=" + "A1b2C3d4E5f6G7h8I9j0K1L2M3n4O5p6"
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + f"\nCookie: {fake}\n")
+    rc, out = validate(b)
+    assert rc == 1 and "secret leak (GitLab session cookie)" in out
+
+
 def test_provider_prefixes_do_not_flag_prose(tmp_path):
     # The provider prefixes must not fire on documentation: a placeholder ellipsis,
     # an env-var name, words that merely contain an rk_/sk_ substring (the \b anchor
@@ -916,6 +932,7 @@ def test_provider_prefixes_do_not_flag_prose(tmp_path):
         "The pointer secret: anthropic/sk-ant-production-primary-key-path is a vault path.\n"
         "The pointer secret: gitlab/gldt-production-deploy-token-path is a vault path.\n"
         "The pointer secret: openai/sk-proj-A1b2C3d4E5f6G7h8I9j0/key-path is a vault path.\n"
+        "GitLab documents the placeholder _gitlab_session=... for browser sessions.\n"
     )
     write_concept(b, GOOD.rstrip() + "\n" + prose)
     rc, out = validate(b)

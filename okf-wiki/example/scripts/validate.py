@@ -109,7 +109,14 @@ SECRET_PATTERNS = [
     # Providers whose token bodies allow path-like hyphens and underscores use the
     # entropy-gated patterns below instead.
     ("Stripe secret key", re.compile(r"\b[sr]k_(?:live|test)_[0-9A-Za-z]{24,}\b")),
+    ("Stripe organization key", re.compile(r"\bsk_org_[0-9A-Za-z]{24,}\b")),
     ("Stripe webhook secret", re.compile(r"\bwhsec_[0-9A-Za-z]{32,}\b")),
+    # GitLab documents this exact cookie label as a token prefix. Keep the value
+    # shape narrow enough that its `_gitlab_session=...` documentation placeholder
+    # stays clean while an actual serialized cookie is caught.
+    ("GitLab session cookie", re.compile(
+        r"(?i)\b_gitlab_session\s*=\s*['\"]?"
+        r"[0-9A-Za-z%+/_=-]{20,}(?![0-9A-Za-z%+/_=.\-])")),
     ("npm token", re.compile(r"\bnpm_[0-9A-Za-z]{36}\b")),
     ("SendGrid API key", re.compile(r"\bSG\.[0-9A-Za-z_-]{22}\.[0-9A-Za-z_-]{43}")),
     # Legacy personal OpenAI keys carry no project/service segment. `sk-` alone is a
@@ -130,21 +137,25 @@ SECRET_PATTERNS = [
 # Some provider token bodies allow the same hyphens and underscores used in
 # human-readable vault paths. A prefix alone would therefore flag documentation
 # such as `openai/sk-proj-production-primary-key-path`. These patterns capture a
-# complete base64url-like body; prefixed_secret_labels applies the same 4.0
-# bits/character floor as the opt-in generic entropy scan. They still run by
-# default because the provider prefix is strong, but the entropy gate keeps path
-# documentation clean.
+# complete base64url-like body. They still run by default because the provider
+# prefix is strong, but the entropy gate keeps path documentation clean. OpenAI
+# and Anthropic use the generic 4.0 bits/character floor. GitLab accepts 20-char
+# bodies, whose repeated characters lower their observable entropy; its narrower
+# floor is 88% of the maximum entropy observable at the captured body length,
+# capped at 4.0. That is 3.80 bits/character at 20 chars and rises to 4.0 at 24,
+# so short tokens are not judged against a longer sample's ceiling while the
+# longer path regressions stay clean.
 #
 # GitLab prefixes are from its token overview (checked 2026-07-23):
 # https://docs.gitlab.com/security/tokens/#token-prefixes
 PREFIXED_SECRET_PATTERNS = [
     ("GitLab token", re.compile(
         r"\b(?:glpat|gloas|gldt|glrtr?|glcbt|glptt|glft|glimt|glagent|glwt"
-        r"|glsoat|glffct)-([0-9A-Za-z_-]{20,})(?![0-9A-Za-z_/-])")),
+        r"|glsoat|glffct)-([0-9A-Za-z_-]{20,})(?![0-9A-Za-z_/-])"), 0.88),
     ("Anthropic API key", re.compile(
-        r"\bsk-ant-([0-9A-Za-z_-]{20,})(?![0-9A-Za-z_/-])")),
+        r"\bsk-ant-([0-9A-Za-z_-]{20,})(?![0-9A-Za-z_/-])"), 1.0),
     ("OpenAI project key", re.compile(
-        r"\bsk-(?:proj|svcacct)-([0-9A-Za-z_-]{20,})(?![0-9A-Za-z_/-])")),
+        r"\bsk-(?:proj|svcacct)-([0-9A-Za-z_-]{20,})(?![0-9A-Za-z_/-])"), 1.0),
 ]
 
 # Opt-in entropy scan (--secret-entropy-scan). The generic assignment pattern
@@ -184,12 +195,18 @@ def shannon_entropy(s: str) -> float:
 
 def prefixed_secret_labels(text: str):
     """Yield each provider label with a complete, random-looking token body."""
-    for label, pattern in PREFIXED_SECRET_PATTERNS:
-        if any(
-            shannon_entropy(match.group(1)) >= SECRET_ENTROPY_MIN_BITS
-            for match in pattern.finditer(text)
-        ):
-            yield label
+    for label, pattern, max_entropy_fraction in PREFIXED_SECRET_PATTERNS:
+        for match in pattern.finditer(text):
+            body = match.group(1)
+            # A sample of n characters cannot exhibit more than log2(n) bits of
+            # entropy per character, even when every character is unique.
+            min_entropy = min(
+                SECRET_ENTROPY_MIN_BITS,
+                max_entropy_fraction * math.log2(len(body)),
+            )
+            if shannon_entropy(body) >= min_entropy:
+                yield label
+                break
 
 
 def entropy_secret_values(text: str):
