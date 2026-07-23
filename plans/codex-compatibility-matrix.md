@@ -34,6 +34,7 @@ Status labels:
 | Repository release verification | [`9eef57629edbaa19bf47ec35296acebdd7b4ab1f`](https://github.com/jamditis/claude-skills-journalism/commit/9eef57629edbaa19bf47ec35296acebdd7b4ab1f) | July 23 post-merge `master` head used for the phase-one release evidence |
 | Repository visual-explainer pilot | [`f6a4b84dd2e9feafc6c2bf067f873e9301a083c2`](https://github.com/jamditis/claude-skills-journalism/commit/f6a4b84dd2e9feafc6c2bf067f873e9301a083c2) | July 23 `master` head installed for the V-ex-1 runtime evidence |
 | Repository okf-wiki pilot | [`cabb43bc2515c6c30a3d0839909f786e7afbcba8`](https://github.com/jamditis/claude-skills-journalism/commit/cabb43bc2515c6c30a3d0839909f786e7afbcba8) | July 23 `master` head installed for the Okf-1 no-Claude runtime evidence |
+| Repository Document design lock pilot | [`d49ed1022a012269a237f7749b0e47c099e7add6`](https://github.com/jamditis/claude-skills-journalism/commit/d49ed1022a012269a237f7749b0e47c099e7add6) | July 23 `master` head used for the D-lock-1 update target |
 | Claude Code | 2.1.215; 2.1.218 | Phase-one marketplace validation, then the post-merge clean `journalism-core` install |
 | Codex CLI | 0.145.0 | Legacy-compatible marketplace and clean `journalism-core` install |
 | skills CLI | 1.5.19; 1.5.20 | Phase-one standards discovery, then post-merge project and user install canaries |
@@ -351,6 +352,28 @@ Codex project behavior. Removing the installed skill left the generated
 project intact and valid, while the empty lock entry, Claude adapter directory,
 and OKF user data remained independently removable.
 
+### D-lock-release-1: Document design standards lock migration
+
+Environment: Codex CLI 0.145.0 with a disposable skills CLI 1.5.20 project on
+July 23, 2026. The
+[migration record](2026-07-23-document-design-lock-migration.md) contains the
+historical fixture, exact source commits, hashes, failure, migration boundary,
+two update passes, verification, and cleanup.
+
+Result: skills CLI 1.5.20 exited 1 when its project updater passed the
+historical `Document design` lock key back to the current repository. The
+explicit repository migration renamed only the exact
+`jamditis/claude-skills-journalism` and
+`pdf-playground/skills/document-design/SKILL.md` identity. It left the
+installed directory and complete record intact, rejected ambiguous inputs, and
+did not run automatically.
+
+After migration, two consecutive skills CLI updates exited 0. Exactly one
+`document-design` lock identity remained; its repository source, skill path,
+installed directory, frontmatter, and content hash matched. The second update
+left the lock and installed-tree digests unchanged. This is local lock
+migration evidence, not public catalog history or a mixed-install claim.
+
 ## Package matrix
 
 | Package | Version and components | Current classification | Included and excluded scope | Evidence | Next proof |
@@ -360,7 +383,7 @@ and OKF user data remained independently removable.
 | `journalism-core` | 1.2.0; 14 nested skills | Runtime pilot passed on the Claude package and Codex project-standards paths | Include the 14 shared skills. No commands, agents, or hooks are part of this package. The legacy-compatible Codex package and user-level standards paths remain install-only. | [J-release-1](#j-release-1-paired-journalism-core-runtime-pilot), [C-phase-1](#c-phase-1-repeatable-claude-install-canary), [K-phase-1](#k-phase-1-repeatable-codex-legacy-package-canary), [S-phase-1](#s-phase-1-full-journalism-core-standards-canary), [S-global-phase-1](#s-global-phase-1-user-level-journalism-core-standards-canary), [V-phase-1](#v-phase-1-repaired-standards-baseline) | Add a no-Claude-environment gate and scheduled runtime regression before a broader package support claim. |
 | `okf-wiki` | 0.6.1; one root skill; scripts and generated Claude settings | Pre-set portable runtime pilot passed; instruction and Claude-output adapters remain | Include the tested Okf-1 path: standards discovery, installed spec and scaffolder reads, explicit project-relative scaffolding, validation, examples, and the generated OKF bundle. Exclude the unadapted general instructions that name `AskUserQuestion` and `${CLAUDE_SKILL_DIR}`. The generated `.claude/settings.json` and hook scripts are an inert Claude Code adapter, not Codex configuration or lifecycle behavior. | [Okf-release-1](#okf-release-1-okf-wiki-no-claude-runtime-pilot), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [R-phase-1](#r-phase-1-phase-one-repository-checks) | Port and test general onboarding and skill-root resolution; add scheduled Okf-1 coverage against current Codex; test mixed-client hook trust separately before any cross-client lifecycle claim. |
 | `pdf-design` | 1.1.0; one root skill | Adapter required | Shared design guidance and assets are candidates. Hard-coded `~/.claude` and host-specific browser paths are excluded from a Codex claim. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add a no-Claude path-resolution fixture before editing paths. |
-| `pdf-playground` | 1.3.2; one nested skill; eight commands; one hook file | Candidate plus Claude-only surfaces | `document-design` is shared. Commands and hook behavior remain Claude-only until mapped. | [V-phase-1](#v-phase-1-repaired-standards-baseline) and [F-phase-1](#f-phase-1-affected-claude-package-regression); standards, Claude install, and argument delivery pass | Test Codex activation, non-activation, resource loading, and output before a runtime claim. |
+| `pdf-playground` | 1.3.2; one nested skill; eight commands; one hook file | Candidate plus Claude-only surfaces | `document-design` is shared. Its historical project lock identity has an explicit migration. Commands and hook behavior remain Claude-only until mapped. | [D-lock-release-1](#d-lock-release-1-document-design-standards-lock-migration), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [F-phase-1](#f-phase-1-affected-claude-package-regression); lock migration, standards, Claude install, and argument delivery pass | Test Codex activation, non-activation, resource loading, and output before a runtime claim. |
 | `project-templates-toolkit` | 1.0.0; three nested skills | Adapter required | Retrospective and template selection may be shared. `project-memory` must distinguish `CLAUDE.md` from `AGENTS.md` scope. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add paired Claude/Codex project-memory fixtures before changing generated instructions. |
 | `research-toolkit` | 1.1.0; six nested skills | Candidate | Include shared instruction-led skills. Network and external-content trust boundaries stay unchanged. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add representative activation, non-activation, network-boundary, and resource checks. |
 | `security-toolkit` | 1.2.0; four nested skills; one command | Candidate plus Claude-only surface | The four shared skills are candidates. `/security-toolkit:hotpatch` and its sandbox lifecycle remain Claude-only. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; [R-phase-1](#r-phase-1-phase-one-repository-checks) covers security tests | Test skill activation separately; do not map `hotpatch` without authority and failure-semantics tests. |
@@ -487,9 +510,10 @@ alias or restoration for the same repository, path, and slug; another source
 rename would create more identity churn and is not a recovery. Track that
 catalog-side request with #219 and the upstream stale-snapshot report above.
 
-Issue #230 separately tests an update fixture whose old lock key is
-`Document design` so local normalization cannot leave two lock entries for one
-directory.
+[D-lock-release-1](#d-lock-release-1-document-design-standards-lock-migration)
+separately proves the local `Document design` lock migration and prevents two
+lock identities from remaining for one installed directory. That project
+migration neither restores nor changes public catalog metrics.
 
 ## Mixed-install cases still pending
 
