@@ -95,7 +95,7 @@ source master: d49ed1022a012269a237f7749b0e47c099e7add6
 ```
 
 The canary checked the public source commit before, between, and after the
-updates, then removed its disposable project and npm cache:
+updates, then removed its disposable project, client home, and npm cache:
 
 ```bash
 npm run canary:document-design-lock

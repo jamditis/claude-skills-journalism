@@ -143,8 +143,10 @@ export function runDocumentDesignLockCanary() {
   try {
     const project = join(canaryRoot, 'project');
     const cache = join(canaryRoot, 'npm-cache');
+    const clientHome = join(canaryRoot, 'home');
     mkdirSync(project);
     mkdirSync(cache);
+    mkdirSync(clientHome);
     const installedRoot = materializeHistoricalSkill(project);
     const fixtureBytes = readFileSync(FIXTURE_PATH);
     const lockPath = join(project, 'skills-lock.json');
@@ -154,6 +156,8 @@ export function runDocumentDesignLockCanary() {
       ...process.env,
       DISABLE_TELEMETRY: '1',
       DO_NOT_TRACK: '1',
+      HOME: clientHome,
+      USERPROFILE: clientHome,
       npm_config_cache: cache,
     };
     const npxArgs = ['--yes', `skills@${SKILLS_CLI_VERSION}`];

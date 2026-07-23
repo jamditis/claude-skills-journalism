@@ -239,6 +239,8 @@ test('package scripts keep migration explicit and the live updater canary separa
   assert.match(canary, /assertStatus\(prechange, 1/u);
   assert.match(canary, /assertStatus\(firstUpdate, 0/u);
   assert.match(canary, /assertStatus\(secondUpdate, 0/u);
+  assert.match(canary, /HOME: clientHome/u);
+  assert.match(canary, /USERPROFILE: clientHome/u);
   assert.match(canary, /removeCanaryRoot\(canaryRoot\)/u);
   assert.doesNotMatch(canary, /shell:\s*true/u);
 });
