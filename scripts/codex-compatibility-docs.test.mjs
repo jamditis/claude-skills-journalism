@@ -50,6 +50,11 @@ test('the compatibility matrix classifies every marketplace package', () => {
   assert.match(matrix, /`pdf-playground` \| 1\.3\.2/u);
   assert.match(matrix, /`video-toolkit` \| 1\.0\.3/u);
   assert.match(matrix, /V-phase-1: repaired standards baseline/u);
+  assert.match(matrix, /J-release-1: paired journalism-core runtime pilot/u);
+  assert.match(
+    matrix,
+    /`journalism-core` \| 1\.2\.0; 14 nested skills \| Runtime pilot passed on the Claude package and Codex project-standards paths/u,
+  );
 
   const evidenceCells = matrix
     .split('\n')
