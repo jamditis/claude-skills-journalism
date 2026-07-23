@@ -238,6 +238,42 @@ export function verifyOkfOutput(projectDir, fixtureId) {
     }
   }
 
+  const readmeLines = readFileSync(resolve(target, 'README.md'), 'utf8')
+    .split(/\r?\n/u);
+  if (readmeLines[0] !== `# ${fixture.title}`) {
+    throw new Error('generated README title does not match the fixture');
+  }
+
+  const bundleIndexLines = readFileSync(
+    resolve(target, 'bundle/index.md'),
+    'utf8',
+  ).split(/\r?\n/u);
+  const bundleTitle = bundleIndexLines.find((line) => line.startsWith('# '));
+  if (bundleTitle !== `# ${fixture.title}`) {
+    throw new Error('generated bundle title does not match the fixture');
+  }
+  const sectionsHeading = bundleIndexLines.indexOf('## Sections');
+  const sectionNavigation = sectionsHeading === -1
+    ? []
+    : bundleIndexLines
+      .slice(sectionsHeading + 1)
+      .filter((line) => line.length > 0);
+  const expectedNavigation = fixture.sections.map(
+    (section) => `- [${section}](${section}/index.md)`,
+  );
+  if (!isDeepStrictEqual(sectionNavigation, expectedNavigation)) {
+    throw new Error('generated section navigation does not match the fixture');
+  }
+  for (const section of fixture.sections) {
+    const sectionLines = readFileSync(
+      resolve(target, `bundle/${section}/index.md`),
+      'utf8',
+    ).split(/\r?\n/u);
+    if (sectionLines[0] !== `# ${section}`) {
+      throw new Error(`generated section heading does not match: ${section}`);
+    }
+  }
+
   const settingsPath = resolve(target, '.claude/settings.json');
   let settings;
   try {
@@ -401,6 +437,34 @@ export function runOkfValidation(
   };
 }
 
+export function verifyOkfPythonDependencies(
+  {
+    pythonCommand = process.platform === 'win32' ? 'python' : 'python3',
+    run = spawnSync,
+    env = process.env,
+  } = {},
+) {
+  const result = run(
+    pythonCommand,
+    ['-c', 'import yaml'],
+    {
+      env,
+      encoding: 'utf8',
+      shell: false,
+      timeout: OKF_VALIDATION_TIMEOUT_MS,
+      windowsHide: true,
+    },
+  );
+  if (result.status !== 0) {
+    throw new Error(
+      'PyYAML is required before running the okf-wiki pilot; install '
+      + '.agents/skills/okf-wiki/requirements.txt into the selected '
+      + 'Python environment',
+    );
+  }
+  return { command: pythonCommand };
+}
+
 export function parseCliArgs(args) {
   const [client, fixtureId, ...options] = args;
   let projectDir;
@@ -473,6 +537,7 @@ function runCli() {
       allowOutput: true,
     });
     verifyOkfInstall(projectDir, fixtureId);
+    verifyOkfPythonDependencies();
     const output = verifyOkfOutput(projectDir, fixtureId);
     const validation = runOkfValidation(projectDir, fixtureId);
     console.log(JSON.stringify({
@@ -498,6 +563,7 @@ function runCli() {
 
   verifyNoClaudePreconditions(projectDir, clientHome, fixtureId);
   verifyOkfInstall(projectDir, fixtureId);
+  verifyOkfPythonDependencies();
   runOkfPilot(invocation);
   const output = verifyOkfOutput(projectDir, fixtureId);
   const validation = runOkfValidation(projectDir, fixtureId);

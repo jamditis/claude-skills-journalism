@@ -244,6 +244,11 @@ client adapter. The three generated `.claude/` files are a Claude Code adapter, 
 the OKF format and not shared Codex behavior. Codex does not read them as project configuration,
 and this skill must not claim that their `SessionStart` or `PreToolUse` lifecycle runs there.
 
+The general onboarding route above still names Claude Code's `AskUserQuestion` and
+`${CLAUDE_SKILL_DIR}` surfaces. The recorded Codex pilot pre-set every onboarding choice and
+used an explicit project-relative installed path; it does not establish that the unadapted
+general route is portable.
+
 For a mixed Claude Code and Codex project, keep `.claude/` so Claude Code can request trust
 and use the hooks; Codex leaves it inert. For a Codex-only project, pass `--no-hooks` while
 scaffolding or delete `.claude/` afterward. Either choice leaves the portable bundle and

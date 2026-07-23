@@ -26,6 +26,7 @@ import {
   verifyNoClaudePreconditions,
   verifyOkfInstall,
   verifyOkfOutput,
+  verifyOkfPythonDependencies,
 } from './okf-wiki-runtime-pilot.mjs';
 
 const projectDir = '/tmp/okf-wiki-runtime/project';
@@ -95,6 +96,29 @@ function writePilotOutput(project) {
     ['templates/hooks/okf-orient.py', '.claude/hooks/okf-orient.py'],
   ]) {
     copyFileSync(join(skill, source), join(target, output));
+  }
+  writeFileSync(join(target, 'README.md'), `# ${fixture.title}\n`);
+  writeFileSync(
+    join(target, 'bundle', 'index.md'),
+    [
+      '---',
+      'okf_version: "0.3"',
+      '---',
+      `# ${fixture.title}`,
+      '',
+      '## Sections',
+      '',
+      ...fixture.sections.map(
+        (section) => `- [${section}](${section}/index.md)`,
+      ),
+      '',
+    ].join('\n'),
+  );
+  for (const section of fixture.sections) {
+    writeFileSync(
+      join(target, 'bundle', section, 'index.md'),
+      `# ${section}\n`,
+    );
   }
   return target;
 }
@@ -330,6 +354,65 @@ test('output verifier rejects generated resources that diverge from the install'
   assert.throws(
     () => verifyOkfOutput(project, 'okf-1'),
     /generated file differs from installed source: \.claude\/hooks\/okf-anchor\.py/u,
+  );
+});
+
+test('output verifier rejects a title that differs from the accepted fixture', () => {
+  const { project } = createInstalledFixture();
+  const target = writePilotOutput(project);
+  writeFileSync(join(target, 'README.md'), '# Wrong title\n');
+
+  assert.throws(
+    () => verifyOkfOutput(project, 'okf-1'),
+    /generated README title does not match the fixture/u,
+  );
+});
+
+test('output verifier rejects changed section navigation', () => {
+  const { project } = createInstalledFixture();
+  const target = writePilotOutput(project);
+  writeFileSync(
+    join(target, 'bundle', 'index.md'),
+    [
+      '---',
+      'okf_version: "0.3"',
+      '---',
+      '# Codex no-Claude pilot',
+      '',
+      '## Sections',
+      '',
+      '- [decisions](decisions/index.md)',
+      '- [concepts](concepts/index.md)',
+      '',
+    ].join('\n'),
+  );
+
+  assert.throws(
+    () => verifyOkfOutput(project, 'okf-1'),
+    /generated section navigation does not match the fixture/u,
+  );
+});
+
+test('Python dependency preflight requires PyYAML without using a shell', () => {
+  const calls = [];
+  const run = (command, args, options) => {
+    calls.push({ command, args, options });
+    return { status: 0, stdout: '', stderr: '' };
+  };
+  const result = verifyOkfPythonDependencies({
+    pythonCommand: 'python-fixture',
+    run,
+  });
+  assert.equal(result.command, 'python-fixture');
+  assert.deepEqual(calls[0].args, ['-c', 'import yaml']);
+  assert.equal(calls[0].options.shell, false);
+
+  assert.throws(
+    () => verifyOkfPythonDependencies({
+      pythonCommand: 'python-fixture',
+      run: () => ({ status: 1, stdout: '', stderr: 'missing yaml' }),
+    }),
+    /PyYAML is required before running the okf-wiki pilot/u,
   );
 });
 

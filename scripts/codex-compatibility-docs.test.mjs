@@ -63,7 +63,11 @@ test('the compatibility matrix classifies every marketplace package', () => {
   );
   assert.match(
     matrix,
-    /`okf-wiki` \| 0\.6\.1; one root skill; scripts and generated Claude settings \| Portable runtime pilot passed; Claude adapter output recorded/u,
+    /`okf-wiki` \| 0\.6\.1; one root skill; scripts and generated Claude settings \| Pre-set portable runtime pilot passed; instruction and Claude-output adapters remain/u,
+  );
+  assert.match(
+    matrix,
+    /Exclude the unadapted general instructions that name `AskUserQuestion` and `\$\{CLAUDE_SKILL_DIR\}`/u,
   );
   assert.match(matrix, /scripts\/okf-wiki-runtime-pilot\.mjs/u);
   assert.match(matrix, /scripts\/visual-explainer-runtime-pilot\.mjs/u);
@@ -101,12 +105,18 @@ test('okf-wiki no-Claude evidence keeps Claude adapters outside Codex behavior',
   assert.match(record, /allowlisted executable path containing Codex/u);
   assert.match(record, /no Claude executable/u);
   assert.match(record, /byte-for-byte identical to the first run/u);
+  assert.match(record, /runner now checks this before invoking Codex/u);
+  assert.match(record, /`AskUserQuestion` and `\$\{CLAUDE_SKILL_DIR\}` remain outside/u);
   assert.match(record, /removed the installed skill without touching the generated OKF project/u);
   assert.match(record, /The three `.claude\/` files are Claude adapter output/u);
   assert.doesNotMatch(record, /repository-wide Codex support/u);
 
   assert.match(skill, /The three generated `.claude\/` files are a Claude Code adapter/u);
   assert.match(skill, /Codex does not read them as project configuration/u);
+  assert.match(
+    skill,
+    /does not establish that the unadapted\s+general route is portable/u,
+  );
 });
 
 test('visual-explainer runtime evidence stays scoped to the tested Codex path', () => {

@@ -17,6 +17,12 @@ It does not claim that Codex runs Claude Code hooks, reads
 `.claude/settings.json`, maps the Claude plugin package, or supports GitHub-wiki
 publishing. No native Codex manifest or new client lifecycle was added.
 
+This was a pre-set fixture, not a general Codex onboarding test. The prompt
+supplied every onboarding answer and named the installed project-relative
+skill path. The unadapted instructions that name Claude Code's
+`AskUserQuestion` and `${CLAUDE_SKILL_DIR}` remain outside this compatibility
+claim.
+
 ## Isolation and standards installation
 
 The disposable root was `/tmp/okf-wiki-runtime-20260723-pywnoL`. Its project
@@ -153,9 +159,20 @@ symlinks, and client homes were moved to the desktop trash after verification.
 ## Repeatable harness
 
 Run the accepted fixture only with an explicit disposable client home and a
-fresh standards install:
+fresh standards install. The selected Python environment must import PyYAML;
+the runner now checks this before invoking Codex or the generated validator and
+fails with a setup error if it is absent. For an isolated POSIX environment:
 
 ```bash
+python3 -m venv '<disposable-home>/okf-python'
+'<disposable-home>/okf-python/bin/python3' -m pip install \
+  -r '<checkout>/okf-wiki/requirements.txt'
+```
+
+Place that environment first on `PATH` for the pilot:
+
+```bash
+PATH='<disposable-home>/okf-python/bin:'"$PATH" \
 CODEX_HOME='<disposable-home>/.codex' \
   npm run pilot:okf-wiki -- codex okf-1 \
   --project '<disposable-project>' \
@@ -175,6 +192,6 @@ CODEX_HOME='<disposable-home>/.codex' \
 
 The focused tests pin the accepted prompt, exact portable and adapter
 inventories, empty-Claude preconditions, install and output containment,
-copied-resource equality, environment stripping, sandbox plan, authorized
-fallback, validator invocation, timeout, shell avoidance, and adversarial CLI
-inputs.
+copied-resource equality, title and section navigation, the PyYAML preflight,
+environment stripping, sandbox plan, authorized fallback, validator
+invocation, timeout, shell avoidance, and adversarial CLI inputs.
