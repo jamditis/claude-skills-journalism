@@ -206,7 +206,15 @@ def _predecode_ansi_c(line):
             if end is None:  # unterminated: leave the span exactly as written
                 out.append(line[i:])
                 return "".join(out)
-            decoded = _decode_c_escapes(body)
+            # Re-escape backslashes on the way out. The message this produces is
+            # decoded once more downstream (_shell_message_variants), so a literal
+            # backslash the shell really passes has to survive that second pass.
+            # Without this, `$'Fix\\n\\nGenerated with Claude Code'` -- which bash
+            # passes as one line holding a literal \n -- decodes here to `\n`, then
+            # again downstream into a real newline, inventing a byline that the
+            # commit never had. Real newlines produced above are already newline
+            # characters, not escapes, so the second pass leaves them alone.
+            decoded = _decode_c_escapes(body).replace("\\", "\\\\")
             out.append("'" + decoded.replace("'", "'\"'\"'") + "'")
             i = end + 1
             continue
@@ -1244,6 +1252,66 @@ def _apply_cd(core, eff_cwd):
     return _resolve_dir(eff_cwd, target)
 
 
+def _dir_entries(eff_cwd, dir_stack):
+    """The stack as `dirs` lists it: the working directory, then return dirs newest first.
+
+    dir_stack records return directories oldest first, which is the order a plain
+    push/pop pair needs. Every positional form instead counts in `dirs` order, so both
+    helpers below convert once here rather than reasoning about two orderings inline.
+    """
+    return [eff_cwd] + list(reversed(dir_stack))
+
+
+def _entry_index(token, entries):
+    """Resolve a `+N` / `-N` position into an index in the `dirs` listing, or None.
+
+    `+N` counts from the working directory, `-N` from the far end -- so with entries
+    `b a base`, `+0` and `-2` both name b. Out-of-range positions are a bash error, and
+    the command never reaches the commit, so they resolve to None and the caller holds.
+    """
+    n = int(token)
+    index = n if token.startswith("+") else len(entries) - 1 + n
+    return index if 0 <= index < len(entries) else None
+
+
+def _rotate_stack(rotation, eff_cwd, dir_stack, hold_cwd):
+    """Return the effective directory after a `pushd` that names no directory.
+
+    `pushd +N` brings entry N to the top and the shell follows it; `pushd -N` counts from
+    the far end; bare `pushd` swaps the top two. All three only reorder what is already
+    on the stack, so they are computable while dir_stack mirrors it -- and unknowable
+    once it does not, where the base is held instead.
+
+    `hold_cwd` is the `-n` variant, which reorders the stack but leaves the shell where it
+    is. Measured after `pushd a; pushd b` (entries `b a base`): bare `pushd -n` leaves the
+    listing untouched, while `pushd -n +1` rotates the entries behind the working
+    directory to `b base b` -- so the shell stays in b either way, and a following popd
+    lands in a or in the starting directory respectively.
+    """
+    entries = _dir_entries(eff_cwd, dir_stack)
+    if len(entries) < 2:
+        # Nothing to rotate: a stack this hook never mirrored, or a genuinely empty one
+        # where bash itself would fail.
+        dir_stack.clear()
+        return eff_cwd
+    if rotation is None:
+        if hold_cwd:
+            return eff_cwd  # bare `pushd -n` leaves the listing exactly as it was
+        entries[0], entries[1] = entries[1], entries[0]
+    else:
+        index = _entry_index(rotation, entries)
+        if index is None:
+            dir_stack.clear()
+            return eff_cwd
+        entries = entries[index:] + entries[:index]
+        if hold_cwd:
+            # The rotation happened, but the shell did not move, so the working directory
+            # stays at the head of the listing and the rotated entries fall in behind it.
+            entries[0] = eff_cwd
+    dir_stack[:] = list(reversed(entries[1:]))
+    return entries[0]
+
+
 def _apply_pushd(core, eff_cwd, dir_stack):
     """Return the effective directory after a `pushd` segment, recording the return dir.
 
@@ -1251,17 +1319,27 @@ def _apply_pushd(core, eff_cwd, dir_stack):
     return stack differs -- so an untracked pushd leaves a later `git commit -F MSG`
     resolving MSG against the wrong base.
 
-    Three forms move the stack without a directory this hook can follow, so each holds
-    the base rather than guess: `-n` pushes without changing the working directory at
-    all, the rotations (`pushd +1`, `pushd -2`) reorder a stack whose contents were
-    never seen, and the bare argument-less form swaps the top two entries. Holding is
-    the conservative direction: moving the base on a guess can make the hook read a
-    file the command never opens, which false-blocks a clean commit.
+    `pushd -n repo` is the one form that moves the stack without moving the shell: it
+    inserts repo just under the working directory and stays put. That is still fully
+    trackable, so it records repo as the next return directory instead of discarding
+    what it knows. Measured: `pushd a; pushd -n b; popd` lands in b, and a second popd
+    lands back in the starting directory.
+
+    The argument-less forms move the shell without naming a directory: `pushd +1` rotates
+    the stack so that entry to the top, `pushd -1` counts from the far end instead, and
+    bare `pushd` swaps the top two. Each lands somewhere already on the stack, so while
+    dir_stack still mirrors it they are computable rather than guesses -- measured, after
+    `pushd a; pushd b`, all three of `pushd +1`, `pushd -1` and bare `pushd` land in a.
+    Once the mirror is gone there is nothing left to rotate, so they hold the base:
+    moving it on a guess can make the hook read a file the command never opens, which
+    false-blocks a clean commit.
 
     `--` ends option parsing here too: `pushd -- -n` enters a directory literally named
     `-n`, so the option test must not reach past it.
     """
     target = None
+    stack_only = False
+    rotation = None
     end_of_opts = False
     for t in core[1:]:
         if not end_of_opts:
@@ -1269,16 +1347,53 @@ def _apply_pushd(core, eff_cwd, dir_stack):
                 end_of_opts = True
                 continue
             if t == "-n":
-                # Stack-only push: the working directory does not move, so following it
-                # would read a file the command never opens.
-                return eff_cwd
+                stack_only = True
+                continue
             if _ROTATION_RE.match(t):
-                return eff_cwd  # rotates a stack whose contents were never seen
+                rotation = t
+                continue
         target = t
     if target is None:
-        return eff_cwd  # bare pushd swaps the top two stack entries: unknowable
+        return _rotate_stack(rotation, eff_cwd, dir_stack, stack_only)
+    if stack_only:
+        dir_stack.append(_resolve_dir(eff_cwd, target))
+        return eff_cwd
     dir_stack.append(eff_cwd)
     return _resolve_dir(eff_cwd, target)
+
+
+def _apply_popd(core, eff_cwd, dir_stack):
+    """Return the effective directory after a `popd` segment, consuming the return dir.
+
+    Bare `popd` drops the working directory from the stack and follows the entry beneath
+    it -- the directory the matching pushd left. An indexed form drops the entry at that
+    position in the `dirs` listing instead, so it only moves the shell when it names
+    entry 0, and then it moves exactly where a bare popd would. Measured with `pushd a;
+    pushd b` (entries `b a base`): `popd +0` and `popd -2` both land in a, while
+    `popd +1`, `popd +2`, `popd -0` and `popd -1` all stay in b and simply shorten the
+    stack behind it.
+
+    `-n` suppresses the directory change in every form, including the one position that
+    would otherwise move: `popd -n +0` stays put. It also drops an entry this hook cannot
+    place -- measured, `popd -n` removes the entry *below* the working directory, so the
+    positions stop lining up with the listing. That leaves dir_stack no longer mirroring
+    the real stack, so it is cleared and later popds hold the base rather than return to
+    an entry bash has since dropped.
+    """
+    if "-n" in core[1:]:
+        dir_stack.clear()
+        return eff_cwd
+    entries = _dir_entries(eff_cwd, dir_stack)
+    rotation = next((t for t in core[1:] if _ROTATION_RE.match(t)), None)
+    index = 0 if rotation is None else _entry_index(rotation, entries)
+    if index is None or not dir_stack:
+        # An out-of-range position is a bash error, and an unmirrored stack (a pushd this
+        # hook could not resolve, or a popd with no push) has no entry worth trusting.
+        dir_stack.clear()
+        return eff_cwd
+    entries.pop(index)
+    dir_stack[:] = list(reversed(entries[1:]))
+    return entries[0]
 
 
 def _git_effective_dir(core, stop, base):
@@ -1315,7 +1430,15 @@ def find_attribution(command, cwd, depth=0, inherited=None):
     environment instead.
     """
     eff_cwd = cwd
-    dir_stack = []  # directories pushd left, for a later popd to return to
+    # Directories pushd left, for a later popd to return to, oldest first. The invariant
+    # every writer below keeps: this is non-empty only while it exactly mirrors bash's
+    # return stack. The pushd and popd forms that reorder or drop entries keep the mirror
+    # by replaying the same move; the three that cannot -- `popd -n`, which drops an entry
+    # from a position that stops lining up with the listing, a `+N` / `-N` position bash
+    # would reject, and a stack that was never mirrored to begin with -- empty it instead.
+    # So an unmirrored stack is never popped: popd holds the base rather than return to a
+    # stale entry.
+    dir_stack = []
     # The starting ambient identity. At the top level, an identity var already exported
     # before the hook runs (GIT_AUTHOR_NAME=Claude set in the parent shell) is inherited by
     # a bare `git commit`, so seed from the process environment. When recursing into a
@@ -1397,13 +1520,7 @@ def find_attribution(command, cwd, depth=0, inherited=None):
                 eff_cwd = _apply_pushd(core, eff_cwd, dir_stack)
                 continue
             if core[0] == "popd":
-                # popd returns to the directory the matching pushd left. `popd -n` drops
-                # a stack entry without changing the working directory, so it must not
-                # move the base. With nothing tracked (a pushd this hook could not
-                # resolve, or a popd with no push), the destination is unknowable, so
-                # hold the base rather than guess.
-                if dir_stack and "-n" not in core[1:]:
-                    eff_cwd = dir_stack.pop()
+                eff_cwd = _apply_popd(core, eff_cwd, dir_stack)
                 continue
             if core[0] == "export":
                 # `export GIT_AUTHOR_NAME=Claude; git commit` sets the identity in this

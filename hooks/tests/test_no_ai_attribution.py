@@ -1603,3 +1603,253 @@ def test_block_cd_double_dash_dash_is_still_oldpwd(tmp_path):
     # cd sub, then `cd -- -` returns to tmp_path, where MSG is attributed.
     r = run("cd sub && cd -- - && git commit -F MSG", cwd=tmp_path)
     assert_blocked(r)
+
+
+def test_block_popd_indexed_leaves_cwd(tmp_path):
+    # `popd +N` / `-N` remove an indexed entry from the directory stack; only the bare
+    # form changes directory. Verified in bash: after `pushd a; pushd b`, `popd +1`
+    # leaves you in b. Treating it as a plain pop would send the scan to a/ and let an
+    # attributed b/MSG through, which is the bypass this pins shut.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Fix the parser\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Generated with Claude Code\n")
+    r = run(f"pushd {a} && pushd {b} && popd +1 && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_popd_negative_index_leaves_cwd(tmp_path):
+    # The `-N` spelling of the same rule: it also removes an indexed entry rather than
+    # returning to the previous directory.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Fix the parser\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Co-Authored-By: Claude <noreply@anthropic.com>\n")
+    r = run(f"pushd {a} && pushd {b} && popd -1 && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_allow_popd_indexed_when_only_popped_entry_is_attributed(tmp_path):
+    # The mirror image: the attributed file sits in the directory an indexed popd would
+    # wrongly select, and the directory the commit really runs in is clean.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Generated with Claude Code\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Fix the parser\n")
+    r = run(f"pushd {a} && pushd {b} && popd +1 && git commit -F MSG", cwd=tmp_path)
+    assert_allowed(r)
+
+
+def test_allow_ansi_c_escaped_backslash_is_literal_not_byline(tmp_path):
+    # In `$'...'` a doubled backslash is a literal backslash, so bash passes
+    # `Fix\n\nGenerated with Claude Code` as ONE line holding the two characters \ and n.
+    # That is prose about a byline, not a byline. Decoding the escape twice (once when
+    # rewriting the ANSI-C quote, once in the message scan) would manufacture a real
+    # newline and false-block a clean commit.
+    r = run(r"git commit -m $'Fix\\n\\nGenerated with Claude Code'", cwd=tmp_path)
+    assert_allowed(r)
+
+
+def test_block_ansi_c_single_backslash_newline_byline(tmp_path):
+    # The contrast that keeps the test above honest: a single backslash IS a newline
+    # escape, so this really does place the byline on its own line and must be blocked.
+    r = run(r"git commit -m $'Fix\n\nGenerated with Claude Code'", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_indexed_popd_shortens_what_the_next_popd_returns_to(tmp_path):
+    # An indexed popd drops an entry from the middle of the stack, so the bare popd after
+    # it skips past what it removed. Verified in bash: `pushd a; pushd b; popd +1; popd`
+    # ends in the starting directory, because `+1` already consumed a. Tracking the
+    # removal is what keeps the scan on the starting directory's MSG.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Fix the parser\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Fix the parser\n")
+    (tmp_path / "MSG").write_text("Generated with Claude Code\n")
+    r = run(f"pushd {a} && pushd {b} && popd +1 && popd && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_pushd_rotation_then_bare_popd_reaches_the_start(tmp_path):
+    # The same reordering from the pushd side: a rotation moves the shell to an entry
+    # already on the stack and rearranges what is left behind it. Verified in bash:
+    # `pushd a; pushd b; pushd +1` lands in a, and the popd after it ends in the
+    # starting directory rather than back in b.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Fix the parser\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Fix the parser\n")
+    (tmp_path / "MSG").write_text("Co-Authored-By: Claude <noreply@anthropic.com>\n")
+    r = run(f"pushd {a} && pushd {b} && pushd +1 && popd && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_pushd_rotation_lands_on_the_rotated_entry(tmp_path):
+    # The rotation itself moves the shell, before any popd: `pushd a; pushd b; pushd +1`
+    # leaves bash in a. Holding at b would scan the wrong directory outright.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Generated with Claude Code\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Fix the parser\n")
+    r = run(f"pushd {a} && pushd {b} && pushd +1 && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_pushd_dash_n_rotation_leaves_cwd(tmp_path):
+    # `-n` suppresses the move in the argument-less forms too, so the rotation happens but
+    # the shell stays put. Verified in bash: after `pushd a; pushd b`, all of `pushd -n`,
+    # `pushd -n +1` and `pushd -n -1` stay in b. Rotating the scan to a here would both
+    # miss an attributed b/MSG and false-block a clean one, which is the failure the
+    # holding rule exists to prevent.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Fix the parser\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Generated with Claude Code\n")
+    r = run(f"pushd {a} && pushd {b} && pushd -n +1 && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_allow_bare_pushd_dash_n_leaves_the_listing_intact(tmp_path):
+    # Bare `pushd -n` is the one rotation form that changes nothing at all -- no move, and
+    # the listing is untouched -- so the popd after it still returns where the matching
+    # pushd left. Verified in bash: `pushd a; pushd b; pushd -n; popd` lands in a. Clearing
+    # the tracked stack here would strand the scan in b and false-block this clean commit.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Fix the parser\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Generated with Claude Code\n")
+    r = run(f"pushd {a} && pushd {b} && pushd -n && popd && git commit -F MSG", cwd=tmp_path)
+    assert_allowed(r)
+
+
+def test_block_pushd_dash_n_rotation_reorders_what_popd_returns_to(tmp_path):
+    # The rotation still lands behind the working directory, so the popd after it goes
+    # somewhere a plain pair would not. Verified in bash: `pushd a; pushd b; pushd -n +1;
+    # popd` ends in the starting directory rather than in a.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Fix the parser\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Fix the parser\n")
+    (tmp_path / "MSG").write_text("Generated with Claude Code\n")
+    r = run(f"pushd {a} && pushd {b} && pushd -n +1 && popd && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_bare_pushd_swaps_the_top_two_entries(tmp_path):
+    # Argument-less `pushd` swaps the top two entries rather than rotating by a position,
+    # so after `pushd a; pushd b` it also lands in a. Same destination as `pushd +1` here,
+    # but by a different rule, and both must be followed.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Generated with Claude Code\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Fix the parser\n")
+    r = run(f"pushd {a} && pushd {b} && pushd && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_pushd_dash_n_becomes_the_next_popd_destination(tmp_path):
+    # `pushd -n b` does not move the shell, but it does insert b as the next entry a popd
+    # returns to. Verified in bash: `pushd a; pushd -n b; popd` ends in b, not in the
+    # starting directory. Recording it rather than discarding it is what keeps b/MSG in
+    # the scan's path.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Fix the parser\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Generated with Claude Code\n")
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    r = run(f"pushd {a} && pushd -n {b} && popd && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_pushd_dash_n_then_two_popds_reach_the_start(tmp_path):
+    # The rest of that stack stays in order behind the inserted entry: a second popd
+    # returns to where the whole sequence began. Verified in bash: `pushd a; pushd -n b;
+    # popd; popd` ends in the starting directory.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Fix the parser\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Fix the parser\n")
+    (tmp_path / "MSG").write_text("Co-Authored-By: Claude <noreply@anthropic.com>\n")
+    r = run(f"pushd {a} && pushd -n {b} && popd && popd && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_popd_index_zero_moves_like_bare_popd(tmp_path):
+    # `popd +0` names entry 0 of the dirs listing, which IS the working directory, so it
+    # is the one indexed form that moves the shell -- and it moves exactly where a bare
+    # popd would. Verified in bash: `pushd a; pushd b; popd +0` lands in a. Holding at b
+    # here would not be a conservative miss, it would be a bypass: git reads a/MSG while
+    # the scan reads b/MSG.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Generated with Claude Code\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Fix the parser\n")
+    r = run(f"pushd {a} && pushd {b} && popd +0 && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_popd_negative_index_reaching_entry_zero(tmp_path):
+    # The same move spelled from the far end: `-N` counts back from the deepest entry, so
+    # with two pushes `-2` resolves to entry 0 and behaves exactly like `popd +0`.
+    # Verified in bash: `pushd a; pushd b; popd -2` lands in a, while `popd -1` stays in b.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Co-Authored-By: Claude <noreply@anthropic.com>\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Fix the parser\n")
+    r = run(f"pushd {a} && pushd {b} && popd -2 && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_popd_dash_n_index_zero_leaves_cwd(tmp_path):
+    # `-n` suppresses the directory change in every form, including the one index that
+    # would otherwise move: `popd -n +0` stays in b. So the `-n` test has to come first,
+    # before the index is considered at all.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Fix the parser\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Generated with Claude Code\n")
+    r = run(f"pushd {a} && pushd {b} && popd -n +0 && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_allow_tracked_pushd_popd_pairs_still_return(tmp_path):
+    # The guard against over-correcting: clearing the stack must only happen on the forms
+    # that desynchronize it. A plain push/pop pair is still fully mirrored, so popd keeps
+    # returning to the directory pushd left and a clean commit there stays allowed.
+    sub = tmp_path / "sub"
+    sub.mkdir()
+    (sub / "MSG").write_text("Generated with Claude Code\n")
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    r = run(f"pushd {sub} && popd && git commit -F MSG", cwd=tmp_path)
+    assert_allowed(r)
