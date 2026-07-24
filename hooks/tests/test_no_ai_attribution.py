@@ -611,6 +611,76 @@ def test_allow_exported_clean_env_then_commit():
     assert_allowed(r)
 
 
+def test_block_ambient_exported_identity_before_bare_commit():
+    # An identity var exported in the PARENT shell, before the hook even runs, is inherited
+    # by a bare `git commit`, so the commit is authored by the tool with no assignment in
+    # the command itself. Seeding identity tracking from the inherited environment is what
+    # catches it; without that seed the bare commit reads as unwatched.
+    r = run('git commit -m "Fix the parser"', env={"GIT_AUTHOR_NAME": "Claude"})
+    assert_blocked(r)
+
+
+def test_block_ambient_exported_identity_email():
+    # The same inheritance holds for the email twin: an ambient GIT_COMMITTER_EMAIL naming
+    # a bot is inherited by a bare commit and must block.
+    r = run('git commit -m "Fix the parser"', env={"GIT_COMMITTER_EMAIL": "claude@anthropic.com"})
+    assert_blocked(r)
+
+
+def test_allow_ambient_human_identity_before_bare_commit():
+    # Seeding from the environment must not misfire on a real person's identity: an ambient
+    # GIT_AUTHOR_NAME that names no tool is a normal developer setup and must pass.
+    r = run('git commit -m "Fix the parser"', env={"GIT_AUTHOR_NAME": "Jane Doe"})
+    assert_allowed(r)
+
+
+def test_allow_inline_human_reassignment_overrides_ambient_identity():
+    # Reassignment is the third way the ambient identity is cleared, alongside env -i and
+    # unset: an inline `GIT_AUTHOR_NAME=Jane git commit` overrides an ambient tool value for
+    # that command (last-wins), so the effective author is the human and it must pass.
+    r = run('GIT_AUTHOR_NAME="Jane Doe" git commit -m Fix', env={"GIT_AUTHOR_NAME": "Claude"})
+    assert_allowed(r)
+
+
+def test_allow_env_i_wipes_ambient_identity():
+    # `env -i` starts the command with an empty environment, so an ambient tool identity is
+    # NOT inherited by the commit it runs; seeding from the environment must still yield a
+    # clean pass here, or env -i would falsely block.
+    r = run('env -i git commit -m Fix', env={"GIT_AUTHOR_NAME": "Claude"})
+    assert_allowed(r)
+
+
+def test_allow_unset_clears_ambient_identity():
+    # An `unset` of an ambient tool identity before the commit clears it, so the commit
+    # carries no tool author and must pass even though the environment seeded the var.
+    r = run('unset GIT_AUTHOR_NAME && git commit -m Fix', env={"GIT_AUTHOR_NAME": "Claude"})
+    assert_allowed(r)
+
+
+def test_block_ambient_identity_inside_nested_shell_runner():
+    # A `bash -c 'git commit'` still inherits an ambient tool identity from the parent
+    # shell, so the bypass of hiding the commit inside a shell runner must be closed: the
+    # outer segment propagates its effective identity into the recursion.
+    r = run("bash -c 'git commit -m Fix'", env={"GIT_AUTHOR_NAME": "Claude"})
+    assert_blocked(r)
+
+
+def test_allow_env_i_before_nested_shell_runner_commit():
+    # A nested `bash -c 'git commit'` inherits the environment the OUTER command set up.
+    # `env -i` cleared it, so the inner commit sees no tool identity: the propagated map is
+    # empty and the commit must pass, not misfire on the wiped ambient value.
+    r = run("env -i bash -c 'git commit -m Fix'", env={"GIT_AUTHOR_NAME": "Claude"})
+    assert_allowed(r)
+
+
+def test_allow_unset_before_nested_shell_runner_commit():
+    # Same, via `unset`: the outer command dropped the ambient identity before running the
+    # nested `bash -c 'git commit'`, so the propagated identity is empty and a clean commit
+    # must pass.
+    r = run("unset GIT_AUTHOR_NAME && bash -c 'git commit -m Fix'", env={"GIT_AUTHOR_NAME": "Claude"})
+    assert_allowed(r)
+
+
 def test_block_commit_tilde_home_message_file(tmp_path):
     # An unquoted `~/MSG` expands to $HOME/MSG before the command runs; resolving it
     # against cwd (reading cwd/~/MSG) would miss the byline in the real home file.

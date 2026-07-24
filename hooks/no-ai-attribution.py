@@ -1171,16 +1171,31 @@ def _git_effective_dir(core, stop, base):
     return d
 
 
-def find_attribution(command, cwd, depth=0):
+def find_attribution(command, cwd, depth=0, inherited=None):
     """Return a short reason string if the command would write AI attribution, else None.
 
     Walks the command's logical lines (so a newline-separated command is seen), then the
     segments of each, tracking the effective directory across `cd` so relative message
     files resolve where the command would read them. `depth` bounds recursion into a shell
     runner's `-c` script (bash -c '<script>'), so a pathological nest cannot run away.
+    `inherited` carries the ambient git-identity vars the OUTER command hands this one when
+    recursing into a `bash -c` script; at the top level it is seeded from the process
+    environment instead.
     """
     eff_cwd = cwd
-    exported_identity = {}  # exported identity var -> latest value (shell last-wins)
+    # The starting ambient identity. At the top level, an identity var already exported
+    # before the hook runs (GIT_AUTHOR_NAME=Claude set in the parent shell) is inherited by
+    # a bare `git commit`, so seed from the process environment. When recursing into a
+    # `bash -c` script, take the identity the outer segment actually passes in `inherited`
+    # instead -- re-reading os.environ there would resurrect a value the outer `env -i` or
+    # `unset` already cleared and falsely block. Either way a later unset/reassign in the
+    # command overrides it (last-wins below).
+    if depth == 0:
+        exported_identity = {
+            name: os.environ[name] for name in _GIT_IDENTITY_ENV if name in os.environ
+        }
+    else:
+        exported_identity = dict(inherited or {})  # exported var -> latest value
     for raw_line in _logical_lines(command):
         # Drop an unquoted trailing `#` comment first: the shell never runs it, so a clean
         # command with an attributed example in a comment must not be blocked.
@@ -1224,7 +1239,19 @@ def find_attribution(command, cwd, depth=0):
                     # the inner command reads (git commit -F MSG) resolves there. Recurse
                     # with the env -C-adjusted cwd, not the bare tracked cwd.
                     rec_cwd = eff_cwd if env_chdir is None else _resolve_dir(eff_cwd, env_chdir)
-                    inner = find_attribution(script, rec_cwd, depth + 1)
+                    # The script inherits this segment's effective environment: the tracked
+                    # exported identity, wiped by env -i, minus any env -u unset, plus the
+                    # inline `NAME=val bash -c ...` prefix (all last-wins) -- the same fields
+                    # the git-commit branch computes. Pass only identity vars so the nested
+                    # `git commit` is judged against the identity it would really inherit.
+                    rec_env = {} if ignore_env else dict(exported_identity)
+                    for u in unsets:
+                        rec_env.pop(u, None)
+                    for a in assigns:
+                        name, _, val = a.partition("=")
+                        rec_env[name] = val
+                    rec_env = {k: v for k, v in rec_env.items() if k in _GIT_IDENTITY_ENV}
+                    inner = find_attribution(script, rec_cwd, depth + 1, inherited=rec_env)
                     if inner is not None:
                         return inner
                 continue
