@@ -1,0 +1,35 @@
+name: hook tests
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'hooks/**.py'
+      - 'hooks/tests/**'
+      - '.github/workflows/hook-tests.yml'
+
+# This workflow only runs tests, so it needs no write access to the repository.
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # The executable hooks are standard-library only; pytest is the sole dep.
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
+      # skill-lint covers hooks/*.md, the markdown specs. The executable hooks and
+      # their regression suites were unguarded, so a parser change that reopened a
+      # known attribution bypass could merge green.
+      - name: Run hook test suite
+        run: python -m pytest hooks/tests -q

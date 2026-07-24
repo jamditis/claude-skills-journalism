@@ -158,6 +158,93 @@ def _decode_c_escapes(text):
     return "".join(out)
 
 
+def _predecode_ansi_c(line):
+    """Rewrite ANSI-C ($'...') quotes into ordinary single-quoted words before tokenizing.
+
+    shlex has no ANSI-C mode. Inside `$'...'` bash treats `\\'` as an escaped apostrophe
+    that does NOT close the quote, but shlex ends the single-quoted run there, so
+    `git commit -m $'It\\'s generated with Claude Code'` tokenizes as unbalanced quoting
+    and the byline reaches the record with only the raw-text fallback scanning it. Find
+    each ANSI-C span with bash's escape rules, decode it, and re-emit the result as a
+    plain single-quoted word so the rest of the hook sees the string bash will actually
+    pass to git -- correct tokenizing, correct command classification, correct scan.
+
+    Conservative by construction: a span with no closing quote is left untouched (the
+    caller's unparseable-quoting fallback still sees it), and `$'` inside single or
+    double quotes is not ANSI-C, so it is skipped.
+    """
+    if "$'" not in line:
+        return line
+    out = []
+    i, n = 0, len(line)
+    quote = None  # None, "'", or '"' -- the quoting context outside any ANSI-C span
+    while i < n:
+        ch = line[i]
+        if quote is None and ch == "\\" and i + 1 < n:
+            out.append(line[i:i + 2])  # an escaped char cannot open a quote
+            i += 2
+            continue
+        if quote is None and ch in ("'", '"'):
+            quote = ch
+            out.append(ch)
+            i += 1
+            continue
+        if quote is not None:
+            # Inside double quotes a backslash still escapes; inside single quotes it
+            # does not, so only skip the pair for the double-quoted case.
+            if quote == '"' and ch == "\\" and i + 1 < n:
+                out.append(line[i:i + 2])
+                i += 2
+                continue
+            if ch == quote:
+                quote = None
+            out.append(ch)
+            i += 1
+            continue
+        if ch == "$" and i + 1 < n and line[i + 1] == "'":
+            body, end = _scan_ansi_c_body(line, i + 2)
+            if end is None:  # unterminated: leave the span exactly as written
+                out.append(line[i:])
+                return "".join(out)
+            # Re-escape backslashes on the way out. The message this produces is
+            # decoded once more downstream (_shell_message_variants), so a literal
+            # backslash the shell really passes has to survive that second pass.
+            # Without this, `$'Fix\\n\\nGenerated with Claude Code'` -- which bash
+            # passes as one line holding a literal \n -- decodes here to `\n`, then
+            # again downstream into a real newline, inventing a byline that the
+            # commit never had. Real newlines produced above are already newline
+            # characters, not escapes, so the second pass leaves them alone.
+            decoded = _decode_c_escapes(body).replace("\\", "\\\\")
+            out.append("'" + decoded.replace("'", "'\"'\"'") + "'")
+            i = end + 1
+            continue
+        out.append(ch)
+        i += 1
+    return "".join(out)
+
+
+def _scan_ansi_c_body(line, start):
+    """Return (body, index-of-closing-quote) for an ANSI-C span, or (None, None).
+
+    Inside `$'...'` a backslash escapes the next character, so an escaped apostrophe is
+    part of the string rather than its terminator. The body is returned with escapes
+    still raw, for _decode_c_escapes to resolve.
+    """
+    body = []
+    i, n = start, len(line)
+    while i < n:
+        ch = line[i]
+        if ch == "\\" and i + 1 < n:
+            body.append(line[i:i + 2])
+            i += 2
+            continue
+        if ch == "'":
+            return "".join(body), i
+        body.append(ch)
+        i += 1
+    return None, None
+
+
 def _shell_message_variants(text):
     """Yield the forms of a message argument to scan for a byline.
 
@@ -1123,6 +1210,10 @@ def _input_file_has_attribution(name, read_dirs):
     return False
 
 
+# `pushd +1` / `pushd -2` rotate the directory stack rather than naming a directory.
+_ROTATION_RE = re.compile(r"^[+-]\d+$")
+
+
 def _resolve_dir(base, target):
     """Resolve a possibly-relative directory against base."""
     if os.path.isabs(target):
@@ -1136,17 +1227,220 @@ def _apply_cd(core, eff_cwd):
     A relative message file resolves against the shell's current directory, so a
     preceding `cd repo` must move the base a `git commit -F MSG` reads MSG from. `cd -`
     (previous dir) is unknowable and leaves the base unchanged; a bare `cd` goes home.
+
+    `--` ends option parsing, so a dash-prefixed token after it is the destination
+    directory, not a flag (`cd -- -foo` enters ./-foo). Skipping it as an option would
+    leave no target at all and send the lookup to the home directory, hiding an
+    attributed message file there. A bare `-` is the exception: bash substitutes
+    $OLDPWD for it even after `--`, so it stays the previous-directory shorthand
+    rather than becoming a literal path.
     """
     target = None
+    end_of_opts = False
     for t in core[1:]:
-        if t == "--" or (t.startswith("-") and t != "-"):
-            continue
+        if not end_of_opts:
+            if t == "--":
+                end_of_opts = True
+                continue
+            if t.startswith("-") and t != "-":
+                continue
         target = t  # last positional is the destination
     if target is None:
         return os.path.expanduser("~")
     if target == "-":
-        return eff_cwd
+        return eff_cwd  # $OLDPWD, including after `--`
     return _resolve_dir(eff_cwd, target)
+
+
+def _dir_entries(eff_cwd, dir_stack):
+    """The stack as `dirs` lists it: the working directory, then return dirs newest first.
+
+    dir_stack records return directories oldest first, which is the order a plain
+    push/pop pair needs. Every positional form instead counts in `dirs` order, so both
+    helpers below convert once here rather than reasoning about two orderings inline.
+    """
+    return [eff_cwd] + list(reversed(dir_stack))
+
+
+def _entry_index(token, entries):
+    """Resolve a `+N` / `-N` position into an index in the `dirs` listing, or None.
+
+    `+N` counts from the working directory, `-N` from the far end -- so with entries
+    `b a base`, `+0` and `-2` both name b. Out-of-range positions are a bash error, and
+    the command never reaches the commit, so they resolve to None and the caller holds.
+    """
+    n = int(token)
+    index = n if token.startswith("+") else len(entries) - 1 + n
+    return index if 0 <= index < len(entries) else None
+
+
+def _dirstack_operands(core):
+    """Split a pushd/popd argument list into `(hold_cwd, operands)`.
+
+    operands is a list of `(kind, token)` pairs: "index" for a `+N` / `-N` position,
+    "dir" for a directory name, and "post" for anything after a `--`. `--` ends option
+    parsing, so `popd -- -n` pops for real rather than holding the working directory, and
+    it ends position parsing too, so `pushd -- +1` looks for a directory literally named
+    `+1` instead of rotating.
+
+    The two builtins apply different precedence to the same operand list (a directory
+    name and a position do not mix the same way in each), so that part stays in the two
+    appliers below rather than being guessed at here.
+    """
+    hold_cwd = False
+    operands = []
+    end_of_opts = False
+    for t in core[1:]:
+        if end_of_opts:
+            operands.append(("post", t))
+            continue
+        if t == "--":
+            end_of_opts = True
+            continue
+        if t == "-n":
+            hold_cwd = True
+            continue
+        operands.append(("index" if _ROTATION_RE.match(t) else "dir", t))
+    return hold_cwd, operands
+
+
+def _rotate_stack(rotation, eff_cwd, dir_stack, hold_cwd):
+    """Return the effective directory after a `pushd` that names no directory.
+
+    `pushd +N` brings entry N to the top and the shell follows it; `pushd -N` counts from
+    the far end; bare `pushd` swaps the top two. All three only reorder what is already
+    on the stack, so they are computable from the mirror rather than guessed.
+
+    `hold_cwd` is the `-n` variant, which reorders the stack but leaves the shell where it
+    is. Measured after `pushd a; pushd b` (entries `b a base`): bare `pushd -n` leaves the
+    listing untouched, while `pushd -n +1` rotates the entries behind the working
+    directory to `b base b` -- so the shell stays in b either way, and a following popd
+    lands in a or in the starting directory respectively.
+    """
+    entries = _dir_entries(eff_cwd, dir_stack)
+    if len(entries) < 2:
+        return eff_cwd  # nothing to rotate; bash fails, changing neither cwd nor stack
+    if rotation is None:
+        if hold_cwd:
+            return eff_cwd  # bare `pushd -n` leaves the listing exactly as it was
+        entries[0], entries[1] = entries[1], entries[0]
+    else:
+        index = _entry_index(rotation, entries)
+        if index is None:
+            # "directory stack index out of range": bash rejects the whole command, so
+            # the stack it would have rotated is still intact and still a true mirror.
+            return eff_cwd
+        entries = entries[index:] + entries[:index]
+        if hold_cwd:
+            # The rotation happened, but the shell did not move, so the working directory
+            # stays at the head of the listing and the rotated entries fall in behind it.
+            entries[0] = eff_cwd
+    dir_stack[:] = list(reversed(entries[1:]))
+    return _resolve_dir(eff_cwd, entries[0])
+
+
+def _apply_pushd(core, eff_cwd, dir_stack):
+    """Return the effective directory after a `pushd` segment, recording the return dir.
+
+    `pushd repo` changes the working directory exactly as `cd repo` does -- only the
+    return stack differs -- so an untracked pushd leaves a later `git commit -F MSG`
+    resolving MSG against the wrong base.
+
+    The first operand's *kind* decides what the rest of the line means, which is measured
+    bash behaviour rather than a reading of the flags:
+
+    - A position first puts pushd in rotate mode. A run of further positions collapses to
+      the last (`pushd +1 +2` rotates by +2), but the run ends at the first directory
+      name, which is then ignored entirely (`pushd +1 c +2` rotates by +1).
+    - A directory name first, with any second operand and no `-n`, is
+      "pushd: too many arguments" -- bash changes neither cwd nor stack.
+    - `-n` does not turn position parsing off: `pushd -n +1` still rotates, it just stays
+      put. What it does change is that trailing operands stop being an error, so
+      `pushd -n c +1` pushes c and drops the `+1`.
+
+    `pushd -n repo` is the one form that moves the stack without moving the shell, and
+    bash stores the operand *as written*: `dirs` prints a relative entry verbatim and only
+    resolves it if a later popd or rotation makes it the working directory. So it is kept
+    raw here and resolved at that point, not eagerly against today's cwd.
+    """
+    hold_cwd, operands = _dirstack_operands(core)
+    if not operands:
+        return _rotate_stack(None, eff_cwd, dir_stack, hold_cwd)
+    kind, token = operands[0]
+    if kind == "index":
+        rotation = token
+        for next_kind, next_token in operands[1:]:
+            if next_kind != "index":
+                break
+            rotation = next_token
+        return _rotate_stack(rotation, eff_cwd, dir_stack, hold_cwd)
+    if len(operands) > 1 and not hold_cwd:
+        return eff_cwd  # "too many arguments": the command fails before it can move
+    if hold_cwd:
+        dir_stack.append(token)  # stored unresolved, exactly as bash stores it
+        return eff_cwd
+    target = _resolve_dir(eff_cwd, token)
+    if not os.path.isdir(target):
+        # A pushd that cannot chdir fails, leaving cwd and stack alone, so moving here
+        # would resolve a later `-F MSG` against a directory the shell never entered and
+        # read past the real one. The case isdir reads wrong is a directory the same
+        # command line creates (`mkdir foo && pushd foo`), and there the message file
+        # inside it does not exist yet either, so no tracked directory would have found
+        # it -- that shape fails open whichever way this goes, while the typo shape is
+        # only caught by staying put.
+        return eff_cwd
+    dir_stack.append(eff_cwd)
+    return target
+
+
+def _apply_popd(core, eff_cwd, dir_stack):
+    """Return the effective directory after a `popd` segment, consuming the return dir.
+
+    Bare `popd` drops the working directory from the stack and follows the entry beneath
+    it -- the directory the matching pushd left. An indexed form drops the entry at that
+    position in the `dirs` listing instead, so it only moves the shell when it names
+    entry 0, and then it moves exactly where a bare popd would. Measured with `pushd a;
+    pushd b` (entries `b a base`): `popd +0` and `popd -2` both land in a, while
+    `popd +1`, `popd +2`, `popd -0` and `popd -1` all stay in b and simply shorten the
+    stack behind it.
+
+    Where several positions are given the LAST one wins (`popd +0 +1` == `popd +1`), a
+    non-position operand is "invalid argument" and changes nothing, and everything after a
+    `--` is ignored, so `popd -- +1` is a plain pop.
+
+    `-n` suppresses the directory change in every form, including the one position that
+    would otherwise move: `popd -n +0` stays put. Since position 0 is the working
+    directory it cannot be the entry dropped, so bash drops entry 1 instead -- measured,
+    bare `popd -n` and `popd -n +0` both remove the entry just below the shell. The
+    remaining entries still line up with the real listing, so the mirror survives and a
+    later popd is still exact.
+    """
+    hold_cwd, operands = _dirstack_operands(core)
+    rotation = None
+    for kind, token in operands:
+        if kind == "post":
+            continue  # after `--` popd ignores what is left
+        if kind != "index":
+            return eff_cwd  # "invalid argument": bash rejects it, changing nothing
+        rotation = token
+    if not dir_stack:
+        return eff_cwd  # nothing pushed, so bash has nothing to pop and fails
+    entries = _dir_entries(eff_cwd, dir_stack)
+    index = 0 if rotation is None else _entry_index(rotation, entries)
+    if index is None:
+        # "directory stack index out of range": the command fails whole, so the stack is
+        # untouched and still a true mirror for the next popd.
+        return eff_cwd
+    if hold_cwd:
+        index = max(index, 1)
+        if index >= len(entries):
+            return eff_cwd
+        entries.pop(index)
+        dir_stack[:] = list(reversed(entries[1:]))
+        return eff_cwd
+    entries.pop(index)
+    dir_stack[:] = list(reversed(entries[1:]))
+    return _resolve_dir(eff_cwd, entries[0])
 
 
 def _git_effective_dir(core, stop, base):
@@ -1183,6 +1477,15 @@ def find_attribution(command, cwd, depth=0, inherited=None):
     environment instead.
     """
     eff_cwd = cwd
+    # Directories pushd left, for a later popd to return to, oldest first. The invariant
+    # every writer below keeps: this mirrors bash's return stack entry for entry. Each
+    # form replays the real move rather than approximating it, including the ones that
+    # only reorder or only drop (`pushd +N`, `popd -n`), and the forms bash rejects
+    # outright -- an out-of-range position, too many arguments -- leave it untouched
+    # because the command they belong to never runs. Entries are stored as bash stores
+    # them, so a relative `pushd -n repo` entry stays relative and is resolved at the pop
+    # that lands on it.
+    dir_stack = []
     # The starting ambient identity. At the top level, an identity var already exported
     # before the hook runs (GIT_AUTHOR_NAME=Claude set in the parent shell) is inherited by
     # a bare `git commit`, so seed from the process environment. When recursing into a
@@ -1199,7 +1502,9 @@ def find_attribution(command, cwd, depth=0, inherited=None):
     for raw_line in _logical_lines(command):
         # Drop an unquoted trailing `#` comment first: the shell never runs it, so a clean
         # command with an attributed example in a comment must not be blocked.
-        line = _strip_comment(raw_line)
+        # Resolve ANSI-C ($'...') quoting first, so the comment strip and the tokenizer
+        # both see ordinary single-quoted words instead of a run shlex cannot balance.
+        line = _strip_comment(_predecode_ansi_c(raw_line))
         try:
             tokens = _tokenize(line)
         except ValueError:
@@ -1257,6 +1562,12 @@ def find_attribution(command, cwd, depth=0, inherited=None):
                 continue
             if core[0] == "cd":
                 eff_cwd = _apply_cd(core, eff_cwd)
+                continue
+            if core[0] == "pushd":
+                eff_cwd = _apply_pushd(core, eff_cwd, dir_stack)
+                continue
+            if core[0] == "popd":
+                eff_cwd = _apply_popd(core, eff_cwd, dir_stack)
                 continue
             if core[0] == "export":
                 # `export GIT_AUTHOR_NAME=Claude; git commit` sets the identity in this
