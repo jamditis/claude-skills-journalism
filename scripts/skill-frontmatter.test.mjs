@@ -112,12 +112,14 @@ test('every SKILL.md follows the Agent Skills frontmatter contract', () => {
   assert.deepEqual(errors, []);
 });
 
-test('frontmatter repairs advance the affected Claude package versions', () => {
+test('published package versions stay aligned with the marketplace', () => {
   const marketplace = JSON.parse(
     readFileSync(join(ROOT, '.claude-plugin', 'marketplace.json'), 'utf8'),
   );
-  assert.equal(marketplace.version, '2.3.3', 'marketplace version');
+  assert.equal(marketplace.version, '2.4.0', 'marketplace version');
   const expected = new Map([
+    ['journalism-core', '1.3.0'],
+    ['okf-wiki', '0.7.0'],
     ['pdf-playground', '1.3.2'],
     ['video-toolkit', '1.0.3'],
   ]);

@@ -11,7 +11,7 @@ description: >-
 license: MIT
 metadata:
   author: jamditis
-  version: "0.6.1"
+  version: "0.7.0"
   okf_spec: v1
 ---
 
