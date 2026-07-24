@@ -1844,12 +1844,204 @@ def test_block_popd_dash_n_index_zero_leaves_cwd(tmp_path):
 
 
 def test_allow_tracked_pushd_popd_pairs_still_return(tmp_path):
-    # The guard against over-correcting: clearing the stack must only happen on the forms
-    # that desynchronize it. A plain push/pop pair is still fully mirrored, so popd keeps
-    # returning to the directory pushd left and a clean commit there stays allowed.
+    # The guard against over-correcting: the whole point of mirroring the stack is that a
+    # plain push/pop pair returns exactly where pushd left, so a clean commit there stays
+    # allowed rather than being judged against the file in sub/.
     sub = tmp_path / "sub"
     sub.mkdir()
     (sub / "MSG").write_text("Generated with Claude Code\n")
     (tmp_path / "MSG").write_text("Fix the parser\n")
     r = run(f"pushd {sub} && popd && git commit -F MSG", cwd=tmp_path)
     assert_allowed(r)
+
+
+# The directory-stack forms below were all measured against bash 5.2.37 before being
+# encoded here. Each one is a case where guessing at the shape of the arguments -- rather
+# than replaying what bash actually does -- pointed the scan at a directory the commit
+# never runs in, which reads a clean MSG while git reads an attributed one. In several of
+# them the attributed file deliberately sits somewhere that is neither the tracked
+# directory nor the payload cwd, so the cwd fallback cannot rescue the assertion and the
+# test genuinely pins the move.
+
+
+def test_block_pushd_dash_n_relative_entry_resolves_at_pop(tmp_path):
+    # `pushd -n <relative>` stores the operand exactly as typed and resolves it only when
+    # a later popd lands on it, so the entry follows wherever the shell moved in between.
+    # Measured: from the start dir, `pushd -n repo; cd other; popd` lands in other/repo,
+    # and `dirs` prints the entry as the bare word `repo` until that pop. Absolutizing at
+    # push time aims the scan at ./repo, which the commit never enters.
+    landing = tmp_path / "other" / "repo"
+    landing.mkdir(parents=True)
+    (landing / "MSG").write_text("Generated with Claude Code\n")
+    early = tmp_path / "repo"
+    early.mkdir()
+    (early / "MSG").write_text("Fix the parser\n")
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    r = run("pushd -n repo && cd other && popd && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_popd_double_dash_dash_n_is_a_real_pop(tmp_path):
+    # `--` ends option parsing for popd too, so a `-n` after it is an operand and not the
+    # hold-the-cwd option: measured, `pushd sub; popd -- -n` returns to the starting
+    # directory. Testing for `-n` anywhere in the argument list holds the base in sub/ and
+    # reads the wrong MSG.
+    work = tmp_path / "work"
+    sub = work / "sub"
+    sub.mkdir(parents=True)
+    (work / "MSG").write_text("Generated with Claude Code\n")
+    (sub / "MSG").write_text("Fix the parser\n")
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    r = run("cd work && pushd sub && popd -- -n && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_out_of_range_popd_index_leaves_the_stack_intact(tmp_path):
+    # An out-of-range position is a bash error, so the command fails whole and changes
+    # neither the working directory nor the stack: measured, `pushd a; pushd b; popd +9`
+    # leaves `dirs` reading `b a base` exactly as before. Discarding the stack instead
+    # strands the popd after it, which then holds in b while bash returns to a.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Generated with Claude Code\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Fix the parser\n")
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    r = run(f"pushd {a} && pushd {b} && popd +9; popd && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_out_of_range_pushd_rotation_leaves_the_stack_intact(tmp_path):
+    # The same class from the pushd side, which is why it is a class and not one bug:
+    # measured, `pushd +9` and `pushd -9` both fail with "directory stack index out of
+    # range" and leave the listing untouched, so the popd after them still reaches a.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Co-Authored-By: Claude <noreply@anthropic.com>\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Fix the parser\n")
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    r = run(f"pushd {a} && pushd {b} && pushd +9; popd && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_popd_dash_n_keeps_the_stack_mirrored(tmp_path):
+    # `popd -n` drops a return directory without leaving the current one. Position 0 is
+    # the working directory, so it cannot be the entry dropped and bash drops entry 1
+    # instead -- measured, `pushd a; pushd b; popd -n` leaves `dirs` as `b base`. The
+    # remaining entries still line up, so the popd after it reaches the starting
+    # directory; treating `-n` as unmirrorable strands that pop in b.
+    work = tmp_path / "work"
+    work.mkdir()
+    (work / "MSG").write_text("Generated with Claude Code\n")
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Fix the parser\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Fix the parser\n")
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    r = run(
+        f"cd work && pushd {a} && pushd {b} && popd -n && popd && git commit -F MSG",
+        cwd=tmp_path,
+    )
+    assert_blocked(r)
+
+
+def test_block_pushd_rotation_ignores_a_trailing_directory(tmp_path):
+    # A position as the first operand puts pushd in rotate mode, and a directory name
+    # after it is ignored rather than entered: measured, `pushd a; pushd b; pushd +1 c`
+    # lands in a and never looks at c. Reading the last positional as the destination
+    # turns the rotation into a `cd b/c` the shell never performs.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Generated with Claude Code\n")
+    b = tmp_path / "b"
+    c = b / "c"
+    c.mkdir(parents=True)
+    (b / "MSG").write_text("Fix the parser\n")
+    (c / "MSG").write_text("Fix the parser\n")
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    r = run(f"pushd {a} && pushd {b} && pushd +1 c && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_pushd_rotation_run_ends_at_the_first_directory(tmp_path):
+    # Consecutive positions collapse to the last one, but the run ends at the first
+    # directory name and a position after that is dropped with it: measured,
+    # `pushd +1 +2` rotates by +2 while `pushd +1 c +2` rotates by +1, landing in a.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Generated with Claude Code\n")
+    b = tmp_path / "b"
+    c = b / "c"
+    c.mkdir(parents=True)
+    (b / "MSG").write_text("Fix the parser\n")
+    (c / "MSG").write_text("Fix the parser\n")
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    r = run(f"pushd {a} && pushd {b} && pushd +1 c +2 && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_pushd_directory_then_position_is_too_many_arguments(tmp_path):
+    # Operand order decides, so the mirror image of the case above is not a rotation at
+    # all: measured, `pushd c +1` fails with "pushd: too many arguments" and changes
+    # neither cwd nor stack, while `pushd +1 c` rotates. Scanning for a position anywhere
+    # in the arguments makes both shapes look alike and enters b/c on a command that
+    # failed.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Fix the parser\n")
+    b = tmp_path / "b"
+    c = b / "c"
+    c.mkdir(parents=True)
+    (b / "MSG").write_text("Generated with Claude Code\n")
+    (c / "MSG").write_text("Fix the parser\n")
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    r = run(f"pushd {a} && pushd {b}; pushd c +1; git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_pushd_missing_target_does_not_move(tmp_path):
+    # A pushd that cannot chdir fails, leaving cwd and stack alone -- measured, `pushd`
+    # into a name that does not exist reports "No such file or directory" and `dirs` is
+    # unchanged. Following it anyway resolves the message file under a directory the
+    # shell never entered, so the attributed MSG one level up is never read.
+    work = tmp_path / "work"
+    work.mkdir()
+    (work / "MSG").write_text("Generated with Claude Code\n")
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    r = run("cd work; pushd nope; git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_popd_last_position_wins(tmp_path):
+    # Given several positions popd applies the LAST, not the first: measured,
+    # `popd +1 +0` behaves as `popd +0` and moves to a, while `popd +0 +1` behaves as
+    # `popd +1` and stays put. Taking the first match holds the scan in b.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Generated with Claude Code\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Fix the parser\n")
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    r = run(f"pushd {a} && pushd {b} && popd +1 +0 && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_popd_double_dash_ignores_a_later_position(tmp_path):
+    # `--` ends position parsing as well as option parsing, so what follows is not the
+    # entry to drop: measured, `popd -- +1` is a plain pop and lands in a, where
+    # `popd +1` would have stayed in b and only shortened the stack.
+    a = tmp_path / "a"
+    a.mkdir()
+    (a / "MSG").write_text("Co-Authored-By: Claude <noreply@anthropic.com>\n")
+    b = tmp_path / "b"
+    b.mkdir()
+    (b / "MSG").write_text("Fix the parser\n")
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    r = run(f"pushd {a} && pushd {b} && popd -- +1 && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
