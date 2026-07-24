@@ -158,6 +158,85 @@ def _decode_c_escapes(text):
     return "".join(out)
 
 
+def _predecode_ansi_c(line):
+    """Rewrite ANSI-C ($'...') quotes into ordinary single-quoted words before tokenizing.
+
+    shlex has no ANSI-C mode. Inside `$'...'` bash treats `\\'` as an escaped apostrophe
+    that does NOT close the quote, but shlex ends the single-quoted run there, so
+    `git commit -m $'It\\'s generated with Claude Code'` tokenizes as unbalanced quoting
+    and the byline reaches the record with only the raw-text fallback scanning it. Find
+    each ANSI-C span with bash's escape rules, decode it, and re-emit the result as a
+    plain single-quoted word so the rest of the hook sees the string bash will actually
+    pass to git -- correct tokenizing, correct command classification, correct scan.
+
+    Conservative by construction: a span with no closing quote is left untouched (the
+    caller's unparseable-quoting fallback still sees it), and `$'` inside single or
+    double quotes is not ANSI-C, so it is skipped.
+    """
+    if "$'" not in line:
+        return line
+    out = []
+    i, n = 0, len(line)
+    quote = None  # None, "'", or '"' -- the quoting context outside any ANSI-C span
+    while i < n:
+        ch = line[i]
+        if quote is None and ch == "\\" and i + 1 < n:
+            out.append(line[i:i + 2])  # an escaped char cannot open a quote
+            i += 2
+            continue
+        if quote is None and ch in ("'", '"'):
+            quote = ch
+            out.append(ch)
+            i += 1
+            continue
+        if quote is not None:
+            # Inside double quotes a backslash still escapes; inside single quotes it
+            # does not, so only skip the pair for the double-quoted case.
+            if quote == '"' and ch == "\\" and i + 1 < n:
+                out.append(line[i:i + 2])
+                i += 2
+                continue
+            if ch == quote:
+                quote = None
+            out.append(ch)
+            i += 1
+            continue
+        if ch == "$" and i + 1 < n and line[i + 1] == "'":
+            body, end = _scan_ansi_c_body(line, i + 2)
+            if end is None:  # unterminated: leave the span exactly as written
+                out.append(line[i:])
+                return "".join(out)
+            decoded = _decode_c_escapes(body)
+            out.append("'" + decoded.replace("'", "'\"'\"'") + "'")
+            i = end + 1
+            continue
+        out.append(ch)
+        i += 1
+    return "".join(out)
+
+
+def _scan_ansi_c_body(line, start):
+    """Return (body, index-of-closing-quote) for an ANSI-C span, or (None, None).
+
+    Inside `$'...'` a backslash escapes the next character, so an escaped apostrophe is
+    part of the string rather than its terminator. The body is returned with escapes
+    still raw, for _decode_c_escapes to resolve.
+    """
+    body = []
+    i, n = start, len(line)
+    while i < n:
+        ch = line[i]
+        if ch == "\\" and i + 1 < n:
+            body.append(line[i:i + 2])
+            i += 2
+            continue
+        if ch == "'":
+            return "".join(body), i
+        body.append(ch)
+        i += 1
+    return None, None
+
+
 def _shell_message_variants(text):
     """Yield the forms of a message argument to scan for a byline.
 
@@ -1123,6 +1202,10 @@ def _input_file_has_attribution(name, read_dirs):
     return False
 
 
+# `pushd +1` / `pushd -2` rotate the directory stack rather than naming a directory.
+_ROTATION_RE = re.compile(r"^[+-]\d+$")
+
+
 def _resolve_dir(base, target):
     """Resolve a possibly-relative directory against base."""
     if os.path.isabs(target):
@@ -1136,16 +1219,65 @@ def _apply_cd(core, eff_cwd):
     A relative message file resolves against the shell's current directory, so a
     preceding `cd repo` must move the base a `git commit -F MSG` reads MSG from. `cd -`
     (previous dir) is unknowable and leaves the base unchanged; a bare `cd` goes home.
+
+    `--` ends option parsing, so a dash-prefixed token after it is the destination
+    directory, not a flag (`cd -- -foo` enters ./-foo). Skipping it as an option would
+    leave no target at all and send the lookup to the home directory, hiding an
+    attributed message file there. A bare `-` is the exception: bash substitutes
+    $OLDPWD for it even after `--`, so it stays the previous-directory shorthand
+    rather than becoming a literal path.
     """
     target = None
+    end_of_opts = False
     for t in core[1:]:
-        if t == "--" or (t.startswith("-") and t != "-"):
-            continue
+        if not end_of_opts:
+            if t == "--":
+                end_of_opts = True
+                continue
+            if t.startswith("-") and t != "-":
+                continue
         target = t  # last positional is the destination
     if target is None:
         return os.path.expanduser("~")
     if target == "-":
-        return eff_cwd
+        return eff_cwd  # $OLDPWD, including after `--`
+    return _resolve_dir(eff_cwd, target)
+
+
+def _apply_pushd(core, eff_cwd, dir_stack):
+    """Return the effective directory after a `pushd` segment, recording the return dir.
+
+    `pushd repo` changes the working directory exactly as `cd repo` does -- only the
+    return stack differs -- so an untracked pushd leaves a later `git commit -F MSG`
+    resolving MSG against the wrong base.
+
+    Three forms move the stack without a directory this hook can follow, so each holds
+    the base rather than guess: `-n` pushes without changing the working directory at
+    all, the rotations (`pushd +1`, `pushd -2`) reorder a stack whose contents were
+    never seen, and the bare argument-less form swaps the top two entries. Holding is
+    the conservative direction: moving the base on a guess can make the hook read a
+    file the command never opens, which false-blocks a clean commit.
+
+    `--` ends option parsing here too: `pushd -- -n` enters a directory literally named
+    `-n`, so the option test must not reach past it.
+    """
+    target = None
+    end_of_opts = False
+    for t in core[1:]:
+        if not end_of_opts:
+            if t == "--":
+                end_of_opts = True
+                continue
+            if t == "-n":
+                # Stack-only push: the working directory does not move, so following it
+                # would read a file the command never opens.
+                return eff_cwd
+            if _ROTATION_RE.match(t):
+                return eff_cwd  # rotates a stack whose contents were never seen
+        target = t
+    if target is None:
+        return eff_cwd  # bare pushd swaps the top two stack entries: unknowable
+    dir_stack.append(eff_cwd)
     return _resolve_dir(eff_cwd, target)
 
 
@@ -1183,6 +1315,7 @@ def find_attribution(command, cwd, depth=0, inherited=None):
     environment instead.
     """
     eff_cwd = cwd
+    dir_stack = []  # directories pushd left, for a later popd to return to
     # The starting ambient identity. At the top level, an identity var already exported
     # before the hook runs (GIT_AUTHOR_NAME=Claude set in the parent shell) is inherited by
     # a bare `git commit`, so seed from the process environment. When recursing into a
@@ -1199,7 +1332,9 @@ def find_attribution(command, cwd, depth=0, inherited=None):
     for raw_line in _logical_lines(command):
         # Drop an unquoted trailing `#` comment first: the shell never runs it, so a clean
         # command with an attributed example in a comment must not be blocked.
-        line = _strip_comment(raw_line)
+        # Resolve ANSI-C ($'...') quoting first, so the comment strip and the tokenizer
+        # both see ordinary single-quoted words instead of a run shlex cannot balance.
+        line = _strip_comment(_predecode_ansi_c(raw_line))
         try:
             tokens = _tokenize(line)
         except ValueError:
@@ -1257,6 +1392,18 @@ def find_attribution(command, cwd, depth=0, inherited=None):
                 continue
             if core[0] == "cd":
                 eff_cwd = _apply_cd(core, eff_cwd)
+                continue
+            if core[0] == "pushd":
+                eff_cwd = _apply_pushd(core, eff_cwd, dir_stack)
+                continue
+            if core[0] == "popd":
+                # popd returns to the directory the matching pushd left. `popd -n` drops
+                # a stack entry without changing the working directory, so it must not
+                # move the base. With nothing tracked (a pushd this hook could not
+                # resolve, or a popd with no push), the destination is unknowable, so
+                # hold the base rather than guess.
+                if dir_stack and "-n" not in core[1:]:
+                    eff_cwd = dir_stack.pop()
                 continue
             if core[0] == "export":
                 # `export GIT_AUTHOR_NAME=Claude; git commit` sets the identity in this

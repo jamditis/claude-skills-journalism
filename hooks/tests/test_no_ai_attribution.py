@@ -1479,3 +1479,127 @@ def test_block_real_commit_chained_after_dry_run():
     # a dry-run still writes the record and must block.
     assert_blocked(run(
         'git commit --dry-run -m "preview" && git commit -m "Generated with Claude Code"'))
+
+
+def test_block_ansi_c_escaped_apostrophe_byline():
+    # Inside $'...', \' is an escaped apostrophe, so the quote does NOT end there and the
+    # whole string is one word bash writes verbatim (with \n as a real newline, making a
+    # trailing byline). shlex has no ANSI-C mode: it ends the single-quoted run at that
+    # apostrophe and the rest of the line reads as unbalanced quoting, so the byline
+    # reaches the record unscanned unless $'...' is decoded before tokenizing.
+    r = run("git commit -m $'It\\'s fixed\\n\\nGenerated with Claude Code'")
+    assert_blocked(r)
+
+
+def test_allow_ansi_c_escaped_apostrophe_clean_message():
+    # The same quoting with no attribution must still pass: decoding $'...' must not
+    # turn an ordinary apostrophe into a block.
+    r = run("git commit -m $'It\\'s a parser fix'")
+    assert_allowed(r)
+
+
+def test_allow_ansi_c_escaped_apostrophe_prose_mention():
+    # Decoding must not widen the message check either: a tool named mid-sentence is
+    # prose about the work, not a byline, and stays allowed once the quoting resolves.
+    r = run("git commit -m $'Document what it\\'s generated with Claude Code'")
+    assert_allowed(r)
+
+
+def test_block_cd_double_dash_then_dash_prefixed_dir(tmp_path):
+    # `cd -- -foo` ends option parsing, so `-foo` is the destination directory, not a
+    # flag. Skipping it as an option sends the file lookup to the home directory and the
+    # attributed MSG in -foo/ is never read.
+    weird = tmp_path / "-foo"
+    weird.mkdir()
+    (weird / "MSG").write_text("Generated with Claude Code\n")
+    r = run("cd -- -foo && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_pushd_then_relative_file_commit(tmp_path):
+    # `pushd repo` changes the directory exactly as `cd repo` does; only the return stack
+    # differs. Untracked, MSG resolves against the payload cwd and the attributed file in
+    # repo/ is missed.
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "MSG").write_text("Written by ChatGPT\n")
+    r = run("pushd repo && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_popd_returns_to_attributed_dir(tmp_path):
+    # popd returns to the directory pushd left, so the commit reads MSG from the payload
+    # cwd. Treating popd as an unknown command would strand the base in sub/.
+    (tmp_path / "MSG").write_text("Generated with Claude Code\n")
+    sub = tmp_path / "sub"
+    sub.mkdir()
+    (sub / "MSG").write_text("Fix the parser\n")
+    r = run("pushd sub && popd && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_allow_pushd_then_clean_file(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "MSG").write_text("Fix the parser\n")
+    r = run("pushd repo && git commit -F MSG", cwd=tmp_path)
+    assert_allowed(r)
+
+
+def test_block_pushd_dash_n_leaves_cwd(tmp_path):
+    # `pushd -n repo` pushes onto the directory stack WITHOUT changing the working
+    # directory, so the commit still reads MSG from the payload cwd. Following the -n
+    # push into repo/ would scan a file the command never opens: it misses the real
+    # attributed message here, and elsewhere false-blocks a clean commit.
+    (tmp_path / "MSG").write_text("Generated with Claude Code\n")
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "MSG").write_text("Fix the parser\n")
+    r = run("pushd -n repo && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_allow_pushd_dash_n_clean_cwd_file(tmp_path):
+    # The mirror image: with the attributed file only in repo/, a `pushd -n` commit
+    # reads the clean cwd file and must not be blocked.
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "MSG").write_text("Generated with Claude Code\n")
+    r = run("pushd -n repo && git commit -F MSG", cwd=tmp_path)
+    assert_allowed(r)
+
+
+def test_block_popd_dash_n_leaves_cwd(tmp_path):
+    # `popd -n` drops a stack entry without changing the working directory, so the
+    # commit still runs in sub/ and must be judged against sub/MSG.
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    sub = tmp_path / "sub"
+    sub.mkdir()
+    (sub / "MSG").write_text("Generated with Claude Code\n")
+    r = run("pushd sub && popd -n && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_pushd_double_dash_then_dash_n_dir(tmp_path):
+    # `pushd -- -n` enters a directory literally named -n: `--` ends option parsing, so
+    # the -n option test must not reach past it. Verified against bash.
+    weird = tmp_path / "-n"
+    weird.mkdir()
+    (weird / "MSG").write_text("Generated with Claude Code\n")
+    (tmp_path / "MSG").write_text("Fix the parser\n")
+    r = run("pushd -- -n && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
+
+
+def test_block_cd_double_dash_dash_is_still_oldpwd(tmp_path):
+    # `cd -- -` is NOT a literal directory named `-`: bash substitutes $OLDPWD even
+    # after `--`. Verified against bash. Treating it as a path would resolve the
+    # message file under ./- and scan a file the command never opens.
+    (tmp_path / "MSG").write_text("Generated with Claude Code\n")
+    sub = tmp_path / "sub"
+    sub.mkdir()
+    (sub / "MSG").write_text("Fix the parser\n")
+    # cd sub, then `cd -- -` returns to tmp_path, where MSG is attributed.
+    r = run("cd sub && cd -- - && git commit -F MSG", cwd=tmp_path)
+    assert_blocked(r)
