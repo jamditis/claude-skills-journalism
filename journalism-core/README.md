@@ -16,7 +16,7 @@ Fourteen core journalism skills for Claude Code — covering reporting, verifica
 | **interview-transcription** | Whisper / WhisperX transcription pipelines with speaker diarization |
 | **newsletter-publishing** | Email newsletter workflows including 2024-2026 Gmail / Yahoo / Outlook bulk-sender compliance |
 | **newsroom-style** | AP Style enforcement for journalism writing |
-| **photo-metadata** | Embed caption, byline, credit, alt text, keywords, and copyright or Creative Commons license into a photo's IPTC/EXIF/XMP metadata for wire and archive use |
+| **photo-metadata** | Embed caption, byline, credit, alt text, keywords, copyright or Creative Commons license, AI-source labeling (IPTC Digital Source Type), and Google-Images licensing into a photo's IPTC/EXIF/XMP metadata; strip GPS for source protection and read C2PA Content Credentials, for wire and archive use |
 | **social-media-intelligence** | Narrative tracking, coordinated-campaign analysis, account authenticity checks, OSINT for digital investigations |
 | **source-verification** | Source credibility, image and video verification, deepfake detection (2026), and C2PA Content Credentials |
 | **story-pitch** | Pitch templates for daily news, features, investigations, and freelance queries |
