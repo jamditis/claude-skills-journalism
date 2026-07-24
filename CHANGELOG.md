@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **photo-metadata:** modernized for the provenance era after deep web research
+  against IPTC, C2PA, Google, and exiftool primary sources. Adds AI/synthetic
+  labeling via IPTC `DigitalSourceType` (full controlled vocabulary, with the
+  `trainedAlgorithmicMedia` / `compositeWithTrainedAlgorithmicMedia` /
+  `compositeSynthetic` distinctions and the IPTC 2025.1 AI-system/prompt fields);
+  a C2PA / Content Credentials section (exiftool reads but cannot sign — use
+  `c2patool` / `verify.contentauthenticity.org` — with cautions that a credential
+  proves a signature, not truth); GPS-stripping guidance and an `embed.py
+  --strip-gps` flag for source protection; Google Images "Licensable" fields
+  (`xmpRights:WebStatement` + PLUS `Licensor*`); an XMP-first framing with a
+  HEIC/AVIF/WebP format table; and a corrected caption vs. alt-text vs. extended-
+  description distinction. `embed.py` gains `digital_source_type` (shorthand→URI,
+  per-image override), licensing, and `ext_description` manifest fields, with
+  nine new tests (19 total).
+
 ## [2.3.3] - 2026-07-23
 
 This release catches the public GitHub history up to marketplace `2.3.3`. It adds

@@ -217,6 +217,233 @@ class EmbedCLITests(unittest.TestCase):
         self.assertEqual(r.returncode, 0, f"stdout={r.stdout} stderr={r.stderr}")
         self.assertEqual(read_back(str(self.src / "-dash.jpg")).get("By-line"), "Dana")
 
+    def test_digital_source_type_shorthand_expands_to_full_uri(self):
+        # A newsroom shorthand must be written as the full IPTC CV URI — exiftool does
+        # not validate DigitalSourceType, so the tool is responsible for the URI.
+        m = self.write_manifest({
+            "constants": {"digital_source_type": "digitalCapture"},
+            "images": {"a.jpg": {"caption": "A red rectangle."}},
+        })
+        r = run_embed("--dir", str(self.src), "--manifest", str(m))
+        self.assertEqual(r.returncode, 0, f"stdout={r.stdout} stderr={r.stderr}")
+        out = subprocess.run(["exiftool", "-s3", "-XMP-iptcExt:DigitalSourceType",
+                              "--", str(self.src / "tagged" / "a.jpg")],
+                             capture_output=True, text=True)
+        self.assertEqual(
+            out.stdout.strip(),
+            "http://cv.iptc.org/newscodes/digitalsourcetype/digitalCapture")
+
+    def test_digital_source_type_ai_value_and_per_image_override(self):
+        # A per-image value overrides the constant, so a folder can mix a real photo
+        # with an AI illustration and label each honestly.
+        make_jpeg(self.src / "ai.jpg")
+        m = self.write_manifest({
+            "constants": {"digital_source_type": "digitalCapture"},
+            "images": {
+                "a.jpg": {"caption": "A real photo."},
+                "ai.jpg": {"caption": "An AI illustration.",
+                           "digital_source_type": "trainedAlgorithmicMedia"},
+            },
+        })
+        r = run_embed("--dir", str(self.src), "--manifest", str(m))
+        self.assertEqual(r.returncode, 0, f"stdout={r.stdout} stderr={r.stderr}")
+
+        def dst(name):
+            out = subprocess.run(["exiftool", "-s3", "-XMP-iptcExt:DigitalSourceType",
+                                  "--", str(self.src / "tagged" / name)],
+                                 capture_output=True, text=True)
+            return out.stdout.strip()
+        self.assertTrue(dst("a.jpg").endswith("/digitalCapture"))
+        self.assertTrue(dst("ai.jpg").endswith("/trainedAlgorithmicMedia"))
+
+    def test_digital_source_type_full_uri_normalizes_to_http(self):
+        # An https CV URI is accepted and normalized to the canonical http form.
+        m = self.write_manifest({
+            "constants": {},
+            "images": {"a.jpg": {"caption": "x",
+                "digital_source_type":
+                    "https://cv.iptc.org/newscodes/digitalsourcetype/compositeSynthetic"}},
+        })
+        r = run_embed("--dir", str(self.src), "--manifest", str(m))
+        self.assertEqual(r.returncode, 0, f"stdout={r.stdout} stderr={r.stderr}")
+        out = subprocess.run(["exiftool", "-s3", "-XMP-iptcExt:DigitalSourceType",
+                              "--", str(self.src / "tagged" / "a.jpg")],
+                             capture_output=True, text=True)
+        self.assertEqual(
+            out.stdout.strip(),
+            "http://cv.iptc.org/newscodes/digitalsourcetype/compositeSynthetic")
+
+    def test_digital_source_type_typo_and_non_iptc_urls_are_rejected(self):
+        # A typo'd CV id or a non-IPTC URL must be warned and skipped, not written as
+        # broken provenance that a non-empty read-back would wave through.
+        for bad in ("https://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedi",
+                    "https://example.com/ai"):
+            make_jpeg(self.src / "b.jpg")
+            m = self.write_manifest({
+                "constants": {},
+                "images": {"b.jpg": {"caption": "x", "digital_source_type": bad}},
+            })
+            r = run_embed("--dir", str(self.src), "--manifest", str(m))
+            self.assertEqual(r.returncode, 0, f"stdout={r.stdout} stderr={r.stderr}")
+            self.assertIn("digital_source_type", (r.stderr + r.stdout))
+            out = subprocess.run(["exiftool", "-s3", "-XMP-iptcExt:DigitalSourceType",
+                                  "--", str(self.src / "tagged" / "b.jpg")],
+                                 capture_output=True, text=True)
+            self.assertEqual(out.stdout.strip(), "", f"wrote broken value for {bad!r}")
+
+    def test_strip_gps_clears_destination_coordinates_too(self):
+        # A publish-safe strip must clear the whole XMP GPS set, not just the three
+        # main coordinates: GPSDest* is also a location and must not survive.
+        subprocess.run(["exiftool", "-overwrite_original",
+                        "-GPSLatitude=40.7", "-GPSLatitudeRef=N",
+                        "-GPSLongitude=74.0", "-GPSLongitudeRef=W",
+                        "-XMP-exif:GPSDestLatitude=41.0", "-XMP-exif:GPSDestLongitude=75.0",
+                        "--", str(self.src / "a.jpg")], capture_output=True, text=True)
+        m = self.write_manifest({"constants": {"by_line": "Dana"},
+                                 "images": {"a.jpg": {"caption": "x"}}})
+        r = run_embed("--dir", str(self.src), "--manifest", str(m), "--strip-gps")
+        self.assertEqual(r.returncode, 0, f"stdout={r.stdout} stderr={r.stderr}")
+        gps = subprocess.run(["exiftool", "-a", "-G1", "-gps:all", "-XMP-exif:all",
+                              "--", str(self.src / "tagged" / "a.jpg")],
+                             capture_output=True, text=True)
+        self.assertNotIn("GPS", gps.stdout, f"GPS survived strip: {gps.stdout}")
+
+    def test_webp_no_iim_format_verifies_via_xmp(self):
+        # HEIC/AVIF/WebP have no IIM slot: exiftool writes only XMP, so verify must not
+        # false-fail a valid XMP-only write by demanding the IPTC read-back tags.
+        from PIL import Image
+        Image.new("RGB", (48, 32), (20, 80, 20)).save(self.src / "a.webp", "WEBP")
+        m = self.write_manifest({
+            "constants": {"by_line": "Dana Rivera", "digital_source_type": "digitalCapture"},
+            "images": {"a.webp": {"caption": "A green frame.",
+                                  "alt": "A solid green rectangle.",
+                                  "keywords": ["test", "webp"]}},
+        })
+        r = run_embed("--dir", str(self.src), "--manifest", str(m))
+        self.assertEqual(r.returncode, 0, f"stdout={r.stdout} stderr={r.stderr}")
+        out = subprocess.run(
+            ["exiftool", "-G1", "-j", "-XMP-dc:Creator", "-XMP-dc:Description",
+             "-XMP-dc:Subject", "-XMP-iptcExt:DigitalSourceType",
+             "--", str(self.src / "tagged" / "a.webp")],
+            capture_output=True, text=True)
+        data = json.loads(out.stdout)[0]
+        self.assertEqual(data.get("XMP-dc:Creator"), "Dana Rivera")
+        self.assertEqual(data.get("XMP-dc:Description"), "A green frame.")
+
+    def test_unknown_digital_source_type_is_warned_and_skipped(self):
+        # A typo must not be embedded as a broken value: warn, skip the tag, still
+        # succeed on the fields that did write.
+        m = self.write_manifest({
+            "constants": {},
+            "images": {"a.jpg": {"caption": "x", "digital_source_type": "camera-photo"}},
+        })
+        r = run_embed("--dir", str(self.src), "--manifest", str(m))
+        self.assertEqual(r.returncode, 0, f"stdout={r.stdout} stderr={r.stderr}")
+        self.assertIn("digital_source_type", (r.stderr + r.stdout))
+        out = subprocess.run(["exiftool", "-s3", "-XMP-iptcExt:DigitalSourceType",
+                              "--", str(self.src / "tagged" / "a.jpg")],
+                             capture_output=True, text=True)
+        self.assertEqual(out.stdout.strip(), "")
+
+    def test_google_licensing_fields_land(self):
+        # WebStatement (the Licensable trigger) + PLUS Licensor name/URL must round-trip.
+        m = self.write_manifest({
+            "constants": {
+                "web_statement": "https://example.org/license/123",
+                "licensor_name": "Example Agency",
+                "licensor_url": "https://example.org/buy/123",
+            },
+            "images": {"a.jpg": {"caption": "x"}},
+        })
+        r = run_embed("--dir", str(self.src), "--manifest", str(m))
+        self.assertEqual(r.returncode, 0, f"stdout={r.stdout} stderr={r.stderr}")
+        out = subprocess.run(
+            ["exiftool", "-G1", "-j", "-XMP-xmpRights:WebStatement",
+             "-XMP-plus:LicensorName", "-XMP-plus:LicensorURL",
+             "--", str(self.src / "tagged" / "a.jpg")],
+            capture_output=True, text=True)
+        data = json.loads(out.stdout)[0]
+        self.assertEqual(data.get("XMP-xmpRights:WebStatement"),
+                         "https://example.org/license/123")
+        self.assertEqual(data.get("XMP-plus:LicensorName"), "Example Agency")
+        self.assertEqual(data.get("XMP-plus:LicensorURL"), "https://example.org/buy/123")
+
+    def test_web_statement_overrides_license_url_web_statement(self):
+        # When both license_url and web_statement are set, the more specific
+        # web_statement wins the shared WebStatement tag (Google reads the license page).
+        m = self.write_manifest({
+            "constants": {
+                "license_url": "https://creativecommons.org/licenses/by/4.0/",
+                "web_statement": "https://example.org/license/123",
+            },
+            "images": {"a.jpg": {"caption": "x"}},
+        })
+        r = run_embed("--dir", str(self.src), "--manifest", str(m))
+        self.assertEqual(r.returncode, 0, f"stdout={r.stdout} stderr={r.stderr}")
+        out = subprocess.run(["exiftool", "-s3", "-XMP-xmpRights:WebStatement",
+                              "-XMP-cc:License", "--", str(self.src / "tagged" / "a.jpg")],
+                             capture_output=True, text=True)
+        lines = out.stdout.strip().splitlines()
+        self.assertEqual(lines[0].strip(), "https://example.org/license/123")  # WebStatement
+        self.assertEqual(lines[1].strip(),
+                         "https://creativecommons.org/licenses/by/4.0/")        # cc:License
+
+    def test_ext_description_is_distinct_from_caption(self):
+        # The caption must NOT be routed into the accessibility extended description;
+        # ext_description is its own field (IPTC keeps them distinct).
+        m = self.write_manifest({
+            "constants": {},
+            "images": {"a.jpg": {
+                "caption": "A visible cutline about the scene.",
+                "ext_description": "A long screen-reader description of the chart.",
+            }},
+        })
+        r = run_embed("--dir", str(self.src), "--manifest", str(m))
+        self.assertEqual(r.returncode, 0, f"stdout={r.stdout} stderr={r.stderr}")
+        out = subprocess.run(
+            ["exiftool", "-G1", "-j", "-XMP-iptcCore:ExtDescrAccessibility",
+             "-IPTC:Caption-Abstract", "--", str(self.src / "tagged" / "a.jpg")],
+            capture_output=True, text=True)
+        data = json.loads(out.stdout)[0]
+        self.assertEqual(data.get("XMP-iptcCore:ExtDescrAccessibility"),
+                         "A long screen-reader description of the chart.")
+        self.assertEqual(data.get("IPTC:Caption-Abstract"),
+                         "A visible cutline about the scene.")
+
+    def test_caption_alone_does_not_write_ext_description(self):
+        # A caption with no ext_description leaves ExtDescrAccessibility empty.
+        m = self.write_manifest({
+            "constants": {}, "images": {"a.jpg": {"caption": "Just a caption."}},
+        })
+        r = run_embed("--dir", str(self.src), "--manifest", str(m))
+        self.assertEqual(r.returncode, 0, f"stdout={r.stdout} stderr={r.stderr}")
+        out = subprocess.run(["exiftool", "-s3", "-XMP-iptcCore:ExtDescrAccessibility",
+                              "--", str(self.src / "tagged" / "a.jpg")],
+                             capture_output=True, text=True)
+        self.assertEqual(out.stdout.strip(), "")
+
+    def test_strip_gps_removes_location_but_keeps_editorial_metadata(self):
+        # A publish-safe derivative: GPS gone, caption/credit/source-type intact.
+        subprocess.run(["exiftool", "-overwrite_original",
+                        "-GPSLatitude=40.7", "-GPSLatitudeRef=N",
+                        "-GPSLongitude=74.0", "-GPSLongitudeRef=W",
+                        "--", str(self.src / "a.jpg")], capture_output=True, text=True)
+        m = self.write_manifest({
+            "constants": {"by_line": "Dana", "digital_source_type": "digitalCapture"},
+            "images": {"a.jpg": {"caption": "A red rectangle."}},
+        })
+        r = run_embed("--dir", str(self.src), "--manifest", str(m), "--strip-gps")
+        self.assertEqual(r.returncode, 0, f"stdout={r.stdout} stderr={r.stderr}")
+        tagged = str(self.src / "tagged" / "a.jpg")
+        gps = subprocess.run(["exiftool", "-s3", "-GPSLatitude", "-GPSLongitude",
+                              "--", tagged], capture_output=True, text=True)
+        self.assertEqual(gps.stdout.strip(), "")  # GPS removed
+        keep = subprocess.run(["exiftool", "-s3", "-IPTC:By-line",
+                               "-XMP-iptcExt:DigitalSourceType", "--", tagged],
+                              capture_output=True, text=True)
+        self.assertIn("Dana", keep.stdout)
+        self.assertIn("digitalsourcetype/digitalCapture", keep.stdout)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
