@@ -221,6 +221,7 @@ exiftool shows the manifest contents but does **not** validate the signature, th
 
 Cautions to state plainly to any newsroom:
 
+- **Editing metadata invalidates the credential.** The hard binding hashes the asset, metadata included, so any `exiftool` write to a signed file — including the tagging and GPS-stripping in this skill — leaves the manifest embedded but no longer valid. Preserving the JUMBF box is not enough. Keep the signed original untouched and do metadata work on a derivative you re-sign with `c2patool`, or state that the embedded credential no longer validates. Do not tag a signed original and call its credential good.
 - **A valid credential proves a signature and a chain, not truth.** A camera will sign a photo of a screen; a manifest can be forged with a mis-issued cert; certificate revocation checking is optional in the spec and validators have disagreed in practice (e.g., a revoked Nikon signing cert in late 2025). Verify the *signer identity*, not merely that a credential exists.
 - **Adoption is emerging, not universal.** Cameras (Leica M11-P, Nikon Z6III via firmware + Nikon's authenticity service, Sony Alpha via Camera Verify, Canon) and agencies (AFP, AP, BBC pilots) are shipping it, but claims that wire services "require" signed credentials on all images are overstated — treat provenance as a growing practice.
 - **Durability.** Because platforms strip the embedded manifest, "Durable Content Credentials" add an invisible watermark (Digimarc, in the C2PA spec since 2.1) and a content fingerprint so a stripped credential can be recovered from a manifest store. Don't count on the embedded manifest alone surviving a trip through social media.
@@ -230,10 +231,12 @@ Cautions to state plainly to any newsroom:
 GPS is the highest-risk tag in a news file. Strip it from the published derivative while keeping the editorial metadata:
 
 ```bash
-# EXIF GPS IFD + any XMP GPS copy; leaves caption/credit/copyright/source-type intact
-exiftool -gps:all= -xmp:GPSLatitude= -xmp:GPSLongitude= -xmp:GPSAltitude= -overwrite_original photo.jpg
-exiftool -a -G1 -gps:all photo.jpg      # verify: must print nothing
+# EXIF GPS IFD + the whole XMP GPS set; leaves caption/credit/copyright/source-type intact
+exiftool -gps:all= "-xmp:GPS*=" -overwrite_original photo.jpg
+exiftool -a -G1 -gps:all "-xmp:GPS*" photo.jpg   # verify: must print nothing
 ```
+
+Clear the whole XMP GPS set with the `-xmp:GPS*=` wildcard, not just `GPSLatitude`/`GPSLongitude`/`GPSAltitude`: exiftool's EXIF→XMP GPS mapping can also populate `GPSDestLatitude`/`GPSDestLongitude` and `GPSImgDirection`, and a destination coordinate left behind still leaks a location. The `*` is quoted so the shell passes it to exiftool rather than globbing it.
 
 Keep a full-GPS archival master, locked internally, where coordinates are editorial evidence (geolocation, verification, accountability). Publish the stripped copy. `embed.py --strip-gps` applies this to every file in a tagged folder. Note that a blunt `exiftool -all=` also removes the ICC color profile (colors shift), the EXIF orientation (image may display rotated), and any C2PA credential — for a targeted scrub prefer `-gps:all=`; for a full strip that keeps color, add `--icc_profile:all=` back: `exiftool -all= --icc_profile:all= -overwrite_original photo.jpg`.
 
@@ -248,7 +251,7 @@ Keep a full-GPS archival master, locked internally, where coordinates are editor
 | WebP | ✓ | ✓ | **✗** | **XMP + EXIF only** (confirm downstream reads WebP XMP) |
 | PNG | ✓ (eXIf) | ✓ | limited | **XMP + EXIF**; IIM not standard |
 
-exiftool reads and writes all of these. On the no-IIM formats, `-IPTC:*` tags have nowhere to go — write the `XMP-*` equivalents (exiftool routes IPTC values into XMP-iptcCore/iptcExt). `embed.py` writes both blocks and reads them back, so a format that dropped IIM surfaces as a verify note rather than silent loss.
+exiftool reads and writes all of these. On the no-IIM formats, an `-IPTC:*` write is silently dropped (exiftool writes only the XMP copy) — so target the `XMP-*` equivalents. `embed.py` writes both blocks and, on read-back, accepts the IIM tag *or* its XMP twin for byline, caption, and keywords: a valid XMP-only write on HEIC/AVIF/WebP passes rather than false-failing, while a tag that landed in neither layer still fails.
 
 ## Social platforms strip metadata
 

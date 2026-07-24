@@ -124,18 +124,22 @@ A **Content Credential** is a cryptographically signed C2PA manifest bound to th
 exiftool -G1 -a -jumbf:all incoming.jpg     # report the C2PA/JUMBF manifest (no signature check)
 ```
 
-That shows the manifest as *data* — it does not validate the signature or the signer. For a real check, drop the file into **verify.contentauthenticity.org** and confirm the signer is the agency you expect. To *create* a credential, use Adobe/CAI tooling — `c2patool` (`brew install c2patool`) or `pip install c2pa-python` — not exiftool. Two cautions worth stating to any newsroom: a valid credential proves a signature and a chain, **not** that the scene is real (a camera will happily sign a photo of a screen), and most social platforms strip the manifest on upload, so on-platform provenance often survives only via "durable" watermark/fingerprint recovery. See `reference.md`.
+That shows the manifest as *data* — it does not validate the signature or the signer. For a real check, drop the file into **verify.contentauthenticity.org** and confirm the signer is the agency you expect. To *create* a credential, use Adobe/CAI tooling — `c2patool` (`brew install c2patool`) or `pip install c2pa-python` — not exiftool.
+
+**Writing metadata to a signed file breaks its credential.** A C2PA hard binding hashes the asset, and that hash covers the embedded metadata, so any `exiftool` write — caption, credit, GPS strip, even the tagging in this skill — leaves the manifest present but *invalid*. "Never strip the credential" is necessary but not sufficient. On an inbound signed file, either leave the original untouched and do your metadata work on a **derivative you will re-sign** with `c2patool`, or accept that the embedded credential no longer validates and say so. Do not embed metadata into a signed original and treat its credential as still good.
+
+Two more cautions worth stating to any newsroom: a valid credential proves a signature and a chain, **not** that the scene is real (a camera will happily sign a photo of a screen), and most social platforms strip the manifest on upload, so on-platform provenance often survives only via "durable" watermark/fingerprint recovery. See `reference.md`.
 
 ## Strip GPS for a publish-safe derivative
 
 Remove location without touching the caption, credit, copyright, or source type:
 
 ```bash
-exiftool -gps:all= -xmp:GPSLatitude= -xmp:GPSLongitude= -xmp:GPSAltitude= -overwrite_original photo.jpg
-exiftool -a -G1 -gps:all photo.jpg          # verify — this must print nothing
+exiftool -gps:all= "-xmp:GPS*=" -overwrite_original photo.jpg
+exiftool -a -G1 -gps:all "-xmp:GPS*" photo.jpg   # verify — this must print nothing
 ```
 
-Keep the full-GPS file as a locked archival master where coordinates are editorial evidence (geolocation, verification). Publish the stripped copy. `embed.py --strip-gps` does this for a whole folder after tagging.
+Use the `-xmp:GPS*=` wildcard, not just the three main coordinates: destination and image-direction fields (`GPSDestLatitude`, `GPSImgDirection`) are also a location and would otherwise survive. Keep the full-GPS file as a locked archival master where coordinates are editorial evidence (geolocation, verification). Publish the stripped copy. `embed.py --strip-gps` does this for a whole folder after tagging.
 
 ## Licensing that shows up in search (Google Images)
 

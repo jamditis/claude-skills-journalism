@@ -159,16 +159,22 @@ def effective_dst(constants, per_image):
 
 
 def resolve_dst(value):
-    """Return the full Digital Source Type CV URI for a shorthand, or pass a URL through.
+    """Return the canonical Digital Source Type CV URI for a value, or None.
 
-    Returns None if `value` is empty, or is neither a known CV shorthand nor an
-    http(s) URL — the caller warns and skips it rather than embedding a broken value.
+    Accepts a known CV shorthand (`digitalCapture`) or a full IPTC CV URI in either
+    the `http://` or `https://` form; a full URI is reduced to its trailing ID and
+    validated against the vocabulary, so a non-IPTC URL or a typo'd ID (e.g.
+    `.../trainedAlgorithmicMedi`) returns None and the caller warns and skips it
+    rather than embedding a broken value. The result is always the canonical
+    `http://` form regardless of how it was written.
     """
     if not value:
         return None
     v = str(value).strip()
-    if v.startswith("http://") or v.startswith("https://"):
-        return v
+    for scheme in (DST_BASE, DST_BASE.replace("http://", "https://", 1)):
+        if v.startswith(scheme):
+            v = v[len(scheme):]      # reduce a full CV URI to its bare ID
+            break
     if v in DST_IDS:
         return DST_BASE + v
     return None
@@ -268,31 +274,36 @@ def verify(path, const_keys, per_image, dst_uri=None):
     truncated IIM field is not a false failure — but a silently dropped or skipped tag
     (e.g. a non-writable spelling) does fail.
     """
+    # Each check is (label, [json_keys]); it passes if ANY of the keys is non-empty.
+    # by_line/caption/keywords list both the IIM tag and its XMP twin, because
+    # HEIC/AVIF/WebP have no IIM slot — there exiftool writes only the XMP copy, so a
+    # valid write would false-fail if we demanded the IIM tag. On JPEG both are present.
     read_args, checks = [], []
     for key in const_keys:
-        if key in VERIFY_TAGS:
+        if key == "by_line":
+            read_args += ["-IPTC:By-line", "-XMP-dc:Creator"]
+            checks.append(("by_line", ["IPTC:By-line", "XMP-dc:Creator"]))
+        elif key in VERIFY_TAGS:
             arg, json_key = VERIFY_TAGS[key]
             read_args.append(arg)
-            checks.append((key, json_key))
+            checks.append((key, [json_key]))
     if per_image.get("caption"):
-        read_args.append("-IPTC:Caption-Abstract")
-        checks.append(("caption", "IPTC:Caption-Abstract"))
+        read_args += ["-IPTC:Caption-Abstract", "-XMP-dc:Description"]
+        checks.append(("caption", ["IPTC:Caption-Abstract", "XMP-dc:Description"]))
     if per_image.get("alt"):
         read_args.append("-XMP-iptcCore:AltTextAccessibility")
-        checks.append(("alt", "XMP-iptcCore:AltTextAccessibility"))
+        checks.append(("alt", ["XMP-iptcCore:AltTextAccessibility"]))
     if per_image.get("ext_description"):
         read_args.append("-XMP-iptcCore:ExtDescrAccessibility")
-        checks.append(("ext_description", "XMP-iptcCore:ExtDescrAccessibility"))
+        checks.append(("ext_description", ["XMP-iptcCore:ExtDescrAccessibility"]))
     if dst_uri:
         read_args.append("-XMP-iptcExt:DigitalSourceType")
-        checks.append(("digital_source_type", "XMP-iptcExt:DigitalSourceType"))
+        checks.append(("digital_source_type", ["XMP-iptcExt:DigitalSourceType"]))
     want_keywords = per_image.get("keywords") or []
     if want_keywords:
-        read_args.append("-IPTC:Keywords")
-    # The date copy is always attempted, so always confirm it: if the file carries a
-    # shot date it must have landed in all three copy targets (IPTC date + time and
-    # the XMP date). Under -G1, DateTimeOriginal is grouped as ExifIFD. (A file with
-    # no shot date is fine — there is nothing to copy.)
+        read_args += ["-IPTC:Keywords", "-XMP-dc:Subject"]
+    # The date copy is always attempted, so confirm it. Under -G1, DateTimeOriginal is
+    # grouped as ExifIFD. (A file with no shot date is fine — there is nothing to copy.)
     read_args += ["-EXIF:DateTimeOriginal", "-IPTC:DateCreated",
                   "-IPTC:TimeCreated", "-XMP-photoshop:DateCreated"]
 
@@ -303,29 +314,40 @@ def verify(path, const_keys, per_image, dst_uri=None):
     if out.returncode != 0 or not out.stdout.strip():
         return False, ["could not read file back"]
     data = json.loads(out.stdout)[0]
-    problems = [f"missing {label}" for label, json_key in checks if not data.get(json_key)]
+    problems = [f"missing {label}" for label, json_keys in checks
+                if not any(data.get(k) for k in json_keys)]
     if want_keywords:
-        got = data.get("IPTC:Keywords")
-        got = [got] if isinstance(got, str) else (got or [])
+        got = []
+        for k in ("IPTC:Keywords", "XMP-dc:Subject"):     # union of both layers
+            v = data.get(k)
+            got += [v] if isinstance(v, str) else (v or [])
         missing = [k for k in want_keywords if k not in got]
         if missing:
             problems.append("missing keywords: " + ", ".join(missing))
     if data.get("ExifIFD:DateTimeOriginal"):
-        for json_key in ("IPTC:DateCreated", "IPTC:TimeCreated", "XMP-photoshop:DateCreated"):
-            if not data.get(json_key):
-                problems.append(f"shot date present but {json_key} not copied")
+        # XMP-photoshop:DateCreated is the format-agnostic proof the copy ran. The IPTC
+        # date/time split only exists where there is an IIM block; require both there
+        # (the bug this guards), but do not demand them on a no-IIM format.
+        if not data.get("XMP-photoshop:DateCreated"):
+            problems.append("shot date present but XMP-photoshop:DateCreated not copied")
+        if data.get("IPTC:DateCreated") or data.get("IPTC:TimeCreated"):
+            for json_key in ("IPTC:DateCreated", "IPTC:TimeCreated"):
+                if not data.get(json_key):
+                    problems.append(f"shot date present but {json_key} not copied")
     return (not problems), problems
 
 
 def strip_gps(path):
     """Remove GPS coordinates from a file, keeping every editorial tag. Returns True on
-    success. Targets the EXIF GPS IFD and the XMP-exif GPS copy (some tools duplicate it
-    there); other metadata — caption, credit, copyright, Digital Source Type — is left
-    intact. This makes a publish-safe derivative that will not leak a subject's location.
+    success. Clears the whole EXIF GPS IFD (`-gps:all=`) and the entire XMP GPS set
+    (`-xmp:GPS*=`) — the wildcard catches destination and image-direction fields
+    (`GPSDestLatitude`, `GPSImgDirection`, …), not just the three main coordinates, so
+    a publish-safe derivative cannot leak a location through a field left behind. Other
+    metadata — caption, credit, copyright, Digital Source Type — is untouched.
     """
     out = subprocess.run(
         ["exiftool", "-m", "-overwrite_original",
-         "-gps:all=", "-xmp:GPSLatitude=", "-xmp:GPSLongitude=", "-xmp:GPSAltitude=",
+         "-gps:all=", "-xmp:GPS*=",
          "--", str(path)],
         capture_output=True, text=True,
     )
