@@ -5,7 +5,7 @@
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
 > **The released packages are now newer than everything tested here.** The v2.4.0
-> release (July 24, 2026) publishes marketplace 2.4.0, `journalism-core` 1.3.0,
+> release (July 25, 2026) publishes marketplace 2.4.0, `journalism-core` 1.3.0,
 > and `okf-wiki` 0.7.0. Every version recorded below is the version that was
 > actually exercised — marketplace 2.3.3, `journalism-core` 1.2.0, `okf-wiki`
 > 0.6.1 — and those are deliberately **not** bumped to match the release, because
