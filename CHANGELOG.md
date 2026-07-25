@@ -7,10 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-07-25
+
+This release advances photo provenance and OKF secret detection, records a
+no-Claude runtime boundary for okf-wiki, and finishes the attribution-hook
+parser hardening with required CI coverage.
+
+### Added
+
+- **okf-wiki provider detectors:** added default high-signal checks for
+  Anthropic, GitLab, npm, OpenAI, SendGrid, and Stripe secrets. Prefix-based
+  formats use provider-specific shape, boundary, and entropy checks so
+  human-readable vault paths remain valid (#248).
+- **okf-wiki runtime evidence:** added a repeatable isolated Codex pilot that
+  verifies skill and spec reads, exact generated output, an immutable install,
+  and the boundary between the portable OKF bundle and its inert Claude adapter
+  files (#251).
+
 ### Changed
 
-- **photo-metadata:** modernized for the provenance era after deep web research
-  against IPTC, C2PA, Google, and exiftool primary sources. Adds AI/synthetic
+- **photo-metadata:** modernized for current provenance practice using IPTC,
+  C2PA, Google, and exiftool primary sources. Adds AI/synthetic
   labeling via IPTC `DigitalSourceType` (full controlled vocabulary, with the
   `trainedAlgorithmicMedia` / `compositeWithTrainedAlgorithmicMedia` /
   `compositeSynthetic` distinctions and the IPTC 2025.1 AI-system/prompt fields);
@@ -22,7 +39,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   HEIC/AVIF/WebP format table; and a corrected caption vs. alt-text vs. extended-
   description distinction. `embed.py` gains `digital_source_type` (shorthand→URI,
   per-image override), licensing, and `ext_description` manifest fields, with
-  nine new tests (19 total).
+  black-box round-trip coverage (#255).
+- **Published versions:** marketplace `2.3.3 → 2.4.0`; journalism-core
+  `1.2.0 → 1.3.0`; and okf-wiki `0.6.1 → 0.7.0`.
+
+### Fixed
+
+- **Document design updates:** added a fail-closed migration, verifier, fixture,
+  and live canary for the historical project-lock key that blocked updates in
+  Skills CLI 1.5.20 (#252).
+- **Attribution hook:** catches an inherited Git identity and models measured
+  Bash `cd`, `pushd`, `popd`, ANSI-C quoting, and directory-stack behavior when
+  resolving commit message files. A required hook-test workflow now gates
+  changes to the executable parser (#253, #258).
 
 ## [2.3.3] - 2026-07-23
 
@@ -584,7 +613,8 @@ Initial commit with foundational skills.
 
 ---
 
-[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.3.3...HEAD
+[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.4.0...HEAD
+[2.4.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.3.3...v2.4.0
 [2.3.3]: https://github.com/jamditis/claude-skills-journalism/compare/v2.2.0...v2.3.3
 [2.2.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.0.0...v2.1.0

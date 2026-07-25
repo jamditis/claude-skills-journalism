@@ -1,6 +1,6 @@
 {
   "name": "claude-skills-journalism",
-  "version": "2.3.3",
+  "version": "2.4.0",
   "description": "Claude Code plugins for journalism, research, and media organizations",
   "owner": {
     "name": "Joe Amditis",
@@ -32,7 +32,7 @@
     {
       "name": "journalism-core",
       "description": "Fourteen core journalism skills for reporting, verification, publishing, and digital investigations. Covers AP-style writing, AI-slop detoxing, source verification (2026 deepfake/C2PA detection), FOIA and OPRA requests with current statutory citations, fact-checking workflows, interview prep and transcription, story pitches, editorial workflow, crisis communications, newsletter publishing (2024-2026 Gmail/Yahoo/Outlook bulk-sender requirements), data journalism (with 2025-2026 federal-data-portal currency notes and AI-assisted-analysis cautions), and social-media intelligence / OSINT (post-CrowdTangle Meta Content Library, X pay-per-use API, TikTok Research API, Bluesky/Threads/Mastodon/Telegram coverage). Adds embedded photo metadata (IPTC/EXIF/XMP captions, byline, alt text, keywords, Creative Commons or copyright licensing, AI-source labeling via IPTC Digital Source Type, Google-Images licensing, GPS stripping for source protection, and C2PA Content Credentials reading) for wire and archive use.",
-      "version": "1.2.0",
+      "version": "1.3.0",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"
@@ -43,7 +43,7 @@
     {
       "name": "okf-wiki",
       "description": "Scaffold an Open Knowledge Format (OKF) knowledge base from existing docs, plans, notes, or a repository: one-concept-per-file Markdown with YAML frontmatter, directory navigation, and validation. Generate a starter wiki that passes conformance and secret-leak checks, or bootstrap an optional GitHub wiki. Session-start hooks orient Claude to the knowledge base. Built for newsroom institutional memory, research atlases, decision logs, and infrastructure maps.",
-      "version": "0.6.1",
+      "version": "0.7.0",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"

@@ -4,6 +4,20 @@
 - Last evidence update: July 23, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
+> **The released packages are now newer than everything tested here.** The v2.4.0
+> release (July 25, 2026) publishes marketplace 2.4.0, `journalism-core` 1.3.0,
+> and `okf-wiki` 0.7.0. Every version recorded below is the version that was
+> actually exercised — marketplace 2.3.3, `journalism-core` 1.2.0, `okf-wiki`
+> 0.6.1 — and those are deliberately **not** bumped to match the release, because
+> this file records evidence and the rule under [Tool baseline](#tool-baseline) is
+> to never rewrite an older result as if it ran on the newer version.
+>
+> The practical consequence for a reader: the unversioned install commands in the
+> README now deliver packages that no pilot here has covered. Treat the passes
+> below as evidence for the 2.3.3-era packages, not as a support claim for 2.4.0,
+> until the pilots are re-run against the released versions. Re-running them is
+> what clears this note.
+
 ## How to read this matrix
 
 This file records what has been proved for each package. Installation alone is
