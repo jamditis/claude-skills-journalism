@@ -112,7 +112,7 @@ Codex desktop can [import skills from another agent](https://learn.chatgpt.com/d
 
 Codex's bundled skill installer writes to a different Codex-specific directory and is not a tested installation path for this repository. Codex does not deduplicate same-name skills across install roots, so don't combine it with the `.agents/skills` route above.
 
-See the checked-in [Codex compatibility matrix](./plans/codex-compatibility-matrix.md) for tested versions, package boundaries, and pending runtime gates. A valid install is not yet a package-wide runtime support claim.
+See the checked-in [Codex compatibility matrix](./plans/codex-compatibility-matrix.md) for tested versions, package boundaries, and pending runtime gates. A valid install is not yet a package-wide runtime support claim. As of v2.4.0 the tested versions lag the released ones: the matrix records evidence gathered against the previous release, and the install commands above deliver the newer packages.
 
 ### Claude.ai
 
