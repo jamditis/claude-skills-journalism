@@ -11,7 +11,7 @@ description: >-
 license: MIT
 metadata:
   author: jamditis
-  version: "0.7.0"
+  version: "0.8.0"
   okf_spec: v1
 ---
 
@@ -196,11 +196,11 @@ that is the actual goal.
 
 ## The format, briefly
 
-Full contract in `spec/SPEC.md`. This spec is a strict fork of Google's upstream OKF
-v0.1: it requires all seven frontmatter keys, uses a `source` list in place of upstream's
-`resource` and `# Citations`, adds `verified`, closes the type vocab, and enforces link
-resolution. `spec/SPEC.md` ("Relationship to upstream OKF") lists every difference. The
-load-bearing rules:
+Full contract in `spec/SPEC.md`. This spec is a strict fork of Google's upstream OKF: it
+requires all seven frontmatter keys, uses a `source` list in place of upstream's `resource`
+and `# Citations`, adds `verified`, closes the type vocab, and enforces link resolution.
+`spec/SPEC.md` ("Relationship to upstream OKF") lists every difference. The load-bearing
+rules:
 
 - **Required frontmatter** on every concept: `type, title, description, source, verified,
   timestamp, tags`. `type` is one of: Machine, Network, Service, Session, Project, Repo,
@@ -216,6 +216,21 @@ load-bearing rules:
   path, never the value. The validator fails the build on a leaked secret.
 - **`index.md` and `log.md` are reserved** — no frontmatter (except the bundle-root
   `index.md`, which carries `okf_version` only).
+
+### Optional: upstream v0.2 trust/provenance signals
+
+Upstream Google OKF v0.2 (July 2026) added an optional vocabulary for a consumer to judge a
+concept before reading it: `generated` (who/what produced it), `verified` (a list of
+independent confirmations, not this fork's own single-date field), `sources` (structured,
+per-pointer credibility signals), `status` (draft/stable/deprecated), `stale_after` (an
+absolute expiry date), and an `Attested Computation` type for a sanctioned, checkable
+computation. None of it is required, and a bundle that adopts none of it is unaffected.
+
+Scaffold a project with these enabled — `scaffold.py <target> --trust-signals` — and the
+bundle declares `okf_version: "0.4"`, with `verified` renamed to `verified_on` in the
+required set (freeing `verified` for the new shape; see `spec/SPEC.md`'s "Trust and
+provenance" section for the full field contract and the reasoning behind the rename). Without
+the flag, scaffolding is unchanged from before this vocabulary existed.
 
 ## Session hooks
 

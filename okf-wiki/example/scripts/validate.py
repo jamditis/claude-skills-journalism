@@ -10,15 +10,16 @@ Checks:
   1. Every non-reserved .md file has a parseable YAML frontmatter block. A YAML
      parse error is reported (commonly an unquoted colon-space or '#' in a
      string field — quote the value).
-  2. Frontmatter carries every required key, non-empty:
-     type, title, description, source, verified, timestamp, tags.
+  2. Frontmatter carries every required key, non-empty. Through okf_version 0.3:
+     type, title, description, source, verified, timestamp, tags. At 0.4:
+     the same list with 'verified' renamed to 'verified_on' (see #6).
        - type     is one of the spec type vocab.
        - source   is a non-empty list of non-empty strings (provenance pointers).
                   An unquoted '#' in a block-style element (which YAML would silently
                   drop as a comment, losing the rest) is rejected — quote it.
        - tags     is a list.
-       - verified   parses as an ISO date (YYYY-MM-DD).
-       - timestamp parses as an ISO date, or under okf_version 0.3 as a full
+       - verified/verified_on parses as an ISO date (YYYY-MM-DD).
+       - timestamp parses as an ISO date, or under okf_version 0.3+ as a full
                     ISO 8601 datetime (upstream OKF writes a datetime).
   3. Reserved filenames (index.md, log.md) name no concept and carry no
      frontmatter — except the bundle-root index.md may carry okf_version only.
@@ -33,6 +34,14 @@ Checks:
      secret=<blob> assignments). Credential concepts document key NAMES and
      paths, never the values. Heuristic; narrow a pattern if it false-positives,
      do not delete the rule.
+  6. Optional upstream-v0.2 trust/provenance fields, checked for shape only when
+     present (never required): 'generated' ({by, at}); at okf_version 0.4, the
+     new 'verified' (a list of {by, at} confirmations — distinct from the
+     required 'verified_on' at that version); 'sources' (plural; structured
+     provenance objects, distinct from the required singular 'source'); 'status'
+     (draft/stable/deprecated); 'stale_after' (an ISO date). A concept typed
+     'Attested Computation' additionally requires 'runtime', 'parameters',
+     'executor', and 'attester' to be present and correctly shaped.
 
 Exits non-zero on any hard failure.
 Usage: python3 validate.py --bundle DIR
@@ -49,32 +58,65 @@ from pathlib import Path
 
 import yaml
 
-REQUIRED_KEYS = ("type", "title", "description", "source", "verified", "timestamp", "tags")
+REQUIRED_KEYS_LEGACY = ("type", "title", "description", "source", "verified", "timestamp", "tags")
+# At TRUST_SIGNALS_VERSION, 'verified' is renamed to 'verified_on' in the required
+# set -- it frees the bare name 'verified' for upstream v0.2's own optional field (a
+# list of {by, at} confirmations; see check_verified_trust), which is a different
+# shape and would otherwise collide with this fork's older single-date field.
+REQUIRED_KEYS_V04 = ("type", "title", "description", "source", "verified_on", "timestamp", "tags")
 LIST_KEYS = ("source", "tags")
-DATE_KEYS = ("verified", "timestamp")
 # Keys that may also carry a full ISO 8601 datetime (see check_dates). The
 # bundle must explicitly opt into this grammar through okf_version 0.3 so an
 # older validator rejects the format at its version gate instead of later on a
 # timestamp it does not understand.
 DATETIME_KEYS = ("timestamp",)
 DATETIME_TIMESTAMP_VERSION = "0.3"
+# The version at which 'verified' is renamed to 'verified_on' and the optional
+# upstream-v0.2 trust/provenance fields (generated, verified, sources, status,
+# stale_after, Attested Computation) become available. See REQUIRED_KEYS_V04 above
+# and SPEC.md's "Trust and provenance (upstream v0.2 vocabulary)" section.
+TRUST_SIGNALS_VERSION = "0.4"
 ALLOWED_TYPES = {
     # Infrastructure / ops (fleet maps, system docs)
     "Machine", "Network", "Service", "Session", "Project",
     "Repo", "Credential", "Path", "Process",
     # Domain-neutral (newsrooms, research atlases, decision logs)
     "Concept", "Decision", "Event", "Person", "Org", "Source",
+    # Upstream v0.2: a sanctioned computation plus how to check a run of it
+    # (see check_attested_computation). Kept as the literal upstream spelling
+    # (with a space), not renamed to fit a no-space convention.
+    "Attested Computation",
     # Catch-all
     "Reference",
 }
+ALLOWED_STATUSES = {"draft", "stable", "deprecated"}
 RESERVED = {"index.md", "log.md"}
 # okf_version values this validator accepts. The last entry is the current format
-# version (what scaffold writes for a new bundle); older entries stay supported so a
-# newer validator still reads an older bundle. Adding allowed types is backward
-# compatible and bumps the format version (0.1 -> 0.2). Accepting a datetime in
-# timestamp changes the field grammar and bumps it again (0.2 -> 0.3).
-SUPPORTED_VERSIONS = ("0.1", "0.2", DATETIME_TIMESTAMP_VERSION)
-SPEC_VERSION = SUPPORTED_VERSIONS[-1]  # current format version, written by new scaffolds
+# version, but it is opt-in, not the scaffold default -- scaffold.py still writes
+# "0.3" unless --trust-signals asks for "0.4" (see scaffold.py's own default).
+# Older entries stay supported so a newer validator still reads an older bundle.
+# Adding allowed types is backward compatible and bumps the format version
+# (0.1 -> 0.2). Accepting a datetime in timestamp changes the field grammar and
+# bumps it again (0.2 -> 0.3). Renaming 'verified' to 'verified_on' and adopting
+# the optional upstream-v0.2 trust fields bumps it once more (0.3 -> 0.4).
+SUPPORTED_VERSIONS = ("0.1", "0.2", DATETIME_TIMESTAMP_VERSION, TRUST_SIGNALS_VERSION)
+SPEC_VERSION = SUPPORTED_VERSIONS[-1]  # current (opt-in) format version -- see note above
+
+
+def required_keys_for(bundle_version):
+    """The required-key tuple for a declared okf_version.
+
+    Only TRUST_SIGNALS_VERSION ("0.4") renames 'verified' to 'verified_on'; every
+    other declared (or missing/unsupported) version keeps the legacy name, so an
+    unsupported-version bundle is still checked against a sensible required set
+    instead of crashing before the version-gate error is reported.
+    """
+    return REQUIRED_KEYS_V04 if bundle_version == TRUST_SIGNALS_VERSION else REQUIRED_KEYS_LEGACY
+
+
+def date_keys_for(bundle_version):
+    """The date-checked key names for a declared okf_version (see required_keys_for)."""
+    return ("verified_on", "timestamp") if bundle_version == TRUST_SIGNALS_VERSION else ("verified", "timestamp")
 # Inline markdown link. The destination group allows one level of balanced
 # parens so a filename like `missing(v2).md` is still captured (a plain [^)]+
 # would stop at the first ')' and skip the link entirely).
@@ -579,7 +621,7 @@ def _raw_top_level_scalar(raw_fm, key):
 
 
 def check_dates(rel, fm, raw_fm, bundle_version, errors):
-    for key in DATE_KEYS:
+    for key in date_keys_for(bundle_version):
         val = fm.get(key)
         if val is None:
             continue  # missing/empty already reported by required-key check
@@ -621,6 +663,179 @@ def check_lists(rel, fm, errors):
         for el in val:
             if not isinstance(el, str) or not el.strip():
                 errors.append(f"{rel}: '{key}' has a non-string/empty element {el!r}")
+
+
+def _date_ok(val):
+    """True if val (a YAML scalar already loaded by safe_load) is a valid ISO date.
+    Accepts both a str the loader left alone and a date/datetime it auto-constructed."""
+    s = val.isoformat() if isinstance(val, dt.date) else str(val)
+    return _is_iso_date(s)
+
+
+def check_generated(rel, fm, errors):
+    """Optional upstream-v0.2 'generated' field: {by, at} -- who/what produced the
+    current content and when. Available at any okf_version (purely additive; it does
+    not touch the required-key contract the way verified/verified_on does)."""
+    val = fm.get("generated")
+    if val is None:
+        return
+    if not isinstance(val, dict):
+        errors.append(f"{rel}: 'generated' must be a mapping {{by, at}}, got {type(val).__name__}")
+        return
+    by = val.get("by")
+    if not isinstance(by, str) or not by.strip():
+        errors.append(f"{rel}: 'generated.by' must be a non-empty string")
+    at = val.get("at")
+    if at is None:
+        errors.append(f"{rel}: 'generated.at' is required when 'generated' is present")
+        return
+    s = at.isoformat() if isinstance(at, dt.date) else str(at)
+    if not (_is_iso_date(s) or _is_iso_datetime(s)):
+        errors.append(f"{rel}: 'generated.at' must be an ISO date or a full ISO 8601 datetime, got {at!r}")
+
+
+def check_verified_trust(rel, fm, bundle_version, errors):
+    """Optional upstream-v0.2 'verified' field: a list of independent {by, at}
+    confirmations, from which a consumer derives a trust tier (unverified /
+    machine-confirmed / human-reviewed). Only meaningful at TRUST_SIGNALS_VERSION,
+    where 'verified' is not the required key (see REQUIRED_KEYS_V04's
+    'verified_on') -- at every earlier version 'verified' IS the required legacy
+    single-date field, already checked by check_dates, so this must not also
+    re-validate it there under the new shape."""
+    if bundle_version != TRUST_SIGNALS_VERSION:
+        return
+    val = fm.get("verified")
+    if val is None:
+        return  # optional; absence reads as "unverified" to a consumer, not an error
+    if not isinstance(val, list) or not val:
+        errors.append(
+            f"{rel}: 'verified' (trust confirmations) must be a non-empty YAML list "
+            f"of {{by, at}} mappings when present, got {type(val).__name__}")
+        return
+    for i, entry in enumerate(val):
+        if not isinstance(entry, dict):
+            errors.append(f"{rel}: 'verified[{i}]' must be a mapping with 'by' and 'at', got {type(entry).__name__}")
+            continue
+        by = entry.get("by")
+        if not isinstance(by, str) or not by.strip():
+            errors.append(f"{rel}: 'verified[{i}].by' must be a non-empty string")
+        at = entry.get("at")
+        if at is None:
+            errors.append(f"{rel}: 'verified[{i}].at' is required")
+        elif not _date_ok(at):
+            errors.append(f"{rel}: 'verified[{i}].at' must be an ISO date YYYY-MM-DD, got {at!r}")
+
+
+def check_sources_plural(rel, fm, errors):
+    """Optional upstream-v0.2 'sources' field (plural) -- structured provenance
+    objects, distinct from the required singular 'source' (a flat list of quoted
+    pointers). Each entry needs a unique 'id' and a 'resource'; title/author/
+    usage_count/last_modified are optional credibility signals. Shape-checked
+    only -- this does not cross-check in-body [^id] footnotes against these ids
+    (see SPEC.md)."""
+    val = fm.get("sources")
+    if val is None:
+        return
+    if not isinstance(val, list) or not val:
+        errors.append(
+            f"{rel}: 'sources' must be a non-empty YAML list of provenance objects "
+            f"when present, got {type(val).__name__}")
+        return
+    seen_ids = set()
+    for i, entry in enumerate(val):
+        if not isinstance(entry, dict):
+            errors.append(f"{rel}: 'sources[{i}]' must be a mapping, got {type(entry).__name__}")
+            continue
+        sid = entry.get("id")
+        if not isinstance(sid, str) or not sid.strip():
+            errors.append(f"{rel}: 'sources[{i}].id' must be a non-empty string")
+        elif sid in seen_ids:
+            errors.append(
+                f"{rel}: 'sources[{i}].id' {sid!r} duplicates an earlier entry -- "
+                f"ids must be unique within 'sources'")
+        else:
+            seen_ids.add(sid)
+        resource = entry.get("resource")
+        if not isinstance(resource, str) or not resource.strip():
+            errors.append(f"{rel}: 'sources[{i}].resource' must be a non-empty string")
+        for opt_key in ("title", "author"):
+            v = entry.get(opt_key)
+            if v is not None and (not isinstance(v, str) or not v.strip()):
+                errors.append(f"{rel}: 'sources[{i}].{opt_key}' must be a non-empty string when present")
+        uc = entry.get("usage_count")
+        if uc is not None and (not isinstance(uc, int) or isinstance(uc, bool) or uc < 0):
+            errors.append(f"{rel}: 'sources[{i}].usage_count' must be a non-negative integer when present, got {uc!r}")
+        lm = entry.get("last_modified")
+        if lm is not None and not _date_ok(lm):
+            errors.append(f"{rel}: 'sources[{i}].last_modified' must be an ISO date YYYY-MM-DD when present, got {lm!r}")
+
+
+def check_status(rel, fm, errors):
+    """Optional upstream-v0.2 'status' field: draft/stable/deprecated. Absent means
+    stable (nothing to check)."""
+    val = fm.get("status")
+    if val is None:
+        return
+    if not isinstance(val, str) or val not in ALLOWED_STATUSES:
+        errors.append(f"{rel}: 'status' must be one of {sorted(ALLOWED_STATUSES)} when present, got {val!r}")
+
+
+def check_stale_after(rel, fm, errors):
+    """Optional upstream-v0.2 'stale_after' field: an absolute ISO date, deliberately
+    not a relative TTL (see SPEC.md)."""
+    val = fm.get("stale_after")
+    if val is None:
+        return
+    if not _date_ok(val):
+        errors.append(f"{rel}: 'stale_after' must be an ISO date YYYY-MM-DD, got {val!r}")
+
+
+def check_attested_computation(rel, fm, errors):
+    """Upstream-v0.2 'Attested Computation' type: a sanctioned computation plus the
+    means to check that a run of it actually matches. Checks shape only -- this
+    validator never executes the computation, the executor, or the attester; that
+    is a consumer's runtime job (see SPEC.md)."""
+    if fm.get("type") != "Attested Computation":
+        return
+
+    runtime = fm.get("runtime")
+    if not isinstance(runtime, str) or not runtime.strip():
+        errors.append(f"{rel}: 'Attested Computation' requires a non-empty 'runtime' string")
+
+    params = fm.get("parameters")
+    if not isinstance(params, list) or not params:
+        errors.append(f"{rel}: 'Attested Computation' requires a non-empty 'parameters' list")
+    else:
+        for i, p in enumerate(params):
+            if not isinstance(p, dict):
+                errors.append(f"{rel}: 'parameters[{i}]' must be a mapping {{name, type, required}}, got {type(p).__name__}")
+                continue
+            for key in ("name", "type"):
+                v = p.get(key)
+                if not isinstance(v, str) or not v.strip():
+                    errors.append(f"{rel}: 'parameters[{i}].{key}' must be a non-empty string")
+            if not isinstance(p.get("required"), bool):
+                errors.append(f"{rel}: 'parameters[{i}].required' must be true or false")
+
+    executor = fm.get("executor")
+    if not isinstance(executor, dict):
+        errors.append(f"{rel}: 'Attested Computation' requires an 'executor' mapping {{resource, receipt}}")
+    else:
+        resource = executor.get("resource")
+        if not isinstance(resource, str) or not resource.strip():
+            errors.append(f"{rel}: 'executor.resource' must be a non-empty string")
+        receipt = executor.get("receipt")
+        if not isinstance(receipt, list) or not receipt or not all(
+                isinstance(r, str) and r.strip() for r in receipt):
+            errors.append(f"{rel}: 'executor.receipt' must be a non-empty list of non-empty strings")
+
+    attester = fm.get("attester")
+    if not isinstance(attester, dict):
+        errors.append(f"{rel}: 'Attested Computation' requires an 'attester' mapping {{resource}}")
+    else:
+        resource = attester.get("resource")
+        if not isinstance(resource, str) or not resource.strip():
+            errors.append(f"{rel}: 'attester.resource' must be a non-empty string")
 
 
 def declared_bundle_version(bundle):
@@ -773,7 +988,7 @@ def main() -> int:
             ctype = "<none>"
         type_counts[ctype] += 1
 
-        for key in REQUIRED_KEYS:
+        for key in required_keys_for(bundle_version):
             val = fm.get(key)
             if val is None or (isinstance(val, str) and not val.strip()):
                 errors.append(f"{rel}: missing/empty required frontmatter key '{key}'")
@@ -785,6 +1000,12 @@ def main() -> int:
         raw_fm = frontmatter_block(text)
         check_dates(rel, fm, raw_fm, bundle_version, errors)
         check_source_quoting(rel, fm, raw_fm, errors)
+        check_generated(rel, fm, errors)
+        check_verified_trust(rel, fm, bundle_version, errors)
+        check_sources_plural(rel, fm, errors)
+        check_status(rel, fm, errors)
+        check_stale_after(rel, fm, errors)
+        check_attested_computation(rel, fm, errors)
 
     # Link resolution: every internal link to a .md file must resolve to a file
     # that exists inside the bundle. A link escaping the bundle root or pointing at

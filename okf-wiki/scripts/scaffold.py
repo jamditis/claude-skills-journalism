@@ -91,10 +91,10 @@ def copy_if_absent(src: Path, dst: Path, preserved: list[Path]) -> None:
     shutil.copy2(src, dst)
 
 
-def root_index(title: str, sections: list[str]) -> str:
+def root_index(title: str, sections: list[str], version: str = "0.3") -> str:
     nav = "\n".join(f"- [{s}]({s}/index.md)" for s in sections)
     return (
-        '---\nokf_version: "0.3"\n---\n'
+        f'---\nokf_version: "{version}"\n---\n'
         f"# {title}\n\n"
         "An Open Knowledge Format bundle. One concept per file; provenance in each file's frontmatter.\n\n"
         "## Sections\n\n"
@@ -110,26 +110,32 @@ def section_index(section: str) -> str:
     )
 
 
-def example_concept(today: str) -> str:
+def example_concept(today: str, trust_signals: bool = False) -> str:
+    # Pre-0.4, this fork's own field is named 'verified'. At 0.4 it is renamed
+    # 'verified_on' to free 'verified' for upstream v0.2's own (differently
+    # shaped) field of the same name -- see SPEC.md's "Trust and provenance"
+    # section and validate.py's REQUIRED_KEYS_V04.
+    verified_key = "verified_on" if trust_signals else "verified"
     return (
         "---\n"
         "type: Reference\n"
         "title: Example concept\n"
         "description: A starter concept showing the OKF frontmatter contract.\n"
         'source: ["SPEC.md", "scaffold.py"]\n'
-        f"verified: {today}\n"
+        f"{verified_key}: {today}\n"
         f"timestamp: {today}\n"
         "tags: [example, starter]\n"
         "---\n"
         "# Example concept\n\n"
         "Replace this file with a real concept. Keep it to one concept per file.\n\n"
         "- Point every `source` element at real provenance (a path, command, URL, or event).\n"
-        "- Update `verified` when you re-check the fact against reality.\n"
+        f"- Update `{verified_key}` when you re-check the fact against reality.\n"
         "- Link related concepts with relative markdown links, like this one to [the section index](index.md).\n"
     )
 
 
-def readme(title: str, hooks: bool, interp: str = "python3") -> str:
+def readme(title: str, hooks: bool, interp: str = "python3", trust_signals: bool = False) -> str:
+    verified_key = "verified_on" if trust_signals else "verified"
     hooks_section = (
         "## Session hooks\n\n"
         "`.claude/` ships two hooks that orient Claude on this knowledge base before it works:\n\n"
@@ -160,7 +166,7 @@ def readme(title: str, hooks: bool, interp: str = "python3") -> str:
         "It must exit 0. Run it before every commit.\n\n"
         "## Add a concept\n\n"
         "1. Create `bundle/<section>/<concept>.md` with the required frontmatter\n"
-        "   (`type, title, description, source, verified, timestamp, tags`).\n"
+        f"   (`type, title, description, source, {verified_key}, timestamp, tags`).\n"
         "2. Add a bullet for it in that section's `index.md`.\n"
         "3. Validate.\n\n"
         f"{hooks_section}"
@@ -472,6 +478,12 @@ def main() -> int:
     ap.add_argument("--no-hooks", action="store_true", help="do not write the .claude/ session hooks")
     ap.add_argument("--hooks-os", choices=("auto", "posix", "windows"), default="auto",
                     help="launch command for the hooks (default: auto-detect this OS)")
+    ap.add_argument(
+        "--trust-signals", action="store_true",
+        help="scaffold under okf_version 0.4: renames 'verified' to 'verified_on' and "
+             "enables the optional upstream-v0.2 trust/provenance fields (generated, "
+             "the new 'verified', sources, status, stale_after, Attested Computation). "
+             "Default is okf_version 0.3, unchanged from before this flag existed.")
     args = ap.parse_args()
 
     if not SRC_SPEC.exists() or not SRC_VALIDATOR.exists():
@@ -516,6 +528,7 @@ def main() -> int:
 
     write_hooks = not args.no_hooks
     hooks_os = resolve_hooks_os(args.hooks_os)
+    version = "0.4" if args.trust_signals else "0.3"
 
     # Skip-if-exists so --force into a populated directory never overwrites a user's
     # own SPEC.md/README.md/validator/bundle content with a generic template. (A
@@ -526,13 +539,13 @@ def main() -> int:
     copy_if_absent(SRC_VALIDATOR, target / "scripts" / "validate.py", preserved)
     write_if_absent(target / "requirements.txt", REQUIREMENTS_TXT, preserved)
     write_if_absent(target / "README.md",
-                    readme(title, write_hooks, interpreter_for(hooks_os)), preserved)
-    write_if_absent(bundle / "index.md", root_index(title, sections), preserved)
+                    readme(title, write_hooks, interpreter_for(hooks_os), args.trust_signals), preserved)
+    write_if_absent(bundle / "index.md", root_index(title, sections, version), preserved)
     for s in sections:
         sdir = bundle / s
         sdir.mkdir(parents=True, exist_ok=True)
         write_if_absent(sdir / "index.md", section_index(s), preserved)
-        write_if_absent(sdir / "example-concept.md", example_concept(today), preserved)
+        write_if_absent(sdir / "example-concept.md", example_concept(today, args.trust_signals), preserved)
     if write_hooks:
         write_claude_hooks(target, hooks_os)
 
