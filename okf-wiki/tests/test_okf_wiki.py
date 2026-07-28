@@ -2128,3 +2128,503 @@ class TestTimestampAcceptsIsoDatetime:
         rc, out = validate(bundle)
         assert rc == 1
         assert "require okf_version 0.3" in out
+
+
+# --- Upstream v0.2 trust/provenance vocabulary (generated, verified, sources,
+# status, stale_after, Attested Computation) and the okf_version 0.4 rename of
+# 'verified' to 'verified_on' that makes room for the new 'verified' shape. ---
+
+GOOD_V04 = GOOD.replace("verified: 2026-06-23", "verified_on: 2026-06-23")
+
+
+def _scaffold_v04(tmp_path, name="kb"):
+    scaffold(tmp_path / name, "--no-validate", "--trust-signals")
+    return tmp_path / name / "bundle"
+
+
+class TestScaffoldTrustSignalsFlag:
+    def test_default_scaffold_still_writes_0_3_and_legacy_verified(self, tmp_path):
+        # Pins the revert: adding --trust-signals must not change scaffold's
+        # default output for every existing caller.
+        rc, out = scaffold(tmp_path / "kb", "--no-validate")
+        assert rc == 0, out
+        root = (tmp_path / "kb" / "bundle" / "index.md").read_text()
+        assert 'okf_version: "0.3"' in root
+        example = (tmp_path / "kb" / "bundle" / "concepts" / "example-concept.md").read_text()
+        assert "verified:" in example and "verified_on:" not in example
+        rc, out = validate(tmp_path / "kb" / "bundle")
+        assert rc == 0, out
+
+    def test_trust_signals_flag_writes_0_4_and_verified_on(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        root = (bundle / "index.md").read_text()
+        assert 'okf_version: "0.4"' in root
+        example = (bundle / "concepts" / "example-concept.md").read_text()
+        assert "verified_on:" in example and "verified:" not in example
+        rc, out = validate(bundle)
+        assert rc == 0, out
+
+    def test_trust_signals_readme_documents_verified_on(self, tmp_path):
+        scaffold(tmp_path / "kb", "--no-validate", "--trust-signals")
+        readme = (tmp_path / "kb" / "README.md").read_text()
+        assert "verified_on" in readme
+        assert "source, verified, timestamp" not in readme
+
+
+class TestVerifiedOnRename:
+    def test_legacy_bundle_still_requires_verified_not_verified_on(self, tmp_path):
+        bundle = tmp_path / "bundle"
+        bundle.mkdir()
+        (bundle / "index.md").write_text('---\nokf_version: "0.3"\n---\n# kb\n', encoding="utf-8")
+        write_concept(bundle, GOOD)  # legacy 'verified', not 'verified_on'
+        rc, out = validate(bundle)
+        assert rc == 0, out
+
+    def test_legacy_bundle_rejects_verified_on_in_place_of_verified(self, tmp_path):
+        bundle = tmp_path / "bundle"
+        bundle.mkdir()
+        (bundle / "index.md").write_text('---\nokf_version: "0.3"\n---\n# kb\n', encoding="utf-8")
+        write_concept(bundle, GOOD_V04)  # has verified_on, not verified
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "missing/empty required frontmatter key 'verified'" in out
+
+    def test_v04_bundle_requires_verified_on_not_verified(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        write_concept(bundle, GOOD)  # legacy 'verified', wrong at 0.4
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "missing/empty required frontmatter key 'verified_on'" in out
+
+    def test_v04_bundle_accepts_verified_on(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        write_concept(bundle, GOOD_V04)
+        rc, out = validate(bundle)
+        assert rc == 0, out
+
+    def test_v04_bundle_accepts_datetime_timestamp(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            "timestamp: 2026-06-23",
+            "timestamp: 2026-06-23T14:30:00Z")
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 0, out
+
+
+class TestVerifiedTrustList:
+    def test_v04_verified_confirmation_list_passes(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            "tags: [\"x\"]",
+            'verified:\n  - { by: "human:kliu@acme", at: 2026-07-01 }\n'
+            '  - { by: "agent:reference_agent", at: 2026-06-30 }\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 0, out
+
+    def test_v04_verified_absent_is_fine_unverified(self, tmp_path):
+        # Absence of the new 'verified' is not an error -- it just means
+        # "unverified" to a consumer deriving a trust tier.
+        bundle = _scaffold_v04(tmp_path)
+        write_concept(bundle, GOOD_V04)
+        rc, out = validate(bundle)
+        assert rc == 0, out
+
+    def test_pre_04_bundle_ignores_new_verified_shape_check(self, tmp_path):
+        # At 0.3, 'verified' IS the required legacy single-date field -- a list
+        # there must fail the legacy date check, not be silently accepted as a
+        # trust-confirmation list (that shape only exists at 0.4).
+        bundle = tmp_path / "bundle"
+        bundle.mkdir()
+        (bundle / "index.md").write_text('---\nokf_version: "0.3"\n---\n# kb\n', encoding="utf-8")
+        concept = GOOD.replace(
+            "verified: 2026-06-23",
+            'verified:\n  - { by: "human:kliu@acme", at: 2026-07-01 }')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "'verified' must be an ISO date" in out
+
+    @pytest.mark.parametrize("bad_verified,msg", [
+        ("verified: []", "non-empty YAML list"),
+        ("verified: not-a-list", "non-empty YAML list"),
+        ('verified:\n  - { at: 2026-07-01 }', "'verified[0].by'"),
+        ('verified:\n  - { by: "human:kliu@acme" }', "'verified[0].at'"),
+        ('verified:\n  - { by: "human:kliu@acme", at: nonsense }', "'verified[0].at'"),
+        ('verified:\n  - { by: "human:kliu@acme", at: 2026-06-30 4:05:06 }', "'verified[0].at'"),
+        ('verified:\n  - "just a string"', "'verified[0]'"),
+    ])
+    def test_v04_verified_malformed_entries_rejected(self, tmp_path, bad_verified, msg):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace('tags: ["x"]', f'{bad_verified}\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert msg in out
+
+    @pytest.mark.parametrize("written", ["2026-6-3", "!!timestamp 2026-6-3"])
+    def test_v04_verified_rejects_yaml_normalized_date_spelling(self, tmp_path, written):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            'tags: ["x"]',
+            f'verified:\n  - {{ by: "human:kliu@acme", at: {written} }}\n'
+            'tags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "'verified[0].at' must be an ISO date YYYY-MM-DD" in out
+
+
+class TestGenerated:
+    def test_generated_valid_passes_at_v04(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            'tags: ["x"]',
+            'generated: { by: "reference_agent/gemini-2.5-pro", at: 2026-06-30T14:00:00Z }\n'
+            'tags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 0, out
+
+    def test_generated_accepts_plain_date_too(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            'tags: ["x"]',
+            'generated: { by: "human:jsmith@acme", at: 2026-06-30 }\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 0, out
+
+    @pytest.mark.parametrize("bad,msg", [
+        ("generated: not-a-mapping", "'generated' must be a mapping"),
+        ('generated: { at: 2026-06-30 }', "'generated.by'"),
+        ('generated: { by: "x" }', "'generated.at'"),
+        ('generated: { by: "x", at: nonsense }', "'generated.at'"),
+        ('generated: { by: "", at: 2026-06-30 }', "'generated.by'"),
+    ])
+    def test_generated_malformed_rejected(self, tmp_path, bad, msg):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace("tags: [\"x\"]", f'{bad}\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert msg in out
+
+    def test_generated_at_rejects_yaml_normalized_datetime_spelling(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            'tags: ["x"]',
+            'generated: { by: "x", at: 2026-06-30 4:05:06 }\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "'generated.at' must be an ISO date or a full ISO 8601 datetime" in out
+
+
+class TestTrustSignalVersionGate:
+    @pytest.mark.parametrize("version", ["0.1", "0.2", "0.3"])
+    @pytest.mark.parametrize("extra", [
+        "generated: not-a-mapping",
+        "sources: not-a-list",
+        "status: not-a-status",
+        "stale_after: not-a-date",
+    ])
+    def test_pre_04_bundle_ignores_trust_signal_extra_keys(self, tmp_path, version, extra):
+        scaffold(tmp_path / "kb", "--no-validate")
+        bundle = tmp_path / "kb" / "bundle"
+        root = bundle / "index.md"
+        root.write_text(
+            root.read_text(encoding="utf-8").replace(
+                'okf_version: "0.3"', f'okf_version: "{version}"'),
+            encoding="utf-8")
+        concept = GOOD.replace("tags: [\"x\"]", f'{extra}\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 0, out
+
+
+class TestNullTrustSignals:
+    @pytest.mark.parametrize("field", [
+        "generated",
+        "verified",
+        "sources",
+        "status",
+        "stale_after",
+    ])
+    def test_v04_rejects_explicitly_null_trust_signal(self, tmp_path, field):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            'tags: ["x"]',
+            f"{field}: null\ntags: [\"x\"]")
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert f"'{field}'" in out
+
+
+class TestSourcesPlural:
+    def test_sources_valid_full_shape_passes(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            'tags: ["x"]',
+            "sources:\n"
+            '  - id: "warehouse-schema"\n'
+            '    resource: "https://wiki.acme.internal/data/warehouse/schemas/sales"\n'
+            '    title: "Acme Retail warehouse schema"\n'
+            '    author: "team:data-platform"\n'
+            "    usage_count: 1240\n"
+            "    last_modified: 2026-06-15\n"
+            'tags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 0, out
+
+    def test_sources_minimal_shape_passes(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            'tags: ["x"]',
+            'sources:\n  - id: "a"\n    resource: "README.md"\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 0, out
+
+    def test_sources_resource_rejects_yaml_comment_truncation(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            'tags: ["x"]',
+            'sources:\n  - id: "a"\n    resource: issue #445\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "'sources[0].resource' has an unquoted '#'" in out
+
+    @pytest.mark.parametrize("written", ["2026-6-3", "!!timestamp 2026-6-3"])
+    def test_sources_last_modified_rejects_yaml_normalized_date_spelling(
+            self, tmp_path, written):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            'tags: ["x"]',
+            'sources:\n  - id: "a"\n    resource: "README.md"\n'
+            f'    last_modified: {written}\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "'sources[0].last_modified' must be an ISO date YYYY-MM-DD" in out
+
+    def test_sources_duplicate_id_rejected(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            'tags: ["x"]',
+            'sources:\n  - id: "a"\n    resource: "one.md"\n'
+            '  - id: "a"\n    resource: "two.md"\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "duplicates an earlier entry" in out
+
+    @pytest.mark.parametrize("bad,msg", [
+        ("sources: []", "non-empty YAML list"),
+        ('sources:\n  - resource: "x.md"', "'sources[0].id'"),
+        ('sources:\n  - id: "a"', "'sources[0].resource'"),
+        ('sources:\n  - id: "a"\n    resource: "x.md"\n    usage_count: -1', "usage_count"),
+        ('sources:\n  - id: "a"\n    resource: "x.md"\n    usage_count: "many"', "usage_count"),
+        ('sources:\n  - id: "a"\n    resource: "x.md"\n    last_modified: nonsense', "last_modified"),
+    ])
+    def test_sources_malformed_rejected(self, tmp_path, bad, msg):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace("tags: [\"x\"]", f'{bad}\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert msg in out
+
+
+class TestStatusAndStaleAfter:
+    @pytest.mark.parametrize("status", ["draft", "stable", "deprecated"])
+    def test_status_allowed_values_pass(self, tmp_path, status):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace("tags: [\"x\"]", f'status: {status}\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 0, out
+
+    def test_status_invalid_value_rejected(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace("tags: [\"x\"]", 'status: "wip"\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "'status' must be one of" in out
+
+    def test_stale_after_valid_date_passes(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace("tags: [\"x\"]", 'stale_after: 2026-12-31\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 0, out
+
+    def test_stale_after_invalid_date_rejected(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace("tags: [\"x\"]", 'stale_after: not-a-date\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "'stale_after' must be an ISO date" in out
+
+    @pytest.mark.parametrize("written", ["2026-6-3", "!!timestamp 2026-6-3"])
+    def test_stale_after_rejects_yaml_normalized_date_spelling(self, tmp_path, written):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            'tags: ["x"]',
+            f'stale_after: {written}\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "'stale_after' must be an ISO date YYYY-MM-DD" in out
+
+
+ATTESTED_COMPUTATION_GOOD = """---
+type: Attested Computation
+title: Revenue for a fiscal year
+description: Sanctioned computation for fiscal-year revenue.
+source: ["policies/revenue-recognition.md"]
+verified_on: 2026-06-23
+timestamp: 2026-06-23
+tags: ["finance"]
+runtime: bigquery
+parameters:
+  - { name: year, type: integer, required: true }
+executor:
+  resource: "skills/run-on-bq.md"
+  receipt: ["job_id", "executed_sql", "result"]
+attester:
+  resource: "attesters/sql_equality.py"
+---
+# Computation
+
+SELECT 1;
+"""
+
+
+class TestAttestedComputation:
+    def test_valid_attested_computation_passes(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        write_concept(bundle, ATTESTED_COMPUTATION_GOOD)
+        rc, out = validate(bundle)
+        assert rc == 0, out
+        assert "Attested Computation=1" in out
+
+    def test_type_in_allowed_vocab(self, tmp_path):
+        # A bare-minimum concept of this type with no of the extra keys must
+        # fail on the extra keys, not on an unrecognised type.
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace("type: Process", "type: Attested Computation")
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "not in the spec vocab" not in out
+        assert "requires a non-empty 'runtime'" in out
+
+    @pytest.mark.parametrize("version", ["0.1", "0.2", "0.3"])
+    def test_type_rejected_before_v04(self, tmp_path, version):
+        scaffold(tmp_path / "kb", "--no-validate")
+        bundle = tmp_path / "kb" / "bundle"
+        root = bundle / "index.md"
+        root.write_text(
+            root.read_text(encoding="utf-8").replace(
+                'okf_version: "0.3"', f'okf_version: "{version}"'),
+            encoding="utf-8")
+        concept = GOOD.replace("type: Process", "type: Attested Computation")
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "type 'Attested Computation' not in the spec vocab" in out
+
+    def test_missing_runtime_rejected(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = ATTESTED_COMPUTATION_GOOD.replace("runtime: bigquery\n", "")
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "requires a non-empty 'runtime'" in out
+
+    def test_missing_parameters_rejected(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = ATTESTED_COMPUTATION_GOOD.replace(
+            "parameters:\n  - { name: year, type: integer, required: true }\n", "")
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "requires a 'parameters' list" in out
+
+    def test_empty_parameters_list_allows_fixed_computation(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = ATTESTED_COMPUTATION_GOOD.replace(
+            "parameters:\n  - { name: year, type: integer, required: true }\n",
+            "parameters: []\n")
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 0, out
+
+    def test_parameter_missing_required_flag_rejected(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = ATTESTED_COMPUTATION_GOOD.replace(
+            "{ name: year, type: integer, required: true }", "{ name: year, type: integer }")
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "'parameters[0].required'" in out
+
+    def test_parameter_undeclared_key_rejected(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = ATTESTED_COMPUTATION_GOOD.replace(
+            "{ name: year, type: integer, required: true }",
+            "{ name: year, type: integer, required: true, default: 2026 }")
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "'parameters[0]' has undeclared keys ['default']" in out
+
+    def test_missing_executor_rejected(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = ATTESTED_COMPUTATION_GOOD.replace(
+            'executor:\n  resource: "skills/run-on-bq.md"\n  receipt: ["job_id", "executed_sql", "result"]\n',
+            "")
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "requires an 'executor' mapping" in out
+
+    def test_executor_empty_receipt_rejected(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = ATTESTED_COMPUTATION_GOOD.replace(
+            'receipt: ["job_id", "executed_sql", "result"]', "receipt: []")
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "'executor.receipt'" in out
+
+    def test_missing_attester_rejected(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = ATTESTED_COMPUTATION_GOOD.replace(
+            'attester:\n  resource: "attesters/sql_equality.py"\n', "")
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "requires an 'attester' mapping" in out
+
+    def test_attester_missing_resource_rejected(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = ATTESTED_COMPUTATION_GOOD.replace(
+            'attester:\n  resource: "attesters/sql_equality.py"', "attester:\n  resource: \"\"")
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "'attester.resource'" in out
+
+
+def test_skill_authoring_workflow_is_version_aware():
+    skill = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+    assert '`verified` for `okf_version` `0.1` through `0.3`' in skill
+    assert '`verified_on` for `okf_version` `0.4`' in skill

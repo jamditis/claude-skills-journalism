@@ -1,6 +1,6 @@
 {
   "name": "okf-wiki",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Scaffold an Open Knowledge Format (OKF) knowledge base from existing docs, plans, notes, or a repository: one-concept-per-file Markdown with YAML frontmatter, directory navigation, and validation. Generate a starter wiki that passes conformance and secret-leak checks, or bootstrap an optional GitHub wiki. Session-start hooks orient Claude to the knowledge base. Built for newsroom institutional memory, research atlases, decision logs, and infrastructure maps.",
   "author": {
     "name": "Joe Amditis",

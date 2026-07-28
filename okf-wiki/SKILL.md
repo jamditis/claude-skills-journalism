@@ -11,7 +11,7 @@ description: >-
 license: MIT
 metadata:
   author: jamditis
-  version: "0.7.0"
+  version: "0.8.0"
   okf_spec: v1
 ---
 
@@ -88,7 +88,7 @@ making it here, up front, where it can steer the rest of the setup.
     hooks/okf-anchor.py   SessionStart: load the index into context
     hooks/okf-orient.py   PreToolUse: gate the first action on orientation
   bundle/                 the OKF bundle (the validated tree)
-    index.md              carries okf_version: "0.3"
+    index.md              carries okf_version: "0.3" by default; "0.4" with --trust-signals
     <section>/
       index.md
       example-concept.md  a starter concept with full frontmatter
@@ -140,15 +140,17 @@ mechanical transform. So you (Claude) author the concepts directly, in this loop
    its own (a service, a decision, a path, a person, an event). Split a doc that covers five
    things into five concepts; merge fragments that only mean something together into one. A
    heading is a hint, not a rule — do not blindly map one `##` to one file.
-3. **Draft each concept** at `bundle/<section>/<slug>.md` with the full frontmatter
-   (`type, title, description, source, verified, timestamp, tags`):
+3. **Draft each concept** at `bundle/<section>/<slug>.md` with the full frontmatter. Read the
+   bundle-root `index.md` before writing so the verification key matches its declared format:
+   use `verified` for `okf_version` `0.1` through `0.3`; use `verified_on` for `okf_version` `0.4`.
+   Emit that exact key with `type, title, description, source, timestamp, tags`:
    - `type` from the vocab. Infrastructure: Machine, Network, Service, Session, Project,
      Repo, Credential, Path, Process. Domain-neutral: Concept, Decision, Event, Person,
      Org, Source. Plus Reference (the catch-all). The set is closed; an unlisted type fails.
    - `description` is one line. `source` — quote every element — points at where the fact
      actually came from (the origin file path, URL, command, or event), not at this skill.
-   - Set `timestamp` to today. `verified` is the date the fact was last confirmed true — set it by
-     how you came to know it, not reflexively to today:
+   - Set `timestamp` to today. `verified`/`verified_on` is the date the fact was last confirmed
+     true — set it by how you came to know it, not reflexively to today:
      - You re-checked it against reality now, or the user is the authority for it (a decision,
        preference, or intent they state in this session): today.
      - The user is recalling external or system state (a spec, a path, a config): their memory is a
@@ -196,26 +198,45 @@ that is the actual goal.
 
 ## The format, briefly
 
-Full contract in `spec/SPEC.md`. This spec is a strict fork of Google's upstream OKF
-v0.1: it requires all seven frontmatter keys, uses a `source` list in place of upstream's
-`resource` and `# Citations`, adds `verified`, closes the type vocab, and enforces link
+Full contract in `spec/SPEC.md`. This spec is a strict fork of Google's upstream OKF: it
+requires all seven frontmatter keys, uses a `source` list in place of upstream's `resource`
+and `# Citations`, adds a verification-date key, closes the type vocab, and enforces link
 resolution. `spec/SPEC.md` ("Relationship to upstream OKF") lists every difference. The
 load-bearing rules:
 
-- **Required frontmatter** on every concept: `type, title, description, source, verified,
-  timestamp, tags`. `type` is one of: Machine, Network, Service, Session, Project, Repo,
-  Credential, Path, Process (infrastructure); Concept, Decision, Event, Person, Org, Source
-  (domain-neutral); or Reference (catch-all).
+- **Required frontmatter** on every concept: `type, title, description, source`, the
+  version-specific verification key described above, `timestamp, tags`. `type` is one of:
+  Machine, Network, Service, Session, Project, Repo, Credential, Path, Process
+  (infrastructure); Concept, Decision, Event, Person, Org, Source (domain-neutral); or
+  Reference (catch-all).
 - **Quote every `source` element** — source pointers carry `#` and `: ` which break YAML
   if unquoted. `source: ["README.md", "issue #445"]`.
-- **`verified`** is the date the fact was last confirmed true — a re-check against reality, or the
-  user stating a fact they are the authority for (a decision, a preference); a fact they merely
-  recall about external state is a source claim, not a re-check. **`timestamp`** is when the concept
-  was authored/updated. Both ISO `YYYY-MM-DD`. See the authoring loop above for the full date rules.
+- **`verified`/`verified_on`** is the date the fact was last confirmed true — a re-check
+  against reality, or the user stating a fact they are the authority for (a decision, a
+  preference); a fact they merely recall about external state is a source claim, not a
+  re-check. **`timestamp`** is when the concept was authored/updated. The verification date is
+  ISO `YYYY-MM-DD`; `timestamp` may also be a full ISO 8601 datetime in `0.3` and `0.4`. See
+  the authoring loop above for the full date rules.
 - **No secret values, ever.** A credential concept documents the key name and retrieval
   path, never the value. The validator fails the build on a leaked secret.
 - **`index.md` and `log.md` are reserved** — no frontmatter (except the bundle-root
   `index.md`, which carries `okf_version` only).
+
+### Optional: upstream v0.2 trust/provenance signals
+
+Upstream Google OKF v0.2 (July 2026) added an optional vocabulary for a consumer to judge a
+concept before reading it: `generated` (who/what produced it), `verified` (a list of
+independent confirmations, not this fork's own single-date field), `sources` (structured,
+per-pointer credibility signals), `status` (draft/stable/deprecated), `stale_after` (an
+absolute expiry date), and an `Attested Computation` type for a sanctioned, checkable
+computation. None of it is required, and a bundle that adopts none of it is unaffected.
+
+Scaffold a project with these enabled — `scaffold.py <target> --trust-signals` — and the
+bundle declares `okf_version: "0.4"`, with `verified` renamed to `verified_on` in the
+required set (freeing `verified` for the new shape; see `spec/SPEC.md`'s "Trust and
+provenance" section for the full field contract and the reasoning behind the rename).
+`Attested Computation` is likewise a `0.4`-only type. Without the flag, scaffolding is
+unchanged from before this vocabulary existed.
 
 ## Session hooks
 
