@@ -240,7 +240,8 @@ wants "only surface human-reviewed metrics" derives that filter itself from the 
 
 None of the above changes what the validator requires; it only makes the *absence* of these
 fields distinguishable from their presence where they matter to a consumer deciding whether to
-act on a concept.
+act on a concept. Absence means the signal was not supplied. A trust field that is explicitly
+present with a YAML null value is invalid; present fields must have the shape documented above.
 
 ## Type vocab
 
@@ -253,6 +254,8 @@ Domain-neutral (newsrooms, research atlases, decision logs): `Concept`, `Decisio
 `Reference` is the catch-all for a concept that is not one of the others. Index files carry
 no frontmatter, so there is no `Index` type. The set is closed: an unlisted type fails the
 build, which catches typos. To extend it, add the type here and in `scripts/validate.py`.
+`Attested Computation` joins this closed vocabulary only in a bundle declaring
+`okf_version` `0.4`; versions `0.1` through `0.3` reject it.
 
 ### `Attested Computation` (upstream v0.2)
 
