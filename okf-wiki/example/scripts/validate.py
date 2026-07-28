@@ -599,16 +599,12 @@ def _is_iso_datetime(s):
     return True
 
 
-def _raw_mapping_scalar(raw_fm, *path):
-    """Return a literal scalar's unnormalised text along a mapping path, or None.
+def _literal_scalar_node(raw_fm, *path):
+    """Return an unshared literal scalar node along a mapping/sequence path.
 
-    ``safe_load`` constructs a broad family of YAML timestamp spellings as
-    ``date``/``datetime`` objects. Calling ``isoformat`` on those objects would
-    silently turn a malformed source spelling into a conforming value. Compose
-    the same frontmatter into a node tree and inspect each effective (last)
-    literal key along the path instead. Simple quoted strings remain supported;
-    YAML aliases, tags, block scalars, and escape-based spellings are not literal
-    date fields.
+    String path components select the effective (last) literal mapping key;
+    integer components index a sequence. Aliases are rejected because their
+    source marks describe the anchor rather than the use site.
     """
     if not raw_fm or not path:
         return None
@@ -621,34 +617,61 @@ def _raw_mapping_scalar(raw_fm, *path):
 
     counts = _child_ref_counts(root)
     node = root
-    for index, key in enumerate(path):
-        if not isinstance(node, yaml.MappingNode):
+    for component in path:
+        if isinstance(component, str):
+            if not isinstance(node, yaml.MappingNode):
+                return None
+            candidates = [
+                (key_node, val_node)
+                for key_node, val_node in node.value
+                if isinstance(key_node, yaml.ScalarNode)
+                and key_node.value == component
+                and key_node.tag != _MERGE_TAG
+                and counts.get(id(key_node), 0) < 2
+            ]
+            if not candidates:
+                return None
+            _, node = candidates[-1]  # safe_load keeps the last duplicate key
+        elif isinstance(component, int):
+            if (not isinstance(node, yaml.SequenceNode)
+                    or component < 0
+                    or component >= len(node.value)):
+                return None
+            node = node.value[component]
+        else:
             return None
-        candidates = [
-            (key_node, val_node)
-            for key_node, val_node in node.value
-            if isinstance(key_node, yaml.ScalarNode)
-            and key_node.value == key
-            and key_node.tag != _MERGE_TAG
-            and counts.get(id(key_node), 0) < 2
-        ]
-        if not candidates:
-            return None
-        _, val_node = candidates[-1]  # safe_load keeps the last duplicate key
-        if counts.get(id(val_node), 0) >= 2:
-            return None
-        if index < len(path) - 1:
-            node = val_node
-            continue
-        if not isinstance(val_node, yaml.ScalarNode):
+        if counts.get(id(node), 0) >= 2:
             return None
 
-    written = raw_fm[val_node.start_mark.index:val_node.end_mark.index]
-    if val_node.style is None and written == val_node.value:
+    return node if isinstance(node, yaml.ScalarNode) else None
+
+
+def _raw_mapping_scalar(raw_fm, *path):
+    """Return a literal scalar's unnormalised text along a node path, or None.
+
+    ``safe_load`` constructs a broad family of YAML timestamp spellings as
+    ``date``/``datetime`` objects. Calling ``isoformat`` on those objects would
+    silently turn a malformed source spelling into a conforming value. Compose
+    the same frontmatter into a node tree and inspect each effective (last)
+    literal key along the path instead. Simple quoted strings remain supported;
+    YAML aliases, tags, block scalars, and escape-based spellings are not literal
+    date fields.
+    """
+    node = _literal_scalar_node(raw_fm, *path)
+    if node is None:
+        return None
+    written = raw_fm[node.start_mark.index:node.end_mark.index]
+    if node.style is None and written == node.value:
         return written
-    if val_node.style in ("'", '"') and written == val_node.style + val_node.value + val_node.style:
-        return val_node.value
+    if node.style in ("'", '"') and written == node.style + node.value + node.style:
+        return node.value
     return None
+
+
+def _mapping_scalar_dropped_comment(raw_fm, *path):
+    """True when a literal scalar at path was truncated by a YAML comment."""
+    node = _literal_scalar_node(raw_fm, *path)
+    return node is not None and _plain_scalar_dropped_comment(node, raw_fm)
 
 
 def _raw_top_level_scalar(raw_fm, key):
@@ -702,13 +725,6 @@ def check_lists(rel, fm, errors):
                 errors.append(f"{rel}: '{key}' has a non-string/empty element {el!r}")
 
 
-def _date_ok(val):
-    """True if val (a YAML scalar already loaded by safe_load) is a valid ISO date.
-    Accepts both a str the loader left alone and a date/datetime it auto-constructed."""
-    s = val.isoformat() if isinstance(val, dt.date) else str(val)
-    return _is_iso_date(s)
-
-
 def check_generated(rel, fm, raw_fm, errors):
     """Optional upstream-v0.2 'generated' field: {by, at} -- who/what produced the
     current content and when."""
@@ -731,7 +747,7 @@ def check_generated(rel, fm, raw_fm, errors):
         errors.append(f"{rel}: 'generated.at' must be an ISO date or a full ISO 8601 datetime, got {shown!r}")
 
 
-def check_verified_trust(rel, fm, bundle_version, errors):
+def check_verified_trust(rel, fm, raw_fm, bundle_version, errors):
     """Optional upstream-v0.2 'verified' field: a list of independent {by, at}
     confirmations, from which a consumer derives a trust tier (unverified /
     machine-confirmed / human-reviewed). Only meaningful at TRUST_SIGNALS_VERSION,
@@ -759,11 +775,16 @@ def check_verified_trust(rel, fm, bundle_version, errors):
         at = entry.get("at")
         if at is None:
             errors.append(f"{rel}: 'verified[{i}].at' is required")
-        elif not _date_ok(at):
-            errors.append(f"{rel}: 'verified[{i}].at' must be an ISO date YYYY-MM-DD, got {at!r}")
+        else:
+            raw = _raw_mapping_scalar(raw_fm, "verified", i, "at")
+            if raw is None or not _is_iso_date(raw):
+                shown = raw if raw is not None else at
+                errors.append(
+                    f"{rel}: 'verified[{i}].at' must be an ISO date YYYY-MM-DD, "
+                    f"got {shown!r}")
 
 
-def check_sources_plural(rel, fm, errors):
+def check_sources_plural(rel, fm, raw_fm, errors):
     """Optional upstream-v0.2 'sources' field (plural) -- structured provenance
     objects, distinct from the required singular 'source' (a flat list of quoted
     pointers). Each entry needs a unique 'id' and a 'resource'; title/author/
@@ -795,6 +816,10 @@ def check_sources_plural(rel, fm, errors):
         resource = entry.get("resource")
         if not isinstance(resource, str) or not resource.strip():
             errors.append(f"{rel}: 'sources[{i}].resource' must be a non-empty string")
+        elif _mapping_scalar_dropped_comment(raw_fm, "sources", i, "resource"):
+            errors.append(
+                f"{rel}: 'sources[{i}].resource' has an unquoted '#' that YAML "
+                f"reads as a comment, dropping the rest of the provenance pointer")
         for opt_key in ("title", "author"):
             v = entry.get(opt_key)
             if v is not None and (not isinstance(v, str) or not v.strip()):
@@ -803,8 +828,13 @@ def check_sources_plural(rel, fm, errors):
         if uc is not None and (not isinstance(uc, int) or isinstance(uc, bool) or uc < 0):
             errors.append(f"{rel}: 'sources[{i}].usage_count' must be a non-negative integer when present, got {uc!r}")
         lm = entry.get("last_modified")
-        if lm is not None and not _date_ok(lm):
-            errors.append(f"{rel}: 'sources[{i}].last_modified' must be an ISO date YYYY-MM-DD when present, got {lm!r}")
+        if lm is not None:
+            raw = _raw_mapping_scalar(raw_fm, "sources", i, "last_modified")
+            if raw is None or not _is_iso_date(raw):
+                shown = raw if raw is not None else lm
+                errors.append(
+                    f"{rel}: 'sources[{i}].last_modified' must be an ISO date "
+                    f"YYYY-MM-DD when present, got {shown!r}")
 
 
 def check_status(rel, fm, errors):
@@ -817,14 +847,17 @@ def check_status(rel, fm, errors):
         errors.append(f"{rel}: 'status' must be one of {sorted(ALLOWED_STATUSES)} when present, got {val!r}")
 
 
-def check_stale_after(rel, fm, errors):
+def check_stale_after(rel, fm, raw_fm, errors):
     """Optional upstream-v0.2 'stale_after' field: an absolute ISO date, deliberately
     not a relative TTL (see SPEC.md)."""
     if "stale_after" not in fm:
         return
     val = fm["stale_after"]
-    if not _date_ok(val):
-        errors.append(f"{rel}: 'stale_after' must be an ISO date YYYY-MM-DD, got {val!r}")
+    raw = _raw_mapping_scalar(raw_fm, "stale_after")
+    if raw is None or not _is_iso_date(raw):
+        shown = raw if raw is not None else val
+        errors.append(
+            f"{rel}: 'stale_after' must be an ISO date YYYY-MM-DD, got {shown!r}")
 
 
 def check_attested_computation(rel, fm, errors):
@@ -840,8 +873,8 @@ def check_attested_computation(rel, fm, errors):
         errors.append(f"{rel}: 'Attested Computation' requires a non-empty 'runtime' string")
 
     params = fm.get("parameters")
-    if not isinstance(params, list) or not params:
-        errors.append(f"{rel}: 'Attested Computation' requires a non-empty 'parameters' list")
+    if not isinstance(params, list):
+        errors.append(f"{rel}: 'Attested Computation' requires a 'parameters' list")
     else:
         for i, p in enumerate(params):
             if not isinstance(p, dict):
@@ -1043,10 +1076,10 @@ def main() -> int:
         check_source_quoting(rel, fm, raw_fm, errors)
         if bundle_version == TRUST_SIGNALS_VERSION:
             check_generated(rel, fm, raw_fm, errors)
-            check_verified_trust(rel, fm, bundle_version, errors)
-            check_sources_plural(rel, fm, errors)
+            check_verified_trust(rel, fm, raw_fm, bundle_version, errors)
+            check_sources_plural(rel, fm, raw_fm, errors)
             check_status(rel, fm, errors)
-            check_stale_after(rel, fm, errors)
+            check_stale_after(rel, fm, raw_fm, errors)
             check_attested_computation(rel, fm, errors)
 
     # Link resolution: every internal link to a .md file must resolve to a file

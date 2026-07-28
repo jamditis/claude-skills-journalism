@@ -2263,6 +2263,18 @@ class TestVerifiedTrustList:
         assert rc == 1
         assert msg in out
 
+    @pytest.mark.parametrize("written", ["2026-6-3", "!!timestamp 2026-6-3"])
+    def test_v04_verified_rejects_yaml_normalized_date_spelling(self, tmp_path, written):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            'tags: ["x"]',
+            f'verified:\n  - {{ by: "human:kliu@acme", at: {written} }}\n'
+            'tags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "'verified[0].at' must be an ISO date YYYY-MM-DD" in out
+
 
 class TestGenerated:
     def test_generated_valid_passes_at_v04(self, tmp_path):
@@ -2377,6 +2389,29 @@ class TestSourcesPlural:
         rc, out = validate(bundle)
         assert rc == 0, out
 
+    def test_sources_resource_rejects_yaml_comment_truncation(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            'tags: ["x"]',
+            'sources:\n  - id: "a"\n    resource: issue #445\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "'sources[0].resource' has an unquoted '#'" in out
+
+    @pytest.mark.parametrize("written", ["2026-6-3", "!!timestamp 2026-6-3"])
+    def test_sources_last_modified_rejects_yaml_normalized_date_spelling(
+            self, tmp_path, written):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            'tags: ["x"]',
+            'sources:\n  - id: "a"\n    resource: "README.md"\n'
+            f'    last_modified: {written}\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "'sources[0].last_modified' must be an ISO date YYYY-MM-DD" in out
+
     def test_sources_duplicate_id_rejected(self, tmp_path):
         bundle = _scaffold_v04(tmp_path)
         concept = GOOD_V04.replace(
@@ -2436,6 +2471,17 @@ class TestStatusAndStaleAfter:
         rc, out = validate(bundle)
         assert rc == 1
         assert "'stale_after' must be an ISO date" in out
+
+    @pytest.mark.parametrize("written", ["2026-6-3", "!!timestamp 2026-6-3"])
+    def test_stale_after_rejects_yaml_normalized_date_spelling(self, tmp_path, written):
+        bundle = _scaffold_v04(tmp_path)
+        concept = GOOD_V04.replace(
+            'tags: ["x"]',
+            f'stale_after: {written}\ntags: ["x"]')
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 1
+        assert "'stale_after' must be an ISO date YYYY-MM-DD" in out
 
 
 ATTESTED_COMPUTATION_GOOD = """---
@@ -2510,7 +2556,16 @@ class TestAttestedComputation:
         write_concept(bundle, concept)
         rc, out = validate(bundle)
         assert rc == 1
-        assert "requires a non-empty 'parameters'" in out
+        assert "requires a 'parameters' list" in out
+
+    def test_empty_parameters_list_allows_fixed_computation(self, tmp_path):
+        bundle = _scaffold_v04(tmp_path)
+        concept = ATTESTED_COMPUTATION_GOOD.replace(
+            "parameters:\n  - { name: year, type: integer, required: true }\n",
+            "parameters: []\n")
+        write_concept(bundle, concept)
+        rc, out = validate(bundle)
+        assert rc == 0, out
 
     def test_parameter_missing_required_flag_rejected(self, tmp_path):
         bundle = _scaffold_v04(tmp_path)

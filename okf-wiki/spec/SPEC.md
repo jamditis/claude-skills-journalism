@@ -268,7 +268,7 @@ addition to the seven (or, at `0.4`, six-plus-`verified_on`) base required keys:
 | key | value |
 | --- | --- |
 | `runtime` | non-empty string naming the execution environment (e.g. `bigquery`) |
-| `parameters` | YAML list of mappings, each `{name, type, required}` — the declared inputs a caller may fill; nothing else |
+| `parameters` | YAML list (possibly empty) of mappings, each `{name, type, required}` — the declared inputs a caller may fill; nothing else |
 | `executor` | mapping `{resource, receipt}` — `resource` points at the skill/tool that runs the computation, `receipt` a list naming what it returns (e.g. `[job_id, executed_sql, result]`) |
 | `attester` | mapping `{resource}` — points at the deterministic, non-LLM checker that compares a receipt against this concept's sanctioned computation |
 
