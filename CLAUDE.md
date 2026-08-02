@@ -344,3 +344,18 @@ Seven rules keep it honest, all covered by tests in
 - Keep descriptions terse and actionable
 - Include examples and templates
 - Avoid AI writing patterns (see ai-writing-detox)
+
+## Commits and attribution
+
+No AI attribution in commits, PR bodies, issues, docs, or code. `.claude/settings.json` sets `attribution.sessionUrl` to false and blanks `attribution.commit` and `attribution.pr`, which stops Claude Code from appending a `Claude-Session:` trailer to commits, adding the session link to PR bodies, and emitting the "Generated with Claude Code" strings. Web and Remote Control sessions both emit these by default. The setting lives in the repo rather than `~/.claude/settings.json` because cloud sessions clone the repo and never read user-level config. Don't reintroduce any of it by hand.
+
+No `Co-authored-by` trailers of any kind, including Joe's own aliases.
+
+Git identity — set before committing, in every worktree and every agent session:
+
+```sh
+git config user.name "Joe Amditis"
+git config user.email "6799804+jamditis@users.noreply.github.com"
+```
+
+Any other author email either trips GitHub's email-privacy push block (GH007) or makes a squash merge inject a `Co-authored-by` line into the merge body.
