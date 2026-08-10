@@ -27,8 +27,9 @@ Checks:
      ('/'-prefixed) link is rejected. Every link to a .md file inside the bundle
      must point at a file that exists, with the case it has on disk (a
      case-insensitive filesystem would otherwise let a wrong-case link pass on
-     macOS and dangle on Linux); a link that escapes the bundle root or
-     dangles is a hard failure. Optional link titles and <>-wrapped destinations
+     macOS and dangle on Linux; see real_case_path for why a Windows author is
+     not covered); a link that escapes the bundle root or dangles is a hard
+     failure. Optional link titles and <>-wrapped destinations
      are handled. The bundle is validated as one self-contained tree (to validate
      federated content, assemble the bundles into one tree and point --bundle at
      that root).
@@ -337,15 +338,23 @@ def real_case_path(dest: Path, bundle: Path) -> Path | None:
 
     Returns `dest` unchanged when every component already matches the real name.
 
-    Path.exists() asks the filesystem, and macOS and Windows answer yes for
-    `Concepts/Foo.md` when the file is really `concepts/foo.md`. A bundle written
-    there passes validation on the author's machine and dangles the first time
-    Linux CI or a Linux reader opens it, which is the class of break this
-    validator exists to catch before it ships. So walk the components against the
-    real directory listings instead of asking whether the path exists.
+    Path.exists() asks the filesystem, and macOS answers yes for `Concepts/Foo.md`
+    when the file is really `concepts/foo.md`. A bundle written there passes
+    validation on the author's machine and dangles the first time Linux CI or a
+    Linux reader opens it, which is the class of break this validator exists to
+    catch before it ships. So walk the components against the real directory
+    listings instead of asking whether the path exists.
 
     The walk doubles as the existence check: a component that matches nothing,
     case or no case, means the link dangles.
+
+    This does not catch a Windows author, and saying so is the honest scope: there
+    os.path.realpath goes through GetFinalPathNameByHandle, so Path.resolve() has
+    already replaced the link's casing with the on-disk casing by the time the
+    walk sees it, and every component matches. A Windows-side wrong-case link is
+    still caught, just later, by Linux CI. Fixing it needs a lexically normalized
+    path here, which is not the same as the resolved one across a symlinked
+    directory, so it is tracked separately rather than bolted on.
 
     `dest` must be inside `bundle`; the caller checks that first.
     """
@@ -1164,10 +1173,13 @@ def main() -> int:
                 if real is None:
                     errors.append(f"{f.relative_to(bundle)}: dangling link -> {target}")
                 elif real != dest:
+                    # Report the fix as a link, relative to the file doing the linking,
+                    # so it can be pasted straight in. Bundle-relative would be the
+                    # error-line convention but is not what goes between the parens.
+                    fix = os.path.relpath(real, f.parent).replace(os.sep, "/")
                     errors.append(
                         f"{f.relative_to(bundle)}: link case does not match the file on "
-                        f"disk -> {target}; the file is "
-                        f"{real.relative_to(bundle).as_posix()}. Links are case-sensitive "
+                        f"disk -> {target}; write {fix}. Links are case-sensitive "
                         f"on Linux, so this resolves on macOS and breaks in CI.")
 
     # report

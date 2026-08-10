@@ -2642,7 +2642,8 @@ def test_wrong_case_link_names_the_real_file(tmp_path):
     rc, out = validate(b)
     assert rc == 1
     assert "link case does not match" in out
-    assert "concepts/target.md" in out
+    # Relative to the linking file, so it can be pasted straight into the link.
+    assert "write target.md" in out
     # The unhelpful wording must not also fire for the same link.
     assert "dangling link -> Target.md" not in out
 
@@ -2689,3 +2690,17 @@ def test_real_case_path_reports_the_on_disk_name(tmp_path):
     assert real_case_path(tmp_path / "concepts" / "nowhere.md", tmp_path) is None
     # A file where a directory is expected is not a resolvable parent.
     assert real_case_path(tmp_path / "concepts" / "target.md" / "deeper.md", tmp_path) is None
+
+
+def test_two_case_variants_report_dangling_not_a_guess(tmp_path):
+    # A Linux checkout of a bundle that went through a case-rename on macOS holds
+    # both spellings. There is no way to say which the link meant, and picking
+    # whichever os.listdir returned first would be an order-dependent guess.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD, name="concepts/target.md")
+    write_concept(b, GOOD, name="concepts/Target.md")
+    write_concept(b, GOOD.rstrip() + "\nSee [x](TARGET.md).\n", name="concepts/c.md")
+    rc, out = validate(b)
+    assert rc == 1 and "dangling link -> TARGET.md" in out
+    assert "link case does not match" not in out
