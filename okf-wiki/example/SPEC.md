@@ -283,6 +283,13 @@ Relative markdown links. Every link to a file inside the bundle must resolve to 
 exists; a link that escapes the bundle root or dangles fails validation. The bundle is
 validated as one self-contained tree (see Federation for combining several).
 
+A link's case must match the file on disk. macOS and Windows resolve
+`Concepts/Foo.md` to `concepts/foo.md` and answer that the file exists, so a bundle
+written there validates locally and dangles the first time a Linux reader or CI job
+opens it. The validator compares each path component against the real directory
+listing rather than asking the filesystem, and names the on-disk path in the error, so
+the mismatch is caught on the machine that introduced it.
+
 The `[[slug]]` wikilink form is not an OKF link, and the validator rejects it. It is the
 auto-memory cross-reference idiom and easy to reach for by habit, but a `[[slug]]` is never
 resolved or checked, so a dead reference would pass silently. Always link with

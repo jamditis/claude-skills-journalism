@@ -2628,3 +2628,64 @@ def test_skill_authoring_workflow_is_version_aware():
     skill = (SKILL / "SKILL.md").read_text(encoding="utf-8")
     assert '`verified` for `okf_version` `0.1` through `0.3`' in skill
     assert '`verified_on` for `okf_version` `0.4`' in skill
+
+
+def test_wrong_case_link_names_the_real_file(tmp_path):
+    # The link resolves on macOS and Windows, where the filesystem answers
+    # case-insensitively, and dangles on Linux. Reporting it as "dangling" leaves
+    # the author of the mac-side bundle reading a CI failure about a file they can
+    # see on their own disk, so name the real path instead.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD, name="concepts/target.md")
+    write_concept(b, GOOD.rstrip() + "\nSee [x](Target.md).\n", name="concepts/c.md")
+    rc, out = validate(b)
+    assert rc == 1
+    assert "link case does not match" in out
+    assert "concepts/target.md" in out
+    # The unhelpful wording must not also fire for the same link.
+    assert "dangling link -> Target.md" not in out
+
+
+def test_wrong_case_directory_in_link_caught(tmp_path):
+    # Every component is walked, not just the filename: a mac-side bundle can get
+    # the directory wrong just as easily.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD, name="concepts/target.md")
+    write_concept(b, GOOD.rstrip() + "\nSee [x](../Concepts/target.md).\n", name="concepts/c.md")
+    rc, out = validate(b)
+    assert rc == 1 and "link case does not match" in out
+
+
+def test_missing_file_is_still_reported_as_dangling(tmp_path):
+    # A link matching nothing on disk, case or no case, keeps the plain wording.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + "\nSee [x](nowhere.md).\n")
+    rc, out = validate(b)
+    assert rc == 1 and "dangling link -> nowhere.md" in out
+    assert "link case does not match" not in out
+
+
+def test_exact_case_link_passes(tmp_path):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD, name="concepts/target.md")
+    write_concept(b, GOOD.rstrip() + "\nSee [x](target.md).\n", name="concepts/c.md")
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_real_case_path_reports_the_on_disk_name(tmp_path):
+    # Unit-level: the walk answers with the real name, so the caller can name it.
+    real_case_path = _validate_module().real_case_path
+    (tmp_path / "concepts").mkdir()
+    (tmp_path / "concepts" / "target.md").write_text("x", encoding="utf-8")
+    assert real_case_path(tmp_path / "concepts" / "target.md", tmp_path) \
+        == tmp_path / "concepts" / "target.md"
+    assert real_case_path(tmp_path / "Concepts" / "TARGET.md", tmp_path) \
+        == tmp_path / "concepts" / "target.md"
+    assert real_case_path(tmp_path / "concepts" / "nowhere.md", tmp_path) is None
+    # A file where a directory is expected is not a resolvable parent.
+    assert real_case_path(tmp_path / "concepts" / "target.md" / "deeper.md", tmp_path) is None

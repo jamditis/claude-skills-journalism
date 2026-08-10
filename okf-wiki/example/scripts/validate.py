@@ -25,7 +25,9 @@ Checks:
      frontmatter — except the bundle-root index.md may carry okf_version only.
   4. Internal markdown links resolve. Links must be relative — a root-relative
      ('/'-prefixed) link is rejected. Every link to a .md file inside the bundle
-     must point at a file that exists; a link that escapes the bundle root or
+     must point at a file that exists, with the case it has on disk (a
+     case-insensitive filesystem would otherwise let a wrong-case link pass on
+     macOS and dangle on Linux); a link that escapes the bundle root or
      dangles is a hard failure. Optional link titles and <>-wrapped destinations
      are handled. The bundle is validated as one self-contained tree (to validate
      federated content, assemble the bundles into one tree and point --bundle at
@@ -51,6 +53,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import math
+import os
 import re
 import sys
 from collections import Counter
@@ -327,6 +330,41 @@ def resolve_link(target: str, md_file: Path) -> Path:
     .resolve() collapses ../ so the bundle-boundary check is not fooled by a path
     like ../../outside.md."""
     return (md_file.parent / target).resolve()
+
+
+def real_case_path(dest: Path, bundle: Path) -> Path | None:
+    """The path on disk that `dest` names, ignoring case, or None if nothing matches.
+
+    Returns `dest` unchanged when every component already matches the real name.
+
+    Path.exists() asks the filesystem, and macOS and Windows answer yes for
+    `Concepts/Foo.md` when the file is really `concepts/foo.md`. A bundle written
+    there passes validation on the author's machine and dangles the first time
+    Linux CI or a Linux reader opens it, which is the class of break this
+    validator exists to catch before it ships. So walk the components against the
+    real directory listings instead of asking whether the path exists.
+
+    The walk doubles as the existence check: a component that matches nothing,
+    case or no case, means the link dangles.
+
+    `dest` must be inside `bundle`; the caller checks that first.
+    """
+    current = bundle
+    for part in dest.relative_to(bundle).parts:
+        try:
+            names = set(os.listdir(current))
+        except OSError:
+            return None  # not a directory, or unreadable: nothing below it resolves
+        if part in names:
+            current = current / part
+            continue
+        # Exactly one case-variant is a mismatch worth naming. Several means a
+        # case-sensitive filesystem holding both, and no way to say which was meant.
+        variants = [n for n in names if n.lower() == part.lower()]
+        if len(variants) != 1:
+            return None
+        current = current / variants[0]
+    return current
 
 
 def strip_code(text: str) -> str:
@@ -1121,8 +1159,16 @@ def main() -> int:
             inside = dest == bundle or bundle in dest.parents
             if not inside:
                 errors.append(f"{f.relative_to(bundle)}: link escapes bundle root -> {target}")
-            elif not dest.exists():
-                errors.append(f"{f.relative_to(bundle)}: dangling link -> {target}")
+            else:
+                real = real_case_path(dest, bundle)
+                if real is None:
+                    errors.append(f"{f.relative_to(bundle)}: dangling link -> {target}")
+                elif real != dest:
+                    errors.append(
+                        f"{f.relative_to(bundle)}: link case does not match the file on "
+                        f"disk -> {target}; the file is "
+                        f"{real.relative_to(bundle).as_posix()}. Links are case-sensitive "
+                        f"on Linux, so this resolves on macOS and breaks in CI.")
 
     # report
     print(f"Bundle: {bundle}")
