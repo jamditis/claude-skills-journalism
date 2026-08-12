@@ -969,6 +969,21 @@ def test_nonconforming_extension_rename_uses_real_parent_case(tmp_path):
     assert "rename Target.MD to ../Concepts/target.md" not in out
 
 
+def test_nonconforming_extension_rename_normalizes_link_extension(tmp_path):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD, name="concepts/Target.MD")
+    write_concept(
+        b,
+        GOOD.rstrip() + "\n\nSee [target](target.MD).\n",
+        name="concepts/c.md",
+    )
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "rename Target.MD to target.md" in out
+    assert "rename Target.MD to target.MD" not in out
+
+
 def test_wrong_case_dangling_symlink_is_reported_as_dangling(tmp_path):
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"

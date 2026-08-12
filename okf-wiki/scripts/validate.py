@@ -1187,7 +1187,7 @@ def main() -> int:
                             and nonconforming.suffix.lower() == ".md"
                             and nonconforming.suffix != ".md"):
                         found = os.path.relpath(nonconforming, f.parent).replace(os.sep, "/")
-                        expected_path = nonconforming.parent / dest.name
+                        expected_path = nonconforming.parent / Path(dest.name).with_suffix(".md")
                         expected = os.path.relpath(expected_path, f.parent).replace(os.sep, "/")
                         errors.append(
                             f"{f.relative_to(bundle)}: link target exists only as a "
