@@ -312,18 +312,21 @@ def frontmatter_block(text: str) -> str | None:
     return m.group(1) if m else None
 
 
-def link_destination(raw: str) -> str:
-    """Pull the destination out of a markdown link's (...) contents: strip <...>
-    wrapping, an optional "title"/'title', and any #anchor. Markdown allows
+def link_destination(raw: str) -> tuple[str, str]:
+    """Pull the path and fragment out of a markdown link's (...) contents: strip
+    <...> wrapping and an optional "title"/'title'. Markdown allows
     [text](dest "title") and [text](<dest with spaces>) — treating the whole
     contents as the path would falsely flag those as dangling."""
     s = raw.strip()
     if s.startswith("<"):
         end = s.find(">")
         if end != -1:
-            return s[1:end].split("#", 1)[0].strip()
+            destination = s[1:end].strip()
+            path, separator, fragment = destination.partition("#")
+            return path, separator + fragment
     s = s.split(None, 1)[0] if s else s  # dest ends at first space; rest is a title
-    return s.split("#", 1)[0]
+    path, separator, fragment = s.partition("#")
+    return path, separator + fragment
 
 
 def resolve_link(target: str, md_file: Path) -> Path:
@@ -1151,7 +1154,7 @@ def main() -> int:
                 f"relative markdown link like [text]({slug}.md). The [[slug]] form is "
                 f"the auto-memory convention, not OKF.")
         for raw in LINK_RE.findall(text):
-            target = link_destination(raw)
+            target, fragment = link_destination(raw)
             if not target:
                 continue
             low = target.lower()
@@ -1199,7 +1202,7 @@ def main() -> int:
                     # Report the fix as a link, relative to the file doing the linking,
                     # so it can be pasted straight in. Bundle-relative would be the
                     # error-line convention but is not what goes between the parens.
-                    fix = os.path.relpath(real, f.parent).replace(os.sep, "/")
+                    fix = os.path.relpath(real, f.parent).replace(os.sep, "/") + fragment
                     errors.append(
                         f"{f.relative_to(bundle)}: link case does not match the file on "
                         f"disk -> {target}; write {fix}. Links are case-sensitive "

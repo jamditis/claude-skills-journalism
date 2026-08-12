@@ -2697,6 +2697,23 @@ def test_wrong_case_link_names_the_real_file(tmp_path):
     assert "dangling link -> Target.md" not in out
 
 
+def test_wrong_case_link_fix_preserves_fragment(tmp_path):
+    # The diagnostic promises a replacement that can be pasted into the link.
+    # Correcting path casing must not discard the section the author targeted.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD, name="concepts/target.md")
+    write_concept(
+        b,
+        GOOD.rstrip() + "\nSee [x](Target.md#usage).\n",
+        name="concepts/c.md",
+    )
+    rc, out = validate(b)
+    assert rc == 1
+    assert "link case does not match" in out
+    assert "write target.md#usage" in out
+
+
 def test_wrong_case_directory_in_link_caught(tmp_path):
     # Every component is walked, not just the filename: a mac-side bundle can get
     # the directory wrong just as easily.
