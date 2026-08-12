@@ -25,8 +25,11 @@ Checks:
      frontmatter — except the bundle-root index.md may carry okf_version only.
   4. Internal markdown links resolve. Links must be relative — a root-relative
      ('/'-prefixed) link is rejected. Every link to a .md file inside the bundle
-     must point at a file that exists; a link that escapes the bundle root or
-     dangles is a hard failure. Optional link titles and <>-wrapped destinations
+     must point at a file that exists, with the case it has on disk (a
+     case-insensitive filesystem would otherwise let a wrong-case link pass on
+     macOS and dangle on Linux; see real_case_path for why a Windows author is
+     not covered); a link that escapes the bundle root or dangles is a hard
+     failure. Optional link titles and <>-wrapped destinations
      are handled. The bundle is validated as one self-contained tree (to validate
      federated content, assemble the bundles into one tree and point --bundle at
      that root).
@@ -51,6 +54,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import math
+import os
 import re
 import sys
 from collections import Counter
@@ -308,18 +312,21 @@ def frontmatter_block(text: str) -> str | None:
     return m.group(1) if m else None
 
 
-def link_destination(raw: str) -> str:
-    """Pull the destination out of a markdown link's (...) contents: strip <...>
-    wrapping, an optional "title"/'title', and any #anchor. Markdown allows
+def link_destination(raw: str) -> tuple[str, str]:
+    """Pull the path and fragment out of a markdown link's (...) contents: strip
+    <...> wrapping and an optional "title"/'title'. Markdown allows
     [text](dest "title") and [text](<dest with spaces>) — treating the whole
     contents as the path would falsely flag those as dangling."""
     s = raw.strip()
     if s.startswith("<"):
         end = s.find(">")
         if end != -1:
-            return s[1:end].split("#", 1)[0].strip()
+            destination = s[1:end].strip()
+            path, separator, fragment = destination.partition("#")
+            return path, separator + fragment
     s = s.split(None, 1)[0] if s else s  # dest ends at first space; rest is a title
-    return s.split("#", 1)[0]
+    path, separator, fragment = s.partition("#")
+    return path, separator + fragment
 
 
 def resolve_link(target: str, md_file: Path) -> Path:
@@ -327,6 +334,55 @@ def resolve_link(target: str, md_file: Path) -> Path:
     .resolve() collapses ../ so the bundle-boundary check is not fooled by a path
     like ../../outside.md."""
     return (md_file.parent / target).resolve()
+
+
+def real_case_path(
+    dest: Path, bundle: Path, *, allow_nonconforming_md: bool = False
+) -> Path | None:
+    """The path on disk that `dest` names, ignoring case, or None if nothing matches.
+
+    Returns `dest` unchanged when every component already matches the real name.
+
+    Path.exists() asks the filesystem, and macOS answers yes for `Concepts/Foo.md`
+    when the file is really `concepts/foo.md`. A bundle written there passes
+    validation on the author's machine and dangles the first time Linux CI or a
+    Linux reader opens it, which is the class of break this validator exists to
+    catch before it ships. So walk the components against the real directory
+    listings instead of asking whether the path exists.
+
+    The walk doubles as the existence check: a component that matches nothing,
+    case or no case, means the link dangles.
+
+    This does not catch a Windows author, and a wrong-cased symlink component can
+    escape the local check on case-insensitive macOS. In both cases Path.resolve()
+    may replace the link's spelling with the on-disk target before the walk sees
+    it. The wrong-case link is still caught later by Linux CI. Fixing it needs a
+    lexically normalized path here, which is not the same as the resolved one
+    across a symlinked directory, so it is tracked separately rather than bolted on.
+
+    `dest` must be inside `bundle`; the caller checks that first.
+    """
+    current = bundle
+    for part in dest.relative_to(bundle).parts:
+        try:
+            names = set(os.listdir(current))
+        except OSError:
+            return None  # not a directory, or unreadable: nothing below it resolves
+        if part in names:
+            current = current / part
+            continue
+        # Exactly one case-variant is a mismatch worth naming. Several means a
+        # case-sensitive filesystem holding both, and no way to say which was meant.
+        # Do not recommend a file with an uppercase .md extension as a link fix: that
+        # filename is rejected elsewhere in this validator. The caller can opt into a
+        # second lookup solely to give that non-conforming file a rename diagnostic.
+        variants = [n for n in names if n.lower() == part.lower()]
+        if not allow_nonconforming_md and Path(part).suffix.lower() == ".md":
+            variants = [n for n in variants if Path(n).suffix == ".md"]
+        if len(variants) != 1:
+            return None
+        current = current / variants[0]
+    return current
 
 
 def strip_code(text: str) -> str:
@@ -1098,7 +1154,7 @@ def main() -> int:
                 f"relative markdown link like [text]({slug}.md). The [[slug]] form is "
                 f"the auto-memory convention, not OKF.")
         for raw in LINK_RE.findall(text):
-            target = link_destination(raw)
+            target, fragment = link_destination(raw)
             if not target:
                 continue
             low = target.lower()
@@ -1121,8 +1177,36 @@ def main() -> int:
             inside = dest == bundle or bundle in dest.parents
             if not inside:
                 errors.append(f"{f.relative_to(bundle)}: link escapes bundle root -> {target}")
-            elif not dest.exists():
-                errors.append(f"{f.relative_to(bundle)}: dangling link -> {target}")
+            else:
+                real = real_case_path(dest, bundle)
+                if real is not None and not real.exists():
+                    real = None
+                if real is None:
+                    nonconforming = real_case_path(
+                        dest, bundle, allow_nonconforming_md=True
+                    )
+                    if (nonconforming is not None
+                            and nonconforming.exists()
+                            and nonconforming.suffix.lower() == ".md"
+                            and nonconforming.suffix != ".md"):
+                        found = os.path.relpath(nonconforming, f.parent).replace(os.sep, "/")
+                        expected_path = nonconforming.parent / Path(dest.name).with_suffix(".md")
+                        expected = os.path.relpath(expected_path, f.parent).replace(os.sep, "/")
+                        errors.append(
+                            f"{f.relative_to(bundle)}: link target exists only as a "
+                            f"non-conforming markdown filename -> {target}; rename "
+                            f"{found} to {expected}")
+                    else:
+                        errors.append(f"{f.relative_to(bundle)}: dangling link -> {target}")
+                elif real != dest:
+                    # Report the fix as a link, relative to the file doing the linking,
+                    # so it can be pasted straight in. Bundle-relative would be the
+                    # error-line convention but is not what goes between the parens.
+                    fix = os.path.relpath(real, f.parent).replace(os.sep, "/") + fragment
+                    errors.append(
+                        f"{f.relative_to(bundle)}: link case does not match the file on "
+                        f"disk -> {target}; write {fix}. Links are case-sensitive "
+                        f"on Linux, so this resolves on macOS and breaks in CI.")
 
     # report
     print(f"Bundle: {bundle}")

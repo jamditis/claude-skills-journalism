@@ -947,10 +947,59 @@ def test_link_to_existing_uppercase_md_fails(tmp_path):
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
     write_concept(b, GOOD, name="concepts/Target.MD")
-    write_concept(b, GOOD.rstrip() + "\n\nSee [target](Target.MD).\n", name="concepts/c.md")
+    write_concept(b, GOOD.rstrip() + "\n\nSee [target](target.md).\n", name="concepts/c.md")
     rc, out = validate(b)
     assert rc == 1, out
-    assert "Target.MD" in out
+    assert "rename Target.MD to target.md" in out
+    assert "write Target.MD" not in out
+
+
+def test_nonconforming_extension_rename_uses_real_parent_case(tmp_path):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD, name="concepts/Target.MD")
+    write_concept(
+        b,
+        GOOD.rstrip() + "\n\nSee [target](../Concepts/target.md).\n",
+        name="concepts/c.md",
+    )
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "rename Target.MD to target.md" in out
+    assert "rename Target.MD to ../Concepts/target.md" not in out
+
+
+def test_nonconforming_extension_rename_normalizes_link_extension(tmp_path):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD, name="concepts/Target.MD")
+    write_concept(
+        b,
+        GOOD.rstrip() + "\n\nSee [target](target.MD).\n",
+        name="concepts/c.md",
+    )
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "rename Target.MD to target.md" in out
+    assert "rename Target.MD to target.MD" not in out
+
+
+def test_wrong_case_dangling_symlink_is_reported_as_dangling(tmp_path):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    try:
+        (b / "concepts" / "Broken.md").symlink_to("missing.md")
+    except OSError as exc:
+        pytest.skip(f"symlink unavailable on this filesystem: {exc}")
+    write_concept(
+        b,
+        GOOD.rstrip() + "\n\nSee [broken](broken.md).\n",
+        name="concepts/c.md",
+    )
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "dangling link -> broken.md" in out
+    assert "write Broken.md" not in out
 
 
 def test_uppercase_scheme_link_not_flagged(tmp_path):
@@ -2628,3 +2677,101 @@ def test_skill_authoring_workflow_is_version_aware():
     skill = (SKILL / "SKILL.md").read_text(encoding="utf-8")
     assert '`verified` for `okf_version` `0.1` through `0.3`' in skill
     assert '`verified_on` for `okf_version` `0.4`' in skill
+
+
+def test_wrong_case_link_names_the_real_file(tmp_path):
+    # The link resolves on macOS and Windows, where the filesystem answers
+    # case-insensitively, and dangles on Linux. Reporting it as "dangling" leaves
+    # the author of the mac-side bundle reading a CI failure about a file they can
+    # see on their own disk, so name the real path instead.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD, name="concepts/target.md")
+    write_concept(b, GOOD.rstrip() + "\nSee [x](Target.md).\n", name="concepts/c.md")
+    rc, out = validate(b)
+    assert rc == 1
+    assert "link case does not match" in out
+    # Relative to the linking file, so it can be pasted straight into the link.
+    assert "write target.md" in out
+    # The unhelpful wording must not also fire for the same link.
+    assert "dangling link -> Target.md" not in out
+
+
+def test_wrong_case_link_fix_preserves_fragment(tmp_path):
+    # The diagnostic promises a replacement that can be pasted into the link.
+    # Correcting path casing must not discard the section the author targeted.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD, name="concepts/target.md")
+    write_concept(
+        b,
+        GOOD.rstrip() + "\nSee [x](Target.md#usage).\n",
+        name="concepts/c.md",
+    )
+    rc, out = validate(b)
+    assert rc == 1
+    assert "link case does not match" in out
+    assert "write target.md#usage" in out
+
+
+def test_wrong_case_directory_in_link_caught(tmp_path):
+    # Every component is walked, not just the filename: a mac-side bundle can get
+    # the directory wrong just as easily.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD, name="concepts/target.md")
+    write_concept(b, GOOD.rstrip() + "\nSee [x](../Concepts/target.md).\n", name="concepts/c.md")
+    rc, out = validate(b)
+    assert rc == 1 and "link case does not match" in out
+
+
+def test_missing_file_is_still_reported_as_dangling(tmp_path):
+    # A link matching nothing on disk, case or no case, keeps the plain wording.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD.rstrip() + "\nSee [x](nowhere.md).\n")
+    rc, out = validate(b)
+    assert rc == 1 and "dangling link -> nowhere.md" in out
+    assert "link case does not match" not in out
+
+
+def test_exact_case_link_passes(tmp_path):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD, name="concepts/target.md")
+    write_concept(b, GOOD.rstrip() + "\nSee [x](target.md).\n", name="concepts/c.md")
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_real_case_path_reports_the_on_disk_name(tmp_path):
+    # Unit-level: the walk answers with the real name, so the caller can name it.
+    real_case_path = _validate_module().real_case_path
+    (tmp_path / "concepts").mkdir()
+    (tmp_path / "concepts" / "target.md").write_text("x", encoding="utf-8")
+    assert real_case_path(tmp_path / "concepts" / "target.md", tmp_path) \
+        == tmp_path / "concepts" / "target.md"
+    assert real_case_path(tmp_path / "Concepts" / "TARGET.md", tmp_path) \
+        == tmp_path / "concepts" / "target.md"
+    assert real_case_path(tmp_path / "concepts" / "nowhere.md", tmp_path) is None
+    # A file where a directory is expected is not a resolvable parent.
+    assert real_case_path(tmp_path / "concepts" / "target.md" / "deeper.md", tmp_path) is None
+
+
+def test_two_case_variants_report_dangling_not_a_guess(tmp_path):
+    # A Linux checkout of a bundle that went through a case-rename on macOS holds
+    # both spellings. There is no way to say which the link meant, and picking
+    # whichever os.listdir returned first would be an order-dependent guess.
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    probe = tmp_path / "case-sensitivity-probe"
+    probe.mkdir()
+    (probe / "lower").write_text("x", encoding="utf-8")
+    if (probe / "LOWER").exists():
+        pytest.skip("filesystem cannot represent two names that differ only by case")
+    write_concept(b, GOOD, name="concepts/target.md")
+    write_concept(b, GOOD, name="concepts/Target.md")
+    write_concept(b, GOOD.rstrip() + "\nSee [x](TARGET.md).\n", name="concepts/c.md")
+    rc, out = validate(b)
+    assert rc == 1 and "dangling link -> TARGET.md" in out
+    assert "link case does not match" not in out

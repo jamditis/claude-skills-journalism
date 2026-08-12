@@ -283,6 +283,18 @@ Relative markdown links. Every link to a file inside the bundle must resolve to 
 exists; a link that escapes the bundle root or dangles fails validation. The bundle is
 validated as one self-contained tree (see Federation for combining several).
 
+A link's case must match the file on disk. macOS resolves `Concepts/Foo.md` to
+`concepts/foo.md` and answers that the file exists, so a bundle written there validates
+locally and dangles the first time a Linux reader or CI job opens it. The validator
+compares each path component against the real directory listing rather than asking the
+filesystem, and the error gives the link to write instead, so a macOS author usually
+sees the mismatch on their own machine. A wrong-cased symlink component can be
+normalized to its target before this comparison and is caught later by Linux CI.
+
+A Windows author does not: there `Path.resolve()` goes through
+GetFinalPathNameByHandle, which substitutes the on-disk casing before the check runs.
+Their wrong-case link is still caught, on Linux CI or by the next Linux reader.
+
 The `[[slug]]` wikilink form is not an OKF link, and the validator rejects it. It is the
 auto-memory cross-reference idiom and easy to reach for by habit, but a `[[slug]]` is never
 resolved or checked, so a dead reference would pass silently. Always link with
