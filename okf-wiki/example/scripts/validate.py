@@ -333,7 +333,9 @@ def resolve_link(target: str, md_file: Path) -> Path:
     return (md_file.parent / target).resolve()
 
 
-def real_case_path(dest: Path, bundle: Path) -> Path | None:
+def real_case_path(
+    dest: Path, bundle: Path, *, allow_nonconforming_md: bool = False
+) -> Path | None:
     """The path on disk that `dest` names, ignoring case, or None if nothing matches.
 
     Returns `dest` unchanged when every component already matches the real name.
@@ -369,7 +371,12 @@ def real_case_path(dest: Path, bundle: Path) -> Path | None:
             continue
         # Exactly one case-variant is a mismatch worth naming. Several means a
         # case-sensitive filesystem holding both, and no way to say which was meant.
+        # Do not recommend a file with an uppercase .md extension as a link fix: that
+        # filename is rejected elsewhere in this validator. The caller can opt into a
+        # second lookup solely to give that non-conforming file a rename diagnostic.
         variants = [n for n in names if n.lower() == part.lower()]
+        if not allow_nonconforming_md and Path(part).suffix.lower() == ".md":
+            variants = [n for n in variants if Path(n).suffix == ".md"]
         if len(variants) != 1:
             return None
         current = current / variants[0]
@@ -1171,7 +1178,20 @@ def main() -> int:
             else:
                 real = real_case_path(dest, bundle)
                 if real is None:
-                    errors.append(f"{f.relative_to(bundle)}: dangling link -> {target}")
+                    nonconforming = real_case_path(
+                        dest, bundle, allow_nonconforming_md=True
+                    )
+                    if (nonconforming is not None
+                            and nonconforming.suffix.lower() == ".md"
+                            and nonconforming.suffix != ".md"):
+                        found = os.path.relpath(nonconforming, f.parent).replace(os.sep, "/")
+                        expected = os.path.relpath(dest, f.parent).replace(os.sep, "/")
+                        errors.append(
+                            f"{f.relative_to(bundle)}: link target exists only as a "
+                            f"non-conforming markdown filename -> {target}; rename "
+                            f"{found} to {expected}")
+                    else:
+                        errors.append(f"{f.relative_to(bundle)}: dangling link -> {target}")
                 elif real != dest:
                     # Report the fix as a link, relative to the file doing the linking,
                     # so it can be pasted straight in. Bundle-relative would be the

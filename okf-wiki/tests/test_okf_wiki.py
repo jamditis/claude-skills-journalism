@@ -947,10 +947,11 @@ def test_link_to_existing_uppercase_md_fails(tmp_path):
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
     write_concept(b, GOOD, name="concepts/Target.MD")
-    write_concept(b, GOOD.rstrip() + "\n\nSee [target](Target.MD).\n", name="concepts/c.md")
+    write_concept(b, GOOD.rstrip() + "\n\nSee [target](target.md).\n", name="concepts/c.md")
     rc, out = validate(b)
     assert rc == 1, out
-    assert "Target.MD" in out
+    assert "rename Target.MD to target.md" in out
+    assert "write Target.MD" not in out
 
 
 def test_uppercase_scheme_link_not_flagged(tmp_path):
@@ -2698,6 +2699,11 @@ def test_two_case_variants_report_dangling_not_a_guess(tmp_path):
     # whichever os.listdir returned first would be an order-dependent guess.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
+    probe = tmp_path / "case-sensitivity-probe"
+    probe.mkdir()
+    (probe / "lower").write_text("x", encoding="utf-8")
+    if (probe / "LOWER").exists():
+        pytest.skip("filesystem cannot represent two names that differ only by case")
     write_concept(b, GOOD, name="concepts/target.md")
     write_concept(b, GOOD, name="concepts/Target.md")
     write_concept(b, GOOD.rstrip() + "\nSee [x](TARGET.md).\n", name="concepts/c.md")
