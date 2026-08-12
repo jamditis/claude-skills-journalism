@@ -350,13 +350,12 @@ def real_case_path(
     The walk doubles as the existence check: a component that matches nothing,
     case or no case, means the link dangles.
 
-    This does not catch a Windows author, and saying so is the honest scope: there
-    os.path.realpath goes through GetFinalPathNameByHandle, so Path.resolve() has
-    already replaced the link's casing with the on-disk casing by the time the
-    walk sees it, and every component matches. A Windows-side wrong-case link is
-    still caught, just later, by Linux CI. Fixing it needs a lexically normalized
-    path here, which is not the same as the resolved one across a symlinked
-    directory, so it is tracked separately rather than bolted on.
+    This does not catch a Windows author, and a wrong-cased symlink component can
+    escape the local check on case-insensitive macOS. In both cases Path.resolve()
+    may replace the link's spelling with the on-disk target before the walk sees
+    it. The wrong-case link is still caught later by Linux CI. Fixing it needs a
+    lexically normalized path here, which is not the same as the resolved one
+    across a symlinked directory, so it is tracked separately rather than bolted on.
 
     `dest` must be inside `bundle`; the caller checks that first.
     """
@@ -1177,15 +1176,19 @@ def main() -> int:
                 errors.append(f"{f.relative_to(bundle)}: link escapes bundle root -> {target}")
             else:
                 real = real_case_path(dest, bundle)
+                if real is not None and not real.exists():
+                    real = None
                 if real is None:
                     nonconforming = real_case_path(
                         dest, bundle, allow_nonconforming_md=True
                     )
                     if (nonconforming is not None
+                            and nonconforming.exists()
                             and nonconforming.suffix.lower() == ".md"
                             and nonconforming.suffix != ".md"):
                         found = os.path.relpath(nonconforming, f.parent).replace(os.sep, "/")
-                        expected = os.path.relpath(dest, f.parent).replace(os.sep, "/")
+                        expected_path = nonconforming.parent / dest.name
+                        expected = os.path.relpath(expected_path, f.parent).replace(os.sep, "/")
                         errors.append(
                             f"{f.relative_to(bundle)}: link target exists only as a "
                             f"non-conforming markdown filename -> {target}; rename "

@@ -954,6 +954,39 @@ def test_link_to_existing_uppercase_md_fails(tmp_path):
     assert "write Target.MD" not in out
 
 
+def test_nonconforming_extension_rename_uses_real_parent_case(tmp_path):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD, name="concepts/Target.MD")
+    write_concept(
+        b,
+        GOOD.rstrip() + "\n\nSee [target](../Concepts/target.md).\n",
+        name="concepts/c.md",
+    )
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "rename Target.MD to target.md" in out
+    assert "rename Target.MD to ../Concepts/target.md" not in out
+
+
+def test_wrong_case_dangling_symlink_is_reported_as_dangling(tmp_path):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    try:
+        (b / "concepts" / "Broken.md").symlink_to("missing.md")
+    except OSError as exc:
+        pytest.skip(f"symlink unavailable on this filesystem: {exc}")
+    write_concept(
+        b,
+        GOOD.rstrip() + "\n\nSee [broken](broken.md).\n",
+        name="concepts/c.md",
+    )
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "dangling link -> broken.md" in out
+    assert "write Broken.md" not in out
+
+
 def test_uppercase_scheme_link_not_flagged(tmp_path):
     # an external link with an uppercase scheme must be recognized as external and
     # skipped, not resolved as a local path (which falsely fails as escaping).

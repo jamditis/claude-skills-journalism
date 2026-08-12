@@ -287,8 +287,9 @@ A link's case must match the file on disk. macOS resolves `Concepts/Foo.md` to
 `concepts/foo.md` and answers that the file exists, so a bundle written there validates
 locally and dangles the first time a Linux reader or CI job opens it. The validator
 compares each path component against the real directory listing rather than asking the
-filesystem, and the error gives the link to write instead, so a macOS author sees the
-mismatch on their own machine.
+filesystem, and the error gives the link to write instead, so a macOS author usually
+sees the mismatch on their own machine. A wrong-cased symlink component can be
+normalized to its target before this comparison and is caught later by Linux CI.
 
 A Windows author does not: there `Path.resolve()` goes through
 GetFinalPathNameByHandle, which substitutes the on-disk casing before the check runs.
