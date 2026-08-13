@@ -48,7 +48,7 @@ Requeiro a reforma da decisão recorrida e, se for o caso, a desclassificação
 da informação, com o consequente fornecimento em formato aberto.
 
 [NOME COMPLETO]
-[CPF]
+[CPF ou outro documento de identificação válido]
 [DATA]
 
 ---

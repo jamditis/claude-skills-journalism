@@ -16,6 +16,7 @@ import { createHash } from 'node:crypto';
 
 export const EXPECTED_SKILL_NAMES = [
   'ai-writing-detox',
+  'brazil-records-requests',
   'crisis-communications',
   'data-journalism',
   'editorial-workflow',
@@ -32,7 +33,7 @@ export const EXPECTED_SKILL_NAMES = [
 ];
 
 const PLUGIN_ID = 'journalism-core@claude-skills-journalism';
-const EXPECTED_VERSION = '1.3.0';
+const EXPECTED_VERSION = '1.4.0';
 export const SUBPROCESS_TIMEOUT_MS = 180_000;
 
 export function buildCommandPlan(client, repoRoot, tempRoot) {

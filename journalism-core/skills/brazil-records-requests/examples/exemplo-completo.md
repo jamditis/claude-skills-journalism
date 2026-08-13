@@ -53,15 +53,18 @@ Brazilian practice, and it rarely survives an appeal that cites art. 7 §2º.*
 **Request 2 → appeal, not refiling.** The "additional work" ground is the one
 worth fighting: the appeal argued the agency was being asked to export an
 existing field from an existing system, not to compute anything, and invoked
-art. 13 §2º, which obliges the agency to indicate where the raw data sits when
-it does claim additional work. The response had done neither.
+art. 13, parágrafo único, which obliges the agency to indicate where the raw
+data sits when it does claim additional work. The response had done neither.
 
 *A refiling here would have conceded the point and started over.*
 
-**Request 3 → new request, not an appeal.** The information was granted, so
-there was nothing to appeal. A fresh request asked for the same content in
-CSV, citing art. 8 §3º, II and III. Format complaints are refiled, not
-appealed.
+**Request 3 → appeal on the format, within the 10-day window.** The agency
+had a CSV export in its own open-data release (see request 1), so the PDF was
+not full compliance — LAI art. 11 §5 entitles the requester to digitally
+stored information in that digital format. The appeal cited art. 11 §5
+alongside art. 8 §3º, II and III, and asked for the same content in CSV. A
+fresh request would have worked too, but it forfeits the shorter 10-day
+appeal clock for a new 20-day cycle with no guarantee of a better outcome.
 
 ## Timeline
 
@@ -70,10 +73,9 @@ appealed.
 | 0 | Three requests filed |
 | 18 | Requests 1 and 3 answered |
 | 20 | Request 2 denied |
-| 22 | Appeals filed on 1 and 2; request 3 refiled for format |
+| 22 | Appeals filed on 1, 2, and 3 |
 | 31 | Request 1 appeal granted in part |
-| 45 | Request 2 appeal granted after the agency was asked to locate the raw data |
-| 48 | CSV received for request 3 |
+| 45 | Request 2 appeal granted after the agency was asked to locate the raw data; request 3 appeal granted, CSV received |
 
 Seven weeks from filing to usable data, with no denial reaching CGU. Planning
 the reporting on a two-month horizon rather than a two-week one was what made
@@ -85,5 +87,7 @@ that acceptable.
 2. Diagnose before responding. Appeal, refile, and file-new are three
    different tools, and using the wrong one costs weeks.
 3. The personal-data objection is usually over-applied. Cite art. 7 §2º.
-4. Format problems are not denials. Refile.
+4. An unusable digital format is not full compliance when the agency already
+   holds the data digitally. Appeal it under art. 11 §5 rather than treating
+   it as granted.
 5. Ask for the data dictionary in the original request, not after.

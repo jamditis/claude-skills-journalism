@@ -37,7 +37,7 @@ do órgão ou entidade que as detém, nos termos do art. 11, inciso III, da
 Lei nº 12.527/2011.
 
 [NOME COMPLETO]
-[CPF]
+[CPF ou outro documento de identificação válido]
 [DATA]
 
 ---
@@ -57,3 +57,8 @@ Lei nº 12.527/2011.
   base em um único campo pessoal. Não o remova.
   *The partial-redaction paragraph blocks a total denial based on one
   personal field. Keep it.*
+- **A identificação exigida pelo art. 12 do Decreto 7.724/2012 é um documento
+  de identificação válido, não especificamente o CPF.** Se o pedido for feito
+  pelo Fala.BR com usuário já identificado, o campo pode ser dispensado.
+  *Art. 12 requires a valid ID document, not CPF specifically. Drop the field
+  if filing through an already-identified Fala.BR account.*

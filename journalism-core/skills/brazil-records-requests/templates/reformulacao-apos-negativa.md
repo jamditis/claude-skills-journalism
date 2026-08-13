@@ -45,7 +45,7 @@ parcelado, começando pelo período de [RECORTE MENOR], nos termos do que o
 próprio órgão indicar como exequível.
 
 [NOME COMPLETO]
-[CPF]
+[CPF ou outro documento de identificação válido]
 [DATA]
 
 ---

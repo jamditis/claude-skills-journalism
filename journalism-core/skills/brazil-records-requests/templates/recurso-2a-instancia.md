@@ -51,7 +51,7 @@ aberto, ou, subsidiariamente, o acesso parcial com supressão exclusiva dos
 elementos protegidos.
 
 [NOME COMPLETO]
-[CPF]
+[CPF ou outro documento de identificação válido]
 [DATA]
 
 ---

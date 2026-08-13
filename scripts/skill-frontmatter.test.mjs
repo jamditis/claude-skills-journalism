@@ -118,7 +118,7 @@ test('published package versions stay aligned with the marketplace', () => {
   );
   assert.equal(marketplace.version, '2.4.0', 'marketplace version');
   const expected = new Map([
-    ['journalism-core', '1.3.0'],
+    ['journalism-core', '1.4.0'],
     ['okf-wiki', '0.8.0'],
     ['pdf-playground', '1.3.2'],
     ['video-toolkit', '1.0.3'],

@@ -38,7 +38,7 @@ Caso algum campo contenha dados pessoais protegidos, requeiro o fornecimento
 da base com a supressão exclusiva desses campos, preservados os demais.
 
 [NOME COMPLETO]
-[CPF]
+[CPF ou outro documento de identificação válido]
 [DATA]
 
 ---

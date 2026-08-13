@@ -92,7 +92,9 @@ records unit. Filing as a private citizen is normal practice.
 
 ### What the request must contain
 
-- Requester identification (name, CPF) — anonymous filing is not available
+- Requester identification (name and a valid ID document — CPF is common but
+  not mandated by art. 12; a user already identified on Fala.BR does not need
+  to re-disclose it) — anonymous filing is not available
 - A specific description of the information sought
 - The delivery format you want
 
@@ -138,9 +140,10 @@ Under art. 11:
 - **Extendable once, by 10 days**, with express written justification
   communicated to the requester (art. 11 §2º)
 
-So the realistic worst case for a first answer is 30 days. Silence after the
-deadline is treated as a denial for appeal purposes, and it is a stronger
-appeal than a reasoned refusal.
+So the realistic worst case for a first answer is 30 days. Silence does not
+route through the same channel as a reasoned denial — see "Step 5: The
+appeal chain" for the federal-executive procedure (reclamação, not a direct
+appeal).
 
 Service is free; agencies may charge only for reproduction costs, and
 low-income requesters are exempt on declaration (art. 12).
@@ -157,11 +160,12 @@ for each — appealing a denial that should have been refiled wastes months.
 | --- | --- | --- |
 | Generic request | Decree 7.724/2012, art. 13, I | **Refile**, narrowed. Faster than appealing. |
 | Disproportionate or unreasonable | Decree 7.724, art. 13, II | **Refile** in slices, or appeal if the volume claim is implausible |
-| Requires additional analysis, interpretation or consolidation of data | Decree 7.724, art. 13, III | **Appeal.** The agency must indicate where the raw data is (art. 13 §2º). Ask for the raw export instead. |
+| Requires additional analysis, interpretation or consolidation of data | Decree 7.724, art. 13, III | **Appeal.** The agency must indicate where the raw data is (art. 13, parágrafo único). Ask for the raw export instead. |
 | Personal data / LGPD | LAI art. 31; Lei 13.709/2018 | **Appeal**, requesting the record with personal fields redacted. Partial access is the rule, full withholding the exception. |
 | Classified | LAI arts. 23–24 | **Appeal**, demanding the classification instrument (termo de classificação), its date, level and authority. Reservada is 5 years, secreta 15, ultrassecreta 25. |
 | Body does not hold it | LAI art. 11, III | Ask which body does — the agency is required to say — then refile there |
-| Silence | — | **Appeal immediately** when the deadline passes. Do not wait. |
+| Silence (federal executive) | Decree 7.724/2012, arts. 22–23 | **Reclamação** to the monitoring authority, not a direct appeal — see Step 5. |
+| Silence (other spheres) | Local LAI regulation | Usually an immediate appeal under LAI art. 15; confirm the state, municipal, judicial or legislative body's own rule — Decree 7.724/2012 binds the federal executive only. |
 
 Two provisions worth knowing by heart:
 
@@ -176,11 +180,11 @@ Two provisions worth knowing by heart:
 
 ## Step 5: The appeal chain
 
-Four administrative levels. Each has its own window, and missing one closes
-the chain.
+**A reasoned denial** goes up four administrative levels. Each has its own
+window, and missing one closes the chain.
 
 ```
-Denial or silence
+Reasoned denial
    │  10 days to file
    ▼
 1. Immediate superior authority          → decides in 5 days   (LAI art. 15)
@@ -194,6 +198,26 @@ Denial or silence
    ▼
 4. CMRI — final administrative recourse  (LAI art. 16 §3º)
 ```
+
+**Silence from a federal executive body** does not enter that chain directly.
+It goes through a separate reclamação step first:
+
+```
+Silence past the deadline (30 days after filing, at the earliest)
+   │  10 days to file
+   ▼
+1. Reclamação to the monitoring authority → decides in 5 days  (Decree 7.724/2012, art. 22)
+   │  if unsuccessful, 10 days
+   ▼
+2. Recurso to CGU                         → decides in 5 days  (Decree 7.724/2012, art. 23)
+   │  10 days
+   ▼
+3. CMRI — final administrative recourse   (LAI art. 16 §3º)
+```
+
+For state, municipal, judicial and legislative bodies, Decree 7.724/2012 does
+not apply — check whether the local LAI regulation has an equivalent
+reclamação step, or whether silence is appealed directly under LAI art. 15.
 
 Notes from practice:
 
@@ -236,7 +260,12 @@ and Fala.BR does not notify reliably.
 
 Publishing the request and the response afterwards — through Achados e
 Pedidos or the outlet's own site — is standard practice in Brazilian
-investigative work and helps the next reporter.
+investigative work and helps the next reporter. Before publishing, redact
+CPFs, home addresses, and any other personal field the agency did not
+already withhold under LAI art. 31 — a public record is not automatically a
+public-interest publication, and this is especially true for victim,
+witness, and juvenile identifiers. LGPD applies to what a newsroom does with
+personal data it receives, not just to what the agency releases.
 
 ## Working with what comes back
 

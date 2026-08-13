@@ -55,7 +55,7 @@ Requeiro o provimento do recurso, com a determinação de fornecimento das
 informações em formato aberto e legível por máquina.
 
 [NOME COMPLETO]
-[CPF]
+[CPF ou outro documento de identificação válido]
 [DATA]
 
 ---
