@@ -60,6 +60,8 @@ Contradictory information from multiple sources causes derailing conflicts.
 
 ## Practical degradation thresholds
 
+These bands are illustrative heuristics, not model-independent guarantees. The transition points move with the model, its version, and the retrieval or reasoning task: a short context is not always reliable, and a long one is not always lossy. Measure recall on your own model and workload before you treat a threshold as a hard cutoff for discarding or summarizing context.
+
 | Context Size | Expected Behavior |
 |--------------|-------------------|
 | < 8K tokens | Full attention, reliable recall |
@@ -70,10 +72,10 @@ Contradictory information from multiple sources causes derailing conflicts.
 ## Mitigation strategies
 
 ### Write externally
-Don't rely on Claude to remember across turns. Write important state to files:
+Don't rely on Claude to remember across turns. Write important state to files, but agree the path with the user first and prefer a gitignored workspace so you never overwrite project-owned content:
 ```
-After each major step, write progress to PROGRESS.md
-Before starting, read PROGRESS.md to restore context
+With the user's approval, after each major step write progress to an agreed scratch file (for example a gitignored PROGRESS.md or a path they choose)
+Before starting, read that file back to restore context
 ```
 
 ### Select carefully
