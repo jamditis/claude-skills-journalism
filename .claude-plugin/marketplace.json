@@ -1,7 +1,7 @@
 {
   "name": "claude-skills-journalism",
   "version": "2.5.0",
-  "description": "Claude Code plugins for journalism, research, and media organizations",
+  "description": "Agent skills and Claude Code plugins for journalism, research, and media organizations",
   "owner": {
     "name": "Joe Amditis",
     "email": "jamditis@gmail.com"
