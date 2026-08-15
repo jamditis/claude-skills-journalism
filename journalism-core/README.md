@@ -1,12 +1,13 @@
 # journalism-core
 
-Fourteen core journalism skills for Claude Code — covering reporting, verification, and publishing workflows for working journalists.
+Fifteen core journalism skills for Claude Code — covering reporting, verification, and publishing workflows for working journalists.
 
 ## What's in this plugin
 
 | Skill | Purpose |
 |---|---|
 | **ai-writing-detox** | Eliminate AI-generated writing patterns that erode reader trust |
+| **brazil-records-requests** | Public records requests under Brazil's Access to Information Law (Lei 12.527/2011) — portal selection, drafting, and the four-level appeal chain |
 | **crisis-communications** | Rapid-response and breaking-news verification frameworks |
 | **data-journalism** | Dataset analysis, chart and map creation, statistical reasoning, data-driven story structure |
 | **editorial-workflow** | Assignment tracking, deadlines, and editorial calendars |
@@ -39,6 +40,7 @@ A few skills in this bundle reference siblings in other bundles. The references 
 - **source-verification** points to `social-media-intelligence` (deeper account analysis) and `web-archiving` (full archiving workflows)
 - **interview-prep** points to `web-archiving` (recovering deleted social media content)
 - **foia-requests** does not depend on other bundles
+- **brazil-records-requests** is a companion to `foia-requests` (Brazil vs. US jurisdiction) and does not depend on other bundles
 
 ## Maintenance
 
@@ -47,6 +49,7 @@ Skills are updated against current authoritative sources. Substantive content ch
 Notable currency dates:
 
 - **foia-requests** — citations verified May 2026 (FOIA Improvement Act of 2016 codification at 5 U.S.C. § 552(a)(8)(A); NJ OPRA P.L. 2024 c.16 effective September 3, 2024)
+- **brazil-records-requests** — citations verified against Lei 12.527/2011 and Decreto 7.724/2012 as published on planalto.gov.br
 - **newsletter-publishing** — Gmail / Yahoo / Outlook bulk-sender requirements verified May 2026 including the November 2025 Gmail enforcement escalation to permanent 5xx rejections
 - **source-verification** — C2PA Content Credentials adoption + deepfake detection tooling verified May 2026
 

@@ -1049,6 +1049,10 @@ video {
   --tw-text-opacity: 1;
   color: rgb(13 148 136 / var(--tw-text-opacity, 1));
 }
+.text-\[\#0f766e\] {
+  --tw-text-opacity: 1;
+  color: rgb(15 118 110 / var(--tw-text-opacity, 1));
+}
 .text-\[\#1a6b5a\] {
   --tw-text-opacity: 1;
   color: rgb(26 107 90 / var(--tw-text-opacity, 1));
@@ -1243,6 +1247,10 @@ video {
 .group:hover .group-hover\:text-\[\#0d9488\] {
   --tw-text-opacity: 1;
   color: rgb(13 148 136 / var(--tw-text-opacity, 1));
+}
+.group:hover .group-hover\:text-\[\#0f766e\] {
+  --tw-text-opacity: 1;
+  color: rgb(15 118 110 / var(--tw-text-opacity, 1));
 }
 .group:hover .group-hover\:text-\[\#1a6b5a\] {
   --tw-text-opacity: 1;

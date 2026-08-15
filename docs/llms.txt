@@ -12,11 +12,12 @@ Source: https://github.com/jamditis/claude-skills-journalism
 Joe Amditis — associate director of operations, Center for Cooperative Media, Montclair State University.
 Personal site: https://jamditis.com
 
-## Skills (61 total)
+## Skills (62 total)
 
 ### Journalism and verification
 - source-verification — SIFT method, verification trails, source credibility, deepfakes/C2PA
 - foia-requests — drafting and tracking public records requests
+- brazil-records-requests — Brazilian public records requests under the Access to Information Law (LAI)
 - fact-check-workflow — claim verification, evidence chains
 - crisis-communications — breaking news protocols, rapid verification
 - social-media-intelligence — OSINT, account analysis, social media verification
@@ -137,7 +138,7 @@ Skills above are distributed as Claude Code plugins. Install via:
 
 Restart your Claude Code session after installing or updating a plugin so the new skills and commands register.
 
-Plugins (12): `journalism-core` (14 skills), `research-toolkit` (6), `dev-toolkit` (12), `security-toolkit` (4 skills + /hotpatch command), `project-templates-toolkit` (3), `pdf-design` (1), `pdf-playground` (1), `visual-explainer` (1), `video-toolkit` (4), `okf-wiki` (1), `superjawn` (14), `autocontext` (cross-session knowledge persistence — hooks, commands, and agents rather than skills).
+Plugins (12): `journalism-core` (15 skills), `research-toolkit` (6), `dev-toolkit` (12), `security-toolkit` (4 skills + /hotpatch command), `project-templates-toolkit` (3), `pdf-design` (1), `pdf-playground` (1), `visual-explainer` (1), `video-toolkit` (4), `okf-wiki` (1), `superjawn` (14), `autocontext` (cross-session knowledge persistence — hooks, commands, and agents rather than skills).
 
 ## Alternate installation
 
