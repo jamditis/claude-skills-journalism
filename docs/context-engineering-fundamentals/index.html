@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Manage attention, evidence, and task state during long AI-agent sessions without relying on fixed token thresholds.">
+    <title>Context engineering fundamentals - Agent skills for journalism</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="stylesheet" href="../assets/tailwind/context-engineering-fundamentals.css" data-tailwind-build="3.4.19">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Fraunces', serif; }
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.45), transparent 60%);
+            pointer-events: none;
+        }
+        .skip-link { position: absolute; left: -9999px; top: 0; z-index: 100; }
+        .skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1rem; background: #121212; color: #fff; }
+        :focus-visible { outline: 2px solid #4f46e5; outline-offset: 4px; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; }
+        }
+    </style>
+    <meta property="og:title" content="Context engineering fundamentals">
+    <meta property="og:description" content="Keep instructions, evidence, and task state usable during long AI-agent sessions.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/context-engineering-fundamentals/">
+    <meta property="og:image" content="https://skills.amditis.tech/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Context engineering fundamentals">
+    <meta name="twitter:description" content="Keep instructions, evidence, and task state usable during long AI-agent sessions.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/og-image.png">
+    <link rel="stylesheet" href="../updated.css">
+    <script src="../ask-ai.js" defer></script>
+</head>
+<body class="bg-canvas text-ink">
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <div class="paper-overlay" aria-hidden="true"></div>
+
+    <nav aria-label="Primary" class="relative z-10 border-b border-mist/40">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="../" class="text-sm font-semibold text-accent hover:underline">All skills</a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/dev-toolkit/skills/context-engineering-fundamentals" class="text-sm font-semibold text-accent hover:underline">View source</a>
+        </div>
+    </nav>
+
+    <header class="relative z-10 bg-gradient-to-br from-accent to-accentDark text-white">
+        <div class="max-w-4xl mx-auto px-6 py-16">
+            <p class="text-sm font-semibold mb-4">Development skill</p>
+            <h1 class="text-4xl md:text-5xl font-bold">Context engineering fundamentals</h1>
+            <p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-08-14T12:31:33-04:00" data-updated-slug="context-engineering-fundamentals">Updated <time datetime="2026-08-14T12:31:33-04:00">Aug 14, 2026</time></p>
+            <p class="text-xl text-white/90 max-w-2xl mt-5">Keep instructions, evidence, and task state usable during long AI-agent sessions.</p>
+        </div>
+    </header>
+
+    <main id="main" class="relative z-10 max-w-4xl mx-auto px-6 py-12">
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">Use this skill when</h2>
+            <ul class="space-y-3 list-disc pl-6 text-clay">
+                <li>A task spans many steps, files, tools, or agents.</li>
+                <li>An agent loses an instruction or misses supplied evidence.</li>
+                <li>You must decide what to preserve, compress, or remove.</li>
+                <li>You need a repeatable way to test long-context quality.</li>
+            </ul>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">Core rule</h2>
+            <div class="bg-white/60 border border-mist/40 rounded-xl p-6">
+                <p class="text-lg">A large context limit does not guarantee equal use of every item.</p>
+                <p class="mt-3 text-clay">Measure retrieval and reasoning quality on the model and task you use. Do not rely on universal token thresholds.</p>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-5">Five failure patterns</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                <article class="bg-white/50 border border-mist/40 rounded-xl p-5">
+                    <h3 class="text-lg font-semibold">Lost in the middle</h3>
+                    <p class="text-clay mt-2">Evidence can become harder to retrieve when it sits between other material.</p>
+                </article>
+                <article class="bg-white/50 border border-mist/40 rounded-xl p-5">
+                    <h3 class="text-lg font-semibold">Context poisoning</h3>
+                    <p class="text-clay mt-2">An early error can shape later reasoning when nobody verifies it.</p>
+                </article>
+                <article class="bg-white/50 border border-mist/40 rounded-xl p-5">
+                    <h3 class="text-lg font-semibold">Context distraction</h3>
+                    <p class="text-clay mt-2">Irrelevant material competes with the evidence that matters.</p>
+                </article>
+                <article class="bg-white/50 border border-mist/40 rounded-xl p-5">
+                    <h3 class="text-lg font-semibold">Context confusion</h3>
+                    <p class="text-clay mt-2">Mixed tasks and unclear boundaries make the next action ambiguous.</p>
+                </article>
+                <article class="bg-white/50 border border-mist/40 rounded-xl p-5 md:col-span-2">
+                    <h3 class="text-lg font-semibold">Context clash</h3>
+                    <p class="text-clay mt-2">Conflicting sources or instructions need an explicit decision before use.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">Practical workflow</h2>
+            <ol class="space-y-4 list-decimal pl-6 text-clay">
+                <li>Keep critical constraints near the decision that uses them.</li>
+                <li>Verify intermediate outputs before later steps depend on them.</li>
+                <li>Remove irrelevant material before you add more context.</li>
+                <li>Write durable state only to a user-approved path.</li>
+                <li>Compare task quality before and after summarization.</li>
+            </ol>
+        </section>
+
+        <section class="border-t border-mist/40 pt-8">
+            <h2 class="text-2xl font-semibold mb-4">Install</h2>
+            <p class="text-clay mb-4">Install the dev-toolkit plugin or copy this skill with the standards-based skills CLI.</p>
+            <pre class="bg-ink text-white rounded-xl p-4 overflow-x-auto mb-4"><code>/plugin install dev-toolkit@claude-skills-journalism</code></pre>
+            <pre class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>npx skills@latest add jamditis/claude-skills-journalism \
+  --skill context-engineering-fundamentals --agent codex --copy -g -y</code></pre>
+        </section>
+    </main>
+
+    <footer class="relative z-10 border-t border-mist/40 mt-8">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-sm text-clay flex flex-wrap gap-4 justify-between">
+            <span>Joe Amditis</span>
+            <a href="https://github.com/jamditis/claude-skills-journalism" class="text-accent hover:underline">GitHub repository</a>
+        </div>
+    </footer>
+    <script defer src="../updated.js"></script>
+</body>
+</html>

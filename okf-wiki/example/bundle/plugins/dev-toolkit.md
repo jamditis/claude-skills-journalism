@@ -1,15 +1,15 @@
 ---
 type: Reference
 title: "dev-toolkit plugin"
-description: "Eleven development skills for small newsroom dev teams."
+description: "Twelve development skills for small newsroom dev teams."
 source: ["dev-toolkit/.claude-plugin/plugin.json", ".claude-plugin/marketplace.json"]
-verified: 2026-06-26
-timestamp: 2026-06-26
+verified: 2026-08-15
+timestamp: 2026-08-15
 tags: [plugin, development]
 ---
 # dev-toolkit plugin
 
-Eleven skills: accessibility (WCAG 2.2), Electron patterns, mobile/remote
+Twelve skills: accessibility (WCAG 2.2), context engineering, Electron patterns, mobile/remote
 debugging, irreversible-decision discipline, Python data pipelines, test-first bug
 fixing, AI-assisted development, ethical web scraping, no-build frontend patterns,
 web-UI taste, and CLAUDE.md context maintenance. Install with
@@ -19,6 +19,7 @@ web-UI taste, and CLAUDE.md context maintenance. Install with
 
 - [accessibility-compliance](../skills/accessibility-compliance.md)
 - [claude-md-updater](../skills/claude-md-updater.md)
+- [context-engineering-fundamentals](../skills/context-engineering-fundamentals.md)
 - [electron-dev](../skills/electron-dev.md)
 - [mobile-debugging](../skills/mobile-debugging.md)
 - [one-way-door](../skills/one-way-door.md)

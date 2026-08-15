@@ -1,6 +1,6 @@
 # skills
 
-Every skill the marketplace ships, one concept per file, grouped by [plugin](../plugins/index.md). 56 skills across 10 plugins.
+Every skill the marketplace ships, one concept per file, grouped by [plugin](../plugins/index.md). 61 skills across 11 plugins.
 
 ## [journalism-core](../plugins/journalism-core.md)
 - [ai-writing-detox](ai-writing-detox.md)
@@ -29,6 +29,7 @@ Every skill the marketplace ships, one concept per file, grouped by [plugin](../
 ## [dev-toolkit](../plugins/dev-toolkit.md)
 - [accessibility-compliance](accessibility-compliance.md)
 - [claude-md-updater](claude-md-updater.md)
+- [context-engineering-fundamentals](context-engineering-fundamentals.md)
 - [electron-dev](electron-dev.md)
 - [mobile-debugging](mobile-debugging.md)
 - [one-way-door](one-way-door.md)
@@ -77,3 +78,9 @@ Every skill the marketplace ships, one concept per file, grouped by [plugin](../
 
 ## [okf-wiki](../plugins/okf-wiki.md)
 - [okf-wiki](okf-wiki.md)
+
+## [video-toolkit](../plugins/video-toolkit.md)
+- [video-dashboard](video-dashboard.md)
+- [video-download](video-download.md)
+- [video-frames](video-frames.md)
+- [video-transcribe](video-transcribe.md)
