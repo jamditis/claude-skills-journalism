@@ -21,9 +21,9 @@ Claude Code skills derived from [obra/superpowers](https://github.com/obra/super
 | `using-superjawn` | Consumer | Ported (Batch 5, renamed from upstream `using-superpowers`) |
 | `writing-skills` | Research | Ported (Batch 5) |
 
-## Coexistence with upstream
+## Standalone by default
 
-v1.0.0 ships with no soft dependencies on the upstream `superpowers` plugin — the four `superpowers:code-reviewer` agent dispatches in v0.6.0 now target `pr-review-toolkit:code-reviewer` (Anthropic-maintained, in `@claude-code-plugins`). You can run `superjawn` as a standalone replacement for `superpowers` from this version forward. If you want to revert to the upstream plugin for any reason, install with `/plugin install superpowers@claude-plugins-official`.
+Superjawn has no soft dependencies on the upstream `superpowers` plugin. The v1.0.0 release rewrote the four `superpowers:code-reviewer` agent dispatches from v0.6.0 to target `pr-review-toolkit:code-reviewer` (Anthropic-maintained, in `@claude-code-plugins`). You can run `superjawn` as a standalone replacement for `superpowers`. If you want to revert to the upstream plugin for any reason, install with `/plugin install superpowers@claude-plugins-official`.
 
 ## Phase shapes
 
