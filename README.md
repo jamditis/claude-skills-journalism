@@ -43,7 +43,7 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 |--------|-------------|----------|--------|
 | [autocontext](./autocontext/) | Cross-session knowledge persistence with skill evolution. Lessons accumulate per-skill, and `/autocontext:evolve` folds them back into skill files | `/autocontext:setup`, `/autocontext:init`, `/autocontext:review`, `/autocontext:status`, `/autocontext:evolve` | Apr 27, 2026 |
 | [dev-toolkit](./dev-toolkit/) | Twelve development-focused skills for journalists, researchers, and small newsroom dev teams: accessibility (WCAG 2.2), Electron app patterns, mobile/remote debugging, irreversible-decision discipline, Python data pipelines, test-first bug fixing, AI-assisted development workflows, ethical web scraping, no-build frontend patterns, signs-of-taste guidance for web UI, CLAUDE.md context maintenance, and managing attention across long sessions | n/a — skills only | Aug 15, 2026 |
-| [journalism-core](./journalism-core/) | Fourteen core journalism skills, including AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, fact-checking, interview prep + transcription, story pitches, editorial workflow, crisis communications, newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements, and embedded photo metadata for wire distribution | n/a — skills only | Jul 25, 2026 |
+| [journalism-core](./journalism-core/) | Fifteen core journalism skills, including AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, Brazilian LAI requests, fact-checking, interview prep + transcription, story pitches, editorial workflow, crisis communications, newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements, and embedded photo metadata for wire distribution | n/a — skills only | Aug 13, 2026 |
 | [okf-wiki](./okf-wiki/) | Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with YAML frontmatter, directory navigation, and a validator. Generates a starter wiki that passes its own conformance and secret-leak checks, ships session-start hooks that orient Claude on the knowledge base before it works, and includes an optional GitHub-wiki bootstrap. For newsroom institutional memory, research atlases, decision logs, and infrastructure maps | n/a — skill only | Aug 15, 2026 |
 | [pdf-design](./pdf-design/) | PDF report and proposal design system with brand variables, budget tables, and reusable content blocks (stats strips, three-column, four-tile pillars, partner grids) | n/a — skill-only | Jul 21, 2026 |
 | [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials with an interactive control panel for live design editing (colors, fonts, spacing, sections) and a guided wizard for proposals | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` | Jul 22, 2026 |
@@ -106,7 +106,7 @@ codex plugin marketplace add jamditis/claude-skills-journalism
 codex plugin add journalism-core@claude-skills-journalism
 ```
 
-The package route is covered by a clean-install canary, but it uses Codex's legacy Claude-manifest reader. It exposes the 14 nested skills in `journalism-core`; it does not convert Claude commands, agents, hooks, or root-level skills into Codex components. This repository does not ship native Codex manifests yet.
+The package route is covered by a clean-install canary, but it uses Codex's legacy Claude-manifest reader. It exposes the 15 nested skills in `journalism-core`; it does not convert Claude commands, agents, hooks, or root-level skills into Codex components. This repository does not ship native Codex manifests yet.
 
 Codex desktop can [import skills from another agent](https://learn.chatgpt.com/docs/import.md). Import leaves the source installation in place. Until duplicate-identity and uninstall behavior has been tested for this repository, do not import a skill and also install the same skill through `npx skills` or the package route.
 
@@ -130,11 +130,12 @@ age.
 
 ### Core journalism skills (in `journalism-core` plugin)
 
-These fourteen skills ship together as the [journalism-core](./journalism-core/) plugin. Install via `/plugin install journalism-core@claude-skills-journalism` to get all of them at once.
+These fifteen skills ship together as the [journalism-core](./journalism-core/) plugin. Install via `/plugin install journalism-core@claude-skills-journalism` to get all of them at once.
 
 | Skill | Description | Updated |
 |-------|-------------|--------|
 | [ai-writing-detox](./journalism-core/skills/ai-writing-detox/) | Eliminate AI-generated patterns that erode reader trust. Banned words, phrases, and structures with alternatives | May 8, 2026 |
+| [brazil-records-requests](./journalism-core/skills/brazil-records-requests/) | Public records requests under Brazil's Access to Information Law (Lei 12.527/2011) — portal selection across federal, state, municipal, judicial and legislative bodies; deadlines; the four-level appeal chain (first instance, agency head, CGU, CMRI); templates in Portuguese with English glosses | Aug 13, 2026 |
 | [crisis-communications](./journalism-core/skills/crisis-communications/) | Breaking news protocol, rapid verification, crisis response, misinformation countering | Jul 21, 2026 |
 | [data-journalism](./journalism-core/skills/data-journalism/) | Dataset analysis, chart and map creation, statistical reasoning, data-driven story structure | Jul 21, 2026 |
 | [editorial-workflow](./journalism-core/skills/editorial-workflow/) | Story assignment tracking, deadline management, editorial calendars, handoff protocols | May 8, 2026 |
