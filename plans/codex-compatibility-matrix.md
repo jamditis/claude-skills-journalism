@@ -18,7 +18,7 @@
 
 ## August 2026 structure refresh
 
-- Marketplace 2.5.0 contains 12 packages and 61 shared skills.
+- Marketplace 2.5.0 contains 12 packages and 62 shared skills.
 - Eleven packages contain native `.codex-plugin/plugin.json` manifests.
 - Nested-skill packages point at `./skills/`.
 - Root-skill packages point at `./`.
