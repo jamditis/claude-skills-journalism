@@ -37,8 +37,8 @@ test('video toolkit docs explain the four-stage reporting pipeline and its bound
 test('homepage lists video toolkit once, before visual explainer, with accurate counts', () => {
   const index = readFileSync(join(DOCS, 'index.html'), 'utf8');
 
-  assert.match(index, />61 Skills \/\/ 12 Plugins \/\/ 17 Hooks</u);
-  assert.match(index, /id="finder-count">61 skills, 12 plugins</u);
+  assert.match(index, />62 Skills \/\/ 12 Plugins \/\/ 17 Hooks</u);
+  assert.match(index, /id="finder-count">62 skills, 12 plugins</u);
   assert.match(index, />12 Plugins<\/span>/u);
   assert.equal((index.match(/href="video-toolkit\/"/gu) || []).length, 1);
 

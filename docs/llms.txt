@@ -12,7 +12,7 @@ Source: https://github.com/jamditis/claude-skills-journalism
 Joe Amditis — associate director of operations, Center for Cooperative Media, Montclair State University.
 Personal site: https://jamditis.com
 
-## Skills (61 total)
+## Skills (62 total)
 
 ### Journalism and verification
 - source-verification — SIFT method, verification trails, source credibility, deepfakes/C2PA
