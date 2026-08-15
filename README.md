@@ -83,9 +83,18 @@ Do not clone the repo directly into `~/.claude/skills/journalism-skills/` — th
 
 ### Codex
 
-**Prerequisite:** Install [Codex CLI](https://learn.chatgpt.com/docs/codex/cli). Run `codex --version` in your terminal to check.
+**Prerequisite:** Install [Codex CLI](https://developers.openai.com/codex/cli). Run `codex --version` in your terminal to check. The native package route below is verified with Codex CLI 0.147.0.
 
-For a new Codex setup, install standards-based skills with the `skills` CLI. This user-level command makes the 14 core skills available across your Codex projects:
+This repository ships native Codex manifests for 11 skill packages. Install one package through the marketplace:
+
+```bash
+codex plugin marketplace add jamditis/claude-skills-journalism
+codex plugin add journalism-core@claude-skills-journalism
+```
+
+The native manifests expose shared skills. They do not convert Claude commands, agents, or hooks into Codex components. Autocontext remains Claude-only because its current package contains Claude commands and hooks, not a shared `SKILL.md`.
+
+You can instead install standards-based skills with the `skills` CLI. This user-level command makes the 14 core skills available across your Codex projects:
 
 ```bash
 npx skills@latest add https://github.com/jamditis/claude-skills-journalism/tree/master/journalism-core \
@@ -99,20 +108,13 @@ npx skills@latest add jamditis/claude-skills-journalism \
   --skill fact-check-workflow --agent codex --copy -g -y
 ```
 
-Codex can also install the full package through this repository's existing Claude marketplace metadata:
-
-```bash
-codex plugin marketplace add jamditis/claude-skills-journalism
-codex plugin add journalism-core@claude-skills-journalism
-```
-
-The package route is covered by a clean-install canary, but it uses Codex's legacy Claude-manifest reader. It exposes the 14 nested skills in `journalism-core`; it does not convert Claude commands, agents, hooks, or root-level skills into Codex components. This repository does not ship native Codex manifests yet.
-
 Codex desktop can [import skills from another agent](https://learn.chatgpt.com/docs/import.md). Import leaves the source installation in place. Until duplicate-identity and uninstall behavior has been tested for this repository, do not import a skill and also install the same skill through `npx skills` or the package route.
 
 Codex's bundled skill installer writes to a different Codex-specific directory and is not a tested installation path for this repository. Codex does not deduplicate same-name skills across install roots, so don't combine it with the `.agents/skills` route above.
 
-See the checked-in [Codex compatibility matrix](./plans/codex-compatibility-matrix.md) for tested versions, package boundaries, and pending runtime gates. A valid install is not yet a package-wide runtime support claim. As of v2.4.0 the tested versions lag the released ones: the matrix records evidence gathered against the previous release, and the install commands above deliver the newer packages.
+Use only one Codex installation path for the same skill identity. Codex does not deduplicate same-name skills across install roots.
+
+See the checked-in [Codex compatibility matrix](./plans/codex-compatibility-matrix.md) for tested versions, package boundaries, and pending runtime gates. A valid install is not a package-wide runtime support claim. The historical pilots remain tied to their recorded snapshots. The August 2026 structure check covers native manifest discovery and clean installation.
 
 ### Claude.ai
 

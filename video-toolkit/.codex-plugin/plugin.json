@@ -1,0 +1,11 @@
+{
+  "name": "video-toolkit",
+  "version": "1.0.4",
+  "description": "Download, transcribe, inspect, and analyze public social video.",
+  "author": { "name": "Joe Amditis", "email": "jamditis@gmail.com" },
+  "homepage": "https://skills.amditis.tech/",
+  "repository": "https://github.com/jamditis/claude-skills-journalism",
+  "license": "MIT",
+  "keywords": ["video", "transcription", "journalism", "analysis"],
+  "skills": "./skills/"
+}

@@ -16,6 +16,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   "Amditis Resource Kit" section, the dangling related-skill references, and the
   dated version footer before publishing (#220).
 
+## [2.5.0] - 2026-08-15
+
+This release adds native Codex package support and refreshes the public site for
+Claude Code and Codex users.
+
+### Added
+
+- Added native `.codex-plugin/plugin.json` manifests for 11 portable packages.
+- Added current Codex installation guidance and compatibility checks.
+
+### Changed
+
+- Updated all published package versions and their matching marketplace data.
+- Replaced mutable Lucide CDN references with a pinned, integrity-checked build.
+- Updated public descriptions, model examples, dependencies, and accessibility.
+
 ## [2.4.0] - 2026-07-25
 
 This release advances photo provenance and OKF secret detection, records a
@@ -622,7 +638,8 @@ Initial commit with foundational skills.
 
 ---
 
-[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.4.0...HEAD
+[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.5.0...HEAD
+[2.5.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.3.3...v2.4.0
 [2.3.3]: https://github.com/jamditis/claude-skills-journalism/compare/v2.2.0...v2.3.3
 [2.2.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.1.0...v2.2.0

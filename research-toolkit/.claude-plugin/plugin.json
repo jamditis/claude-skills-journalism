@@ -1,6 +1,6 @@
 {
   "name": "research-toolkit",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Six skills for research, source preservation, and academic workflows. Covers academic writing and scholarly communication, legal paywall-bypass strategies (Unpaywall, library databases, ethical open-access strategies), web archiving (Wayback Machine, Archive.today, ArchiveBox, evidence preservation), web page monitoring and change detection (Visualping, ChangeTower, self-hosted alternatives), AI-enriched digital archive construction with entity extraction and knowledge graphs, and a curated free-API catalog with currency notes for major API sunsets (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit). Built for journalists, researchers, librarians, and academics who need to find, preserve, and analyze evidence across the web.",
   "author": {
     "name": "Joe Amditis",

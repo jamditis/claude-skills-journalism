@@ -710,7 +710,7 @@ Most journals want a methods/acknowledgments statement that names the
 tool, version (if available), and what it was used for. Example:
 
 > During the preparation of this work the author(s) used [tool name,
-> e.g., ChatGPT-5, Claude Opus 4.7, Gemini 3 Pro] in order to
+> e.g., GPT-5.6 Sol, Claude Opus 5, Gemini 3.7 Flash] in order to
 > [specific use, e.g., language polishing of the introduction; drafting
 > code for the cluster analysis in section 3.2]. After using this tool,
 > the author(s) reviewed and edited the content as needed and take(s)

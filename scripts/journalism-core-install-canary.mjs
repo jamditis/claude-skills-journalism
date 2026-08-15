@@ -32,7 +32,7 @@ export const EXPECTED_SKILL_NAMES = [
 ];
 
 const PLUGIN_ID = 'journalism-core@claude-skills-journalism';
-const EXPECTED_VERSION = '1.3.0';
+const EXPECTED_VERSION = '1.3.1';
 export const SUBPROCESS_TIMEOUT_MS = 180_000;
 
 export function buildCommandPlan(client, repoRoot, tempRoot) {
@@ -224,12 +224,16 @@ function verifySourceContract(repoRoot) {
     throw new Error('journalism-core Claude manifest does not match the canary contract');
   }
 
-  const nativePaths = [
-    join(repoRoot, '.agents', 'plugins', 'marketplace.json'),
-    join(repoRoot, 'journalism-core', '.codex-plugin', 'plugin.json'),
-  ];
-  const nativeManifest = nativePaths.find((path) => existsSync(path));
-  if (nativeManifest) throw new Error(`Phase one must not add a native Codex manifest: ${nativeManifest}`);
+  const nativePath = join(repoRoot, 'journalism-core', '.codex-plugin', 'plugin.json');
+  if (!existsSync(nativePath)) throw new Error('journalism-core native Codex manifest is missing');
+  const native = JSON.parse(readFileSync(nativePath, 'utf8'));
+  if (
+    native.name !== 'journalism-core'
+    || native.version !== EXPECTED_VERSION
+    || native.skills !== './skills/'
+  ) {
+    throw new Error('journalism-core native Codex manifest does not match the canary contract');
+  }
 }
 
 export function verifyStandardsInstall(installRoot, sourceSkillsPath, lockPath) {

@@ -116,12 +116,20 @@ test('published package versions stay aligned with the marketplace', () => {
   const marketplace = JSON.parse(
     readFileSync(join(ROOT, '.claude-plugin', 'marketplace.json'), 'utf8'),
   );
-  assert.equal(marketplace.version, '2.4.0', 'marketplace version');
+  assert.equal(marketplace.version, '2.5.0', 'marketplace version');
   const expected = new Map([
-    ['journalism-core', '1.3.0'],
-    ['okf-wiki', '0.8.0'],
-    ['pdf-playground', '1.3.2'],
-    ['video-toolkit', '1.0.3'],
+    ['autocontext', '1.1.0'],
+    ['dev-toolkit', '1.2.1'],
+    ['journalism-core', '1.3.1'],
+    ['okf-wiki', '0.8.1'],
+    ['pdf-design', '1.1.1'],
+    ['pdf-playground', '1.3.3'],
+    ['project-templates-toolkit', '1.0.1'],
+    ['research-toolkit', '1.1.1'],
+    ['security-toolkit', '1.2.1'],
+    ['superjawn', '1.0.1'],
+    ['video-toolkit', '1.0.4'],
+    ['visual-explainer', '0.7.2'],
   ]);
 
   for (const [name, version] of expected) {

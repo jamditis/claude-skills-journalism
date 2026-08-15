@@ -1,0 +1,11 @@
+{
+  "name": "security-toolkit",
+  "version": "1.2.1",
+  "description": "Defensive application-security and supply-chain-hardening skills.",
+  "author": { "name": "Joe Amditis", "email": "jamditis@gmail.com" },
+  "homepage": "https://skills.amditis.tech/",
+  "repository": "https://github.com/jamditis/claude-skills-journalism",
+  "license": "MIT",
+  "keywords": ["security", "authentication", "api", "supply-chain"],
+  "skills": "./skills/"
+}

@@ -156,7 +156,7 @@
     .hero__meta { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); margin-top: 26px; }
 
     /* ---------- Hero load stagger ---------- */
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    @keyframes fadeUp { from { transform: translateY(12px); } to { transform: none; } }
     .hero > * { animation: fadeUp 0.55s ease both; }
     .hero h1 { animation-delay: 0.05s; }
     .hero__byline { animation-delay: 0.10s; }

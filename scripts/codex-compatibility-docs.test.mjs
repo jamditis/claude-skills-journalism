@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
@@ -201,19 +201,30 @@ test('visual-explainer runtime evidence stays scoped to the tested Codex path', 
 
 test('the README routes Codex users without implying mixed-install support', () => {
   const readme = readFileSync(join(ROOT, 'README.md'), 'utf8');
+  const homepage = readFileSync(join(ROOT, 'docs', 'index.html'), 'utf8');
 
   assert.match(readme, /^# Journalism agent skills$/mu);
-  assert.match(readme, /https:\/\/learn\.chatgpt\.com\/docs\/codex\/cli/u);
+  assert.match(readme, /https:\/\/developers\.openai\.com\/codex\/cli/u);
   assert.doesNotMatch(readme, /https:\/\/learn\.chatgpt\.com\/docs\/get-started/u);
   assert.match(readme, /npx skills@latest add[\s\S]*journalism-core[\s\S]*--agent codex --copy -g -y/u);
   assert.match(readme, /`~\/\.agents\/skills`/u);
   assert.match(readme, /codex plugin marketplace add jamditis\/claude-skills-journalism/u);
   assert.match(readme, /codex plugin add journalism-core@claude-skills-journalism/u);
   assert.match(readme, /use only one Codex installation path/u);
-  assert.match(readme, /does not ship native Codex manifests yet/u);
+  assert.match(readme, /ships native Codex manifests for 11 skill packages/u);
+  assert.match(readme, /Autocontext remains Claude-only/u);
   assert.doesNotMatch(readme, /Every skill in this repo now lives inside a plugin's `skills\/` directory/u);
   assert.match(readme, /root-skill packages/u);
   assert.match(readme, /visual-explainer\/SKILL\.md/u);
+
+  assert.match(homepage, /Agent skills for journalism/u);
+  assert.match(homepage, /Supports Claude Code and Codex/u);
+  assert.match(homepage, /codex plugin marketplace add jamditis\/claude-skills-journalism/u);
+  assert.match(homepage, /codex plugin add journalism-core@claude-skills-journalism/u);
+  assert.match(homepage, /Eleven packages include native Codex plugin manifests/u);
+  assert.match(homepage, /Autocontext remains Claude-only/u);
+  assert.match(homepage, /Codex CLI 0\.147\.0/u);
+  assert.doesNotMatch(homepage, /A curated collection of Claude Code skills/u);
 });
 
 test('marketplace and child plugin metadata agree', () => {
@@ -227,6 +238,33 @@ test('marketplace and child plugin metadata agree', () => {
     assert.equal(child.name, plugin.name, `${plugin.name} name drifted`);
     assert.equal(child.version, plugin.version, `${plugin.name} version drifted`);
     assert.equal(child.description, plugin.description, `${plugin.name} description drifted`);
+
+    const nativePath = join(ROOT, plugin.source, '.codex-plugin', 'plugin.json');
+    if (plugin.name === 'autocontext') {
+      assert.equal(findNativeCodexManifests().includes(relative(ROOT, nativePath)), false);
+      continue;
+    }
+    const native = JSON.parse(readFileSync(nativePath, 'utf8'));
+    assert.equal(native.name, plugin.name, `${plugin.name} Codex name drifted`);
+    assert.equal(native.version, plugin.version, `${plugin.name} Codex version drifted`);
+    assert.equal(typeof native.description, 'string', `${plugin.name} Codex description missing`);
+    assert.equal(native.author?.name, plugin.author.name, `${plugin.name} Codex author drifted`);
+    assert.equal(native.repository, 'https://github.com/jamditis/claude-skills-journalism');
+    assert.equal(native.license, 'MIT', `${plugin.name} Codex license drifted`);
+    assert.ok(Array.isArray(native.keywords) && native.keywords.length > 0);
+    assert.ok(['./', './skills/'].includes(native.skills), `${plugin.name} skills path is invalid`);
+
+    const skillRoot = join(ROOT, plugin.source, native.skills);
+    if (native.skills === './') {
+      assert.ok(existsSync(join(skillRoot, 'SKILL.md')), `${plugin.name} root skill missing`);
+    } else {
+      assert.ok(
+        readdirSync(skillRoot, { withFileTypes: true }).some(
+          (entry) => entry.isDirectory() && existsSync(join(skillRoot, entry.name, 'SKILL.md')),
+        ),
+        `${plugin.name} nested skills missing`,
+      );
+    }
   }
 });
 
@@ -248,6 +286,18 @@ test('skill lint runs for compatibility claims and native Codex manifests', () =
   }
 });
 
-test('phase one adds no native Codex manifest', () => {
-  assert.deepEqual(findNativeCodexManifests(), []);
+test('cross-client skill packages ship native Codex manifests', () => {
+  assert.deepEqual(findNativeCodexManifests(), [
+    'dev-toolkit/.codex-plugin/plugin.json',
+    'journalism-core/.codex-plugin/plugin.json',
+    'okf-wiki/.codex-plugin/plugin.json',
+    'pdf-design/.codex-plugin/plugin.json',
+    'pdf-playground/.codex-plugin/plugin.json',
+    'project-templates-toolkit/.codex-plugin/plugin.json',
+    'research-toolkit/.codex-plugin/plugin.json',
+    'security-toolkit/.codex-plugin/plugin.json',
+    'superjawn/.codex-plugin/plugin.json',
+    'video-toolkit/.codex-plugin/plugin.json',
+    'visual-explainer/.codex-plugin/plugin.json',
+  ]);
 });

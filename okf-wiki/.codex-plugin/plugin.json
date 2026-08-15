@@ -1,0 +1,11 @@
+{
+  "name": "okf-wiki",
+  "version": "0.8.1",
+  "description": "Scaffold and validate an Open Knowledge Format knowledge base.",
+  "author": { "name": "Joe Amditis", "email": "jamditis@gmail.com" },
+  "homepage": "https://skills.amditis.tech/okf-wiki/",
+  "repository": "https://github.com/jamditis/claude-skills-journalism",
+  "license": "MIT",
+  "keywords": ["knowledge", "wiki", "documentation", "okf"],
+  "skills": "./"
+}

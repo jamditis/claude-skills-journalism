@@ -1,0 +1,11 @@
+{
+  "name": "journalism-core",
+  "version": "1.3.1",
+  "description": "Core reporting, verification, publishing, and digital-investigation skills.",
+  "author": { "name": "Joe Amditis", "email": "jamditis@gmail.com" },
+  "homepage": "https://skills.amditis.tech/",
+  "repository": "https://github.com/jamditis/claude-skills-journalism",
+  "license": "MIT",
+  "keywords": ["journalism", "reporting", "verification", "publishing"],
+  "skills": "./skills/"
+}
