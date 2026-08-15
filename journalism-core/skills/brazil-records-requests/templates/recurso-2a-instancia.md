@@ -5,6 +5,12 @@
 **Destinatário:** autoridade máxima do órgão (ministro, presidente, diretor-geral).
 *Deadline: 10 days from notice. Addressee: the head of the agency.*
 
+**Alcance:** este segundo recurso e seu prazo são do Poder Executivo federal,
+nos termos do parágrafo único do art. 21 do Decreto 7.724/2012. Para estados,
+municípios, Judiciário, Legislativo e Ministério Público, confirme a regra local.
+*Scope: this second appeal and deadline apply to the federal executive. Check
+the local rule for other bodies.*
+
 Este é o último degrau interno. Depois dele, o recurso sai do órgão — vai à
 CGU, no caso do Executivo federal.
 *This is the last internal step. After it, the appeal leaves the agency.*
@@ -46,9 +52,10 @@ descreva a natureza pública do dado.]
 
 **5. Do pedido**
 
-Requeiro a reforma da decisão e o fornecimento das informações em formato
-aberto, ou, subsidiariamente, o acesso parcial com supressão exclusiva dos
-elementos protegidos.
+Requeiro a reforma da decisão e o fornecimento das informações no formato
+digital existente, quando estiverem armazenadas nesse formato, ou,
+subsidiariamente, o acesso parcial com supressão exclusiva dos elementos
+protegidos.
 
 [NOME COMPLETO]
 [CPF ou outro documento de identificação válido]

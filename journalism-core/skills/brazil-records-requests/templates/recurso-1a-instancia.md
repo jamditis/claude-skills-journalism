@@ -48,9 +48,10 @@ exige demonstração concreta, não bastando a mera afirmação.
 
 O pedido versa sobre a extração de dados já existentes em base estruturada,
 o que não configura trabalho adicional de análise, interpretação ou
-consolidação. Subsidiariamente, ainda que assim se entendesse, o parágrafo
-único do mesmo artigo impõe ao órgão o dever de indicar o local onde se encontram as
-informações originais — providência não adotada na resposta recorrida.
+consolidação. Subsidiariamente, o parágrafo único do mesmo artigo determina
+que o órgão, caso tenha conhecimento, indique o local onde se encontram as
+informações originais. Requeiro essa indicação, caso o órgão tenha esse
+conhecimento.
 
 **c) Negativa por proteção de dados pessoais**
 

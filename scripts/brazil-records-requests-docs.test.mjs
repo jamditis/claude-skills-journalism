@@ -10,6 +10,7 @@ const PAGE = join(DOCS, 'brazil-records-requests', 'index.html');
 const STYLESHEET = join(DOCS, 'assets', 'tailwind', 'brazil-records-requests.css');
 const SKILL = join(ROOT, 'journalism-core', 'skills', 'brazil-records-requests', 'SKILL.md');
 const TEMPLATES = join(ROOT, 'journalism-core', 'skills', 'brazil-records-requests', 'templates');
+const EXAMPLES = join(ROOT, 'journalism-core', 'skills', 'brazil-records-requests', 'examples');
 const README = join(ROOT, 'README.md');
 
 test('Brazil records requests has a public skill page', () => {
@@ -49,13 +50,18 @@ test('Brazil records requests keeps the legal routes in scope', () => {
   const skill = readFileSync(SKILL, 'utf8');
   const request = readFileSync(join(TEMPLATES, 'pedido-inicial.md'), 'utf8');
   const firstAppeal = readFileSync(join(TEMPLATES, 'recurso-1a-instancia.md'), 'utf8');
+  const secondAppeal = readFileSync(join(TEMPLATES, 'recurso-2a-instancia.md'), 'utf8');
   const cguAppeal = readFileSync(join(TEMPLATES, 'recurso-cgu.md'), 'utf8');
+  const example = readFileSync(join(EXAMPLES, 'exemplo-completo.md'), 'utf8');
 
   assert.match(skill, /sensitive, personal, classified,\s+or otherwise restricted information may be redacted or excluded/iu);
   assert.match(skill, /Decree 7\.724\/2012 binds the federal executive only/iu);
   assert.match(skill, /LGPD does not apply to processing carried\s+out exclusively for journalistic purposes/iu);
   assert.match(skill, /art\. 11, §1º, III/iu);
   assert.doesNotMatch(skill, /art\. 11, III/iu);
+  assert.match(skill, /if it knows where the source information is/iu);
+  assert.match(skill, /maximum restriction periods/iu);
+  assert.match(skill, /120-day period\s+from notice of the challenged act/iu);
 
   assert.match(request, /art\. 11, §5º/iu);
   assert.match(request, /ENDEREÇO FÍSICO OU ELETRÔNICO PARA COMUNICAÇÕES/u);
@@ -66,11 +72,17 @@ test('Brazil records requests keeps the legal routes in scope', () => {
   assert.match(firstAppeal, /parágrafo\s+único/u);
   assert.doesNotMatch(firstAppeal, /não respondeu no prazo legal/u);
   assert.doesNotMatch(firstAppeal, /Ausência de resposta/u);
+  assert.match(firstAppeal, /caso tenha conhecimento/u);
+
+  assert.match(secondAppeal, /Poder\s+Executivo federal/u);
+  assert.match(secondAppeal, /regra local/u);
 
   assert.match(cguAppeal, /informação não classificada/u);
   assert.match(cguAppeal, /autoridade classificadora/u);
   assert.match(cguAppeal, /procedimentos de classificação de informação não foram observados/u);
   assert.match(cguAppeal, /prazos ou outros procedimentos/u);
+
+  assert.match(example, /caso tenha conhecimento/iu);
 });
 
 test('Brazil records requests page supplies the Open Graph image size', () => {

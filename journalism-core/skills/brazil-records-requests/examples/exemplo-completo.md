@@ -53,8 +53,9 @@ Brazilian practice, and it rarely survives an appeal that cites art. 7 §2º.*
 **Request 2 → appeal, not refiling.** The "additional work" ground is the one
 worth fighting: the appeal argued the agency was being asked to export an
 existing field from an existing system, not to compute anything, and invoked
-art. 13, parágrafo único, which obliges the agency to indicate where the raw
-data sits when it does claim additional work. The response had done neither.
+art. 13, parágrafo único, which requires the agency, caso tenha conhecimento,
+to indicate where the source information is. The appeal asked the agency to
+state whether it had that knowledge and to identify the source if it did.
 
 *A refiling here would have conceded the point and started over.*
 

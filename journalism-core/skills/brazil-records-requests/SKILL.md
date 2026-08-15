@@ -171,9 +171,9 @@ denial or citing the Decree.
 | --- | --- | --- |
 | Generic request | Federal executive: Decree 7.724/2012, art. 13, I | **Refile**, narrowed. Faster than appealing. |
 | Disproportionate or unreasonable | Federal executive: Decree 7.724, art. 13, II | **Refile** in slices, or appeal if the volume claim is implausible |
-| Requires additional analysis, interpretation or consolidation of data | Federal executive: Decree 7.724, art. 13, III | **Appeal.** The agency must indicate where the raw data is (art. 13, parágrafo único). Ask for the raw export instead. |
+| Requires additional analysis, interpretation or consolidation of data | Federal executive: Decree 7.724, art. 13, III | **Appeal.** If it knows where the source information is, the agency must identify that location (art. 13, parágrafo único). Ask it to state whether it has that knowledge and to identify the source if it does. |
 | Personal data | LAI art. 31 | **Appeal**, requesting the record with personal fields redacted. Partial access is the rule, full withholding the exception. |
-| Classified | LAI arts. 23–24 | **Appeal**, demanding the classification instrument (termo de classificação), its date, level and authority. Reservada is 5 years, secreta 15, ultrassecreta 25. |
+| Classified | LAI arts. 23–24 | **Appeal**, demanding the classification instrument (termo de classificação), its date, level and authority. The maximum restriction periods are 5 years for reservada, 15 for secreta, and 25 for ultrassecreta. Check whether an earlier event ends the restriction. |
 | Body does not hold it | LAI art. 11, §1º, III | Ask which body does — the agency is required to say — then refile there |
 | Silence (federal executive) | Decree 7.724/2012, arts. 22–23 | **Reclamação** to the monitoring authority, not a direct appeal — see Step 5. |
 | Silence (other spheres) | Local LAI regulation | Usually an immediate appeal under LAI art. 15; confirm the state, municipal, judicial or legislative body's own rule — Decree 7.724/2012 binds the federal executive only. |
@@ -242,9 +242,10 @@ Notes from practice:
   story has a deadline.
 - Each appeal should add an argument, not repeat the last one. Restating the
   original request is the most common reason appeals fail.
-- After the chain is exhausted, the remaining route is judicial — a mandado
-  de segurança. Note this for the reporter; it is a decision for the outlet's
-  lawyers, not for this skill.
+- Consult the outlet's lawyers promptly if a judicial remedy may be needed. A
+  mandado de segurança has a 120-day period from notice of the challenged act
+  (Lei 12.016/2009, art. 23). Track that deadline in parallel with the
+  administrative process. The outlet's lawyers decide whether the remedy fits.
 
 Templates: `recurso-1a-instancia.md`, `recurso-2a-instancia.md`,
 `recurso-cgu.md`, `recurso-cmri.md`.
