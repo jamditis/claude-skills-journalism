@@ -205,16 +205,16 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                                 </div>
                                 <h3 class="font-display text-base font-bold">Three categories, 14 skills total</h3>
                             </div>
-                            <p class="text-mist text-sm">Research phase (3 skills), freshness check (1 skill), consumer/straight port (10 skills). v1.0.0 ships all 14 with no soft dependencies on the upstream <code>superpowers</code> plugin — code-reviewer agent dispatches now target <code>pr-review-toolkit:code-reviewer</code>.</p>
+                            <p class="text-mist text-sm">Research phase (3 skills), freshness check (1 skill), consumer/straight port (10 skills). Includes all 14 with no soft dependencies on the upstream <code>superpowers</code> plugin — code-reviewer agent dispatches target <code>pr-review-toolkit:code-reviewer</code>.</p>
                         </div>
                         <div class="feature-card p-6 rounded-xl">
                             <div class="flex items-center gap-3 mb-3">
                                 <div class="w-10 h-10 bg-accentLight rounded-lg flex items-center justify-center flex-shrink-0">
                                     <i data-lucide="toggle-left" class="w-5 h-5 text-accent"></i>
                                 </div>
-                                <h3 class="font-display text-base font-bold">Coexists with upstream</h3>
+                                <h3 class="font-display text-base font-bold">Standalone by default</h3>
                             </div>
-                            <p class="text-mist text-sm">Keep both <code>superpowers</code> and <code>superjawn</code> installed during rollout. Skills not yet ported resolve via <code>superpowers:&lt;skill&gt;</code>. Upstream disabled at v1.0.0 after all 14 skills land and prove out.</p>
+                            <p class="text-mist text-sm">Superjawn includes all 14 skills and does not require the upstream <code>superpowers</code> plugin. Install <code>superpowers</code> only if you intentionally want the original skill versions.</p>
                         </div>
                     </div>
                 </div>
@@ -494,7 +494,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <span class="w-8 h-8 bg-accentDark text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">!</span>
                             <h3 class="font-display text-xl font-bold">Existing superpowers users</h3>
                         </div>
-                        <p class="text-mist mb-3">v1.0.0 ships with no soft dependencies on the upstream <code>superpowers</code> plugin — code-reviewer agent dispatches now target <code>pr-review-toolkit:code-reviewer</code> (Anthropic-maintained, in <code>@claude-code-plugins</code>). You can run <code>superjawn</code> standalone from this version forward.</p>
+                        <p class="text-mist mb-3">Superjawn has no soft dependencies on the upstream <code>superpowers</code> plugin — code-reviewer agent dispatches target <code>pr-review-toolkit:code-reviewer</code> (Anthropic-maintained, in <code>@claude-code-plugins</code>). You can run <code>superjawn</code> standalone.</p>
                         <p class="text-mist text-sm">If you want to revert to the upstream plugin: <code>/plugin install superpowers@claude-plugins-official</code>.</p>
                     </div>
                 </div>
