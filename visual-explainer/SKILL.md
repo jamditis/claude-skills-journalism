@@ -5,7 +5,7 @@ license: MIT
 compatibility: Requires a browser to view generated HTML files. Optional surf-cli for AI image generation.
 metadata:
   author: nicobailon (upstream); journalism adaptations by jamditis
-  version: "0.7.1"
+  version: "0.7.2"
   upstream: https://github.com/nicobailon/visual-explainer
 ---
 

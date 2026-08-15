@@ -230,7 +230,9 @@ function verifySourceContract(repoRoot) {
     join(repoRoot, 'journalism-core', '.codex-plugin', 'plugin.json'),
   ];
   const nativeManifest = nativePaths.find((path) => existsSync(path));
-  if (nativeManifest) throw new Error(`Phase one must not add a native Codex manifest: ${nativeManifest}`);
+  if (nativeManifest) {
+    throw new Error(`The legacy-package canary must not include a native Codex manifest: ${nativeManifest}`);
+  }
 }
 
 export function verifyStandardsInstall(installRoot, sourceSkillsPath, lockPath) {

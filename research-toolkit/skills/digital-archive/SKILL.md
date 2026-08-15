@@ -159,11 +159,9 @@ from google.genai import types
 import json
 from typing import Optional
 
-# Default to the current Gemini 2.5 family. For 2026 production
-# workloads, the Gemini 3 family (gemini-3-flash, gemini-3-pro) is
-# also available — bump the model string when you've verified the
-# response shape against your taxonomy prompts.
-DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash'
+# Use Google's current stable Flash model. Test the exact model and
+# response shape against your taxonomy prompts before deployment.
+DEFAULT_GEMINI_MODEL = 'gemini-3.7-flash'
 
 # Single client; reads GOOGLE_API_KEY (or pass api_key=...).
 _client = genai.Client(api_key=os.environ.get('GOOGLE_API_KEY'))

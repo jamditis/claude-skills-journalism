@@ -107,6 +107,7 @@ test('Brazil records requests credits its contributor', () => {
 test('Codex guidance gives the current journalism-core skill count', () => {
   const readme = readFileSync(README, 'utf8');
 
-  assert.match(readme, /It exposes the 15 nested skills in `journalism-core`/u);
-  assert.doesNotMatch(readme, /It exposes the 14 nested skills in `journalism-core`/u);
+  assert.match(readme, /legacy-compatible package route exposes the 15 nested/u);
+  assert.match(readme, /makes the 15 core skills available/u);
+  assert.doesNotMatch(readme, /makes the 14 core skills available/u);
 });

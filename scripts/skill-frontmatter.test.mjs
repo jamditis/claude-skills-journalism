@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { basename, dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
@@ -116,12 +116,20 @@ test('published package versions stay aligned with the marketplace', () => {
   const marketplace = JSON.parse(
     readFileSync(join(ROOT, '.claude-plugin', 'marketplace.json'), 'utf8'),
   );
-  assert.equal(marketplace.version, '2.4.0', 'marketplace version');
+  assert.equal(marketplace.version, '2.5.0', 'marketplace version');
   const expected = new Map([
+    ['autocontext', '1.1.0'],
+    ['dev-toolkit', '1.2.1'],
     ['journalism-core', '1.4.0'],
-    ['okf-wiki', '0.8.0'],
-    ['pdf-playground', '1.3.2'],
-    ['video-toolkit', '1.0.3'],
+    ['okf-wiki', '0.8.1'],
+    ['pdf-design', '1.1.1'],
+    ['pdf-playground', '1.3.3'],
+    ['project-templates-toolkit', '1.0.1'],
+    ['research-toolkit', '1.1.1'],
+    ['security-toolkit', '1.2.1'],
+    ['superjawn', '1.0.1'],
+    ['video-toolkit', '1.0.4'],
+    ['visual-explainer', '0.7.2'],
   ]);
 
   for (const [name, version] of expected) {
@@ -131,5 +139,16 @@ test('published package versions stay aligned with the marketplace', () => {
     const listing = marketplace.plugins.find((plugin) => plugin.name === name);
     assert.equal(manifest.version, version, `${name} manifest version`);
     assert.equal(listing?.version, version, `${name} marketplace version`);
+
+    const rootSkillPath = join(ROOT, name, 'SKILL.md');
+    if (existsSync(rootSkillPath)) {
+      const source = readFileSync(rootSkillPath, 'utf8');
+      const match = source.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/u);
+      assert.ok(match, `${name} root skill frontmatter`);
+      const skill = parse(match[1]);
+      if (skill.metadata?.version) {
+        assert.equal(skill.metadata.version, version, `${name} root skill version`);
+      }
+    }
   }
 });

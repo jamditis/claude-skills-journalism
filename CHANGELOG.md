@@ -7,8 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-08-15
+
+This release refreshes the public site and current installation guidance for
+Claude Code and Codex users.
+
 ### Added
 
+- Added current Codex installation guidance and compatibility checks.
+- **dev-toolkit context-engineering-fundamentals:** published the context
+  engineering skill from the tools repo standouts (group 4 of #115). Teaches the
+  attention budget, the lost-in-middle effect, five context degradation patterns
+  with mitigations, and how to measure retrieval quality before compression. Stripped the project-bound
+  "Amditis Resource Kit" section, the dangling related-skill references, and the
+  dated version footer before publishing (#220).
 - **journalism-core:** added `brazil-records-requests`, public records requests
   under Brazil's Access to Information Law (Lei 12.527/2011). Covers portal
   selection across federal, state, municipal, judicial and legislative bodies;
@@ -18,12 +30,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Portuguese with English glosses. First non-US jurisdiction in
   `journalism-core`. Companion to `foia-requests`; does not collide with it on
   US prompts.
-- **dev-toolkit context-engineering-fundamentals:** published the context
-  engineering skill from the tools repo standouts (group 4 of #115). Teaches the
-  attention budget, the lost-in-middle effect, five context degradation patterns
-  with mitigations, and how to measure retrieval quality before compression. Stripped the project-bound
-  "Amditis Resource Kit" section, the dangling related-skill references, and the
-  dated version footer before publishing (#220).
+
+### Changed
+
+- Updated ten package versions and their matching marketplace data. Journalism-core 1.4.0 and autocontext 1.1.0 remain current.
+- Replaced mutable Lucide CDN references with a pinned, integrity-checked build.
+- Updated public descriptions, model examples, dependencies, and accessibility.
 
 ## [2.4.0] - 2026-07-25
 
@@ -631,7 +643,8 @@ Initial commit with foundational skills.
 
 ---
 
-[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.4.0...HEAD
+[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.5.0...HEAD
+[2.5.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.3.3...v2.4.0
 [2.3.3]: https://github.com/jamditis/claude-skills-journalism/compare/v2.2.0...v2.3.3
 [2.2.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.1.0...v2.2.0

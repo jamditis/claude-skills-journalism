@@ -18,7 +18,7 @@ test('video toolkit docs explain the four-stage reporting pipeline and its bound
     /<link rel="stylesheet" href="\.\.\/assets\/tailwind\/video-toolkit\.css" data-tailwind-build="3\.4\.19">/u,
   );
   assert.doesNotMatch(page, /cdn\.tailwindcss\.com|\btailwind\.config\s*=/u);
-  assert.match(page, /Plugin · v1\.0\.3/u);
+  assert.match(page, /Plugin · v1\.0\.4/u);
   assert.match(page, /\/plugin install video-toolkit@claude-skills-journalism/u);
   assert.match(page, /data-updated-slug="video-toolkit"/u);
 

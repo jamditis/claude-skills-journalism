@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <!--
   claude skills for journalism — https://skills.amditis.tech
-  Claude Code skills for journalists, researchers, and newsrooms.
+  Agent skills for journalists, researchers, and newsrooms.
   A dev/journalism crossover: modular instruction sets that extend
-  Claude's capabilities for verification, data work, FOIA, and more.
+  Claude and Codex capabilities for verification, data work, FOIA, and more.
 
   stack: static HTML, precompiled Tailwind CSS, Lucide icons, Google Fonts
   built by: joe amditis  —  jamditis@gmail.com
@@ -12,8 +12,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claude skills for journalism | Joe Amditis</title>
-    <meta name="description" content="A curated collection of Claude Code skills for journalists, researchers, academics, and media professionals.">
+    <title>Agent skills for journalism | Joe Amditis</title>
+    <meta name="description" content="62 agent skills, 12 plugins, and 17 hooks for journalists, researchers, academics, and media professionals. Supports Claude Code and Codex.">
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -25,7 +25,7 @@
 
     <!-- Tailwind -->
     <link rel="stylesheet" href="assets/tailwind/index.css" data-tailwind-build="3.4.19">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@1.31.0/dist/umd/lucide.min.js" integrity="sha384-/ApD3KXMqTmTxEJjuldaZDgdJj7/Hox2LRuKqV3rC7Bu/wE4obLaJRjF1rLHNP57" crossorigin="anonymous"></script>
 
 
     <style>
@@ -226,8 +226,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 </style>
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Claude skills for journalism">
-    <meta property="og:description" content="62 skills, 12 plugins, and 17 hooks for journalists, researchers, academics, and media professionals.">
+    <meta property="og:title" content="Agent skills for journalism">
+    <meta property="og:description" content="62 skills, 12 plugins, and 17 hooks for journalists, researchers, academics, and media professionals. Supports Claude Code and Codex.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://skills.amditis.tech/">
     <meta property="og:image" content="https://skills.amditis.tech/og-image.png">
@@ -236,8 +236,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Claude skills for journalism">
-    <meta name="twitter:description" content="62 skills, 12 plugins, and 17 hooks for journalists, researchers, academics, and media professionals.">
+    <meta name="twitter:title" content="Agent skills for journalism">
+    <meta name="twitter:description" content="62 skills, 12 plugins, and 17 hooks for journalists, researchers, academics, and media professionals. Supports Claude Code and Codex.">
     <meta name="twitter:image" content="https://skills.amditis.tech/og-image.png">
 <script src="ask-ai.js" defer></script>
 
@@ -246,7 +246,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 {
   "@context": "https://schema.org",
   "@type": "SoftwareSourceCode",
-  "name": "Claude skills for journalism",
+  "name": "Agent skills for journalism",
   "description": "62 agent skills, 12 plugins, and 17 workflow hooks for verification, FOIA, data journalism, academic writing, and more. Built for journalists, researchers, and media professionals.",
   "url": "https://skills.amditis.tech",
   "codeRepository": "https://github.com/jamditis/claude-skills-journalism",
@@ -311,7 +311,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
                     <div class="lg:col-start-1 lg:col-span-7 space-y-8">
                         <p class="text-xl md:text-2xl text-ink/80 font-light leading-relaxed border-l-2 border-accent/20 pl-6 md:pl-10">
-                            A curated collection of Claude Code skills for journalists, researchers, academics, and media professionals. Modular instruction sets that extend Claude's capabilities for specialized tasks.
+                            A curated collection of agent skills for journalists, researchers, academics, and media professionals. Shared skills support Claude Code and Codex, while client-specific components stay clearly labeled.
                         </p>
                         <div class="flex flex-wrap gap-4">
                             <a href="#install" class="btn-primary">Install Now</a>
@@ -338,7 +338,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                         <div class="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-12">
                             <div class="flex-1">
-                                <div class="inline-block px-3 py-1 bg-white/15 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase text-white/90 mb-4">v1.0.0 &middot; standalone</div>
+                                <div class="inline-block px-3 py-1 bg-white/15 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase text-white/90 mb-4">v1.0.1 &middot; standalone</div>
                                 <h2 class="font-display text-3xl md:text-4xl font-black text-white leading-tight mb-3">Skills that do their homework first.</h2>
                                 <p class="text-white/75 text-base md:text-lg max-w-xl">Superjawn is a research-augmented fork of <code class="bg-white/10 px-2 py-0.5 rounded text-white/90 text-sm">obra/superpowers</code>. A default-on research phase fires before brainstorming, systematic-debugging, and writing-skills &mdash; pulling from the web, your codebase, and authoritative docs before any plan gets drafted. Skip it when you already know the answer; otherwise the homework happens automatically. All 14 skills ported, no upstream dependency.</p>
                             </div>
@@ -1290,7 +1290,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <span class="section-label">Get Started</span>
                 </div>
 
-                <p class="text-mist mb-8">You need <strong><a target="_blank" rel="noopener noreferrer" href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accentDark hover:underline">Claude Code</a></strong> installed. Run <code class="bg-ink/5 px-2 py-0.5 rounded text-sm">claude --version</code> in your terminal to check.</p>
+                <p class="text-mist mb-8">Choose <strong><a target="_blank" rel="noopener noreferrer" href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accentDark hover:underline">Claude Code</a></strong> or <strong><a target="_blank" rel="noopener noreferrer" href="https://developers.openai.com/codex/cli" class="text-accentDark hover:underline">Codex CLI</a></strong>. Check the installed client with <code class="bg-ink/5 px-2 py-0.5 rounded text-sm">claude --version</code> or <code class="bg-ink/5 px-2 py-0.5 rounded text-sm">codex --version</code>.</p>
 
                 <!-- Plugins (recommended) -->
                 <div class="deckle-card-solid p-8 mb-6">
@@ -1306,6 +1306,20 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <p class="text-sm text-mist">Then restart Claude Code (close and reopen). See the <a href="pdf-playground/" class="text-accentDark font-semibold hover:underline">PDF Playground page</a> for detailed instructions, troubleshooting, and brand setup.</p>
                 </div>
 
+                <!-- Codex package compatibility -->
+                <div class="deckle-card-solid p-8 mb-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-[9px] font-bold tracking-widest text-white uppercase bg-accent px-2 py-1">Codex compatible</span>
+                        <h3 class="font-display text-xl font-bold">Install a skill package in Codex</h3>
+                    </div>
+                    <p class="text-sm text-mist mb-4">Codex can install the 15 nested journalism-core skills through the existing Claude marketplace metadata.</p>
+                    <div class="bg-ink text-canvas p-6 font-mono text-sm mb-4 overflow-x-auto space-y-1" tabindex="0" role="region" aria-label="Codex plugin installation commands">
+                        <div>codex plugin marketplace add jamditis/claude-skills-journalism</div>
+                        <div>codex plugin add journalism-core@claude-skills-journalism</div>
+                    </div>
+                    <p class="text-sm text-mist">This is a verified legacy-compatible route, not a native Codex package. Claude commands, agents, hooks, and root-level skills are not converted. Use one installation route for each skill identity because Codex does not deduplicate identical skills across install roots.</p>
+                </div>
+
                 <!-- Skills (manual) -->
                 <div class="deckle-card p-8">
                     <h3 class="font-display text-xl font-bold mb-4">Install individual skills</h3>
@@ -1317,7 +1331,11 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         <div>cp -r journalism-core/skills/source-verification ~/.claude/skills/</div>
                         <div># or: ln -sfn "$PWD/journalism-core/skills/source-verification" ~/.claude/skills/source-verification</div>
                     </div>
-                    <p class="text-sm text-mist">For example, asking Claude to verify a source will use the source-verification skill. Don't clone the whole repo into <code>~/.claude/skills/journalism-skills/</code> — that nests each <code>SKILL.md</code> two levels deep and Claude Code won't find them.</p>
+                    <p class="text-sm text-mist mb-4">For Codex, the standards-based skills CLI can install one skill into <code>~/.agents/skills</code>:</p>
+                    <div class="bg-ink text-canvas p-6 font-mono text-sm mb-4 overflow-x-auto" tabindex="0" role="region" aria-label="Single Codex skill installation command">
+                        <div>npx skills@latest add jamditis/claude-skills-journalism --skill fact-check-workflow --agent codex --copy -g -y</div>
+                    </div>
+                    <p class="text-sm text-mist">Do not clone the whole repository into a single skill directory. That nests each <code>SKILL.md</code> too deeply for the client to discover.</p>
                 </div>
             </section>
 
@@ -1330,7 +1348,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <div class="flex flex-col lg:flex-row justify-between items-start gap-16 mb-16">
                 <div class="space-y-6">
                     <h5 class="font-display text-4xl italic font-light tracking-tight text-canvas leading-tight">Skills for <br> <span class="font-black">journalism.</span></h5>
-                    <p class="text-sm text-canvas/60 max-w-md">A curated collection of Claude Code skills for journalists, researchers, academics, and media professionals.</p>
+                    <p class="text-sm text-canvas/60 max-w-md">A curated collection of shared agent skills for Claude Code and Codex, plus clearly labeled client-specific components.</p>
                 </div>
                 <div class="grid grid-cols-2 gap-16 md:gap-24">
                     <div class="space-y-6">
@@ -1389,9 +1407,9 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 </footer>
 
     <script>
-      console.log('%c CLAUDE SKILLS FOR JOURNALISM ', 'background: #3d4b40; color: #ede6d4; font-weight: bold; font-size: 16px; padding: 4px 8px; border-radius: 4px;')
-      console.log('%c Claude Code skills for journalists, researchers, and newsrooms.', 'color: #3d4b40; font-style: italic; font-size: 13px;')
-      console.log('%c stack: zero-build HTML, Tailwind CDN, Lucide icons', 'color: #999; font-size: 11px;')
+      console.log('%c AGENT SKILLS FOR JOURNALISM ', 'background: #3d4b40; color: #ede6d4; font-weight: bold; font-size: 16px; padding: 4px 8px; border-radius: 4px;')
+      console.log('%c Agent skills for journalists, researchers, and newsrooms. Supports Claude Code and Codex.', 'color: #3d4b40; font-style: italic; font-size: 13px;')
+      console.log('%c stack: zero-build HTML, compiled Tailwind CSS, Lucide icons', 'color: #999; font-size: 11px;')
       console.log('%c built by joe amditis  —  jamditis@gmail.com', 'color: #999; font-size: 11px;')
     </script>
 

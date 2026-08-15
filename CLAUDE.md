@@ -1,4 +1,4 @@
-# Claude skills collection
+# Agent skills collection
 
 ## Bug-fixing workflow
 
@@ -10,13 +10,17 @@ When a bug is reported, don't immediately attempt to fix it. Instead:
 
 ---
 
-Collection of Claude Code skills for journalism, media, academia, and technical workflows.
+Collection of Claude Code and Codex skills for journalism, media, academia, and technical workflows.
 
 ## Project overview
 
-This repo contains modular instruction sets (skills) that extend Claude's capabilities for specialized tasks. Each skill directory contains domain-specific knowledge, workflows, templates, and best practices.
+This repo contains modular instruction sets that extend supported coding agents for specialized tasks. Each skill directory contains domain knowledge, workflows, templates, and best practices.
 
 ## Directory structure
+
+Packages use `.claude-plugin/plugin.json`. Codex supports standards-based skill
+installs and a verified legacy-compatible journalism-core package route. This
+repository does not ship native Codex manifests.
 
 ```
 claude-skills-journalism/
@@ -43,7 +47,7 @@ claude-skills-journalism/
 │   ├── pre-commit-review.md     # Development: Review staged diff before commit
 │   └── no-ai-attribution.md     # Development: Block AI attribution in commits, PRs, and comments
 │
-├── # Plugin: journalism-core (14 skills) — registered in marketplace.json
+├── # Plugin: journalism-core (15 skills, v1.4.0) — registered in marketplace.json
 ├── journalism-core/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -59,11 +63,12 @@ claude-skills-journalism/
 │       ├── newsletter-publishing/      # Email newsletters, subscribers
 │       ├── newsroom-style/             # AP Style enforcement
 │       ├── photo-metadata/             # Embed caption, credit, alt text, license in IPTC/EXIF/XMP
+│       ├── brazil-records-requests/     # Brazilian LAI requests and appeals
 │       ├── social-media-intelligence/  # OSINT, account analysis, platform-API currency
 │       ├── source-verification/        # SIFT method, verification, deepfakes/C2PA
 │       └── story-pitch/                # Pitch templates
 │
-├── # Plugin: research-toolkit (6 skills, v1.1.0) — registered in marketplace.json
+├── # Plugin: research-toolkit (6 skills, v1.1.1) — registered in marketplace.json
 ├── research-toolkit/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -107,6 +112,16 @@ claude-skills-journalism/
 ├── pdf-design/                  # PDF reports, proposals, brand system
 │   └── templates/               # HTML templates (Democracy Day, etc.)
 │
+├── # Plugin: video-toolkit (4 skills, v1.0.4) — registered in marketplace.json
+├── video-toolkit/
+│   ├── .claude-plugin/plugin.json
+│   ├── README.md
+│   └── skills/
+│       ├── video-dashboard/     # Interactive transcript and frame analysis
+│       ├── video-download/      # Public social-video collection
+│       ├── video-frames/        # Frame extraction and vision analysis
+│       └── video-transcribe/    # Reproducible Whisper transcription
+│
 ├── # Plugin: visual-explainer (1 skill) — registered in marketplace.json
 ├── visual-explainer/            # HTML diagrams, data tables, architecture views
 │   ├── references/              # CSS patterns, library guides, nav patterns
@@ -145,7 +160,7 @@ claude-skills-journalism/
 │   ├── templates/              # Lesson and archive templates
 │   └── tests/
 │
-├── # Plugin: pdf-playground (8 commands, v1.3.2) — registered in marketplace.json
+├── # Plugin: pdf-playground (8 commands, v1.3.3) — registered in marketplace.json
 ├── pdf-playground/              # Interactive proposal/report/slide builder with live control panel
 │   ├── .claude-plugin/plugin.json
 │   ├── brands/                  # Brand presets
@@ -155,7 +170,7 @@ claude-skills-journalism/
 │   ├── templates/               # Document templates
 │   └── skills/                  # document-design/ + playground.md (user-invocable entry skill)
 │
-└── # Plugin: superjawn (14 skills, v1.0.0) — registered in marketplace.json
+└── # Plugin: superjawn (14 skills, v1.0.1) — registered in marketplace.json
     ├── # Research-augmented fork of obra/superpowers; standalone, no upstream dependency
     ├── .claude-plugin/plugin.json
     ├── README.md
@@ -234,7 +249,7 @@ Hooks run automatically at specific workflow events. Most are **non-blocking war
 
 ## Installation
 
-This repo distributes its skills in two ways: **as Marketplace plugins** (registered in `.claude-plugin/marketplace.json`) and **as bare skill directories** (top-level dirs that haven't been bundled into a plugin yet).
+This repo distributes shared skills as Claude and Codex packages and as standards-based skill directories.
 
 ### Recommended: install via Marketplace plugin
 
@@ -243,11 +258,11 @@ This repo distributes its skills in two ways: **as Marketplace plugins** (regist
 /plugin install journalism-core@claude-skills-journalism
 ```
 
-Available plugins: `autocontext`, `dev-toolkit`, `journalism-core`, `okf-wiki`, `pdf-design`, `pdf-playground`, `project-templates-toolkit`, `research-toolkit`, `security-toolkit`, `superjawn`, `visual-explainer`. See `.claude-plugin/marketplace.json` for the full list.
+Available plugins: `autocontext`, `dev-toolkit`, `journalism-core`, `okf-wiki`, `pdf-design`, `pdf-playground`, `project-templates-toolkit`, `research-toolkit`, `security-toolkit`, `superjawn`, `video-toolkit`, `visual-explainer`. See `.claude-plugin/marketplace.json` for the full list.
 
 ### Alternate: copy a single skill into `~/.claude/skills/`
 
-Every skill in this repo now lives inside a plugin's `skills/` directory. To install just one without taking the whole plugin, clone the repo and copy the nested skill folder. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
+Most skills live inside a package's `skills/` directory. The `okf-wiki`, `pdf-design`, and `visual-explainer` packages keep `SKILL.md` at the package root. Clone the repo and copy the directory that directly contains the required `SKILL.md`. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
 
 ```bash
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
@@ -260,6 +275,7 @@ cp -r research-toolkit/skills/web-archiving ~/.claude/skills/
 cp -r dev-toolkit/skills/web-scraping ~/.claude/skills/
 cp -r security-toolkit/skills/secure-auth ~/.claude/skills/
 cp -r project-templates-toolkit/skills/project-memory ~/.claude/skills/
+cp -r okf-wiki ~/.claude/skills/
 
 # Or symlink so git pull updates them in place (ln -sfn replaces an existing link):
 ln -sfn "$PWD/research-toolkit/skills/free-apis-catalog" ~/.claude/skills/free-apis-catalog

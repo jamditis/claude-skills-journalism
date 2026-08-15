@@ -201,9 +201,10 @@ test('visual-explainer runtime evidence stays scoped to the tested Codex path', 
 
 test('the README routes Codex users without implying mixed-install support', () => {
   const readme = readFileSync(join(ROOT, 'README.md'), 'utf8');
+  const homepage = readFileSync(join(ROOT, 'docs', 'index.html'), 'utf8');
 
   assert.match(readme, /^# Journalism agent skills$/mu);
-  assert.match(readme, /https:\/\/learn\.chatgpt\.com\/docs\/codex\/cli/u);
+  assert.match(readme, /https:\/\/developers\.openai\.com\/codex\/cli/u);
   assert.doesNotMatch(readme, /https:\/\/learn\.chatgpt\.com\/docs\/get-started/u);
   assert.match(readme, /npx skills@latest add[\s\S]*journalism-core[\s\S]*--agent codex --copy -g -y/u);
   assert.match(readme, /`~\/\.agents\/skills`/u);
@@ -214,6 +215,14 @@ test('the README routes Codex users without implying mixed-install support', () 
   assert.doesNotMatch(readme, /Every skill in this repo now lives inside a plugin's `skills\/` directory/u);
   assert.match(readme, /root-skill packages/u);
   assert.match(readme, /visual-explainer\/SKILL\.md/u);
+
+  assert.match(homepage, /Agent skills for journalism/u);
+  assert.match(homepage, /Supports Claude Code and Codex/u);
+  assert.match(homepage, /codex plugin marketplace add jamditis\/claude-skills-journalism/u);
+  assert.match(homepage, /codex plugin add journalism-core@claude-skills-journalism/u);
+  assert.match(homepage, /verified legacy-compatible route/u);
+  assert.match(homepage, /15 nested journalism-core skills/u);
+  assert.doesNotMatch(homepage, /A curated collection of Claude Code skills/u);
 });
 
 test('marketplace and child plugin metadata agree', () => {
@@ -227,6 +236,7 @@ test('marketplace and child plugin metadata agree', () => {
     assert.equal(child.name, plugin.name, `${plugin.name} name drifted`);
     assert.equal(child.version, plugin.version, `${plugin.name} version drifted`);
     assert.equal(child.description, plugin.description, `${plugin.name} description drifted`);
+
   }
 });
 
@@ -248,6 +258,6 @@ test('skill lint runs for compatibility claims and native Codex manifests', () =
   }
 });
 
-test('phase one adds no native Codex manifest', () => {
+test('the legacy package route adds no native Codex manifests', () => {
   assert.deepEqual(findNativeCodexManifests(), []);
 });

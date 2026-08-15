@@ -51,13 +51,31 @@ test('docs pages use committed Tailwind CSS instead of the Play CDN runtime', ()
   assert.equal(migrated.length, 51);
 });
 
+test('docs pages pin the shared Lucide runtime with integrity metadata', () => {
+  const lucidePages = [];
+  for (const page of htmlFiles()) {
+    const source = readFileSync(page, 'utf8');
+    assert.doesNotMatch(source, /unpkg\.com\/lucide@(?:latest|next)/u, `${page}: mutable Lucide tag`);
+    if (!source.includes('unpkg.com/lucide@')) continue;
+    lucidePages.push(page);
+    assert.match(source, /lucide@1\.31\.0\/dist\/umd\/lucide\.min\.js/u);
+    assert.match(
+      source,
+      /integrity="sha384-\/ApD3KXMqTmTxEJjuldaZDgdJj7\/Hox2LRuKqV3rC7Bu\/wE4obLaJRjF1rLHNP57"/u,
+    );
+    assert.match(source, /crossorigin="anonymous"/u);
+  }
+
+  assert.equal(lucidePages.length, 11);
+});
+
 test('docs Tailwind build inputs and CI freshness gate are pinned', () => {
   const manifest = JSON.parse(readFileSync(join(DOCS, 'tailwind-pages.json'), 'utf8'));
   assert.equal(Object.keys(manifest).length, 51);
 
   const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
   assert.equal(pkg.devDependencies.tailwindcss, '3.4.19');
-  assert.equal(pkg.devDependencies.postcss, '8.5.21');
+  assert.equal(pkg.devDependencies.postcss, '8.5.26');
   assert.equal(pkg.scripts['build:docs-css'], 'node scripts/docs-tailwind.mjs --write');
   assert.equal(pkg.scripts['check:docs-css'], 'node scripts/docs-tailwind.mjs --check');
 

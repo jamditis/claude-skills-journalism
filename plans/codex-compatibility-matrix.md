@@ -1,22 +1,27 @@
 # Codex compatibility matrix
 
 - Status: phase-two runtime pilots; journalism-core, visual-explainer, and portable okf-wiki scaffolding have scoped passes
-- Last evidence update: July 23, 2026
+- Last evidence update: August 15, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
-> **The released packages are now newer than everything tested here.** The v2.4.0
-> release (July 25, 2026) publishes marketplace 2.4.0, `journalism-core` 1.3.0,
-> and `okf-wiki` 0.7.0. Every version recorded below is the version that was
-> actually exercised — marketplace 2.3.3, `journalism-core` 1.2.0, `okf-wiki`
-> 0.6.1 — and those are deliberately **not** bumped to match the release, because
-> this file records evidence and the rule under [Tool baseline](#tool-baseline) is
-> to never rewrite an older result as if it ran on the newer version.
+> **Historical runtime results stay tied to their tested snapshots.** The v2.5.0
+> refresh updates current installation guidance without adding a native Codex
+> marketplace or plugin manifests. Every older version recorded below is the
+> version that was actually exercised. Those values are deliberately not bumped,
+> because this file records evidence and the rule under
+> [Tool baseline](#tool-baseline) is to never rewrite an older result as if it ran
+> on a newer version.
 >
-> The practical consequence for a reader: the unversioned install commands in the
-> README now deliver packages that no pilot here has covered. Treat the passes
-> below as evidence for the 2.3.3-era packages, not as a support claim for 2.4.0,
-> until the pilots are re-run against the released versions. Re-running them is
-> what clears this note.
+> The August 15 structure check confirms the repository still follows the tested
+> legacy package and Agent Skills routes. It does not convert the older runtime
+> pilots into v2.5.0 runtime evidence.
+
+## August 2026 structure refresh
+
+- Marketplace 2.5.0 contains 12 Claude packages and 62 shared skills.
+- Codex can install the 15 nested journalism-core skills through the verified legacy-compatible package route.
+- The Agent Skills route supports root and nested skill layouts without converting Claude commands, agents, or hooks.
+- No native `.agents/plugins/marketplace.json` or `.codex-plugin/plugin.json` manifests are published.
 
 ## How to read this matrix
 
@@ -44,6 +49,8 @@ Status labels:
 
 | Tool | Version or revision | Role |
 |---|---|---|
+| Codex structure refresh | 0.147.0 | Legacy package and Agent Skills route verification on August 15, 2026 |
+| Claude marketplace, current structure | 2.5.0 | Current catalog and version alignment; historical runtime results below remain snapshot-specific |
 | Repository | `b0617649515d24ebfcd51f15bceb1d76b03db668` | Architecture commit used as the phase-one worktree base |
 | Repository release verification | [`9eef57629edbaa19bf47ec35296acebdd7b4ab1f`](https://github.com/jamditis/claude-skills-journalism/commit/9eef57629edbaa19bf47ec35296acebdd7b4ab1f) | July 23 post-merge `master` head used for the phase-one release evidence |
 | Repository visual-explainer pilot | [`f6a4b84dd2e9feafc6c2bf067f873e9301a083c2`](https://github.com/jamditis/claude-skills-journalism/commit/f6a4b84dd2e9feafc6c2bf067f873e9301a083c2) | July 23 `master` head installed for the V-ex-1 runtime evidence |

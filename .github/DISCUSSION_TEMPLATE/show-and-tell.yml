@@ -1,0 +1,30 @@
+title: "[Workflow] "
+body:
+  - type: input
+    id: skills
+    attributes:
+      label: Skills used
+      description: List the skills, plugins, and agent that supported the workflow.
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Workflow
+      description: Explain the task, key steps, and important human checks.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome and lessons
+      description: Share what worked, what failed, and what others can reuse.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Publication check
+      options:
+        - label: I removed credentials, private source material, and restricted data.
+          required: true

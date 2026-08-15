@@ -1,0 +1,42 @@
+title: "[Idea] "
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - New skill or jurisdiction
+        - Existing skill improvement
+        - Installation or agent compatibility
+        - Documentation or public site
+        - Hook, command, or workflow
+    validations:
+      required: true
+  - type: textarea
+    id: need
+    attributes:
+      label: User need
+      description: Describe the real reporting, research, teaching, or publishing need.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Explain the smallest useful addition or improvement.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sources and examples
+      description: Link primary sources, standards, or representative examples when the idea depends on factual guidance.
+    validations:
+      required: false
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Scope check
+      options:
+        - label: I checked the current catalog and did not find an existing skill that covers this need.
+          required: true
