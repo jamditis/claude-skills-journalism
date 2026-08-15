@@ -27,9 +27,11 @@ test('Brazil records requests has a public skill page', () => {
 test('Brazil records requests is listed in the public catalogs', () => {
   const index = readFileSync(join(DOCS, 'index.html'), 'utf8');
   const llms = readFileSync(join(DOCS, 'llms.txt'), 'utf8');
+  const sitemap = readFileSync(join(DOCS, 'sitemap.xml'), 'utf8');
 
   assert.equal((index.match(/href="brazil-records-requests\//gu) || []).length, 1);
   assert.match(llms, /brazil-records-requests — Brazilian public records requests/iu);
+  assert.equal((sitemap.match(/https:\/\/skills\.amditis\.tech\/brazil-records-requests\//gu) || []).length, 1);
 });
 
 test('Brazil records requests is part of the pinned Tailwind build', () => {

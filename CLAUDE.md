@@ -75,12 +75,14 @@ claude-skills-journalism/
 │       ├── page-monitoring/            # Change detection, availability tracking
 │       └── web-archiving/              # Wayback, Archive.today, evidence preservation
 │
-├── # Plugin: dev-toolkit (10 skills) — registered in marketplace.json
+├── # Plugin: dev-toolkit (12 skills) — registered in marketplace.json
 ├── dev-toolkit/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
 │   └── skills/
 │       ├── accessibility-compliance/   # WCAG 2.2, alt text, focus management
+│       ├── claude-md-updater/          # Propose scoped CLAUDE.md updates
+│       ├── context-engineering-fundamentals/ # Preserve instructions, evidence, and state
 │       ├── electron-dev/               # Electron security model, packaging
 │       ├── mobile-debugging/           # Eruda, vConsole, remote debug
 │       ├── one-way-door/               # Block irreversible decisions

@@ -1,6 +1,6 @@
 # dev-toolkit
 
-Eleven development-focused skills for journalists, researchers, and small newsroom dev teams.
+Twelve development-focused skills for journalists, researchers, and small newsroom dev teams.
 
 ## Skills in this plugin
 
@@ -8,6 +8,7 @@ Eleven development-focused skills for journalists, researchers, and small newsro
 |---|---|
 | accessibility-compliance | WCAG 2.2 baseline, alt text, focus management, motion preferences |
 | claude-md-updater | Detect session lessons, new paths, infra changes, and workflows and propose scoped CLAUDE.md edits |
+| context-engineering-fundamentals | Attention budget, lost-in-middle recall, context degradation patterns, and mitigations for long sessions |
 | electron-dev | Electron security model (contextIsolation, sandbox), IPC patterns, packaging |
 | mobile-debugging | Eruda, vConsole, Chrome DevTools on Android, Safari Web Inspector for iOS |
 | one-way-door | Block irreversible architectural decisions during planning |

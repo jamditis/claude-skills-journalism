@@ -55,6 +55,7 @@ Personal site: https://jamditis.com
 - accessibility-compliance — WCAG, alt text, a11y
 - web-ui-best-practices — signs of craft in web UI
 - claude-md-updater — propose scoped CLAUDE.md updates from a session
+- context-engineering-fundamentals — preserve instructions, evidence, and state in long agent sessions
 
 ### Security
 - security-checklist — pre-deployment security audit
@@ -72,6 +73,12 @@ Personal site: https://jamditis.com
 - pdf-playground — document design (proposals, reports)
 - visual-explainer — generate self-contained HTML pages that visually explain systems
 - okf-wiki — scaffold an Open Knowledge Format knowledge base (one-concept-per-file markdown, validator, session-start orientation hooks)
+
+### Video
+- video-download — download authorized video from supported social platforms
+- video-transcribe — transcribe audio and video with local Whisper workflows
+- video-frames — extract and inspect representative video frames
+- video-dashboard — build a local dashboard from transcript and frame analysis
 
 ### Workflow patterns (superjawn)
 - using-superjawn — establishes how to find and use skills
@@ -131,7 +138,7 @@ Skills above are distributed as Claude Code plugins. Install via:
 
 Restart your Claude Code session after installing or updating a plugin so the new skills and commands register.
 
-Plugins (12): `journalism-core` (15 skills), `research-toolkit` (6), `dev-toolkit` (11), `security-toolkit` (4 skills + /hotpatch command), `project-templates-toolkit` (3), `pdf-design` (1), `pdf-playground` (1), `visual-explainer` (1), `video-toolkit` (4), `okf-wiki` (1), `superjawn` (14), `autocontext` (cross-session knowledge persistence — hooks, commands, and agents rather than skills).
+Plugins (12): `journalism-core` (15 skills), `research-toolkit` (6), `dev-toolkit` (12), `security-toolkit` (4 skills + /hotpatch command), `project-templates-toolkit` (3), `pdf-design` (1), `pdf-playground` (1), `visual-explainer` (1), `video-toolkit` (4), `okf-wiki` (1), `superjawn` (14), `autocontext` (cross-session knowledge persistence — hooks, commands, and agents rather than skills).
 
 ## Alternate installation
 
