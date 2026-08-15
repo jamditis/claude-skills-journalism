@@ -53,13 +53,7 @@ test('docs pages use committed Tailwind CSS instead of the Play CDN runtime', ()
 
 test('docs pages pin the shared Lucide runtime with integrity metadata', () => {
   const lucidePages = [];
-  for (const entry of readdirSync(DOCS, { withFileTypes: true })) {
-    const page = entry.isDirectory()
-      ? join(DOCS, entry.name, 'index.html')
-      : entry.name === 'index.html'
-        ? join(DOCS, entry.name)
-        : null;
-    if (!page || !existsSync(page)) continue;
+  for (const page of htmlFiles()) {
     const source = readFileSync(page, 'utf8');
     assert.doesNotMatch(source, /unpkg\.com\/lucide@(?:latest|next)/u, `${page}: mutable Lucide tag`);
     if (!source.includes('unpkg.com/lucide@')) continue;

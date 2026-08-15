@@ -18,9 +18,9 @@ This repo contains modular instruction sets that extend supported coding agents 
 
 ## Directory structure
 
-Each portable package contains both `.claude-plugin/plugin.json` and
-`.codex-plugin/plugin.json`. Autocontext remains Claude-only and contains no
-native Codex manifest.
+Packages use `.claude-plugin/plugin.json`. Codex supports standards-based skill
+installs and a verified legacy-compatible journalism-core package route. This
+repository does not ship native Codex manifests.
 
 ```
 claude-skills-journalism/
@@ -50,7 +50,6 @@ claude-skills-journalism/
 ├── # Plugin: journalism-core (15 skills, v1.4.0) — registered in marketplace.json
 ├── journalism-core/
 │   ├── .claude-plugin/plugin.json
-│   ├── .codex-plugin/plugin.json
 │   ├── README.md
 │   └── skills/
 │       ├── ai-writing-detox/           # Eliminate AI writing patterns

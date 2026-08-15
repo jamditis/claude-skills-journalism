@@ -225,15 +225,13 @@ function verifySourceContract(repoRoot) {
     throw new Error('journalism-core Claude manifest does not match the canary contract');
   }
 
-  const nativePath = join(repoRoot, 'journalism-core', '.codex-plugin', 'plugin.json');
-  if (!existsSync(nativePath)) throw new Error('journalism-core native Codex manifest is missing');
-  const native = JSON.parse(readFileSync(nativePath, 'utf8'));
-  if (
-    native.name !== 'journalism-core'
-    || native.version !== EXPECTED_VERSION
-    || native.skills !== './skills/'
-  ) {
-    throw new Error('journalism-core native Codex manifest does not match the canary contract');
+  const nativePaths = [
+    join(repoRoot, '.agents', 'plugins', 'marketplace.json'),
+    join(repoRoot, 'journalism-core', '.codex-plugin', 'plugin.json'),
+  ];
+  const nativeManifest = nativePaths.find((path) => existsSync(path));
+  if (nativeManifest) {
+    throw new Error(`The legacy-package canary must not include a native Codex manifest: ${nativeManifest}`);
   }
 }
 

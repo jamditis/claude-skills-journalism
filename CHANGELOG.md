@@ -27,17 +27,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.5.0] - 2026-08-15
 
-This release adds native Codex package support and refreshes the public site for
+This release refreshes the public site and current installation guidance for
 Claude Code and Codex users.
 
 ### Added
 
-- Added native `.codex-plugin/plugin.json` manifests for 11 portable packages.
 - Added current Codex installation guidance and compatibility checks.
+- Added the Brazilian records request skill from the concurrent 1.4.0 journalism-core release.
 
 ### Changed
 
-- Updated all published package versions and their matching marketplace data.
+- Updated ten package versions and their matching marketplace data. Journalism-core 1.4.0 and autocontext 1.1.0 remain current.
 - Replaced mutable Lucide CDN references with a pinned, integrity-checked build.
 - Updated public descriptions, model examples, dependencies, and accessibility.
 

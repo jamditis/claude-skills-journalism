@@ -83,16 +83,16 @@ Do not clone the repo directly into `~/.claude/skills/journalism-skills/` — th
 
 ### Codex
 
-**Prerequisite:** Install [Codex CLI](https://developers.openai.com/codex/cli). Run `codex --version` in your terminal to check. The native package route below is verified with Codex CLI 0.147.0.
+**Prerequisite:** Install [Codex CLI](https://developers.openai.com/codex/cli). Run `codex --version` in your terminal to check. The legacy-compatible package route below is verified with Codex CLI 0.147.0.
 
-This repository ships native Codex manifests for 11 skill packages. Install one package through the marketplace:
+Codex can install `journalism-core` through this repository's Claude marketplace metadata:
 
 ```bash
 codex plugin marketplace add jamditis/claude-skills-journalism
 codex plugin add journalism-core@claude-skills-journalism
 ```
 
-The native manifests expose shared skills. They do not convert Claude commands, agents, or hooks into Codex components. Autocontext remains Claude-only because its current package contains Claude commands and hooks, not a shared `SKILL.md`.
+This legacy-compatible package route exposes the 15 nested `journalism-core` skills. It does not convert Claude commands, agents, hooks, or root-level skills into Codex components. This repository does not ship native Codex manifests yet.
 
 You can instead install standards-based skills with the `skills` CLI. This user-level command makes the 15 core skills available across your Codex projects:
 
@@ -112,9 +112,9 @@ Codex desktop can [import skills from another agent](https://learn.chatgpt.com/d
 
 Codex's bundled skill installer writes to a different Codex-specific directory and is not a tested installation path for this repository. Codex does not deduplicate same-name skills across install roots, so don't combine it with the `.agents/skills` route above.
 
-Use only one Codex installation path for the same skill identity. Codex does not deduplicate same-name skills across install roots.
+Use only one Codex installation path for the same skill identity.
 
-See the checked-in [Codex compatibility matrix](./plans/codex-compatibility-matrix.md) for tested versions, package boundaries, and pending runtime gates. A valid install is not a package-wide runtime support claim. The historical pilots remain tied to their recorded snapshots. The August 2026 structure check covers native manifest discovery and clean installation.
+See the checked-in [Codex compatibility matrix](./plans/codex-compatibility-matrix.md) for tested versions, package boundaries, and pending runtime gates. A valid install is not a package-wide runtime support claim. The historical pilots remain tied to their recorded snapshots.
 
 ### Claude.ai
 

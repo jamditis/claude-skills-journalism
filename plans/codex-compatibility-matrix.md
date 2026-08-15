@@ -5,25 +5,23 @@
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
 > **Historical runtime results stay tied to their tested snapshots.** The v2.5.0
-> structure refresh publishes native Codex manifests for 11 skill packages.
-> Autocontext remains Claude-only. Every older version recorded below is the
+> refresh updates current installation guidance without adding a native Codex
+> marketplace or plugin manifests. Every older version recorded below is the
 > version that was actually exercised. Those values are deliberately not bumped,
 > because this file records evidence and the rule under
 > [Tool baseline](#tool-baseline) is to never rewrite an older result as if it ran
 > on a newer version.
 >
-> The August 15 structure check proves native manifest discovery and clean package
-> installation with Codex CLI 0.147.0. It does not convert the older package-level
-> runtime pilots into v2.5.0 runtime evidence.
+> The August 15 structure check confirms the repository still follows the tested
+> legacy package and Agent Skills routes. It does not convert the older runtime
+> pilots into v2.5.0 runtime evidence.
 
 ## August 2026 structure refresh
 
-- Marketplace 2.5.0 contains 12 packages and 62 shared skills.
-- Eleven packages contain native `.codex-plugin/plugin.json` manifests.
-- Nested-skill packages point at `./skills/`.
-- Root-skill packages point at `./`.
-- Autocontext contains Claude commands and hooks, so it has no native Codex manifest.
-- Native Codex manifests expose skills only. Claude commands, agents, and hooks remain Claude surfaces.
+- Marketplace 2.5.0 contains 12 Claude packages and 62 shared skills.
+- Codex can install the 15 nested journalism-core skills through the verified legacy-compatible package route.
+- The Agent Skills route supports root and nested skill layouts without converting Claude commands, agents, or hooks.
+- No native `.agents/plugins/marketplace.json` or `.codex-plugin/plugin.json` manifests are published.
 
 ## How to read this matrix
 
@@ -51,7 +49,7 @@ Status labels:
 
 | Tool | Version or revision | Role |
 |---|---|---|
-| Codex structure refresh | 0.147.0 | Native manifest discovery and clean package installation on August 15, 2026 |
+| Codex structure refresh | 0.147.0 | Legacy package and Agent Skills route verification on August 15, 2026 |
 | Claude marketplace, current structure | 2.5.0 | Current catalog and version alignment; historical runtime results below remain snapshot-specific |
 | Repository | `b0617649515d24ebfcd51f15bceb1d76b03db668` | Architecture commit used as the phase-one worktree base |
 | Repository release verification | [`9eef57629edbaa19bf47ec35296acebdd7b4ab1f`](https://github.com/jamditis/claude-skills-journalism/commit/9eef57629edbaa19bf47ec35296acebdd7b4ab1f) | July 23 post-merge `master` head used for the phase-one release evidence |

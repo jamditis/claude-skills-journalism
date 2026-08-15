@@ -1,0 +1,59 @@
+title: "[Help] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for installation and skill-usage help. Use Issues for confirmed bugs and bounded implementation work.
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Agent
+      description: Which agent are you using?
+      options:
+        - Claude Code
+        - Codex
+        - Another Agent Skills-compatible agent
+    validations:
+      required: true
+  - type: input
+    id: agent-version
+    attributes:
+      label: Agent version
+      description: Provide the exact CLI or application version.
+      placeholder: "codex-cli 0.147.0"
+    validations:
+      required: true
+  - type: input
+    id: skill
+    attributes:
+      label: Skill or plugin
+      description: Name the skill or plugin involved.
+      placeholder: "journalism-core / fact-check-workflow"
+    validations:
+      required: true
+  - type: dropdown
+    id: installation
+    attributes:
+      label: Installation route
+      options:
+        - Claude Code plugin marketplace
+        - Codex legacy-compatible plugin route
+        - Agent Skills CLI
+        - Manual copy or symlink
+        - Not installed yet
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: Explain your goal, what happened, and what you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: attempts
+    attributes:
+      label: What you tried
+      description: Include relevant commands and sanitized output. Remove credentials and private source material.
+    validations:
+      required: true

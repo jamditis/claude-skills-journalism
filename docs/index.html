@@ -1306,18 +1306,18 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <p class="text-sm text-mist">Then restart Claude Code (close and reopen). See the <a href="pdf-playground/" class="text-accentDark font-semibold hover:underline">PDF Playground page</a> for detailed instructions, troubleshooting, and brand setup.</p>
                 </div>
 
-                <!-- Codex plugins -->
+                <!-- Codex package compatibility -->
                 <div class="deckle-card-solid p-8 mb-6">
                     <div class="flex items-center gap-3 mb-4">
-                        <span class="text-[9px] font-bold tracking-widest text-white uppercase bg-accent px-2 py-1">Codex native</span>
+                        <span class="text-[9px] font-bold tracking-widest text-white uppercase bg-accent px-2 py-1">Codex compatible</span>
                         <h3 class="font-display text-xl font-bold">Install a skill package in Codex</h3>
                     </div>
-                    <p class="text-sm text-mist mb-4">Eleven packages include native Codex plugin manifests. This route installs the shared skills without converting Claude-only commands, agents, or hooks.</p>
+                    <p class="text-sm text-mist mb-4">Codex can install the 15 nested journalism-core skills through the existing Claude marketplace metadata.</p>
                     <div class="bg-ink text-canvas p-6 font-mono text-sm mb-4 overflow-x-auto space-y-1" tabindex="0" role="region" aria-label="Codex plugin installation commands">
                         <div>codex plugin marketplace add jamditis/claude-skills-journalism</div>
                         <div>codex plugin add journalism-core@claude-skills-journalism</div>
                     </div>
-                    <p class="text-sm text-mist">The native route is verified with Codex CLI 0.147.0. Autocontext remains Claude-only. Use one installation route for each skill identity because Codex does not deduplicate identical skills across install roots.</p>
+                    <p class="text-sm text-mist">This is a verified legacy-compatible route, not a native Codex package. Claude commands, agents, hooks, and root-level skills are not converted. Use one installation route for each skill identity because Codex does not deduplicate identical skills across install roots.</p>
                 </div>
 
                 <!-- Skills (manual) -->
