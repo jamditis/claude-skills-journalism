@@ -7,15 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-- **dev-toolkit context-engineering-fundamentals:** published the context
-  engineering skill from the tools repo standouts (group 4 of #115). Teaches the
-  attention budget, the lost-in-middle effect, five context degradation patterns
-  with mitigations, and how to measure retrieval quality before compression. Stripped the project-bound
-  "Amditis Resource Kit" section, the dangling related-skill references, and the
-  dated version footer before publishing (#220).
-
 ## [2.5.0] - 2026-08-15
 
 This release refreshes the public site and current installation guidance for
@@ -24,6 +15,12 @@ Claude Code and Codex users.
 ### Added
 
 - Added current Codex installation guidance and compatibility checks.
+- **dev-toolkit context-engineering-fundamentals:** published the context
+  engineering skill from the tools repo standouts (group 4 of #115). Teaches the
+  attention budget, the lost-in-middle effect, five context degradation patterns
+  with mitigations, and how to measure retrieval quality before compression. Stripped the project-bound
+  "Amditis Resource Kit" section, the dangling related-skill references, and the
+  dated version footer before publishing (#220).
 - **journalism-core:** added `brazil-records-requests`, public records requests
   under Brazil's Access to Information Law (Lei 12.527/2011). Covers portal
   selection across federal, state, municipal, judicial and legislative bodies;
