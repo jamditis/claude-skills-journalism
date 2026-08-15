@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { basename, dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
@@ -139,5 +139,16 @@ test('published package versions stay aligned with the marketplace', () => {
     const listing = marketplace.plugins.find((plugin) => plugin.name === name);
     assert.equal(manifest.version, version, `${name} manifest version`);
     assert.equal(listing?.version, version, `${name} marketplace version`);
+
+    const rootSkillPath = join(ROOT, name, 'SKILL.md');
+    if (existsSync(rootSkillPath)) {
+      const source = readFileSync(rootSkillPath, 'utf8');
+      const match = source.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/u);
+      assert.ok(match, `${name} root skill frontmatter`);
+      const skill = parse(match[1]);
+      if (skill.metadata?.version) {
+        assert.equal(skill.metadata.version, version, `${name} root skill version`);
+      }
+    }
   }
 });
