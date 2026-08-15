@@ -6,6 +6,11 @@ com maior taxa de sucesso, porque não exige nenhum trabalho novo do órgão.
 *Use when the target is a structured dataset. Highest success rate, because
 it asks the agency to produce nothing new.*
 
+**Alcance:** a referência ao Decreto 7.724/2012 serve ao Poder Executivo
+federal. Para os demais órgãos, confirme a regra local.
+*Scope: the Decree 7.724/2012 reference applies to the federal executive.
+Check the local rule for other bodies.*
+
 ---
 
 Ao Serviço de Informação ao Cidadão (SIC) do(a) [ÓRGÃO]
@@ -16,7 +21,8 @@ período de [DATA INICIAL] a [DATA FINAL].
 
 Especificamente, solicito:
 
-a) A exportação completa dos registros, em formato CSV, XLSX ou JSON,
+a) A exportação completa dos registros no formato digital já disponível
+   [CSV, XLSX, JSON OU OUTRO],
    contendo os campos [LISTAR CAMPOS, se conhecidos — ou "todos os campos
    não protegidos por sigilo"];
 
@@ -26,19 +32,20 @@ b) O dicionário de dados ou layout do arquivo, com a descrição de cada campo
 c) A informação sobre a periodicidade de atualização da base e a data da
    última carga.
 
-Registro que o pedido se refere à extração de dados já existentes e
-estruturados, sem qualquer trabalho adicional de análise, interpretação ou
-consolidação, não incidindo a hipótese do art. 13, inciso III, do Decreto
-nº 7.724/2012.
+Para o Poder Executivo federal, registro que o pedido se refere à extração de
+dados já existentes e estruturados, sem trabalho adicional de análise,
+interpretação ou consolidação, não incidindo a hipótese do art. 13, inciso III,
+do Decreto nº 7.724/2012.
 
-Requeiro o fornecimento em formato aberto e legível por máquina, nos termos
-do art. 8º, §3º, incisos II e III, da Lei nº 12.527/2011.
+Manifesto minha anuência para receber a base no formato digital em que ela é
+mantida, nos termos do art. 11, §5º, da Lei nº 12.527/2011.
 
 Caso algum campo contenha dados pessoais protegidos, requeiro o fornecimento
 da base com a supressão exclusiva desses campos, preservados os demais.
 
 [NOME COMPLETO]
 [CPF ou outro documento de identificação válido]
+[ENDEREÇO FÍSICO OU ELETRÔNICO PARA COMUNICAÇÕES]
 [DATA]
 
 ---

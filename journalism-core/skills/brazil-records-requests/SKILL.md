@@ -42,9 +42,10 @@ Check, in order:
 2. **Dados abertos** (dados.gov.br) and the agency's own open-data page
 3. **PNCP** (pncp.gov.br) — federal, state and municipal procurement since 2021
 4. **Painel Lei de Acesso à Informação** (CGU) — request statistics by agency
-5. **Busca de Pedidos e Respostas** (CGU) — every answered federal request is
-   itself public. Someone may have already asked your question, and the answer
-   tells you exactly how the agency describes its own data.
+5. **Busca de Pedidos e Respostas** (CGU) — published federal responses can
+   show how an agency describes its own data. Sensitive, personal, classified,
+   or otherwise restricted information may be redacted or excluded. A missing
+   result does not prove that no earlier request exists.
 6. **Achados e Pedidos** (achadosepedidos.org.br), Abraji and Transparência
    Brasil's archive of requests and responses across jurisdictions
 
@@ -68,7 +69,7 @@ There is no single filing system. The portal follows the body.
 Practical consequences:
 
 - **Filing with the wrong body costs the full 20 days.** The agency will
-  answer that it does not hold the information, and under art. 11, III it
+  answer that it does not hold the information, and under art. 11, §1º, III it
   should indicate who does — but frequently does not.
 - **When you are unsure which of two bodies holds the record, file with
   both.** There is no penalty and no cost.
@@ -98,6 +99,10 @@ records unit. Filing as a private citizen is normal practice.
 - A specific description of the information sought
 - The delivery format you want
 
+For a federal-executive request filed outside Fala.BR, add a physical or
+electronic address for communications. Decree 7.724/2012, art. 12, IV requires
+it. Other bodies can have different local rules.
+
 ### What makes a request survive
 
 Be specific about the record, not about the subject. Agencies hold documents
@@ -123,9 +128,10 @@ Techniques that work:
 - **Split a broad question into several narrow requests.** Each is judged
   separately, so one refusal does not sink the rest, and each starts its own
   20-day clock in parallel.
-- **State the format explicitly**: "em formato aberto e legível por máquina
-  (CSV ou XLSX), não em PDF". Art. 8 §3º, II and III support open,
-  machine-readable formats.
+- **Ask for the existing digital format.** If the information is stored
+  digitally, agree to receive it in that format under LAI art. 11 §5º. For a
+  dataset, request its existing CSV, XLSX, or other digital export. Do not
+  demand conversion of a document that exists only as a PDF.
 
 Use `templates/pedido-inicial.md` for the general form and
 `templates/pedido-base-de-dados.md` when the target is a database.
@@ -156,14 +162,19 @@ appeal chain may not resolve until August.
 Almost all denials fall into a few categories. The right response differs
 for each — appealing a denial that should have been refiled wastes months.
 
+Decree 7.724/2012 applies only to the federal executive. The first three
+grounds below use that Decree. For state, municipal, judicial, legislative,
+and Ministério Público bodies, check the local rule before characterizing a
+denial or citing the Decree.
+
 | Denial | Basis | Response |
 | --- | --- | --- |
-| Generic request | Decree 7.724/2012, art. 13, I | **Refile**, narrowed. Faster than appealing. |
-| Disproportionate or unreasonable | Decree 7.724, art. 13, II | **Refile** in slices, or appeal if the volume claim is implausible |
-| Requires additional analysis, interpretation or consolidation of data | Decree 7.724, art. 13, III | **Appeal.** The agency must indicate where the raw data is (art. 13, parágrafo único). Ask for the raw export instead. |
-| Personal data / LGPD | LAI art. 31; Lei 13.709/2018 | **Appeal**, requesting the record with personal fields redacted. Partial access is the rule, full withholding the exception. |
+| Generic request | Federal executive: Decree 7.724/2012, art. 13, I | **Refile**, narrowed. Faster than appealing. |
+| Disproportionate or unreasonable | Federal executive: Decree 7.724, art. 13, II | **Refile** in slices, or appeal if the volume claim is implausible |
+| Requires additional analysis, interpretation or consolidation of data | Federal executive: Decree 7.724, art. 13, III | **Appeal.** The agency must indicate where the raw data is (art. 13, parágrafo único). Ask for the raw export instead. |
+| Personal data | LAI art. 31 | **Appeal**, requesting the record with personal fields redacted. Partial access is the rule, full withholding the exception. |
 | Classified | LAI arts. 23–24 | **Appeal**, demanding the classification instrument (termo de classificação), its date, level and authority. Reservada is 5 years, secreta 15, ultrassecreta 25. |
-| Body does not hold it | LAI art. 11, III | Ask which body does — the agency is required to say — then refile there |
+| Body does not hold it | LAI art. 11, §1º, III | Ask which body does — the agency is required to say — then refile there |
 | Silence (federal executive) | Decree 7.724/2012, arts. 22–23 | **Reclamação** to the monitoring authority, not a direct appeal — see Step 5. |
 | Silence (other spheres) | Local LAI regulation | Usually an immediate appeal under LAI art. 15; confirm the state, municipal, judicial or legislative body's own rule — Decree 7.724/2012 binds the federal executive only. |
 
@@ -264,13 +275,16 @@ investigative work and helps the next reporter. Before publishing, redact
 CPFs, home addresses, and any other personal field the agency did not
 already withhold under LAI art. 31 — a public record is not automatically a
 public-interest publication, and this is especially true for victim,
-witness, and juvenile identifiers. LGPD applies to what a newsroom does with
-personal data it receives, not just to what the agency releases.
+witness, and juvenile identifiers. LGPD does not apply to processing carried
+out exclusively for journalistic purposes (LGPD art. 4, II, a). That exclusion
+does not remove editorial, ethical, or other applicable legal duties to
+safeguard personal data.
 
 ## Working with what comes back
 
-- Responses often arrive as PDFs of screenshots of tables. Push back and cite
-  art. 8 §3º; if the agency will not budge, extract and document the process.
+- Responses often arrive as PDFs of screenshots of tables. Where the agency
+  stores the information digitally, agree to receive that existing format under
+  art. 11 §5º. If the agency will not budge, extract and document the process.
 - Check the response against the request field by field. Partial delivery
   presented as full delivery is common, and the 10-day appeal clock starts
   from receipt.

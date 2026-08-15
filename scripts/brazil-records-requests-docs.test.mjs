@@ -8,6 +8,9 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const DOCS = join(ROOT, 'docs');
 const PAGE = join(DOCS, 'brazil-records-requests', 'index.html');
 const STYLESHEET = join(DOCS, 'assets', 'tailwind', 'brazil-records-requests.css');
+const SKILL = join(ROOT, 'journalism-core', 'skills', 'brazil-records-requests', 'SKILL.md');
+const TEMPLATES = join(ROOT, 'journalism-core', 'skills', 'brazil-records-requests', 'templates');
+const README = join(ROOT, 'README.md');
 
 test('Brazil records requests has a public skill page', () => {
   assert.equal(existsSync(PAGE), true, 'docs/brazil-records-requests/index.html is missing');
@@ -40,4 +43,46 @@ test('Brazil records requests is part of the pinned Tailwind build', () => {
   assert.ok(manifest['brazil-records-requests/index.html']);
   assert.equal(existsSync(STYLESHEET), true, 'generated brazil-records-requests.css is missing');
   assert.ok(statSync(STYLESHEET).size > 1000, 'generated stylesheet is unexpectedly small');
+});
+
+test('Brazil records requests keeps the legal routes in scope', () => {
+  const skill = readFileSync(SKILL, 'utf8');
+  const request = readFileSync(join(TEMPLATES, 'pedido-inicial.md'), 'utf8');
+  const firstAppeal = readFileSync(join(TEMPLATES, 'recurso-1a-instancia.md'), 'utf8');
+  const cguAppeal = readFileSync(join(TEMPLATES, 'recurso-cgu.md'), 'utf8');
+
+  assert.match(skill, /sensitive, personal, classified,\s+or otherwise restricted information may be redacted or excluded/iu);
+  assert.match(skill, /Decree 7\.724\/2012 binds the federal executive only/iu);
+  assert.match(skill, /LGPD does not apply to processing carried\s+out exclusively for journalistic purposes/iu);
+  assert.match(skill, /art\. 11, §1º, III/iu);
+  assert.doesNotMatch(skill, /art\. 11, III/iu);
+
+  assert.match(request, /art\. 11, §5º/iu);
+  assert.match(request, /ENDEREÇO FÍSICO OU ELETRÔNICO PARA COMUNICAÇÕES/u);
+  assert.match(request, /art\. 11, §1º, III/iu);
+  assert.doesNotMatch(request, /art\. 8º, §3º,\s*incisos II e III/iu);
+
+  assert.match(firstAppeal, /Poder\s+Executivo federal/u);
+  assert.match(firstAppeal, /parágrafo\s+único/u);
+  assert.doesNotMatch(firstAppeal, /não respondeu no prazo legal/u);
+  assert.doesNotMatch(firstAppeal, /Ausência de resposta/u);
+
+  assert.match(cguAppeal, /informação não classificada/u);
+  assert.match(cguAppeal, /autoridade classificadora/u);
+  assert.match(cguAppeal, /procedimentos de classificação de informação não foram observados/u);
+  assert.match(cguAppeal, /prazos ou outros procedimentos/u);
+});
+
+test('Brazil records requests page supplies the Open Graph image size', () => {
+  const page = readFileSync(PAGE, 'utf8');
+
+  assert.match(page, /<meta property="og:image:width" content="1200">/u);
+  assert.match(page, /<meta property="og:image:height" content="630">/u);
+});
+
+test('Codex guidance gives the current journalism-core skill count', () => {
+  const readme = readFileSync(README, 'utf8');
+
+  assert.match(readme, /It exposes the 15 nested skills in `journalism-core`/u);
+  assert.doesNotMatch(readme, /It exposes the 14 nested skills in `journalism-core`/u);
 });

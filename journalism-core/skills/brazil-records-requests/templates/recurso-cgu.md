@@ -24,9 +24,17 @@ decisão da autoridade máxima do(a) [ÓRGÃO] que manteve a negativa de acesso.
 
 **1. Da hipótese de cabimento**
 
-O recurso se enquadra na hipótese de [acesso negado / razões da negativa não
-indicadas / procedimentos de classificação não observados], nos termos do
-art. 16 da Lei nº 12.527/2011.
+O recurso se enquadra na hipótese de [ESCOLHA UMA]:
+
+- I — negativa de acesso à informação não classificada;
+- II — decisão de negativa de acesso total ou parcial a informação classificada
+  sem indicação da autoridade classificadora ou da autoridade hierarquicamente
+  superior competente para decidir sobre acesso ou desclassificação;
+- III — procedimentos de classificação de informação não foram observados; ou
+- IV — prazos ou outros procedimentos previstos nesta Lei não foram observados.
+
+Nos termos do art. 16 da Lei nº 12.527/2011, esta é a hipótese aplicável:
+[EXPLIQUE EM UMA FRASE].
 
 **2. Do histórico do pedido**
 
@@ -52,7 +60,8 @@ ANTERIOR APLICÁVEL AO CASO].
 **5. Do pedido**
 
 Requeiro o provimento do recurso, com a determinação de fornecimento das
-informações em formato aberto e legível por máquina.
+informações no formato digital existente, quando estiverem armazenadas nesse
+formato.
 
 [NOME COMPLETO]
 [CPF ou outro documento de identificação válido]

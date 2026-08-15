@@ -106,7 +106,7 @@ codex plugin marketplace add jamditis/claude-skills-journalism
 codex plugin add journalism-core@claude-skills-journalism
 ```
 
-The package route is covered by a clean-install canary, but it uses Codex's legacy Claude-manifest reader. It exposes the 14 nested skills in `journalism-core`; it does not convert Claude commands, agents, hooks, or root-level skills into Codex components. This repository does not ship native Codex manifests yet.
+The package route is covered by a clean-install canary, but it uses Codex's legacy Claude-manifest reader. It exposes the 15 nested skills in `journalism-core`; it does not convert Claude commands, agents, hooks, or root-level skills into Codex components. This repository does not ship native Codex manifests yet.
 
 Codex desktop can [import skills from another agent](https://learn.chatgpt.com/docs/import.md). Import leaves the source installation in place. Until duplicate-identity and uninstall behavior has been tested for this repository, do not import a skill and also install the same skill through `npx skills` or the package route.
 

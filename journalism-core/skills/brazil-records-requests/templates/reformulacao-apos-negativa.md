@@ -6,16 +6,21 @@
 ser resolvidas mais rápido com um pedido novo e mais estreito do que com um
 recurso. Um recurso pode levar meses; um pedido novo, 20 dias.
 
+**Alcance:** essas hipóteses do Decreto 7.724/2012 aplicam-se ao Poder
+Executivo federal. Para outro órgão, confirme a regra local antes de citar o
+Decreto.
+
 *When to refile rather than appeal: "generic" and "disproportionate" denials
 usually resolve faster with a narrower new request — 20 days versus months.*
 
 **Quando recorrer, e não reformular:** negativa por trabalho adicional
-(art. 13, III), por dados pessoais, por sigilo, ou silêncio. Nesses casos a
-negativa é juridicamente frágil e vale derrubá-la — inclusive porque o
-precedente serve para os próximos pedidos.
+(art. 13, III), por dados pessoais ou por sigilo. Nesses casos a negativa pode
+ser juridicamente frágil e vale contestá-la — inclusive porque o precedente
+serve para os próximos pedidos. Para silêncio no Poder Executivo federal, use
+uma reclamação, nos termos dos arts. 22 e 23 do Decreto 7.724/2012.
 
-*When to appeal instead: "additional work", personal data, classification, or
-silence. Those denials are legally weak and worth beating.*
+*When to appeal instead: "additional work", personal data, or classification.
+Federal-executive silence uses the Decree complaint route.*
 
 Se houver dúvida, faça as duas coisas em paralelo. São processos
 independentes e não há custo.
@@ -38,7 +43,7 @@ a) Documento ou base: [NOME EXATO DO SISTEMA, RELATÓRIO OU CONJUNTO]
 b) Período: [DATA INICIAL] a [DATA FINAL]
 c) Unidade administrativa: [SETOR, SE CONHECIDO]
 d) Campos ou seções de interesse: [LISTAR]
-e) Formato: CSV, XLSX ou JSON
+e) Formato: [FORMATO DIGITAL JÁ DISPONÍVEL]
 
 Caso o volume ainda seja considerado excessivo, requeiro o fornecimento
 parcelado, começando pelo período de [RECORTE MENOR], nos termos do que o

@@ -5,6 +5,13 @@
 O órgão deve decidir em 5 dias.
 *Deadline: 10 days from notice of the decision. The agency decides in 5.*
 
+**Alcance:** use este modelo para uma negativa fundamentada. No Poder
+Executivo federal, o silêncio segue a reclamação dos arts. 22 e 23 do Decreto
+7.724/2012. Os blocos (a) e (b) também são exclusivos desse Poder; para outro
+órgão, confirme a regra local.
+*Scope: use this form for a reasoned denial. Federal-executive silence uses the
+Decree 7.724/2012 complaint route. Check local rules for other bodies.*
+
 **Destinatário:** autoridade hierarquicamente superior à que proferiu a decisão.
 No Fala.BR isso é automático — basta acionar "Recorrer".
 *Addressee: the authority immediately above the one who decided. Fala.BR routes
@@ -19,14 +26,12 @@ Data do pedido: [DATA]
 Data da resposta: [DATA]
 
 Com fundamento no art. 15 da Lei nº 12.527/2011, interponho recurso contra a
-decisão que [negou o acesso / concedeu acesso parcial / não respondeu no prazo
-legal], pelas razões a seguir.
+decisão que [negou o acesso / concedeu acesso parcial], pelas razões a seguir.
 
 **1. Do objeto do pedido**
 
 O pedido solicitou [RESUMO EM UMA FRASE]. A resposta recebida
-[negou o acesso sob o argumento de que ... / entregou apenas ... / não foi
-apresentada].
+[negou o acesso sob o argumento de que ... / entregou apenas ...].
 
 **2. Das razões do recurso**
 
@@ -43,8 +48,8 @@ exige demonstração concreta, não bastando a mera afirmação.
 
 O pedido versa sobre a extração de dados já existentes em base estruturada,
 o que não configura trabalho adicional de análise, interpretação ou
-consolidação. Subsidiariamente, ainda que assim se entendesse, o §2º do mesmo
-artigo impõe ao órgão o dever de indicar o local onde se encontram as
+consolidação. Subsidiariamente, ainda que assim se entendesse, o parágrafo
+único do mesmo artigo impõe ao órgão o dever de indicar o local onde se encontram as
 informações originais — providência não adotada na resposta recorrida.
 
 **c) Negativa por proteção de dados pessoais**
@@ -63,16 +68,10 @@ com indicação do grau de sigilo, da data da classificação, do prazo de
 restrição e da autoridade classificadora. Sem esses elementos, não é possível
 verificar a regularidade da restrição.
 
-**e) Ausência de resposta**
-
-Transcorrido o prazo do art. 11 da Lei nº 12.527/2011 sem manifestação do
-órgão [e sem a prorrogação prevista no §2º, que exige justificativa expressa],
-a omissão equivale à negativa de acesso e enseja o presente recurso.
-
 **3. Do pedido**
 
 Requeiro o provimento do recurso e o fornecimento das informações solicitadas
-em formato aberto e legível por máquina.
+no formato digital existente, quando estiverem armazenadas nesse formato.
 
 [NOME COMPLETO]
 [CPF ou outro documento de identificação válido]
