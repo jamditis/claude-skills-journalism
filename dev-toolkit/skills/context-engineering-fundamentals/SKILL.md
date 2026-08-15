@@ -1,35 +1,27 @@
 ---
 name: context-engineering-fundamentals
-description: Understand how Claude manages attention and when context degrades. Activate for long sessions, complex tasks, or when Claude seems to "forget" information.
+description: Manage attention and evidence in long AI-agent sessions. Use for complex tasks, large contexts, multi-agent work, or apparent instruction and evidence loss.
 ---
 
-# Context Engineering Fundamentals
+# Context engineering fundamentals
 
-Context engineering is the practice of managing an LLM's limited attention budget. This skill helps you understand why Claude sometimes "forgets" things and how to work within context limitations.
-
-## When to activate
-
-- Working on long, multi-step tasks
-- Claude seems to forget earlier instructions or context
-- Debugging "why didn't Claude use the information I gave it?"
-- Planning how to structure complex prompts
-- Optimizing for token efficiency
+Context engineering is the practice of managing an LLM's limited attention budget. Use this skill to keep instructions, evidence, and state available during long work.
 
 ## Core concept
 
-**Context windows are constrained by attention mechanics, not just token capacity.** A 200K token window doesn't mean 200K tokens of useful information. Attention degrades, especially in the middle of long contexts.
+**Context windows are constrained by attention mechanics, not only token capacity.** A large context limit does not guarantee equal use of every item.
 
 ## The lost-in-middle effect
 
-Research shows information position dramatically affects recall:
+The "Lost in the Middle" experiments show that retrieval quality can change with information position. The result depends on the model, task, context length, and number of documents.
 
-| Position | Recall Accuracy |
-|----------|----------------|
-| Beginning | High (~90%) |
-| Middle | Low (50-70%) |
-| End | High (~85%) |
+| Position | Common test result |
+|----------|--------------------|
+| Beginning | Often easier to retrieve |
+| Middle | Can be harder to retrieve |
+| End | Often benefits from recency |
 
-**Implication:** Put critical information at the start or end, not buried in the middle.
+**Implication:** Keep critical constraints easy to find and repeat them near the decision that uses them. Do not assume position alone predicts recall.
 
 ## Context degradation patterns
 
@@ -58,21 +50,16 @@ Contradictory information from multiple sources causes derailing conflicts.
 
 **Mitigation:** Resolve contradictions explicitly before asking Claude to use the information.
 
-## Practical degradation thresholds
+## Measure before compressing
 
-These bands are illustrative heuristics, not model-independent guarantees. The transition points move with the model, its version, and the retrieval or reasoning task: a short context is not always reliable, and a long one is not always lossy. Measure recall on your own model and workload before you treat a threshold as a hard cutoff for discarding or summarizing context.
+Do not use a fixed token threshold to decide when context is reliable. Measure retrieval and reasoning quality on your own model and task. Test representative evidence at several positions, then compare the result before and after summarization.
 
-| Context Size | Expected Behavior |
-|--------------|-------------------|
-| < 8K tokens | Full attention, reliable recall |
-| 8-32K tokens | Good performance, some middle-loss |
-| 32-100K tokens | Noticeable degradation, need explicit structure |
-| > 100K tokens | Significant loss, use summarization/chunking |
+Compress only when the measured result or the agent's behavior shows a problem. Preserve exact constraints, decisions, source links, unresolved questions, and verification evidence.
 
 ## Mitigation strategies
 
 ### Write externally
-Don't rely on Claude to remember across turns. Write important state to files, but agree the path with the user first and prefer a gitignored workspace so you never overwrite project-owned content:
+Do not rely on the agent to remember across turns. Write important state to files, but agree the path with the user first. Prefer a gitignored workspace so you never overwrite project-owned content:
 ```
 With the user's approval, after each major step write progress to an agreed scratch file (for example a gitignored PROGRESS.md or a path they choose)
 Before starting, read that file back to restore context
@@ -93,11 +80,11 @@ Do: Key functions and their signatures, with context on the specific area
 ```
 
 ### Isolate contexts
-For complex tasks, use sub-agents with focused contexts rather than one agent with everything.
+For complex tasks, use subagents with focused contexts rather than one agent with everything.
 
 ## Signs of context degradation
 
-| Symptom | Likely Cause |
+| Symptom | Likely cause |
 |---------|--------------|
 | Ignores earlier instructions | Lost-in-middle or context too long |
 | Contradicts itself | Context confusion or clash |

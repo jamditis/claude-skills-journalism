@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **dev-toolkit context-engineering-fundamentals:** published the context
   engineering skill from the tools repo standouts (group 4 of #115). Teaches the
   attention budget, the lost-in-middle effect, five context degradation patterns
-  with mitigations, and practical size thresholds. Stripped the project-bound
+  with mitigations, and how to measure retrieval quality before compression. Stripped the project-bound
   "Amditis Resource Kit" section, the dangling related-skill references, and the
   dated version footer before publishing (#220).
 
