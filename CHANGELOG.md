@@ -9,15 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **journalism-core:** added `brazil-records-requests`, public records requests
-  under Brazil's Access to Information Law (Lei 12.527/2011). Covers portal
-  selection across federal, state, municipal, judicial and legislative bodies;
-  the 20+10 day response deadlines; the four-level appeal chain (immediate
-  superior, agency head, CGU, CMRI); denial diagnosis, including the art. 13
-  grounds of Decree 7.724/2012; and six request and appeal templates in
-  Portuguese with English glosses. First non-US jurisdiction in
-  `journalism-core`. Companion to `foia-requests`; does not collide with it on
-  US prompts.
 - **dev-toolkit context-engineering-fundamentals:** published the context
   engineering skill from the tools repo standouts (group 4 of #115). Teaches the
   attention budget, the lost-in-middle effect, five context degradation patterns
@@ -33,7 +24,15 @@ Claude Code and Codex users.
 ### Added
 
 - Added current Codex installation guidance and compatibility checks.
-- Added the Brazilian records request skill from the concurrent 1.4.0 journalism-core release.
+- **journalism-core:** added `brazil-records-requests`, public records requests
+  under Brazil's Access to Information Law (Lei 12.527/2011). Covers portal
+  selection across federal, state, municipal, judicial and legislative bodies;
+  the 20+10 day response deadlines; the four-level appeal chain (immediate
+  superior, agency head, CGU, CMRI); denial diagnosis, including the art. 13
+  grounds of Decree 7.724/2012; and six request and appeal templates in
+  Portuguese with English glosses. First non-US jurisdiction in
+  `journalism-core`. Companion to `foia-requests`; does not collide with it on
+  US prompts.
 
 ### Changed
 
