@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Brazilian public records request guidance for journalists. Use the Access to Information Law, choose the right portal, and track each appeal deadline.">
+    <title>Brazilian public records requests | Claude skills for journalism</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="stylesheet" href="../assets/tailwind/brazil-records-requests.css" data-tailwind-build="3.4.19">
+    <link rel="stylesheet" href="../updated.css">
+    <style>
+        body { font-family: ui-sans-serif, system-ui, sans-serif; }
+        h1, h2, h3 { font-family: Georgia, serif; }
+        .record-grid { background-image: linear-gradient(rgba(13, 148, 136, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(13, 148, 136, 0.08) 1px, transparent 1px); background-size: 28px 28px; }
+        .skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+        .skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #134e4a; color: white; font-weight: 700; }
+        :focus-visible { outline: 2px solid #0f766e; outline-offset: 4px; }
+        .content-link { text-decoration: underline; text-underline-offset: 0.18em; }
+    </style>
+    <meta property="og:title" content="Brazilian public records requests | Claude skills for journalism">
+    <meta property="og:description" content="Use Brazil's Access to Information Law to draft, track, and appeal public records requests.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/brazil-records-requests/">
+    <meta property="og:image" content="https://skills.amditis.tech/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Brazilian public records requests | Claude skills for journalism">
+    <meta name="twitter:description" content="A practical LAI workflow for reporters in Brazil.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/og-image.png">
+    <script src="../ask-ai.js" defer></script>
+</head>
+<body class="bg-canvas text-ink">
+    <a href="#main" class="skip-link">Skip to main content</a>
+
+    <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/95 backdrop-blur-md border-b border-clay/20">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="../" class="text-sm font-semibold text-accentDark hover:text-ink transition-colors">All skills</a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/journalism-core/skills/brazil-records-requests" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-accentDark hover:text-ink transition-colors">GitHub</a>
+        </div>
+    </nav>
+
+    <header class="record-grid pt-28 pb-20 border-b border-clay/20">
+        <div class="max-w-5xl mx-auto px-6">
+            <p class="inline-flex items-center rounded-full bg-accentLight text-accentDark px-3 py-1 text-sm font-semibold mb-6">journalism-core skill</p>
+            <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-5">Brazilian public records requests</h1>
+            <p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-08-13T20:48:03-03:00" data-updated-slug="brazil-records-requests">Updated <time datetime="2026-08-13T20:48:03-03:00">Aug 13, 2026</time></p>
+            <p class="text-xl md:text-2xl text-clay leading-relaxed max-w-3xl">Use the Lei de Acesso à Informação to find the right public body, request the record, track the deadline, and take the correct appeal path.</p>
+        </div>
+    </header>
+
+    <main id="main" class="max-w-5xl mx-auto px-6 py-14">
+        <section class="mb-16 grid lg:grid-cols-3 gap-8" aria-labelledby="start-heading">
+            <div class="lg:col-span-2">
+                <p class="text-xs font-bold uppercase tracking-widest text-accentDark mb-2">Start with the record</p>
+                <h2 id="start-heading" class="text-3xl md:text-4xl font-bold mb-5">Choose the body before you write</h2>
+                <p class="text-clay leading-relaxed mb-4">The law does not use one filing system. Federal executive bodies use Fala.BR. State, municipal, judicial, legislative, and Ministério Público bodies use their own systems.</p>
+                <p class="text-clay leading-relaxed">The skill helps a reporter check Portal da Transparência, Dados Abertos, PNCP, and prior responses before a new request starts the clock.</p>
+            </div>
+            <aside class="bg-accentLight rounded-2xl p-6">
+                <h3 class="text-xl font-bold mb-3">First response</h3>
+                <p class="text-clay text-sm leading-relaxed">The normal deadline is 20 days. A body can extend it once for 10 days with written reasons.</p>
+            </aside>
+        </section>
+
+        <section class="mb-16" aria-labelledby="route-heading">
+            <p class="text-xs font-bold uppercase tracking-widest text-accentDark mb-2">Appeal route</p>
+            <h2 id="route-heading" class="text-3xl md:text-4xl font-bold mb-6">Use the right procedure for the result</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <article class="bg-white rounded-2xl border border-clay/20 p-6">
+                    <h3 class="text-2xl font-bold mb-3">Reasoned denial</h3>
+                    <p class="text-clay leading-relaxed">File within 10 days. The federal executive chain is the immediate superior, the agency head, CGU, then CMRI.</p>
+                </article>
+                <article class="bg-white rounded-2xl border border-clay/20 p-6">
+                    <h3 class="text-2xl font-bold mb-3">Federal executive silence</h3>
+                    <p class="text-clay leading-relaxed">File a reclamação with the monitoring authority first. It does not go directly to the ordinary appeal chain. An unsuccessful reclamação can go to CGU.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="mb-16 bg-ink text-white rounded-3xl p-8 md:p-10" aria-labelledby="request-heading">
+            <p class="text-xs font-bold uppercase tracking-widest text-white/60 mb-2">Drafting</p>
+            <h2 id="request-heading" class="text-3xl md:text-4xl font-bold mb-5">Ask for a record, not a topic</h2>
+            <ul class="grid md:grid-cols-3 gap-5 text-white/85 leading-relaxed">
+                <li class="bg-white/10 rounded-xl p-5">Name the dataset, document, process number, date range, and fields.</li>
+                <li class="bg-white/10 rounded-xl p-5">Request a machine-readable file when the body holds the data digitally.</li>
+                <li class="bg-white/10 rounded-xl p-5">Ask for the data dictionary with the export.</li>
+            </ul>
+        </section>
+
+        <section class="mb-16 grid lg:grid-cols-2 gap-8" aria-labelledby="privacy-heading">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-widest text-accentDark mb-2">Publication</p>
+                <h2 id="privacy-heading" class="text-3xl md:text-4xl font-bold mb-5">Publish with care</h2>
+                <p class="text-clay leading-relaxed">A public record does not automatically justify public-interest publication. Redact personal data. Protect victim and witness identifiers. Check the reporting value before you share the full response.</p>
+            </div>
+            <div class="bg-white rounded-2xl border border-clay/20 p-6">
+                <h3 class="text-xl font-bold mb-3">The full skill includes</h3>
+                <ul class="space-y-3 text-clay">
+                    <li>Request and data-export templates in Portuguese with English glosses.</li>
+                    <li>Templates for each federal appeal level.</li>
+                    <li>Guidance for generic, disproportionate, privacy, classification, and format denials.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="mb-16" aria-labelledby="install-heading">
+            <p class="text-xs font-bold uppercase tracking-widest text-accentDark mb-2">Installation</p>
+            <h2 id="install-heading" class="text-3xl md:text-4xl font-bold mb-6">Install the journalism-core plugin</h2>
+            <pre class="bg-ink rounded-2xl p-6 text-sm overflow-x-auto text-white" tabindex="0"><code>/plugin marketplace add jamditis/claude-skills-journalism
+/plugin install journalism-core@claude-skills-journalism</code></pre>
+            <p class="text-sm text-clay mt-4">Read the <a class="content-link text-accentDark font-semibold" href="https://github.com/jamditis/claude-skills-journalism/tree/master/journalism-core/skills/brazil-records-requests" target="_blank" rel="noopener noreferrer">full skill on GitHub</a>.</p>
+        </section>
+
+        <section class="bg-accentLight rounded-3xl p-8 md:p-10" aria-labelledby="related-heading">
+            <h2 id="related-heading" class="text-2xl font-bold mb-5">Related skills</h2>
+            <div class="flex flex-wrap gap-3">
+                <a href="../foia-requests/" class="bg-white rounded-full px-4 py-2 text-sm border border-clay/20 hover:border-accent transition-colors">FOIA requests</a>
+                <a href="../data-journalism/" class="bg-white rounded-full px-4 py-2 text-sm border border-clay/20 hover:border-accent transition-colors">Data journalism</a>
+                <a href="../source-verification/" class="bg-white rounded-full px-4 py-2 text-sm border border-clay/20 hover:border-accent transition-colors">Source verification</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-clay/20 mt-10">
+        <div class="max-w-5xl mx-auto px-6 py-8 flex justify-between gap-4 text-sm text-clay">
+            <p>Claude skills for journalism</p>
+            <a href="../" class="hover:text-ink">All skills</a>
+        </div>
+    </footer>
+    <script defer src="../updated.js"></script>
+</body>
+</html>

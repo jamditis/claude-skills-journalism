@@ -96,6 +96,31 @@
       }
     }
   },
+  "brazil-records-requests/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "sans": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#f0fdf4",
+          "ink": "#11231d",
+          "clay": "#486257",
+          "mist": "#64748b",
+          "accent": "#0f766e",
+          "accentDark": "#115e59",
+          "accentLight": "#d1fae5"
+        }
+      }
+    }
+  },
   "api-hardening/index.html": {
     "theme": {
       "extend": {
