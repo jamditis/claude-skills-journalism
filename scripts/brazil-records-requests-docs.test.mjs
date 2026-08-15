@@ -92,6 +92,18 @@ test('Brazil records requests page supplies the Open Graph image size', () => {
   assert.match(page, /<meta property="og:image:height" content="630">/u);
 });
 
+test('Brazil records requests credits its contributor', () => {
+  const page = readFileSync(PAGE, 'utf8');
+  const skill = readFileSync(SKILL, 'utf8');
+
+  assert.match(page, /Reinaldo Chaves/u);
+  assert.match(page, /https:\/\/github\.com\/reichaves/u);
+  assert.match(page, /https:\/\/github\.com\/jamditis\/claude-skills-journalism\/pull\/267/u);
+  assert.match(skill, /Reinaldo Chaves/u);
+  assert.match(skill, /https:\/\/github\.com\/reichaves/u);
+  assert.match(skill, /https:\/\/github\.com\/jamditis\/claude-skills-journalism\/pull\/267/u);
+});
+
 test('Codex guidance gives the current journalism-core skill count', () => {
   const readme = readFileSync(README, 'utf8');
 

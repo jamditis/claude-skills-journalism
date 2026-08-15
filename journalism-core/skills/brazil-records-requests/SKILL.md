@@ -303,3 +303,8 @@ current CGU guidance for procedural changes to Fala.BR.
 Related Brazilian statutes that intersect: Lei 13.709/2018 (LGPD),
 Lei 13.460/2017 (users of public services), Lei 14.129/2021 (digital
 government).
+
+## Contributor credit
+
+Reinaldo Chaves ([@reichaves](https://github.com/reichaves)) contributed this
+skill in [PR #267](https://github.com/jamditis/claude-skills-journalism/pull/267).
