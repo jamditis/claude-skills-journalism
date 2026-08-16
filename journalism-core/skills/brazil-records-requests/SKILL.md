@@ -29,6 +29,13 @@ tracking, and the four-level appeal chain.
   (DataJud, e-SAJ, PJe) and rarely needs a records request
 - Data already published under transparência ativa (see "Check first" below)
 
+## Language
+
+Respond in the language the reporter writes in. Any text addressed to a
+Brazilian public body — the request itself, appeals, follow-ups — must be
+in Portuguese regardless of the conversation language, because a request
+written in English will be denied.
+
 ## Check first: is a request even necessary?
 
 Art. 8 of the LAI obliges agencies to publish core categories of information
