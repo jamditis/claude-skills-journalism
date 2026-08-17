@@ -562,8 +562,8 @@ verify the target journal's policy before posting if you're unsure.
 **Why preprint:** Faster timestamp on priority claims, citable months
 before journal acceptance, and broader feedback before final review.
 (The 2026 OSTP Nelson Memo governs immediate public access to the
-*peer-reviewed* version of federally-funded US research at publication
-, it is not a preprint mandate. Preprinting is a separate, voluntary
+*peer-reviewed* version of federally-funded US research at publication,
+it is not a preprint mandate. Preprinting is a separate, voluntary
 choice that complements but doesn't satisfy Nelson Memo compliance.)
 
 ### Persistent identifiers, get an ORCID and use DOIs

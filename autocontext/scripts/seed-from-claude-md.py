@@ -129,12 +129,12 @@ def is_cross_reference(text):
 def is_command_reference(text):
     """Detect bot command documentation that isn't a lesson.
 
-    Examples: "/cjs stats, User counts by registration status",
-              "/tweet <text>, Post a tweet (max 280 chars)"
+    Examples: "/cjs stats — User counts by registration status",
+              "/tweet <text> — Post a tweet (max 280 chars)"
     """
     # Strip markdown formatting to check the actual text
     clean = text.lstrip("`")
-    return clean.startswith("/") and ", " in text
+    return clean.startswith("/") and " — " in text
 
 
 def is_too_short_standalone(text):

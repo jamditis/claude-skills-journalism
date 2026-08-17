@@ -1,6 +1,6 @@
 ---
 name: interview-prep
-description: Prepares for journalism interviews with research checklists and question frameworks. Use when preparing sources or follow-ups.
+description: Interview preparation and recording-consent law. Use for research, question frameworks, one-party or all-party consent rules.
 ---
 
 # Interview preparation

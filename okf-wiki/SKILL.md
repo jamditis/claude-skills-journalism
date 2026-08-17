@@ -120,8 +120,8 @@ python3 scripts/validate.py --bundle bundle    # must exit 0
 
 ## Populate the bundle: author concepts from existing material
 
-Scaffolding leaves an empty tree with one placeholder concept. The usual next request
-, "here are my docs / plans / notes / repo, build the wiki", has no importer script, and
+Scaffolding leaves an empty tree with one placeholder concept. The usual next request,
+"here are my docs / plans / notes / repo, build the wiki", has no importer script, and
 can't have one: deciding what counts as a single concept, writing its one-line description,
 choosing its `type`, and pointing `source` at real provenance is judgment work, not a
 mechanical transform. So you (Claude) author the concepts directly, in this loop:

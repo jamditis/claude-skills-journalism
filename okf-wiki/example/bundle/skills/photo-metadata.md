@@ -9,8 +9,8 @@ tags: ["skill", "journalism-core"]
 ---
 # photo-metadata skill
 
-Use when preparing photos or images for a news wire, publication, photo CMS, or archive
-, embedding caption, byline, credit, alt text, keywords, copyright or Creative Commons
+Use when preparing photos or images for a news wire, publication, photo CMS, or archive,
+embedding caption, byline, credit, alt text, keywords, copyright or Creative Commons
 license, and location into a file's IPTC, EXIF, and XMP metadata, or batch-tagging a
 folder of press photos with exiftool.
 

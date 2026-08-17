@@ -1,6 +1,6 @@
 ---
 name: web-scraping
-description: Authorized web extraction with fallback cascades. Use for scraping public content with requests or Playwright.
+description: Authorized web scraping with fallback cascades and access-failure handling. Use for social media, yt-dlp, CAPTCHA or 403 blocks.
 ---
 
 # Web scraping methodology

@@ -74,3 +74,17 @@ def test_no_duplicates():
     lessons = _seed(md)
     texts = [l["text"] for l in lessons]
     assert len(texts) == len(set(texts))
+
+
+def test_skips_command_references_with_em_dash():
+    # Command docs in an external CLAUDE.md use an em-dash separator and must not
+    # be imported as lessons. The repo-wide comma sweep must not rewrite this
+    # parser's delimiter (regression guard for is_command_reference).
+    md = """# CLAUDE.md
+## Bot commands
+- /tweet <text> — Post a tweet (max 280 chars)
+- /cjs stats — User counts by registration status
+"""
+    lessons = _seed(md)
+    texts = [l["text"] for l in lessons]
+    assert not any(t.lstrip("`").startswith("/") for t in texts), texts
