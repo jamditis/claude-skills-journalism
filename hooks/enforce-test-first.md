@@ -15,9 +15,9 @@ This hook checks whether Claude is attempting to fix a bug by editing source cod
 
 Analyze the current conversation to determine:
 
-1. **Is this a bug fix context?** — Has the user reported a bug, error, or requested a fix?
-2. **Is this editing source code?** — Is the target file a source file (not a test file)?
-3. **Has a test been written?** — Has Claude already created or modified a test file in this session?
+1. **Is this a bug fix context?**, Has the user reported a bug, error, or requested a fix?
+2. **Is this editing source code?**, Is the target file a source file (not a test file)?
+3. **Has a test been written?**, Has Claude already created or modified a test file in this session?
 
 ## File classification
 
@@ -71,9 +71,9 @@ Allow the edit when ANY of these are true:
 ## Session state tracking
 
 Track in conversation context:
-- `bug_fix_mode`: boolean — Is this session in bug-fix mode?
-- `test_file_modified`: boolean — Has a test file been touched?
-- `bug_keywords_detected`: list — Which bug indicators were found?
+- `bug_fix_mode`: boolean, Is this session in bug-fix mode?
+- `test_file_modified`: boolean, Has a test file been touched?
+- `bug_keywords_detected`: list, Which bug indicators were found?
 
 ## Override phrases
 
@@ -125,7 +125,7 @@ When override detected, allow edit but warn:
 
 ## Implementation notes
 
-This is a **prompt-based hook** — Claude evaluates the conditions and decides whether to proceed or block. The hook content provides the decision criteria.
+This is a **prompt-based hook**, Claude evaluates the conditions and decides whether to proceed or block. The hook content provides the decision criteria.
 
 For reliable enforcement, this hook should:
 1. Scan conversation history for bug indicators

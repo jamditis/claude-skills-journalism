@@ -1,6 +1,6 @@
 ---
 name: document-design
-description: This skill should be used when the user asks to "create a proposal", "design a report", "make a one-pager", "build a PDF", "create a newsletter", "design slides", "make event materials", "design a flyer", or needs help with print-ready HTML documents. Provides brand configuration, CSS patterns for print layout, and document design best practices.
+description: Creates print-ready HTML that exports to PDF. Use to make a proposal, report, one-pager, newsletter, slides, or flyer.
 ---
 
 # Document design
@@ -131,7 +131,7 @@ Generate CSS variables from brand config:
 
 Content overlapping or touching the footer is a recurring issue.
 
-**Preferred layout — grid rows `auto 1fr auto`:**
+**Preferred layout, grid rows `auto 1fr auto`:**
 ```css
 .page {
     display: grid;
@@ -139,15 +139,15 @@ Content overlapping or touching the footer is a recurring issue.
     overflow: hidden;
 }
 ```
-This makes the header and footer take their natural height, and the content fills the remaining space. No magic-number `calc()` needed — the footer clearance is structural.
+This makes the header and footer take their natural height, and the content fills the remaining space. No magic-number `calc()` needed, the footer clearance is structural.
 
 **Required safeguards:**
 1. Use `grid-template-rows: auto 1fr auto` on the page so content automatically gets the space between header and footer
 2. Set `overflow: hidden` on the content container to prevent text bleeding past its bounds
 3. Include `padding-bottom: 0.3in` (minimum) inside the content area as a buffer
-4. Never use hardcoded `height: calc(...)` with magic numbers for header/footer heights — they drift when padding or font sizes change
+4. Never use hardcoded `height: calc(...)` with magic numbers for header/footer heights, they drift when padding or font sizes change
 5. After rendering, always screenshot and visually verify the bottom of the page before delivering
-6. If content overflows, **reduce content** — never shrink the footer gap. Tighten the header first if you need more room.
+6. If content overflows, **reduce content**, never shrink the footer gap. Tighten the header first if you need more room.
 
 ## Typography patterns
 

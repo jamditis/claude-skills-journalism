@@ -1,4 +1,4 @@
-// ask-ai.js — "Ask an AI about this" dropdown for skills.amditis.tech
+// ask-ai.js, "Ask an AI about this" dropdown for skills.amditis.tech
 // Self-contained vanilla JS. No external CSS dependencies.
 // Injected as a text-style nav link in the header/nav bar.
 
@@ -177,7 +177,7 @@
     container.setAttribute('data-ask-ai', 'true');
     container.style.position = 'relative';
 
-    // Trigger — styled as a nav text link with a small icon
+    // Trigger, styled as a nav text link with a small icon
     var trigger = document.createElement('button');
     trigger.setAttribute('aria-expanded', 'false');
     trigger.setAttribute('aria-haspopup', 'menu');

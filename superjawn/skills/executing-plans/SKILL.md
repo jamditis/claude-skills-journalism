@@ -47,21 +47,21 @@ Load plan, review critically, execute all tasks, report when complete.
 
 The plan was written at a point in time. **Default-skip.** Run only when one of these triggers fires:
 
-- **Cross-session execution.** The plan was drafted in a prior session — different cwd, different transcript, or different day. If you wrote the plan yourself in this session, the freshness check is not needed.
+- **Cross-session execution.** The plan was drafted in a prior session, different cwd, different transcript, or different day. If you wrote the plan yourself in this session, the freshness check is not needed.
 - **External API/service touched.** Any task in the plan calls an external API, service, or file outside the repo (e.g., live HTTP, third-party SDK call, OS-managed config). Internal state can be assumed stable; external contracts cannot.
 - **Working on main/master.** Current branch is `main` or `master`. Heightened drift risk because integration work assumes the branch is in sync, and other people landing commits can invalidate the plan's assumptions silently.
 
 If none of the triggers fire, write one line into the execution journal and proceed:
 
 ```
-[YYYY-MM-DD HH:MM] Freshness check skipped — none of the triggers fired (current session, no external APIs, on feature branch <name>).
+[YYYY-MM-DD HH:MM] Freshness check skipped, none of the triggers fired (current session, no external APIs, on feature branch <name>).
 ```
 
 ### When the check fires
 
 Verify, in order, BEFORE running any tasks:
 
-1. **Authoritative state.** For each external API/file the plan references, hit the real source — live curl, file read, version check. Confirm the contract still matches what the plan assumed.
+1. **Authoritative state.** For each external API/file the plan references, hit the real source, live curl, file read, version check. Confirm the contract still matches what the plan assumed.
 2. **Codebase drift.** Grep that any function/module/path the plan names still exists at the expected location with the expected shape.
 3. **Repo state.** `git log <plan-write-sha>..HEAD` if you can identify when the plan was written; otherwise `git log --since='1 week ago' --oneline`. Has anyone landed conflicting work since the plan was drafted?
 
@@ -78,10 +78,10 @@ Where `<plan-slug>` is the kebab-case basename of the plan file with the `.md` e
 One line per check:
 
 ```
-[YYYY-MM-DD HH:MM] Freshness check: <PASS / FAIL> — <one-line summary>
+[YYYY-MM-DD HH:MM] Freshness check: <PASS / FAIL>, <one-line summary>
 ```
 
-If FAIL on any check, **stop and escalate to your human partner before implementing** — the plan may need revision.
+If FAIL on any check, **stop and escalate to your human partner before implementing**, the plan may need revision.
 
 ### Master-branch guardrail
 
@@ -92,7 +92,7 @@ If the trigger fired because you're on `main` or `master`, the freshness check A
 ### Step 1: Load and Review Plan
 1. Read plan file
 2. Review critically - identify any questions or concerns about the plan
-3. Run the freshness check (see "Freshness check (when artifact is stale)" above) — single decision, write the result line to the execution journal
+3. Run the freshness check (see "Freshness check (when artifact is stale)" above), single decision, write the result line to the execution journal
 4. If concerns or freshness FAIL: Raise them with your human partner before starting
 5. If no concerns and freshness PASS or skipped: Create TodoWrite and proceed
 
@@ -132,7 +132,7 @@ After all tasks complete and verified:
 ## Remember
 - Review plan critically first
 - Follow plan steps exactly
-- Run the freshness check at Step 1 — default-skip, but fires for cross-session plans, external APIs, or main/master branch work
+- Run the freshness check at Step 1, default-skip, but fires for cross-session plans, external APIs, or main/master branch work
 - Don't skip verifications
 - Reference skills when plan says to
 - Stop when blocked, don't guess

@@ -12,7 +12,7 @@
 #      frontmatter close (no blank line between --- and <!--)
 #   4. Cross-refs: superjawn:<x> must resolve to a ported skill (SKILL.md must exist,
 #      not just the directory); superpowers:<x> must NOT be a ported skill (dual-namespace
-#      strict) — if ported, the reference must use superjawn:<x> instead; superpowers:<x>
+#      strict), if ported, the reference must use superjawn:<x> instead; superpowers:<x>
 #      is allowed only when <x> is an upstream skill or upstream agent
 #   5. Parity (skill_md_parity: true in manifest): SKILL.md after stripping the MIT block
 #      must be byte-identical to upstream SKILL.md
@@ -128,7 +128,7 @@ check_skill() {
   # ------------------------------------------------------------------ #
   # Check 1b: Skill must be declared in the manifest.                   #
   # A skill present in skills/ but absent from the manifest would       #
-  # silently inherit null parity and empty overrides — the manifest is  #
+  # silently inherit null parity and empty overrides, the manifest is  #
   # the authoritative registry so an undeclared skill is always a fail. #
   # ------------------------------------------------------------------ #
   local in_manifest
@@ -298,7 +298,7 @@ check_skill() {
     fi
 
     if [[ "$in_overrides" == "true" ]]; then
-      # File is in overrides; upstream file exists — this is a valid documented divergence.
+      # File is in overrides; upstream file exists, this is a valid documented divergence.
       pass "$name" "supporting-files" "$rel_path: documented divergence ok"
     else
       # File must be byte-identical to upstream.

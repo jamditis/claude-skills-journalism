@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-transcript-scanner.py — scan a Claude Code session transcript for meaningful activity.
+transcript-scanner.py, scan a Claude Code session transcript for meaningful activity.
 
 Usage:
     python3 transcript-scanner.py --transcript /path/to/session.jsonl [--since UNIX_TS] [--config path/to/config.json]
@@ -90,12 +90,12 @@ def classify_tool_use(name, inp, high_tools, medium_tools, high_bash, medium_bas
         detail = raw[:120]
         return "medium", detail
 
-    # Email/compose tools (substring match on name) — high
+    # Email/compose tools (substring match on name), high
     name_lower = name.lower()
     if any(sub in name_lower for sub in HIGH_TOOL_NAME_SUBSTRINGS):
         return "high", name
 
-    # Bash — check patterns
+    # Bash, check patterns
     if name == "Bash":
         command = inp.get("command", "")
         detail = command[:120]
@@ -105,7 +105,7 @@ def classify_tool_use(name, inp, high_tools, medium_tools, high_bash, medium_bas
         for pattern in medium_bash:
             if pattern in command:
                 return "medium", detail
-        # Unmatched Bash — no signal
+        # Unmatched Bash, no signal
         return None, detail
 
     # Low-signal tools (no trigger)

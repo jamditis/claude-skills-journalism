@@ -1,6 +1,6 @@
 ---
 name: video-download
-description: This skill should be used when the user asks to "download videos", "scrape videos from social media", "pull videos from Twitter/TikTok/YouTube/Instagram/Facebook", "download someone's social media videos", or needs to collect video content from public social media accounts for analysis.
+description: Collects videos from public social accounts. Use to download or scrape from Twitter, TikTok, YouTube, Instagram, or Facebook.
 ---
 
 # Video download from social media
@@ -83,11 +83,11 @@ in project metadata.
 
 If not provided as arguments, ask the user interactively:
 
-1. **Subject name** — who are we downloading from?
-2. **Platform URLs** — which social media profile pages? Support: Twitter/X, TikTok, YouTube, Instagram, Facebook
-3. **Video count** — how many recent videos per platform? Default: 15
-4. **Output directory** — where to save? Default: `{subject-name}-video-analysis/downloads/{platform}/`
-5. **Resource caps** — default maximum 2 GiB and 2 hours per video, plus a total project disk quota
+1. **Subject name**, who are we downloading from?
+2. **Platform URLs**, which social media profile pages? Support: Twitter/X, TikTok, YouTube, Instagram, Facebook
+3. **Video count**, how many recent videos per platform? Default: 15
+4. **Output directory**, where to save? Default: `{subject-name}-video-analysis/downloads/{platform}/`
+5. **Resource caps**, default maximum 2 GiB and 2 hours per video, plus a total project disk quota
 
 Confirm the total count, size, and duration caps before downloading.
 
@@ -117,7 +117,7 @@ yt-dlp --list-extractors | grep -iE "twitter|tiktok|youtube|instagram|facebook"
 
 Look for "(CURRENTLY BROKEN)" flags. Platforms marked broken will need the Playwright fallback.
 
-### Step 4: Download — yt-dlp first
+### Step 4: Download, yt-dlp first
 
 For each platform, attempt yt-dlp first:
 
@@ -140,7 +140,7 @@ Parse `--print-json` output to extract metadata (id, title, upload_date, duratio
 
 Run platforms one at a time, starting with the most reliable.
 
-### Step 5: Fallback — Playwright URL extraction
+### Step 5: Fallback, Playwright URL extraction
 
 For platforms where yt-dlp fails (common for Instagram, Facebook, sometimes Twitter), use Playwright browser automation:
 
@@ -183,11 +183,11 @@ Sort videos by upload_date descending. Deduplicate by video ID.
 
 ### Step 7: Verify and report
 
-Print a summary table showing per-platform download counts and any failures. Commit the download script and metadata.json (not the video files — those should be gitignored).
+Print a summary table showing per-platform download counts and any failures. Commit the download script and metadata.json (not the video files, those should be gitignored).
 
 ## Key lessons
 
 - **Windows encoding:** TikTok titles often contain emoji/Unicode that crashes Windows console output. Encode print output as ASCII with replacement characters.
-- **Chrome cookies:** `--cookies-from-browser chrome` often fails on Windows with a DPAPI error. Try without cookies first — public accounts usually work.
+- **Chrome cookies:** `--cookies-from-browser chrome` often fails on Windows with a DPAPI error. Try without cookies first, public accounts usually work.
 - **Instagram user extractor:** Frequently broken in yt-dlp. Always plan for the Playwright fallback.
 - **Timeout handling:** Set generous timeouts (10+ minutes per platform) for large video downloads.

@@ -21,7 +21,7 @@ You will receive lesson candidates (raw user corrections and context). For each 
 - General knowledge any developer would know
 - Too vague to act on ("be careful with X" without specifics)
 - About a one-time task that won't recur
-- Contains secrets, API keys, tokens, passwords, or PII — NEVER include credentials or personally identifiable information in lesson text. Describe the pattern without the actual value.
+- Contains secrets, API keys, tokens, passwords, or PII, NEVER include credentials or personally identifiable information in lesson text. Describe the pattern without the actual value.
 
 For each accepted lesson, output structured JSON:
 ```json

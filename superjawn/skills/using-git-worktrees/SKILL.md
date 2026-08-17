@@ -1,11 +1,11 @@
 ---
 name: using-git-worktrees
-description: Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification
+description: Creates isolated git worktrees with smart directory selection and safety checks. Use when starting isolated feature work.
 ---
 <!--
 Adapted from obra/superpowers using-git-worktrees skill (v5.0.7),
 MIT-licensed, copyright 2025 Jesse Vincent. Modifications copyright 2026 Joe Amditis.
-v0.5.0 ports as a consumer category — no research phase per the v0.2.0
+v0.5.0 ports as a consumer category, no research phase per the v0.2.0
 architecture, since git worktree setup is a mechanical workspace utility, not
 a strategic decision; the strategic decisions belong to the skill that
 invokes this one.

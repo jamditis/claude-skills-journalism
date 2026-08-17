@@ -125,4 +125,4 @@ This is informational. The hook surfaces deadlines but doesn't prevent any actio
 
 ## Privacy note
 
-Deadline information may be sensitive (story slugs, source names). This hook only reads local files—no external transmission.
+Deadline information may be sensitive (story slugs, source names). This hook only reads local files, no external transmission.

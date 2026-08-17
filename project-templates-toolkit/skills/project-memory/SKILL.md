@@ -1,15 +1,15 @@
 ---
 name: project-memory
-description: Generate CLAUDE.md project memory files that transfer institutional knowledge, not obvious information. Use when setting up new journalism projects, onboarding collaborators, or documenting project-specific quirks. Includes templates for editorial tools, event websites, publications, research projects, content pipelines, and digital archives.
+description: Generates CLAUDE.md project memory files that transfer institutional knowledge. Use when setting up projects or onboarding.
 ---
 
 # Project memory generator
 
-Create CLAUDE.md files that transfer institutional knowledge, not obvious information. Think like a senior journalist onboarding a competent colleague — you don't explain how journalism works, you explain YOUR project's quirks.
+Create CLAUDE.md files that transfer institutional knowledge, not obvious information. Think like a senior journalist onboarding a competent colleague, you don't explain how journalism works, you explain YOUR project's quirks.
 
 ## CLAUDE.md is advisory, not enforced
 
-Anthropic is explicit on this point: CLAUDE.md content is delivered as a user message after the system prompt. Claude reads it and tries to follow it, but there's no guarantee of strict compliance — especially with vague or conflicting instructions. Source: https://code.claude.com/docs/en/memory
+Anthropic is explicit on this point: CLAUDE.md content is delivered as a user message after the system prompt. Claude reads it and tries to follow it, but there's no guarantee of strict compliance, especially with vague or conflicting instructions. Source: https://code.claude.com/docs/en/memory
 
 This affects how you write a CLAUDE.md and what you put elsewhere:
 
@@ -17,7 +17,7 @@ This affects how you write a CLAUDE.md and what you put elsewhere:
 |---|---|---|
 | **CLAUDE.md** | Standing facts, conventions, "always do X" rules | Advisory |
 | **Skills** | Multi-step procedures, on-demand workflows | Loaded when invoked |
-| **Hooks** | Actions that must happen every time, no exceptions | Deterministic — runs as a shell command (e.g., `hooks/one-way-door-check.md`) or as a prompt the harness enforces (e.g., `hooks/enforce-test-first.md`) |
+| **Hooks** | Actions that must happen every time, no exceptions | Deterministic, runs as a shell command (e.g. `hooks/one-way-door-check.md`) or as a prompt the harness enforces (e.g. `hooks/enforce-test-first.md`) |
 
 If an instruction is "block writes to `published/`" or "run accessibility check before commit," that belongs in a hook, not CLAUDE.md. If it's "fact-check workflow" or "FOIA-letter drafting," that's a skill. CLAUDE.md is the place for things Claude must hold in every session.
 
@@ -50,9 +50,9 @@ Anthropic's explicit guidance as of 2026: target under 200 lines per CLAUDE.md f
 
 Going over 200 lines is a signal to use one of these instead:
 
-- **`.claude/rules/` with `paths:` frontmatter** — file-pattern-scoped rules that load only when Claude works with matching files. Replaces `@import` chains as the size-management mechanism. (Note: `@imports` no longer help with context size — Anthropic explicitly notes that imports load fully at launch.)
-- **Skills** — for multi-step procedures that don't need to be in every session.
-- **Hooks** — for deterministic enforcement.
+- **`.claude/rules/` with `paths:` frontmatter**, file-pattern-scoped rules that load only when Claude works with matching files. Replaces `@import` chains as the size-management mechanism. (Note: `@imports` no longer help with context size, Anthropic explicitly notes that imports load fully at launch.)
+- **Skills**, for multi-step procedures that don't need to be in every session.
+- **Hooks**, for deterministic enforcement.
 
 ## Where to put CLAUDE.md files
 
@@ -78,7 +78,7 @@ If your repo already has `AGENTS.md` for other coding agents (Cursor, Codex, etc
 - Use plan mode for changes under `src/billing/`.
 ```
 
-For journalism teams using multiple agents, this matters — shared editorial standards (AP-style preferences, source-handling invariants, fact-check protocols) belong to the org, not one agent.
+For journalism teams using multiple agents, this matters, shared editorial standards (AP-style preferences, source-handling invariants, fact-check protocols) belong to the org, not one agent.
 
 ## Anti-patterns to warn about
 
@@ -86,7 +86,7 @@ Anthropic now names these explicitly. Source: https://code.claude.com/docs/en/be
 
 1. **The over-specified CLAUDE.md.** Bloat causes Claude to ignore real rules. If Claude keeps doing something despite a CLAUDE.md rule, the file is probably too long and the rule is getting lost.
 2. **Conflicting instructions across nested CLAUDE.md files.** Claude picks one arbitrarily. Review periodically to remove outdated rules.
-3. **Hand-coded standard conventions Claude already knows.** "Use proper indentation," "write clean code" — delete.
+3. **Hand-coded standard conventions Claude already knows.** "Use proper indentation," "write clean code", delete.
 4. **Detailed API docs / file-by-file descriptions / info that changes frequently.** Link to the canonical source instead.
 5. **Secrets in CLAUDE.md.** It's checked into git. Use `CLAUDE.local.md` (gitignored) for sandbox URLs, test credentials, personal overrides.
 
@@ -110,7 +110,7 @@ Each of the 6 journalism templates ships a sub-30-line "starter" variant alongsi
 
 As of Claude Code v2.1.59+, there's a second memory mechanism alongside CLAUDE.md: **auto memory**, where Claude writes notes to itself in `~/.claude/projects/<project>/memory/` based on your corrections. The first 200 lines of that directory's `MEMORY.md` are loaded into every session. Source: https://code.claude.com/docs/en/memory
 
-Practical implication for templates: don't ask the user to manually write down "things Claude learns over time" — that's auto memory's job now. CLAUDE.md is for facts you write up front; auto memory is for things Claude notices.
+Practical implication for templates: don't ask the user to manually write down "things Claude learns over time", that's auto memory's job now. CLAUDE.md is for facts you write up front; auto memory is for things Claude notices.
 
 ## Voice guidelines
 
@@ -146,7 +146,7 @@ Story tracker for metro desk. React + Supabase.
 
 ## Gotchas
 - Story slugs must be unique across ALL desks, not just metro
-- "Hold" status doesn't stop the autopublish cron — use "Kill"
+- "Hold" status doesn't stop the autopublish cron, use "Kill"
 - Reporter dropdown caches for 1 hour; new hires won't appear
 
 ## Commands
@@ -187,7 +187,7 @@ What are you building?
 2. Fill in the bracketed placeholders with YOUR specifics
 3. Delete any sections that don't apply
 4. If your project uses other agents (Cursor, Codex), add `@AGENTS.md` at the top instead of duplicating shared content
-5. Add project-specific gotchas as you discover them — but stay under 200 lines
+5. Add project-specific gotchas as you discover them, but stay under 200 lines
 6. Move multi-step procedures to skills, deterministic enforcement to hooks
 
 ## Last currency sweep

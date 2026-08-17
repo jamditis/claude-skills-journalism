@@ -1,4 +1,4 @@
-# Copilot review instructions — claude-skills-journalism
+# Copilot review instructions, claude-skills-journalism
 
 Project context, skill format, and hook conventions live in [CLAUDE.md](../CLAUDE.md). Both this file and CLAUDE.md are read by Copilot code review (cap ~4,000 chars each). This file lists the rules worth named attention on every PR.
 

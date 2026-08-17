@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# hotpatch — bypass the supply-chain cooldown for one install, after a
+# hotpatch, bypass the supply-chain cooldown for one install, after a
 # sandboxed pre-install scan. Defends against attacks that ship within the
 # 7-day cooldown window (e.g. Mini Shai-Hulud, TanStack 2026-05-11).
 #
@@ -28,7 +28,7 @@ die() { echo "hotpatch: $*" >&2; exit 1; }
 die_red() { echo "hotpatch: $*" >&2; exit 2; }
 warn() { echo "WARN: $*" >&2; }
 need_value() {
-  # Usage: need_value "$#" "$1"  — fail loudly when a flag is given without
+  # Usage: need_value "$#" "$1", fail loudly when a flag is given without
   # its required value (otherwise set -u crashes with "unbound variable").
   local remaining="$1" flag="$2"
   [ "$remaining" -ge 2 ] || die "flag $flag requires a value"
@@ -41,7 +41,7 @@ flag_yellow() { FLAGS_YELLOW+=("$*"); echo "  YEL  $*"; }
 
 print_usage() {
   cat <<EOF
-hotpatch v$VERSION — sandboxed bypass for npm/bun cooldown
+hotpatch v$VERSION, sandboxed bypass for npm/bun cooldown
 
   hotpatch <pkg>[@<version>] [--manager npm|bun] [--force] [--yes]
   hotpatch --scan-local <tarball-path>
@@ -209,7 +209,7 @@ sandboxed_extract() {
       if command -v bwrap >/dev/null 2>&1 && bwrap_works; then
         sandboxed_extract_bwrap "$tarball" "$dest"
       elif command -v bwrap >/dev/null 2>&1; then
-        warn "bwrap installed but blocked by host policy (likely AppArmor/seccomp restriction on unprivileged user namespaces — common in CI runners and containers). Falling back to unsandboxed tar. Static scan still runs."
+        warn "bwrap installed but blocked by host policy (likely AppArmor/seccomp restriction on unprivileged user namespaces, common in CI runners and containers). Falling back to unsandboxed tar. Static scan still runs."
         tar -xzf "$tarball" -C "$dest"
       else
         warn "bwrap not installed; falling back to unsandboxed tar. Install bubblewrap (apt/dnf/pacman install bubblewrap) for isolation."
@@ -240,7 +240,7 @@ sandboxed_extract_bwrap() {
   #
   # We enumerate --unshare-* flags individually instead of --unshare-all because
   # --unshare-net triggers loopback (lo) interface setup inside the new netns,
-  # which requires CAP_NET_ADMIN — not granted to unprivileged users on
+  # which requires CAP_NET_ADMIN, not granted to unprivileged users on
   # hardened/containerized hosts (e.g. GitHub Actions runners), producing
   # "bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted". Tar
   # extraction doesn't need network anyway; the script's `curl` calls all
@@ -268,7 +268,7 @@ sandboxed_extract_macos() {
   local tarball_abs dest_abs profile rc
   # sandbox-exec subpath rules require absolute, resolved paths.
   # We resolve the tarball as a FILE (not its parent dir) so the read scope
-  # stays tight — tar reads the archive itself, never its siblings.
+  # stays tight, tar reads the archive itself, never its siblings.
   tarball_abs="$(cd "$(dirname "$tarball")" && pwd -P)/$(basename "$tarball")"
   dest_abs="$(cd "$dest" && pwd -P)"
   profile="$(mktemp -t hotpatch-sandbox.XXXXXX)"
@@ -276,7 +276,7 @@ sandboxed_extract_macos() {
   # Read scope: system dirs + the tarball file only. NOT the user homedir;
   # otherwise a malicious archive's symlinks/hardlinks could exfiltrate
   # ~/.ssh, ~/.aws, etc. via tar's symlink-follow behavior.
-  # Write scope: $dest only — the tarball directory is read-only.
+  # Write scope: $dest only, the tarball directory is read-only.
   # Process exec: /usr/bin/tar only.
   # Network: denied at the syscall layer.
   # sandbox-exec is technically deprecated by Apple but still ships and
@@ -346,7 +346,7 @@ PY
     fi
   fi
 
-  # 2. OSV.dev — free public vulnerability database
+  # 2. OSV.dev, free public vulnerability database
   local osv_resp
   osv_resp=$(curl -fsSL --max-time 10 -X POST "https://api.osv.dev/v1/query" \
     -d "{\"package\":{\"name\":\"$name\",\"ecosystem\":\"npm\"},\"version\":\"$version\"}" 2>/dev/null) \
@@ -406,7 +406,7 @@ do_self_test() {
     echo "SELF-TEST PASSED"
     exit 0
   else
-    echo "SELF-TEST FAILED — scan did not flag the synthetic Mini Shai-Hulud fixture"
+    echo "SELF-TEST FAILED, scan did not flag the synthetic Mini Shai-Hulud fixture"
     exit 1
   fi
 }
@@ -485,7 +485,7 @@ PY
   echo "         tarball:  ${size_kb}KB"
 
   # Size + fileCount delta vs prior version, using registry metadata (no
-  # second HEAD request — Cloudflare HEAD responses sometimes drop Content-Length).
+  # second HEAD request, Cloudflare HEAD responses sometimes drop Content-Length).
   local prior this_size this_files prior_size prior_files
   read -r prior this_size this_files prior_size prior_files < <(python3 - "$meta_file" "$version" <<'PY'
 import json, sys
@@ -522,13 +522,13 @@ PY
     file_delta=$(( this_files - prior_files ))
     echo "         vs $prior:  unpackedSize ${prior_size}B (this is ${size_ratio}%), fileCount ${prior_files} (delta: $file_delta)"
     if [ "$size_ratio" -gt 300 ]; then
-      flag_red "unpacked size is ${size_ratio}% of prior version — 3x+ growth is rare in legit releases"
+      flag_red "unpacked size is ${size_ratio}% of prior version, 3x+ growth is rare in legit releases"
     elif [ "$size_ratio" -gt 150 ]; then
-      flag_yellow "unpacked size is ${size_ratio}% of prior version — sanity-check what was added"
+      flag_yellow "unpacked size is ${size_ratio}% of prior version, sanity-check what was added"
     fi
     # File count jump without proportional size change = single fat payload (Mini Shai-Hulud pattern).
     if [ "$file_delta" -gt 0 ] && [ "$file_delta" -lt 5 ] && [ "$size_ratio" -gt 200 ]; then
-      flag_red "added $file_delta file(s) but size jumped ${size_ratio}% — consistent with a single planted payload"
+      flag_red "added $file_delta file(s) but size jumped ${size_ratio}%, consistent with a single planted payload"
     fi
   fi
 

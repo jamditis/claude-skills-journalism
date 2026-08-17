@@ -1,6 +1,6 @@
 ---
 name: crisis-communications
-description: Crisis communication and rapid response workflows for journalists and communications professionals. Use when covering breaking news events, managing organizational communications during crises, coordinating rapid fact-checking efforts, or developing crisis response plans. Essential for newsrooms, PR teams, and anyone who needs to communicate accurately under time pressure.
+description: Crisis communication and rapid-response workflows. Use when covering breaking news or coordinating fast fact-checking on deadline.
 ---
 
 # Crisis communications

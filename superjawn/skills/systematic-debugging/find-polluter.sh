@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Sequential test scanner — runs tests one-by-one until pollution is detected.
+# Sequential test scanner, runs tests one-by-one until pollution is detected.
 # Usage: ./find-polluter.sh <file_or_dir_to_check> <test_pattern>
 # Example: ./find-polluter.sh '.git' 'src/**/*.test.ts'
 

@@ -1,11 +1,11 @@
 ---
 name: security-checklist
-description: Pre-deployment security audit for web applications, organized by OWASP Top 10:2025 categories. Use when reviewing code before shipping, auditing an existing application, or when users mention "security review," "ready to deploy," "going to production," or express concern about vulnerabilities. Covers access control, supply chain, cryptography, injection, auth, integrity, logging, and exception handling.
+description: Pre-deployment security audit organized by OWASP Top 10. Use when reviewing code before shipping or going to production.
 ---
 
 # Security checklist
 
-Pre-deployment security audit organized around the OWASP Top 10:2025 categories (released late 2025, succeeding the 2021 edition). This is the baseline that prevents obvious disasters — not a substitute for a real penetration test or threat model. For verification depth beyond this checklist, see OWASP ASVS 5.0 (https://owasp.org/www-project-application-security-verification-standard/). For API-specific scope, see OWASP API Security Top 10:2023 (https://owasp.org/API-Security/editions/2023/en/0x00-header/).
+Pre-deployment security audit organized around the OWASP Top 10:2025 categories (released late 2025, succeeding the 2021 edition). This is the baseline that prevents obvious disasters, not a substitute for a real penetration test or threat model. For verification depth beyond this checklist, see OWASP ASVS 5.0 (https://owasp.org/www-project-application-security-verification-standard/). For API-specific scope, see OWASP API Security Top 10:2023 (https://owasp.org/API-Security/editions/2023/en/0x00-header/).
 
 ## Step 0: Research the current security landscape (do this first)
 
@@ -25,13 +25,13 @@ Run the 4-angle research below by default. Skip ONLY when ALL of these hold:
 
 Each subagent returns ≤300 words of bullets with citations. Dispatch all 4 in a single message so they run concurrently.
 
-**Angle 1 — Authoritative standards.** Have NIST / OWASP / IETF (RFCs and Internet-Drafts) / W3C / CISA published anything new about the OWASP Top 10:2025 categories being audited in the last 6-12 months? Look for: spec finalizations, deprecations, replacement specs, RFC publications, draft revisions, NIST SP updates, OWASP project version bumps. Cite by document number + publication date.
+**Angle 1, Authoritative standards.** Have NIST / OWASP / IETF (RFCs and Internet-Drafts) / W3C / CISA published anything new about the OWASP Top 10:2025 categories being audited in the last 6-12 months? Look for: spec finalizations, deprecations, replacement specs, RFC publications, draft revisions, NIST SP updates, OWASP project version bumps. Cite by document number + publication date.
 
-**Angle 2 — Active exploitation.** What's actively being exploited that targets the OWASP Top 10:2025 categories being audited? Pull from: CISA Known Exploited Vulnerabilities (KEV) catalog (filter to last 6-12 months), recent CVE / GHSA entries with high CVSS or in-the-wild exploitation, breach postmortems and incident reports (CSRB, vendor RCAs, security-vendor research). Surface CWE patterns dominating recent KEV adds. Cite by CVE number + advisory URL.
+**Angle 2, Active exploitation.** What's actively being exploited that targets the OWASP Top 10:2025 categories being audited? Pull from: CISA Known Exploited Vulnerabilities (KEV) catalog (filter to last 6-12 months), recent CVE / GHSA entries with high CVSS or in-the-wild exploitation, breach postmortems and incident reports (CSRB, vendor RCAs, security-vendor research). Surface CWE patterns dominating recent KEV adds. Cite by CVE number + advisory URL.
 
-**Angle 3 — Tooling and library state.** Are the libraries this skill recommends still current? What are the latest major versions in the relevant package registry (npm / PyPI / RubyGems / crates.io)? Have any been deprecated, replaced, or merged into another project? Have any flipped a secure default? Look up current versions in: registry.npmjs.org, pypi.org, rubygems.org, crates.io, pkg.go.dev. Cite by package + version + release date.
+**Angle 3, Tooling and library state.** Are the libraries this skill recommends still current? What are the latest major versions in the relevant package registry (npm / PyPI / RubyGems / crates.io)? Have any been deprecated, replaced, or merged into another project? Have any flipped a secure default? Look up current versions in: registry.npmjs.org, pypi.org, rubygems.org, crates.io, pkg.go.dev. Cite by package + version + release date.
 
-**Angle 4 — Practitioner discourse.** What are practitioners and security teams talking about in the last 6 months? Pull from: OWASP Cheat Sheet Series (last-modified date matters), GitHub Security Lab posts, vendor security blogs (Cloudflare, Fastly, Snyk, Datadog, Wiz, GitGuardian), conference talks (Black Hat, DEF CON, OWASP Global AppSec, USENIX Security), SANS ISC, Krebs, recent OWASP project re-releases. Surface the patterns being adopted and the anti-patterns being called out. Cite by post URL + author + date.
+**Angle 4, Practitioner discourse.** What are practitioners and security teams talking about in the last 6 months? Pull from: OWASP Cheat Sheet Series (last-modified date matters), GitHub Security Lab posts, vendor security blogs (Cloudflare, Fastly, Snyk, Datadog, Wiz, GitGuardian), conference talks (Black Hat, DEF CON, OWASP Global AppSec, USENIX Security), SANS ISC, Krebs, recent OWASP project re-releases. Surface the patterns being adopted and the anti-patterns being called out. Cite by post URL + author + date.
 
 ### Synthesize before applying recipes
 
@@ -52,15 +52,15 @@ If subagents are not available in your runtime, the same shape applies in-line: 
 
 Walk all 10 categories before any production deployment. For each category: read the framing paragraph, run through the must-do items, and check the code-pattern references where they apply. After the walk, file findings as one issue per category with gaps. The flat 25-item Yes/No gate at the end is the pre-deploy summary, not the audit itself.
 
-If you can't check an item, don't ship — fix it first.
+If you can't check an item, don't ship, fix it first.
 
-## A01:2025 — Broken Access Control
+## A01:2025, Broken Access Control
 
 Authorization failures are the most-exploited class on the web. The 2025 edition folds SSRF (Server-Side Request Forgery) into A01 because the underlying failure is the same: the server acts on a request it should have rejected. Active exemplars in 2024-2025 include broken object-level authorization in API endpoints (still the dominant API risk per OWASP API Top 10:2023 API1) and SSRF used as a pivot to cloud metadata endpoints.
 
 - [ ] Authorization checked at every endpoint, not just at the gateway or middleware layer.
 - [ ] Default-deny at the controller level (explicit allow per route, not implicit allow).
-- [ ] Object-level authorization on every resource fetch (IDOR — don't expose IDs without checking the principal owns them).
+- [ ] Object-level authorization on every resource fetch (IDOR, don't expose IDs without checking the principal owns them).
 - [ ] Function-level authorization on admin and privileged endpoints (check role, not just route).
 - [ ] SSRF defenses: outbound allowlist for any URL fetched server-side; no `localhost`, `127.0.0.0/8`, link-local (`169.254.0.0/16`), or cloud metadata IP (`169.254.169.254`) fetches; DNS rebinding protection on resolvers.
 - [ ] Database row-level security enabled where the platform supports it (see code-pattern below).
@@ -89,7 +89,7 @@ CREATE POLICY "Users can delete own documents" ON documents
   FOR DELETE USING (auth.uid() = user_id);
 ```
 
-## A02:2025 — Security Misconfiguration
+## A02:2025, Security Misconfiguration
 
 Misconfiguration moved up the rankings (was A05 in 2021) because default-insecure framework settings keep shipping to production. The 2024 Snowflake / UNC5537 campaign is the canonical lesson: MFA was opt-in per tenant by default, and the campaign harvested credentials at scale before Snowflake flipped the default in 2024.
 
@@ -152,9 +152,9 @@ app.use(cors({
 }));
 ```
 
-The unsafe pattern — `cors()` with no options, which sends `Access-Control-Allow-Origin: *` — is fine for dev but never for production with credentialed requests.
+The unsafe pattern, `cors()` with no options, which sends `Access-Control-Allow-Origin: *`, is fine for dev but never for production with credentialed requests.
 
-## A03:2025 — Software Supply Chain Failures
+## A03:2025, Software Supply Chain Failures
 
 New category in 2025 that absorbs the old 2021 A06 "Vulnerable and Outdated Components." Broader than just patching: covers SBOM, build-system integrity, package provenance, and dependency-source trust. The xz-utils CVE-2024-3094 backdoor (March 2024) is the canonical "social-engineering of an open-source maintainer" lesson; Polyfill.io (June 2024) is the canonical "trusted CDN turned hostile" lesson.
 
@@ -165,13 +165,13 @@ New category in 2025 that absorbs the old 2021 A06 "Vulnerable and Outdated Comp
 - [ ] SLSA v1.2 source/build track adoption tracked (released 2025-11-24, https://slsa.dev/).
 - [ ] Patches applied on a schedule. Renovate or Dependabot enabled with auto-merge for patch versions.
 - [ ] End-of-life runtimes flagged and replaced (Node 18 EOL April 2025; Python 3.8 EOL Oct 2024).
-- [ ] Subresource Integrity on every external `<script>` and `<link rel="stylesheet">` (Polyfill.io lesson — see A08 for the SRI checklist item).
+- [ ] Subresource Integrity on every external `<script>` and `<link rel="stylesheet">` (Polyfill.io lesson, see A08 for the SRI checklist item).
 
-**Compliance pointer:** OMB M-26-05 (issued 2026-01-23) rescinded the federal-wide SBOM self-attestation mandate from M-22-18 + M-23-16. The EU Cyber Resilience Act (Reg 2024/2847) reporting obligations apply from 2026-09-11 and full obligations from 2027-12-11 — don't treat the US rescission as global rescission.
+**Compliance pointer:** OMB M-26-05 (issued 2026-01-23) rescinded the federal-wide SBOM self-attestation mandate from M-22-18 + M-23-16. The EU Cyber Resilience Act (Reg 2024/2847) reporting obligations apply from 2026-09-11 and full obligations from 2027-12-11, don't treat the US rescission as global rescission.
 
-## A04:2025 — Cryptographic Failures
+## A04:2025, Cryptographic Failures
 
-Use vetted high-level libraries. Don't roll crypto. Don't compose AES-CBC + HMAC by hand — use libsodium, AWS Encryption SDK, or Tink. The 2026 normative ceiling is TLS 1.3 by default, TLS 1.2 minimum, TLS 1.0/1.1 disabled (RFC 8996 / BCP 195).
+Use vetted high-level libraries. Don't roll crypto. Don't compose AES-CBC + HMAC by hand, use libsodium, AWS Encryption SDK, or Tink. The 2026 normative ceiling is TLS 1.3 by default, TLS 1.2 minimum, TLS 1.0/1.1 disabled (RFC 8996 / BCP 195).
 
 - [ ] HTTPS only; HTTP redirects to HTTPS.
 - [ ] TLS 1.3 by default; TLS 1.2 minimum; TLS 1.0/1.1 disabled.
@@ -179,9 +179,9 @@ Use vetted high-level libraries. Don't roll crypto. Don't compose AES-CBC + HMAC
 - [ ] Secure cookie flags set (`Secure`, `HttpOnly`, `SameSite=Lax` or `Strict`).
 - [ ] Database connections use SSL/TLS.
 - [ ] Backups encrypted at rest and tested for restoration.
-- [ ] Password storage uses argon2id with OWASP cheat-sheet parameters (m=47104/t=1, m=19456/t=2, m=12288/t=3, m=9216/t=4, or m=7168/t=5; all p=1). The full policy lives in the `secure-auth` skill in this bundle — link from here.
+- [ ] Password storage uses argon2id with OWASP cheat-sheet parameters (m=47104/t=1, m=19456/t=2, m=12288/t=3, m=9216/t=4, or m=7168/t=5; all p=1). The full policy lives in the `secure-auth` skill in this bundle, link from here.
 - [ ] No MD5 / SHA-1 / unsalted hashes anywhere in the auth or integrity path.
-- [ ] No hand-rolled crypto — use libsodium, AWS Encryption SDK, Google Tink, or equivalent.
+- [ ] No hand-rolled crypto, use libsodium, AWS Encryption SDK, Google Tink, or equivalent.
 
 ### Code pattern: security headers (Express.js with Helmet)
 
@@ -207,21 +207,21 @@ app.use(helmet({
 ```
 
 ```javascript
-// Manual headers — modern set
+// Manual headers, modern set
 res.setHeader('X-Content-Type-Options', 'nosniff');
 res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
 res.setHeader('Content-Security-Policy', "default-src 'self'; frame-ancestors 'none'");
-// Note: X-Frame-Options is replaced by CSP frame-ancestors. The legacy XSS-protection header is deprecated — modern browsers ignore it.
+// Note: X-Frame-Options is replaced by CSP frame-ancestors. The legacy XSS-protection header is deprecated, modern browsers ignore it.
 ```
 
-## A05:2025 — Injection
+## A05:2025, Injection
 
-CWE-78 OS command injection dominates CISA KEV in 2024-2025 (14 entries in 2024, 18 in 2025) — eclipsing classic SQL injection by volume. CWE-22 path traversal also climbed (9 in 2024, 13 in 2025). MOVEit CVE-2023-34362 remains the canonical SQLi exemplar.
+CWE-78 OS command injection dominates CISA KEV in 2024-2025 (14 entries in 2024, 18 in 2025), eclipsing classic SQL injection by volume. CWE-22 path traversal also climbed (9 in 2024, 13 in 2025). MOVEit CVE-2023-34362 remains the canonical SQLi exemplar.
 
 - [ ] All user input validated server-side. Client validation is UX, not security.
 - [ ] SQL queries use parameterized statements (CWE-89). Never string concatenation.
 - [ ] OS commands invoked with argv-list form, shell disabled. Allowlist-validate any path or filename used in shell-out (CWE-78).
-- [ ] LDAP / NoSQL / template injection — same parameterization principle.
+- [ ] LDAP / NoSQL / template injection, same parameterization principle.
 - [ ] HTML output escaped (XSS): framework auto-escape + CSP3 nonce + Trusted Types where supported.
 - [ ] Header injection: validate any user-supplied value used in response headers (no CR/LF).
 - [ ] File uploads validate type, size, and store outside webroot.
@@ -230,7 +230,7 @@ CWE-78 OS command injection dominates CISA KEV in 2024-2025 (14 entries in 2024,
 
 ### Code pattern: parameterized SQL (Node.js)
 
-The unsafe pattern — interpolating user input into a SQL template string and calling `db.query` on the result — is CWE-89. Always parameterize.
+The unsafe pattern, interpolating user input into a SQL template string and calling `db.query` on the result, is CWE-89. Always parameterize.
 
 ```javascript
 // SAFE: parameterized query, user input bound as $1
@@ -244,7 +244,7 @@ db.query('SELECT * FROM users WHERE id = $1', [req.params.id]);
 cursor.execute("SELECT * FROM users WHERE id = %s", [user_id])
 ```
 
-The unsafe pattern — building the SQL string with an f-string that interpolates user input — is CWE-89.
+The unsafe pattern, building the SQL string with an f-string that interpolates user input, is CWE-89.
 
 ### Code pattern: command injection (Node.js)
 
@@ -258,7 +258,7 @@ const { spawn } = require('child_process');
 spawn('convert', [userInput, 'output.png'], { shell: false });
 ```
 
-The unsafe pattern — passing a template string with interpolated user input to the shell-execution primitive — is CWE-78. Don't do it. If you absolutely need shell features, allowlist-validate every component of the command first.
+The unsafe pattern, passing a template string with interpolated user input to the shell-execution primitive, is CWE-78. Don't do it. If you absolutely need shell features, allowlist-validate every component of the command first.
 
 ### Code pattern: command injection (Python)
 
@@ -272,7 +272,7 @@ import subprocess
 subprocess.run(["convert", user_input, "output.png"], shell=False, check=True)
 ```
 
-The unsafe patterns — passing an f-string with interpolated user input to the OS shell-out function or to a subprocess call with `shell=True` — are CWE-78. Don't do them. Allowlist-validate any path or filename component before it reaches a shell-out boundary.
+The unsafe patterns, passing an f-string with interpolated user input to the OS shell-out function or to a subprocess call with `shell=True`, are CWE-78. Don't do them. Allowlist-validate any path or filename component before it reaches a shell-out boundary.
 
 ### Code pattern: XSS (React/Frontend)
 
@@ -300,20 +300,20 @@ res.send(`<h1>Hello ${req.query.name}</h1>`);
 res.render('greeting', { name: req.query.name });
 ```
 
-## A06:2025 — Insecure Design
+## A06:2025, Insecure Design
 
-Threat-modeling and secure defaults belong in the design phase, not retrofitted post-incident. Snowflake's MFA-opt-in default (until 2024) is the canonical "secure default" lesson — features that ship insecure by default and require opt-in to be safe are misuse-prone.
+Threat-modeling and secure defaults belong in the design phase, not retrofitted post-incident. Snowflake's MFA-opt-in default (until 2024) is the canonical "secure default" lesson, features that ship insecure by default and require opt-in to be safe are misuse-prone.
 
 - [ ] Threat-model new features before code (STRIDE for security, LINDDUN for privacy).
 - [ ] Misuse cases written alongside use cases.
 - [ ] Least-privilege at the design layer (services, roles, scopes).
 - [ ] Rate limits designed in, not retrofitted: API endpoints rate-limited per user/IP, login endpoints stricter, request size limits configured, timeouts on all external calls.
 - [ ] CDN or DDoS protection in front of the application.
-- [ ] Secure defaults — the safe option is the path of least resistance; opt-in is for the unsafe option, not the safe one.
+- [ ] Secure defaults, the safe option is the path of least resistance; opt-in is for the unsafe option, not the safe one.
 
-## A07:2025 — Authentication Failures
+## A07:2025, Authentication Failures
 
-Renamed from "Identification and Authentication Failures" in 2021. Defaults live in the `secure-auth` skill in this bundle — checklist items here reference, don't duplicate. NIST SP 800-63B-4 went final 2025-07-31 (https://csrc.nist.gov/pubs/sp/800/63/b/4/final).
+Renamed from "Identification and Authentication Failures" in 2021. Defaults live in the `secure-auth` skill in this bundle, checklist items here reference, don't duplicate. NIST SP 800-63B-4 went final 2025-07-31 (https://csrc.nist.gov/pubs/sp/800/63/b/4/final).
 
 - [ ] 15-character single-factor password minimum (NIST SP 800-63B-4). No composition rules. No periodic rotation.
 - [ ] Breach blocklist check on registration / change (Have I Been Pwned API or equivalent).
@@ -328,27 +328,27 @@ Renamed from "Identification and Authentication Failures" in 2021. Defaults live
 - [ ] Refresh-token rotation with reuse detection.
 - [ ] No credentials in code, logs, or error messages.
 
-**Anchor lessons:** Change Healthcare Feb 2024 (no MFA on the Citrix remote-access portal — https://www.unitedhealthgroup.com/newsroom/2024/2024-04-22-uhg-update-on-change-healthcare-cyberattack.html), Snowflake / UNC5537 2024 (default-on MFA was opt-in per tenant), Storm-0558 2023 (full token validation; CSRB review at https://www.cisa.gov/resources-tools/resources/CSRB-Review-Summer-2023-MEO-Intrusion), 23andMe 2023 (graph-traversal blast radius across linked accounts).
+**Anchor lessons:** Change Healthcare Feb 2024 (no MFA on the Citrix remote-access portal, https://www.unitedhealthgroup.com/newsroom/2024/2024-04-22-uhg-update-on-change-healthcare-cyberattack.html), Snowflake / UNC5537 2024 (default-on MFA was opt-in per tenant), Storm-0558 2023 (full token validation; CSRB review at https://www.cisa.gov/resources-tools/resources/CSRB-Review-Summer-2023-MEO-Intrusion), 23andMe 2023 (graph-traversal blast radius across linked accounts).
 
-## A08:2025 — Software or Data Integrity Failures
+## A08:2025, Software or Data Integrity Failures
 
-Note: "Software or Data" — the OR is load-bearing. Covers CI/CD pipeline integrity, signed update channels, and deserialization safety. CWE-502 (deserialization) dominates KEV in 2024-2025 (11 in 2024, 14 in 2025).
+Note: "Software or Data", the OR is load-bearing. Covers CI/CD pipeline integrity, signed update channels, and deserialization safety. CWE-502 (deserialization) dominates KEV in 2024-2025 (11 in 2024, 14 in 2025).
 
 - [ ] CI/CD pipeline integrity: signed builds, branch protections, required reviews, no plaintext secrets in pipeline config.
 - [ ] Update channels validated: signature checks on auto-updaters; Sigstore cosign for container images.
 - [ ] Deserialization gates: never deserialize untrusted input with native binary deserializers or YAML's unrestricted-load primitives. JSON-only across trust boundaries.
-- [ ] Subresource Integrity on every external `<script>` and `<link rel="stylesheet">` (Polyfill.io lesson — https://sansec.io/research/polyfill-supply-chain-attack).
+- [ ] Subresource Integrity on every external `<script>` and `<link rel="stylesheet">` (Polyfill.io lesson, https://sansec.io/research/polyfill-supply-chain-attack).
 - [ ] No third-party scripts referenced from CDNs without SRI hashes pinned.
 
 ### Code pattern: deserialization (Python)
 
-Python's native binary-deserialization primitive executes arbitrary code on untrusted input — `loads` runs object constructors, including any `__reduce__` payload an attacker has crafted. JSON does not. Across any trust boundary, use JSON. Same hazard for YAML: the bare loader runs Python code; use `safe_load`.
+Python's native binary-deserialization primitive executes arbitrary code on untrusted input, `loads` runs object constructors, including any `__reduce__` payload an attacker has crafted. JSON does not. Across any trust boundary, use JSON. Same hazard for YAML: the bare loader runs Python code; use `safe_load`.
 
 ```python
 import json
 import yaml
 
-# DO NOT USE: pickle.loads runs arbitrary code on untrusted input —
+# DO NOT USE: pickle.loads runs arbitrary code on untrusted input,
 # any object's __reduce__ method executes at parse time. CWE-502 sink.
 #   import pickle
 #   obj = pickle.loads(request.body)
@@ -374,11 +374,11 @@ CWE-502 (deserialization of untrusted data) dominated the CISA KEV catalog in 20
         crossorigin="anonymous"></script>
 ```
 
-The unsafe pattern — referencing an external script with no `integrity` attribute — means any change at the CDN runs in your origin's context. Polyfill.io 2024 was exactly this.
+The unsafe pattern, referencing an external script with no `integrity` attribute, means any change at the CDN runs in your origin's context. Polyfill.io 2024 was exactly this.
 
-## A09:2025 — Security Logging and Alerting Failures
+## A09:2025, Security Logging and Alerting Failures
 
-Note: "Alerting", not "Monitoring" — the 2025 edition reframes around active response, not just collection. The Okta HAR incident (2023) is the anchor lesson: customer-uploaded debug artifacts contained live session tokens because sanitization at log boundaries was inadequate.
+Note: "Alerting", not "Monitoring", the 2025 edition reframes around active response, not just collection. The Okta HAR incident (2023) is the anchor lesson: customer-uploaded debug artifacts contained live session tokens because sanitization at log boundaries was inadequate.
 
 - [ ] Log auth events (login, logout, failed attempts), authz failures, admin actions, payment events.
 - [ ] Logs do NOT include passwords, tokens, JWTs, API keys, PII, session IDs, credit cards, or full request bodies with user data.
@@ -387,7 +387,7 @@ Note: "Alerting", not "Monitoring" — the 2025 edition reframes around active r
 - [ ] Alerts configured for impossible-travel, mass-failed-auth, privilege-escalation patterns.
 - [ ] Error messages don't leak system information to clients (see A10).
 
-**Anchor lesson:** Okta HAR file incident — https://sec.okta.com/articles/harfiles/
+**Anchor lesson:** Okta HAR file incident, https://sec.okta.com/articles/harfiles/
 
 ### Code pattern: what NOT to log
 
@@ -397,9 +397,9 @@ console.log('Login attempt:', { email, success: false, reason: 'invalid_password
 console.log('Request:', { endpoint: req.path, method: req.method, userId: req.user?.id });
 ```
 
-The unsafe pattern — logging the full request body or a credentials object — leaks every secret a user supplies. Never log password fields, token fields, full request bodies, or session identifiers.
+The unsafe pattern, logging the full request body or a credentials object, leaks every secret a user supplies. Never log password fields, token fields, full request bodies, or session identifiers.
 
-## A10:2025 — Mishandling of Exceptional Conditions
+## A10:2025, Mishandling of Exceptional Conditions
 
 New category in 2025. CWE catalog assigned CWE-1445 to this category, covering CWE-209/234/274/476/636 among 24 CWEs. The CrowdStrike Channel File 291 incident (July 2024) is the anchor lesson: production deployment of an unvalidated config file caused 8.5M Windows hosts to BSOD.
 
@@ -407,12 +407,12 @@ New category in 2025. CWE catalog assigned CWE-1445 to this category, covering C
 - [ ] Error responses don't leak structure, stack traces, or internal IDs.
 - [ ] Config validated before deploying to production. Staged rollouts, canary percentages, validation gates between staging and prod.
 - [ ] Catch `Exception` blocks don't swallow security-relevant failures silently.
-- [ ] Test exceptional paths (timeout, OOM, partial-write, network partition) — most security regressions hide here.
+- [ ] Test exceptional paths (timeout, OOM, partial-write, network partition), most security regressions hide here.
 - [ ] Timeouts set on all external calls, with explicit handling for the timeout case.
 
-**Anchor lesson:** CrowdStrike Falcon Channel File 291 RCA — https://www.crowdstrike.com/en-us/blog/falcon-content-update-preliminary-post-incident-report/
+**Anchor lesson:** CrowdStrike Falcon Channel File 291 RCA, https://www.crowdstrike.com/en-us/blog/falcon-content-update-preliminary-post-incident-report/
 
-## Pre-deployment summary — 25-item Yes/No gate
+## Pre-deployment summary, 25-item Yes/No gate
 
 Run this at the end of the audit. If any answer is N, don't ship.
 

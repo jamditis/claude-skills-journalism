@@ -9,7 +9,7 @@ Skills use Claude Code tool names. When you encounter these in a skill, use your
 | Task returns result | `wait` |
 | Task completes automatically | `close_agent` to free slot |
 | `TodoWrite` (task tracking) | `update_plan` |
-| `Skill` tool (invoke a skill) | Skills load natively — just follow the instructions |
+| `Skill` tool (invoke a skill) | Skills load natively, just follow the instructions |
 | `Read`, `Write`, `Edit` (files) | Use your native file tools |
 | `Bash` (run commands) | Use your native shell tools |
 
@@ -27,7 +27,7 @@ This enables `spawn_agent`, `wait`, and `close_agent` for skills like `dispatchi
 ## Named agent dispatch
 
 Claude Code skills reference named agent types like `superpowers:code-reviewer`.
-Codex does not have a named agent registry — `spawn_agent` creates generic agents
+Codex does not have a named agent registry, `spawn_agent` creates generic agents
 from built-in roles (`default`, `explorer`, `worker`).
 
 When a skill says to dispatch a named agent type:
@@ -60,7 +60,7 @@ specified in the instructions above.
 ```
 
 - Use task-delegation framing ("Your task is...") rather than persona framing ("You are...")
-- Wrap instructions in XML tags — the model treats tagged blocks as authoritative
+- Wrap instructions in XML tags, the model treats tagged blocks as authoritative
 - End with an explicit execution directive to prevent summarization of the instructions
 
 ### When this workaround can be removed
@@ -93,8 +93,8 @@ When the sandbox blocks branch/push operations (detached HEAD in an
 externally managed worktree), the agent commits all work and informs
 the user to use the App's native controls:
 
-- **"Create branch"** — names the branch, then commit/push/PR via App UI
-- **"Hand off to local"** — transfers work to the user's local checkout
+- **"Create branch"**, names the branch, then commit/push/PR via App UI
+- **"Hand off to local"**, transfers work to the user's local checkout
 
 The agent can still run tests, stage files, and output suggested branch
 names, commit messages, and PR descriptions for the user to copy.

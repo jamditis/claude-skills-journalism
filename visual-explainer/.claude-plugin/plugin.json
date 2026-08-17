@@ -1,6 +1,6 @@
 {
   "name": "visual-explainer",
-  "description": "HTML diagrams, data tables, and architecture views — adapted from nicobailon/visual-explainer with journalism, newsroom, and academic design sensibilities. Generates self-contained HTML pages with Mermaid diagrams, responsive section navigation, KPI cards, slide decks, and zoom/pan controls. Useful for project recaps, architecture snapshots, post-mortem visualizations, and editorial dashboards.",
+  "description": "HTML diagrams, data tables, and architecture views adapted from nicobailon/visual-explainer with newsroom and academic design sensibilities. Generates self-contained pages with Mermaid diagrams, KPI cards, slide decks, and zoom/pan controls.",
   "version": "0.7.2",
   "author": {
     "name": "Joe Amditis",

@@ -1,33 +1,33 @@
 ---
 name: project-retrospective
-description: Generate LESSONS.md retrospective files that capture institutional knowledge, especially failures. Use when closing out journalism projects, investigations, events, or publications. Includes templates for research projects, event post-mortems, editorial tools, and publications.
+description: Generates LESSONS.md files capturing institutional knowledge and failures. Use when closing out projects or investigations.
 ---
 
 # Project retrospective writer
 
-Create LESSONS.md files that capture institutional knowledge, especially failures. Think like a journalist writing about your own project — be specific, be honest, name the actual mistakes.
+Create LESSONS.md files that capture institutional knowledge, especially failures. Think like a journalist writing about your own project, be specific, be honest, name the actual mistakes.
 
 ## Frame the retrospective: blame-aware, not pure-blameless
 
-The 2024–2026 consensus in incident-analysis writing (PagerDuty, J. Paul Reed, Lorin Hochstein) is that pure blamelessness is neurobiologically unrealistic — humans default to blame. Healthier framing: acknowledge the blame bias exists and counter it deliberately. Source: https://postmortems.pagerduty.com/culture/blameless/
+The 2024–2026 consensus in incident-analysis writing (PagerDuty, J. Paul Reed, Lorin Hochstein) is that pure blamelessness is neurobiologically unrealistic, humans default to blame. Healthier framing: acknowledge the blame bias exists and counter it deliberately. Source: https://postmortems.pagerduty.com/culture/blameless/
 
 Cognitive biases to counter explicitly:
-- **Fundamental attribution error** — blaming individuals for failures the system permitted
-- **Confirmation bias** — looking for evidence that confirms a pre-formed narrative
-- **Hindsight bias** — judging past decisions by knowledge that wasn't available at the time
-- **Negativity bias** — over-weighting what went wrong vs. what worked
+- **Fundamental attribution error**, blaming individuals for failures the system permitted
+- **Confirmation bias**, looking for evidence that confirms a pre-formed narrative
+- **Hindsight bias**, judging past decisions by knowledge that wasn't available at the time
+- **Negativity bias**, over-weighting what went wrong vs. what worked
 
-The voice rule isn't "no blame" — it's "name the system that permitted the human action, not just the action."
+The voice rule isn't "no blame", it's "name the system that permitted the human action, not just the action."
 
 ## Drop the single-root-cause framing
 
-Allspaw's canonical critique (still the dominant view in 2024–2026) calls Five Whys / single-root-cause analysis "seductively satisfying and compellingly simple — but false." It locks analysts into a linear causal chain that terminates in individual blame. Source: https://www.kitchensoap.com/2014/11/14/the-infinite-hows-or-the-dangers-of-the-five-whys/
+Allspaw's canonical critique (still the dominant view in 2024–2026) calls Five Whys / single-root-cause analysis "seductively satisfying and compellingly simple, but false." It locks analysts into a linear causal chain that terminates in individual blame. Source: https://www.kitchensoap.com/2014/11/14/the-infinite-hows-or-the-dangers-of-the-five-whys/
 
 Use "how" narratives instead, gathering on four prompts:
-- **Cues** — what signals were available, who saw them when?
-- **Interpretation** — how did people make sense of those signals?
-- **Goals** — what were people trying to accomplish?
-- **Taking action** — what did they do, and what did they expect to happen?
+- **Cues**, what signals were available, who saw them when?
+- **Interpretation**, how did people make sense of those signals?
+- **Goals**, what were people trying to accomplish?
+- **Taking action**, what did they do, and what did they expect to happen?
 
 The retrospective's job is to surface contributing factors, not declare a root cause.
 
@@ -71,7 +71,7 @@ Four prompts:
 3. **What was right or wrong about the difference?**
 4. **How do we perform to standard next time?**
 
-Run AAR immediately after the event with all participants — election night newsroom team, live-blog runners, breaking-news desk. Use `event.md` template for this; project-close templates are wrong for live-event retros.
+Run AAR immediately after the event with all participants, election night newsroom team, live-blog runners, breaking-news desk. Use `event.md` template for this; project-close templates are wrong for live-event retros.
 
 ## The critical section: "The real problem"
 
@@ -80,7 +80,7 @@ This is the most valuable part of any retrospective. It answers:
 > "What did we THINK we were building vs. what was ACTUALLY needed?"
 
 **Strong example:**
-> We built an admin dashboard for editors when they actually needed a Slack bot. They live in Slack — forcing them to open a web app was friction they'd never accept. The dashboard has 2 monthly active users; the Slack bot prototype we built in a day has 47.
+> We built an admin dashboard for editors when they actually needed a Slack bot. They live in Slack, forcing them to open a web app was friction they'd never accept. The dashboard has 2 monthly active users; the Slack bot prototype we built in a day has 47.
 
 **Weak example:**
 > We learned the importance of user research.
@@ -95,7 +95,7 @@ This is the most valuable part of any retrospective. It answers:
 - **Dates:** [Start - End]
 - **Status:** [Completed / Abandoned / Ongoing]
 - **Author:** [Your name]
-- **Retrospective written:** [Date — should be within timing window above]
+- **Retrospective written:** [Date, should be within timing window above]
 
 ## Summary
 [One paragraph: what it did, what impact it had, why it matters]
@@ -122,7 +122,7 @@ people inside that system do?"
 - **Cost:** [Quantified impact: hours, subscribers affected, money]
 
 ### Technical debt
-- [Shortcut that hurt later — and why it was the rational choice at the time]
+- [Shortcut that hurt later, and why it was the rational choice at the time]
 - [Complexity that wasn't needed]
 
 ### External factors
@@ -138,7 +138,7 @@ The gap cost us: [Time / effort / money wasted]
 
 Each item must have an owner, a deadline, a tracker URL, and a priority.
 "Postmortems without subsequent action are indistinguishable from no postmortem."
-— Google SRE
+- Google SRE
 
 | # | Action | Owner | Deadline | Tracker | Priority |
 |---|--------|-------|----------|---------|----------|
@@ -193,7 +193,7 @@ Newsroom engineering blogs (NYT Open, ProPublica News Apps, WaPo Engineering) pu
 | Actual time / cost of mistakes | Blame for individuals |
 | What the system permitted (then what humans did) | "Mistakes were made" passives |
 | Tools that helped or hurt, by name | Generic best practices |
-| Decisions you'd reverse — and why now, not then | Obvious statements |
+| Decisions you'd reverse, and why now, not then | Obvious statements |
 | Surprising discoveries | Information already in other docs |
 
 ## The specificity test
@@ -220,12 +220,12 @@ These are placeholders for real insights. Replace them.
 
 ## Examples of good vs bad entries
 
-**Bad — too vague:**
+**Bad, too vague:**
 > - Communication could have been better
 > - We underestimated the complexity
 > - Testing was insufficient
 
-**Good — specific and actionable:**
+**Good, specific and actionable:**
 > - The schema validation step was disabled in CI for the data-import script (system) and the freelance reporter who imported new entries didn't know it had been disabled (people). Cost: 3 hours debugging a typo that caused silent failures across 12 published stories.
 > - We built a custom date picker when the browser native input would have worked. Tracker: ENG-1247. Owner: K. Park. 2 days wasted.
 

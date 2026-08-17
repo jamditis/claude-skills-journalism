@@ -98,4 +98,4 @@ This hook is purely informational. It reminds the user but does not prevent task
 
 Journalists working with AI assistance may move faster than traditional workflows. This hook serves as a "pause and verify" moment before publication, encouraging the verification habits that maintain credibility.
 
-The goal is not to slow down or annoy—it's to build in a systematic reminder of professional standards.
+The goal is not to slow down or annoy, it's to build in a systematic reminder of professional standards.

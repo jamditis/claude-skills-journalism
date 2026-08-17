@@ -6,7 +6,7 @@
 
 ## Problem
 
-The autocontext `session-end.sh` Stop hook runs after every Claude response. It validates lessons (bumping confidence, checking for contradictions) and regenerates the playbook each time. While it's a lightweight command hook (not an agent spawn), it does unnecessary disk I/O on sessions where nothing meaningful happened — pure Q&A, research, or reading.
+The autocontext `session-end.sh` Stop hook runs after every Claude response. It validates lessons (bumping confidence, checking for contradictions) and regenerates the playbook each time. While it's a lightweight command hook (not an agent spawn), it does unnecessary disk I/O on sessions where nothing meaningful happened, pure Q&A, research, or reading.
 
 Separately, users who build custom Stop hooks (like session handoff writers) lack a reusable way to detect whether a session produced meaningful work. Each hook ends up reimplementing transcript parsing logic independently.
 
@@ -14,8 +14,8 @@ Separately, users who build custom Stop hooks (like session handoff writers) lac
 
 Two changes:
 
-1. **Shared transcript scanner** (`scripts/transcript-scanner.py`) — a standalone utility that reads a Claude Code session transcript (JSONL) and returns structured activity signals.
-2. **Activity gate in `session-end.sh`** — calls the scanner before doing lesson validation. Skips work when no meaningful activity happened, with a 10-minute time fallback.
+1. **Shared transcript scanner** (`scripts/transcript-scanner.py`), a standalone utility that reads a Claude Code session transcript (JSONL) and returns structured activity signals.
+2. **Activity gate in `session-end.sh`**, calls the scanner before doing lesson validation. Skips work when no meaningful activity happened, with a 10-minute time fallback.
 
 ## Design
 
@@ -32,9 +32,9 @@ python3 "$PLUGIN_ROOT/scripts/transcript-scanner.py" \
 ```
 
 All arguments are optional:
-- `--transcript` — path to the session JSONL file. If missing, empty, or file doesn't exist, returns `{"meaningful": false}` (no data to scan, so no signals found). Callers that want fail-open behavior should handle this themselves.
-- `--since` — Unix timestamp (seconds). Only consider tool calls after this time. Entries without a timestamp field are included regardless. Default: 0 (scan all).
-- `--config` — path to config file for custom signal definitions. Falls back to hardcoded defaults if missing or unreadable.
+- `--transcript`, path to the session JSONL file. If missing, empty, or file doesn't exist, returns `{"meaningful": false}` (no data to scan, so no signals found). Callers that want fail-open behavior should handle this themselves.
+- `--since`, Unix timestamp (seconds). Only consider tool calls after this time. Entries without a timestamp field are included regardless. Default: 0 (scan all).
+- `--config`, path to config file for custom signal definitions. Falls back to hardcoded defaults if missing or unreadable.
 
 **Output (JSON to stdout):**
 ```json
@@ -93,7 +93,7 @@ The scanner reads lines from the JSONL file. For each line:
 5. For each tool use, check `name` and `input` against the signal classification.
 6. Collect matching signals and aggregate tool counts.
 
-**Error handling:** The scanner itself returns `{"meaningful": false}` when there's no data to scan (missing file, empty path). Unexpected errors (malformed JSON mid-file, permission issues) are logged to stderr and the scanner continues scanning remaining lines. The fail-open behavior lives in `session-end.sh`, which defaults to `{"meaningful": true}` if the scanner subprocess fails entirely — so validation proceeds as before.
+**Error handling:** The scanner itself returns `{"meaningful": false}` when there's no data to scan (missing file, empty path). Unexpected errors (malformed JSON mid-file, permission issues) are logged to stderr and the scanner continues scanning remaining lines. The fail-open behavior lives in `session-end.sh`, which defaults to `{"meaningful": true}` if the scanner subprocess fails entirely, so validation proceeds as before.
 
 ### Changes to session-end.sh
 
@@ -104,7 +104,7 @@ Add an activity gate at the top of the script, after reading stdin and before th
 2. Call `transcript-scanner.py` with `--transcript` and `--since` (mtime of `session-lessons.json`, which marks session start).
 3. If scanner returns `meaningful: false`:
    - Check session age (now - mtime of session-lessons.json).
-   - If under 10 minutes (600 seconds), return `{}` and exit — skip validation.
+   - If under 10 minutes (600 seconds), return `{}` and exit, skip validation.
    - If 10+ minutes, fall through to normal validation (time fallback).
 4. If scanner returns `meaningful: true` or errors, proceed with existing validation.
 
@@ -117,18 +117,18 @@ The existing lesson validation, playbook regeneration, and skill tracking cleanu
 
 ### What this does NOT change
 
-- `session-start.sh` — runs once per session, already efficient.
-- `post-tool-use.sh` — already scoped to specific tool types.
-- `user-prompt-submit.sh` — fires on user messages, correct trigger for correction detection.
-- `generate-playbook.py` — called by session-end.sh only when validation runs.
-- Plugin config schema — `activity_signals` is optional, all existing configs work unchanged.
+- `session-start.sh`, runs once per session, already efficient.
+- `post-tool-use.sh`, already scoped to specific tool types.
+- `user-prompt-submit.sh`, fires on user messages, correct trigger for correction detection.
+- `generate-playbook.py`, called by session-end.sh only when validation runs.
+- Plugin config schema, `activity_signals` is optional, all existing configs work unchanged.
 
 ## Backward compatibility
 
 - No new required config keys.
 - No changes to lesson.json schema.
 - If the scanner script is missing (e.g., older plugin version), session-end.sh falls through to current behavior.
-- The scanner reads the transcript JSONL format that Claude Code produces. No version-specific coupling — it only looks for `type: "assistant"` entries with `content` arrays containing `tool_use` blocks.
+- The scanner reads the transcript JSONL format that Claude Code produces. No version-specific coupling, it only looks for `type: "assistant"` entries with `content` arrays containing `tool_use` blocks.
 
 ## Files changed
 

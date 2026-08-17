@@ -28,7 +28,7 @@ Before proceeding, verify the control panel files exist:
    > ```
    > claude plugin update pdf-playground@claude-skills-journalism
    > ```
-   Then STOP — do not continue with the preview workflow.
+   Then STOP, do not continue with the preview workflow.
 
 ## Preview workflow
 
@@ -142,7 +142,7 @@ To determine which template map to use, check the HTML file for clues:
 - If uncertain, default to the proposal template map
 
 Currently available template maps:
-- `proposal.js` — Funding proposals, grant applications
+- `proposal.js`, Funding proposals, grant applications
 
 ## Common adjustments
 
@@ -156,14 +156,14 @@ Currently available template maps:
 
 ## Browser commands
 
-- `browser_navigate` — Open the wrapper page via HTTP URL
-- `browser_snapshot` — Get accessibility tree
-- `browser_take_screenshot` — Capture visual state
-- `browser_close` — End preview session
+- `browser_navigate`, Open the wrapper page via HTTP URL
+- `browser_snapshot`, Get accessibility tree
+- `browser_take_screenshot`, Capture visual state
+- `browser_close`, End preview session
 
 ## Tips
 
-- Always use HTTP URLs (`http://localhost:<port>/`) — never `file://`
+- Always use HTTP URLs (`http://localhost:<port>/`), never `file://`
 - Take screenshots after each change
 - The control panel reloads with each page navigation (no manual re-injection needed)
 - For multi-page docs, scroll or use page-specific screenshots

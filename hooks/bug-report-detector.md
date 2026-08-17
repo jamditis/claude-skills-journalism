@@ -36,12 +36,12 @@ When a bug report is detected, prepend this reminder to Claude's context:
 
 ---
 
-**🐛 Bug report detected — Follow test-first workflow:**
+**🐛 Bug report detected, Follow test-first workflow:**
 
 1. **DO NOT** immediately edit code to fix the bug
 2. **FIRST** write a failing test that reproduces the bug
 3. **THEN** launch subagents via Task tool to attempt fixes
-4. **VERIFY** by running the test — passing test proves the fix works
+4. **VERIFY** by running the test, passing test proves the fix works
 
 This workflow is required per project CLAUDE.md guidelines.
 

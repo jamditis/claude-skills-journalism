@@ -140,7 +140,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">Web UI best practices</h1>
             <p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-05-08T21:46:38-04:00" data-updated-slug="web-ui-best-practices">Updated <time datetime="2026-05-08T21:46:38-04:00">May 8, 2026</time></p>
             <p class="text-xl text-white/90 max-w-2xl">
-                Signs of taste in web UI. The small details that separate polished products from rough ones — speed, restraint, honesty, and respect for the user's time.
+                Signs of taste in web UI. The small details that separate polished products from rough ones, speed, restraint, honesty, and respect for the user's time.
             </p>
         </div>
     </header>
@@ -284,8 +284,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <section id="speed" class="mb-16">
             <h2 class="font-display text-2xl font-semibold mb-4">100ms interactions</h2>
             <div class="bg-white rounded-xl p-6 border border-mist/30 mb-4">
-                <p class="text-clay/80 mb-4">Every interaction completes in under 100ms. If it can't, fake it with optimistic updates — show the result before the server confirms.</p>
-                <pre tabindex="0"><code>// Optimistic delete — remove immediately, reconcile later
+                <p class="text-clay/80 mb-4">Every interaction completes in under 100ms. If it can't, fake it with optimistic updates, show the result before the server confirms.</p>
+                <pre tabindex="0"><code>// Optimistic delete, remove immediately, reconcile later
 async function handleDelete(id) {
   setItems(prev => prev.filter(i => i.id !== id));
   try {
@@ -392,7 +392,7 @@ async function handleDelete(id) {
                     <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>Save draft form state to localStorage or the server</li>
                     <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>Restore scroll position on back navigation</li>
                     <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>Preserve filter/sort selections across sessions</li>
-                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>URL encodes the view state — sharing reproduces the view</li>
+                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-accent mt-0.5 flex-shrink-0"></i>URL encodes the view state, sharing reproduces the view</li>
                 </ul>
             </div>
         </section>
@@ -514,7 +514,7 @@ input, select, textarea {
                 <ul class="text-sm text-clay/70 space-y-1 mt-4">
                     <li>Adjacent clickable elements: 8px gap minimum</li>
                     <li>Icon-only buttons get larger padding</li>
-                    <li>Don't rely on hover states — they don't exist on touch</li>
+                    <li>Don't rely on hover states, they don't exist on touch</li>
                 </ul>
             </div>
         </section>
@@ -583,7 +583,7 @@ input, select, textarea {
                         </ul>
                     </div>
                 </div>
-                <p class="text-sm text-clay/80 mt-4">Buttons are verbs: "Save", "Delete", "Send" — not "Submit", "OK", "Confirm". Sentence case everywhere, never Title Case.</p>
+                <p class="text-sm text-clay/80 mt-4">Buttons are verbs: "Save", "Delete", "Send", not "Submit", "OK", "Confirm". Sentence case everywhere, never Title Case.</p>
             </div>
         </section>
 

@@ -49,18 +49,18 @@ match_patterns:
 
 # Copywriting preflight
 
-When the user asks for a new piece of writing or a revision, interview them about intent **before** drafting a single word. Jumping straight to a draft produces generic copy that misses the audience, message, and tone the user actually had in mind — and then both of you spend more time fixing the wrong draft than a 30-second interview would have cost.
+When the user asks for a new piece of writing or a revision, interview them about intent **before** drafting a single word. Jumping straight to a draft produces generic copy that misses the audience, message, and tone the user actually had in mind, and then both of you spend more time fixing the wrong draft than a 30-second interview would have cost.
 
 This hook does not write anything. It pauses to gather intent, then gets out of the way.
 
 ## Detection criteria
 
-The signal is the verb-plus-writing-noun pairing, not message length. A terse command that matches a writing pattern — "write copy", "op-ed", "press release" — is still a real request, and terse is often exactly when an intent interview is most useful, so do not skip it for being short. Treat the message as a writing task when it contains:
+The signal is the verb-plus-writing-noun pairing, not message length. A terse command that matches a writing pattern, "write copy", "op-ed", "press release", is still a real request, and terse is often exactly when an intent interview is most useful, so do not skip it for being short. Treat the message as a writing task when it contains:
 
 - **New writing:** a drafting verb ("write", "draft", "create") next to a prose form (post, blog post, article, essay, memo, pitch, newsletter, press release, op-ed, announcement, proposal, one-pager, copy, talking points).
 - **Revision:** a revision verb ("revise", "rewrite", "rework", "polish", "tighten", "punch up", "edit", "refine", "strengthen") **next to** a writing-context word ("draft", "post", "article", "piece", "copy", "newsletter", "write-up"). Require both, so "tighten that" about a code hook does not trip it.
 
-Check revision first — it is the more specific case, since it implies a piece already exists.
+Check revision first, it is the more specific case, since it implies a piece already exists.
 
 The `match_patterns` above pair a verb with a writing noun (`write a newsletter`, `rewrite the post`) and keep bare nouns only for forms that rarely show up in code or admin prompts (`op-ed`, `press release`). That is why "write a SQL query", "build a newsletter signup form", and "rewrite this regex" never trip the interview. "Script" is deliberately left out: in a code repo "write a script" almost always means code, not a screenplay. If a borderline prompt still matches, apply the verb-plus-writing-noun test before interviewing and skip silently when the request turns out to be about code.
 
@@ -68,12 +68,12 @@ The `match_patterns` above pair a verb with a writing noun (`write a newsletter`
 
 Before drafting, use `AskUserQuestion` to map out:
 
-1. **Audience** — who is this for?
-2. **Key message** — what is the one thing they should take away (the thesis)?
-3. **Tone** — formal, conversational, urgent, reflective?
-4. **Emphasis** — what should be foregrounded, and what should be played down?
-5. **Voice** — first person, organizational voice, journalistic remove?
-6. **Boundaries** — specific points to include, and anything to avoid?
+1. **Audience**, who is this for?
+2. **Key message**, what is the one thing they should take away (the thesis)?
+3. **Tone**, formal, conversational, urgent, reflective?
+4. **Emphasis**, what should be foregrounded, and what should be played down?
+5. **Voice**, first person, organizational voice, journalistic remove?
+6. **Boundaries**, specific points to include, and anything to avoid?
 
 Then draft against the answers, not against a guess.
 
@@ -89,7 +89,7 @@ Then revise to the brief, rather than re-drafting from scratch and discarding wh
 
 ## Loading a style guide
 
-If the project defines a writing style guide — a `STYLE_GUIDE.md`, a voice-and-tone doc, or whatever path the project configures — load it into context before drafting so the piece matches the established voice. If none exists, ask the user whether one should be followed.
+If the project defines a writing style guide, a `STYLE_GUIDE.md`, a voice-and-tone doc, or whatever path the project configures, load it into context before drafting so the piece matches the established voice. If none exists, ask the user whether one should be followed.
 
 ## Finalizing
 

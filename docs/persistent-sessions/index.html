@@ -216,14 +216,14 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <!-- The problem -->
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">The problem</h2>
-            <p class="text-clay/80 mb-6">If you run Claude Code in a browser-based terminal (like Cockpit), your session lives inside a WebSocket connection. When that connection drops — browser tab closed, laptop lid shut, phone screen locked, network hiccup — everything dies. Claude stops mid-task. Your context is gone. You start over.</p>
+            <p class="text-clay/80 mb-6">If you run Claude Code in a browser-based terminal (like Cockpit), your session lives inside a WebSocket connection. When that connection drops, browser tab closed, laptop lid shut, phone screen locked, network hiccup, everything dies. Claude stops mid-task. Your context is gone. You start over.</p>
 
             <div class="terminal-bar mb-6">
                 <div class="terminal-titlebar">
                     <div class="terminal-dot bg-red-400"></div>
                     <div class="terminal-dot bg-yellow-400"></div>
                     <div class="terminal-dot bg-green-400"></div>
-                    <span class="text-white/70 text-xs ml-2">dashboard.yourdomain.com — terminal</span>
+                    <span class="text-white/70 text-xs ml-2">dashboard.yourdomain.com, terminal</span>
                 </div>
                 <div class="terminal-body">
                     <span class="terminal-green">$</span> claude<br>
@@ -233,14 +233,14 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 </div>
             </div>
 
-            <p class="text-clay/80">Cockpit compounds this with a 15-minute idle session timeout. If Claude is thinking quietly — running tools, processing files — and you're not clicking around in the Cockpit UI, your session gets terminated automatically, taking Claude with it.</p>
+            <p class="text-clay/80">Cockpit compounds this with a 15-minute idle session timeout. If Claude is thinking quietly, running tools, processing files, and you're not clicking around in the Cockpit UI, your session gets terminated automatically, taking Claude with it.</p>
         </section>
 
         <!-- The solution -->
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">The solution</h2>
             <p class="text-clay/80 mb-6">
-                <strong>tmux</strong> is a terminal multiplexer that runs on the server, not in your browser. Your Claude session runs inside tmux. The browser terminal just shows you a view of it — like a window into a room that exists independently of whether you're looking.
+                <strong>tmux</strong> is a terminal multiplexer that runs on the server, not in your browser. Your Claude session runs inside tmux. The browser terminal just shows you a view of it, like a window into a room that exists independently of whether you're looking.
             </p>
 
             <div class="grid md:grid-cols-2 gap-4 mb-6">
@@ -260,7 +260,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </svg>
                     </div>
                     <h3 class="font-semibold mb-1">With tmux</h3>
-                    <p class="text-sm text-clay/70">Claude runs inside a server-side tmux session. Close the tab, switch devices, lose network — tmux keeps running. Reconnect and attach.</p>
+                    <p class="text-sm text-clay/70">Claude runs inside a server-side tmux session. Close the tab, switch devices, lose network, tmux keeps running. Reconnect and attach.</p>
                 </div>
             </div>
 
@@ -269,7 +269,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <div class="terminal-dot bg-red-400"></div>
                     <div class="terminal-dot bg-yellow-400"></div>
                     <div class="terminal-dot bg-green-400"></div>
-                    <span class="text-white/70 text-xs ml-2">dashboard.yourdomain.com — main (tmux)</span>
+                    <span class="text-white/70 text-xs ml-2">dashboard.yourdomain.com, main (tmux)</span>
                 </div>
                 <div class="terminal-body">
                     <span class="terminal-green">$</span> claude<br>
@@ -289,7 +289,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-6">Setup</h2>
 
-            <p class="text-clay/80 mb-6">tmux runs on the <strong>server</strong> — the always-on machine where Claude Code lives. Your laptop, phone, or tablet is just the client connecting to it. Everything in this Setup section is configured on the server. See <a href="#install-tmux" class="text-accentDark underline underline-offset-2">Installing tmux</a> if you don't have it yet, and <a href="#clients" class="text-accentDark underline underline-offset-2">Connecting from different devices</a> for the client side.</p>
+            <p class="text-clay/80 mb-6">tmux runs on the <strong>server</strong>, the always-on machine where Claude Code lives. Your laptop, phone, or tablet is just the client connecting to it. Everything in this Setup section is configured on the server. See <a href="#install-tmux" class="text-accentDark underline underline-offset-2">Installing tmux</a> if you don't have it yet, and <a href="#clients" class="text-accentDark underline underline-offset-2">Connecting from different devices</a> for the client side.</p>
 
             <!-- Step 1 -->
             <div class="flex gap-4 mb-8">
@@ -307,7 +307,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         <div class="terminal-body text-xs leading-relaxed">
                             <span class="terminal-dim"># True color support</span><br>
                             set -g default-terminal "screen-256color"<br><br>
-                            <span class="terminal-dim"># Mouse support — click to switch, scroll with wheel</span><br>
+                            <span class="terminal-dim"># Mouse support, click to switch, scroll with wheel</span><br>
                             set -g mouse on<br><br>
                             <span class="terminal-dim"># Start window numbering at 1</span><br>
                             set -g base-index 1<br>
@@ -321,7 +321,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             set -g status-right "#[fg=#484f58]Ctrl+B H for help  #[fg=#3fb950]%H:%M #[fg=#484f58]%b %d"<br>
                             set -g window-status-current-style "fg=#3fb950,bold"<br>
                             set -g pane-active-border-style "fg=#3fb950"<br><br>
-                            <span class="terminal-dim"># Ctrl+B H — help popup</span><br>
+                            <span class="terminal-dim"># Ctrl+B H, help popup</span><br>
                             bind H display-popup -E -w 62 -h 26 "cat &lt;&lt; 'EOF'<br>
                             &nbsp;&nbsp;tmux quick reference<br>
                             &nbsp;&nbsp;...<br>
@@ -348,7 +348,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <span class="text-white/70 text-xs ml-2">~/.bashrc  /  ~/.zshrc</span>
                         </div>
                         <div class="terminal-body text-xs leading-relaxed">
-                            <span class="terminal-dim"># SSH (most common — Termius, Blink, Termux, OpenSSH, PuTTY, etc.)</span><br>
+                            <span class="terminal-dim"># SSH (most common, Termius, Blink, Termux, OpenSSH, PuTTY, etc.)</span><br>
                             <span class="terminal-dim"># SSH_TTY is set on interactive SSH logins only, not on `ssh host "cmd"`.</span><br>
                             if [ -z "$TMUX" ] &amp;&amp; [ -n "$SSH_TTY" ]; then<br>
                             &nbsp;&nbsp;&nbsp;&nbsp;exec tmux new-session -A -s main<br>
@@ -360,7 +360,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             fi
                         </div>
                     </div>
-                    <p class="text-clay/80 text-sm mt-3">Pick one — or keep both, since the conditions don't overlap. The <code>-z "$TMUX"</code> guard prevents nested tmux sessions when you re-attach.</p>
+                    <p class="text-clay/80 text-sm mt-3">Pick one, or keep both, since the conditions don't overlap. The <code>-z "$TMUX"</code> guard prevents nested tmux sessions when you re-attach.</p>
                 </div>
             </div>
 
@@ -369,7 +369,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 <div class="step-number mt-1">3</div>
                 <div class="flex-1">
                     <h3 class="font-semibold text-lg mb-3">Fix the Cockpit idle timeout <span class="text-clay/70 font-normal text-sm">(Cockpit only)</span></h3>
-                    <p class="text-clay/80 mb-3">Skip this step if you connect over SSH. By default, Cockpit terminates idle web sessions after 15 minutes — exactly long enough to time out while Claude is working quietly. Disable it:</p>
+                    <p class="text-clay/80 mb-3">Skip this step if you connect over SSH. By default, Cockpit terminates idle web sessions after 15 minutes, exactly long enough to time out while Claude is working quietly. Disable it:</p>
                     <div class="terminal-bar">
                         <div class="terminal-titlebar">
                             <div class="terminal-dot bg-red-400"></div>
@@ -425,7 +425,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </tr>
                         <tr>
                             <td class="px-5 py-3">Alpine</td>
-                            <td class="px-5 py-3"><code>apk add tmux</code> as root (Alpine has no <code>sudo</code> by default — use <code>doas</code> if configured)</td>
+                            <td class="px-5 py-3"><code>apk add tmux</code> as root (Alpine has no <code>sudo</code> by default, use <code>doas</code> if configured)</td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3">macOS (as the server)</td>
@@ -455,12 +455,12 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <!-- Connecting from different devices -->
         <section id="clients" class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Connecting from different devices</h2>
-            <p class="text-clay/80 mb-6">Once tmux is set up on the server, anything that can open a shell on it — SSH, mosh, or Cockpit's web terminal — works as a client. The auto-attach snippet drops you straight into the running session, so the client doesn't need to know anything about tmux.</p>
+            <p class="text-clay/80 mb-6">Once tmux is set up on the server, anything that can open a shell on it, SSH, mosh, or Cockpit's web terminal, works as a client. The auto-attach snippet drops you straight into the running session, so the client doesn't need to know anything about tmux.</p>
 
             <div class="grid md:grid-cols-2 gap-4">
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <h3 class="font-semibold mb-2">macOS</h3>
-                    <p class="text-sm text-clay/70 mb-2">Built-in Terminal.app or <a href="https://iterm2.com" class="text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">iTerm2</a> + <code>ssh user@server</code>. OpenSSH ships with macOS — no install needed.</p>
+                    <p class="text-sm text-clay/70 mb-2">Built-in Terminal.app or <a href="https://iterm2.com" class="text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">iTerm2</a> + <code>ssh user@server</code>. OpenSSH ships with macOS, no install needed.</p>
                     <p class="text-xs text-clay/70">Tip: set up <code>~/.ssh/config</code> with a <code>Host</code> alias so you can run <code>ssh box</code> from any folder.</p>
                 </div>
 
@@ -471,7 +471,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <h3 class="font-semibold mb-2">Linux desktop</h3>
-                    <p class="text-sm text-clay/70">Any terminal emulator + <code>ssh</code>. Same pattern as macOS. GNOME Terminal, Konsole, Alacritty, Kitty, Wezterm — all fine.</p>
+                    <p class="text-sm text-clay/70">Any terminal emulator + <code>ssh</code>. Same pattern as macOS. GNOME Terminal, Konsole, Alacritty, Kitty, Wezterm, all fine.</p>
                 </div>
 
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
@@ -481,7 +481,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <h3 class="font-semibold mb-2">Android</h3>
-                    <p class="text-sm text-clay/70 mb-2"><a href="https://termux.dev" class="text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">Termux</a> (free, install from F-Droid — the Play Store version is unmaintained) gives you a real shell with <code>pkg install openssh</code>. <a href="https://termius.com" class="text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">Termius</a> is the easiest GUI option.</p>
+                    <p class="text-sm text-clay/70 mb-2"><a href="https://termux.dev" class="text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">Termux</a> (free, install from F-Droid, the Play Store version is unmaintained) gives you a real shell with <code>pkg install openssh</code>. <a href="https://termius.com" class="text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">Termius</a> is the easiest GUI option.</p>
                 </div>
 
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
@@ -496,20 +496,20 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <h3 class="font-semibold mb-2">Flaky networks (any device)</h3>
-                    <p class="text-sm text-clay/70 mb-2">Install <a href="https://mosh.org" class="text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">mosh</a> on <em>both</em> the server and the client (<code>apt/dnf/brew install mosh</code>; Blink Shell has it built in), then use <code>mosh user@server</code> instead of <code>ssh</code>. Mosh survives network changes and sleep — a good companion to tmux on cellular or while moving between Wi-Fi networks.</p>
-                    <p class="text-xs text-clay/70">Mosh also needs UDP ports <code>60000–61000</code> open inbound to the server — open them in your firewall (and any cloud security group) or you'll see "mosh: connect failed".</p>
+                    <p class="text-sm text-clay/70 mb-2">Install <a href="https://mosh.org" class="text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">mosh</a> on <em>both</em> the server and the client (<code>apt/dnf/brew install mosh</code>; Blink Shell has it built in), then use <code>mosh user@server</code> instead of <code>ssh</code>. Mosh survives network changes and sleep, a good companion to tmux on cellular or while moving between Wi-Fi networks.</p>
+                    <p class="text-xs text-clay/70">Mosh also needs UDP ports <code>60000–61000</code> open inbound to the server, open them in your firewall (and any cloud security group) or you'll see "mosh: connect failed".</p>
                 </div>
             </div>
 
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-4">
-                <p class="text-sm text-amber-800"><strong>Phone keyboards and the <span class="kbd">Ctrl</span> key:</strong> tmux's prefix is <span class="kbd">Ctrl+B</span>, which most mobile SSH apps expose via a software toolbar above the keyboard. If you'd rather use a different prefix, add <code>set -g prefix C-a</code> (and <code>unbind C-b</code> / <code>bind C-a send-prefix</code>) to <code>~/.tmux.conf</code> — <span class="kbd">Ctrl+A</span> is a common alternative that's easier on some layouts.</p>
+                <p class="text-sm text-amber-800"><strong>Phone keyboards and the <span class="kbd">Ctrl</span> key:</strong> tmux's prefix is <span class="kbd">Ctrl+B</span>, which most mobile SSH apps expose via a software toolbar above the keyboard. If you'd rather use a different prefix, add <code>set -g prefix C-a</code> (and <code>unbind C-b</code> / <code>bind C-a send-prefix</code>) to <code>~/.tmux.conf</code>, <span class="kbd">Ctrl+A</span> is a common alternative that's easier on some layouts.</p>
             </div>
         </section>
 
         <!-- Key bindings -->
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-2">Key bindings</h2>
-            <p class="text-clay/70 mb-6">All tmux commands start with the prefix <span class="kbd">Ctrl+B</span> — press and release it, then press the next key. <span class="kbd">Ctrl+B H</span> shows this as a popup in your terminal.</p>
+            <p class="text-clay/70 mb-6">All tmux commands start with the prefix <span class="kbd">Ctrl+B</span>, press and release it, then press the next key. <span class="kbd">Ctrl+B H</span> shows this as a popup in your terminal.</p>
 
             <div class="bg-white rounded-xl border border-mist/30 overflow-hidden mb-4">
                 <div class="bg-mist/10 border-b border-mist/30 px-5 py-3 font-semibold text-sm">Windows</div>
@@ -573,7 +573,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </tr>
                         <tr>
                             <td class="px-5 py-3"><span class="kbd">Ctrl+B</span> then <span class="kbd">D</span></td>
-                            <td class="px-5 py-3 text-clay/70">Detach — session keeps running</td>
+                            <td class="px-5 py-3 text-clay/70">Detach, session keeps running</td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3"><span class="kbd">Ctrl+B</span> then <span class="kbd">H</span></td>
@@ -626,7 +626,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <!-- Bonus: scheduler coexistence -->
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Coexisting with scheduled Claude sessions</h2>
-            <p class="text-clay/80 mb-4">If you run automated Claude sessions (cron-based check-ins, email processing, transcript analysis), they can conflict with your interactive session — competing for CPU and trying to process the same data at the same time.</p>
+            <p class="text-clay/80 mb-4">If you run automated Claude sessions (cron-based check-ins, email processing, transcript analysis), they can conflict with your interactive session, competing for CPU and trying to process the same data at the same time.</p>
             <p class="text-clay/80 mb-4">Add this function to your scheduler to detect an active interactive session and skip the automated wake:</p>
             <div class="terminal-bar">
                 <div class="terminal-titlebar">
@@ -654,13 +654,13 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     &nbsp;&nbsp;&nbsp;&nbsp;return False
                 </div>
             </div>
-            <p class="text-clay/80 text-sm mt-2">The <code>pane_current_command</code> tmux format string returns the name of the running process — no need to parse <code>ps aux</code>.</p>
+            <p class="text-clay/80 text-sm mt-2">The <code>pane_current_command</code> tmux format string returns the name of the running process, no need to parse <code>ps aux</code>.</p>
         </section>
 
         <!-- Activity notifications -->
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Getting notified when a session needs input</h2>
-            <p class="text-clay/80 mb-4">tmux can highlight a tab when the process in it goes quiet — a reliable signal that something has finished and is waiting for you. This uses <code>monitor-silence</code>, which fires after a window has produced no output for a set number of seconds.</p>
+            <p class="text-clay/80 mb-4">tmux can highlight a tab when the process in it goes quiet, a reliable signal that something has finished and is waiting for you. This uses <code>monitor-silence</code>, which fires after a window has produced no output for a set number of seconds.</p>
             <p class="text-clay/80 mb-4">Add these lines to your <code>~/.tmux.conf</code>:</p>
             <div class="terminal-bar">
                 <div class="terminal-titlebar">
@@ -683,7 +683,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             </div>
             <p class="text-clay/80 text-sm mt-3 mb-4">The <code>monitor-silence 20</code> value is seconds. Bump it up if it fires too often during normal processing pauses.</p>
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                <p class="text-sm text-amber-800"><strong>Why silence, not activity?</strong> <code>monitor-activity</code> fires on every byte of output — too noisy for Claude sessions that stream continuously. <code>monitor-silence</code> fires only when output <em>stops</em>, which is a much better proxy for "waiting for you." While a session is running it outputs constantly; when it hits a prompt or finishes, it goes quiet.</p>
+                <p class="text-sm text-amber-800"><strong>Why silence, not activity?</strong> <code>monitor-activity</code> fires on every byte of output, too noisy for Claude sessions that stream continuously. <code>monitor-silence</code> fires only when output <em>stops</em>, which is a much better proxy for "waiting for you." While a session is running it outputs constantly; when it hits a prompt or finishes, it goes quiet.</p>
             </div>
         </section>
 
@@ -714,7 +714,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-1 rounded mt-0.5">Best practice</span>
                         <div>
                             <h3 class="font-semibold">Name your windows</h3>
-                            <p class="text-sm text-clay/70 mt-1">Use <span class="kbd">Ctrl+B ,</span> to name each window. The status bar shows all window names at once — without names, you'll end up with a row of identical <code>bash</code> entries.</p>
+                            <p class="text-sm text-clay/70 mt-1">Use <span class="kbd">Ctrl+B ,</span> to name each window. The status bar shows all window names at once, without names, you'll end up with a row of identical <code>bash</code> entries.</p>
                         </div>
                     </div>
                 </div>

@@ -5,7 +5,7 @@ description: Use when executing implementation plans with independent tasks in t
 <!--
 Adapted from obra/superpowers subagent-driven-development skill (v5.0.7),
 MIT-licensed, copyright 2025 Jesse Vincent. Modifications copyright 2026 Joe Amditis.
-v0.5.0 ports as a consumer category — no research phase per the v0.2.0
+v0.5.0 ports as a consumer category, no research phase per the v0.2.0
 architecture, since subagent-driven-development is an in-session execution mode
 whose plan handoff already carries the research conclusions. skill_md_parity is
 false in the manifest because the dual-namespace cross-ref check requires
@@ -18,7 +18,7 @@ See CREDITS.md.
 
 Execute plan by dispatching fresh subagent per task, with two-stage review after each: spec compliance review first, then code quality review.
 
-**Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
+**Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history, you construct exactly what they need. This also preserves your own context for coordination work.
 
 **Core principle:** Fresh subagent per task + two-stage review (spec then quality) = high quality, fast iteration
 

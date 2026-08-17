@@ -1,12 +1,12 @@
 ---
 name: brazil-records-requests
-description: Public records requests under Brazil's Access to Information Law (Lei 12.527/2011, "LAI"). Use when filing, tracking, or appealing a request to any Brazilian government body — federal, state, municipal, judicial or legislative — including Fala.BR filings, the four-level appeal chain (first instance, agency head, CGU, CMRI), and rewriting requests denied as generic or as requiring additional analysis work. Triggers on "LAI", "Lei de Acesso à Informação", "pedido de acesso à informação", "e-SIC", "Fala.BR", "recurso à CGU", "CMRI", or any request for Brazilian government records. Companion to foia-requests, which covers the US.
+description: Public records requests under Brazil's Access to Information Law (LAI). Use for Fala.BR filings, e-SIC, and CGU/CMRI appeals.
 ---
 
 # Brazilian public records requests (LAI)
 
-Brazil's Access to Information Law — Lei 12.527/2011, universally called the
-LAI — is one of the stronger transparency statutes in Latin America and one of
+Brazil's Access to Information Law, Lei 12.527/2011, universally called the
+LAI, is one of the stronger transparency statutes in Latin America and one of
 the most under-used by reporters. Most denials are not legal defeats. They are
 drafting failures that a differently worded request would have avoided.
 
@@ -24,7 +24,7 @@ tracking, and the four-level appeal chain.
 
 ## Do not use for
 
-- US records requests — use `foia-requests`
+- US records requests, use `foia-requests`
 - Court case data, which in Brazil is mostly public through other channels
   (DataJud, e-SAJ, PJe) and rarely needs a records request
 - Data already published under transparência ativa (see "Check first" below)
@@ -37,12 +37,12 @@ and signals inexperience to the agency.
 
 Check, in order:
 
-1. **Portal da Transparência** (portaltransparencia.gov.br) — federal spending,
+1. **Portal da Transparência** (portaltransparencia.gov.br), federal spending,
    payroll, sanctions, benefits
 2. **Dados abertos** (dados.gov.br) and the agency's own open-data page
-3. **PNCP** (pncp.gov.br) — federal, state and municipal procurement since 2021
-4. **Painel Lei de Acesso à Informação** (CGU) — request statistics by agency
-5. **Busca de Pedidos e Respostas** (CGU) — published federal responses can
+3. **PNCP** (pncp.gov.br), federal, state and municipal procurement since 2021
+4. **Painel Lei de Acesso à Informação** (CGU), request statistics by agency
+5. **Busca de Pedidos e Respostas** (CGU), published federal responses can
    show how an agency describes its own data. Sensitive, personal, classified,
    or otherwise restricted information may be redacted or excluded. A missing
    result does not prove that no earlier request exists.
@@ -70,7 +70,7 @@ Practical consequences:
 
 - **Filing with the wrong body costs the full 20 days.** The agency will
   answer that it does not hold the information, and under art. 11, §1º, III it
-  should indicate who does — but frequently does not.
+  should indicate who does, but frequently does not.
 - **When you are unsure which of two bodies holds the record, file with
   both.** There is no penalty and no cost.
 - **Sub-national practice is uneven.** Many municipal systems are broken,
@@ -93,9 +93,9 @@ records unit. Filing as a private citizen is normal practice.
 
 ### What the request must contain
 
-- Requester identification (name and a valid ID document — CPF is common but
+- Requester identification (name and a valid ID document, CPF is common but
   not mandated by art. 12; a user already identified on Fala.BR does not need
-  to re-disclose it) — anonymous filing is not available
+  to re-disclose it), anonymous filing is not available
 - A specific description of the information sought
 - The delivery format you want
 
@@ -147,7 +147,7 @@ Under art. 11:
   communicated to the requester (art. 11 §2º)
 
 So the realistic worst case for a first answer is 30 days. Silence does not
-route through the same channel as a reasoned denial — see "Step 5: The
+route through the same channel as a reasoned denial, see "Step 5: The
 appeal chain" for the federal-executive procedure (reclamação, not a direct
 appeal).
 
@@ -160,7 +160,7 @@ appeal chain may not resolve until August.
 ## Step 4: Diagnose the denial
 
 Almost all denials fall into a few categories. The right response differs
-for each — appealing a denial that should have been refiled wastes months.
+for each, appealing a denial that should have been refiled wastes months.
 
 Decree 7.724/2012 applies only to the federal executive. The first three
 grounds below use that Decree. For state, municipal, judicial, legislative,
@@ -174,9 +174,9 @@ denial or citing the Decree.
 | Requires additional analysis, interpretation or consolidation of data | Federal executive: Decree 7.724, art. 13, III | **Appeal.** If it knows where the source information is, the agency must identify that location (art. 13, parágrafo único). Ask it to state whether it has that knowledge and to identify the source if it does. |
 | Personal data | LAI art. 31 | **Appeal**, requesting the record with personal fields redacted. Partial access is the rule, full withholding the exception. |
 | Classified | LAI arts. 23–24 | **Appeal**, demanding the classification instrument (termo de classificação), its date, level and authority. The maximum restriction periods are 5 years for reservada, 15 for secreta, and 25 for ultrassecreta. Check whether an earlier event ends the restriction. |
-| Body does not hold it | LAI art. 11, §1º, III | Ask which body does — the agency is required to say — then refile there |
-| Silence (federal executive) | Decree 7.724/2012, arts. 22–23 | **Reclamação** to the monitoring authority, not a direct appeal — see Step 5. |
-| Silence (other spheres) | Local LAI regulation | Usually an immediate appeal under LAI art. 15; confirm the state, municipal, judicial or legislative body's own rule — Decree 7.724/2012 binds the federal executive only. |
+| Body does not hold it | LAI art. 11, §1º, III | Ask which body does, the agency is required to say, then refile there |
+| Silence (federal executive) | Decree 7.724/2012, arts. 22–23 | **Reclamação** to the monitoring authority, not a direct appeal, see Step 5. |
+| Silence (other spheres) | Local LAI regulation | Usually an immediate appeal under LAI art. 15; confirm the state, municipal, judicial or legislative body's own rule, Decree 7.724/2012 binds the federal executive only. |
 
 Two provisions worth knowing by heart:
 
@@ -187,7 +187,7 @@ Two provisions worth knowing by heart:
   military or prison records.
 - **Art. 14**: you are entitled to the full text of the denial decision.
   Request it. Agencies often refuse informally, by email, without a formal
-  decision that can be appealed — demanding the decision forces the issue.
+  decision that can be appealed, demanding the decision forces the issue.
 
 ## Step 5: The appeal chain
 
@@ -204,10 +204,10 @@ Reasoned denial
 2. Agency head (autoridade máxima)       → decides in 5 days
    │  10 days
    ▼
-3. CGU — federal executive only          → decides in 5 days   (LAI art. 16)
+3. CGU, federal executive only          → decides in 5 days   (LAI art. 16)
    │  10 days
    ▼
-4. CMRI — final administrative recourse  (LAI art. 16 §3º)
+4. CMRI, final administrative recourse  (LAI art. 16 §3º)
 ```
 
 **Silence from a federal executive body** does not enter that chain directly.
@@ -223,11 +223,11 @@ Silence past the deadline (30 days after filing, at the earliest)
 2. Recurso to CGU                         → decides in 5 days  (Decree 7.724/2012, art. 23)
    │  10 days
    ▼
-3. CMRI — final administrative recourse   (LAI art. 16 §3º)
+3. CMRI, final administrative recourse   (LAI art. 16 §3º)
 ```
 
 For state, municipal, judicial and legislative bodies, Decree 7.724/2012 does
-not apply — check whether the local LAI regulation has an equivalent
+not apply, check whether the local LAI regulation has an equivalent
 reclamação step, or whether silence is appealed directly under LAI art. 15.
 
 Notes from practice:
@@ -262,7 +262,7 @@ and Fala.BR does not notify reliably.
 **Body:** [agency]
 **Filed:** [date]
 **Statutory deadline:** [filed + 20 days]
-**Extended to:** [+10 days, if invoked — note the justification given]
+**Extended to:** [+10 days, if invoked, note the justification given]
 **Status:** [pending / granted / partial / denied / appealed]
 **Denial ground cited:** [article and text]
 **Appeal level:** [1 / 2 / CGU / CMRI]
@@ -270,11 +270,11 @@ and Fala.BR does not notify reliably.
 **Files received:** [paths]
 ```
 
-Publishing the request and the response afterwards — through Achados e
-Pedidos or the outlet's own site — is standard practice in Brazilian
+Publishing the request and the response afterwards, through Achados e
+Pedidos or the outlet's own site, is standard practice in Brazilian
 investigative work and helps the next reporter. Before publishing, redact
 CPFs, home addresses, and any other personal field the agency did not
-already withhold under LAI art. 31 — a public record is not automatically a
+already withhold under LAI art. 31, a public record is not automatically a
 public-interest publication, and this is especially true for victim,
 witness, and juvenile identifiers. LGPD does not apply to processing carried
 out exclusively for journalistic purposes (LGPD art. 4, II, a). That exclusion

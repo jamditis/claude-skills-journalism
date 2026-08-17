@@ -1,5 +1,5 @@
 ---
-description: Sandboxed pre-install scan + cooldown bypass for an urgent npm/bun install. Use when a recent package version must be installed despite the global supply-chain cooldown — for example a published CVE patch, a dependency that just shipped, or any case where waiting the full cooldown is not acceptable.
+description: Sandboxed pre-install scan plus cooldown bypass for urgent npm/bun installs. Use when a package must ship despite the cooldown.
 ---
 
 # /security-toolkit:hotpatch
@@ -21,16 +21,16 @@ The command is the gate. The trigger phrase "hotpatch" should not bypass the coo
    Pass through `--yes` only if the user has explicitly authorized non-interactive execution. Pass through `--force` only if the user has reviewed red flags from a prior run and approved.
 
 2. **If no local script exists**, perform the scan in-conversation using the supply-chain-hardening skill's heuristics. Briefly:
-   - `curl -fsSL "https://registry.npmjs.org/<encoded-name>"` — get metadata
+   - `curl -fsSL "https://registry.npmjs.org/<encoded-name>"`, get metadata
    - Resolve the requested version, extract `unpackedSize`, `fileCount`, `dist.tarball`, `time[version]`, and any `deprecated` flag
    - Download the tarball to a `mktemp -d` directory
-   - Extract under `bwrap --ro-bind /usr /usr --unshare-all --die-with-parent --bind ...` (Linux) or `sandbox-exec` (macOS) — never extract into the cwd, never extract without sandboxing
+   - Extract under `bwrap --ro-bind /usr /usr --unshare-all --die-with-parent --bind ...` (Linux) or `sandbox-exec` (macOS), never extract into the cwd, never extract without sandboxing
    - Parse `package.json` for risky patterns (see SKILL.md "Static checks" table)
-   - Diff size + fileCount against the most recent **stable** prior version (skip prereleases — `-dev`, `-rc`, `-beta`)
-   - Hit OSV.dev: `POST https://api.osv.dev/v1/query` with `{"package":{"name":"<name>","ecosystem":"npm"},"version":"<version>"}` — no auth required
+   - Diff size + fileCount against the most recent **stable** prior version (skip prereleases, `-dev`, `-rc`, `-beta`)
+   - Hit OSV.dev: `POST https://api.osv.dev/v1/query` with `{"package":{"name":"<name>","ecosystem":"npm"},"version":"<version>"}`, no auth required
    - Render a report with `RED` (block install) and `YELLOW` (warn) flags
 
-3. **If any RED flags fire**, do NOT install. Surface the flags, recommend either picking a different version, waiting out the cooldown, or — if the user has confirmed they understand the risk — passing `--force` on a re-run. Do not auto-`--force` without explicit user confirmation.
+3. **If any RED flags fire**, do NOT install. Surface the flags, recommend either picking a different version, waiting out the cooldown, or, if the user has confirmed they understand the risk, passing `--force` on a re-run. Do not auto-`--force` without explicit user confirmation.
 
 4. **If clean (or user approved despite flags)**, install with the cooldown bypassed AND scripts disabled:
 
@@ -62,10 +62,10 @@ If `--manager` is not given, autodetect from cwd:
 
 ## What this command is NOT for
 
-- Routine package installs — let the cooldown do its job; no scan needed
-- Bulk dependency upgrades — use `npm update` / `bun update` normally
-- Auditing already-installed packages — that's `npm audit` / `osv-scanner --lockfile=...`
-- Scanning a tarball without installing — call the scan script directly with `--scan-local <tarball>` if it supports that mode
+- Routine package installs, let the cooldown do its job; no scan needed
+- Bulk dependency upgrades, use `npm update` / `bun update` normally
+- Auditing already-installed packages, that's `npm audit` / `osv-scanner --lockfile=...`
+- Scanning a tarball without installing, call the scan script directly with `--scan-local <tarball>` if it supports that mode
 
 ## Cross-reference
 

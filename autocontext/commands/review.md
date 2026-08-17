@@ -7,25 +7,25 @@ Review accumulated lessons in `.autocontext/lessons.json`. Use AskUserQuestion t
 ## Initialization
 
 The script first reads `.autocontext/lessons.json` and separates lessons into two groups:
-- **Active lessons** — `deleted: false` or not marked deleted
-- **Tombstoned lessons** — `deleted: true` (lessons that were intentionally removed)
+- **Active lessons**, `deleted: false` or not marked deleted
+- **Tombstoned lessons**, `deleted: true` (lessons that were intentionally removed)
 
 If `.autocontext/cache/curated-pending.json` exists (from previous curation sessions with pending items), those are presented first for final approval.
 
 ## Review order
 
-Active lessons are sorted by **confidence score (lowest first)**. Low-confidence lessons need the most attention — these are either new, frequently contradicted, or validated by few developers.
+Active lessons are sorted by **confidence score (lowest first)**. Low-confidence lessons need the most attention, these are either new, frequently contradicted, or validated by few developers.
 
 ## Lesson presentation
 
 Lessons are presented in batches of 3-4 using AskUserQuestion. For each lesson, the review shows:
 
-- **Text** — the lesson content
-- **Category** — lesson type (bug-fix, architecture, workflow, pattern, gotcha, etc.)
-- **Confidence** — current score (0.0 to 1.0)
-- **Validated count** — how many sessions/developers have confirmed it
-- **Created by** — which developer/session discovered it
-- **Age** — how long ago it was created
+- **Text**, the lesson content
+- **Category**, lesson type (bug-fix, architecture, workflow, pattern, gotcha, etc.)
+- **Confidence**, current score (0.0 to 1.0)
+- **Validated count**, how many sessions/developers have confirmed it
+- **Created by**, which developer/session discovered it
+- **Age**, how long ago it was created
 
 Example format:
 ```
@@ -39,11 +39,11 @@ Confidence: 0.9 | Validated: 12 times | Created by: alice | Age: 45 days
 For each lesson, you choose one action:
 
 **Options:**
-- Approve — increase confidence by +0.2 (confirms lesson is valuable)
-- Edit — modify lesson text, category, or tags
-- Delete — tombstone the lesson (marks as `deleted: true`)
-- Supersede — replace this lesson with a newer/better version
-- Skip — leave unchanged and move to next
+- Approve, increase confidence by +0.2 (confirms lesson is valuable)
+- Edit, modify lesson text, category, or tags
+- Delete, tombstone the lesson (marks as `deleted: true`)
+- Supersede, replace this lesson with a newer/better version
+- Skip, leave unchanged and move to next
 
 ### Approve
 Bumps confidence by 0.2. Use this when you confirm a lesson is still valid and useful.
@@ -73,7 +73,7 @@ Leaves the lesson unchanged and moves to the next one. Use this when you're not 
 
 When a lesson has a `skill` field (non-null) and `skill_learning.enabled` is true in config, a sixth action is available:
 
-- **Promote to global** — Copy this lesson to the global skill lesson store using the store module. Update the original lesson's `scope` to `"skill"` in `lessons.json`. Report: "Promoted to global store for [skill name]."
+- **Promote to global**, Copy this lesson to the global skill lesson store using the store module. Update the original lesson's `scope` to `"skill"` in `lessons.json`. Report: "Promoted to global store for [skill name]."
 
 The global store path comes from config: `skill_learning.global_store` (default `~/.claude/skill-lessons/`).
 
@@ -102,14 +102,14 @@ After reviewing all active lessons, you'll be asked about any tombstoned lessons
 **Question:** There are N tombstoned lessons. What would you like to do?
 
 **Options:**
-- Remove all tombstones permanently — deletes archived lessons (cannot be undone)
-- Let me review them individually — presents each tombstone for potential restoration or permanent removal
-- Keep them — preserves tombstones for historical reference
+- Remove all tombstones permanently, deletes archived lessons (cannot be undone)
+- Let me review them individually, presents each tombstone for potential restoration or permanent removal
+- Keep them, preserves tombstones for historical reference
 
 If you choose to review individually, each tombstoned lesson is presented with options to:
-- Restore — mark as `deleted: false` and add back to active lessons
-- Permanently remove — delete from archive (cannot be undone)
-- Skip — leave in archive
+- Restore, mark as `deleted: false` and add back to active lessons
+- Permanently remove, delete from archive (cannot be undone)
+- Skip, leave in archive
 
 ## Playbook regeneration
 
@@ -137,7 +137,7 @@ This summary confirms what changed and gives you confidence that the curation wa
 
 ## Tips
 
-- **Low-confidence lessons first** — the review order (lowest confidence first) helps you focus on lessons that need validation
-- **Be liberal with approval** — if a lesson is still correct, approve it. This builds signal about what's truly useful.
-- **Supersede instead of delete** — if a lesson is mostly right but needs an update, supersede it rather than deleting. This preserves the learning path.
-- **Regular curation** — run `/autocontext:review` weekly or after major changes to keep lessons fresh and accurate
+- **Low-confidence lessons first**, the review order (lowest confidence first) helps you focus on lessons that need validation
+- **Be liberal with approval**, if a lesson is still correct, approve it. This builds signal about what's truly useful.
+- **Supersede instead of delete**, if a lesson is mostly right but needs an update, supersede it rather than deleting. This preserves the learning path.
+- **Regular curation**, run `/autocontext:review` weekly or after major changes to keep lessons fresh and accurate

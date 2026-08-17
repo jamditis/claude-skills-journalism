@@ -438,7 +438,7 @@ Sentry.init({
 **Best for:** Session replay and understanding user behavior during errors
 
 **Overview:**
-LogRocket records everything users do—mouse movements, clicks, console logs, network requests—allowing you to replay sessions like a video.
+LogRocket records everything users do, mouse movements, clicks, console logs, network requests, allowing you to replay sessions like a video.
 
 **Key Features:**
 - **Session Replay:** Watch exact user interactions leading to errors

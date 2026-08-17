@@ -1,17 +1,17 @@
 ---
 name: free-apis-catalog
-description: Use when suggesting APIs for a project, looking for free data sources, building weekend projects that need external data, or when the user needs weather, news, finance, sports, ML, or entertainment data without paid subscriptions
+description: Curated free APIs with verified free-tier limits. Use when suggesting APIs or finding free weather, news, finance, or sports data.
 ---
 
 # Free APIs catalog (journalism-curated)
 
-A short list of free APIs that work for journalism, research, and weekend projects under current free-tier conditions. The value here is curation under verified 2026 free-tier limits — not coverage. For breadth, defer to the canonical aggregator below.
+A short list of free APIs that work for journalism, research, and weekend projects under current free-tier conditions. The value here is curation under verified 2026 free-tier limits, not coverage. For breadth, defer to the canonical aggregator below.
 
 ## Canonical breadth reference
 
 For a near-complete inventory of free public APIs across every category (1000+ entries, actively maintained), use:
 
-- **public-apis/public-apis on GitHub** — https://github.com/public-apis/public-apis
+- **public-apis/public-apis on GitHub**, https://github.com/public-apis/public-apis
 
 Not archived, last commit verified 2026-05-09, 4,600+ commits, 6,000+ merged PRs. When you need an API outside the categories below, search there first.
 
@@ -22,10 +22,10 @@ This skill curates the journalism-relevant subset.
 | API | Status | What to use instead |
 |---|---|---|
 | **IEX Cloud** | Fully retired 2024-08-31. https://iexcloud.org/ | Alpha Vantage, Tiingo IEX, Financial Modeling Prep, Polygon |
-| **CrowdTangle** | Sunset 2024-08-14 | Meta Content Library (academic/non-profit-research only — most journalists ineligible). https://transparency.meta.com/researchtools/meta-content-library/ |
+| **CrowdTangle** | Sunset 2024-08-14 | Meta Content Library (academic/non-profit-research only, most journalists ineligible). https://transparency.meta.com/researchtools/meta-content-library/ |
 | **ProPublica Congress API** | Retired 2024-07-10, repo archived. https://www.propublica.org/nerds/congress-api-update | api.congress.gov (Library of Congress, free with api.data.gov key) |
 | **X / Twitter API free tier** | Effectively eliminated for new developers as of Feb 2026; pay-per-use only. Uncertain on exact figures (provider pricing page returned 402). Treat as paid. | No free replacement; closest free alternatives are Bluesky Jetstream + Mastodon |
-| **Reddit API** | Free for research/non-commercial only since June 2023; paid for commercial use. https://www.reddit.com/wiki/api/ | (Same — usable for journalism research, prohibited for monetized products) |
+| **Reddit API** | Free for research/non-commercial only since June 2023; paid for commercial use. https://www.reddit.com/wiki/api/ | (Same, usable for journalism research, prohibited for monetized products) |
 | **Hugging Face Inference API** | Rebranded to Inference Providers (router across 20+ providers). Free users now get $0.10/month in credits, down from previous unmetered free tier for many models. https://huggingface.co/docs/inference-providers/pricing | Free tier still works for low-volume / embeddings; paid for production |
 
 ## Journalism-curated short list
@@ -40,16 +40,16 @@ All entries below verified against provider pages on 2026-05-09 unless marked **
 | [NewsAPI](https://newsapi.org/pricing) | 100 req/day, 24h delay, 1mo window, dev-only | Commercial use prohibited on free tier. Not usable in shipped products. |
 | [GNews](https://gnews.io/#pricing) | 100 req/day, 30d window, 12h delay, non-commercial | 10 articles/request cap. |
 | [Mediastack](https://mediastack.com/pricing) | 100 req/month, 30-min delay | Functionally a demo. |
-| [NYT Article Search / Top Stories](https://developer.nytimes.com/) | Free with key, daily cap (uncertain — verify) | Solid for archival queries. |
+| [NYT Article Search / Top Stories](https://developer.nytimes.com/) | Free with key, daily cap (uncertain, verify) | Solid for archival queries. |
 
 ### Social platforms (post-API-monetization landscape)
 
 | API | Free tier | Notes |
 |---|---|---|
-| [Bluesky Jetstream](https://docs.bsky.app/blog/jetstream) | Public WebSocket firehose, no auth | Real-time public-post stream. 4 official instances. Caveat: not formally part of AT Protocol — no long-term stability commitment. |
+| [Bluesky Jetstream](https://docs.bsky.app/blog/jetstream) | Public WebSocket firehose, no auth | Real-time public-post stream. 4 official instances. Caveat: not formally part of AT Protocol, no long-term stability commitment. |
 | [Bluesky AppView](https://docs.bsky.app/docs/advanced-guides/rate-limits) | Public read endpoints, 3000 req / 5min IP-based | Auth needed for write ops. Profiles, posts, search. |
-| [Mastodon](https://docs.joinmastodon.org/api/) | Per-instance, OAuth, public endpoints often unauth-readable | Federated — coverage is server-by-server. |
-| [Threads (Meta)](https://developers.facebook.com/docs/threads) | Free pricing not surfaced on docs page (uncertain — verify) | Read/post/reply/search/insights/webhooks. |
+| [Mastodon](https://docs.joinmastodon.org/api/) | Per-instance, OAuth, public endpoints often unauth-readable | Federated, coverage is server-by-server. |
+| [Threads (Meta)](https://developers.facebook.com/docs/threads) | Free pricing not surfaced on docs page (uncertain, verify) | Read/post/reply/search/insights/webhooks. |
 | [Reddit](https://www.reddit.com/wiki/api/) | 100 QPM authenticated, 10 QPM unauthenticated, non-commercial only | Adequate for OSINT/research, prohibited for monetized products. |
 | [Meta Content Library](https://transparency.meta.com/researchtools/meta-content-library/) | Academic / non-profit researchers only | Most journalists need a university partner to qualify. |
 | [TikTok Research API](https://developers.tiktok.com/products/research-api/) | Academic-affiliated researchers only | Same eligibility gate as MCL. |
@@ -61,11 +61,11 @@ All entries below verified against provider pages on 2026-05-09 unless marked **
 | [api.data.gov umbrella key](https://api.data.gov/) | One key for 25+ federal agencies, 450+ APIs | Gateway for NASA, NPS, NIH, USGS, FDA, EPA, LoC, etc. Use this first. |
 | [api.congress.gov](https://api.congress.gov/) | Free with api.data.gov key | Official Library of Congress legislative data. Replaces ProPublica Congress API. |
 | [GovInfo (GPO)](https://www.govinfo.gov/developers) | Uses api.data.gov key | Federal-publication search and full-text. New MCP server in public preview for LLM workflows. |
-| [OpenFEC](https://api.open.fec.gov/developers/) | Free, api.data.gov key | Campaign finance. (Page ECONNREFUSED on verification day — confirm rate limits live.) |
+| [OpenFEC](https://api.open.fec.gov/developers/) | Free, api.data.gov key | Campaign finance. (Page ECONNREFUSED on verification day, confirm rate limits live.) |
 | [Census API](https://api.census.gov/data.html) | Free, no documented rate limits | Demographic / economic data. |
-| [BLS](https://www.bls.gov/developers/) | 500 queries/day, 25 series/query with key (**uncertain** — page 403'd; verify) | Labor statistics. |
+| [BLS](https://www.bls.gov/developers/) | 500 queries/day, 25 series/query with key (**uncertain**, page 403'd; verify) | Labor statistics. |
 | [BEA](https://apps.bea.gov/api/signup/) | Free with key | National income & product accounts. |
-| [EPA Envirofacts](https://www.epa.gov/enviro/envirofacts-data-service-api) | Free, no auth | TRI, Superfund, ECHO, RCRAInfo, SDWIS, GHG, RadNet, FRS — ~20 EPA programs. |
+| [EPA Envirofacts](https://www.epa.gov/enviro/envirofacts-data-service-api) | Free, no auth | TRI, Superfund, ECHO, RCRAInfo, SDWIS, GHG, RadNet, FRS, ~20 EPA programs. |
 | [USGS earthquakes](https://earthquake.usgs.gov/fdsnws/event/1/) | Free, no auth | Real-time + historical earthquake events. GeoJSON / QuakeML / CSV. |
 
 ### Weather / climate
@@ -80,9 +80,9 @@ All entries below verified against provider pages on 2026-05-09 unless marked **
 
 | API | Free tier | Notes |
 |---|---|---|
-| [FRED (St. Louis Fed)](https://fred.stlouisfed.org/docs/api/fred/) | Free with key (**uncertain** — page 403'd; verify limits) | Primary reference for US macro data. |
+| [FRED (St. Louis Fed)](https://fred.stlouisfed.org/docs/api/fred/) | Free with key (**uncertain**, page 403'd; verify limits) | Primary reference for US macro data. |
 | [CoinGecko Demo](https://www.coingecko.com/en/api/pricing) | 10k calls/mo, 30/min, free with key | Attribution required. |
-| [Alpha Vantage](https://www.alphavantage.co/support/#api-key) | 25 requests/day | Free tier is now a demo, not a usable journalism data source. Migration target for IEX Cloud users — but expect to need a paid tier for any real workload. |
+| [Alpha Vantage](https://www.alphavantage.co/support/#api-key) | 25 requests/day | Free tier is now a demo, not a usable journalism data source. Migration target for IEX Cloud users, but expect to need a paid tier for any real workload. |
 | [Financial Modeling Prep](https://site.financialmodelingprep.com/) | Free tier exists, paid for production | IEX Cloud successor. |
 
 ### Archive / preservation
@@ -90,7 +90,7 @@ All entries below verified against provider pages on 2026-05-09 unless marked **
 | API | Free tier | Notes |
 |---|---|---|
 | [Wayback Machine](https://archive.org/help/wayback_api.php) | Free | Availability JSON, Memento, CDX server. Save Page Now exposes programmatic submit. |
-| archive.today | Programmatic submit available; no public API docs (uncertain — WebFetch blocked) | Useful for redundancy alongside Wayback. Verify endpoint by direct curl. |
+| archive.today | Programmatic submit available; no public API docs (uncertain, WebFetch blocked) | Useful for redundancy alongside Wayback. Verify endpoint by direct curl. |
 
 ### AI / ML
 
@@ -128,7 +128,7 @@ When picking an API for a journalism project, check three things on the provider
 
 ## Usage tip
 
-For any new project needing external data: check the journalism-curated list above first. If nothing fits, search public-apis/public-apis. Feed candidate API docs to an agent along with your specific use case — it'll spot rate-limit / commercial-use traps that a casual read would miss.
+For any new project needing external data: check the journalism-curated list above first. If nothing fits, search public-apis/public-apis. Feed candidate API docs to an agent along with your specific use case, it'll spot rate-limit / commercial-use traps that a casual read would miss.
 
 ## Last currency sweep
 

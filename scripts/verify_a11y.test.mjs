@@ -2,8 +2,8 @@
 //
 // Regression coverage for issue #121: the old readiness check used global fetch
 // (undici) and left the response body unconsumed, which intermittently crashed
-// the run with `assert(!this.paused)`. waitForPort uses a raw TCP connect — no
-// body, no connection pool — so that failure class is gone. These tests pin the
+// the run with `assert(!this.paused)`. waitForPort uses a raw TCP connect, no
+// body, no connection pool, so that failure class is gone. These tests pin the
 // probe's contract and stress the path that used to crash.
 //
 // They deliberately never free a local port and reuse it: that races the OS

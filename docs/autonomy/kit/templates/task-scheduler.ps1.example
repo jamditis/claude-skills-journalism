@@ -1,16 +1,16 @@
 # Task Scheduler registration for the issue workhorse (Windows, PowerShell).
 #
 # RECOMMENDED WINDOWS PATH: run the loop inside WSL, not native Task Scheduler.
-# WSL reuses the exact Linux primitives this kit was tested on — cron, GNU
-# `timeout --foreground`, tmux — so it's the lower-risk setup by a wide margin.
+# WSL reuses the exact Linux primitives this kit was tested on, cron, GNU
+# `timeout --foreground`, tmux, so it's the lower-risk setup by a wide margin.
 # Install a WSL distro, then follow the Linux recipe (crontab.example) inside it.
 #
 # One WSL gotcha: the distro's lightweight VM shuts down when nothing is holding
-# it open, and cron does not auto-start — so a crontab alone won't survive a
+# it open, and cron does not auto-start, so a crontab alone won't survive a
 # reboot or an idle WSL shutdown. Two one-time steps fix it:
 #   1. Inside WSL, run cron under systemd:  set [boot] systemd=true in
 #      /etc/wsl.conf, `wsl --shutdown` once, then `sudo systemctl enable --now cron`.
-#   2. On Windows, add a Task Scheduler task "At log on" that boots the distro —
+#   2. On Windows, add a Task Scheduler task "At log on" that boots the distro,
 #      e.g. action `wsl.exe` with arguments `-d <distro> -u root service cron start`
 #      (or `-d <distro> --exec true` just to start the VM). Without this the hourly
 #      wake won't fire until someone opens WSL by hand.
@@ -19,8 +19,8 @@
 #
 # Untested as of this version: only the Linux path has been run end to end. This
 # script is reasoned from the same design but not yet verified on Windows.
-# Register it against a throwaway issue and watch one wake complete — including
-# the hard-timeout kill — before you trust it.
+# Register it against a throwaway issue and watch one wake complete, including
+# the hard-timeout kill, before you trust it.
 #
 # Run once from an elevated PowerShell. Edit the paths and hours first. Check it
 # took with:  Get-ScheduledTask -TaskName "AutonomyWake"
@@ -41,7 +41,7 @@
 #   $job = Start-Job {
 #       & $using:python $using:wake
 #       # A job reaches 'Completed' even when the child exits non-zero, so turn a
-#       # bad exit into a terminating error the parent can re-raise — otherwise a
+#       # bad exit into a terminating error the parent can re-raise, otherwise a
 #       # failed wake (bad creds, wrong path, crashed session) is logged as a
 #       # successful run and you never find out.
 #       if ($LASTEXITCODE -ne 0) { throw "wake exited $LASTEXITCODE" }
@@ -60,7 +60,7 @@
 #   }
 #   Remove-Job $job -Force
 #
-# A job + Stop-Job is not a perfect process-tree kill — verify on a deliberately
+# A job + Stop-Job is not a perfect process-tree kill, verify on a deliberately
 # hung session that the child python actually dies and the log isn't zero-byte
 # before you rely on it.
 
@@ -74,14 +74,14 @@ $taskName = "AutonomyWake"
 # Interval (PT1H = every hour), and Duration (PT12H = the active window).
 #
 # This uses Register-ScheduledTask -Xml, the form Microsoft documents. The older
-# idiom — assigning .Repetition from a throwaway -Once trigger onto a -Daily
-# trigger object — is widely copied but undocumented for daily triggers and has
+# idiom, assigning .Repetition from a throwaway -Once trigger onto a -Daily
+# trigger object, is widely copied but undocumented for daily triggers and has
 # been observed not to repeat. <Repetition> inside <CalendarTrigger> below is the
 # documented equivalent. The action runs powershell.exe against the wrapper, so
 # the hard timeout in step 1 actually bounds every wake.
 #
 # Element order matters: the XSD fixes the trigger sequence as Enabled,
-# StartBoundary, Repetition, then ScheduleByDay — out-of-order children make
+# StartBoundary, Repetition, then ScheduleByDay, out-of-order children make
 # Register-ScheduledTask reject the whole task. The <Principal id="Author"> has
 # to match Actions Context="Author" for the same reason (an action context that
 # names no defined principal is a validation error, not a silent default).

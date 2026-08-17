@@ -61,8 +61,8 @@ parser hardening with required CI coverage.
   labeling via IPTC `DigitalSourceType` (full controlled vocabulary, with the
   `trainedAlgorithmicMedia` / `compositeWithTrainedAlgorithmicMedia` /
   `compositeSynthetic` distinctions and the IPTC 2025.1 AI-system/prompt fields);
-  a C2PA / Content Credentials section (exiftool reads but cannot sign — use
-  `c2patool` / `verify.contentauthenticity.org` — with cautions that a credential
+  a C2PA / Content Credentials section (exiftool reads but cannot sign, use
+  `c2patool` / `verify.contentauthenticity.org`, with cautions that a credential
   proves a signature, not truth); GPS-stripping guidance and an `embed.py
   --strip-gps` flag for source protection; Google Images "Licensable" fields
   (`xmpRights:WebStatement` + PLUS `Licensor*`); an XMP-first framing with a
@@ -215,19 +215,19 @@ The bundling milestone: every skill in the repo now lives inside a registered pl
 
 ### Added
 
-- **journalism-core plugin v1.1.0 (#60, #61)**: 13 skills — `ai-writing-detox`, `crisis-communications`, `data-journalism`, `editorial-workflow`, `fact-check-workflow`, `foia-requests`, `interview-prep`, `interview-transcription`, `newsletter-publishing`, `newsroom-style`, `social-media-intelligence`, `source-verification`, `story-pitch`. Phase 2 (#61) absorbed `data-journalism` and `social-media-intelligence` from the bare-skill set.
-- **research-toolkit plugin v1.1.0 (#62, #69)**: 6 skills — `academic-writing`, `content-access`, `digital-archive`, `free-apis-catalog`, `page-monitoring`, `web-archiving`. v1.1.0 (#69) absorbed `free-apis-catalog` from the bare-skill set.
-- **dev-toolkit plugin v1.0.0 (#63)**: 10 skills — `accessibility-compliance`, `electron-dev`, `mobile-debugging`, `one-way-door`, `python-pipeline`, `test-first-bugs`, `vibe-coding`, `web-scraping`, `web-ui-best-practices`, `zero-build-frontend`.
-- **security-toolkit plugin v1.0.0 (#64)**: 3 skills — `api-hardening`, `secure-auth`, `security-checklist`. Includes 2026 currency sweep aligned to OWASP Top 10:2025, NIST SP 800-63B-4, OAuth 2.1, WebAuthn L3.
-- **project-templates-toolkit plugin v1.0.0 (#68)**: 3 skills — `project-memory`, `project-retrospective`, `template-selector`.
+- **journalism-core plugin v1.1.0 (#60, #61)**: 13 skills, `ai-writing-detox`, `crisis-communications`, `data-journalism`, `editorial-workflow`, `fact-check-workflow`, `foia-requests`, `interview-prep`, `interview-transcription`, `newsletter-publishing`, `newsroom-style`, `social-media-intelligence`, `source-verification`, `story-pitch`. Phase 2 (#61) absorbed `data-journalism` and `social-media-intelligence` from the bare-skill set.
+- **research-toolkit plugin v1.1.0 (#62, #69)**: 6 skills, `academic-writing`, `content-access`, `digital-archive`, `free-apis-catalog`, `page-monitoring`, `web-archiving`. v1.1.0 (#69) absorbed `free-apis-catalog` from the bare-skill set.
+- **dev-toolkit plugin v1.0.0 (#63)**: 10 skills, `accessibility-compliance`, `electron-dev`, `mobile-debugging`, `one-way-door`, `python-pipeline`, `test-first-bugs`, `vibe-coding`, `web-scraping`, `web-ui-best-practices`, `zero-build-frontend`.
+- **security-toolkit plugin v1.0.0 (#64)**: 3 skills, `api-hardening`, `secure-auth`, `security-checklist`. Includes 2026 currency sweep aligned to OWASP Top 10:2025, NIST SP 800-63B-4, OAuth 2.1, WebAuthn L3.
+- **project-templates-toolkit plugin v1.0.0 (#68)**: 3 skills, `project-memory`, `project-retrospective`, `template-selector`.
 - **visual-explainer plugin (#68 registration)**: registered in marketplace.json alongside the v0.7.1 backport (#66) that pulled in the upstream nicobailon/visual-explainer fork while preserving journalism overlays.
 
 ### Changed
 
 - **Currency sweeps across multiple skills** (Phase 3 #62, Phase 5 #64, Phase 6c #67): updated `data-journalism`, `social-media-intelligence`, `source-verification`, `web-archiving`, `page-monitoring`, `api-hardening`, `secure-auth`, `security-checklist`, `project-memory`, `project-retrospective`, `free-apis-catalog` against authoritative 2026 sources (NIST, IETF, W3C, OWASP, vendor docs, CVE DBs).
 - **visual-explainer backported v0.1.0 → upstream v0.7.1 (#66)**: pulled in the upstream nicobailon/visual-explainer fork at v0.7.1, preserved the journalism-specific palette and design sensibilities as overlays.
-- **Docs site sweep (#71)**: 36 landing pages updated for the bundling reorg — install snippets switched from `cp -r <skill>` to the plugin-install pattern with the new plugin-nested bare path as a fallback. 41 GitHub tree links rewritten to the new paths. 28 pages got real `<meta name="description">` tags sourced from each SKILL.md frontmatter (previously many had placeholder OG descriptions like "A Claude Code skill for X"). 5 pages had lead-paragraph drift fixed against their SKILL.md.
-- **project-memory language drift fix (this release)**: SKILL.md body lines 8 and 140, plus `docs/project-memory/index.html` lines 237 and 381, now consistently use "institutional knowledge" — matching the canonical phrasing from the SKILL.md frontmatter description (which already used that phrasing after Phase 6c). Closes the last drift loose-thread from PR #71.
+- **Docs site sweep (#71)**: 36 landing pages updated for the bundling reorg, install snippets switched from `cp -r <skill>` to the plugin-install pattern with the new plugin-nested bare path as a fallback. 41 GitHub tree links rewritten to the new paths. 28 pages got real `<meta name="description">` tags sourced from each SKILL.md frontmatter (previously many had placeholder OG descriptions like "A Claude Code skill for X"). 5 pages had lead-paragraph drift fixed against their SKILL.md.
+- **project-memory language drift fix (this release)**: SKILL.md body lines 8 and 140, plus `docs/project-memory/index.html` lines 237 and 381, now consistently use "institutional knowledge", matching the canonical phrasing from the SKILL.md frontmatter description (which already used that phrasing after Phase 6c). Closes the last drift loose-thread from PR #71.
 
 ### Fixed
 
@@ -237,7 +237,7 @@ The bundling milestone: every skill in the repo now lives inside a registered pl
 
 ### Changed
 
-- **superjawn v1.0.0 — standalone (#58)**: decouples superjawn's runtime dispatch from the upstream `superpowers` plugin. The four `superpowers:code-reviewer` agent dispatches that v0.6.0 left in place (three in `requesting-code-review/SKILL.md`, one in `subagent-driven-development/code-quality-reviewer-prompt.md`) now target `pr-review-toolkit:code-reviewer`, an Anthropic-maintained agent in `@claude-code-plugins`. After this release, no skill in `superjawn` requires the upstream `superpowers` plugin to be installed. The original "≥2 weeks of real use" readiness gate is waived ahead of ship; reinstall path for the upstream plugin is `/plugin install superpowers@claude-plugins-official`. Manifest: `requesting-code-review` drops `skill_md_parity` from `true` to `false` (the rewrite breaks byte-identity); `subagent-driven-development` adds a `supporting_file_overrides` entry for `code-quality-reviewer-prompt.md`. Three documentation example mentions of `superpowers:code-reviewer` in `using-superjawn/references/{codex,copilot}-tools.md` are intentionally preserved as references to upstream's canonical agent name.
+- **superjawn v1.0.0, standalone (#58)**: decouples superjawn's runtime dispatch from the upstream `superpowers` plugin. The four `superpowers:code-reviewer` agent dispatches that v0.6.0 left in place (three in `requesting-code-review/SKILL.md`, one in `subagent-driven-development/code-quality-reviewer-prompt.md`) now target `pr-review-toolkit:code-reviewer`, an Anthropic-maintained agent in `@claude-code-plugins`. After this release, no skill in `superjawn` requires the upstream `superpowers` plugin to be installed. The original "≥2 weeks of real use" readiness gate is waived ahead of ship; reinstall path for the upstream plugin is `/plugin install superpowers@claude-plugins-official`. Manifest: `requesting-code-review` drops `skill_md_parity` from `true` to `false` (the rewrite breaks byte-identity); `subagent-driven-development` adds a `supporting_file_overrides` entry for `code-quality-reviewer-prompt.md`. Three documentation example mentions of `superpowers:code-reviewer` in `using-superjawn/references/{codex,copilot}-tools.md` are intentionally preserved as references to upstream's canonical agent name.
 - **persistent-sessions guide expanded (#57)**: promotes the SSH path to first-class alongside Cockpit in the auto-attach step, marks the Cockpit `IdleTimeout` step as Cockpit-only with an anchor link, adds an "Installing tmux" table covering Debian/Ubuntu, Fedora/RHEL, Arch, openSUSE, Alpine, macOS, FreeBSD, and WSL2 (plus notes on Windows-as-server and macOS-as-server), and adds a "Connecting from different devices" section covering macOS, Windows, Linux, iOS/iPadOS, Android, ChromeOS, Cockpit, and mosh. Notes the Ctrl-prefix alternative for mobile keyboards and updates the CTA so it no longer claims the skill requires Cockpit.
 - **Marketplace landing page: superjawn card refreshed**. The featured-plugin card on `docs/index.html` previously read "v0.6.0 ships all 14 skills; v1.0.0 (disabling the upstream plugin) gates on 2 weeks of real use." Now reads as the v1.0.0 standalone description, matching `docs/superjawn/index.html` (which was updated in PR #58).
 
@@ -250,18 +250,18 @@ The bundling milestone: every skill in the repo now lives inside a registered pl
 
 ### Added
 
-- **superjawn v0.6.0 — feature-complete (#46, #48)**: all 14 skills now ported across five batches. Final batch (Batch 5) brings `finishing-a-development-branch`, `using-superjawn` (the bootstrap skill, ported from upstream `using-superpowers` so the directory + frontmatter `name:` field match the local plugin's identity), and the writing-skills triad. Earlier in the window: Batch 3 added the `code-review` pair plus the validator script (`#36` series), Batch 4 added parallel execution and `using-git-worktrees` (`#46`).
+- **superjawn v0.6.0, feature-complete (#46, #48)**: all 14 skills now ported across five batches. Final batch (Batch 5) brings `finishing-a-development-branch`, `using-superjawn` (the bootstrap skill, ported from upstream `using-superpowers` so the directory + frontmatter `name:` field match the local plugin's identity), and the writing-skills triad. Earlier in the window: Batch 3 added the `code-review` pair plus the validator script (`#36` series), Batch 4 added parallel execution and `using-git-worktrees` (`#46`).
 - **Validator support for renamed ports (#48)**: `superjawn/scripts/validate-skill.sh` now reads an optional `upstream_name:` field from `superjawn/skills-manifest.json` so renamed ports (`using-superjawn` ← `using-superpowers`) pass parity checks against the upstream skill of record.
 
 ### Fixed
 
 - **CVE chain cleared by removing `puppeteer-core` (#41, #50)**: the dependency was never imported anywhere in the repo. Removing it eliminated GHSA-5rq4-664w-9x2c (path traversal) and GHSA-6v7q-wjvx-w8wg (CRLF injection) and shrank the install footprint substantially. `playwright` remains for the small number of scripts that actually use a browser.
-- **`single-file-cli` removed (#51, #53)**: same pattern — declared but unused. Its removal dropped the dependency tree from ~80 packages to 5 and cleared GHSA-rp42-5vxx-qpwr, GHSA-rpmf-866q-6p89 (DoS), and GHSA-v2v4-37r5-5v8g (XSS). `npm audit` now reports zero vulnerabilities.
+- **`single-file-cli` removed (#51, #53)**: same pattern, declared but unused. Its removal dropped the dependency tree from ~80 packages to 5 and cleared GHSA-rp42-5vxx-qpwr, GHSA-rpmf-866q-6p89 (DoS), and GHSA-v2v4-37r5-5v8g (XSS). `npm audit` now reports zero vulnerabilities.
 
 ### Changed
 
-- **CI: `actions/checkout` v4 → v6 (#27, #54)**: aligns with GitHub Actions runner deprecations around Node.js 20 (warnings 2026-06-02, hard fail 2026-09-16). Both `lint-skills` and `check-readme` jobs run under v6. The workflow's `paths:` filter includes itself, so the bump verified itself on the PR under the new pin — no separate dispatch needed.
-- **Featured plugin on the landing page: autocontext → superjawn (#52)**: the hero slot now showcases superjawn v0.6.0 with a "New in v0.6.0" pill, headline "Skills that do their homework first.", and a copy block pitching the research-augmented fork plus the default-on research phase. autocontext stays in the plugin grid below — only the hero rotates.
+- **CI: `actions/checkout` v4 → v6 (#27, #54)**: aligns with GitHub Actions runner deprecations around Node.js 20 (warnings 2026-06-02, hard fail 2026-09-16). Both `lint-skills` and `check-readme` jobs run under v6. The workflow's `paths:` filter includes itself, so the bump verified itself on the PR under the new pin, no separate dispatch needed.
+- **Featured plugin on the landing page: autocontext → superjawn (#52)**: the hero slot now showcases superjawn v0.6.0 with a "New in v0.6.0" pill, headline "Skills that do their homework first.", and a copy block pitching the research-augmented fork plus the default-on research phase. autocontext stays in the plugin grid below, only the hero rotates.
 - **README: plugin table expanded** to list all four marketplace plugins (`autocontext`, `pdf-design`, `pdf-playground`, `superjawn`). Previously listed only `pdf-playground`.
 - **Docs: skill and hook counts corrected.** Landing page hero badge, OG/Twitter descriptions, and JSON-LD schema now report 39 skills + 14 hooks (was a mix of 31/37 skills and 11/14 hooks across stale fields). `CLAUDE.md` directory tree now reads "14 hooks" instead of "13."
 
@@ -269,7 +269,7 @@ The bundling milestone: every skill in the repo now lives inside a registered pl
 
 ### Added
 
-- **superjawn plugin (#34, #35, #36, #37)** — new plugin at v0.3.0. Research-augmented fork of [obra/superpowers](https://github.com/obra/superpowers) v5.0.7 (MIT, dual-copyright Vincent 2025 / Amditis 2026) with a default-on research phase at entry-point stages: web search, codebase prior-bugs (`git log --grep`), authoritative docs, and memory check before Claude commits to a direction. Three categories:
+- **superjawn plugin (#34, #35, #36, #37)**, new plugin at v0.3.0. Research-augmented fork of [obra/superpowers](https://github.com/obra/superpowers) v5.0.7 (MIT, dual-copyright Vincent 2025 / Amditis 2026) with a default-on research phase at entry-point stages: web search, codebase prior-bugs (`git log --grep`), authoritative docs, and memory check before Claude commits to a direction. Three categories:
   - **Research** (entry points where work originates without an upstream artifact): `brainstorming`, `systematic-debugging`. Research phase fires by default.
   - **Freshness check** (stale-artifact consumers): `executing-plans`. Default-skip; fires only when a trigger indicates real drift risk (cross-session execution, external API touched, working on master/main).
   - **Consumer** (trust the upstream-artifact handoff): `writing-plans`, `test-driven-development`, `verification-before-completion`.
@@ -281,7 +281,7 @@ The bundling milestone: every skill in the repo now lives inside a registered pl
 ### Fixed
 
 - **autocontext slash commands (#26)**: Claude Code's plugin-namespaced commands use colons (`/autocontext:review`), not hyphens. INSTALL.md, CLAUDE.md, and the docs site updated to match actual invocation.
-- **WCAG 2.2 AA pass across all 45 docs/ pages (#40)**: 86 violations to 0 — alt text, heading order, color contrast, focus-visible, link purpose. Validated with axe-core via Playwright.
+- **WCAG 2.2 AA pass across all 45 docs/ pages (#40)**: 86 violations to 0, alt text, heading order, color contrast, focus-visible, link purpose. Validated with axe-core via Playwright.
 - **Plugin grid layout (#38)**: docs landing page plugin grid bumped from 3 columns to 4 so the fourth card (superjawn) doesn't strand on its own row.
 - **Marketplace version sync (#33, #39)**: `marketplace.json` plugin entries are now kept in sync with each plugin's individual `plugin.json` version. Closes the drift surfaced by issue #33.
 
@@ -300,10 +300,10 @@ The bundling milestone: every skill in the repo now lives inside a registered pl
 ### Added
 - **pdf-playground v1.3.1**: `session-start.sh` hook that checks GitHub for a newer plugin version and prints a one-line warning if the installed copy is behind
   - Fetches `.claude-plugin/plugin.json` from the repo's `master` branch (raw.githubusercontent.com) and compares with `sort -V` for correct semver ordering
-  - Rate-limited to once per 24 hours via `$XDG_CACHE_HOME/pdf-playground/last-version-check` when set, or `~/.cache/pdf-playground/last-version-check` otherwise. Applies to failed checks too — an offline host gets rate-limited the same way a successful one does
-  - 3-second network timeout and silent failure on any error — a missing curl/jq, offline host, or GitHub outage never delays or pollutes session start
+  - Rate-limited to once per 24 hours via `$XDG_CACHE_HOME/pdf-playground/last-version-check` when set, or `~/.cache/pdf-playground/last-version-check` otherwise. Applies to failed checks too, an offline host gets rate-limited the same way a successful one does
+  - 3-second network timeout and silent failure on any error, a missing curl/jq, offline host, or GitHub outage never delays or pollutes session start
   - Points users at `/pdf-playground:update` to pull the new version
-  - First proactive update nudge for the plugin — previously users had to remember to run the update command themselves
+  - First proactive update nudge for the plugin, previously users had to remember to run the update command themselves
 
 ## [1.6.0] - 2026-04-14
 
@@ -312,7 +312,7 @@ The bundling milestone: every skill in the repo now lives inside a registered pl
   - New `.slide-hero` layout: full-bleed photo background with right-aligned headline and red branded footer bar. Includes a `.slide-closing` variant with left-aligned headline and tightened subtitle for "Ready on [date]" close slides
   - New `.slide-section.with-photo` layout: photo-background section divider with a red section chip ("Section 8.1") for decks that mirror numbered documents like RFP responses
   - New `.three-col` layout: three text columns with dashed dividers for breaking a topic into parallel facets
-  - New `.four-col-tiles` layout: four numbered pillar cards with red top rule and short descriptions — for parallel capabilities or themes
+  - New `.four-col-tiles` layout: four numbered pillar cards with red top rule and short descriptions, for parallel capabilities or themes
   - New `.stats-strip` layout: row of big numbers with small captions, each with a red left rule. Column count configurable via `--stat-cols` custom property
   - New `.slide-table` layout: comparison/budget table with red header row, gray label column, grid rules
   - New `.partner-grid` layout: 4-column grid of labeled tiles with red left accent bar for sponsor lists and letters of support
@@ -320,7 +320,7 @@ The bundling milestone: every skill in the repo now lives inside a registered pl
   - Montserrat added to the font stack alongside Playfair Display + Source Sans 3. Switch via `--font-heading` and `--font-body` CSS variables
 - **pdf-design v1.1.0**: Reusable content blocks section added to SKILL.md
   - Stats strip, three-column, four-tile pillars, and partner grid patterns documented as drop-in blocks for report and proposal pages
-  - Vertical rhythm guidelines added — tighter spacing is a feature, not a bug
+  - Vertical rhythm guidelines added, tighter spacing is a feature, not a bug
 
 ### Changed
 - **pdf-playground v1.3.0**: Tighter vertical rhythm throughout content slides
@@ -335,7 +335,7 @@ The bundling milestone: every skill in the repo now lives inside a registered pl
 ### Changed
 - **pdf-playground v1.2.0**: Footer clearance overhaul across all templates
   - All document templates (one-pager, report, proposal, slides, event) now use CSS Grid `grid-template-rows: auto 1fr auto` instead of absolute-positioned footers
-  - Footers are in normal document flow as the third grid row — no more fragile `calc()` with hardcoded header/footer heights
+  - Footers are in normal document flow as the third grid row, no more fragile `calc()` with hardcoded header/footer heights
   - Content areas have `overflow: hidden` to prevent text bleeding into the footer zone
   - All 5 document commands updated with footer clearance verification rules
   - Document-design skill updated with the grid layout pattern and safeguards
@@ -381,7 +381,7 @@ The bundling milestone: every skill in the repo now lives inside a registered pl
 New skills, new plugin, and new docs pages added since v1.2.0.
 
 ### Added
-- **`autocontext` plugin** — cross-session knowledge persistence for Claude Code
+- **`autocontext` plugin**, cross-session knowledge persistence for Claude Code
   - 5 hooks: SessionStart (load + curate), PreToolUse (warn on mistakes), UserPromptSubmit (detect corrections), PostToolUse (performance + test quality), SessionEnd (persist)
   - 4 slash commands: `/autocontext-setup`, `/autocontext-init`, `/autocontext-review`, `/autocontext-status`
   - Curator agent for lesson validation
@@ -390,12 +390,12 @@ New skills, new plugin, and new docs pages added since v1.2.0.
   - Cross-developer sharing via git with custom merge driver
   - Built-in test quality rules (tautological tests, bare assertions, happy-path-only, mock-as-assertion)
   - Landing page at `skills.amditis.tech/autocontext/` with interactive lesson lifecycle demo
-- `visual-explainer` skill — HTML diagrams, data tables, architecture views (adapted from nicobailon/visual-explainer)
-- `web-ui-best-practices` skill — signs of taste in web UI design
-- `nano-banana-image-gen` skill — Gemini image generation model selection, visual grounding, cost optimization
-- `free-apis-catalog` skill — 1000+ categorized free public APIs
-- `animated-sprite-gen` skill — AI-generated animated sprite sheets for 2D games
-- `persistent-sessions` guide — tmux configuration for long-running Claude Code sessions
+- `visual-explainer` skill, HTML diagrams, data tables, architecture views (adapted from nicobailon/visual-explainer)
+- `web-ui-best-practices` skill, signs of taste in web UI design
+- `nano-banana-image-gen` skill, Gemini image generation model selection, visual grounding, cost optimization
+- `free-apis-catalog` skill, 1000+ categorized free public APIs
+- `animated-sprite-gen` skill, AI-generated animated sprite sheets for 2D games
+- `persistent-sessions` guide, tmux configuration for long-running Claude Code sessions
 - Docs pages for visual-explainer, web-ui-best-practices, animated-sprite-gen
 - Support/sponsor buttons in site footer
 
@@ -413,8 +413,8 @@ New skills, new plugin, and new docs pages added since v1.2.0.
 Added the one-way door check skill and hook, plus a flagship documentation page. Set up custom domain `skills.amditis.tech`.
 
 ### Added
-- `one-way-door` skill — flag irreversible architectural decisions (data models, infra, auth, APIs, events, CI/CD, dependencies, cloud configs) before committing
-- `one-way-door-check` hook — PreToolUse hook that blocks Write calls for one-way-door file patterns and forces a trade-off discussion
+- `one-way-door` skill, flag irreversible architectural decisions (data models, infra, auth, APIs, events, CI/CD, dependencies, cloud configs) before committing
+- `one-way-door-check` hook, PreToolUse hook that blocks Write calls for one-way-door file patterns and forces a trade-off discussion
 - Flagship page at `skills.amditis.tech/one-way-door/` with amber/gold design, SVG grid hero, 8-category grid, workflow phases, and hook code
 - Custom domain `skills.amditis.tech` via Cloudflare CNAME
 - Development hooks category on the homepage (one-way-door-check, bug-report-detector, enforce-test-first)
@@ -430,10 +430,10 @@ Added the one-way door check skill and hook, plus a flagship documentation page.
 Update awareness and version checking for PDF Playground.
 
 ### Added
-- **`/pdf-playground:update` command** — checks the installed version and runs the update
-- **Pre-flight check in preview** — verifies control panel files exist before starting; warns if the plugin is outdated
-- **Version check in all document commands** — reads `plugin.json` at startup to detect installation problems
-- **Updating section in README** — instructions for updating the plugin and signs you need an update
+- **`/pdf-playground:update` command**, checks the installed version and runs the update
+- **Pre-flight check in preview**, verifies control panel files exist before starting; warns if the plugin is outdated
+- **Version check in all document commands**, reads `plugin.json` at startup to detect installation problems
+- **Updating section in README**, instructions for updating the plugin and signs you need an update
 
 ### Changed
 - Bumped `plugin.json` version from 1.0.0 to 1.1.1
@@ -447,7 +447,7 @@ Update awareness and version checking for PDF Playground.
 Interactive control panel and guided wizard for PDF Playground.
 
 ### Added
-- **Interactive control panel** — a sidebar that sits alongside your document for live design editing
+- **Interactive control panel**, a sidebar that sits alongside your document for live design editing
   - 5 color theme presets (CCM brand, Professional blue, Modern green, Warm earth, Elegant purple)
   - 7 color pickers for CSS variables (primary, dark, text, heading, background, accent, gray)
   - Font dropdowns for heading and body (any Google Font, loaded dynamically)
@@ -457,21 +457,21 @@ Interactive control panel and guided wizard for PDF Playground.
   - Undo/redo for all changes
   - "Copy changes" button generates a prompt you can paste back into Claude Code
   - Collapsible sidebar with vertical tab when minimized
-- **Iframe-based preview architecture** — document lives in an iframe, controls in a wrapper page
+- **Iframe-based preview architecture**, document lives in an iframe, controls in a wrapper page
   - Scales with browser window via CSS `clamp()` and flexbox
-  - No script injection needed — the wrapper handles everything
+  - No script injection needed, the wrapper handles everything
   - Document HTML stays completely unchanged for clean PDF export
   - No re-injection after page refresh
-- **Guided proposal wizard** — AskUserQuestion-driven setup with 4 phases
+- **Guided proposal wizard**, AskUserQuestion-driven setup with 4 phases
   - Phase 1 (Content): proposal type, sections, page count, budget items
   - Phase 2 (Design): color scheme, typography, visual style
   - Phase 3 (Review): live preview with control panel, screenshot, iterate
   - Phase 4 (Finalization): save, export, or continue editing
-- **Prompt generator** — tracks changes and generates copyable prompts
+- **Prompt generator**, tracks changes and generates copyable prompts
   - Deduplicates by type+label (same slider moved twice = one change)
   - Skips no-op changes (e.g. background #ffffff to #ffffff)
   - Generates numbered lists for multiple changes
-- **Template map system** — data-driven control panel configuration
+- **Template map system**, data-driven control panel configuration
   - `proposal.js` maps all CSS variables and selectors for the proposal template
   - New templates just need a map file (see `controls/template-maps/README.md`)
 - New files: `controls/control-panel.js`, `controls/control-panel.css`, `controls/playground-wrapper.html`, `controls/prompt-generator.js`, `controls/template-maps/proposal.js`, `controls/template-maps/README.md`

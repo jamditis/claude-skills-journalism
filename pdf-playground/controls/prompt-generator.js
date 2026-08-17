@@ -1,5 +1,5 @@
 /**
- * PDF Playground — Prompt generator
+ * PDF Playground, Prompt generator
  *
  * Tracks design changes made through the control panel and generates
  * Claude Code prompts that can be pasted back to apply those changes
@@ -145,7 +145,7 @@
         document.execCommand("copy");
         showToast("Copied " + pending.size + " change" + (pending.size === 1 ? "" : "s") + " to clipboard");
       } catch (_) {
-        showToast("Copy failed — select and copy manually");
+        showToast("Copy failed, select and copy manually");
       }
       document.body.removeChild(ta);
     });

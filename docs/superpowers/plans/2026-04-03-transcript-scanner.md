@@ -6,7 +6,7 @@
 
 **Architecture:** Standalone Python script (`transcript-scanner.py`) reads Claude Code session JSONL transcripts and returns structured activity signals as JSON. The existing `session-end.sh` Stop hook calls this script before doing any lesson validation work and exits early if no meaningful activity is detected (with a 10-minute time fallback).
 
-**Tech Stack:** Python 3 (stdlib only — json, argparse, os, sys, time), bash
+**Tech Stack:** Python 3 (stdlib only, json, argparse, os, sys, time), bash
 
 ---
 
@@ -159,12 +159,12 @@ TESTEOF
 chmod +x /tmp/test-transcript-scanner.sh
 ```
 
-Note: the test script does not `exit 1` on failure here — it uses the exit code from `[[ "$FAIL" -eq 0 ]]` so the script can be appended to in Task 2.
+Note: the test script does not `exit 1` on failure here, it uses the exit code from `[[ "$FAIL" -eq 0 ]]` so the script can be appended to in Task 2.
 
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `cd /home/jamditis/projects/claude-skills-journalism && bash /tmp/test-transcript-scanner.sh`
-Expected: FAIL — `transcript-scanner.py` doesn't exist yet.
+Expected: FAIL, `transcript-scanner.py` doesn't exist yet.
 
 - [ ] **Step 3: Write the scanner implementation**
 
@@ -347,7 +347,7 @@ def scan_transcript(transcript_path, since_ts, cfg):
 def main():
     parser = argparse.ArgumentParser(description="Scan session transcript for activity signals")
     parser.add_argument("--transcript", default="", help="Path to session JSONL file")
-    parser.add_argument("--since", type=float, default=0, help="Unix timestamp — ignore entries before this")
+    parser.add_argument("--since", type=float, default=0, help="Unix timestamp, ignore entries before this")
     parser.add_argument("--config", default="", help="Path to config JSON with activity_signals key")
     args = parser.parse_args()
 
@@ -437,7 +437,7 @@ TESTEOF
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `cd /home/jamditis/projects/claude-skills-journalism && bash /tmp/test-transcript-scanner.sh`
-Expected: Tests 1-10 pass, test 11 FAILS — session-end.sh doesn't have the gate yet.
+Expected: Tests 1-10 pass, test 11 FAILS, session-end.sh doesn't have the gate yet.
 
 - [ ] **Step 3: Add the activity gate to session-end.sh**
 
@@ -520,9 +520,9 @@ RESULT=$(python3 "$PLUGIN_ROOT/scripts/transcript-scanner.py" \
 ```
 
 **Arguments:**
-- `--transcript` — path to the session JSONL file
-- `--since` — Unix timestamp (seconds). Only scan entries after this time. Default: 0 (scan all).
-- `--config` — path to config file. Reads `activity_signals` key if present.
+- `--transcript`, path to the session JSONL file
+- `--since`, Unix timestamp (seconds). Only scan entries after this time. Default: 0 (scan all).
+- `--config`, path to config file. Reads `activity_signals` key if present.
 
 **Signal levels:**
 
@@ -579,7 +579,7 @@ python3 autocontext/scripts/transcript-scanner.py \
     --since 9999999999
 ```
 
-Expected: `meaningful: false` — all entries are before that far-future timestamp.
+Expected: `meaningful: false`, all entries are before that far-future timestamp.
 
 - [ ] **Step 4: Clean up test script**
 

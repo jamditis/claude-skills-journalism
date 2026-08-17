@@ -36,7 +36,7 @@ cat > "$TEST_DIR/.autocontext/cache/session-lessons.json" <<'JSON'
 [{"id":"test-lesson-1","text":"Always write tests first.","tags":["testing"],"confidence":0.5,"validated_count":0}]
 JSON
 
-# Create a research-only transcript (only Read/Grep/Glob — not meaningful)
+# Create a research-only transcript (only Read/Grep/Glob, not meaningful)
 TRANSCRIPT="$TEST_DIR/research-only.jsonl"
 cat > "$TRANSCRIPT" <<'JSONL'
 {"type":"assistant","timestamp":"2026-04-03T10:00:00.000Z","message":{"content":[{"type":"tool_use","name":"Read","input":{"file_path":"/tmp/foo.py"}}]}}

@@ -2391,7 +2391,7 @@
             "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.28 (foreground color: #6b6b6b, background color: #ede6d4, font size: 13.5pt (18px), font weight: normal). Expected contrast ratio of 4.5:1"
           },
           {
-            "html": "<p class=\"text-white/40 text-xs mt-2\">Demo mode — press \"Start demo\" to see the full workflow</p>",
+            "html": "<p class=\"text-white/40 text-xs mt-2\">Demo mode, press \"Start demo\" to see the full workflow</p>",
             "target": [
               ".text-white\\/40"
             ],
@@ -2546,14 +2546,14 @@
         "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
         "nodes": [
           {
-            "html": "<span class=\"text-white/40 text-xs ml-2\">dashboard.yourdomain.com — terminal</span>",
+            "html": "<span class=\"text-white/40 text-xs ml-2\">dashboard.yourdomain.com, terminal</span>",
             "target": [
               ".mb-6.terminal-bar > .terminal-titlebar > .text-white\\/40.ml-2.text-xs"
             ],
             "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.53 (foreground color: #818181, background color: #2d2d2d, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
           },
           {
-            "html": "<span class=\"text-white/40 text-xs ml-2\">dashboard.yourdomain.com — main (tmux)</span>",
+            "html": "<span class=\"text-white/40 text-xs ml-2\">dashboard.yourdomain.com, main (tmux)</span>",
             "target": [
               ".mb-12:nth-child(2) > .terminal-bar > .terminal-titlebar > .text-white\\/40.ml-2.text-xs"
             ],
@@ -2602,7 +2602,7 @@
             "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.53 (foreground color: #818181, background color: #2d2d2d, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
           },
           {
-            "html": "<p class=\"text-clay/60 text-sm mt-2\">The <code>pane_current_command</code> tmux format string returns the name of the running process — no need to parse <code>ps aux</code>.</p>",
+            "html": "<p class=\"text-clay/60 text-sm mt-2\">The <code>pane_current_command</code> tmux format string returns the name of the running process, no need to parse <code>ps aux</code>.</p>",
             "target": [
               ".mb-12:nth-child(6) > .mt-2.text-clay\\/60.text-sm"
             ],
@@ -4051,7 +4051,7 @@
             "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.98 (foreground color: #817f7d, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
           },
           {
-            "html": "<p class=\"text-sm text-clay/60 mt-4\">Buttons are verbs: \"Save\", \"Delete\", \"Send\" — not \"Submit\", \"OK\", \"Confirm\". Sentence case everywhere, never Title Case.</p>",
+            "html": "<p class=\"text-sm text-clay/60 mt-4\">Buttons are verbs: \"Save\", \"Delete\", \"Send\", not \"Submit\", \"OK\", \"Confirm\". Sentence case everywhere, never Title Case.</p>",
             "target": [
               ".mt-4.text-clay\\/60"
             ],

@@ -1,13 +1,6 @@
 ---
 name: okf-wiki
-description: >-
-  Scaffold a new Open Knowledge Format (OKF) knowledge base and populate it
-  from existing material: a tree of small markdown concept files with YAML
-  frontmatter, a spec, a validator, and session-start hooks that orient Claude
-  on the knowledge base before it works. Use when the user wants to start an
-  OKF atlas/wiki/knowledge base, build one from existing docs, plans, notes, or
-  a repo, structure docs as one-concept-per-file with provenance, or initialize
-  OKF in a repo (optionally into its GitHub wiki).
+description: Scaffolds an Open Knowledge Format (OKF) knowledge base from markdown concept files. Use to start or build an OKF wiki.
 license: MIT
 metadata:
   author: jamditis
@@ -20,11 +13,11 @@ metadata:
 OKF (Open Knowledge Format) stores knowledge as small markdown files: one concept per
 file, each carrying its own provenance in YAML frontmatter, with directory `index.md`
 files for navigation and a validator that enforces the contract. It is built for
-knowledge bases that both people and agents read and edit — newsroom institutional
+knowledge bases that both people and agents read and edit, newsroom institutional
 memory, a research atlas, a team's decision log, an infrastructure map.
 
 This skill scaffolds a conforming OKF project and validates it. The format contract is
-in `spec/SPEC.md` (in this skill's directory) — read it before changing structure.
+in `spec/SPEC.md` (in this skill's directory), read it before changing structure.
 
 ## When to use
 
@@ -40,9 +33,9 @@ rather than in prose, in two steps: the first three questions in one call, then 
 as a follow-up call only if the audience came back public or both (it does not apply to an
 internal-only wiki, and its relevant options depend on that answer, so it cannot share the first
 batch). Infer the title from the repo or project and confirm it. Skip any question the user already
-answered in their request — do not re-ask what they have told you.
+answered in their request, do not re-ask what they have told you.
 
-1. **Audience** — who reads this wiki? This answer sets the others:
+1. **Audience**, who reads this wiki? This answer sets the others:
    - **Internal (agents and teammates):** the orientation hooks earn their keep, so keep them on.
      The bundle may hold infrastructure detail, so it usually lives in a private repo. The in-repo
      `bundle/` is the source of truth.
@@ -50,28 +43,28 @@ answered in their request — do not re-ask what they have told you.
      less, since people read it and agents do not. Plan a published view (see Publish below).
    - **Both:** the in-repo `bundle/` is the source of truth with hooks on for agents, plus a
      published view for people. Default here when the user is unsure.
-2. **Title and sections** — the knowledge-base title (infer it, then confirm) and the starting
+2. **Title and sections**, the knowledge-base title (infer it, then confirm) and the starting
    sections. Offer sections as a use-case preset, not a blank prompt:
    - Newsroom institutional memory: `people, orgs, sources, decisions, beats`
    - Research atlas: `concepts, sources, methods, findings`
    - Infrastructure or fleet map: `machines, services, networks, credentials, processes`
    - Decision log: `decisions, context, events`
    The chosen title and list feed `--title` and `--sections` below; the user can edit the list.
-3. **Populate now or later** — author concepts now from existing material (a repo, docs, notes, or a
+3. **Populate now or later**, author concepts now from existing material (a repo, docs, notes, or a
    URL: gather it and enter the authoring loop after scaffolding), or scaffold an empty tree the user
    fills in later.
-4. **Publish target** — a follow-up `AskUserQuestion` call, made only after the audience comes back
+4. **Publish target**, a follow-up `AskUserQuestion` call, made only after the audience comes back
    public or both (skip it entirely for an internal-only wiki):
    - **In-repo bundle only (default):** the validator and relative links work directly, with no
      extra surface to maintain. Right for most wikis.
-   - **GitHub wiki:** an optional reading surface. Advanced and manual — see "Optional: publish into
+   - **GitHub wiki:** an optional reading surface. Advanced and manual, see "Optional: publish into
      a GitHub wiki" below, bootstrapped with `scripts/gh-wiki-bootstrap.py`.
-   - **GitHub Pages:** a browsable site rendered from the bundle. Not built yet — treat it as a
+   - **GitHub Pages:** a browsable site rendered from the bundle. Not built yet, treat it as a
      goal and keep the in-repo bundle as the source of truth.
 
 Carry the answers into the scaffold command (the title and sections, plus `--no-hooks` if the user
 opts out of the hooks for a public-only wiki) and into the populate step. The audience answer is
-also the visibility decision the "Before finishing" section asks you to make deliberately — you are
+also the visibility decision the "Before finishing" section asks you to make deliberately, you are
 making it here, up front, where it can steer the rest of the setup.
 
 ## What gets created
@@ -95,7 +88,7 @@ making it here, up front, where it can steer the rest of the setup.
 ```
 
 Docs and tooling sit at the project root; only `bundle/` is validated. Keep them
-separate — the validator treats every non-reserved `.md` inside the bundle as a
+separate, the validator treats every non-reserved `.md` inside the bundle as a
 concept that needs frontmatter, so a stray `SPEC.md` inside `bundle/` would fail.
 The `.claude/` hooks sit outside `bundle/`, so they never trip the concept checks.
 
@@ -128,18 +121,18 @@ python3 scripts/validate.py --bundle bundle    # must exit 0
 ## Populate the bundle: author concepts from existing material
 
 Scaffolding leaves an empty tree with one placeholder concept. The usual next request
-— "here are my docs / plans / notes / repo, build the wiki" — has no importer script, and
+, "here are my docs / plans / notes / repo, build the wiki", has no importer script, and
 can't have one: deciding what counts as a single concept, writing its one-line description,
 choosing its `type`, and pointing `source` at real provenance is judgment work, not a
 mechanical transform. So you (Claude) author the concepts directly, in this loop:
 
-1. **Gather the source.** Read what the user pointed you at — a file, a folder, a repo, or a
+1. **Gather the source.** Read what the user pointed you at, a file, a folder, a repo, or a
    URL (fetch a URL first). Skim the whole thing before writing anything, so you can see the
    natural concept boundaries.
 2. **Decide concept boundaries.** One file is one concept: one thing a reader would look up on
    its own (a service, a decision, a path, a person, an event). Split a doc that covers five
    things into five concepts; merge fragments that only mean something together into one. A
-   heading is a hint, not a rule — do not blindly map one `##` to one file.
+   heading is a hint, not a rule, do not blindly map one `##` to one file.
 3. **Draft each concept** at `bundle/<section>/<slug>.md` with the full frontmatter. Read the
    bundle-root `index.md` before writing so the verification key matches its declared format:
    use `verified` for `okf_version` `0.1` through `0.3`; use `verified_on` for `okf_version` `0.4`.
@@ -147,20 +140,20 @@ mechanical transform. So you (Claude) author the concepts directly, in this loop
    - `type` from the vocab. Infrastructure: Machine, Network, Service, Session, Project,
      Repo, Credential, Path, Process. Domain-neutral: Concept, Decision, Event, Person,
      Org, Source. Plus Reference (the catch-all). The set is closed; an unlisted type fails.
-   - `description` is one line. `source` — quote every element — points at where the fact
+   - `description` is one line. `source`, quote every element, points at where the fact
      actually came from (the origin file path, URL, command, or event), not at this skill.
    - Set `timestamp` to today. `verified`/`verified_on` is the date the fact was last confirmed
-     true — set it by how you came to know it, not reflexively to today:
+     true, set it by how you came to know it, not reflexively to today:
      - You re-checked it against reality now, or the user is the authority for it (a decision,
        preference, or intent they state in this session): today.
      - The user is recalling external or system state (a spec, a path, a config): their memory is a
        source claim, not a re-check, so date it to when that state was last checked or to the
-       recollection's own date — not today just because it came up now.
+       recollection's own date, not today just because it came up now.
      - It was copied from a dated source without re-checking: the date it was last known true (the
        source's own date), not today.
      - It came from an undated record you cannot re-confirm (a memory file, an old conversation):
-       the oldest date you can evidence — file timestamp, introducing commit, or the date it was
-       said — never today. If you cannot evidence any date at all, it is not yet a verifiable fact;
+       the oldest date you can evidence, file timestamp, introducing commit, or the date it was
+       said, never today. If you cannot evidence any date at all, it is not yet a verifiable fact;
        find a datable source or leave the concept out.
      When the date is uncertain, round it down: an older `verified` correctly reads as "may be
      stale, re-check," while today reads as "just confirmed." The frontmatter date is the contract;
@@ -170,13 +163,13 @@ mechanical transform. So you (Claude) author the concepts directly, in this loop
      never the value. The validator fails the build on a leaked secret.
 4. **Place and link.** Put each concept in the right section (create sections as needed), add a
    bullet for it to that section's `index.md`, and cross-link related concepts with relative
-   `[text](path.md)` links — not `[[slug]]` wikilinks. `[[slug]]` is the auto-memory idiom; the
+   `[text](path.md)` links, not `[[slug]]` wikilinks. `[[slug]]` is the auto-memory idiom; the
    OKF validator rejects it and never resolves it, so a typo'd or deleted reference passes silently.
-   When you create a new section, also link it from the bundle-root `index.md` — that root is the
+   When you create a new section, also link it from the bundle-root `index.md`, that root is the
    navigation map the session anchor loads, so a section missing from it is invisible to orientation
    even though validation still passes.
 5. **Clear the placeholder.** If you scaffolded fresh, delete the starter `example-concept.md` (and
-   its bullet in the section `index.md`) once real concepts exist — otherwise the sample ships in
+   its bullet in the section `index.md`) once real concepts exist, otherwise the sample ships in
    the finished wiki and still passes validation.
 6. **Validate in a loop.** Run `python3 scripts/validate.py --bundle bundle`, fix what it
    reports, repeat until it exits 0. Unquoted `source` elements and missing frontmatter keys are
@@ -209,9 +202,9 @@ load-bearing rules:
   Machine, Network, Service, Session, Project, Repo, Credential, Path, Process
   (infrastructure); Concept, Decision, Event, Person, Org, Source (domain-neutral); or
   Reference (catch-all).
-- **Quote every `source` element** — source pointers carry `#` and `: ` which break YAML
+- **Quote every `source` element**, source pointers carry `#` and `: ` which break YAML
   if unquoted. `source: ["README.md", "issue #445"]`.
-- **`verified`/`verified_on`** is the date the fact was last confirmed true — a re-check
+- **`verified`/`verified_on`** is the date the fact was last confirmed true, a re-check
   against reality, or the user stating a fact they are the authority for (a decision, a
   preference); a fact they merely recall about external state is a source claim, not a
   re-check. **`timestamp`** is when the concept was authored/updated. The verification date is
@@ -219,7 +212,7 @@ load-bearing rules:
   the authoring loop above for the full date rules.
 - **No secret values, ever.** A credential concept documents the key name and retrieval
   path, never the value. The validator fails the build on a leaked secret.
-- **`index.md` and `log.md` are reserved** — no frontmatter (except the bundle-root
+- **`index.md` and `log.md` are reserved**, no frontmatter (except the bundle-root
   `index.md`, which carries `okf_version` only).
 
 ### Optional: upstream v0.2 trust/provenance signals
@@ -231,7 +224,7 @@ per-pointer credibility signals), `status` (draft/stable/deprecated), `stale_aft
 absolute expiry date), and an `Attested Computation` type for a sanctioned, checkable
 computation. None of it is required, and a bundle that adopts none of it is unaffected.
 
-Scaffold a project with these enabled — `scaffold.py <target> --trust-signals` — and the
+Scaffold a project with these enabled, `scaffold.py <target> --trust-signals`, and the
 bundle declares `okf_version: "0.4"`, with `verified` renamed to `verified_on` in the
 required set (freeing `verified` for the new shape; see `spec/SPEC.md`'s "Trust and
 provenance" section for the full field contract and the reasoning behind the rename).
@@ -278,13 +271,13 @@ validator unchanged.
 ## Optional: publish into a GitHub wiki
 
 OKF lives best as in-repo files (the validator and relative links work directly). A repo's
-GitHub wiki is an optional reading surface, and wiring it up is an advanced, manual step —
+GitHub wiki is an optional reading surface, and wiring it up is an advanced, manual step,
 most users should skip it and keep the bundle in-repo.
 
 A wiki with zero pages has no git repo to push to and no API, so the very first page must be
 created through the web UI. `scripts/gh-wiki-bootstrap.py` automates that one step, but it
 drives a real logged-in browser, so it needs two things you provide yourself (a GitHub PAT
-does not work — wiki pages are a web-UI-only surface):
+does not work, wiki pages are a web-UI-only surface):
 
 - **Playwright with Chromium installed:** `pip install playwright && playwright install chromium`.
 - **A saved GitHub web session:** a Playwright `storageState` JSON, captured from a browser

@@ -1,6 +1,6 @@
 ---
 name: electron-dev
-description: Electron desktop application development with React, TypeScript, and Vite. Use when building desktop apps, implementing IPC communication, managing windows/tray, handling PTY terminals, integrating WebRTC/audio, or packaging with electron-builder. Covers patterns from AudioBash, Yap, and Pisscord projects.
+description: Electron desktop apps with React, TypeScript, and Vite. Use for IPC, window/tray, PTY terminals, WebRTC, and packaging.
 ---
 
 # Electron desktop development
@@ -9,7 +9,7 @@ Patterns and practices for building production-quality Electron applications wit
 
 ## Security baseline (Electron 30+)
 
-Electron's defaults have hardened over the past several releases. As of Electron 28+, `contextIsolation: true` and `sandbox: true` are the defaults for new BrowserWindow instances — most security advice from older guides assumed you had to opt in. You don't anymore; you have to opt OUT, and you should not.
+Electron's defaults have hardened over the past several releases. As of Electron 28+, `contextIsolation: true` and `sandbox: true` are the defaults for new BrowserWindow instances, most security advice from older guides assumed you had to opt in. You don't anymore; you have to opt OUT, and you should not.
 
 Set explicitly anyway, so a config drift never weakens the security model:
 
@@ -31,18 +31,18 @@ Validate every IPC message in main. Don't trust the renderer.
 
 Electron Fuses are package-time toggles baked into the binary. The two relevant for security distribution:
 
-- `EnableEmbeddedAsarIntegrityValidation` — verifies the app.asar hash at runtime against a hash embedded in the binary. Defends against attackers swapping the asar contents post-install.
-- `OnlyLoadAppFromAsar` — refuses to load app code from anywhere except the validated asar.
+- `EnableEmbeddedAsarIntegrityValidation`, verifies the app.asar hash at runtime against a hash embedded in the binary. Defends against attackers swapping the asar contents post-install.
+- `OnlyLoadAppFromAsar`, refuses to load app code from anywhere except the validated asar.
 
 These are **opt-in**, not default. Enable both for production. Requires `@electron/asar` 3.1.0+ to generate the asar with embeddable integrity. electron-builder configures this via `electronFuses` in the build config; `@electron/fuses` does it programmatically.
 
-CVE-2023-44402 (ASAR integrity bypass via filetype confusion) was the canonical motivation here — without integrity + only-load-from-asar, an attacker who can modify app files can swap behavior silently.
+CVE-2023-44402 (ASAR integrity bypass via filetype confusion) was the canonical motivation here, without integrity + only-load-from-asar, an attacker who can modify app files can swap behavior silently.
 
 ### Common renderer-side risks
 
-- **Preload script confusion** — only expose narrow, typed surfaces via `contextBridge.exposeInMainWorld`. Never re-export `ipcRenderer` itself; expose specific methods that map to specific channels.
-- **`file://` IPC and navigation** — restrict navigation with `webContents.on('will-navigate', e => e.preventDefault())` for windows that shouldn't change URL. Deny `setWindowOpenHandler` requests by default; allow-list specific origins.
-- **`shell.openExternal` with user input** — validate the URL scheme before opening. An attacker-controlled `file://` or `javascript:` URL hands them code execution.
+- **Preload script confusion**, only expose narrow, typed surfaces via `contextBridge.exposeInMainWorld`. Never re-export `ipcRenderer` itself; expose specific methods that map to specific channels.
+- **`file://` IPC and navigation**, restrict navigation with `webContents.on('will-navigate', e => e.preventDefault())` for windows that shouldn't change URL. Deny `setWindowOpenHandler` requests by default; allow-list specific origins.
+- **`shell.openExternal` with user input**, validate the URL scheme before opening. An attacker-controlled `file://` or `javascript:` URL hands them code execution.
 
 ## Architecture patterns
 
@@ -327,12 +327,12 @@ peer.on('call', () => {
 - Validate all IPC arguments in main process
 - Use TypeScript interfaces for IPC contracts
 
-**BrowserView is deprecated — use WebContentsView:**
+**BrowserView is deprecated, use WebContentsView:**
 
 `BrowserView` was deprecated in Electron 30 (April 2024) and the underlying implementation has been replaced. `BrowserView` still works as a compatibility shim over `WebContentsView`, but new code should target `WebContentsView` directly. The constructors take the same `webPreferences` shape, so the migration is mostly mechanical. The differences worth knowing:
 
 - `WebContentsView` is added via `win.contentView.addChildView(view)` instead of `win.addBrowserView(view)`
-- Sizing is via `view.setBounds({x, y, width, height})` — no `setAutoResize`. You wire your own resize handlers if you want auto-resize.
+- Sizing is via `view.setBounds({x, y, width, height})`, no `setAutoResize`. You wire your own resize handlers if you want auto-resize.
 - Z-order is the order of `addChildView` calls; `removeChildView` then re-`addChildView` to bring forward.
 
 ```javascript

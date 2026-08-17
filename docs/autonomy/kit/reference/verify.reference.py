@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""REFERENCE IMPLEMENTATION — read it, adapt it, do NOT run it as-is.
+"""REFERENCE IMPLEMENTATION, read it, adapt it, do NOT run it as-is.
 
 The verifier. After a session ends, it confirms the receipt token actually landed
-in a commit, a pull request, or an issue comment — proof the work was this
+in a commit, a pull request, or an issue comment, proof the work was this
 session's and not a human's or another job's. If the token is nowhere, the run is
 reported "unverified" rather than quietly assumed good (invariant 8).
 
@@ -46,7 +46,7 @@ def token_in_recent_comments(repo, token, since_issues=30):
 
 def verify(repo, repo_dir, token):
     """Classify the run. 'confirmed' if the token is in any expected surface;
-    'unverified' if it's nowhere — which is a real, reportable outcome, not an
+    'unverified' if it's nowhere, which is a real, reportable outcome, not an
     error to swallow."""
     pr = token_in_open_prs(repo, token)
     found = (

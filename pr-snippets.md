@@ -1,18 +1,18 @@
-# PR snippets — files to edit besides the skill folder
+# PR snippets, files to edit besides the skill folder
 
 Not part of the skill. Copy these into the repo files, adjusting wording to
 match whatever is actually there when you branch.
 
-## 1. `journalism-core/README.md` — skill table row
+## 1. `journalism-core/README.md`, skill table row
 
 ```markdown
-| [brazil-records-requests](skills/brazil-records-requests/) | Public records requests under Brazil's Access to Information Law (Lei 12.527/2011) — portal selection across federal, state, municipal, judicial and legislative bodies; deadlines; the four-level appeal chain (first instance, agency head, CGU, CMRI); templates in Portuguese with English glosses |
+| [brazil-records-requests](skills/brazil-records-requests/) | Public records requests under Brazil's Access to Information Law (Lei 12.527/2011), portal selection across federal, state, municipal, judicial and legislative bodies; deadlines; the four-level appeal chain (first instance, agency head, CGU, CMRI); templates in Portuguese with English glosses |
 ```
 
 ## 2. root `README.md`
 
 Same row in the core-skills table, plus the count. "Fourteen" appears in at
-least three places — the plugin description, the plugin table, and the
+least three places, the plugin description, the plugin table, and the
 journalism-core section heading. Grep before committing:
 
 ```bash
@@ -36,7 +36,7 @@ list after `FOIA + NJ OPRA requests`.
   Portuguese and English prompts and does not collide with `foia-requests`.
 ```
 
-Follow the existing changelog's version-heading convention — this is a
+Follow the existing changelog's version-heading convention, this is a
 `journalism-core` minor bump, not a patch.
 
 ## 4. Plugin manifest
@@ -49,14 +49,14 @@ names the skills. Update whichever exist.
 grep -rn "foia-requests" --include="*.json" .
 ```
 
-That grep finds every manifest that enumerates skills — wherever
+That grep finds every manifest that enumerates skills, wherever
 `foia-requests` is listed, `brazil-records-requests` belongs too.
 
 ## 5. Docs landing page
 
 The changelog mentions `docs/<skill>/index.html` landing pages per skill. If
 that pattern still holds, either add one following the existing template or
-say in the PR that you left it for the maintainer's generator — ask, don't
+say in the PR that you left it for the maintainer's generator, ask, don't
 guess.
 
 ## Before opening the PR

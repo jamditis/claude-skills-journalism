@@ -1,5 +1,5 @@
 # Recurso de segunda instância
-*Second-instance appeal — to the agency head*
+*Second-instance appeal, to the agency head*
 
 **Prazo:** 10 dias contados da ciência da decisão de primeira instância.
 **Destinatário:** autoridade máxima do órgão (ministro, presidente, diretor-geral).
@@ -11,7 +11,7 @@ municípios, Judiciário, Legislativo e Ministério Público, confirme a regra l
 *Scope: this second appeal and deadline apply to the federal executive. Check
 the local rule for other bodies.*
 
-Este é o último degrau interno. Depois dele, o recurso sai do órgão — vai à
+Este é o último degrau interno. Depois dele, o recurso sai do órgão, vai à
 CGU, no caso do Executivo federal.
 *This is the last internal step. After it, the appeal leaves the agency.*
 
@@ -47,7 +47,7 @@ para o mesmo pedido indica ausência de exame concreto do objeto solicitado.
 **4. Do interesse público na informação**
 
 [QUANDO CABÍVEL: relacione a informação a gasto público, contratação,
-fiscalização ou conduta de agente público. Não descreva a reportagem —
+fiscalização ou conduta de agente público. Não descreva a reportagem,
 descreva a natureza pública do dado.]
 
 **5. Do pedido**

@@ -1,5 +1,5 @@
 /**
- * PDF Playground — Control panel
+ * PDF Playground, Control panel
  *
  * Builds a sidebar with live design controls. When an iframe with
  * id="preview-frame" exists, all CSS changes target the iframe's

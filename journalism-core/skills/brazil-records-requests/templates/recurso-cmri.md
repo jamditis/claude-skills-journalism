@@ -1,5 +1,5 @@
 # Recurso à CMRI
-*Final administrative appeal — Comissão Mista de Reavaliação de Informações*
+*Final administrative appeal, Comissão Mista de Reavaliação de Informações*
 
 **Prazo:** 10 dias contados da ciência da decisão da CGU
 (art. 16, §3º, da Lei 12.527/2011).
@@ -26,13 +26,13 @@ acesso.
 
 **1. Da questão submetida**
 
-A controvérsia se resume a [UMA FRASE — a CMRI decide questões, não pedidos].
+A controvérsia se resume a [UMA FRASE, a CMRI decide questões, não pedidos].
 
 **2. Da classificação da informação** *(quando for o caso)*
 
 A informação foi classificada como [GRAU] em [DATA], pela autoridade [X].
 Requeiro a reavaliação da classificação, nos termos da competência desta
-Comissão, considerando que [RAZÃO — por exemplo: decurso de tempo, cessação
+Comissão, considerando que [RAZÃO, por exemplo: decurso de tempo, cessação
 do risco invocado, ausência de dano concreto demonstrado, ou informação
 relativa a conduta de agentes públicos].
 
@@ -62,7 +62,7 @@ da informação, com o consequente fornecimento em formato aberto.
 - Escreva pensando no precedente, não apenas no seu pedido. A decisão será
   citada por outros repórteres.
   *Write for the precedent. Other reporters will cite the decision.*
-- Registre a data de protocolo e acompanhe as pautas de reunião — não há
+- Registre a data de protocolo e acompanhe as pautas de reunião, não há
   notificação confiável.
   *Log the filing date and watch the meeting agendas. Notification is
   unreliable.*

@@ -286,7 +286,7 @@
     function intc(v) { return Math.round(v).toLocaleString("en-US"); }
     const $ = id => document.getElementById(id);
 
-    // DOM builders — no innerHTML, so user-typed cron text is never parsed as markup.
+    // DOM builders, no innerHTML, so user-typed cron text is never parsed as markup.
     function el(tag, cls, text) {
       const n = document.createElement(tag);
       if (cls) n.className = cls;

@@ -11,7 +11,7 @@ tags: ["hook", "development"]
 
 Blocks creation of files that represent irreversible architectural decisions until the
 user confirms. Requires the companion PostToolUse:AskUserQuestion hook (one-way-door-
-approve), which promotes the session's pending files to approved so the retry passes —
+approve), which promotes the session's pending files to approved so the retry passes,
 install both, not just this check.
 
 **Event:** `PreToolUse`  |  **Tools:** Write  |  **Category:** Development

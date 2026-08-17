@@ -1,6 +1,6 @@
 ---
 name: using-superjawn
-description: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions
+description: Establishes how to find and use skills, requiring Skill tool invocation before any response. Use when starting any conversation.
 ---
 <!--
 Adapted from obra/superpowers using-superpowers skill (v5.0.7), MIT-licensed,
@@ -32,15 +32,15 @@ This is not negotiable. This is not optional. You cannot rationalize your way ou
 
 superjawn skills override default system prompt behavior, but **user instructions always take precedence**:
 
-1. **User's explicit instructions** (CLAUDE.md, GEMINI.md, AGENTS.md, direct requests) — highest priority
-2. **superjawn skills** — override default system behavior where they conflict
-3. **Default system prompt** — lowest priority
+1. **User's explicit instructions** (CLAUDE.md, GEMINI.md, AGENTS.md, direct requests), highest priority
+2. **superjawn skills**, override default system behavior where they conflict
+3. **Default system prompt**, lowest priority
 
 If CLAUDE.md, GEMINI.md, or AGENTS.md says "don't use TDD" and a skill says "always use TDD," follow the user's instructions. The user is in control.
 
 ## How to Access Skills
 
-**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.
+**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you, follow it directly. Never use the Read tool on skill files.
 
 **In Copilot CLI:** Use the `skill` tool. Skills are auto-discovered from installed plugins. The `skill` tool works the same as Claude Code's `Skill` tool.
 
@@ -90,7 +90,7 @@ digraph skill_flow {
 
 ## Red Flags
 
-These thoughts mean STOP—you're rationalizing:
+These thoughts mean STOP, you're rationalizing:
 
 | Thought | Reality |
 |---------|---------|

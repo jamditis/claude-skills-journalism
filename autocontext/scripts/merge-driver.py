@@ -57,10 +57,10 @@ def merge_lesson(ancestor, ours, theirs):
         anc_val = (ancestor or {}).get(field)
         if ours_val != theirs_val:
             if ours_val != anc_val and theirs_val != anc_val:
-                # Both sides changed differently — conflict
+                # Both sides changed differently, conflict
                 result["needs_review"] = True
             elif theirs_val != anc_val:
-                # Only theirs changed — take theirs
+                # Only theirs changed, take theirs
                 result[field] = theirs_val
 
     # Supersedes conflicts

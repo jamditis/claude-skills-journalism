@@ -1,4 +1,4 @@
-# Phase 4 — dev-toolkit plugin (10 skills)
+# Phase 4, dev-toolkit plugin (10 skills)
 
 **Status:** draft, 2026-05-08
 **Branch:** `package/dev-toolkit-phase4`
@@ -76,7 +76,7 @@ Updated files:
 |---|---|
 | Plugin structure validity | GitHub Actions `check-readme` and `lint-skills` (existing) |
 | Pre-PR cross-skill review | `codex exec` against the full branch after sweep commits land |
-| External code review | Copilot PR-bot review (one-shot per PR — no re-trigger) |
+| External code review | Copilot PR-bot review (one-shot per PR, no re-trigger) |
 | Post-Copilot review | `codex exec` against the Copilot-fix commit |
 | Convergence | Recursive codex reviews until a round returns NO ISSUES FOUND |
 | Final | Squash merge after Joe's explicit "merge" instruction |

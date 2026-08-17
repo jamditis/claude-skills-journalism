@@ -17,7 +17,7 @@ specific trigger conditions. Skills now live inside a plugin at
 the plugin root.
 
 A hook is a single markdown file in `hooks/` with `event` (and `tools` for
-Pre/PostToolUse hooks) frontmatter — see [the hooks catalog](hooks-catalog.md).
+Pre/PostToolUse hooks) frontmatter, see [the hooks catalog](hooks-catalog.md).
 
 House style, enforced by review and the writing hooks: sentence-case headings,
 terse and actionable descriptions, cited sources, and no AI writing patterns (the

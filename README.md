@@ -2,7 +2,7 @@
 
 A collection of Agent Skills for journalists, researchers, academics, media professionals, and communications practitioners. The same repository serves Claude Code and Codex while keeping Claude-only commands, agents, and hooks clearly labeled.
 
-**Docs site:** [skills.amditis.tech](https://skills.amditis.tech) — interactive skill browser, setup guides, and full documentation.
+**Docs site:** [skills.amditis.tech](https://skills.amditis.tech), interactive skill browser, setup guides, and full documentation.
 
 ## Guides
 
@@ -10,9 +10,9 @@ Setup and workflow guides, separate from the skills themselves:
 
 | Guide | Description |
 |-------|-------------|
-| [Autonomous and hands-on dev work](https://skills.amditis.tech/autonomy/) | A first-person account of running dev work with Claude in two modes — autonomous sessions that pull tasks off GitHub issues, and hands-on multi-agent reviews at the keyboard — held to one quality bar, with copy-able prompts to adapt the approach to your own agent |
-| [Multi-agent workflows](https://skills.amditis.tech/workflows/) | Plain-language guide to running many AI agents on one job — fan-out, pipeline, and adversarial-verify patterns, with real examples from ICIJ, The Markup, Full Fact, and Elicit, plus honest cautions |
-| [Persistent sessions](https://skills.amditis.tech/persistent-sessions/) | Keep Claude Code sessions alive through disconnects using tmux — setup, key bindings, activity notifications, and scheduler coexistence |
+| [Autonomous and hands-on dev work](https://skills.amditis.tech/autonomy/) | A first-person account of running dev work with Claude in two modes, autonomous sessions that pull tasks off GitHub issues, and hands-on multi-agent reviews at the keyboard, held to one quality bar, with copy-able prompts to adapt the approach to your own agent |
+| [Multi-agent workflows](https://skills.amditis.tech/workflows/) | Plain-language guide to running many AI agents on one job, fan-out, pipeline, and adversarial-verify patterns, with real examples from ICIJ, The Markup, Full Fact, and Elicit, plus honest cautions |
+| [Persistent sessions](https://skills.amditis.tech/persistent-sessions/) | Keep Claude Code sessions alive through disconnects using tmux, setup, key bindings, activity notifications, and scheduler coexistence |
 
 ## What are agent skills?
 
@@ -42,21 +42,21 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | Plugin | Description | Commands | Updated |
 |--------|-------------|----------|--------|
 | [autocontext](./autocontext/) | Cross-session knowledge persistence with skill evolution. Lessons accumulate per-skill, and `/autocontext:evolve` folds them back into skill files | `/autocontext:setup`, `/autocontext:init`, `/autocontext:review`, `/autocontext:status`, `/autocontext:evolve` | Apr 27, 2026 |
-| [dev-toolkit](./dev-toolkit/) | Twelve development-focused skills for journalists, researchers, and small newsroom dev teams: accessibility (WCAG 2.2), Electron app patterns, mobile/remote debugging, irreversible-decision discipline, Python data pipelines, test-first bug fixing, AI-assisted development workflows, ethical web scraping, no-build frontend patterns, signs-of-taste guidance for web UI, CLAUDE.md context maintenance, and managing attention across long sessions | n/a — skills only | Aug 15, 2026 |
-| [journalism-core](./journalism-core/) | Fifteen core journalism skills, including AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, Brazilian LAI requests, fact-checking, interview prep + transcription, story pitches, editorial workflow, crisis communications, newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements, and embedded photo metadata for wire distribution | n/a — skills only | Aug 15, 2026 |
-| [okf-wiki](./okf-wiki/) | Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with YAML frontmatter, directory navigation, and a validator. Generates a starter wiki that passes its own conformance and secret-leak checks, ships session-start hooks that orient Claude on the knowledge base before it works, and includes an optional GitHub-wiki bootstrap. For newsroom institutional memory, research atlases, decision logs, and infrastructure maps | n/a — skill only | Aug 15, 2026 |
-| [pdf-design](./pdf-design/) | PDF report and proposal design system with brand variables, budget tables, and reusable content blocks (stats strips, three-column, four-tile pillars, partner grids) | n/a — skill-only | Aug 15, 2026 |
+| [dev-toolkit](./dev-toolkit/) | Twelve development-focused skills for journalists, researchers, and small newsroom dev teams: accessibility (WCAG 2.2), Electron app patterns, mobile/remote debugging, irreversible-decision discipline, Python data pipelines, test-first bug fixing, AI-assisted development workflows, ethical web scraping, no-build frontend patterns, signs-of-taste guidance for web UI, CLAUDE.md context maintenance, and managing attention across long sessions | n/a, skills only | Aug 15, 2026 |
+| [journalism-core](./journalism-core/) | Fifteen core journalism skills, including AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, Brazilian LAI requests, fact-checking, interview prep + transcription, story pitches, editorial workflow, crisis communications, newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements, and embedded photo metadata for wire distribution | n/a, skills only | Aug 15, 2026 |
+| [okf-wiki](./okf-wiki/) | Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with YAML frontmatter, directory navigation, and a validator. Generates a starter wiki that passes its own conformance and secret-leak checks, ships session-start hooks that orient Claude on the knowledge base before it works, and includes an optional GitHub-wiki bootstrap. For newsroom institutional memory, research atlases, decision logs, and infrastructure maps | n/a, skill only | Aug 15, 2026 |
+| [pdf-design](./pdf-design/) | PDF report and proposal design system with brand variables, budget tables, and reusable content blocks (stats strips, three-column, four-tile pillars, partner grids) | n/a, skill-only | Aug 15, 2026 |
 | [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials with an interactive control panel for live design editing (colors, fonts, spacing, sections) and a guided wizard for proposals | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` | Aug 15, 2026 |
-| [project-templates-toolkit](./project-templates-toolkit/) | Three skills for setting up and closing out journalism projects: a CLAUDE.md project-memory writer (institutional knowledge), a LESSONS.md retrospective writer (failures and decisions), and a template-selector decision tree across 6 project types | n/a — skills only | Aug 15, 2026 |
-| [research-toolkit](./research-toolkit/) | Six skills for research, source preservation, and academic workflows: academic writing, legal paywall-bypass via Unpaywall and library databases, web archiving (Wayback / Archive.today / ArchiveBox), web page change monitoring, AI-enriched digital archive construction, and a curated free-API catalog with sunset currency notes (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) | n/a — skills only | Aug 15, 2026 |
+| [project-templates-toolkit](./project-templates-toolkit/) | Three skills for setting up and closing out journalism projects: a CLAUDE.md project-memory writer (institutional knowledge), a LESSONS.md retrospective writer (failures and decisions), and a template-selector decision tree across 6 project types | n/a, skills only | Aug 15, 2026 |
+| [research-toolkit](./research-toolkit/) | Six skills for research, source preservation, and academic workflows: academic writing, legal paywall-bypass via Unpaywall and library databases, web archiving (Wayback / Archive.today / ArchiveBox), web page change monitoring, AI-enriched digital archive construction, and a curated free-API catalog with sunset currency notes (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) | n/a, skills only | Aug 15, 2026 |
 | [security-toolkit](./security-toolkit/) | Four defensive security skills covering OWASP Top 10 fundamentals and supply-chain hardening: pre-deployment audit checklists (auth, input validation, secrets management), secure authentication patterns (password hashing, session management, JWT, OAuth, passkeys), API hardening (rate limiting, CORS, request throttling, defense-in-depth for Express, FastAPI, and serverless), and npm/bun supply-chain hardening with install-time cooldown plus a sandboxed pre-install scan for the bypass case (defends against Mini Shai-Hulud-class worms) | `/security-toolkit:hotpatch` | Aug 15, 2026 |
 | [superjawn](./superjawn/) | Research-augmented fork of obra/superpowers. Default-on research phase fires before brainstorming, systematic-debugging, and writing-skills. Includes all 14 skills with no soft dependencies on the upstream `superpowers` plugin | invoked indirectly via skills (e.g. `superjawn:brainstorming`, `superjawn:systematic-debugging`, `superjawn:writing-plans`) | Aug 15, 2026 |
-| [video-toolkit](./video-toolkit/) | Four composable skills for social-video accountability reporting: downloading public video from Twitter/X, TikTok, YouTube, Instagram, and Facebook; transcribing it with a provenance sidecar and a CPU path any evaluator can re-run; extracting and vision-analyzing frames; and aggregating the result into an interactive dashboard | n/a — skills only | Aug 15, 2026 |
+| [video-toolkit](./video-toolkit/) | Four composable skills for social-video accountability reporting: downloading public video from Twitter/X, TikTok, YouTube, Instagram, and Facebook; transcribing it with a provenance sidecar and a CPU path any evaluator can re-run; extracting and vision-analyzing frames; and aggregating the result into an interactive dashboard | n/a, skills only | Aug 15, 2026 |
 | [visual-explainer](./visual-explainer/) | HTML diagrams, data tables, architecture views, slide decks, and KPI dashboards adapted from nicobailon/visual-explainer with journalism, newsroom, and academic design sensibilities | `/visual-explainer:project-recap` | Aug 15, 2026 |
 
 #### Skills (manual installation)
 
-Most skills live inside a plugin's `skills/` directory. The `okf-wiki/SKILL.md`, `pdf-design/SKILL.md`, and `visual-explainer/SKILL.md` root-skill packages keep the skill at the package root. To install one skill without taking a whole plugin, clone the repo and copy or symlink the directory that directly contains its `SKILL.md`. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
+Most skills live inside a plugin's `skills/` directory. The `okf-wiki/SKILL.md`, `pdf-design/SKILL.md`, and `visual-explainer/SKILL.md` root-skill packages keep the skill at the package root. To install one skill without taking a whole plugin, clone the repo and copy or symlink the directory that directly contains its `SKILL.md`. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md`, one level deep:
 
 ```
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
@@ -79,7 +79,7 @@ ln -sfn "$PWD/research-toolkit/skills/free-apis-catalog" ~/.claude/skills/free-a
 ln -sfn "$PWD/visual-explainer" ~/.claude/skills/visual-explainer
 ```
 
-Do not clone the repo directly into `~/.claude/skills/journalism-skills/` — that nests each `SKILL.md` too deep and Claude Code won't find them.
+Do not clone the repo directly into `~/.claude/skills/journalism-skills/`, that nests each `SKILL.md` too deep and Claude Code won't find them.
 
 ### Codex
 
@@ -137,7 +137,7 @@ These fifteen skills ship together as the [journalism-core](./journalism-core/) 
 | Skill | Description | Updated |
 |-------|-------------|--------|
 | [ai-writing-detox](./journalism-core/skills/ai-writing-detox/) | Eliminate AI-generated patterns that erode reader trust. Banned words, phrases, and structures with alternatives | May 8, 2026 |
-| [brazil-records-requests](./journalism-core/skills/brazil-records-requests/) | Public records requests under Brazil's Access to Information Law (Lei 12.527/2011) — portal selection across federal, state, municipal, judicial and legislative bodies; deadlines; the four-level appeal chain (first instance, agency head, CGU, CMRI); templates in Portuguese with English glosses | Aug 15, 2026 |
+| [brazil-records-requests](./journalism-core/skills/brazil-records-requests/) | Public records requests under Brazil's Access to Information Law (Lei 12.527/2011), portal selection across federal, state, municipal, judicial and legislative bodies; deadlines; the four-level appeal chain (first instance, agency head, CGU, CMRI); templates in Portuguese with English glosses | Aug 15, 2026 |
 | [crisis-communications](./journalism-core/skills/crisis-communications/) | Breaking news protocol, rapid verification, crisis response, misinformation countering | Jul 21, 2026 |
 | [data-journalism](./journalism-core/skills/data-journalism/) | Dataset analysis, chart and map creation, statistical reasoning, data-driven story structure | Jul 21, 2026 |
 | [editorial-workflow](./journalism-core/skills/editorial-workflow/) | Story assignment tracking, deadline management, editorial calendars, handoff protocols | May 8, 2026 |
@@ -170,7 +170,7 @@ These six skills ship together as the [research-toolkit](./research-toolkit/) pl
 | Skill | Description | Updated |
 |-------|-------------|--------|
 | [pdf-design](./pdf-design/) | Professional PDF reports and proposals with brand system, budget tables, and multi-page layouts. For the full interactive experience, use [pdf-playground](./pdf-playground/) instead | Aug 15, 2026 |
-| [visual-explainer](./visual-explainer/) | Turn complex data into styled HTML pages — architecture diagrams, data tables, flowcharts, timelines, source maps, and dashboards with dark/light theme support. Now registered as a plugin (`/plugin install visual-explainer@claude-skills-journalism`) | Aug 15, 2026 |
+| [visual-explainer](./visual-explainer/) | Turn complex data into styled HTML pages, architecture diagrams, data tables, flowcharts, timelines, source maps, and dashboards with dark/light theme support. Now registered as a plugin (`/plugin install visual-explainer@claude-skills-journalism`) | Aug 15, 2026 |
 
 ### PDF Playground skill
 
@@ -397,7 +397,7 @@ When preserving or tracking content:
 
 ## Contributing
 
-Contributions welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide — skill structure, testing, and style guidelines.
+Contributions welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide, skill structure, testing, and style guidelines.
 
 Quick version: fork, create your skill with a `SKILL.md` frontmatter file, run `npm run validate:agent-skills`, test the clients affected by your change, and submit a PR.
 
@@ -418,7 +418,7 @@ Quick version: fork, create your skill with a `SKILL.md` frontmatter file, run `
 - [Claude Code documentation](https://docs.anthropic.com/claude-code)
 - [Codex skills documentation](https://learn.chatgpt.com/docs/build-skills)
 - [Agent Skills specification](https://agentskills.io/specification)
-- [autopunk-media-skills](https://github.com/ur-grue/autopunk-media-skills) — broadcast, TV, podcast, and radio production skills; complements this repo's investigative focus. Free library, paired with a paid product ([autopunk.io](https://autopunk.io))
+- [autopunk-media-skills](https://github.com/ur-grue/autopunk-media-skills), broadcast, TV, podcast, and radio production skills; complements this repo's investigative focus. Free library, paired with a paid product ([autopunk.io](https://autopunk.io))
 - [NICAR (Investigative Reporters & Editors)](https://www.ire.org/nicar/)
 - [First Draft News](https://firstdraftnews.org/)
 - [Verification Handbook](https://verificationhandbook.com/)

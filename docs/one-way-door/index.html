@@ -135,7 +135,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">One-way door check</h1>
             <p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-06-10T16:49:35-04:00" data-updated-slug="one-way-door">Updated <time datetime="2026-06-10T16:49:35-04:00">Jun 10, 2026</time></p>
             <p class="text-xl text-white/90 max-w-2xl">
-                Flag irreversible architectural decisions before you commit to them. The most expensive mistakes aren't bugs — they're decisions that can't be undone.
+                Flag irreversible architectural decisions before you commit to them. The most expensive mistakes aren't bugs, they're decisions that can't be undone.
             </p>
         </div>
     </header>
@@ -384,7 +384,7 @@ fi
 
 exit 0  # Allow two-way doors</code></pre>
             </div>
-            <p class="text-clay/80 mt-5 mb-3">A second hook runs on <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">PostToolUse:AskUserQuestion</code>. When the user answers any <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">AskUserQuestion</code>, it promotes every pending path to approved so the retried write passes. It never blocks. It keys on the event, not the specific question — so an unrelated question answered while a file is pending approves it too. The block-then-discuss prompt is the guardrail; the ledger just stops an already-discussed file from re-blocking.</p>
+            <p class="text-clay/80 mt-5 mb-3">A second hook runs on <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">PostToolUse:AskUserQuestion</code>. When the user answers any <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">AskUserQuestion</code>, it promotes every pending path to approved so the retried write passes. It never blocks. It keys on the event, not the specific question, so an unrelated question answered while a file is pending approves it too. The block-then-discuss prompt is the guardrail; the ledger just stops an already-discussed file from re-blocking.</p>
             <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                 <pre tabindex="0" class="text-white"><code>#!/bin/sh
 # one-way-door-approve.sh (PostToolUse:AskUserQuestion)
@@ -489,7 +489,7 @@ committing.</code></pre>
 
                 <div>
                     <h3 class="font-semibold mb-3">Option 3: Add the automated hooks</h3>
-                    <p class="text-sm text-clay/70 mb-3">For automated enforcement, save both scripts and add this to your <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">settings.json</code>. The approval hook is required — without it, the check re-blocks an approved file on every retry:</p>
+                    <p class="text-sm text-clay/70 mb-3">For automated enforcement, save both scripts and add this to your <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">settings.json</code>. The approval hook is required, without it, the check re-blocks an approved file on every retry:</p>
                     <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                         <pre tabindex="0" class="text-white"><code>{
   "hooks": {
@@ -511,7 +511,7 @@ committing.</code></pre>
 }</code></pre>
                     </div>
                     <h4 class="font-semibold mb-2 mt-6">Windows (PowerShell)</h4>
-                    <p class="text-sm text-clay/70 mb-3">On Windows, hooks run through PowerShell and file paths can use backslashes. Behavior-matched ports — <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">one-way-door-check.ps1</code> and <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">one-way-door-approve.ps1</code> — ship in the skill directory and use the same session ledger, safelist, and categories. Copy both into your hooks folder (for example <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">%USERPROFILE%\.claude\hooks\</code>), then wire them with the PowerShell launcher — update the paths to match where you saved them (replace <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">&lt;you&gt;</code>):</p>
+                    <p class="text-sm text-clay/70 mb-3">On Windows, hooks run through PowerShell and file paths can use backslashes. Behavior-matched ports, <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">one-way-door-check.ps1</code> and <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">one-way-door-approve.ps1</code>, ship in the skill directory and use the same session ledger, safelist, and categories. Copy both into your hooks folder (for example <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">%USERPROFILE%\.claude\hooks\</code>), then wire them with the PowerShell launcher, update the paths to match where you saved them (replace <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">&lt;you&gt;</code>):</p>
                     <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                         <pre tabindex="0" class="text-white"><code>{
   "hooks": {

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""REFERENCE IMPLEMENTATION — read it, adapt it, do NOT run it as-is.
+"""REFERENCE IMPLEMENTATION, read it, adapt it, do NOT run it as-is.
 
 The issue picker. It lists open issues across your configured repos, drops the
 ones the gates exclude, ranks what's left, and chooses exactly one to work this
 session. Your agent should rewrite this for your real config loader and error
-handling — this version trades robustness for readability.
+handling, this version trades robustness for readability.
 
 Depends only on the `gh` CLI (`gh auth login`) and the Python standard library.
 """

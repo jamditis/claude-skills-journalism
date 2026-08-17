@@ -1,5 +1,5 @@
 {
-  "_comment": "Manifest of ported skills and per-file parity expectations. Maintained alongside CREDITS.md divergence log. The validator at scripts/validate-skill.sh reads this file. supporting_file_overrides covers two cases: (1) a local file that diverges from its upstream counterpart, and (2) a local-only file with no upstream equivalent. Both require an explicit entry — the manifest is the authoritative record of every intentional deviation from upstream.",
+  "_comment": "Manifest of ported skills and per-file parity expectations. Maintained alongside CREDITS.md divergence log. The validator at scripts/validate-skill.sh reads this file. supporting_file_overrides covers two cases: (1) a local file that diverges from its upstream counterpart, and (2) a local-only file with no upstream equivalent. Both require an explicit entry, the manifest is the authoritative record of every intentional deviation from upstream.",
   "skills": {
     "brainstorming": {
       "category": "research",

@@ -31,7 +31,7 @@ Share a visual explainer HTML file instantly via Vercel. Returns a live URL with
 
 - **vercel-deploy skill** - Required for deployment. In Pi, install with: `pi install npm:vercel-deploy`
 
-No Vercel account, Cloudflare account, or API keys needed. The deployment is "claimable" — you can transfer it to your Vercel account later if you want.
+No Vercel account, Cloudflare account, or API keys needed. The deployment is "claimable", you can transfer it to your Vercel account later if you want.
 
 ## Script Location
 
@@ -63,6 +63,6 @@ The script also outputs JSON for programmatic use:
 
 ## Notes
 
-- Deployments are **public** — anyone with the URL can view
+- Deployments are **public**, anyone with the URL can view
 - Preview deployments have a configurable retention period (default: 30 days)
 - Each share creates a new deployment with a unique URL

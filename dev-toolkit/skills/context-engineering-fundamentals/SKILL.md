@@ -1,6 +1,6 @@
 ---
 name: context-engineering-fundamentals
-description: Manage attention and evidence in long AI-agent sessions. Use for complex tasks, large contexts, multi-agent work, or apparent instruction and evidence loss.
+description: Manages attention and evidence in long agent sessions. Use for complex tasks, large contexts, or multi-agent work.
 ---
 
 # Context engineering fundamentals

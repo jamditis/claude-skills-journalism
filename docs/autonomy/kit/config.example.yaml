@@ -1,4 +1,4 @@
-# Autonomous GitHub-issue workhorse — example config
+# Autonomous GitHub-issue workhorse, example config
 #
 # This is the one file you (or your agent) edit. Copy it to `config.yaml`, fill
 # it in, and keep `config.yaml` out of version control (it can hold secret
@@ -30,7 +30,7 @@ schedule:
     enabled: true
     # cron-style on Linux/macOS; your agent translates this for launchd / Task
     # Scheduler. "every hour, 7am-7pm" is a sane starting cadence. Cost scales
-    # with how often this fires — start low, raise it once you trust the output.
+    # with how often this fires, start low, raise it once you trust the output.
     cron: "5 7-19 * * *"
     timezone: America/New_York
   timeouts:
@@ -41,7 +41,7 @@ model:
   # Effort for doing the work. Higher costs more and is slower; don't default
   # everything to the top tier. See COSTS.md.       low|medium|high|xhigh|max
   work_effort: high
-  # Effort for the review pass. Low on purpose — a fast literal read for bugs,
+  # Effort for the review pass. Low on purpose, a fast literal read for bugs,
   # not a rewrite that invents problems.
   review_effort: low
 
@@ -53,7 +53,7 @@ github:
   repos:
     - owner/repo-a
     - repo: owner/repo-b
-      priority: high          # high | normal | low — weights this repo in the picker
+      priority: high          # high | normal | low, weights this repo in the picker
     - repo: owner/repo-c
       priority: low
 
@@ -75,7 +75,7 @@ scope:
   # Limit which files a session may modify. Empty allowed_paths = the whole repo.
   allowed_paths: []           # globs it MAY edit, e.g. ["src/**", "docs/**"]
   denied_paths:               # globs it must NEVER touch, even inside allowed_paths
-    - ".github/workflows/**"  # CI config — a common "never auto-edit" surface
+    - ".github/workflows/**"  # CI config, a common "never auto-edit" surface
     - "infra/**"
     - "**/*secret*"
   # Breadth caps per session. A change that needs more than this is a signal the
@@ -113,14 +113,14 @@ notify:
     chat_id_ref: autonomy/telegram-chat-id
 
 secrets:
-  # GitHub auth comes from the `gh` CLI (`gh auth login`) — you do NOT put a
+  # GitHub auth comes from the `gh` CLI (`gh auth login`), you do NOT put a
   # GitHub token here. This backend only resolves the optional notifier secrets.
   #   env | pass | keychain | credential-manager | 1password
   backend: env
   prefix: ""
 
 safety:
-  # Hard rules. Not style preferences — the difference between a helper and a
+  # Hard rules. Not style preferences, the difference between a helper and a
   # liability. Your agent wires them into the prompt and the harness.
   auto_merge: false                    # NEVER let an unattended session merge its own PR
   protected_branches: [main, master]   # it opens PRs against these; never pushes directly

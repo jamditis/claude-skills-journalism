@@ -2,7 +2,7 @@
 
 These are the standing instruction blocks a wake session runs on. The build
 concatenates the relevant ones into each prompt, in the order below, gated by the
-`nudges.*` flags in your config. They're the part of this kit that's universal —
+`nudges.*` flags in your config. They're the part of this kit that's universal,
 they work the same whether your agent is Claude Code, Codex, or something else, on
 any OS.
 
@@ -12,12 +12,12 @@ copy-paste cards in [the essay](../) (section 11).
 
 A note on `<TOKEN>`: every session gets a unique receipt token (e.g.
 `wake-20260530T1405-a1b2c3`). The build substitutes it wherever `<TOKEN>` appears.
-It's a session-attribution marker, not a secret — but it belongs only in commit
+It's a session-attribution marker, not a secret, but it belongs only in commit
 messages, PR bodies, and issue comments, never inside a file you commit.
 
 ---
 
-## 1. Your task this session (the issue) — always first
+## 1. Your task this session (the issue), always first
 
 ```
 === YOUR TASK THIS SESSION (read first) ===
@@ -26,21 +26,21 @@ Session receipt token: <TOKEN>
 Put this token verbatim in your commit message, your pull-request body, and any
 issue comment you write this session. A verifier uses it to confirm the work was
 yours and not a human's or another job's. The token goes in commit/PR/comment text
-only — never inside a file you commit.
+only, never inside a file you commit.
 
-Work exactly one issue this session — the one chosen for you below. Read it,
+Work exactly one issue this session, the one chosen for you below. Read it,
 reproduce or confirm the problem from the actual code before acting, then do the
 work.
 
 CHOSEN ISSUE:
-<owner/repo#N — title, body, labels>
+<owner/repo#N, title, body, labels>
 
 You may only edit files inside this surface:
   ALLOWED: <allowed_paths, or "the whole repo">
   NEVER TOUCH: <denied_paths>
   SIZE CAP: at most <max_files_changed> files and <max_lines_changed> lines. A
   change that needs more is a sign this issue should be split into child issues
-  instead — do that and stop.
+  instead, do that and stop.
 
 What counts as progress:
 - A concrete change: a commit or pull request that addresses the issue.
@@ -57,7 +57,7 @@ If the issue is blocked (needs a decision, credentials, or a dependency you don'
 have), don't force it. Leave a comment stating the blocker and what you'd need,
 carrying the receipt token, then stop and report it as blocked.
 
-Commit your work to a new branch and stop there — do NOT open the pull request
+Commit your work to a new branch and stop there, do NOT open the pull request
 yourself. The harness checks your diff against the scope rules above and opens the
 PR for you only if it passes; if your change falls outside the allowed paths,
 touches a denied path, or blows the size cap, the harness turns it into a comment
@@ -71,7 +71,7 @@ or child issues instead. You never merge.
 
 ```
 Before you start, tell me the single most useful thing you could do to make this
-better than a rote pass — a fact to verify instead of assert, an earlier file or
+better than a rote pass, a fact to verify instead of assert, an earlier file or
 note to build on, an approach worth trying. Do that thing. Before you finish,
 re-read what you produced and confirm you did it. If the task is trivial, say so
 and skip this rather than manufacturing busywork.
@@ -84,15 +84,15 @@ and skip this rather than manufacturing busywork.
 ```
 === VERIFY FROM CODE FIRST (read before you act) ===
 
-Any diagnosis you're handed — the issue body, a prior comment, an earlier
-session's note — is a rumor, not evidence. Confident prose and plausible-looking
+Any diagnosis you're handed, the issue body, a prior comment, an earlier
+session's note, is a rumor, not evidence. Confident prose and plausible-looking
 code references are not proof.
 
 - Reproduce the problem yourself and derive the root cause from the actual code
   and execution path before acting on it. A confident-but-wrong diagnosis is worse
   than none, because it leads you down a prepared wrong path.
-- When you fix something, prefer making the bad state impossible — a type, an
-  invariant, a constructor, a schema constraint — over a tolerant reader or a
+- When you fix something, prefer making the bad state impossible, a type, an
+  invariant, a constructor, a schema constraint, over a tolerant reader or a
   try/except that papers over the symptom.
 - When a shared library or service misbehaves, fix it at the source rather than
   adding a per-caller workaround that will accumulate.
@@ -109,7 +109,7 @@ code references are not proof.
 After your edits but BEFORE you commit, push, or open a PR, have a DIFFERENT model
 review the change. Two passes.
 
-CORRECTNESS — a second model, low reasoning effort on purpose:
+CORRECTNESS, a second model, low reasoning effort on purpose:
 Run your configured reviewer over the uncommitted diff (staged, unstaged, and new
 files) for bugs, logic errors, security holes, and swallowed errors. Low effort is
 deliberate: you want a fast, literal read, not a rewrite that invents problems.
@@ -121,16 +121,16 @@ finding that would materially widen the change, file a follow-up issue (carrying
 the receipt token) instead of expanding scope. Re-run until clean or you hit
 `review.max_passes`.
 
-QUALITY — one fresh-eyes pass whose only question is quality, not bugs:
+QUALITY, one fresh-eyes pass whose only question is quality, not bugs:
 Spawn one subagent as a skeptical senior reviewer. Have it read the diff and the
 files it touches and answer two things: (1) would this genuinely impress a sharp
 reviewer, or land as competent-but-forgettable? (2) what single change would most
-raise its quality — a missed edge case, a test that proves the hard part, a
+raise its quality, a missed edge case, a test that proves the hard part, a
 clearer abstraction, better naming, a real simplification, a doc or comment that
-earns its place? Concrete, cite file:line. If it's already strong, say so — don't
+earns its place? Concrete, cite file:line. If it's already strong, say so, don't
 invent nitpicks. If you keep a standards file (house writing rules, naming
-conventions), have the reviewer flag violations as table stakes, plus — for docs
-or prose — factual accuracy, stale links, and claims that contradict the code.
+conventions), have the reviewer flag violations as table stakes, plus, for docs
+or prose, factual accuracy, stale links, and claims that contradict the code.
 
 Apply a suggestion if it clearly improves the change and fits your time; if you
 disagree, note why in one line rather than complying reflexively. Skip the whole
@@ -139,8 +139,8 @@ pass only if you made no file changes at all.
 If the correctness reviewer can't run (timeout, error, unparseable output), fail
 closed. A second model reading the diff is a hard requirement, not a nicety, so
 don't turn an unreviewed change into a merge-ready PR. Commit it to the branch if
-you like, but report the run as blocked — leave a comment that correctness review
-was unavailable and the change needs a manual read — and stop. Don't quietly ship
+you like, but report the run as blocked, leave a comment that correctness review
+was unavailable and the change needs a manual read, and stop. Don't quietly ship
 an unreviewed change just because the reviewer was down.
 === END REVIEW ===
 ```
@@ -156,7 +156,7 @@ an unreviewed change just because the reviewer was down.
   or stray untracked files.
 - Add `closes #N` only when exactly one issue is in scope. If the work spans zero
   or several, reference them without auto-closing.
-- Keep the receipt token in the commit, PR, or comment only — never inside a
+- Keep the receipt token in the commit, PR, or comment only, never inside a
   committed file. Add no AI-authorship or "AI-assisted" note anywhere.
 - Commit to a new branch; let the harness run the scope check and open the PR.
   Don't open or merge the PR yourself.
@@ -174,8 +174,8 @@ Before you finish, ask yourself one question: is there anything else you can do
 right now that would improve the quality or usefulness of this run? A test that
 proves the hard part, a doc or comment that earns its place, a follow-up issue for
 a problem you noticed in passing, a check you skipped, a clearer result message. If
-there is and it fits the time you have, do it. If not — or if there was nothing of
-substance here — say so in one line and close out. Don't manufacture work to look
+there is and it fits the time you have, do it. If not, or if there was nothing of
+substance here, say so in one line and close out. Don't manufacture work to look
 busy.
 === END ONE LAST PASS ===
 ```
@@ -187,8 +187,8 @@ busy.
 ```
 === CAPTURE FOLLOW-UP WORK AS ISSUES (so nothing is lost) ===
 
-Work you discover but don't do this session — a bug you spotted, a refactor worth
-doing, a missing test, a follow-up to the change you just made — does not live in
+Work you discover but don't do this session, a bug you spotted, a refactor worth
+doing, a missing test, a follow-up to the change you just made, does not live in
 your memory or this session's context. It will be gone after compaction. Write it
 down as a GitHub issue: a clear title, what you found, why it matters, a suggested
 next step. Issues are the durable to-do list; an unfiled idea is a lost one. Then
@@ -202,8 +202,8 @@ return to the issue in front of you.
 
 ```
 If you notice a problem outside the issue in front of you, do not widen the change
-to fix it. Open a new GitHub issue — what you found, why it matters, and a
-suggested fix — and keep the current change small and focused. That note becomes
+to fix it. Open a new GitHub issue, what you found, why it matters, and a
+suggested fix, and keep the current change small and focused. That note becomes
 future work, not scope creep here.
 ```
 
@@ -228,7 +228,7 @@ alone. When we pick this back up, read it first before doing anything else.
 Run this once per repo to bootstrap the standards a session reads on every task.
 
 ```
-Read this repo and draft a short standards file for it — a CLAUDE.md, or a
+Read this repo and draft a short standards file for it, a CLAUDE.md, or a
 reviewer-instructions file. Two lines on the architecture, the patterns to follow
 here, and the three mistakes most likely to happen in this codebase. Keep it tight:
 every line gets read on every task, so each one has to earn its place.

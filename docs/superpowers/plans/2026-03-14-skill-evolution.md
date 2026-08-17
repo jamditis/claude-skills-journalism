@@ -14,7 +14,7 @@
 
 ---
 
-## Chunk 1: Foundation — config utils and skill tracking
+## Chunk 1: Foundation, config utils and skill tracking
 
 ### Task 1: Create shared config resolution helper
 
@@ -377,7 +377,7 @@ INPUT=$(cat)
 
 With:
 ```bash
-# Read stdin — extract session_id for skill tracking cleanup
+# Read stdin, extract session_id for skill tracking cleanup
 INPUT=$(cat)
 SESSION_ID=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('session_id',''))" 2>/dev/null || echo "")
 ```
@@ -451,7 +451,7 @@ git commit -m "feat(skill-evolution): update curator to output skill and scope f
 **Files:**
 - Create: `scripts/skill-evolution/store.py`
 
-- [ ] **Step 1: Write store.py — the global lesson store manager**
+- [ ] **Step 1: Write store.py, the global lesson store manager**
 
 ```python
 #!/usr/bin/env python3
@@ -788,7 +788,7 @@ After the existing actions (Approve, Edit, Delete, Supersede, Skip), add:
 
 When a lesson has a `skill` field (non-null), add a sixth action:
 
-- **Promote to global** — Copy this lesson to `~/.claude/skill-lessons/<skill>.json` using the promote function. Update the original lesson's `scope` to `"skill"` in `lessons.json`. Report: "Promoted to global store for [skill name]."
+- **Promote to global**, Copy this lesson to `~/.claude/skill-lessons/<skill>.json` using the promote function. Update the original lesson's `scope` to `"skill"` in `lessons.json`. Report: "Promoted to global store for [skill name]."
 
 The global store path comes from config: `skill_learning.global_store` (default `~/.claude/skill-lessons/`).
 
@@ -866,7 +866,7 @@ def generate_evolved_skill(skill_content, lessons, model_cmd="claude -p"):
 
 RULES:
 - Integrate lessons naturally into the existing content
-- Don't create a separate "lessons" section — weave guidance into the flow where it belongs
+- Don't create a separate "lessons" section, weave guidance into the flow where it belongs
 - Preserve the skill's existing structure, voice, and formatting
 - Higher-confidence lessons should be treated as more authoritative
 - If a lesson contradicts existing guidance, the lesson wins (it's from real usage)
@@ -1050,7 +1050,7 @@ def find_skill_path(skill_name):
     return None
 ```
 
-- [ ] **Step 3: Write scan_eligible.sh — the main entry point**
+- [ ] **Step 3: Write scan_eligible.sh, the main entry point**
 
 ```bash
 #!/usr/bin/env bash
@@ -1228,10 +1228,10 @@ This command improves skill .md files based on lessons accumulated in the global
 ## Argument handling
 
 The user may invoke this command with arguments:
-- `/autocontext-evolve` — default: scan and evolve interactively
-- `/autocontext-evolve --rollback <skill-name>` — restore from backup
-- `/autocontext-evolve --export` — export lessons to JSON
-- `/autocontext-evolve --import <path>` — import lessons from JSON
+- `/autocontext-evolve`, default: scan and evolve interactively
+- `/autocontext-evolve --rollback <skill-name>`, restore from backup
+- `/autocontext-evolve --export`, export lessons to JSON
+- `/autocontext-evolve --import <path>`, import lessons from JSON
 
 Parse the arguments from the user's input. If `--rollback` is present, run the rollback flow. If `--export` or `--import`, run the sync flow. Otherwise, run the default evolution flow.
 
@@ -1280,10 +1280,10 @@ Parse the arguments from the user's input. If `--rollback` is present, run the r
    e. If generation failed, offer the append fallback.
    f. Show a diff between the original and evolved content.
    g. Ask the user via AskUserQuestion:
-      - **Accept** — apply the edit
-      - **Edit** — let user make manual changes first
-      - **Reject** — skip, lessons stay
-      - **Append instead** — use the fallback section
+      - **Accept**, apply the edit
+      - **Edit**, let user make manual changes first
+      - **Reject**, skip, lessons stay
+      - **Append instead**, use the fallback section
    h. Apply the chosen action using apply-edit functions.
    i. Mark evolved lessons as folded.
 
@@ -1334,7 +1334,7 @@ for skill, counts in summary.items():
 
 - [ ] **Step 2: Verify command auto-discovery**
 
-Claude Code auto-discovers commands in the `commands/` directory by convention. No explicit `plugin.json` registration is needed — placing `evolve.md` in `commands/` is sufficient. Verify by checking that the existing commands (review.md, setup.md, init.md, status.md) also have no `plugin.json` registration.
+Claude Code auto-discovers commands in the `commands/` directory by convention. No explicit `plugin.json` registration is needed, placing `evolve.md` in `commands/` is sufficient. Verify by checking that the existing commands (review.md, setup.md, init.md, status.md) also have no `plugin.json` registration.
 
 - [ ] **Step 3: Commit**
 
@@ -1385,9 +1385,9 @@ Controls the minimum evidence threshold for `/autocontext-evolve` to consider a 
 **Question:** How aggressive should skill evolution be?
 
 **Options:**
-- Conservative (confidence >= 0.9, 5+ validations) — only well-proven lessons
+- Conservative (confidence >= 0.9, 5+ validations), only well-proven lessons
 - Moderate (confidence >= 0.85, 3+ validations) (recommended)
-- Aggressive (confidence >= 0.7, 2+ validations) — faster evolution, more risk
+- Aggressive (confidence >= 0.7, 2+ validations), faster evolution, more risk
 
 Set `skill_learning.evolution_confidence` and `skill_learning.evolution_min_validations` based on selection.
 ```

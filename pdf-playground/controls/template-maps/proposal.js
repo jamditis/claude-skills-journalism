@@ -1,5 +1,5 @@
 /**
- * PDF Playground — Template map: Proposal
+ * PDF Playground, Template map: Proposal
  *
  * Maps the proposal template's CSS variables, selectors, and sections
  * to human-readable control panel entries. The control-panel.js reads

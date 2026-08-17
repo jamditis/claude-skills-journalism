@@ -1,10 +1,10 @@
 ---
 name: receiving-code-review
-description: Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation
+description: Verifies review feedback with technical rigor, not blind agreement. Use when receiving review before implementing suggestions.
 ---
 <!--
 Adapted from obra/superpowers receiving-code-review skill (v5.0.7),
-MIT-licensed, copyright 2025 Jesse Vincent. Modifications copyright 2026 Joe Amditis. v0.4.0 ports as a consumer category — no research
+MIT-licensed, copyright 2025 Jesse Vincent. Modifications copyright 2026 Joe Amditis. v0.4.0 ports as a consumer category, no research
 phase per the v0.2.0 architecture, since verification-against-codebase
 is already step 3 of the existing flow; review-evaluation is
 per-comment, not entry-point work.

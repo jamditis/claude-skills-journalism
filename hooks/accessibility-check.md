@@ -138,7 +138,7 @@ Good alt text for journalism:
 
 ## Non-blocking
 
-This hook flags issues but doesn't prevent publication. Prioritize fixes based on impact—missing alt text on key images is more critical than minor heading issues.
+This hook flags issues but doesn't prevent publication. Prioritize fixes based on impact, missing alt text on key images is more critical than minor heading issues.
 
 ## Skip conditions
 

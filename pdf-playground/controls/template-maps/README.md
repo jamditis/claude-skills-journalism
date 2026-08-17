@@ -6,15 +6,15 @@ Each file in this directory defines the control panel layout for one document te
 
 A template map is a JS file that assigns `window.PDFPlaygroundTemplateMap` with the following sections:
 
-**colors** — Array of CSS custom property mappings. Each entry has `variable` (the CSS variable name in `:root`), `label` (displayed in the panel), and `default` (the starting hex value).
+**colors**, Array of CSS custom property mappings. Each entry has `variable` (the CSS variable name in `:root`), `label` (displayed in the panel), and `default` (the starting hex value).
 
-**fonts** — Object with `heading` and `body` keys. Each has `targets` (CSS selectors to update), `default` (initial font name), and `options` (array of Google Font names to offer).
+**fonts**, Object with `heading` and `body` keys. Each has `targets` (CSS selectors to update), `default` (initial font name), and `options` (array of Google Font names to offer).
 
-**sliders** — Array of range controls. Each entry has `id`, `label`, `property` (CSS property to set), `targets` (selectors), `unit`, `min`, `max`, `step`, and `default`. Special cases: `isScale: true` multiplies base sizes for heading scaling. `mirrorProperty` copies the value to a second property.
+**sliders**, Array of range controls. Each entry has `id`, `label`, `property` (CSS property to set), `targets` (selectors), `unit`, `min`, `max`, `step`, and `default`. Special cases: `isScale: true` multiplies base sizes for heading scaling. `mirrorProperty` copies the value to a second property.
 
-**toggles** — Array of show/hide switches. Each has `id`, `label`, `selector` (elements to toggle), and `default` (true = visible).
+**toggles**, Array of show/hide switches. Each has `id`, `label`, `selector` (elements to toggle), and `default` (true = visible).
 
-**layout** — Array of layout controls. Each has `id`, `label`, `type` ("buttonGroup" or "select"), `target` (selector), `property` (CSS property), `options` (value/label pairs), and `default`.
+**layout**, Array of layout controls. Each has `id`, `label`, `type` ("buttonGroup" or "select"), `target` (selector), `property` (CSS property), `options` (value/label pairs), and `default`.
 
 ## Creating a new map
 
@@ -38,4 +38,4 @@ A template map is a JS file that assigns `window.PDFPlaygroundTemplateMap` with 
 
 ## Supported templates
 
-- `proposal.js` — Funding proposal template
+- `proposal.js`, Funding proposal template

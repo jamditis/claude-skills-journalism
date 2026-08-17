@@ -135,7 +135,7 @@ Ten development-focused skills for journalists, researchers, and small newsroom 
 | mobile-debugging | Eruda, vConsole, Chrome DevTools on Android, Safari Web Inspector for iOS |
 | one-way-door | Block irreversible architectural decisions during planning |
 | python-pipeline | Data pipeline patterns (pandas, polars, DuckDB, asyncio) |
-| test-first-bugs | TDD workflow for bug fixes — failing test before fix |
+| test-first-bugs | TDD workflow for bug fixes, failing test before fix |
 | vibe-coding | AI-assisted development workflow (Claude Code, Cursor, Aider, Continue) |
 | web-scraping | Ethical scraping patterns (Playwright, robots.txt, anti-bot, terms-of-service) |
 | web-ui-best-practices | Container queries, `:has()`, view transitions, scroll-driven animations |
@@ -150,8 +150,8 @@ Ten development-focused skills for journalists, researchers, and small newsroom 
 
 ## See also
 
-- [`journalism-core`](../journalism-core/README.md) — 13 skills for reporting, verification, publishing
-- [`research-toolkit`](../research-toolkit/README.md) — 5 skills for research, archives, academic workflows
+- [`journalism-core`](../journalism-core/README.md), 13 skills for reporting, verification, publishing
+- [`research-toolkit`](../research-toolkit/README.md), 5 skills for research, archives, academic workflows
 ```
 
 ---
@@ -182,7 +182,7 @@ git mv zero-build-frontend       dev-toolkit/skills/zero-build-frontend
 git status --short
 ```
 
-Expected output: 10 lines starting with `R` (rename), each pointing from the old path to `dev-toolkit/skills/<name>/`. No `D`/`A` pairs (those would mean git didn't detect the rename — bad).
+Expected output: 10 lines starting with `R` (rename), each pointing from the old path to `dev-toolkit/skills/<name>/`. No `D`/`A` pairs (those would mean git didn't detect the rename, bad).
 
 - [ ] **Step 3: Confirm rename similarity**
 
@@ -227,7 +227,7 @@ Edit `.claude-plugin/marketplace.json`:
 }
 ```
 
-(Use the same description as `dev-toolkit/.claude-plugin/plugin.json` — keep them in sync.)
+(Use the same description as `dev-toolkit/.claude-plugin/plugin.json`, keep them in sync.)
 
 - [ ] **Step 3: Validate JSON**
 
@@ -249,7 +249,7 @@ Expected output (one per line, in this order): `"autocontext"`, `"dev-toolkit"`,
 Locate the section starting with `# Plugin: research-toolkit (5 skills)`. Add a new section immediately after research-toolkit's tree:
 
 ```markdown
-├── # Plugin: dev-toolkit (10 skills) — registered in marketplace.json
+├── # Plugin: dev-toolkit (10 skills), registered in marketplace.json
 ├── dev-toolkit/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -374,7 +374,7 @@ Read the file in full. Note any references to versions, URLs, tool names, dates,
 
 For each candidate drift point, web-search for current state. Use `WebSearch` for 2026 facts. Skip obviously stable content (general principles, methodology).
 
-The spec's drift table is the starting point but not a complete list — also flag anything that looks dated.
+The spec's drift table is the starting point but not a complete list, also flag anything that looks dated.
 
 - [ ] **Step 3: Apply edits**
 
@@ -423,7 +423,7 @@ Commit prefix: `Currency sweep: mobile-debugging`.
 
 **Files:** `dev-toolkit/skills/one-way-door/SKILL.md`.
 
-Drift focus: relatively stable methodology. Light-touch sweep — verify the heuristics still hold and any cited examples are reasonable. May produce zero changes (acceptable; commit only if real edits).
+Drift focus: relatively stable methodology. Light-touch sweep, verify the heuristics still hold and any cited examples are reasonable. May produce zero changes (acceptable; commit only if real edits).
 
 Commit prefix: `Currency sweep: one-way-door` (skip commit if no edits warranted; note in execution log).
 
@@ -439,7 +439,7 @@ Commit prefix: `Currency sweep: python-pipeline`.
 
 **Files:** `dev-toolkit/skills/test-first-bugs/SKILL.md`.
 
-Drift focus: pytest 8.x, `pytest-watcher` (replacement for unmaintained `pytest-watch`), `pytest.fixture` patterns. Mostly stable methodology — sweep should focus on tooling references not principles.
+Drift focus: pytest 8.x, `pytest-watcher` (replacement for unmaintained `pytest-watch`), `pytest.fixture` patterns. Mostly stable methodology, sweep should focus on tooling references not principles.
 
 Commit prefix: `Currency sweep: test-first-bugs`.
 
@@ -447,7 +447,7 @@ Commit prefix: `Currency sweep: test-first-bugs`.
 
 **Files:** `dev-toolkit/skills/vibe-coding/SKILL.md`.
 
-Drift focus (high-drift skill): current AI coding tool landscape — Claude Code, Cursor, GitHub Copilot, Aider, Continue, Codeium, Gemini Code Assist. Verify pricing/capability claims with explicit "as of 2026-05" date stamps. Note any tools that have shut down or pivoted.
+Drift focus (high-drift skill): current AI coding tool landscape, Claude Code, Cursor, GitHub Copilot, Aider, Continue, Codeium, Gemini Code Assist. Verify pricing/capability claims with explicit "as of 2026-05" date stamps. Note any tools that have shut down or pivoted.
 
 Commit prefix: `Currency sweep: vibe-coding`.
 
@@ -500,10 +500,10 @@ Review the work on branch package/dev-toolkit-phase4 (HEAD: <branch-head-sha>) a
 This branch ships a new `dev-toolkit` plugin bundling 10 skills + a 2026 currency sweep
 across all 10. There are 11 commits:
 
-- <structural-sha> — Structural: scaffold dev-toolkit/.claude-plugin/plugin.json + README.md,
+- <structural-sha>, Structural: scaffold dev-toolkit/.claude-plugin/plugin.json + README.md,
   git mv 10 skills, update marketplace.json (v1.5.0) and CLAUDE.md / README.md.
-- <accessibility-sha> — accessibility-compliance currency sweep
-- <electron-sha> — electron-dev currency sweep
+- <accessibility-sha>, accessibility-compliance currency sweep
+- <electron-sha>, electron-dev currency sweep
 ... (repeat for each skill)
 
 Repo context:
@@ -515,17 +515,17 @@ Repo context:
 Your task: find HIGH-confidence bugs, regressions, or correctness issues introduced by
 THIS BRANCH (since master). Focus on:
 
-1. CONSISTENCY — same patterns appearing across multiple skills should be consistent.
-2. CODE THAT WON'T RUN — missing imports, undefined variables, syntax mismatches.
-3. FACTUAL CLAIMS — anything asserted as fact that could be wrong (version numbers,
+1. CONSISTENCY, same patterns appearing across multiple skills should be consistent.
+2. CODE THAT WON'T RUN, missing imports, undefined variables, syntax mismatches.
+3. FACTUAL CLAIMS, anything asserted as fact that could be wrong (version numbers,
    API endpoints, retired services, library status).
-4. URL CORRECTNESS — every URL added should be reachable and correctly formatted.
-5. INSTRUCTIONS THAT WOULD BREAK COPY/PASTE — broken bash, malformed Python.
-6. LOW-VALUE FINDINGS — skip "could be improved" / stylistic preferences. Focus on
+4. URL CORRECTNESS, every URL added should be reachable and correctly formatted.
+5. INSTRUCTIONS THAT WOULD BREAK COPY/PASTE, broken bash, malformed Python.
+6. LOW-VALUE FINDINGS, skip "could be improved" / stylistic preferences. Focus on
    what's WRONG.
 
-Output format — terse, no preamble:
-- [HIGH/MED/LOW] <file:line> — <issue> — <suggested fix>
+Output format, terse, no preamble:
+- [HIGH/MED/LOW] <file:line>, <issue>, <suggested fix>
 - One line per finding. NO summary. NO "overall good" wrap-up.
 
 If no issues: NO ISSUES FOUND.
@@ -574,16 +574,16 @@ Phase 4 of the bundling effort: 10 development-themed bare skills become the new
 Mirrors the research-toolkit structure introduced in PR #62.
 
 **The 10 skills:**
-- accessibility-compliance — WCAG 2.2 baseline, alt text, focus management, motion preferences
-- electron-dev — Electron 30+ security model, IPC, packaging
-- mobile-debugging — Eruda 3.x, Chrome DevTools Protocol, Safari Web Inspector
-- one-way-door — block irreversible architectural decisions
-- python-pipeline — pandas, polars, DuckDB, asyncio TaskGroup, Python 3.13+
-- test-first-bugs — TDD bug-fixing workflow, pytest 8.x
-- vibe-coding — AI-assisted development (Claude Code, Cursor, Aider, Continue) — 2026-05 snapshot
-- web-scraping — Playwright 1.50+, Cloudflare bot defense, scraping ethics
-- web-ui-best-practices — container queries, :has(), view transitions, scroll-driven animations
-- zero-build-frontend — ESM import maps, htmx 2.0, Alpine.js
+- accessibility-compliance, WCAG 2.2 baseline, alt text, focus management, motion preferences
+- electron-dev, Electron 30+ security model, IPC, packaging
+- mobile-debugging, Eruda 3.x, Chrome DevTools Protocol, Safari Web Inspector
+- one-way-door, block irreversible architectural decisions
+- python-pipeline, pandas, polars, DuckDB, asyncio TaskGroup, Python 3.13+
+- test-first-bugs, TDD bug-fixing workflow, pytest 8.x
+- vibe-coding, AI-assisted development (Claude Code, Cursor, Aider, Continue), 2026-05 snapshot
+- web-scraping, Playwright 1.50+, Cloudflare bot defense, scraping ethics
+- web-ui-best-practices, container queries, :has(), view transitions, scroll-driven animations
+- zero-build-frontend, ESM import maps, htmx 2.0, Alpine.js
 
 ## Quality gates
 
@@ -646,7 +646,7 @@ gh api repos/jamditis/claude-skills-journalism/pulls/<pr-number>/reviews \
 
 - [ ] **Step 3: Apply fixes**
 
-For each finding (including suppressed-low-confidence ones — they're often real bugs per Phase 3 experience), apply the suggested fix via `Edit`. Group related fixes into one commit. Commit message: `address Copilot review findings`.
+For each finding (including suppressed-low-confidence ones, they're often real bugs per Phase 3 experience), apply the suggested fix via `Edit`. Group related fixes into one commit. Commit message: `address Copilot review findings`.
 
 - [ ] **Step 4: Push the fix commit**
 
@@ -687,8 +687,8 @@ C. Any new factual / URL / import / type errors?
 D. Any non-encoding bugs introduced (typos, broken markdown, removed lines that
    shouldn't have been removed)?
 
-Output format — terse:
-- [HIGH/MED/LOW] <file:line> — <issue> — <suggested fix>
+Output format, terse:
+- [HIGH/MED/LOW] <file:line>, <issue>, <suggested fix>
 - One line per finding. NO summary.
 
 If no issues: NO ISSUES FOUND.

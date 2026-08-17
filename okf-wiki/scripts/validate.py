@@ -9,21 +9,21 @@ agent-readable.
 Checks:
   1. Every non-reserved .md file has a parseable YAML frontmatter block. A YAML
      parse error is reported (commonly an unquoted colon-space or '#' in a
-     string field — quote the value).
+     string field, quote the value).
   2. Frontmatter carries every required key, non-empty. Through okf_version 0.3:
      type, title, description, source, verified, timestamp, tags. At 0.4:
      the same list with 'verified' renamed to 'verified_on' (see #6).
        - type     is one of the spec type vocab.
        - source   is a non-empty list of non-empty strings (provenance pointers).
                   An unquoted '#' in a block-style element (which YAML would silently
-                  drop as a comment, losing the rest) is rejected — quote it.
+                  drop as a comment, losing the rest) is rejected, quote it.
        - tags     is a list.
        - verified/verified_on parses as an ISO date (YYYY-MM-DD).
        - timestamp parses as an ISO date, or under okf_version 0.3+ as a full
                     ISO 8601 datetime (upstream OKF writes a datetime).
   3. Reserved filenames (index.md, log.md) name no concept and carry no
-     frontmatter — except the bundle-root index.md may carry okf_version only.
-  4. Internal markdown links resolve. Links must be relative — a root-relative
+     frontmatter, except the bundle-root index.md may carry okf_version only.
+  4. Internal markdown links resolve. Links must be relative, a root-relative
      ('/'-prefixed) link is rejected. Every link to a .md file inside the bundle
      must point at a file that exists, with the case it has on disk (a
      case-insensitive filesystem would otherwise let a wrong-case link pass on
@@ -39,7 +39,7 @@ Checks:
      do not delete the rule.
   6. At okf_version 0.4, optional upstream-v0.2 trust/provenance fields are
      checked for shape when present (never required): 'generated' ({by, at});
-     the new 'verified' (a list of {by, at} confirmations — distinct from the
+     the new 'verified' (a list of {by, at} confirmations, distinct from the
      required 'verified_on' at that version); 'sources' (plural; structured
      provenance objects, distinct from the required singular 'source'); 'status'
      (draft/stable/deprecated); 'stale_after' (an ISO date). A concept typed
@@ -315,7 +315,7 @@ def frontmatter_block(text: str) -> str | None:
 def link_destination(raw: str) -> tuple[str, str]:
     """Pull the path and fragment out of a markdown link's (...) contents: strip
     <...> wrapping and an optional "title"/'title'. Markdown allows
-    [text](dest "title") and [text](<dest with spaces>) — treating the whole
+    [text](dest "title") and [text](<dest with spaces>), treating the whole
     contents as the path would falsely flag those as dangling."""
     s = raw.strip()
     if s.startswith("<"):
@@ -388,13 +388,13 @@ def real_case_path(
 def strip_code(text: str) -> str:
     """Blank out fenced code blocks and inline code spans so a link shown as an
     example (e.g. a ```md fence containing [x](sample.md)) is not mistaken for a
-    real bundle link. The secret scan still runs on the raw text — a secret in a
+    real bundle link. The secret scan still runs on the raw text, a secret in a
     code block is still a leak.
 
     Heuristic, not a full CommonMark parser: it handles ```/~~~ fences (matching
     the closing fence's char and length, so a longer fence can wrap a shorter one)
-    and backtick-run inline spans (``code with a ` inside``). Rare forms — 4-space
-    indented code blocks, code spans spanning lines — are out of scope; an OKF
+    and backtick-run inline spans (``code with a ` inside``). Rare forms, 4-space
+    indented code blocks, code spans spanning lines, are out of scope; an OKF
     concept that needs those can wrap the example in a fence."""
     out = []
     fence = None  # (char, length) of the open fence, or None
@@ -472,7 +472,7 @@ def _value_uses_alias(val_node, counts):
 
     An alias target is the same node object referenced 2+ times in the whole frontmatter
     (counts), or reached twice while walking this one subtree (a cycle). An unused anchor
-    is referenced once, so an anchored literal is not flagged — consistent with allowing
+    is referenced once, so an anchored literal is not flagged, consistent with allowing
     `source: [&p "x"]`. Rejecting alias USES closes #169: an aliased scalar shares its
     anchor's position marks, so the end-mark quoting check cannot see a comment dropped
     after the alias."""
@@ -545,19 +545,19 @@ def check_source_quoting(rel, fm, raw_fm, errors):
     value alone cannot reveal the loss, so this re-parses the frontmatter into its node
     tree (which carries source position marks) and, for every top-level `source` element,
     checks whether a comment directly truncated a plain scalar (see
-    _plain_scalar_dropped_comment). Delegating the lexing to YAML covers every shape —
+    _plain_scalar_dropped_comment). Delegating the lexing to YAML covers every shape,
     block items, single- and multi-line flow lists, wrapped scalars, quoted strings with
-    escapes, anchors/tags, and block scalars — without re-implementing the parser. It is
+    escapes, anchors/tags, and block scalars, without re-implementing the parser. It is
     scoped to the top-level `source` key only (a nested `source:` under other metadata is
     not the OKF provenance list). A real parse error is reported by the schema check.
 
     `fm` is the safe_load result the caller already parsed. A `source` can enter it through
     a YAML merge key (`<<: {source: *r}`), a whole-node alias, an alias in key position, or a
-    duplicate `source` key — each materializes the field, but YAML keeps the LAST of duplicate
+    duplicate `source` key, each materializes the field, but YAML keeps the LAST of duplicate
     keys, so the value safe_load returns is not necessarily the first clean `source:` the scan
     finds. OKF source must be one literal top-level list, so this requires the effective source
     to come from exactly one literal, unshared `source:` key and rejects every indirection
-    (merge, alias, duplicate) up front — which also keeps the node-tree quoting scan total."""
+    (merge, alias, duplicate) up front, which also keeps the node-tree quoting scan total."""
     if not raw_fm:
         return
     try:
@@ -568,12 +568,12 @@ def check_source_quoting(rel, fm, raw_fm, errors):
         return
     counts = _child_ref_counts(root)
     # YAML keeps the LAST of duplicate keys, so the value safe_load returns for `source` is
-    # decided by the last top-level key that resolves to "source" — not the first clean one.
+    # decided by the last top-level key that resolves to "source", not the first clean one.
     # Collect every such key. An alias in key position (`*k` resolving to "source") makes
     # compose reuse the anchor's node, so the key reads as a "source" scalar while the written
-    # key is an alias — count >= 2 marks that sharing, so an aliased key is not unshared. A key
+    # key is an alias, count >= 2 marks that sharing, so an aliased key is not unshared. A key
     # SPELLED "source" but carrying the explicit merge tag (`!!merge source:`) is a merge
-    # directive, not a source key — PyYAML classifies merge by the tag, not the spelling — so
+    # directive, not a source key, PyYAML classifies merge by the tag, not the spelling, so
     # exclude it here: counting it would both falsely reject a file whose only real source is a
     # separate literal, and let a source merged in through it bypass the scan below.
     source_keys = [
@@ -586,9 +586,9 @@ def check_source_quoting(rel, fm, raw_fm, errors):
         len(source_keys) != 1 or not unshared or _merge_supplies_source(root)
     ):
         errors.append(
-            f"{rel}: 'source' is not a single literal top-level 'source:' key — it enters "
+            f"{rel}: 'source' is not a single literal top-level 'source:' key, it enters "
             f"through a YAML merge key (<<), an alias, or a duplicate 'source' key; OKF "
-            f"'source' must be one literal top-level list of provenance pointers — declare "
+            f"'source' must be one literal top-level list of provenance pointers, declare "
             f"it directly instead of merging, aliasing, or duplicating it")
         return
     for key_node, val_node in source_keys:
@@ -596,14 +596,14 @@ def check_source_quoting(rel, fm, raw_fm, errors):
         # shares node identity and position marks, so the dropped-comment scan below
         # reads the anchor's definition line, not the use site, and can miss a truncated
         # pointer (#169). OKF source is a flat list of literal, self-contained pointers
-        # anyway, so any anchor/alias SHARING is invalid here — reject it, which keeps the
+        # anyway, so any anchor/alias SHARING is invalid here, reject it, which keeps the
         # quoting scan total. An unused anchor definition (`[&p "x"]`) shares nothing and
         # stays allowed.
         if _value_uses_alias(val_node, counts):
             errors.append(
                 f"{rel}: a top-level 'source' value shares a YAML anchor/alias (& or *) "
                 f"with the rest of the frontmatter; OKF 'source' must be a flat list of "
-                f"literal provenance pointers — write each pointer out literally instead "
+                f"literal provenance pointers, write each pointer out literally instead "
                 f"of anchoring or aliasing it")
             return
         if isinstance(val_node, yaml.SequenceNode):
@@ -615,7 +615,7 @@ def check_source_quoting(rel, fm, raw_fm, errors):
         if any(_plain_scalar_dropped_comment(n, raw_fm) for n in scalars):
             errors.append(
                 f"{rel}: a top-level 'source' element has an unquoted '#' that YAML "
-                f"reads as a comment, dropping the rest of the pointer — quote each "
+                f"reads as a comment, dropping the rest of the pointer, quote each "
                 f"source element that contains a '#'")
             return  # one report per concept is enough
 
@@ -1033,20 +1033,20 @@ def main() -> int:
         text = f.read_text(encoding="utf-8-sig")
 
         # secret scan on every file, including index.md and a non-conforming Foo.MD
-        # (a leak is a leak regardless of extension — scan before rejecting below).
+        # (a leak is a leak regardless of extension, scan before rejecting below).
         for label, pat in SECRET_PATTERNS:
             if pat.search(text):
                 errors.append(
-                    f"{rel}: possible secret leak ({label}) — remove the value, "
+                    f"{rel}: possible secret leak ({label}), remove the value, "
                     f"document the key name/path instead")
         for label in prefixed_secret_labels(text):
             errors.append(
-                f"{rel}: possible secret leak ({label}) — remove the value, "
+                f"{rel}: possible secret leak ({label}), remove the value, "
                 f"document the key name/path instead")
         if args.secret_entropy_scan and next(entropy_secret_values(text), None):
             errors.append(
                 f"{rel}: possible secret leak (high-entropy assignment flagged by "
-                f"--secret-entropy-scan) — remove the value, document the key "
+                f"--secret-entropy-scan), remove the value, document the key "
                 f"name/path instead")
 
         # OKF concept and index files use a lowercase .md extension. A non-lowercase
@@ -1057,7 +1057,7 @@ def main() -> int:
         # escaped validation.
         if f.suffix != ".md":
             errors.append(
-                f"{rel}: non-conforming filename — OKF concept files use a lowercase "
+                f"{rel}: non-conforming filename, OKF concept files use a lowercase "
                 f"'.md' extension, found {f.suffix!r}; rename it to .md")
             continue
 
@@ -1067,7 +1067,7 @@ def main() -> int:
             # ValueError covers a date-shaped scalar PyYAML auto-constructs and
             # rejects (e.g. an invalid month), which is not a YAMLError subclass.
             errors.append(
-                f"{rel}: YAML frontmatter parse error ({e.__class__.__name__}: {e}) — "
+                f"{rel}: YAML frontmatter parse error ({e.__class__.__name__}: {e}), "
                 f"quote any string field that holds a YAML-significant character. "
                 f"Common triggers: a colon-space (': ') anywhere in description, title, "
                 f"or a source element; a bare '#' in a source element; an invalid date "
@@ -1084,7 +1084,7 @@ def main() -> int:
         if f.name in RESERVED:
             if str(rel) == "index.md":
                 # the bundle-root index.md may carry frontmatter, but only the
-                # okf_version marker — never concept metadata or stray keys.
+                # okf_version marker, never concept metadata or stray keys.
                 keys = set(fm) if fm else set()
                 if "okf_version" not in keys:
                     errors.append("index.md: bundle-root index must declare okf_version in frontmatter")
@@ -1140,7 +1140,7 @@ def main() -> int:
 
     # Link resolution: every internal link to a .md file must resolve to a file
     # that exists inside the bundle. A link escaping the bundle root or pointing at
-    # a missing file is a hard failure — the bundle is validated as one
+    # a missing file is a hard failure, the bundle is validated as one
     # self-contained tree. To validate federated content, assemble the bundles into
     # a single tree and point --bundle at that root.
     for f in md_files:
@@ -1150,7 +1150,7 @@ def main() -> int:
         for m in WIKILINK_RE.finditer(text):
             slug = m.group(1).strip()
             errors.append(
-                f"{f.relative_to(bundle)}: '[[{slug}]]' is not an OKF link — use a "
+                f"{f.relative_to(bundle)}: '[[{slug}]]' is not an OKF link, use a "
                 f"relative markdown link like [text]({slug}.md). The [[slug]] form is "
                 f"the auto-memory convention, not OKF.")
         for raw in LINK_RE.findall(text):

@@ -90,7 +90,7 @@ check_test_quality() {
     return 1
 }
 
-# Check performance baseline — all matching, timing, and comparison done in Python
+# Check performance baseline, all matching, timing, and comparison done in Python
 check_performance_baseline() {
     local input="$1"
     local config_file="$CWD/.autocontext/config.json"

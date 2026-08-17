@@ -96,7 +96,7 @@ CONST_TAGS = {
     "country_code": ["-IPTC:Country-PrimaryLocationCode=", "-XMP-iptcCore:CountryCode="],
 }
 # The caption is the publishable cutline. It is NOT the accessibility extended
-# description (XMP-iptcCore:ExtDescrAccessibility) — IPTC keeps those distinct — so the
+# description (XMP-iptcCore:ExtDescrAccessibility), IPTC keeps those distinct, so the
 # caption is not routed there; use the per-image "ext_description" field for that.
 CAPTION_TAGS = [
     "-IPTC:Caption-Abstract=", "-XMP-dc:Description=", "-EXIF:ImageDescription=",
@@ -104,7 +104,7 @@ CAPTION_TAGS = [
 
 # IPTC "Digital Source Type" controlled vocabulary (http://cv.iptc.org/newscodes/
 # digitalsourcetype/). exiftool writes DigitalSourceType as an unvalidated string, so a
-# typo is silently accepted — we expand a known shorthand to the full URI, pass a full
+# typo is silently accepted, we expand a known shorthand to the full URI, pass a full
 # URL through, and refuse anything else. Retired terms (minorHumanEdits, digitalArt,
 # softwareImage) are intentionally excluded. See reference.md for the full vocabulary.
 DST_BASE = "http://cv.iptc.org/newscodes/digitalsourcetype/"
@@ -127,7 +127,7 @@ CAPTION_LIMIT = 2000   # IPTC:Caption-Abstract
 KEYWORD_LIMIT = 64     # IPTC:Keywords, per record
 
 # verify(): the canonical read-back tag per constant field, with its `-G1` JSON key.
-# We confirm PRESENCE (the tag is non-empty), not equality — byte-capped IIM fields
+# We confirm PRESENCE (the tag is non-empty), not equality, byte-capped IIM fields
 # are expected to truncate (warned up front), so an equality check would false-fail.
 # Prefer an uncapped XMP layer where one exists. EXIF tags are skipped here because
 # `-G1` names them by IFD (IFD0:Artist), not by the "EXIF" group.
@@ -209,7 +209,7 @@ def build_args(constants, per_image, dst_uri=None):
     if alt:
         args.append(f"-XMP-iptcCore:AltTextAccessibility={alt}")
 
-    # Extended accessibility description — a longer screen-reader text for a complex
+    # Extended accessibility description, a longer screen-reader text for a complex
     # image (a chart, an infographic). Distinct from both the alt text and the caption.
     ext = per_image.get("ext_description")
     if ext:
@@ -271,12 +271,12 @@ def verify(path, const_keys, per_image, dst_uri=None):
     `const_keys` are the constant manifest keys that were actually written; this
     image's caption/alt/ext_description/keywords and its resolved Digital Source Type
     are checked too. Presence (the tag is non-empty), not equality, so a deliberately
-    truncated IIM field is not a false failure — but a silently dropped or skipped tag
+    truncated IIM field is not a false failure, but a silently dropped or skipped tag
     (e.g. a non-writable spelling) does fail.
     """
     # Each check is (label, [json_keys]); it passes if ANY of the keys is non-empty.
     # by_line/caption/keywords list both the IIM tag and its XMP twin, because
-    # HEIC/AVIF/WebP have no IIM slot — there exiftool writes only the XMP copy, so a
+    # HEIC/AVIF/WebP have no IIM slot, there exiftool writes only the XMP copy, so a
     # valid write would false-fail if we demanded the IIM tag. On JPEG both are present.
     read_args, checks = [], []
     for key in const_keys:
@@ -303,7 +303,7 @@ def verify(path, const_keys, per_image, dst_uri=None):
     if want_keywords:
         read_args += ["-IPTC:Keywords", "-XMP-dc:Subject"]
     # The date copy is always attempted, so confirm it. Under -G1, DateTimeOriginal is
-    # grouped as ExifIFD. (A file with no shot date is fine — there is nothing to copy.)
+    # grouped as ExifIFD. (A file with no shot date is fine, there is nothing to copy.)
     read_args += ["-EXIF:DateTimeOriginal", "-IPTC:DateCreated",
                   "-IPTC:TimeCreated", "-XMP-photoshop:DateCreated"]
 
@@ -340,10 +340,10 @@ def verify(path, const_keys, per_image, dst_uri=None):
 def strip_gps(path):
     """Remove GPS coordinates from a file, keeping every editorial tag. Returns True on
     success. Clears the whole EXIF GPS IFD (`-gps:all=`) and the entire XMP GPS set
-    (`-xmp:GPS*=`) — the wildcard catches destination and image-direction fields
+    (`-xmp:GPS*=`), the wildcard catches destination and image-direction fields
     (`GPSDestLatitude`, `GPSImgDirection`, …), not just the three main coordinates, so
     a publish-safe derivative cannot leak a location through a field left behind. Other
-    metadata — caption, credit, copyright, Digital Source Type — is untouched.
+    metadata, caption, credit, copyright, Digital Source Type, is untouched.
     """
     out = subprocess.run(
         ["exiftool", "-m", "-overwrite_original",
@@ -365,7 +365,7 @@ def main():
                     help="overwrite originals instead of writing copies")
     ap.add_argument("--strip-gps", action="store_true",
                     help="remove GPS from each tagged file (keeps editorial metadata) "
-                         "— for a publish-safe derivative that won't leak a location")
+                         ", for a publish-safe derivative that won't leak a location")
     args = ap.parse_args()
 
     # --in-place overwrites originals; refuse to pair it with an explicit --out so a

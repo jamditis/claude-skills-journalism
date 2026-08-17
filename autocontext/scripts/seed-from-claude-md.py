@@ -117,7 +117,7 @@ def is_cross_reference(text):
     """Detect bullets that just point to other content.
 
     Examples: "See 'Twitter posting via Selenium' lesson below for full pattern",
-              "Email (whitelisted CCM staff): Can respond directly — see whitelist below"
+              "Email (whitelisted CCM staff): Can respond directly, see whitelist below"
     """
     lower = text.lower()
     for phrase in CROSS_REF_PHRASES:
@@ -129,12 +129,12 @@ def is_cross_reference(text):
 def is_command_reference(text):
     """Detect bot command documentation that isn't a lesson.
 
-    Examples: "/cjs stats — User counts by registration status",
-              "/tweet <text> — Post a tweet (max 280 chars)"
+    Examples: "/cjs stats, User counts by registration status",
+              "/tweet <text>, Post a tweet (max 280 chars)"
     """
     # Strip markdown formatting to check the actual text
     clean = text.lstrip("`")
-    return clean.startswith("/") and " — " in text
+    return clean.startswith("/") and ", " in text
 
 
 def is_too_short_standalone(text):

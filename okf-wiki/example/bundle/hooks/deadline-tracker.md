@@ -11,6 +11,6 @@ tags: ["hook", "editorial-workflow"]
 
 Surface upcoming deadlines from editorial workflow at session start
 
-**Event:** `SessionStart`  |  **Tools:** —  |  **Category:** Editorial workflow
+**Event:** `SessionStart`  |  **Tools:**, |  **Category:** Editorial workflow
 
 One of the repository's standalone [hooks](index.md). Source: `hooks/deadline-tracker.md`.

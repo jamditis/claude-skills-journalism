@@ -1,6 +1,6 @@
 ---
 name: newsroom-style
-description: Enforce AP Style and newsroom conventions for journalism writing. Use when writing news articles, editing drafts, creating headlines, or converting notes into publishable copy. Ensures professional standards for attribution, numbers, dates, and formatting.
+description: Enforces AP Style and newsroom conventions. Use when writing news, editing drafts, creating headlines, or tightening copy.
 ---
 
 # Newsroom style guide
@@ -219,7 +219,7 @@ Most important information first. Answer the key questions:
 
 Different publications have their own style guides that override AP Style. Common variations:
 
-- Oxford comma (AP doesn't use it; many publications do — verify with your editor)
+- Oxford comma (AP doesn't use it; many publications do, verify with your editor)
 - Courtesy titles (AP doesn't use them; NYT does)
 - Web style (AP merged "web site" to "website" in 2010; some legacy guides still split it)
 

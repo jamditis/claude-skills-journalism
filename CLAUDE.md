@@ -6,7 +6,7 @@ When a bug is reported, don't immediately attempt to fix it. Instead:
 
 1. **Write a failing test first** that reproduces the bug
 2. **Launch subagents** to work on fixing the bug
-3. **Verify the fix** by running the test — a passing test proves the bug is fixed
+3. **Verify the fix** by running the test, a passing test proves the bug is fixed
 
 ---
 
@@ -47,7 +47,7 @@ claude-skills-journalism/
 │   ├── pre-commit-review.md     # Development: Review staged diff before commit
 │   └── no-ai-attribution.md     # Development: Block AI attribution in commits, PRs, and comments
 │
-├── # Plugin: journalism-core (15 skills, v1.4.0) — registered in marketplace.json
+├── # Plugin: journalism-core (15 skills, v1.4.0), registered in marketplace.json
 ├── journalism-core/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -68,7 +68,7 @@ claude-skills-journalism/
 │       ├── source-verification/        # SIFT method, verification, deepfakes/C2PA
 │       └── story-pitch/                # Pitch templates
 │
-├── # Plugin: research-toolkit (6 skills, v1.1.1) — registered in marketplace.json
+├── # Plugin: research-toolkit (6 skills, v1.1.1), registered in marketplace.json
 ├── research-toolkit/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -80,7 +80,7 @@ claude-skills-journalism/
 │       ├── page-monitoring/            # Change detection, availability tracking
 │       └── web-archiving/              # Wayback, Archive.today, evidence preservation
 │
-├── # Plugin: dev-toolkit (12 skills) — registered in marketplace.json
+├── # Plugin: dev-toolkit (12 skills), registered in marketplace.json
 ├── dev-toolkit/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -98,7 +98,7 @@ claude-skills-journalism/
 │       ├── web-ui-best-practices/      # Container queries, :has(), view transitions
 │       └── zero-build-frontend/        # ESM import maps, htmx, Alpine.js
 │
-├── # Plugin: okf-wiki (1 skill) — registered in marketplace.json
+├── # Plugin: okf-wiki (1 skill), registered in marketplace.json
 ├── okf-wiki/                    # Scaffold an Open Knowledge Format knowledge base
 │   ├── .claude-plugin/plugin.json
 │   ├── SKILL.md
@@ -108,11 +108,11 @@ claude-skills-journalism/
 │   ├── example/                # a scaffolded OKF wiki of this repo (dogfood + live example)
 │   └── tests/                   # pytest: scaffold output, hooks, validator rejections
 │
-├── # Plugin: pdf-design (1 skill) — registered in marketplace.json
+├── # Plugin: pdf-design (1 skill), registered in marketplace.json
 ├── pdf-design/                  # PDF reports, proposals, brand system
 │   └── templates/               # HTML templates (Democracy Day, etc.)
 │
-├── # Plugin: video-toolkit (4 skills, v1.0.4) — registered in marketplace.json
+├── # Plugin: video-toolkit (4 skills, v1.0.4), registered in marketplace.json
 ├── video-toolkit/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -122,13 +122,13 @@ claude-skills-journalism/
 │       ├── video-frames/        # Frame extraction and vision analysis
 │       └── video-transcribe/    # Reproducible Whisper transcription
 │
-├── # Plugin: visual-explainer (1 skill) — registered in marketplace.json
+├── # Plugin: visual-explainer (1 skill), registered in marketplace.json
 ├── visual-explainer/            # HTML diagrams, data tables, architecture views
 │   ├── references/              # CSS patterns, library guides, nav patterns
 │   ├── templates/               # Architecture, flowchart, data table templates
 │   └── commands/                # Slash command templates
 │
-├── # Plugin: project-templates-toolkit (3 skills) — registered in marketplace.json
+├── # Plugin: project-templates-toolkit (3 skills), registered in marketplace.json
 ├── project-templates-toolkit/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -137,7 +137,7 @@ claude-skills-journalism/
 │       ├── project-retrospective/      # LESSONS.md generation, 4 project type templates
 │       └── template-selector/          # Decision tree for picking the right template
 │
-├── # Plugin: security-toolkit (4 skills, /security-toolkit:hotpatch command) — registered in marketplace.json
+├── # Plugin: security-toolkit (4 skills, /security-toolkit:hotpatch command), registered in marketplace.json
 ├── security-toolkit/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -150,7 +150,7 @@ claude-skills-journalism/
 │       ├── security-checklist/         # Pre-deployment OWASP audit
 │       └── supply-chain-hardening/     # npm/bun install-time cooldown + sandboxed bypass scan
 │
-├── # Plugin: autocontext (no skills — hooks/commands/agents) — registered in marketplace.json
+├── # Plugin: autocontext (no skills, hooks/commands/agents), registered in marketplace.json
 ├── autocontext/                 # Cross-session knowledge persistence with skill evolution
 │   ├── .claude-plugin/plugin.json
 │   ├── agents/                  # Lesson-review and evolution agents
@@ -160,7 +160,7 @@ claude-skills-journalism/
 │   ├── templates/              # Lesson and archive templates
 │   └── tests/
 │
-├── # Plugin: pdf-playground (8 commands, v1.3.3) — registered in marketplace.json
+├── # Plugin: pdf-playground (8 commands, v1.3.3), registered in marketplace.json
 ├── pdf-playground/              # Interactive proposal/report/slide builder with live control panel
 │   ├── .claude-plugin/plugin.json
 │   ├── brands/                  # Brand presets
@@ -170,7 +170,7 @@ claude-skills-journalism/
 │   ├── templates/               # Document templates
 │   └── skills/                  # document-design/ + playground.md (user-invocable entry skill)
 │
-└── # Plugin: superjawn (14 skills, v1.0.1) — registered in marketplace.json
+└── # Plugin: superjawn (14 skills, v1.0.1), registered in marketplace.json
     ├── # Research-augmented fork of obra/superpowers; standalone, no upstream dependency
     ├── .claude-plugin/plugin.json
     ├── README.md
@@ -262,7 +262,7 @@ Available plugins: `autocontext`, `dev-toolkit`, `journalism-core`, `okf-wiki`, 
 
 ### Alternate: copy a single skill into `~/.claude/skills/`
 
-Most skills live inside a package's `skills/` directory. The `okf-wiki`, `pdf-design`, and `visual-explainer` packages keep `SKILL.md` at the package root. Clone the repo and copy the directory that directly contains the required `SKILL.md`. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md` — one level deep:
+Most skills live inside a package's `skills/` directory. The `okf-wiki`, `pdf-design`, and `visual-explainer` packages keep `SKILL.md` at the package root. Clone the repo and copy the directory that directly contains the required `SKILL.md`. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md`, one level deep:
 
 ```bash
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
@@ -369,7 +369,7 @@ No AI attribution in commits, PR bodies, issues, docs, or code. `.claude/setting
 
 No `Co-authored-by` trailers of any kind, including Joe's own aliases.
 
-Git identity — set before committing, in every worktree and every agent session:
+Git identity, set before committing, in every worktree and every agent session:
 
 ```sh
 git config user.name "Joe Amditis"

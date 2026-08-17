@@ -11,6 +11,6 @@ tags: ["hook", "writing-quality"]
 
 Detects writing and revision requests and prompts an intent interview before drafting
 
-**Event:** `UserPromptSubmit`  |  **Tools:** —  |  **Category:** Writing quality
+**Event:** `UserPromptSubmit`  |  **Tools:**, |  **Category:** Writing quality
 
 One of the repository's standalone [hooks](index.md). Source: `hooks/copywriting-preflight.md`.

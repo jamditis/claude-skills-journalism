@@ -94,7 +94,7 @@
         const span = document.createElement('span');
         span.className = 'selected-text';
         span.textContent = labelText + ' selected';
-        indicator.replaceChildren(span, ' — return to terminal to continue');
+        indicator.replaceChildren(span, ', return to terminal to continue');
       }
     }, 0);
   });

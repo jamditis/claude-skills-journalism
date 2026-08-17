@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""gh-wiki-bootstrap.py — create the FIRST page of an empty GitHub wiki.
+"""gh-wiki-bootstrap.py, create the FIRST page of an empty GitHub wiki.
 
 Why this exists: a repo with the wiki feature enabled but zero pages has no
 `<repo>.wiki.git` repo yet. `git clone`/`git push` both fail with "Repository
@@ -7,13 +7,13 @@ not found," and GitHub exposes no REST API for wiki content. The only way to
 create the first page is the web UI. After that one page exists, the wiki is a
 normal git repo: clone it, add pages, push.
 
-So this script does the minimum web-UI step — create one page (default "Home")
-via Playwright using the saved GitHub web session — and prints the wiki URL.
+So this script does the minimum web-UI step, create one page (default "Home")
+via Playwright using the saved GitHub web session, and prints the wiki URL.
 Everything after (real content, multiple pages) should go through git.
 
 Auth: reuses the saved Playwright storageState at ~/.cache/gh_state.json, the
 same session kept alive by gh-session-keepwarm.py. The github PAT does NOT work
-for this — wiki pages are a web-UI-only surface.
+for this, wiki pages are a web-UI-only surface.
 
 Usage:
   gh-wiki-bootstrap.py owner/repo
@@ -40,7 +40,7 @@ def _still_on_editor(url):
     The new-wiki-page editor lives at the path `/<owner>/<repo>/wiki/_new` and,
     on a successful save, GitHub redirects to `/<owner>/<repo>/wiki/<slug>`. The
     save-success signal is leaving that editor path. Testing the whole URL for
-    the substring "_new" misfires whenever "_new" appears anywhere else in it —
+    the substring "_new" misfires whenever "_new" appears anywhere else in it,
     the owner, the repo name (e.g. owner/service_new), or a saved page's slug:
     the redirected URL still contains the substring, so a real save reads as a
     failure and the tool wrongly reports it never saved. Match the editor by its
@@ -155,9 +155,9 @@ def main():
         browser.close()
 
     # If we never left the editor, the save was rejected (no wiki write access,
-    # bad title, inline validation error) — do not report success.
+    # bad title, inline validation error), do not report success.
     if not saved or _still_on_editor(final_url):
-        print(f"error: wiki editor never redirected to a created page ({final_url}) — "
+        print(f"error: wiki editor never redirected to a created page ({final_url}), "
               "save not confirmed. Check the saved session has wiki write access and "
               "the title is valid.", file=sys.stderr)
         sys.exit(6)

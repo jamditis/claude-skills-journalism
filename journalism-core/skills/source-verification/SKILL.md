@@ -1,6 +1,6 @@
 ---
 name: source-verification
-description: Journalism source verification and fact-checking workflows. Use when verifying claims, checking source credibility, investigating social media accounts, reverse image searching, detecting AI-generated content, or building verification trails. For reporters, fact-checkers, and researchers working with unverified information.
+description: Source verification and fact-checking with SIFT. Use when checking credibility, reverse image searching, or detecting AI content.
 ---
 
 # Source verification methodology
@@ -70,7 +70,7 @@ Use this shape when passing retrieved material onward:
 
 ### Social media account analysis
 
-For deeper open-source intelligence and platform-specific account-analysis techniques, use the **social-media-intelligence** skill. The notes here cover the verification-context subset — specifically what triggers a "verify before quoting" decision.
+For deeper open-source intelligence and platform-specific account-analysis techniques, use the **social-media-intelligence** skill. The notes here cover the verification-context subset, specifically what triggers a "verify before quoting" decision.
 
 ```markdown
 ## Account verification checklist
@@ -173,9 +173,9 @@ Tools:
 
 By 2026, naked-eye detection of high-end synthetic media is no longer reliable. The Columbia Journalism Review's 2025 guide is blunt: detection tools "have largely not kept up with diffusion models." Treat any single tool's verdict as one input, not a ruling.
 
-The verification stack now has two layers — **provenance** (was this content cryptographically signed when created?) and **detection** (does it look or sound generated?). Provenance is the stronger signal when present, but its absence doesn't mean fake.
+The verification stack now has two layers, **provenance** (was this content cryptographically signed when created?) and **detection** (does it look or sound generated?). Provenance is the stronger signal when present, but its absence doesn't mean fake.
 
-### Layer 1 — Content Credentials (C2PA) provenance check
+### Layer 1, Content Credentials (C2PA) provenance check
 
 The Coalition for Content Provenance and Authenticity (C2PA) standard ships cryptographic manifests inside image, audio, and video files describing their origin and edit history. Specification 2.2 was released in April–May 2025; the C2PA Conformance Program and Trust List launched mid-2025 and the legacy ingredient trust list was frozen January 1, 2026.
 
@@ -188,7 +188,7 @@ The Coalition for Content Provenance and Authenticity (C2PA) standard ships cryp
 
 **Verification tool:** drop any file at **`contentcredentials.org/verify`** to read its manifest, capture device, edit history, and any AI-tool involvement. Adobe's Content Authenticity Inspector and the Digimarc C2PA browser extension provide the same in plugin form.
 
-**Hard binding vs soft binding.** Hard binding embeds a SHA-256 hash of the content in the signed manifest — any pixel change invalidates it (strong integrity, brittle to re-encoding). Soft binding stores a perceptual fingerprint or invisible watermark in a manifest repository — survives screenshots and transcoding but offers weaker integrity guarantees. Soft binding lets you *recover* a manifest after metadata stripping.
+**Hard binding vs soft binding.** Hard binding embeds a SHA-256 hash of the content in the signed manifest, any pixel change invalidates it (strong integrity, brittle to re-encoding). Soft binding stores a perceptual fingerprint or invisible watermark in a manifest repository, survives screenshots and transcoding but offers weaker integrity guarantees. Soft binding lets you *recover* a manifest after metadata stripping.
 
 **Known limitations.**
 
@@ -197,7 +197,7 @@ The Coalition for Content Provenance and Authenticity (C2PA) standard ships cryp
 - Absence of Credentials does **not** mean fake. Most camera and phone images in circulation today are unsigned.
 - Signing-key compromise is a real attack vector (Nikon 2025). A "valid signature" can be undermined by upstream breaches.
 
-### Layer 2 — Automated detection tools
+### Layer 2, Automated detection tools
 
 | Tool | Status (May 2026) | Pricing | Use |
 |---|---|---|---|
@@ -206,25 +206,25 @@ The Coalition for Content Provenance and Authenticity (C2PA) standard ships cryp
 | **AI or Not** (`aiornot.com`) | Operational | Free tier + paid | Fast image triage. First-pass, not authoritative |
 | **Sensity AI** (`sensity.ai`) | Operational | Enterprise-priced, forensic-grade | Government/legal use; not journalist-budget-friendly |
 | **DeepFake-o-Meter** (U. Buffalo) | Operational | Free, academic | Listed in CJR's recommended journalist set |
-| **Adobe Content Authenticity Inspector** | Operational | Free | C2PA manifest reading only — no detection |
+| **Adobe Content Authenticity Inspector** | Operational | Free | C2PA manifest reading only, no detection |
 | **TrueMedia.org** | **Shut down January 14, 2025** | n/a | Tech open-sourced on GitHub; do not link out to the dead service |
 | **Microsoft Video Authenticator** | No longer publicly offered | n/a | Skip |
 | **Intel FakeCatcher** | Active research, not publicly available | n/a | Research/enterprise tier only |
-| **Optic** | Unverified live status — last known still operating in 2025 CJR guide | Free | Use as one input among others; don't rely on as authoritative |
+| **Optic** | Unverified live status, last known still operating in 2025 CJR guide | Free | Use as one input among others; don't rely on as authoritative |
 | **Deepware Scanner** | Domain active, live functionality unverified | Free web | Confirm responding before relying |
 
 **Single-tool verdicts are not enough.** Run at least two detectors and treat disagreement as a signal to escalate to deeper analysis or source contact.
 
-### Layer 3 — Detection by eye and ear (2026 calibration)
+### Layer 3, Detection by eye and ear (2026 calibration)
 
-Older artifact tells — extra fingers, weird ears, asymmetric pupils — are largely gone in current diffusion and Sora-2-class video output. What still leaks in May 2026:
+Older artifact tells, extra fingers, weird ears, asymmetric pupils, are largely gone in current diffusion and Sora-2-class video output. What still leaks in May 2026:
 
-- **Boundary regions.** Hairlines, ear edges, tooth boundaries, glasses-to-skin transitions — sub-pixel inconsistency on careful inspection.
+- **Boundary regions.** Hairlines, ear edges, tooth boundaries, glasses-to-skin transitions, sub-pixel inconsistency on careful inspection.
 - **Lighting and shadow physics.** Highlights that don't match scene light direction; cast shadows missing or contradictory.
 - **Eye reflection mismatches.** Left and right catchlights inconsistent with the scene.
 - **Audio-video desync.** Phoneme-to-lip alignment drifts over multi-second clips.
 - **Skin texture.** Waxy or over-smooth in places; noise pattern uniform across the frame instead of varying with surface.
-- **Voice clones.** Breath placement, plosive consonants, and room tone are the remaining giveaways. Fortune (December 2025) reports voice cloning has crossed the indistinguishable threshold for casual listeners — assume voice-only verification fails.
+- **Voice clones.** Breath placement, plosive consonants, and room tone are the remaining giveaways. Fortune (December 2025) reports voice cloning has crossed the indistinguishable threshold for casual listeners, assume voice-only verification fails.
 
 Detection-by-eye is **unreliable on its own**. Use it for triage and to decide whether to escalate, never as the final ruling.
 
@@ -356,7 +356,7 @@ def archive_url(url: str, perma_cc_api_key: str | None = None) -> dict:
     except requests.RequestException as e:
         results['wayback_error'] = str(e)
 
-    # Archive.today — POST to /submit/, the archived URL appears in the
+    # Archive.today, POST to /submit/, the archived URL appears in the
     # Refresh header (or the Location header on a 302).
     try:
         response = requests.post(
@@ -502,21 +502,21 @@ Recommended tools:
 
 ### Training resources
 
-- Bellingcat guides — `bellingcat.com/resources`
-- Google News Initiative — `newsinitiative.withgoogle.com`
-- Verification Handbook — `verificationhandbook.com`
-- SPJ ethics resources — `spj.org/ethics`
-- First Draft News — `firstdraftnews.org` (note: First Draft was wound down in 2022; the site remains a useful archive but is not actively maintained)
+- Bellingcat guides, `bellingcat.com/resources`
+- Google News Initiative, `newsinitiative.withgoogle.com`
+- Verification Handbook, `verificationhandbook.com`
+- SPJ ethics resources, `spj.org/ethics`
+- First Draft News, `firstdraftnews.org` (note: First Draft was wound down in 2022; the site remains a useful archive but is not actively maintained)
 
 ## Related skills
 
-- **fact-check-workflow** — Structured claim verification and rating workflows
-- **social-media-intelligence** — Deeper open-source intelligence on accounts and platforms
-- **interview-prep** — Verifying source backgrounds before interviews
-- **interview-transcription** — Verifying quotes against the original recording
-- **web-archiving** — Full archiving workflows (Wayback, Archive.today, Perma.cc)
-- **crisis-communications** — Time-pressure verification during breaking news
-- **foia-requests** — Obtaining primary-source documents to support verification
+- **fact-check-workflow**, Structured claim verification and rating workflows
+- **social-media-intelligence**, Deeper open-source intelligence on accounts and platforms
+- **interview-prep**, Verifying source backgrounds before interviews
+- **interview-transcription**, Verifying quotes against the original recording
+- **web-archiving**, Full archiving workflows (Wayback, Archive.today, Perma.cc)
+- **crisis-communications**, Time-pressure verification during breaking news
+- **foia-requests**, Obtaining primary-source documents to support verification
 
 ---
 

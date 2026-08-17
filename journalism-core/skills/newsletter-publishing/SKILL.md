@@ -1,6 +1,6 @@
 ---
 name: newsletter-publishing
-description: Email newsletter workflows for journalists and researchers. Use when creating, managing, or optimizing email newsletters, building subscriber lists, designing email templates, analyzing engagement metrics, or planning newsletter content calendars. For independent journalists, academic communicators, and media organizations building direct audience relationships.
+description: Email newsletter workflows. Use when creating newsletters, building subscriber lists, designing templates, or tracking engagement.
 ---
 
 # Newsletter publishing
@@ -431,7 +431,7 @@ v=DMARC1; p=quarantine; rua=mailto:dmarc@yourdomain.com
 
 ### Gmail, Yahoo, and Outlook bulk-sender requirements
 
-Bulk senders must meet authentication and unsubscribe requirements introduced by Gmail and Yahoo in February 2024. Microsoft Outlook adopted a parallel set in May 2025. Since November 2025, Gmail rejects non-compliant mail with permanent 5xx errors rather than soft-deferring it — non-compliant newsletters now bounce hard.
+Bulk senders must meet authentication and unsubscribe requirements introduced by Gmail and Yahoo in February 2024. Microsoft Outlook adopted a parallel set in May 2025. Since November 2025, Gmail rejects non-compliant mail with permanent 5xx errors rather than soft-deferring it, non-compliant newsletters now bounce hard.
 
 **Who is covered.** A "bulk sender" is one mailing more than 5,000 messages per day to Gmail addresses. The 5,000 threshold is counted at the **primary domain level across all subdomains**, not per sending subdomain. A newsroom sending 2,500/day from `transactional.example.com` and 2,500/day from `news.example.com` is over the threshold.
 
@@ -439,7 +439,7 @@ Bulk senders must meet authentication and unsubscribe requirements introduced by
 
 - **SPF and DKIM authentication on the sending domain.** Both must pass. SPF alone is no longer sufficient. DKIM keys must be at least 1024 bits.
 - **DMARC policy at minimum `p=none`.** Production senders should move to `p=quarantine` or `p=reject` once aligned.
-- **Domain alignment.** **One** of SPF or DKIM must align with the organizational domain in the visible `From:` header — not both. Relaxed alignment is acceptable.
+- **Domain alignment.** **One** of SPF or DKIM must align with the organizational domain in the visible `From:` header, not both. Relaxed alignment is acceptable.
 - **One-click unsubscribe (RFC 8058).** The mail must include a `List-Unsubscribe` header with an HTTPS URL and a `List-Unsubscribe-Post: List-Unsubscribe=One-Click` header. The HTTPS endpoint must process the unsubscribe within two days without requiring login. A visible unsubscribe link must also appear in the message body.
 - **Spam complaint rate below 0.3 percent**, measured in Google Postmaster Tools. Google's recommended target ceiling is 0.1 percent; sustained rates above 0.3 percent trigger rejection.
 - **Valid PTR record (reverse DNS) on the sending IP.** Forward and reverse DNS must match.
@@ -447,12 +447,12 @@ Bulk senders must meet authentication and unsubscribe requirements introduced by
 
 **Operational implications:**
 
-Most reputable ESPs handle authentication, headers, and TLS once the sending domain is verified. The two parts that remain the operator's responsibility are complaint rate and unsubscribe behavior — re-engagement campaigns and prompt list hygiene matter here. Re-engaging dormant subscribers is risky precisely because they complain at 5–10× the rate of active ones; one bad re-engagement campaign can push complaint rate over 0.3 percent and trigger rejections across the entire sending domain.
+Most reputable ESPs handle authentication, headers, and TLS once the sending domain is verified. The two parts that remain the operator's responsibility are complaint rate and unsubscribe behavior, re-engagement campaigns and prompt list hygiene matter here. Re-engaging dormant subscribers is risky precisely because they complain at 5–10× the rate of active ones; one bad re-engagement campaign can push complaint rate over 0.3 percent and trigger rejections across the entire sending domain.
 
 References:
-- Google, *Email sender guidelines* — `support.google.com/mail/answer/81126`
-- Google, *Email sender guidelines FAQ* — `support.google.com/a/answer/14229414`
-- Yahoo, *Sender Best Practices* — `senders.yahooinc.com/best-practices/`
+- Google, *Email sender guidelines*, `support.google.com/mail/answer/81126`
+- Google, *Email sender guidelines FAQ*, `support.google.com/a/answer/14229414`
+- Yahoo, *Sender Best Practices*, `senders.yahooinc.com/best-practices/`
 
 ### Spam score checklist
 
@@ -555,12 +555,12 @@ BENCHMARKS = {
 
 ## Related skills
 
-- **web-scraping** — Automate content gathering for newsletters
-- **data-journalism** — Include data visualizations in emails
-- **academic-writing** — Write clear, structured content
-- **newsroom-style** — AP Style enforcement on newsletter copy
-- **fact-check-workflow** — Verify claims before they hit subscribers' inboxes
-- **ai-writing-detox** — Strip AI patterns from drafts
+- **web-scraping**, Automate content gathering for newsletters
+- **data-journalism**, Include data visualizations in emails
+- **academic-writing**, Write clear, structured content
+- **newsroom-style**, AP Style enforcement on newsletter copy
+- **fact-check-workflow**, Verify claims before they hit subscribers' inboxes
+- **ai-writing-detox**, Strip AI patterns from drafts
 
 ---
 

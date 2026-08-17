@@ -11,7 +11,7 @@ is grounded in real prior art and current best practice before TDD begins.
 Findings land at .superpowers/skill-design-<skill-slug>.md. Skip protocol
 text byte-identical to brainstorming/systematic-debugging.
 Four cross-references migrated from the upstream namespace prefix to the
-local one — three refs to test-driven-development and one to systematic-
+local one, three refs to test-driven-development and one to systematic-
 debugging; both targets are ported skills so the dual-namespace cross-ref
 check requires the local prefix.
 SKILL.md is parity:false in the manifest by design.
@@ -91,7 +91,7 @@ The entire skill creation process follows RED-GREEN-REFACTOR.
 - One-off solutions
 - Standard practices well-documented elsewhere
 - Project-specific conventions (put in CLAUDE.md)
-- Mechanical constraints (if it's enforceable with regex/validation, automate it—save documentation for judgment calls)
+- Mechanical constraints (if it's enforceable with regex/validation, automate it, save documentation for judgment calls)
 
 ## Research phase
 
@@ -101,9 +101,9 @@ The aim is to ground the skill design in real prior art and current best practic
 
 ### 1. Pick research kinds
 
-From the menu — patterns + best practices, prior art, authoritative guidance, user-context.
+From the menu, patterns + best practices, prior art, authoritative guidance, user-context.
 
-For writing-skills, the **defaults are: web (skill authoring patterns + recent discourse) and codebase (prior art — does this overlap with an existing skill in this repo or a sibling plugin?)**. Add others when warranted — authoritative when the skill encodes a specific external standard (W3C, RFC, vendor docs), or user-context when prior decisions in memory shape the right shape for the skill.
+For writing-skills, the **defaults are: web (skill authoring patterns + recent discourse) and codebase (prior art, does this overlap with an existing skill in this repo or a sibling plugin?)**. Add others when warranted, authoritative when the skill encodes a specific external standard (W3C, RFC, vendor docs), or user-context when prior decisions in memory shape the right shape for the skill.
 
 ### 2. Dispatch
 
@@ -116,7 +116,7 @@ Inline only for light-touch research (single grep across `~/.claude/skills/`, me
 
 ### 3. Record findings
 
-Findings land at `.superpowers/skill-design-<skill-slug>.md` where `<skill-slug>` is the kebab-case name of the skill you are designing. Write 3–5 tight bullets — load-bearing links/refs, prior-art notes, anything considered-but-ruled-out so future-you knows it was checked. The directory `.superpowers/` is git-ignored by upstream convention.
+Findings land at `.superpowers/skill-design-<skill-slug>.md` where `<skill-slug>` is the kebab-case name of the skill you are designing. Write 3–5 tight bullets, load-bearing links/refs, prior-art notes, anything considered-but-ruled-out so future-you knows it was checked. The directory `.superpowers/` is git-ignored by upstream convention.
 
 ### 4. Skip protocol
 
@@ -124,9 +124,9 @@ If skipping, write one line to `.superpowers/skill-design-<skill-slug>.md`: `Ski
 
 **Valid reasons:**
 - Trivial scope (typo, comment edit, single-line config)
-- Fresh prior research — same topic in current session OR within last 7 days with verifiable spec/plan pointer. **If the pointer doesn't resolve, the skip is invalid.** (Beyond 7 days, repeat the research even if you remember the prior findings — the landscape drifts.)
-- User explicit — **must quote the phrase** that authorized the skip.
-- Repeat of identical task — **must include a pointer** to the prior successful run.
+- Fresh prior research, same topic in current session OR within last 7 days with verifiable spec/plan pointer. **If the pointer doesn't resolve, the skip is invalid.** (Beyond 7 days, repeat the research even if you remember the prior findings, the landscape drifts.)
+- User explicit, **must quote the phrase** that authorized the skip.
+- Repeat of identical task, **must include a pointer** to the prior successful run.
 
 **Invalid reasons:** "I think I know", "seems straightforward", "moving fast", "user wants this done quickly", "already familiar with this codebase". If those are tempting, do the research.
 

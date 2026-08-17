@@ -179,7 +179,7 @@ async function main() {
     const severe = results.some((r) => r.byImpact.critical + r.byImpact.serious + r.byImpact.moderate > 0);
     cleanup();
     // Exit 2 when any page failed to scan (a clean a11y report on the others is not
-    // a pass — we don't know about the failed pages). Exit 1 for real violations.
+    // a pass, we don't know about the failed pages). Exit 1 for real violations.
     // Exit 0 only when every page scanned cleanly.
     if (errored.length) process.exit(2);
     process.exit(severe ? 1 : 0);
@@ -191,7 +191,7 @@ async function main() {
 }
 
 // Only run the scan when executed directly (node verify_a11y.mjs). When the
-// module is imported — e.g. by verify_a11y.test.mjs to exercise waitForPort —
+// module is imported, e.g. by verify_a11y.test.mjs to exercise waitForPort,
 // importing must not spawn the server or launch a browser.
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (isMain) main();

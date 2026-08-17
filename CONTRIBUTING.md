@@ -46,7 +46,7 @@ The `description` field is what Claude uses to decide when to activate the skill
 
 - **Focus area:** journalism, media, communications, academic, or technical workflows that support those fields
 - **Actionable content:** include workflows and decision trees, not just reference info
-- **Templates:** provide templates where applicable — they make skills immediately useful
+- **Templates:** provide templates where applicable, they make skills immediately useful
 - **Sources:** cite standards, style guides, or verification methods you reference
 - **Sentence case:** use sentence case for all headings, not title case
 - **No AI slop:** avoid the banned words and patterns listed in the [ai-writing-detox](./ai-writing-detox/) skill
@@ -76,7 +76,7 @@ tools: [Write, Edit]  # for Pre/PostToolUse hooks
 Hook instructions here.
 ```
 
-All hooks should be **non-blocking warnings** — they provide guidance but don't prevent actions.
+All hooks should be **non-blocking warnings**, they provide guidance but don't prevent actions.
 
 ## Improving existing skills
 

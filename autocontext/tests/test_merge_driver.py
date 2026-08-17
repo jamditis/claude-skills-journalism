@@ -1,4 +1,4 @@
-"""Tests for merge-driver.py — lessons.json three-way merge."""
+"""Tests for merge-driver.py, lessons.json three-way merge."""
 import json
 import tempfile
 import os

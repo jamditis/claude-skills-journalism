@@ -131,7 +131,7 @@ def inject_hero_overlay(html: str, report: PageReport) -> str:
 
 
 def inject_reveal_noscript(html: str, report: PageReport) -> str:
-    # Detect via JS pattern, not CSS selector — our own injected CSS contains .reveal-section.
+    # Detect via JS pattern, not CSS selector, our own injected CSS contains .reveal-section.
     if "IntersectionObserver" not in html and ".reveal-section.visible" not in html:
         return html
     if "noscript-reveal-fallback" in html:
@@ -543,7 +543,7 @@ def fix_homepage_footer_canvas_opacity(html: str, report: PageReport) -> str:
     """Homepage footer uses text-canvas/20 and text-canvas/30 on bg-ink.
 
     Composite contrast ~1.5:1. Bump to /60 (~3.6:1, passes AA large) and /70.
-    The h6 labels are 10px tracked-letterspaced uppercase — visually small but
+    The h6 labels are 10px tracked-letterspaced uppercase, visually small but
     semantically headings. Bumping to /70 gives ~5:1 which passes AA normal.
     """
     changed = False
@@ -562,7 +562,7 @@ def fix_homepage_footer_canvas_opacity(html: str, report: PageReport) -> str:
 def fix_pdf_playground_opacity_60(html: str, report: PageReport) -> str:
     """opacity-60 on mockup feature cards dims everything below contrast threshold.
 
-    Bump to opacity-90 — preserves "older/dimmer" visual cue without breaking AA.
+    Bump to opacity-90, preserves "older/dimmer" visual cue without breaking AA.
     Only targets pdf-playground's mockup pattern: feature-card + opacity-60.
     """
     pattern = re.compile(r'(class\s*=\s*[\"\'][^\"\']*\bfeature-card\b[^\"\']*?\b)opacity-60(\b[^\"\']*[\"\'])')
