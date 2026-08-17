@@ -1,6 +1,6 @@
 {
   "name": "dev-toolkit",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Twelve development skills for newsroom and research dev teams: accessibility (WCAG 2.2), Electron, mobile and remote debugging, Python data pipelines, test-first bug fixing, ethical web scraping, no-build frontend patterns, web UI craft, and CLAUDE.md context maintenance.",
   "author": {
     "name": "Joe Amditis",

@@ -1,6 +1,6 @@
 {
   "name": "research-toolkit",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Six skills for research, source preservation, and academic workflows: academic writing, legal paywall bypass (Unpaywall, library databases), web archiving (Wayback, Archive.today, ArchiveBox), page-change monitoring, AI-enriched digital archives, and a curated free-API catalog.",
   "author": {
     "name": "Joe Amditis",

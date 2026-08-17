@@ -118,18 +118,18 @@ test('published package versions stay aligned with the marketplace', () => {
   );
   assert.equal(marketplace.version, '2.5.0', 'marketplace version');
   const expected = new Map([
-    ['autocontext', '1.1.0'],
-    ['dev-toolkit', '1.2.1'],
-    ['journalism-core', '1.4.0'],
-    ['okf-wiki', '0.8.1'],
-    ['pdf-design', '1.1.1'],
-    ['pdf-playground', '1.3.3'],
-    ['project-templates-toolkit', '1.0.1'],
-    ['research-toolkit', '1.1.1'],
-    ['security-toolkit', '1.2.1'],
-    ['superjawn', '1.0.1'],
-    ['video-toolkit', '1.0.4'],
-    ['visual-explainer', '0.7.2'],
+    ['autocontext', '1.1.1'],
+    ['dev-toolkit', '1.2.2'],
+    ['journalism-core', '1.4.1'],
+    ['okf-wiki', '0.8.2'],
+    ['pdf-design', '1.1.2'],
+    ['pdf-playground', '1.3.4'],
+    ['project-templates-toolkit', '1.0.2'],
+    ['research-toolkit', '1.1.2'],
+    ['security-toolkit', '1.2.2'],
+    ['superjawn', '1.0.2'],
+    ['video-toolkit', '1.0.5'],
+    ['visual-explainer', '0.7.3'],
   ]);
 
   for (const [name, version] of expected) {

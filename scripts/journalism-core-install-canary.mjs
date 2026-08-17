@@ -33,7 +33,7 @@ export const EXPECTED_SKILL_NAMES = [
 ];
 
 const PLUGIN_ID = 'journalism-core@claude-skills-journalism';
-const EXPECTED_VERSION = '1.4.0';
+const EXPECTED_VERSION = '1.4.1';
 export const SUBPROCESS_TIMEOUT_MS = 180_000;
 
 export function buildCommandPlan(client, repoRoot, tempRoot) {

@@ -1,11 +1,11 @@
 ---
 name: visual-explainer
-description: Generates self-contained HTML that explains systems, data, and code. Use for a diagram, architecture view, or diff review.
+description: HTML explainers, diagrams, architecture, timelines, source maps, slide decks, comparison tables, recaps, plan and diff reviews.
 license: MIT
 compatibility: Requires a browser to view generated HTML files. Optional surf-cli for AI image generation.
 metadata:
   author: nicobailon (upstream); journalism adaptations by jamditis
-  version: "0.7.2"
+  version: "0.7.3"
   upstream: https://github.com/nicobailon/visual-explainer
 ---
 

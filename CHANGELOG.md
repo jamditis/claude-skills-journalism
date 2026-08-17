@@ -16,7 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   blurbs were shortened to match (journalism-core dropped from 1,036 to 378).
 - Replaced em-dashes with commas across the repository, following the repo's
   own `ai-writing-detox` guidance. The demonstrative em-dashes that teach the
-  pattern in `ai-writing-detox` and `ai-slop-detector` are preserved.
+  pattern in `ai-writing-detox` and `ai-slop-detector` are preserved. Table
+  "not applicable" markers and quote attributions keep an ASCII hyphen rather
+  than a comma.
+- Patch-bumped every plugin (plugin.json + marketplace.json, and the okf-wiki
+  and visual-explainer root skill versions) so existing installations are
+  offered the shortened descriptions instead of staying on stale metadata.
+- Recorded the superjawn divergence from upstream: the em-dash and description
+  edits drop `skill_md_parity` to false for five skills and add
+  `supporting_file_overrides`, documented in `superjawn/CREDITS.md`.
 
 ## [2.5.0] - 2026-08-15
 

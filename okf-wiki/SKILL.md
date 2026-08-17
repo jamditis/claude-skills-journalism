@@ -4,7 +4,7 @@ description: Scaffolds an Open Knowledge Format (OKF) knowledge base from markdo
 license: MIT
 metadata:
   author: jamditis
-  version: "0.8.1"
+  version: "0.8.2"
   okf_spec: v1
 ---
 
