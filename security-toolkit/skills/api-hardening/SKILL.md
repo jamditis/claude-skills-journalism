@@ -1,6 +1,6 @@
 ---
 name: api-hardening
-description: API security hardening patterns. Use for rate limiting, input validation, CORS, API key management, or OWASP API Top 10 defense.
+description: API hardening for Express, FastAPI, and serverless. Use for rate limiting, CORS, input validation, API keys, or OWASP API Top 10.
 ---
 
 # API hardening

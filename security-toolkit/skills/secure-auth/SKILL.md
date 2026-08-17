@@ -1,6 +1,6 @@
 ---
 name: secure-auth
-description: Secure authentication patterns. Use for login, registration, password reset, session management, JWT, OAuth, MFA, or passkeys.
+description: Secure authentication patterns (OWASP, NIST). Use for login, registration, password reset, sessions, JWT, OAuth, MFA, passkeys.
 ---
 
 # Secure authentication

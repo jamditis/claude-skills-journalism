@@ -1,6 +1,6 @@
 ---
 name: one-way-door
-description: Flags irreversible architectural decisions before commit. Use for data models, infra configs, auth boundaries, or API contracts.
+description: Flags irreversible decisions before commit. Use for data models, infra, auth boundaries, API contracts, event schemas, CI/CD.
 ---
 
 # One-way door check

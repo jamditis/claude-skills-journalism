@@ -1,6 +1,6 @@
 ---
 name: web-archiving
-description: Web page archiving and retrieval from cached or deleted sources. Use to preserve content, reach dead pages, or archive evidence.
+description: Web archiving and retrieval via Wayback Machine and Archive.today. Use to preserve content, reach dead pages, or save evidence.
 ---
 
 # Web archiving methodology
