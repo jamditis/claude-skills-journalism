@@ -21,30 +21,30 @@ To write all three consistently in one shot without listing each tag, exiftool's
 | Role | IPTC (IIM) | XMP | EXIF |
 |------|-----------|-----|------|
 | Photographer | `IPTC:By-line` | `XMP-dc:Creator` | `EXIF:Artist` |
-| Photographer title | `IPTC:By-lineTitle` | `XMP-photoshop:AuthorsPosition` |, |
-| Credit (org / full) | `IPTC:Credit` (org, max 32) | `XMP-photoshop:Credit` (full name / org) |, |
-| Source | `IPTC:Source` | `XMP-photoshop:Source` |, |
+| Photographer title | `IPTC:By-lineTitle` | `XMP-photoshop:AuthorsPosition` | - |
+| Credit (org / full) | `IPTC:Credit` (org, max 32) | `XMP-photoshop:Credit` (full name / org) | - |
+| Source | `IPTC:Source` | `XMP-photoshop:Source` | - |
 | Caption / description | `IPTC:Caption-Abstract` | `XMP-dc:Description` | `EXIF:ImageDescription` |
-| Alt text (accessibility) |, | `XMP-iptcCore:AltTextAccessibility` |, |
-| Extended description (accessibility) |, | `XMP-iptcCore:ExtDescrAccessibility` |, |
-| Digital source type (AI / origin) |, | `XMP-iptcExt:DigitalSourceType` |, |
-| AI system used |, | `XMP-iptcExt:AISystemUsed`, `AISystemVersionUsed` |, |
-| AI prompt |, | `XMP-iptcExt:AIPromptInformation`, `AIPromptWriterName` |, |
-| Headline | `IPTC:Headline` | `XMP-photoshop:Headline` |, |
-| Title / object name | `IPTC:ObjectName` | `XMP-dc:Title` |, |
-| Keywords | `IPTC:Keywords` (repeatable) | `XMP-dc:Subject` (list) |, |
+| Alt text (accessibility) | - | `XMP-iptcCore:AltTextAccessibility` | - |
+| Extended description (accessibility) | - | `XMP-iptcCore:ExtDescrAccessibility` | - |
+| Digital source type (AI / origin) | - | `XMP-iptcExt:DigitalSourceType` | - |
+| AI system used | - | `XMP-iptcExt:AISystemUsed`, `AISystemVersionUsed` | - |
+| AI prompt | - | `XMP-iptcExt:AIPromptInformation`, `AIPromptWriterName` | - |
+| Headline | `IPTC:Headline` | `XMP-photoshop:Headline` | - |
+| Title / object name | `IPTC:ObjectName` | `XMP-dc:Title` | - |
+| Keywords | `IPTC:Keywords` (repeatable) | `XMP-dc:Subject` (list) | - |
 | Copyright notice | `IPTC:CopyrightNotice` | `XMP-dc:Rights` | `EXIF:Copyright` |
-| Rights marked |, | `XMP-xmpRights:Marked` |, |
-| Usage terms | `IPTC:SpecialInstructions` | `XMP-xmpRights:UsageTerms` |, |
-| Web statement of rights |, | `XMP-xmpRights:WebStatement` |, |
-| Licensor (Google "Get this image") |, | `XMP-plus:LicensorName`, `XMP-plus:LicensorURL` |, |
-| License URL (CC, legacy) |, | `XMP-cc:License` |, |
-| Attribution name |, | `XMP-cc:AttributionName` |, |
-| Sub-location | `IPTC:Sub-location` | `XMP-iptcCore:Location` |, |
-| City | `IPTC:City` | `XMP-photoshop:City` |, |
-| State / province | `IPTC:Province-State` | `XMP-photoshop:State` |, |
-| Country | `IPTC:Country-PrimaryLocationName` | `XMP-photoshop:Country` |, |
-| Country code | `IPTC:Country-PrimaryLocationCode` | `XMP-iptcCore:CountryCode` |, |
+| Rights marked | - | `XMP-xmpRights:Marked` | - |
+| Usage terms | `IPTC:SpecialInstructions` | `XMP-xmpRights:UsageTerms` | - |
+| Web statement of rights | - | `XMP-xmpRights:WebStatement` | - |
+| Licensor (Google "Get this image") | - | `XMP-plus:LicensorName`, `XMP-plus:LicensorURL` | - |
+| License URL (CC, legacy) | - | `XMP-cc:License` | - |
+| Attribution name | - | `XMP-cc:AttributionName` | - |
+| Sub-location | `IPTC:Sub-location` | `XMP-iptcCore:Location` | - |
+| City | `IPTC:City` | `XMP-photoshop:City` | - |
+| State / province | `IPTC:Province-State` | `XMP-photoshop:State` | - |
+| Country | `IPTC:Country-PrimaryLocationName` | `XMP-photoshop:Country` | - |
+| Country code | `IPTC:Country-PrimaryLocationCode` | `XMP-iptcCore:CountryCode` | - |
 | Date created | `IPTC:DateCreated` (+ `TimeCreated`) | `XMP-photoshop:DateCreated` | `EXIF:DateTimeOriginal` |
 
 Copy the date from the camera rather than typing it:

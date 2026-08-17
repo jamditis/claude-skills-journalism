@@ -1,6 +1,6 @@
 ---
 name: photo-metadata
-description: Embeds caption, credit, alt text, and license into image IPTC/EXIF/XMP with exiftool. Use for wire, CMS, or archive photos.
+description: Embeds photo IPTC/EXIF/XMP metadata, caption, credit, alt text, license, AI-source label, GPS stripping, and C2PA credentials.
 ---
 
 # Photo metadata
@@ -43,17 +43,17 @@ These are the failures a capable agent makes anyway. They matter more than any t
 | Role | IPTC (IIM) | XMP | EXIF |
 |------|-----------|-----|------|
 | Photographer | `By-line` | `dc:Creator` | `Artist` |
-| Credit | `Credit` (org, max 32 chars) | `photoshop:Credit` (full name / org) |, |
+| Credit | `Credit` (org, max 32 chars) | `photoshop:Credit` (full name / org) | - |
 | Caption | `Caption-Abstract` | `dc:Description` | `ImageDescription` |
-| Alt text (short) |, | `iptcCore:AltTextAccessibility` |, |
-| Extended description |, | `iptcCore:ExtDescrAccessibility` (complex images; not the caption) |, |
-| How it was made |, | `iptcExt:DigitalSourceType` (full CV URI) |, |
-| Keywords | `Keywords` (repeatable) | `dc:Subject` |, |
+| Alt text (short) | - | `iptcCore:AltTextAccessibility` | - |
+| Extended description | - | `iptcCore:ExtDescrAccessibility` (complex images; not the caption) | - |
+| How it was made | - | `iptcExt:DigitalSourceType` (full CV URI) | - |
+| Keywords | `Keywords` (repeatable) | `dc:Subject` | - |
 | Copyright | `CopyrightNotice` | `dc:Rights` | `Copyright` |
-| License (CC) |, | `xmpRights:Marked`/`WebStatement`/`UsageTerms`, `cc:License` (legacy) |, |
-| License / discovery |, | `xmpRights:WebStatement`, `plus:LicensorName`/`LicensorURL` (Google) |, |
-| Headline | `Headline` | `photoshop:Headline` |, |
-| Location | `Sub-location`/`City`/`Province-State`/`Country-*` | `iptcCore:Location`, `photoshop:City`/`State`/`Country` |, |
+| License (CC) | - | `xmpRights:Marked`/`WebStatement`/`UsageTerms`, `cc:License` (legacy) | - |
+| License / discovery | - | `xmpRights:WebStatement`, `plus:LicensorName`/`LicensorURL` (Google) | - |
+| Headline | `Headline` | `photoshop:Headline` | - |
+| Location | `Sub-location`/`City`/`Province-State`/`Country-*` | `iptcCore:Location`, `photoshop:City`/`State`/`Country` | - |
 | Date | `DateCreated` | `photoshop:DateCreated` | `DateTimeOriginal` (source of truth) |
 
 Digital Source Type values (fully AI → `trainedAlgorithmicMedia`, AI-edited → `compositeWithTrainedAlgorithmicMedia`, straight photo → `digitalCapture`), the full IPTC controlled vocabulary, the IPTC-IIM byte limits, the PLUS/Google-licensing and Creative Commons field sets, the C2PA tooling, and the AP caption recipe: see `reference.md`.

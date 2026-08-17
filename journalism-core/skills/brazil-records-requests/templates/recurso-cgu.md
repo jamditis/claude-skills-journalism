@@ -40,7 +40,7 @@ Nos termos do art. 16 da Lei nº 12.527/2011, esta é a hipótese aplicável:
 
 | Etapa | Data | Fundamento invocado |
 | --- | --- | --- |
-| Pedido | |, |
+| Pedido | | - |
 | Resposta | | |
 | 1ª instância | | |
 | 2ª instância | | |
