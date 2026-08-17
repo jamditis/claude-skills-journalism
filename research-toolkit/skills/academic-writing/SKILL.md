@@ -612,7 +612,7 @@ choice that complements but doesn't satisfy Nelson Memo compliance.)
       author, most major journals now require or recommend CRediT,
       which has 14 standardized contributor roles (Conceptualization,
       Methodology, Software, Validation, Formal analysis, Investigation,
-      Resources, Data curation, Writing, original draft, Writing,
+      Resources, Data curation, Writing - original draft, Writing -
       review & editing, Visualization, Supervision, Project administration,
       Funding acquisition).
 

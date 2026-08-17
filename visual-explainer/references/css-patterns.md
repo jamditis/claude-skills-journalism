@@ -312,7 +312,7 @@ For file structures, use `<pre>` with monospace + `white-space: pre`. Tree conne
 ```html
 <pre class="dir-tree">my-project/
 ├── src/
-│   ├── <span class="hl">index.ts</span>       <span class="ann">, entry point</span>
+│   ├── <span class="hl">index.ts</span>       <span class="ann">- entry point</span>
 │   ├── services/
 │   │   └── <span class="hl">api.py</span>     <span class="ann">(142 lines)</span>
 │   └── utils/

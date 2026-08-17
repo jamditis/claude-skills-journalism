@@ -1,6 +1,6 @@
 ---
 name: python-pipeline
-description: Python data-processing pipelines with modular architecture. Use for content workflows, dispatcher patterns, or batch jobs.
+description: Python data pipelines with modular architecture. Use for content workflows, batch jobs, or Google Sheets/Drive integration.
 ---
 
 # Python data pipeline development

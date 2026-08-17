@@ -1,6 +1,6 @@
 ---
 name: zero-build-frontend
-description: Zero-build frontend with vendored React, Tailwind, and vanilla JS. Use for static apps with no build step or Leaflet maps.
+description: Zero-build frontend with vendored React, Tailwind, vanilla JS. Use for static apps, Leaflet maps, or Manifest V3 extensions.
 ---
 
 # Zero-build frontend development

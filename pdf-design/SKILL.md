@@ -1,6 +1,6 @@
 ---
 name: pdf-design
-description: Designs and edits professional PDF reports and proposals from HTML with previews and branding. Use to create or export a PDF.
+description: Designs PDF reports and proposals from HTML with previews and branding. Use to create, export, or securely upload a PDF.
 ---
 
 # PDF Design System

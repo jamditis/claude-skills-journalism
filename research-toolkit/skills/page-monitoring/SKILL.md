@@ -1,6 +1,6 @@
 ---
 name: page-monitoring
-description: Web page change detection and availability tracking. Use when monitoring content changes, detecting downtime, or archiving pages.
+description: Web page change detection, availability tracking, and RSS feed generation. Use to monitor changes, downtime, or make a feed.
 ---
 
 # Page monitoring methodology
