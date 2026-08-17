@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: Explores user intent, requirements, and design before implementation. Use before creating features, components, or functionality.
+description: Explores intent and design before implementation. MUST use before creating or modifying any feature, component, or behavior.
 ---
 <!--
 Adapted from obra/superpowers brainstorming skill (v5.0.7), MIT-licensed,

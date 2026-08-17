@@ -1,6 +1,6 @@
 ---
 name: okf-wiki
-description: Scaffolds an Open Knowledge Format (OKF) knowledge base from markdown concept files. Use to start or build an OKF wiki.
+description: Builds an Open Knowledge Format (OKF) knowledge base from existing docs, notes, or a repo. Use to scaffold an OKF wiki.
 license: MIT
 metadata:
   author: jamditis

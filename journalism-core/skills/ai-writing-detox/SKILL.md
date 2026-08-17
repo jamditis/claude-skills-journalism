@@ -1,6 +1,6 @@
 ---
 name: ai-writing-detox
-description: Eliminates AI-generated writing patterns that erode reader trust. Use when editing AI-assisted articles, docs, or press releases.
+description: Eliminates AI-generated writing patterns that erode reader trust. Use when writing or editing articles, docs, or press releases.
 ---
 
 # AI writing detox

@@ -294,7 +294,7 @@ Subject: Pitch: The nurse who tracks fake diplomas
 
 Dear [Editor],
 
-Maria Chen has caught 47 nurses with fake degrees in three years. None of them through background checks, through a spreadsheet she maintains in her free time.
+Maria Chen has caught 47 nurses with fake degrees in three years. None of them through background checks, but through a spreadsheet she maintains in her free time.
 
 Chen, a nursing supervisor at a rural Oklahoma hospital, started her database after discovering a colleague had purchased credentials from a diploma mill. State nursing boards, she found, rarely verify foreign credentials thoroughly. Her volunteer work has exposed a patient safety gap that regulators have ignored.
 
