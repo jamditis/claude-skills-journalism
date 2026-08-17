@@ -1,6 +1,6 @@
 ---
 name: zero-build-frontend
-description: Zero-build frontend with vendored React, Tailwind, vanilla JS. Use for static apps, Leaflet maps, or Manifest V3 extensions.
+description: Zero-build frontend (React, Tailwind, vanilla JS). Use for static apps, Google Sheets as a database, Leaflet maps, or extensions.
 ---
 
 # Zero-build frontend development

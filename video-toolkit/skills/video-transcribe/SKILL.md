@@ -1,6 +1,6 @@
 ---
 name: video-transcribe
-description: Batch Whisper transcription of video files with a re-runnable provenance record. Use to transcribe videos or generate transcripts.
+description: Batch Whisper transcription of video or audio (WAV, podcasts) with a re-runnable provenance record. Use to transcribe recordings.
 ---
 
 # Video transcription with Whisper

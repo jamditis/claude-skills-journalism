@@ -1,6 +1,6 @@
 ---
 name: vibe-coding
-description: Methodology for AI-assisted software development. Use when building or debugging AI-generated code with Claude Code or Cursor.
+description: AI-assisted coding with Claude Code, Cursor, Copilot, Codex, Aider, or Windsurf. Use to build or debug generated code.
 ---
 
 # Vibe coding methodology
