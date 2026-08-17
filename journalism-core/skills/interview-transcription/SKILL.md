@@ -194,7 +194,7 @@ class QuoteBank:
         output = []
         for q in self.quotes:
             if q.verified:
-                output.append(f'"{q.text}"\n, {q.speaker}\n[Timestamp: {q.timestamp}]')
+                output.append(f'"{q.text}"\n- {q.speaker}\n[Timestamp: {q.timestamp}]')
         return '\n\n'.join(output)
 ```
 

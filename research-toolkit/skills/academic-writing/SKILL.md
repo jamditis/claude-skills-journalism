@@ -1,6 +1,6 @@
 ---
 name: academic-writing
-description: Scholarly writing and research methods. Use for papers, lit reviews, grants, citations, peer review, preprints, ORCID/DOI.
+description: Scholarly writing and research compliance. Use for CRediT, preregistration, Plan S, Nelson Memo, preprints, ORCID, LLM disclosure.
 ---
 
 # Academic writing and research methodology
