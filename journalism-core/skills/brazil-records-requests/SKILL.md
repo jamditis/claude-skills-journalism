@@ -29,6 +29,21 @@ tracking, and the four-level appeal chain.
   (DataJud, e-SAJ, PJe) and rarely needs a records request
 - Data already published under transparência ativa (see "Check first" below)
 
+## Language
+
+Respond in the language the reporter writes in. Draft anything addressed to a
+Brazilian public body — the request itself, appeals, follow-ups — in
+Portuguese, whatever language the conversation is in.
+
+Portuguese is not a validity requirement: LAI art. 10 and Decree 7.724/2012
+art. 12 require the requester's identification and a description of the
+information, and neither mandates a language or authorizes denial for using
+another one. It is a practical one. The clerk reading the request works in
+Portuguese, and a request that is not understood gets bounced as generic
+under Decree 7.724, art. 13, I — which costs the full 20 days and a refile.
+Where the receiving body publishes its own filing rules, check them;
+subnational practice varies.
+
 ## Check first: is a request even necessary?
 
 Art. 8 of the LAI obliges agencies to publish core categories of information
