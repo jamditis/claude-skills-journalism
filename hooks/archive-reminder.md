@@ -111,7 +111,7 @@ This hook pairs with the web-archiving skill, which provides detailed archiving 
 
 ## Non-blocking
 
-This hook suggests archiving but doesn't require it. Breaking news may not allow time for archiving—that's okay, archive when possible.
+This hook suggests archiving but doesn't require it. Breaking news may not allow time for archiving, that's okay, archive when possible.
 
 ## Skip conditions
 

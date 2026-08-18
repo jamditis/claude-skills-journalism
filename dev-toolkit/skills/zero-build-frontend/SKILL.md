@@ -1,6 +1,6 @@
 ---
 name: zero-build-frontend
-description: Zero-build frontend development with locally vendored React, Tailwind CSS, and vanilla JavaScript. Use when building static web apps without a deployment build step, creating Leaflet maps, integrating Google Sheets as a database, or developing browser extensions. Covers lockfile-verified browser dependencies and patterns from rosen-frontend, NJCIC map, and PocketLink projects.
+description: Zero-build frontend (React, Tailwind, vanilla JS). Use for static apps, Google Sheets as a database, Leaflet maps, or extensions.
 ---
 
 # Zero-build frontend development
@@ -38,7 +38,7 @@ Three current zero-build approaches, each with different trade-offs:
 | **htmx 2.x + server-rendered HTML** | CRUD apps, traditional MPA flow, want server-side state of truth | ~14 KB gzipped (htmx alone) |
 | **Alpine.js 3.x + plain HTML** | Light interactivity sprinkled into mostly-static pages, no full SPA | ~15 KB gzipped (Alpine alone) |
 
-You can mix htmx and Alpine.js in the same page — htmx handles server interactions, Alpine handles client-side UI state. Many production sites converge on this combo.
+You can mix htmx and Alpine.js in the same page, htmx handles server interactions, Alpine handles client-side UI state. Many production sites converge on this combo.
 
 ## Dependency policy
 
@@ -96,7 +96,7 @@ sha256sum -c public/vendor/SHA256SUMS
 
 ## ESM import maps
 
-Import maps let you write `import x from 'react'` in a `<script type="module">` without a bundler — the browser resolves the bare specifier against the map. Stable in all major browsers since 2023.
+Import maps let you write `import x from 'react'` in a `<script type="module">` without a bundler, the browser resolves the bare specifier against the map. Stable in all major browsers since 2023.
 
 ```html
 <script type="importmap">
@@ -115,7 +115,7 @@ that local prefix. Import maps do not add integrity protection to a remote ESM
 dependency graph: SRI on the first module cannot authenticate its transitive
 imports. Keep the whole graph local and lockfile-verified.
 
-## htmx 2.x — server-rendered interactivity
+## htmx 2.x, server-rendered interactivity
 
 htmx 2.0 (released June 2024) lets you add AJAX, WebSockets, and SSE to plain HTML through `hx-*` attributes. The server sends HTML fragments; the client swaps them in. No JS framework required.
 
@@ -148,7 +148,7 @@ htmx 2.0 (released June 2024) lets you add AJAX, WebSockets, and SSE to plain HT
 
 htmx 2.x dropped IE support and tightened the API; if you're on htmx 1.x and don't need to migrate, 1.x still receives security patches. New code should target 2.x.
 
-## Alpine.js 3.x — CSP-compatible client-side reactivity
+## Alpine.js 3.x, CSP-compatible client-side reactivity
 
 Alpine.js is a minimal alternative to Vue/React for sprinkles of interactivity.
 Use its dedicated [CSP build](https://alpinejs.dev/advanced/csp), which avoids
@@ -182,7 +182,7 @@ simple property and method references remain in `x-*` attributes.
 ```
 
 ```javascript
-// public/js/alpine-components.js — loaded before the deferred CSP runtime
+// public/js/alpine-components.js, loaded before the deferred CSP runtime
 document.addEventListener('alpine:init', () => {
   Alpine.data('togglePanel', () => ({
     open: false,

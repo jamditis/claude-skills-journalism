@@ -1,6 +1,6 @@
 ---
 name: social-media-intelligence
-description: Social media monitoring, narrative tracking, and open-source intelligence for journalists. Use when tracking viral content spread, analyzing coordinated campaigns, monitoring breaking news on social platforms, investigating accounts for authenticity, or detecting misinformation patterns. Essential for reporters covering online narratives and digital investigations.
+description: Social media monitoring, narrative tracking, and OSINT. Use when tracking viral spread, coordinated campaigns, or account vetting.
 ---
 
 # Social media intelligence
@@ -568,27 +568,27 @@ def coordination_likelihood(posts: List[SocialPost]) -> dict:
 
 ## Platform-specific tools
 
-Status as of 2026. Platform APIs change rapidly — verify pricing and access before designing a project around any one path.
+Status as of 2026. Platform APIs change rapidly, verify pricing and access before designing a project around any one path.
 
 ### X/Twitter evidence packet workflow
 
 When X/Twitter is central to a story, assemble a source packet before you analyze or draft:
 
-1. Record the collection authority. Note where the access comes from — the official X API, X Pro Search, a licensed data broker (Brandwatch, Sprinklr), a reporter-owned account, or a source-provided export — and confirm it fits the platform's terms of service and the newsroom's ethics rules before collecting.
+1. Record the collection authority. Note where the access comes from, the official X API, X Pro Search, a licensed data broker (Brandwatch, Sprinklr), a reporter-owned account, or a source-provided export, and confirm it fits the platform's terms of service and the newsroom's ethics rules before collecting.
 2. Match the collection method to the authority, and never scrape. Bulk or programmatic collection stays on the official API or a licensed vendor; X's post-2023 ToS prohibits scraping even of public posts. A reporter-owned account view, X Pro Search, or a source-provided export is captured and preserved by hand under step 5, not automated against the site. Log the query or route used for each capture.
 3. Keep collection separate from action. Posting, replies, direct messages, media uploads, account changes, monitoring, scheduling, and publishing stay out of the evidence workflow unless an editor approves the step on its own.
 4. Capture the fields a later reviewer needs: URL, post ID, numeric author ID, handle, display name, captured text, timestamp, engagement counts, reply or quote context, media URLs, the collection query, the access path, and the capture time.
-5. Archive immediately, and only public content. Send public post URLs to a web archive and store the archive URL beside the raw capture. Never push non-public material to a public archive. Non-public material that an editor has approved under step 3 — a source-provided export, an account-scoped view, a restricted URL, or a message — is preserved instead: save a timestamped screenshot or export, hash it, and store it under the newsroom's evidence policy.
+5. Archive immediately, and only public content. Send public post URLs to a web archive and store the archive URL beside the raw capture. Never push non-public material to a public archive. Non-public material that an editor has approved under step 3, a source-provided export, an account-scoped view, a restricted URL, or a message, is preserved instead: save a timestamped screenshot or export, hash it, and store it under the newsroom's evidence policy.
 
 Treat any coordination score, bot score, or authenticity label produced here as a lead, not a finding, until a human reviews the underlying evidence.
 
 | Platform | Research access | Notes |
 |----------|-----------------|-------|
-| X (Twitter) | Pay-per-use developer API (developer.x.com); X Pro Search (consumer-facing, behind X Premium+); Brandwatch / Sprinklr (paid third-party) | Free academic/research tier ended early 2023. The 2024 Basic and Pro subscription tiers were replaced in Feb 2026 with a pay-per-use model — billed by API call, no monthly subscription. Verify current per-call rates and any rate-limit caps in the developer portal before scoping a project. Post-2023 ToS explicitly prohibits scraping. |
-| Facebook / Instagram | Meta Content Library + Library API (research access); Junkipedia (free, journalist-friendly); NewsWhip (paid) | CrowdTangle was shut down on Aug 14, 2024 — it does not exist in any form. Meta Content Library replaced it. As of Dec 8, 2025, applications go through Meta's portal directly (previously routed via University of Michigan ICPSR). Eligibility favors academic and nonprofit researchers; most working journalists qualify only through institutional affiliation. SOMAR and other secure enclaves remain typical execution environments. |
+| X (Twitter) | Pay-per-use developer API (developer.x.com); X Pro Search (consumer-facing, behind X Premium+); Brandwatch / Sprinklr (paid third-party) | Free academic/research tier ended early 2023. The 2024 Basic and Pro subscription tiers were replaced in Feb 2026 with a pay-per-use model, billed by API call, no monthly subscription. Verify current per-call rates and any rate-limit caps in the developer portal before scoping a project. Post-2023 ToS explicitly prohibits scraping. |
+| Facebook / Instagram | Meta Content Library + Library API (research access); Junkipedia (free, journalist-friendly); NewsWhip (paid) | CrowdTangle was shut down on Aug 14, 2024, it does not exist in any form. Meta Content Library replaced it. As of Dec 8, 2025, applications go through Meta's portal directly (previously routed via University of Michigan ICPSR). Eligibility favors academic and nonprofit researchers; most working journalists qualify only through institutional affiliation. SOMAR and other secure enclaves remain typical execution environments. |
 | TikTok | Research API (qualifying academic and nonprofit researchers; DSA-vetted researchers in the EU); Exolyt, Pentos (paid) | Apply at developers.tiktok.com. Eligible organizations are typically academic institutions and nonprofit research entities; EU-based researchers have stronger access via DSA Article 40. Playlist Info and Commercial Content endpoints expanded in 2026. |
 | YouTube | YouTube Data API v3 | 10,000 units per day default (search costs 100 units = ~100 searches/day); higher quota by application, multi-week review. No journalist-specific tier. |
-| Reddit | Reddit API (free for non-commercial research); Arctic Shift (Pushshift successor, free dumps via Academic Torrents) | Pushshift restricted to verified moderators since 2023 — it is no longer a journalist-research path. Arctic Shift is the active successor. |
+| Reddit | Reddit API (free for non-commercial research); Arctic Shift (Pushshift successor, free dumps via Academic Torrents) | Pushshift restricted to verified moderators since 2023, it is no longer a journalist-research path. Arctic Shift is the active successor. |
 | Bluesky | Jetstream (filtered JSON over WebSocket, no auth required) or raw firehose | Public-by-default. Jetstream is the journalist-friendly entrypoint at ~850 MB/day filtered; raw firehose is 4-8 GB/hour and requires you to build archives yourself. |
 | Threads (Meta) | Threads API (publishing/embedding); Meta Content Library (research) | Public profile discovery threshold lowered to 100 followers in March 2026. Bulk historical research routes through Meta Content Library, with the same academic-only restriction. |
 | Mastodon / Fediverse | Public-timeline API (per-instance); cross-instance search at search.noc.social or fediverse.info | Many instances now set `DISALLOW_UNAUTHENTICATED_API_ACCESS`; admin-controlled. Cross-instance search is fragmented. |
@@ -604,50 +604,50 @@ The custom Python heuristics above are starting points for monitoring and patter
 
 ### Account authenticity and coordination
 
-- **Botometer X** (osome.iu.edu) — academic standard for Twitter bot likelihood; archival mode only since June 2023, so it cannot score accounts created or active after May 31, 2023.
-- **Hoaxy / Hoaxy2** (osome.iu.edu) — operational; Hoaxy2 added Mastodon search, Bluesky real-time monitoring, and a Facebook News Bridge. Bot scores were removed when the Twitter API died.
-- **OSoMe Coordiscope** — coordinated-network visualizer, free.
-- **CooRTweet** (R package) — successor to CooRnet for coordinated inauthentic behavior analysis. CooRnet was discontinued alongside CrowdTangle in August 2024.
-- **Bot Sentinel** (botsentinel.com) — was offline through 2025 with relaunch announced for 2026; verify operational status before citing in reporting.
+- **Botometer X** (osome.iu.edu), academic standard for Twitter bot likelihood; archival mode only since June 2023, so it cannot score accounts created or active after May 31, 2023.
+- **Hoaxy / Hoaxy2** (osome.iu.edu), operational; Hoaxy2 added Mastodon search, Bluesky real-time monitoring, and a Facebook News Bridge. Bot scores were removed when the Twitter API died.
+- **OSoMe Coordiscope**, coordinated-network visualizer, free.
+- **CooRTweet** (R package), successor to CooRnet for coordinated inauthentic behavior analysis. CooRnet was discontinued alongside CrowdTangle in August 2024.
+- **Bot Sentinel** (botsentinel.com), was offline through 2025 with relaunch announced for 2026; verify operational status before citing in reporting.
 
 ### Reverse image and forensic verification
 
-- **TinEye** — canonical exact-match and first-appearance reverse-image search.
-- **Yandex Images** — strong for face and region matching, especially Russia and Eastern Europe.
-- **Google Lens** — successor to the deprecated legacy Google reverse-image search.
-- **Forensically** (29a.ch) and **FotoForensics** — image manipulation analysis (error level analysis, clone detection, metadata).
-- **InVID-WeVerify plugin** — operational under the EU vera.ai project; new beta synthetic-image and voice-clone detectors added in 2025. Some Twitter-era features broke after the API change.
+- **TinEye**, canonical exact-match and first-appearance reverse-image search.
+- **Yandex Images**, strong for face and region matching, especially Russia and Eastern Europe.
+- **Google Lens**, successor to the deprecated legacy Google reverse-image search.
+- **Forensically** (29a.ch) and **FotoForensics**, image manipulation analysis (error level analysis, clone detection, metadata).
+- **InVID-WeVerify plugin**, operational under the EU vera.ai project; new beta synthetic-image and voice-clone detectors added in 2025. Some Twitter-era features broke after the API change.
 
 ### Network analysis
 
-- **Gephi** — free, open-source; the ICIJ Panama Papers tool of record.
-- **Maltego CE** — Community Edition free with registration; paid tiers expanded in 2025.
-- **NodeXL** — Excel add-on, basic free / Pro paid; legacy but functional.
+- **Gephi**, free, open-source; the ICIJ Panama Papers tool of record.
+- **Maltego CE**, Community Edition free with registration; paid tiers expanded in 2025.
+- **NodeXL**, Excel add-on, basic free / Pro paid; legacy but functional.
 
 ### Methodology authorities (current, 2026)
 
-- **Bellingcat Online Investigation Toolkit** ([bellingcat.gitbook.io/toolkit](https://bellingcat.gitbook.io/toolkit)) — community-maintained "Toolkit 2.0," updated continuously.
-- **Information Futures Lab** at Brown SPH — successor to First Draft News (which closed June 2022); Claire Wardle co-directs.
-- **WITNESS Deepfakes Rapid Response Force** ([gen-ai.witness.org](https://www.gen-ai.witness.org/deepfakes-rapid-response-force/)) — pairs reporters with media-forensics experts on deadline.
-- **CJR Tow Center** — non-technical 2025 deepfake-detection guide for journalists.
+- **Bellingcat Online Investigation Toolkit** ([bellingcat.gitbook.io/toolkit](https://bellingcat.gitbook.io/toolkit)), community-maintained "Toolkit 2.0," updated continuously.
+- **Information Futures Lab** at Brown SPH, successor to First Draft News (which closed June 2022); Claire Wardle co-directs.
+- **WITNESS Deepfakes Rapid Response Force** ([gen-ai.witness.org](https://www.gen-ai.witness.org/deepfakes-rapid-response-force/)), pairs reporters with media-forensics experts on deadline.
+- **CJR Tow Center**, non-technical 2025 deepfake-detection guide for journalists.
 - Note: **Stanford Internet Observatory** was effectively dismantled in June 2024; the election-research mantle moved to the **Stanford Social Media Lab** (Hancock) and the **NYU Stern Center for Business and Human Rights**.
 
 ## Ethical guidelines
 
 - Archive public content only.
 - Don't create fake accounts for monitoring.
-- Respect platform terms of service. X's post-2023 ToS explicitly prohibits scraping even of public posts; rely on the API or licensed data brokers. Don't reuse research-access tokens for non-research purposes — Meta and TikTok terminate access for ToS drift.
+- Respect platform terms of service. X's post-2023 ToS explicitly prohibits scraping even of public posts; rely on the API or licensed data brokers. Don't reuse research-access tokens for non-research purposes, Meta and TikTok terminate access for ToS drift.
 - Protect sources who share social content.
-- Verify before publishing claims about coordination — coordination scoring is a hypothesis, not a finding.
+- Verify before publishing claims about coordination, coordination scoring is a hypothesis, not a finding.
 - Consider context before amplifying harmful content.
 
 ## Related skills
 
-- **source-verification** — Verify accounts and claims found on social
-- **web-archiving** — Full archiving workflows beyond the wrappers shown above
-- **web-scraping** — Programmatic collection of public content
-- **data-journalism** — Analyze social data for patterns and produce charts
-- **crisis-communications** — Time-pressure verification during breaking news
+- **source-verification**, Verify accounts and claims found on social
+- **web-archiving**, Full archiving workflows beyond the wrappers shown above
+- **web-scraping**, Programmatic collection of public content
+- **data-journalism**, Analyze social data for patterns and produce charts
+- **crisis-communications**, Time-pressure verification during breaking news
 
 ---
 

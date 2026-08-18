@@ -12,6 +12,6 @@ tags: ["hook", "editorial-workflow"]
 Remind about verification, legal review, and publication checks before completing
 journalism tasks
 
-**Event:** `Stop`  |  **Tools:** —  |  **Category:** Editorial workflow
+**Event:** `Stop`  |  **Tools:**, |  **Category:** Editorial workflow
 
 One of the repository's standalone [hooks](index.md). Source: `hooks/pre-publish-checklist.md`.

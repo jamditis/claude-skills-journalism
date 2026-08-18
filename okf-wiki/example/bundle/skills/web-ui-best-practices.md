@@ -9,7 +9,7 @@ tags: ["skill", "dev-toolkit"]
 ---
 # web-ui-best-practices skill
 
-Signs of taste in web UI. Use when building or reviewing any user-facing web interface —
+Signs of taste in web UI. Use when building or reviewing any user-facing web interface,
 dashboards, SaaS apps, marketing sites, internal tools. Covers interaction speed,
 navigation depth, visual restraint, copy quality, and the small details that separate
 polished products from rough ones.

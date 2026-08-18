@@ -8,7 +8,7 @@ Every time you start a new Claude Code session, Claude starts from scratch. It d
 
 ## What autocontext does
 
-Autocontext listens to your conversations and captures the moments where you correct Claude — "no, use the other API", "you forgot to clear the cache", "that's the wrong import path." It saves those corrections as structured lessons in a JSON file inside your project.
+Autocontext listens to your conversations and captures the moments where you correct Claude, "no, use the other API", "you forgot to clear the cache", "that's the wrong import path." It saves those corrections as structured lessons in a JSON file inside your project.
 
 The next time you open a session in that project, autocontext loads the relevant lessons and uses them to avoid repeating the same mistakes. Lessons that keep proving useful gain confidence over time. Lessons that go stale lose confidence and eventually fade out.
 
@@ -38,7 +38,7 @@ Claude Code loads the skill automatically on next launch.
 
 ## Quick start
 
-1. Run `/autocontext:setup` to configure your preferences (identity, sensitivity, loading behavior — 12 steps total).
+1. Run `/autocontext:setup` to configure your preferences (identity, sensitivity, loading behavior, 12 steps total).
 2. In any project, run `/autocontext:init` to create the `.autocontext/` directory and start accumulating lessons.
 3. Just use Claude Code normally. Autocontext runs in the background.
 
@@ -48,18 +48,18 @@ Claude Code loads the skill automatically on next launch.
 |---------|-------------|
 | `/autocontext:setup` | One-time setup wizard for global preferences (12 steps covering identity, test rules, loading, persistence, staleness, injection mode, correction sensitivity, baselines, playbook, multi-machine support, skill learning, and evolution settings) |
 | `/autocontext:init` | Set up autocontext in the current project |
-| `/autocontext:review` | Review accumulated lessons — approve, edit, delete, or mark as superseded |
+| `/autocontext:review` | Review accumulated lessons, approve, edit, delete, or mark as superseded |
 | `/autocontext:status` | See how many lessons you have, their confidence levels, and any pending items |
 
 ## How it works under the hood
 
 Autocontext uses Claude Code's hook system to run at five points in every session:
 
-1. **When a session starts** — loads lessons from `.autocontext/lessons.json`, ranked by relevance to the files you've been working on. If there are lesson candidates from your last session, a curator pass decides which ones are worth keeping.
-2. **Before each edit or command** — checks if any loaded lessons are relevant to the file being edited or the command being run. If so, it injects a short warning so Claude doesn't repeat a known mistake.
-3. **When you type a message** — pattern-matches for correction phrases like "no, use X instead" or "you forgot to..." and queues them as lesson candidates.
-4. **After test file edits** — runs quality checks on test code (catches tautological assertions, happy-path-only test suites, and other common test smells). Also tracks build/test times against baselines to flag performance regressions.
-5. **When a session ends** — lessons that were loaded and not contradicted get a confidence boost. The playbook summary file is regenerated.
+1. **When a session starts**, loads lessons from `.autocontext/lessons.json`, ranked by relevance to the files you've been working on. If there are lesson candidates from your last session, a curator pass decides which ones are worth keeping.
+2. **Before each edit or command**, checks if any loaded lessons are relevant to the file being edited or the command being run. If so, it injects a short warning so Claude doesn't repeat a known mistake.
+3. **When you type a message**, pattern-matches for correction phrases like "no, use X instead" or "you forgot to..." and queues them as lesson candidates.
+4. **After test file edits**, runs quality checks on test code (catches tautological assertions, happy-path-only test suites, and other common test smells). Also tracks build/test times against baselines to flag performance regressions.
+5. **When a session ends**, lessons that were loaded and not contradicted get a confidence boost. The playbook summary file is regenerated.
 
 ## Cross-developer sharing
 
@@ -128,9 +128,9 @@ RESULT=$(python3 "$PLUGIN_ROOT/scripts/transcript-scanner.py" \
 ```
 
 **Arguments:**
-- `--transcript` — path to the session JSONL file
-- `--since` — Unix timestamp (seconds). Only scan entries after this time. Default: scan all.
-- `--config` — path to config file. Reads `activity_signals` key if present.
+- `--transcript`, path to the session JSONL file
+- `--since`, Unix timestamp (seconds). Only scan entries after this time. Default: scan all.
+- `--config`, path to config file. Reads `activity_signals` key if present.
 
 **Signal levels:**
 
@@ -159,6 +159,6 @@ Each sub-key fully replaces that tier's defaults when present.
 
 This plugin was inspired by two projects:
 
-- **[autocontext](https://github.com/greyhaven-ai/autocontext)** by Greyhaven AI — a closed-loop system for improving agent behavior over repeated runs. Its architecture of persistent playbooks, curator agents, and confidence-scored knowledge directly shaped how this plugin handles lesson persistence and validation cycles.
+- **[autocontext](https://github.com/greyhaven-ai/autocontext)** by Greyhaven AI, a closed-loop system for improving agent behavior over repeated runs. Its architecture of persistent playbooks, curator agents, and confidence-scored knowledge directly shaped how this plugin handles lesson persistence and validation cycles.
 
-- **[autoresearch](https://github.com/karpathy/autoresearch)** by Andrej Karpathy — AI agents running autonomous research loops. The pattern of accumulating structured knowledge across sessions and using it to inform future runs was a key influence on the session-start/session-end lifecycle design.
+- **[autoresearch](https://github.com/karpathy/autoresearch)** by Andrej Karpathy, AI agents running autonomous research loops. The pattern of accumulating structured knowledge across sessions and using it to inform future runs was a key influence on the session-start/session-end lifecycle design.

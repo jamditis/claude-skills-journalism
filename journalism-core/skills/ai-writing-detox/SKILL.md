@@ -1,11 +1,11 @@
 ---
 name: ai-writing-detox
-description: Eliminate AI-generated writing patterns that erode reader trust. Activate when writing articles, documentation, press releases, or any content where AI patterns would undermine credibility. For journalists using AI assistance who need human-sounding output.
+description: Eliminates AI-generated writing patterns that erode reader trust. Use when writing or editing articles, docs, or press releases.
 ---
 
 # AI writing detox
 
-Good writing is invisible. If readers notice the writing style, it's distracting from the content. AI patterns are noticeable—they break trust.
+Good writing is invisible. If readers notice the writing style, it's distracting from the content. AI patterns are noticeable, they break trust.
 
 ## When to use
 

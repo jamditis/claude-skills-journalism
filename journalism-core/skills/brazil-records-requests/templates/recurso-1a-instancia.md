@@ -1,5 +1,5 @@
 # Recurso de primeira instância
-*First-instance appeal — to the immediate superior authority*
+*First-instance appeal, to the immediate superior authority*
 
 **Prazo:** 10 dias contados da ciência da decisão (art. 15 da Lei 12.527/2011).
 O órgão deve decidir em 5 dias.
@@ -13,7 +13,7 @@ Executivo federal, o silêncio segue a reclamação dos arts. 22 e 23 do Decreto
 Decree 7.724/2012 complaint route. Check local rules for other bodies.*
 
 **Destinatário:** autoridade hierarquicamente superior à que proferiu a decisão.
-No Fala.BR isso é automático — basta acionar "Recorrer".
+No Fala.BR isso é automático, basta acionar "Recorrer".
 *Addressee: the authority immediately above the one who decided. Fala.BR routes
 this automatically.*
 
@@ -87,7 +87,7 @@ no formato digital existente, quando estiverem armazenadas nesse formato.
   *An appeal must add an argument. Restating the request is why most fail.*
 - O bloco (d) é o mais subestimado: exigir o termo de classificação
   frequentemente revela que a informação nunca foi formalmente classificada.
-  *Block (d) is underused — demanding the classification instrument often
+  *Block (d) is underused, demanding the classification instrument often
   reveals the information was never formally classified.*
 - Se o caso envolver conduta de agentes públicos com possível violação de
   direitos humanos, invoque o art. 21, parágrafo único, da LAI.

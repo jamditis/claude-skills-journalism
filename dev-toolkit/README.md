@@ -13,7 +13,7 @@ Twelve development-focused skills for journalists, researchers, and small newsro
 | mobile-debugging | Eruda, vConsole, Chrome DevTools on Android, Safari Web Inspector for iOS |
 | one-way-door | Block irreversible architectural decisions during planning |
 | python-pipeline | Data pipeline patterns (pandas, polars, DuckDB, asyncio) |
-| test-first-bugs | TDD workflow for bug fixes — failing test before fix |
+| test-first-bugs | TDD workflow for bug fixes, failing test before fix |
 | vibe-coding | AI-assisted development workflow (Claude Code, Cursor, Aider, Continue) |
 | web-scraping | Ethical scraping patterns (Playwright, robots.txt, anti-bot, terms-of-service) |
 | web-ui-best-practices | Container queries, `:has()`, view transitions, scroll-driven animations |
@@ -28,5 +28,5 @@ Twelve development-focused skills for journalists, researchers, and small newsro
 
 ## See also
 
-- [`journalism-core`](../journalism-core/README.md) — 13 skills for reporting, verification, publishing
-- [`research-toolkit`](../research-toolkit/README.md) — 5 skills for research, archives, academic workflows
+- [`journalism-core`](../journalism-core/README.md), 13 skills for reporting, verification, publishing
+- [`research-toolkit`](../research-toolkit/README.md), 5 skills for research, archives, academic workflows

@@ -26,7 +26,7 @@ If no project name provided, ask the user in Phase 1 below.
 
 ---
 
-## Phase 1 — Content setup
+## Phase 1, Content setup
 
 Gather requirements using AskUserQuestion before generating anything.
 
@@ -94,7 +94,7 @@ AskUserQuestion:
     - label: "5-6 items"
       description: "Detailed budget with 5-6 expense categories"
     - label: "7+ items"
-      description: "Full budget — may need a second budget page"
+      description: "Full budget, may need a second budget page"
 ```
 
 If no project name was provided via $ARGUMENTS, also ask:
@@ -103,7 +103,7 @@ If no project name was provided via $ARGUMENTS, also ask:
 
 ---
 
-## Phase 2 — Design choices
+## Phase 2, Design choices
 
 **Q5: Color scheme**
 
@@ -115,9 +115,9 @@ AskUserQuestion:
     - label: "Brand colors (Recommended)"
       description: "Use colors from your pdf-playground.local.md config, or the template defaults"
     - label: "Professional blue"
-      description: "Navy and steel blue — formal and institutional"
+      description: "Navy and steel blue, formal and institutional"
     - label: "Bold red and black"
-      description: "High contrast with red accents — CCM style"
+      description: "High contrast with red accents, CCM style"
     - label: "Custom"
       description: "You'll specify the exact hex colors"
 ```
@@ -136,11 +136,11 @@ AskUserQuestion:
   header: "Fonts"
   options:
     - label: "Classic (Recommended)"
-      description: "Playfair Display headings + Source Sans body — elegant and readable"
+      description: "Playfair Display headings + Source Sans body, elegant and readable"
     - label: "Modern"
-      description: "Inter for both headings and body — clean and contemporary"
+      description: "Inter for both headings and body, clean and contemporary"
     - label: "Mixed"
-      description: "Merriweather headings + Open Sans body — warm and approachable"
+      description: "Merriweather headings + Open Sans body, warm and approachable"
     - label: "Custom"
       description: "You'll specify the exact Google Font names"
 ```
@@ -169,7 +169,7 @@ Apply style adjustments:
 
 ---
 
-## Phase 3 — Generation and review
+## Phase 3, Generation and review
 
 **Step 1: Generate the HTML**
 
@@ -205,7 +205,7 @@ Using the answers from Phases 1 and 2:
 4. Take a screenshot and show it to the user
 
 5. Explain the control panel:
-   > The interactive control panel is loaded on the right side. You can tweak colors, fonts, spacing, and toggle sections live. When you're happy with changes, click "Copy all changes" in the panel — it puts a prompt on your clipboard that you can paste back here and I'll apply the changes to the source HTML.
+   > The interactive control panel is loaded on the right side. You can tweak colors, fonts, spacing, and toggle sections live. When you're happy with changes, click "Copy all changes" in the panel, it puts a prompt on your clipboard that you can paste back here and I'll apply the changes to the source HTML.
 
 **Step 3: Iterate with user**
 
@@ -231,7 +231,7 @@ AskUserQuestion:
     - label: "Looks good"
       description: "Move on to finalization"
     - label: "Make more changes"
-      description: "Keep tweaking — describe what to change or use the control panel"
+      description: "Keep tweaking, describe what to change or use the control panel"
     - label: "Start over"
       description: "Scrap this and begin the wizard again from the top"
 ```
@@ -241,7 +241,7 @@ If "Start over": go back to Phase 1.
 
 ---
 
-## Phase 4 — Finalization
+## Phase 4, Finalization
 
 **Q9: What next?**
 
@@ -318,7 +318,7 @@ Content MUST NOT touch or overlap the page footer.
 - The `.page` element MUST use `display: grid; grid-template-rows: auto 1fr auto`
 - It MUST have exactly 3 direct children: `<header class="page-header">`, `<div class="page-body">`, `<footer class="page-footer">`
 - The content wrapper (`.page-body`) MUST have `overflow: hidden` to prevent text bleeding
-- Never use `position: absolute` for footers — keep them in normal document flow as the third grid row
+- Never use `position: absolute` for footers, keep them in normal document flow as the third grid row
 - After generating, always take a screenshot and visually verify the bottom of each page
 - If content is too long, **reduce content** rather than shrinking the footer gap
 

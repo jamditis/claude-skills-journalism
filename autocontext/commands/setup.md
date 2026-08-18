@@ -14,7 +14,7 @@ If `~/.claude/autocontext.json` already exists, read it first and present curren
 
 #### Step 1: Identity
 
-Identity is required for lesson attribution. No automatic fallback — you must explicitly set it.
+Identity is required for lesson attribution. No automatic fallback, you must explicitly set it.
 
 **Question:** What should we call you in lesson attribution?
 
@@ -31,11 +31,11 @@ Select which automated test quality checks you want enabled when reviewing test 
 **Question:** Which built-in test quality rules do you want enabled?
 
 **Available rules (multi-select):**
-- Tautological test check — flags tests that describe code instead of testing behavior
-- No mock everything — warns when mocks are the assertions instead of testing actual behavior
-- No happy path only — requires error cases and edge case tests alongside happy path
-- No bare assertions — flags `assert True`, `assert is not None`, and similar weak assertions
-- Test independence — flags tests that pass without their feature code present
+- Tautological test check, flags tests that describe code instead of testing behavior
+- No mock everything, warns when mocks are the assertions instead of testing actual behavior
+- No happy path only, requires error cases and edge case tests alongside happy path
+- No bare assertions, flags `assert True`, `assert is not None`, and similar weak assertions
+- Test independence, flags tests that pass without their feature code present
 
 You can enable all, some, or none of these. They can be toggled later.
 
@@ -48,9 +48,9 @@ Configure how many lessons to load at session start based on relevance confidenc
 **Question:** How aggressively should lessons be loaded at session start?
 
 **Options:**
-- Conservative — load up to 5 lessons with confidence >= 0.7. Minimal context, high precision.
-- Balanced (Recommended) — load up to 15 lessons with confidence >= 0.3. Good mix of depth and specificity.
-- Aggressive — load up to 25 lessons with confidence >= 0.1. Maximum context, may include tangential material.
+- Conservative, load up to 5 lessons with confidence >= 0.7. Minimal context, high precision.
+- Balanced (Recommended), load up to 15 lessons with confidence >= 0.3. Good mix of depth and specificity.
+- Aggressive, load up to 25 lessons with confidence >= 0.1. Maximum context, may include tangential material.
 
 Conservative is safer for focused work. Balanced provides good coverage. Aggressive helps when exploring unfamiliar codebases.
 
@@ -61,9 +61,9 @@ Choose how new lessons discovered during sessions should be saved.
 **Question:** How should new lessons be persisted at session end?
 
 **Options:**
-- Auto-persist with curator validation (Recommended) — new lessons are automatically added, but marked for review. You can curate them later with `/autocontext:review`.
-- Always ask before persisting — each new lesson prompts for approval before being added.
-- Auto-persist everything — new lessons are immediately added without any review step.
+- Auto-persist with curator validation (Recommended), new lessons are automatically added, but marked for review. You can curate them later with `/autocontext:review`.
+- Always ask before persisting, each new lesson prompts for approval before being added.
+- Auto-persist everything, new lessons are immediately added without any review step.
 
 ### Batch 3 (steps 5-6)
 
@@ -74,10 +74,10 @@ Controls when unused lessons start losing confidence. After the staleness window
 **Question:** How long before unused lessons start losing confidence?
 
 **Options:**
-- 30 days (rapid turnover) — best for fast-moving prototypes where context changes quickly.
-- 60 days (Recommended) — balanced for most projects with regular development cadence.
-- 120 days (long-running) — for stable projects where lessons stay relevant longer.
-- 180 days (archival) — minimal decay, good for slow-moving or reference-heavy codebases.
+- 30 days (rapid turnover), best for fast-moving prototypes where context changes quickly.
+- 60 days (Recommended), balanced for most projects with regular development cadence.
+- 120 days (long-running), for stable projects where lessons stay relevant longer.
+- 180 days (archival), minimal decay, good for slow-moving or reference-heavy codebases.
 
 **Config mapping:**
 - 30 days → `staleness_days: 30`
@@ -92,9 +92,9 @@ The pre-tool-use hook checks loaded lessons before every Edit, Write, and Bash c
 **Question:** Should autocontext inject lesson-based warnings before edits?
 
 **Options:**
-- Enabled (Recommended) — inject relevant warnings before Edit/Write/Bash. Catches known gotchas before you hit them.
-- Errors only — only inject warnings for lessons tagged as bugs, errors, or breaking changes. Quieter.
-- Disabled — no pre-tool warnings. Lessons are still loaded at session start but don't interrupt workflow.
+- Enabled (Recommended), inject relevant warnings before Edit/Write/Bash. Catches known gotchas before you hit them.
+- Errors only, only inject warnings for lessons tagged as bugs, errors, or breaking changes. Quieter.
+- Disabled, no pre-tool warnings. Lessons are still loaded at session start but don't interrupt workflow.
 
 **Config mapping:**
 - Enabled → `pretooluse_hook: "enabled"`
@@ -112,14 +112,14 @@ Controls how aggressively the system captures user corrections as lesson candida
 **Question:** How sensitive should correction detection be?
 
 **Options:**
-- High — capture any redirect, including soft phrases like "actually", "remember that", "keep in mind". Catches more but may pick up non-corrections.
-- Medium (Recommended) — capture explicit corrections like "no, use X instead", "that's wrong", "don't do that", "you forgot". Good signal-to-noise ratio.
-- Low — only capture strong rejections like "that's wrong", "stop doing", "don't do that". Fewest false positives.
+- High, capture any redirect, including soft phrases like "actually", "remember that", "keep in mind". Catches more but may pick up non-corrections.
+- Medium (Recommended), capture explicit corrections like "no, use X instead", "that's wrong", "don't do that", "you forgot". Good signal-to-noise ratio.
+- Low, only capture strong rejections like "that's wrong", "stop doing", "don't do that". Fewest false positives.
 
 **Config mapping:**
-- High → `correction_sensitivity: "high"` — all patterns active
-- Medium → `correction_sensitivity: "medium"` — exclude soft patterns ("actually", "remember that/this", "keep in mind")
-- Low → `correction_sensitivity: "low"` — only: "that's wrong", "don't do that", "stop doing", "no, use X instead"
+- High → `correction_sensitivity: "high"`, all patterns active
+- Medium → `correction_sensitivity: "medium"`, exclude soft patterns ("actually", "remember that/this", "keep in mind")
+- Low → `correction_sensitivity: "low"`, only: "that's wrong", "don't do that", "stop doing", "no, use X instead"
 
 #### Step 8: Performance baselines
 
@@ -128,9 +128,9 @@ Tracks test and build command execution times. When a command takes more than 10
 **Question:** Should autocontext track test/build performance baselines?
 
 **Options:**
-- Enabled with auto-detect (Recommended) — track common test/build commands (pytest, npm test, cargo test, etc.) automatically.
-- Enabled with custom commands — you'll specify which commands to track after setup.
-- Disabled — no performance tracking.
+- Enabled with auto-detect (Recommended), track common test/build commands (pytest, npm test, cargo test, etc.) automatically.
+- Enabled with custom commands, you'll specify which commands to track after setup.
+- Disabled, no performance tracking.
 
 If "Enabled with custom commands" is selected, follow up with an open-ended question asking for the commands as a comma-separated list. Store them in `baseline_commands`.
 
@@ -148,9 +148,9 @@ The playbook (`playbook.md`) is a human-readable summary of all active lessons, 
 **Question:** Should autocontext auto-generate the playbook file?
 
 **Options:**
-- Auto-generate (Recommended) — regenerate `playbook.md` on every session start/end. Always up to date.
-- Manual only — only regenerate when you run `/autocontext:review`. Less overhead.
-- Disabled — no playbook file generated. Lessons are still loaded but not rendered to markdown.
+- Auto-generate (Recommended), regenerate `playbook.md` on every session start/end. Always up to date.
+- Manual only, only regenerate when you run `/autocontext:review`. Less overhead.
+- Disabled, no playbook file generated. Lessons are still loaded but not rendered to markdown.
 
 **Config mapping:**
 - Auto-generate → `playbook_generation: "auto"`
@@ -164,9 +164,9 @@ Lessons can be tagged with `machine:hostname` to limit them to specific machines
 **Question:** Do you work on projects across multiple machines?
 
 **Options:**
-- Single machine — no machine tagging needed. All lessons apply everywhere.
-- Multiple machines — lessons can be machine-scoped. Enter machine hostnames after setup.
-- Auto-detect — use the current hostname automatically. Lessons without machine tags apply everywhere.
+- Single machine, no machine tagging needed. All lessons apply everywhere.
+- Multiple machines, lessons can be machine-scoped. Enter machine hostnames after setup.
+- Auto-detect, use the current hostname automatically. Lessons without machine tags apply everywhere.
 
 If "Multiple machines" is selected, follow up with an open-ended question asking for hostnames as a comma-separated list.
 
@@ -201,9 +201,9 @@ Controls the minimum evidence threshold for `/autocontext:evolve` to consider a 
 **Question:** How aggressive should skill evolution be?
 
 **Options:**
-- Conservative (confidence >= 0.9, 5+ validations) — only well-proven lessons
+- Conservative (confidence >= 0.9, 5+ validations), only well-proven lessons
 - Moderate (confidence >= 0.85, 3+ validations) (recommended)
-- Aggressive (confidence >= 0.7, 2+ validations) — faster evolution, more risk
+- Aggressive (confidence >= 0.7, 2+ validations), faster evolution, more risk
 
 Set `skill_learning.evolution_confidence` and `skill_learning.evolution_min_validations` based on selection.
 

@@ -274,7 +274,7 @@
 - **Doesn't work on**: Hard paywalls that don't load content at all
 - **Success rate**: Variable, generally 30-50% of paywalled articles
 
-**Best Practice**: Try Reader Mode first before other methods—it's built-in, legal, and doesn't require extensions
+**Best Practice**: Try Reader Mode first before other methods, it's built-in, legal, and doesn't require extensions
 
 ---
 
@@ -400,7 +400,7 @@ These tools are specifically designed for legal access to academic and research 
 
 **How it works**: Researchers upload their publications and preprints
 
-**Legal Status**: Grey area—depends on publisher agreements
+**Legal Status**: Grey area, depends on publisher agreements
 
 **Best For**: Finding author-shared versions of papers, contacting researchers directly
 
@@ -471,7 +471,7 @@ If you're affiliated with a university, you likely have access to:
 - Project MUSE
 - Many others
 
-**Pro Tip**: Alumni often retain limited library access—check with your alma mater
+**Pro Tip**: Alumni often retain limited library access, check with your alma mater
 
 ---
 
@@ -711,7 +711,7 @@ Allows limited use without permission for:
 
 ### The "Speed Limit" Analogy
 One expert noted:
-> "Paywalls are more or less like speed limits—there's what's technically illegal, and then there is what's socially and even legally tolerated."
+> "Paywalls are more or less like speed limits, there's what's technically illegal, and then there is what's socially and even legally tolerated."
 
 **Reality**:
 - Personal, non-commercial use typically not prosecuted
@@ -1009,7 +1009,7 @@ For journalists and researchers, access to information is essential for performi
 4. **Last resort**: Archive.is and grey-area tools (legal questions, ethical concerns)
 5. **Avoid**: Systematic circumvention, credential sharing, commercial use of circumvented content
 
-**Remember**: The goal is to advance public knowledge while supporting sustainable journalism and research. When in doubt, choose the most legal and ethical path—your credibility as a journalist or researcher depends on it.
+**Remember**: The goal is to advance public knowledge while supporting sustainable journalism and research. When in doubt, choose the most legal and ethical path, your credibility as a journalist or researcher depends on it.
 
 ---
 
@@ -1046,7 +1046,7 @@ For journalists and researchers, access to information is essential for performi
 - [Best VPNs for geo-blocking in 2026: Unlock Global Content - Cybernews](https://cybernews.com/best-vpn/vpn-for-geo-blocking/)
 - [Geo-Blocking: What Is It and How to Bypass It - AVG](https://www.avg.com/en/signal/geo-blocking)
 - [5 Best VPNs for Government Bypassing: Tested in 2026 - Safety Detectives](https://www.safetydetectives.com/blog/best-vpns-for-government-bypassing/)
-- [Legislation, loopholes, and loose ends — what does 2026 hold for the VPN industry? - TechRadar](https://www.techradar.com/vpn/vpn-services/legislation-loopholes-and-loose-ends-what-does-2026-hold-for-the-vpn-industry)
+- [Legislation, loopholes, and loose ends, what does 2026 hold for the VPN industry? - TechRadar](https://www.techradar.com/vpn/vpn-services/legislation-loopholes-and-loose-ends-what-does-2026-hold-for-the-vpn-industry)
 
 ### Academic and Open Access Tools
 - [Unpaywall Extension - Alternative Access to Articles - University at Buffalo](https://research.lib.buffalo.edu/articleaccess/unpaywall)

@@ -83,7 +83,7 @@ These patterns can erode reader trust. Consider revising.
 
 ## Non-blocking
 
-This hook provides warnings only. It does not prevent the write/edit from completing. The purpose is awareness—the writer decides whether to revise.
+This hook provides warnings only. It does not prevent the write/edit from completing. The purpose is awareness, the writer decides whether to revise.
 
 ## Skip conditions
 

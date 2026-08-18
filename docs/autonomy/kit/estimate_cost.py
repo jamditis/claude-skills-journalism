@@ -4,7 +4,7 @@
 It turns the dials in COSTS.md into numbers: it reads the cadence, effort, and
 timeout from a config.yaml (or flags), works out how many sessions a day that
 fires, and prints a monthly cost range for subscription billing vs a metered
-API key — so the gap COSTS.md describes comes out as a concrete number.
+API key, so the gap COSTS.md describes comes out as a concrete number.
 
   python3 estimate_cost.py config.yaml
   python3 estimate_cost.py --cron "*/15 7-19 * * *" --work-effort high
@@ -45,7 +45,7 @@ METERED_BLENDED_USD_PER_MTOK = {
 }
 
 # Tokens the WORKER bills per active minute, as a (low, high) band per effort
-# tier. This is the softest assumption in the file — an agent streams tool
+# tier. This is the softest assumption in the file, an agent streams tool
 # results, file reads, and reasoning, so per-minute volume varies a lot. These
 # are order-of-magnitude envelopes; replace them with what you actually observe.
 WORKER_TOKENS_PER_MIN = {
@@ -82,7 +82,7 @@ VALID_EFFORTS = tuple(WORKER_TOKENS_PER_MIN.keys())
 # ===========================================================================
 
 # crontab(5) accepts three-letter names in the day-of-week field (SUN..SAT,
-# case-insensitive). Only the day-of-week field is expanded here — the month
+# case-insensitive). Only the day-of-week field is expanded here, the month
 # field is never parsed (cron_unsupported_restrictions refuses any month
 # restriction, named or numeric, because the estimator doesn't model it), so a
 # month-name table would be unreachable.
@@ -141,7 +141,7 @@ def parse_cron_field(
             # names map resolves SUN -> 0, so a range ending in Sunday (e.g.
             # FRI-SUN -> 5-0, or numeric 5-0) reads as start > end. cron lets
             # Sunday also be the high alias 7, so lift the end to hi to keep the
-            # range ordered — "FRI-SUN" then folds to {5,6,0} exactly like the
+            # range ordered, "FRI-SUN" then folds to {5,6,0} exactly like the
             # numeric "5-7". Only the day-of-week field passes a names map, and
             # its caller folds 7 -> 0, so this stays scoped to that field.
             if names and start > end and end == lo:
@@ -181,7 +181,7 @@ def cron_active_days_per_week(expr: str) -> int:
     if dow.strip() == "*":
         return 7
     # Parse against 0-7 (cron allows both 0 and 7 for Sunday), then fold 7 -> 0
-    # on the integer set. Normalizing before the parse — dow.replace("7", "0") —
+    # on the integer set. Normalizing before the parse, dow.replace("7", "0"),
     # would corrupt ranges like "1-7" into the invalid "1-0".
     days = {d % 7 for d in parse_cron_field(dow, 0, 7, CRON_DOW_NAMES)}
     return len(days)
@@ -279,7 +279,7 @@ def estimate(inputs: Inputs) -> Estimate:
         raise ValueError("days_per_month must be positive")
 
     # schedule.wake.enabled: false means the loop never fires, so it runs zero
-    # times and bills zero metered tokens. Short-circuit before reading cadence —
+    # times and bills zero metered tokens. Short-circuit before reading cadence,
     # a disabled schedule's cron is moot. The per-run figure stays informational
     # ("if you turned it on..."); the subscription line still shows the flat
     # plans you hold whether or not this loop fires, minus the reviewer plan when
@@ -298,8 +298,8 @@ def estimate(inputs: Inputs) -> Estimate:
     active_days = cron_active_days_per_week(inputs.cron)
 
     # day-of-month and month aren't modelled. Rather than report a monthly total
-    # that's off by an order of magnitude — "0 9 1 * *" runs once a month, but
-    # minute x hour x day-of-week reads it as ~30 — refuse the schedule and say
+    # that's off by an order of magnitude, "0 9 1 * *" runs once a month, but
+    # minute x hour x day-of-week reads it as ~30, refuse the schedule and say
     # why, instead of printing a confident wrong number with a footnote.
     restrictions = cron_unsupported_restrictions(inputs.cron)
     if restrictions:
@@ -358,7 +358,7 @@ def inputs_from_config(cfg: dict) -> dict:
     review = cfg.get("review") or {}
     nudges = cfg.get("nudges") or {}
     out = {}
-    # Test "is not None" (key present), not truthiness — else an explicit
+    # Test "is not None" (key present), not truthiness, else an explicit
     # review.max_passes: 0 reads as absent and the bad value never reaches the
     # validation in estimate(), exactly the trap the CLI path also had.
     if wake.get("cron") is not None:
@@ -407,7 +407,7 @@ def format_report(inputs: Inputs, est: Estimate, *, source: str) -> str:
         if inputs.review_enabled
         else "review disabled"
     )
-    cadence_note = "" if inputs.wake_enabled else "   (schedule disabled — 0 runs)"
+    cadence_note = "" if inputs.wake_enabled else "   (schedule disabled, 0 runs)"
     # With review off, the headline subscription drops the reviewer plan (matching
     # the metered side). Still surface the with-reviewer figure, since you might
     # keep that plan for interactive use even though this loop won't trigger it.
@@ -444,7 +444,7 @@ def format_report(inputs: Inputs, est: Estimate, *, source: str) -> str:
     ]
     lines += [
         "",
-        "Price assumptions (USD) — edit at the top of estimate_cost.py to fit your plans:",
+        "Price assumptions (USD), edit at the top of estimate_cost.py to fit your plans:",
         f"  subscription/mo   worker {_money(SUBSCRIPTION_PLANS_USD['worker'])}, "
         f"reviewer {_money(SUBSCRIPTION_PLANS_USD['reviewer'])}",
         f"  metered $/Mtok    worker {METERED_BLENDED_USD_PER_MTOK['worker']:g}, "
@@ -497,7 +497,7 @@ def resolve_inputs(args: argparse.Namespace) -> tuple[Inputs, str]:
         values.update(inputs_from_config(load_config(cfg_path)))
         source = cfg_path
     # Flag overrides win over the config file. Test "is not None" (was the flag
-    # passed?), not truthiness — otherwise an explicit --max-passes 0 or
+    # passed?), not truthiness, otherwise an explicit --max-passes 0 or
     # --avg-session-minutes 0 is falsy, gets silently dropped for the default,
     # and the positive-value checks in estimate() never see the bad value.
     if args.cron is not None:
@@ -512,7 +512,7 @@ def resolve_inputs(args: argparse.Namespace) -> tuple[Inputs, str]:
         values["avg_session_minutes"] = args.avg_session_minutes
 
     if "cron" not in values:
-        # A disabled schedule never fires, so its cadence is moot — fill a
+        # A disabled schedule never fires, so its cadence is moot, fill a
         # placeholder so estimate() can short-circuit to 0 runs instead of
         # demanding a cron the user rightly left out. Only an ENABLED loop with
         # no cadence is an error.
@@ -522,7 +522,7 @@ def resolve_inputs(args: argparse.Namespace) -> tuple[Inputs, str]:
             )
         values["cron"] = "(disabled)"
     # An explicit average always wins. Otherwise start from the default and let a
-    # hard timeout pull it down when the timeout is tighter than that default —
+    # hard timeout pull it down when the timeout is tighter than that default,
     # a 15-minute cap can't average 30 minutes a session.
     if "avg_session_minutes" in values:
         avg_session_minutes = values["avg_session_minutes"]

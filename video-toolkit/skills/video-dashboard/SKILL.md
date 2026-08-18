@@ -1,6 +1,6 @@
 ---
 name: video-dashboard
-description: This skill should be used when the user asks to "build a dashboard", "create a video analysis dashboard", "generate content analysis", "run topic analysis on transcripts", "analyze sentiment", "compare cross-platform messaging", or needs to aggregate transcript and frame data into an interactive web dashboard.
+description: Aggregates transcript and frame data into an interactive web dashboard. Use for content, topic, or sentiment analysis.
 ---
 
 # Content analysis and interactive dashboard
@@ -73,7 +73,7 @@ Ask the user: "Want to customize the topic categories for this subject, or use t
 
 Generate four JSON files in `analysis/`:
 
-**topics.json** — keyword frequency per video, per platform, and overall:
+**topics.json**, keyword frequency per video, per platform, and overall:
 ```json
 {
   "overall": {"topic": count, ...},
@@ -82,7 +82,7 @@ Generate four JSON files in `analysis/`:
 }
 ```
 
-**sentiment.json** — positive/negative/urgent scoring per video:
+**sentiment.json**, positive/negative/urgent scoring per video:
 ```json
 {
   "per_video": {"video_id": {"raw_counts": {...}, "dominant_tone": "urgent"}},
@@ -90,7 +90,7 @@ Generate four JSON files in `analysis/`:
 }
 ```
 
-**cross-platform.json** — platform comparison metrics:
+**cross-platform.json**, platform comparison metrics:
 ```json
 {
   "platforms": {
@@ -102,7 +102,7 @@ Generate four JSON files in `analysis/`:
 }
 ```
 
-**summary.json** — high-level overview stats:
+**summary.json**, high-level overview stats:
 ```json
 {
   "total_videos": N, "total_duration_minutes": N, "total_words": N,

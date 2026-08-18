@@ -5,7 +5,7 @@ description: Use when facing 2+ independent tasks that can be worked on without 
 <!--
 Adapted from obra/superpowers dispatching-parallel-agents skill (v5.0.7),
 MIT-licensed, copyright 2025 Jesse Vincent. Modifications copyright 2026 Joe Amditis.
-v0.5.0 ports as a consumer category — no research phase per the v0.2.0
+v0.5.0 ports as a consumer category, no research phase per the v0.2.0
 architecture, since dispatching parallel agents is a fan-out utility called by
 other skills whose research conclusions already determined that parallelism
 applies.
@@ -16,7 +16,7 @@ See CREDITS.md.
 
 ## Overview
 
-You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
+You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history, you construct exactly what they need. This also preserves your own context for coordination work.
 
 When you have multiple unrelated failures (different test files, different subsystems, different bugs), investigating them sequentially wastes time. Each investigation is independent and can happen in parallel.
 

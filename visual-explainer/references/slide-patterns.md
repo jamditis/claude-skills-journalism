@@ -2,28 +2,28 @@
 
 CSS patterns, JS engine, slide type layouts, transitions, navigation chrome, and curated presets for self-contained HTML slide presentations. All slides are viewport-fit (100dvh), single-file, same philosophy as scrollable pages.
 
-**When to use slides:** Only when the user explicitly requests them — `/generate-slides`, `--slides` flag on an existing prompt, or natural language like "as a slide deck." Never auto-select slide format.
+**When to use slides:** Only when the user explicitly requests them, `/generate-slides`, `--slides` flag on an existing prompt, or natural language like "as a slide deck." Never auto-select slide format.
 
-**Before generating**, also read `./css-patterns.md` for shared patterns (Mermaid zoom controls, overflow protection, depth tiers, status badges) and `./libraries.md` for Mermaid theming, Chart.js, and font pairings. Those patterns apply to slides too — this file adds slide-specific patterns on top.
+**Before generating**, also read `./css-patterns.md` for shared patterns (Mermaid zoom controls, overflow protection, depth tiers, status badges) and `./libraries.md` for Mermaid theming, Chart.js, and font pairings. Those patterns apply to slides too, this file adds slide-specific patterns on top.
 
 ## Planning a Deck from a Source Document
 
 When converting a plan, spec, review, or any structured document into slides, follow this process before writing any HTML. Skipping it leads to polished-looking decks that silently drop 30–40% of the source material.
 
-**Step 1 — Inventory the source.** Read the entire source document and enumerate every section, subsection, card, table row, decision, specification, collapsible detail, and footnote. Count them. A plan with 7 sections, 6 decision cards, a 7-row file table, 4 presets, 6 technique guides, and an engine spec with 3 sub-specs and 2 collapsibles is ~25 distinct content items that all need slide real estate.
+**Step 1, Inventory the source.** Read the entire source document and enumerate every section, subsection, card, table row, decision, specification, collapsible detail, and footnote. Count them. A plan with 7 sections, 6 decision cards, a 7-row file table, 4 presets, 6 technique guides, and an engine spec with 3 sub-specs and 2 collapsibles is ~25 distinct content items that all need slide real estate.
 
-**Step 2 — Map source to slides.** Assign each inventory item to one or more slides. Every item must appear somewhere. Rules:
-- If a section has 6 decisions, all 6 need slides — not the 2 that fit on one split slide.
+**Step 2, Map source to slides.** Assign each inventory item to one or more slides. Every item must appear somewhere. Rules:
+- If a section has 6 decisions, all 6 need slides, not the 2 that fit on one split slide.
 - If a table has 7 rows, all 7 rows show up.
-- Collapsible/expandable details in the source are not optional in the deck — they become their own slides.
+- Collapsible/expandable details in the source are not optional in the deck, they become their own slides.
 - Subsections with multiple cards (e.g., "6 Visual Technique cards") may need 2–3 slides to cover at readable density.
 - Each plan section typically needs a divider slide + 1–3 content slides depending on density.
 
-**Step 3 — Choose layouts.** For each planned slide, pick a slide type and spatial composition. Vary across the sequence (see Compositional Variety below). This is where narrative pacing happens — alternate dense slides with sparse ones.
+**Step 3, Choose layouts.** For each planned slide, pick a slide type and spatial composition. Vary across the sequence (see Compositional Variety below). This is where narrative pacing happens, alternate dense slides with sparse ones.
 
-**Step 4 — Plan images.** Run `which surf`. If surf-cli is available, plan 2–4 generated images for the deck. At minimum, target the **title slide** (16:9 background that sets the visual tone) and **one full-bleed slide** (immersive background for a key moment). Content slides with conceptual topics also benefit from a 1:1 illustration in the aside area. Generate these images early — before writing HTML — so you can embed them as base64 data URIs. See the Proactive Imagery section below for the full workflow. If surf isn't available, degrade to CSS gradients and SVG decorations — note the fallback in a comment but don't error.
+**Step 4, Plan images.** Run `which surf`. If surf-cli is available, plan 2–4 generated images for the deck. At minimum, target the **title slide** (16:9 background that sets the visual tone) and **one full-bleed slide** (immersive background for a key moment). Content slides with conceptual topics also benefit from a 1:1 illustration in the aside area. Generate these images early, before writing HTML, so you can embed them as base64 data URIs. See the Proactive Imagery section below for the full workflow. If surf isn't available, degrade to CSS gradients and SVG decorations, note the fallback in a comment but don't error.
 
-**Step 5 — Verify before writing HTML.** Scan the inventory from Step 1. Is anything unmapped? Would a reader of the source document notice something missing from the deck? If yes, add slides. A source document with 7 sections typically produces 18–25 slides, not 10–13.
+**Step 5, Verify before writing HTML.** Scan the inventory from Step 1. Is anything unmapped? Would a reader of the source document notice something missing from the deck? If yes, add slides. A source document with 7 sections typically produces 18–25 slides, not 10–13.
 
 **The test:** After generating the deck, a reader who has never seen the source document should be able to reconstruct every major point from the slides alone. If they'd miss entire sections, the deck is incomplete.
 
@@ -125,7 +125,7 @@ Slide typography is 2–3× larger than scrollable pages. Page-sized text on a v
 IntersectionObserver adds `.visible` when a slide enters the viewport. Slides animate in once and stay visible when scrolling back.
 
 ```css
-/* Slide entrance — fade + lift + subtle scale */
+/* Slide entrance, fade + lift + subtle scale */
 .slide {
   opacity: 0;
   transform: translateY(40px) scale(0.98);
@@ -139,7 +139,7 @@ IntersectionObserver adds `.visible` when a slide enters the viewport. Slides an
   transform: none;
 }
 
-/* Staggered child reveals — add .reveal to each content element */
+/* Staggered child reveals, add .reveal to each content element */
 .slide .reveal {
   opacity: 0;
   transform: translateY(20px);
@@ -153,7 +153,7 @@ IntersectionObserver adds `.visible` when a slide enters the viewport. Slides an
   transform: none;
 }
 
-/* Stagger delays — up to 6 children per slide */
+/* Stagger delays, up to 6 children per slide */
 .slide.visible .reveal:nth-child(1) { transition-delay: 0.1s; }
 .slide.visible .reveal:nth-child(2) { transition-delay: 0.2s; }
 .slide.visible .reveal:nth-child(3) { transition-delay: 0.3s; }
@@ -346,7 +346,7 @@ class SlideEngine {
 
   bindEvents() {
     var self = this;
-    // Keyboard — skip if focus is inside interactive content
+    // Keyboard, skip if focus is inside interactive content
     document.addEventListener('keydown', function(e) {
       if (e.target.closest('.mermaid-wrap, .table-scroll, .code-scroll, input, textarea, [contenteditable]')) return;
       if (['ArrowDown', 'ArrowRight', ' ', 'PageDown'].includes(e.key)) {
@@ -457,8 +457,8 @@ function autoFit() {
 ```
 
 Three cases, one function:
-- **Mermaid:** SVGs render with fixed dimensions inside flex containers — force them to fill available width.
-- **KPI values:** Long text strings at hero scale overflow card boundaries — `transform: scale()` shrinks visually without reflow.
+- **Mermaid:** SVGs render with fixed dimensions inside flex containers, force them to fill available width.
+- **KPI values:** Long text strings at hero scale overflow card boundaries, `transform: scale()` shrinks visually without reflow.
 - **Blockquotes:** Quotes longer than ~100 characters get proportionally smaller font. The 0.5 floor prevents unreadably small text; if it needs more than 50% shrink, it should have been a content slide.
 
 ## Slide Type Layouts
@@ -522,7 +522,7 @@ Oversized decorative number (200px+, ultra-light weight) with heading. Breathing
 
 ### Content Slide
 
-Heading + bullets or paragraphs. Asymmetric layout — content offset to one side. Max 5–6 bullets (2 lines each).
+Heading + bullets or paragraphs. Asymmetric layout, content offset to one side. Max 5–6 bullets (2 lines each).
 
 ```html
 <section class="slide slide--content">
@@ -578,7 +578,7 @@ Heading + bullets or paragraphs. Asymmetric layout — content offset to one sid
 
 ### Split Slide
 
-Asymmetric two-panel (60/40 or 70/30). Before/after, text+diagram, text+image. Each panel has its own background tier. Zero padding on the slide itself — panels fill edge to edge.
+Asymmetric two-panel (60/40 or 70/30). Before/after, text+diagram, text+image. Each panel has its own background tier. Zero padding on the slide itself, panels fill edge to edge.
 
 ```html
 <section class="slide slide--split">
@@ -623,11 +623,11 @@ Asymmetric two-panel (60/40 or 70/30). Before/after, text+diagram, text+image. E
 
 ### Diagram Slide
 
-Full-viewport Mermaid diagram. Max 8–10 nodes (presentation scale — fewer, larger than page diagrams). Node labels at 18px+, edges at 2px+. Zoom controls from `css-patterns.md` apply here.
+Full-viewport Mermaid diagram. Max 8–10 nodes (presentation scale, fewer, larger than page diagrams). Node labels at 18px+, edges at 2px+. Zoom controls from `css-patterns.md` apply here.
 
-**When to use Mermaid vs CSS in slides.** Mermaid renders SVGs at a fixed size the agent can't control — node dimensions are set by the library, not by CSS. This creates a recurring problem: small diagrams (fewer than ~7 nodes, no branching) render as tiny elements floating in a huge viewport with acres of dead space. The rule:
+**When to use Mermaid vs CSS in slides.** Mermaid renders SVGs at a fixed size the agent can't control, node dimensions are set by the library, not by CSS. This creates a recurring problem: small diagrams (fewer than ~7 nodes, no branching) render as tiny elements floating in a huge viewport with acres of dead space. The rule:
 
-- **Use Mermaid** for complex graphs: 8+ nodes, branching paths, cycles, multiple edge crossings — anything where automatic edge routing saves real effort.
+- **Use Mermaid** for complex graphs: 8+ nodes, branching paths, cycles, multiple edge crossings, anything where automatic edge routing saves real effort.
 - **Use CSS Pipeline** (below) for simple linear flows: A → B → C → D sequences, build steps, deployment stages. CSS cards give full control over sizing, typography, and fill the viewport naturally.
 - **Never leave a small Mermaid diagram alone on a slide.** If the diagram is small, either switch to CSS, or pair it with supporting content (description cards, bullet annotations, a summary panel) in a split layout. A slide with a tiny diagram and empty space is a failed slide.
 
@@ -799,7 +799,7 @@ For simple linear flows (build steps, deployment stages, data pipelines) where M
 }
 ```
 
-Each `.pipeline__step` uses `flex: 1` to fill available width equally, and the pipeline container itself uses `flex: 1` to fill available vertical space in the slide. Step cards stretch to fill, so the content isn't floating in empty space. The `.pipeline__file` badge at the bottom anchors each card and adds a practical detail. Max 5–6 steps — beyond that, split across two slides.
+Each `.pipeline__step` uses `flex: 1` to fill available width equally, and the pipeline container itself uses `flex: 1` to fill available vertical space in the slide. Step cards stretch to fill, so the content isn't floating in empty space. The `.pipeline__file` badge at the bottom anchors each card and adds a practical detail. Max 5–6 steps, beyond that, split across two slides.
 
 ### Dashboard Slide
 
@@ -854,11 +854,11 @@ KPI cards at presentation scale (48–64px hero numbers). Mini-charts via Chart.
 }
 ```
 
-**KPI hero values should be short** — numbers, percentages, 1–3 word labels. Ideal length is 1–6 characters at hero scale. Longer strings like `store=false` break the layout at 64px. If you must show a longer value, put it in the label or body text instead. The `autoFit()` function (see below) will scale down overflows as a safety net.
+**KPI hero values should be short**, numbers, percentages, 1–3 word labels. Ideal length is 1–6 characters at hero scale. Longer strings like `store=false` break the layout at 64px. If you must show a longer value, put it in the label or body text instead. The `autoFit()` function (see below) will scale down overflows as a safety net.
 
 ### Table Slide
 
-18–20px cell text for projection readability. Max 8 rows per slide — overflow paginates to the next slide. Stronger alternating row contrast than page tables.
+18–20px cell text for projection readability. Max 8 rows per slide, overflow paginates to the next slide. Stronger alternating row contrast than page tables.
 
 ```html
 <section class="slide slide--table">
@@ -1049,7 +1049,7 @@ Background image (surf-generated or CSS gradient) dominates the viewport. Text o
 
 ## Decorative SVG Elements
 
-Inline SVG accents lift slides from functional to editorial. Use sparingly — one or two per slide, never on every slide.
+Inline SVG accents lift slides from functional to editorial. Use sparingly, one or two per slide, never on every slide.
 
 ### Corner Accent
 
@@ -1120,10 +1120,10 @@ Vary gradient direction and accent glow position across slides to create visual 
 
 Slides should reach for visuals before defaulting to text alone. If a slide could be more compelling with an image, chart, or diagram, add one.
 
-**surf-cli integration:** Check `which surf` at the start of every slide deck generation. If available, **generate 2–4 images minimum** for any deck over 10 slides. This is not optional when surf is available — a deck with AI-generated imagery is dramatically more compelling than one with only CSS gradients. Target these slides in priority order:
+**surf-cli integration:** Check `which surf` at the start of every slide deck generation. If available, **generate 2–4 images minimum** for any deck over 10 slides. This is not optional when surf is available, a deck with AI-generated imagery is dramatically more compelling than one with only CSS gradients. Target these slides in priority order:
 
 1. **Title slide** (always): background image that sets the deck's visual tone. Match the topic and palette. Use `--aspect-ratio 16:9`. Prompt example: "abstract dark geometric pattern with green accent lines, technical and minimal" for Terminal Mono preset.
-2. **Full-bleed slide** (always if deck has one): immersive background for the deck's visual anchor moment. Style should match the preset — photo-realistic for Midnight Editorial, abstract/geometric for Swiss Clean, circuit-board or terminal aesthetic for Terminal Mono.
+2. **Full-bleed slide** (always if deck has one): immersive background for the deck's visual anchor moment. Style should match the preset, photo-realistic for Midnight Editorial, abstract/geometric for Swiss Clean, circuit-board or terminal aesthetic for Terminal Mono.
 3. **Content slides with conceptual topics** (1–2 if the deck has room): illustration in the `.slide__aside` area for slides about abstract concepts. Use `--aspect-ratio 1:1`.
 
 **Generate images before writing HTML** so they're ready to embed. The workflow:
@@ -1151,11 +1151,11 @@ rm /tmp/ve-slide-title.png
 - Midnight Editorial: "deep navy abstract composition, warm gold accent light, cinematic depth of field, premium editorial feel"
 - Warm Signal: "warm cream textured paper with terracotta geometric accents, confident modern design"
 
-**When surf fails or isn't available:** Degrade gracefully to CSS gradients and SVG decorations. Use the `.slide__bg--gradient` pattern with bold `linear-gradient` or `radial-gradient` backgrounds. The deck should stand on its own visually without generated images — they enhance, they don't carry. Note the fallback in an HTML comment (`<!-- surf unavailable, using CSS gradient fallback -->`) so future edits know to retry.
+**When surf fails or isn't available:** Degrade gracefully to CSS gradients and SVG decorations. Use the `.slide__bg--gradient` pattern with bold `linear-gradient` or `radial-gradient` backgrounds. The deck should stand on its own visually without generated images, they enhance, they don't carry. Note the fallback in an HTML comment (`<!-- surf unavailable, using CSS gradient fallback -->`) so future edits know to retry.
 
 **Inline data visualizations:** Proactively add SVG sparklines next to numbers, mini-charts on dashboard slides, and small Mermaid diagrams on split slides even when not explicitly requested. A number with a sparkline next to it tells a better story than a number alone.
 
-**When to skip images:** If surf isn't available, degrade gracefully — use CSS gradients and SVG decorations instead. Never error on missing surf. Pure structural or data-heavy decks (code reviews, table comparisons) may not need generated images.
+**When to skip images:** If surf isn't available, degrade gracefully, use CSS gradients and SVG decorations instead. Never error on missing surf. Pure structural or data-heavy decks (code reviews, table comparisons) may not need generated images.
 
 ## Compositional Variety
 
@@ -1177,13 +1177,13 @@ Slides get projected, screen-shared, viewed at distance. Design accordingly:
 
 - **Minimum body text: 16px.** Nothing smaller except labels and captions.
 - **One focal point per slide.** Not three competing elements.
-- **Higher contrast than pages.** Dimmed text (`--text-dim`) should still be easily readable at distance — test against the background.
+- **Higher contrast than pages.** Dimmed text (`--text-dim`) should still be easily readable at distance, test against the background.
 - **Nav chrome opacity.** Dots and progress bar must be visible on any slide background (light or dark) without being distracting. Use the backdrop blur or text-shadow approach from the Nav Chrome section.
 - **Simpler Mermaid diagrams.** Max 8–10 nodes, 18px+ labels, 2px+ edges. The diagram should be readable without zoom at presentation distance. Zoom controls remain available for detail inspection.
 
 ## Content Density Limits
 
-Each slide must fit in exactly 100dvh. If content exceeds these limits, the agent splits across multiple slides — never scrolls within a slide.
+Each slide must fit in exactly 100dvh. If content exceeds these limits, the agent splits across multiple slides, never scrolls within a slide.
 
 | Slide type | Max content |
 |-----------|-------------|
@@ -1239,7 +1239,7 @@ Height-based scaling is more critical for slides than width. Each breakpoint pro
 
 ## Curated Presets
 
-Starting points the agent can riff on. Each defines a font pairing, palette, and background treatment. The agent adapts these to the content — different decks with the same preset should still feel distinct.
+Starting points the agent can riff on. Each defines a font pairing, palette, and background treatment. The agent adapts these to the content, different decks with the same preset should still feel distinct.
 
 ### Midnight Editorial
 

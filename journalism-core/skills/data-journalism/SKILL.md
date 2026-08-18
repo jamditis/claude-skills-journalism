@@ -1,6 +1,6 @@
 ---
 name: data-journalism
-description: Data journalism workflows for analysis, visualization, and storytelling. Use when analyzing datasets, creating charts and maps, cleaning messy data, calculating statistics or building data-driven stories. Essential for reporters, newsrooms and researchers working with quantitative information.
+description: Data journalism workflows for analysis and visualization. Use when analyzing datasets, cleaning data, or building data stories.
 ---
 
 # Data journalism methodology
@@ -118,25 +118,25 @@ The process is iterative, not sequential.
 **Federal data sources**
 
 *General:*
-- **Data.gov** — Federal open data portal. Many datasets were removed between Feb 2025 and 2026; consult the [Harvard LIL Data.gov archive](https://lil.law.harvard.edu/blog/2025/02/06/announcing-data-gov-archive/) and the [Data Rescue Project](https://www.datarescueproject.org/) for preserved copies before assuming anything is still accessible.
-- **Census Bureau** (census.gov) — Demographics, economic data. Many research pages were removed during the 2025 transition; the [End of Term Web Archive](https://eotarchive.org) holds snapshots.
-- **BLS** (bls.gov) — Employment, inflation, wages. Following the 2025 funding lapse, the October 2025 Employment Situation release was canceled and the CPS October 2025 reference period is permanently uncollected. Check [revised release dates](https://www.bls.gov/bls/2025-lapse-revised-release-dates.htm) before relying on series continuity.
-- **BEA** (bea.gov) — GDP, economic accounts.
-- **FRED / Federal Reserve** (fred.stlouisfed.org) — Financial and macroeconomic data; expanded API access through 2026.
-- **SEC EDGAR** — Corporate filings.
+- **Data.gov**, Federal open data portal. Many datasets were removed between Feb 2025 and 2026; consult the [Harvard LIL Data.gov archive](https://lil.law.harvard.edu/blog/2025/02/06/announcing-data-gov-archive/) and the [Data Rescue Project](https://www.datarescueproject.org/) for preserved copies before assuming anything is still accessible.
+- **Census Bureau** (census.gov), Demographics, economic data. Many research pages were removed during the 2025 transition; the [End of Term Web Archive](https://eotarchive.org) holds snapshots.
+- **BLS** (bls.gov), Employment, inflation, wages. Following the 2025 funding lapse, the October 2025 Employment Situation release was canceled and the CPS October 2025 reference period is permanently uncollected. Check [revised release dates](https://www.bls.gov/bls/2025-lapse-revised-release-dates.htm) before relying on series continuity.
+- **BEA** (bea.gov), GDP, economic accounts.
+- **FRED / Federal Reserve** (fred.stlouisfed.org), Financial and macroeconomic data; expanded API access through 2026.
+- **SEC EDGAR**, Corporate filings.
 
 *Specific domains:*
-- **EPA** (epa.gov/data) — Environmental data. At least 80 climate webpages were removed in Dec 2025, the endangerment finding was repealed Feb 12, 2026, and the Climate Change Indicators site was largely gutted. The [Environmental Data & Governance Initiative](https://envirodatagov.org) maintains mirrors.
-- **FDA / openFDA** (open.fda.gov) — Drug approvals, recalls, adverse events.
-- **CDC WONDER** — Health statistics. Many datasets were removed from data.cdc.gov after Jan 2025, partially restored under Doctors for America v. Trump (TRO Feb 11, 2025) but with altered terminology in some returns. The volunteer-run [RestoredCDC.org](https://restoredcdc.org/wonder.cdc.gov/) mirrors removed content.
-- **NHTSA FARS / vPIC APIs** — Vehicle safety data.
-- **DOT** — Transportation statistics.
-- **FEC** — Campaign finance; 2025-2026 cycle data live.
-- **USASpending.gov** — Federal contracts and grants; API v2 operational.
+- **EPA** (epa.gov/data), Environmental data. At least 80 climate webpages were removed in Dec 2025, the endangerment finding was repealed Feb 12, 2026, and the Climate Change Indicators site was largely gutted. The [Environmental Data & Governance Initiative](https://envirodatagov.org) maintains mirrors.
+- **FDA / openFDA** (open.fda.gov), Drug approvals, recalls, adverse events.
+- **CDC WONDER**, Health statistics. Many datasets were removed from data.cdc.gov after Jan 2025, partially restored under Doctors for America v. Trump (TRO Feb 11, 2025) but with altered terminology in some returns. The volunteer-run [RestoredCDC.org](https://restoredcdc.org/wonder.cdc.gov/) mirrors removed content.
+- **NHTSA FARS / vPIC APIs**, Vehicle safety data.
+- **DOT**, Transportation statistics.
+- **FEC**, Campaign finance; 2025-2026 cycle data live.
+- **USASpending.gov**, Federal contracts and grants; API v2 operational.
 
 *Court records:*
-- **CourtListener / RECAP** (courtlistener.com) — Free PACER alternative covering federal court filings; RECAP Search Alerts launched June 2025 ("Google Alerts for federal courts").
-- **PACER** — Federal court filings; $0.10 per page, $30 per quarter waiver threshold.
+- **CourtListener / RECAP** (courtlistener.com), Free PACER alternative covering federal court filings; RECAP Search Alerts launched June 2025 ("Google Alerts for federal courts").
+- **PACER**, Federal court filings; $0.10 per page, $30 per quarter waiver threshold.
 
 *State and local:*
 - State open data portals (search: "[state] open data")
@@ -145,18 +145,18 @@ The process is iterative, not sequential.
 - State comptroller and auditor reports
 
 *International:*
-- **Eurostat**, **OECD**, **World Bank Open Data**, **UN Data** — major comparative datasets, mostly stable through 2026.
+- **Eurostat**, **OECD**, **World Bank Open Data**, **UN Data**, major comparative datasets, mostly stable through 2026.
 
 *Specialized:*
-- **NICAR Data Library** (IRE) — curated datasets, IRE members only.
-- **IPUMS** (University of Minnesota) — free with account; canonical for harmonized microdata.
-- **ICPSR** (University of Michigan) — social-science data archive.
-- **ProPublica Data Store** — frozen; datasets only run through 2023.
+- **NICAR Data Library** (IRE), curated datasets, IRE members only.
+- **IPUMS** (University of Minnesota), free with account; canonical for harmonized microdata.
+- **ICPSR** (University of Michigan), social-science data archive.
+- **ProPublica Data Store**, frozen; datasets only run through 2023.
 
 *Federal-data preservation (use when source data has been removed):*
-- [Data Rescue Project](https://www.datarescueproject.org) — citizen + library mirrors of removed federal data; more than 1,230 datasets across 85 offices as of Aug 2025.
-- [End of Term Web Archive](https://eotarchive.org) — 500TB / 100M-page snapshot of federal sites at the 2024-2025 transition.
-- Internet Archive Wayback Machine — useful for individual page-level recovery.
+- [Data Rescue Project](https://www.datarescueproject.org), citizen + library mirrors of removed federal data; more than 1,230 datasets across 85 offices as of Aug 2025.
+- [End of Term Web Archive](https://eotarchive.org), 500TB / 100M-page snapshot of federal sites at the 2024-2025 transition.
+- Internet Archive Wayback Machine, useful for individual page-level recovery.
 
 ### Data request strategies
 
@@ -166,7 +166,7 @@ For request mechanics (templates, fee-waiver language, NJ OPRA, appeals, FOIA Im
 
 - Request databases, not just documents
 - Ask for the data dictionary or schema
-- Request in native format (CSV, SQL dump) — not PDFs or scanned printouts
+- Request in native format (CSV, SQL dump), not PDFs or scanned printouts
 - Specify field-level needs and any computed columns you want included
 - For active datasets, ask the cadence (daily, monthly, quarterly) and request standing access if your reporting will continue
 
@@ -297,7 +297,7 @@ def flag_outliers(series: pd.Series, method: str = 'iqr', threshold: float = 1.5
 # use descriptive variable names and chain methods
 data_clean = (pd
 
-            # Load messy data — raw_data is a placeholder
+            # Load messy data, raw_data is a placeholder
             # Be sure to use the right reader for the filetype
             .read_csv('..data/raw/raw_data.csv')
 
@@ -331,10 +331,10 @@ data_clean = (pd
             .pipe(flag_similar_names, name_col='name_clean', threshold=85)
 
             # MISSING VALUES
-            # Strategy depends on context — set required_col when you need to drop incomplete rows
+            # Strategy depends on context, set required_col when you need to drop incomplete rows
             .pipe(handle_missing, required_col='amount', per_thresh=20.0)
 
-            # DUPLICATES — Find and handle duplicates
+            # DUPLICATES, Find and handle duplicates
             .pipe(handle_duplicates, thresh=1)
             
             .reset_index(drop=True)
@@ -376,14 +376,14 @@ data_clean = (pd
 
 ## AI-assisted analysis: cautions
 
-AI tools can speed up exploration, code generation, and pattern surfacing — but they have specific failure modes that journalists must guard against. *Mata v. Avianca* (2023, fabricated court citations sanctioned in federal court) and the Air Canada chatbot ruling (2024, hallucinated refund policy ruled binding on the airline) are the canonical cases of LLM fabrication treated as published fact.
+AI tools can speed up exploration, code generation, and pattern surfacing, but they have specific failure modes that journalists must guard against. *Mata v. Avianca* (2023, fabricated court citations sanctioned in federal court) and the Air Canada chatbot ruling (2024, hallucinated refund policy ruled binding on the airline) are the canonical cases of LLM fabrication treated as published fact.
 
 ### What LLMs reliably get wrong
 
-- **Calculations at scale** — A model may produce a confident-looking sum, percentage, or rate that's off by 1-15%. Re-run any LLM-produced number in pandas, SQL, or R yourself before publishing.
-- **Source citations** — Models hallucinate plausible URLs, paper titles, dataset names, and FOIA exemptions that don't exist. Verify every cited source by visiting it.
-- **Dataset columns** — When asked to describe a dataset's structure, an LLM may invent columns that aren't there. Cross-check against the actual schema (`df.dtypes`, `df.columns.tolist()`).
-- **Statistical reasoning** — LLMs confuse correlation with causation, conflate sample statistics with population parameters, and misapply tests. Treat any analytical claim as a hypothesis to verify, not a finding.
+- **Calculations at scale**, A model may produce a confident-looking sum, percentage, or rate that's off by 1-15%. Re-run any LLM-produced number in pandas, SQL, or R yourself before publishing.
+- **Source citations**, Models hallucinate plausible URLs, paper titles, dataset names, and FOIA exemptions that don't exist. Verify every cited source by visiting it.
+- **Dataset columns**, When asked to describe a dataset's structure, an LLM may invent columns that aren't there. Cross-check against the actual schema (`df.dtypes`, `df.columns.tolist()`).
+- **Statistical reasoning**, LLMs confuse correlation with causation, conflate sample statistics with population parameters, and misapply tests. Treat any analytical claim as a hypothesis to verify, not a finding.
 
 ### Methodology disclosure
 
@@ -684,7 +684,7 @@ existing_chart.title = 'Updated Title'  # modify properties
 existing_chart.update()  # push changes to Datawrapper
 existing_chart.publish()  # republish to make live
 
-# Optional — Export chart as image
+# Optional, Export chart as image
 chart.export(filepath='chart.png', width=800, height=600)
 
 #view chart
@@ -727,7 +727,7 @@ chart
 
 #### U.S. Census Geocoder
 
-**Best for:** U.S. addresses only. Returns Census geography (tract, block, FIPS codes) along with coordinates—essential for joining with Census demographic data.
+**Best for:** U.S. addresses only. Returns Census geography (tract, block, FIPS codes) along with coordinates, essential for joining with Census demographic data.
 
 **Pros:** Completely free with no API key required. Returns Census geographies (state/county FIPS, tract, block) that let you join with ACS/decennial Census data. Good match rates for standard U.S. addresses.
 
@@ -738,7 +738,7 @@ chart
 ```python
 # pip install censusgeocode
 # (the older `censusbatchgeocoder` package on PyPI hasn't been updated since 2017
-# and is unmaintained — use `censusgeocode` instead, which wraps the same Census
+# and is unmaintained, use `censusgeocode` instead, which wraps the same Census
 # batch endpoint and is actively maintained.)
 
 import censusgeocode as cg
@@ -747,7 +747,7 @@ import pandas as pd
 # DataFrame must have columns matching the *_col parameters below
 # (defaults: id, address, city, state, zipcode). If your CSV uses
 # different names like 'street' or 'zip', pass them via address_col=,
-# zipcode_col=, etc. — internally these are renamed to the keys the
+# zipcode_col=, etc. internally these are renamed to the keys the
 # Census API expects ('address', 'zip', etc.) before the request.
 # (state and zipcode are optional but improve match rates)
 
@@ -809,7 +809,7 @@ geocoded = (pd
                     zipcode_col='zip'))
 
 # Follow-up per-address lookup for census geographies (state/county/tract FIPS).
-# The batch endpoint above does not return these — only lat/lon and match status.
+# The batch endpoint above does not return these, only lat/lon and match status.
 def add_geographies(geocoded: pd.DataFrame) -> pd.DataFrame:
     """For each matched row, fetch census-geography FIPS via per-address API."""
     fips_rows = []
@@ -835,7 +835,7 @@ def add_geographies(geocoded: pd.DataFrame) -> pd.DataFrame:
 
 **Pros:** Excellent match rates even for poorly formatted addresses. Works worldwide. Fast and reliable. Returns rich metadata (place types, address components, place IDs).
 
-**Cons:** Costs money ($5 per 1,000 requests after free tier). Requires API key and billing account. Does not return Census geography—you'd need to do a separate spatial join.
+**Cons:** Costs money ($5 per 1,000 requests after free tier). Requires API key and billing account. Does not return Census geography, you'd need to do a separate spatial join.
 
 **Use when:** You need to geocode international addresses, have messy address data that the Census geocoder can't match, or need the highest possible match rate and have budget for it.
 
@@ -934,7 +934,7 @@ gdf.to_file('output.geojson', driver='GeoJSON') #for tools that dont support Geo
 
 **Best for:** Quick exploration and prototyping during data analysis.
 
-**Pros:** Built into GeoPandas—method is available on any GeoDataFrame. Great for exploratory data analysis—checking that your data looks right, exploring spatial patterns, and iterating quickly on map designs.
+**Pros:** Built into GeoPandas, method is available on any GeoDataFrame. Great for exploratory data analysis, checking that your data looks right, exploring spatial patterns, and iterating quickly on map designs.
 
 **Cons:** Becomes slow with large datasets (>100k features). Limited customization compared to dedicated mapping libraries. Requires extra dependencies to be installed.
 
@@ -975,7 +975,7 @@ gdf.explore(
 
 **Best for:** Large datasets and high-performance visualization in Jupyter notebooks.
 
-**Pros:** GPU-accelerated rendering via deck.gl can handle millions of points smoothly. Excellent interactivity—pan, zoom, and hover work fluidly even with massive datasets. Native support for GeoArrow format for efficient data transfer.
+**Pros:** GPU-accelerated rendering via deck.gl can handle millions of points smoothly. Excellent interactivity, pan, zoom, and hover work fluidly even with massive datasets. Native support for GeoArrow format for efficient data transfer.
 
 **Cons:** Requires separate installation (`pip install lonboard`). Styling options are more technical (RGBA arrays, deck.gl conventions). 
 
@@ -1018,11 +1018,11 @@ Map(layer)
 
 **Pros:** Beautiful, professional defaults out of the box. Generates embeddable, responsive iframes that work in any CMS. Readers can interact (hover, click) without running any code. Accessible and mobile-friendly. Easy to update data programmatically for updating data.
 
-**Cons:** Requires a Datawrapper account (free tier available). Limited to Datawrapper's supported boundary files—you can't bring arbitrary geometries. Less flexibility for custom visualizations.
+**Cons:** Requires a Datawrapper account (free tier available). Limited to Datawrapper's supported boundary files, you can't bring arbitrary geometries. Less flexibility for custom visualizations.
 
 **Use when:** You need a polished map for publication. Ideal for choropleth maps showing statistics by region (unemployment by state, COVID cases by county, election results by district). Your audience will view the map in a browser, not a notebook.
 
-Unlike `.explore()` or `lonboard`, you don't pass raw geometry—instead you match your data to Datawrapper's built-in boundary files using standard codes (FIPS, ISO, etc.).
+Unlike `.explore()` or `lonboard`, you don't pass raw geometry, instead you match your data to Datawrapper's built-in boundary files using standard codes (FIPS, ISO, etc.).
 
 ```python
 import datawrapper as dw
@@ -1084,13 +1084,13 @@ existing_chart.publish()
 
 ### Learning resources
 
-- **NICAR** — Annual data journalism conference hosted by Investigative Reporters and Editors (IRE).
-- **Knight Center for Journalism in the Americas** — Free MOOCs in English, Spanish, and Portuguese ([journalismcourses.org](https://journalismcourses.org/)).
-- **Data Journalism Handbook 2: Towards a Critical Data Practice** (Bounegru and Gray) — current canonical edition ([datajournalism.com/read/handbook/two](https://datajournalism.com/read/handbook/two)).
-- **Flowing Data** ([flowingdata.com](https://flowingdata.com)) — Nathan Yau's examples and tutorials.
-- **The Pudding** ([pudding.cool](https://pudding.cool)) — examples of editorial data essays.
-- **Sigma Awards** ([sigmaawards.org](https://sigmaawards.org/)) — annual awards, hosted by GIJN since 2024.
-- **Related skills** — for fact-checking computed numbers see **fact-check-workflow**; for FOIA-ing datasets see **foia-requests**; for verifying social-media-derived data see **source-verification**; for OSINT and platform-API context see **social-media-intelligence**.
+- **NICAR**, Annual data journalism conference hosted by Investigative Reporters and Editors (IRE).
+- **Knight Center for Journalism in the Americas**, Free MOOCs in English, Spanish, and Portuguese ([journalismcourses.org](https://journalismcourses.org/)).
+- **Data Journalism Handbook 2: Towards a Critical Data Practice** (Bounegru and Gray), current canonical edition ([datajournalism.com/read/handbook/two](https://datajournalism.com/read/handbook/two)).
+- **Flowing Data** ([flowingdata.com](https://flowingdata.com)), Nathan Yau's examples and tutorials.
+- **The Pudding** ([pudding.cool](https://pudding.cool)), examples of editorial data essays.
+- **Sigma Awards** ([sigmaawards.org](https://sigmaawards.org/)), annual awards, hosted by GIJN since 2024.
+- **Related skills**, for fact-checking computed numbers see **fact-check-workflow**; for FOIA-ing datasets see **foia-requests**; for verifying social-media-derived data see **source-verification**; for OSINT and platform-API context see **social-media-intelligence**.
 
 ---
 

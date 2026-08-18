@@ -1,6 +1,6 @@
 ---
 name: interview-prep
-description: Prepare for journalism interviews with research checklists, question frameworks, and attribution guidelines. Use when preparing to interview sources, planning follow-up questions, or managing interview logistics. Covers consent, recording laws, and professional protocols.
+description: Interview preparation and recording-consent law. Use for research, question frameworks, one-party or all-party consent rules.
 ---
 
 # Interview preparation
@@ -144,7 +144,7 @@ State recording-consent law is jurisdiction-specific and shifts. Some states dis
 **General categories:**
 
 - **One-party consent (federal default).** You can record without telling the other person if you are a party to the conversation. You *should* tell them anyway for ethical reasons.
-- **All-party (two-party) consent.** All participants must consent. As of 2025-2026 this category includes (non-exhaustive, verify against RCFP before relying): California, Florida, Illinois, Maryland, Massachusetts, Montana, Nevada, New Hampshire, Pennsylvania, Washington. Several other states (Connecticut, Michigan, Oregon, Delaware, Vermont, Hawaii) apply two-party rules in some contexts but not all — RCFP has the per-context details.
+- **All-party (two-party) consent.** All participants must consent. As of 2025-2026 this category includes (non-exhaustive, verify against RCFP before relying): California, Florida, Illinois, Maryland, Massachusetts, Montana, Nevada, New Hampshire, Pennsylvania, Washington. Several other states (Connecticut, Michigan, Oregon, Delaware, Vermont, Hawaii) apply two-party rules in some contexts but not all, RCFP has the per-context details.
 - **Cross-state calls.** When the parties are in different states, the stricter state's law generally controls. If you are in a one-party state interviewing someone in a two-party state, get consent.
 
 **Always do, regardless of jurisdiction:**
@@ -190,7 +190,7 @@ I'm recording this conversation. Do I have your permission to record?"
 ### Deep background
 - Information can guide reporting but cannot be attributed at all
 - Verify independently before publishing
-- Rarely appropriate—push for at least background
+- Rarely appropriate, push for at least background
 
 ### Off the record
 - Information is for your knowledge only
@@ -202,7 +202,7 @@ I'm recording this conversation. Do I have your permission to record?"
 
 ```markdown
 Before starting:
-"Just to be clear on attribution—are we on the record?"
+"Just to be clear on attribution, are we on the record?"
 
 If they request otherwise:
 "I'd prefer on the record. What concerns you about that?"
@@ -211,7 +211,7 @@ If they insist:
 "Okay, we'll go on background. What description can I use?"
 
 Document it:
-"So I can refer to you as [agreed description]—is that right?"
+"So I can refer to you as [agreed description], is that right?"
 ```
 
 ## Interview logistics
@@ -230,7 +230,7 @@ I'm a [title] at [publication] working on a story about [brief, honest descripti
 
 I'd like to speak with you because [why they're relevant]. The interview would take approximately [realistic time estimate].
 
-Are you available [specific days/times]? I can do phone, video, or in-person—whatever works best for you.
+Are you available [specific days/times]? I can do phone, video, or in-person, whatever works best for you.
 
 Please let me know if you have questions about the story.
 
@@ -273,7 +273,7 @@ Please let me know if you have questions about the story.
 
 ### Active listening
 - Let them finish sentences
-- Use silence—don't fill every pause
+- Use silence, don't fill every pause
 - Take notes even if recording
 - Note non-verbal cues separately
 

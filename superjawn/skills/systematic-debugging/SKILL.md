@@ -7,7 +7,7 @@ Adapted from obra/superpowers systematic-debugging skill (v5.0.7), MIT-licensed,
 copyright 2025 Jesse Vincent. Modifications copyright 2026 Joe Amditis.
 v0.3.0 adds a research phase between Phase 1 (Root Cause Investigation)
 and Phase 2 (Pattern Analysis) per the v0.2.0 architecture's
-research-at-entry-point rule (debugging is an entry-point stage —
+research-at-entry-point rule (debugging is an entry-point stage,
 the work begins from a bug report, not an upstream artifact).
 See CREDITS.md.
 -->
@@ -74,7 +74,7 @@ Use for ANY technical issue:
 
 ## The Four Phases
 
-Move through the phases in order. Phase 1 is mandatory; if it produces a clear root cause and a confident fix, you may go directly to Phase 4 (Implementation). Otherwise complete Phase 2 (Pattern Analysis) and Phase 3 (Hypotheses) in order before Phase 4. Between Phase 1 and Phase 2 — when you've decided pattern analysis is needed — run the research phase (default-on, see below) so pattern analysis has external context to build on.
+Move through the phases in order. Phase 1 is mandatory; if it produces a clear root cause and a confident fix, you may go directly to Phase 4 (Implementation). Otherwise complete Phase 2 (Pattern Analysis) and Phase 3 (Hypotheses) in order before Phase 4. Between Phase 1 and Phase 2, when you've decided pattern analysis is needed, run the research phase (default-on, see below) so pattern analysis has external context to build on.
 
 ### Phase 1: Root Cause Investigation
 
@@ -194,9 +194,9 @@ If skipping, write one line to `.superpowers/debug-log-<slug>.md`: `Skipped rese
 
 **Valid reasons:**
 - Trivial scope (typo, comment edit, single-line config)
-- Fresh prior research — same topic in current session OR within last 7 days with verifiable spec/plan pointer. **If the pointer doesn't resolve, the skip is invalid.** (Beyond 7 days, repeat the research even if you remember the prior findings — the landscape drifts.)
-- User explicit — **must quote the phrase** that authorized the skip.
-- Repeat of identical task — **must include a pointer** to the prior successful run.
+- Fresh prior research, same topic in current session OR within last 7 days with verifiable spec/plan pointer. **If the pointer doesn't resolve, the skip is invalid.** (Beyond 7 days, repeat the research even if you remember the prior findings, the landscape drifts.)
+- User explicit, **must quote the phrase** that authorized the skip.
+- Repeat of identical task, **must include a pointer** to the prior successful run.
 
 **Invalid reasons:** "I think I know", "seems straightforward", "moving fast", "user wants this done quickly", "already familiar with this codebase". If those are tempting, do the research.
 

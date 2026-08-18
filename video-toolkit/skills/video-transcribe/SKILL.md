@@ -1,6 +1,6 @@
 ---
 name: video-transcribe
-description: This skill should be used when the user asks to "transcribe videos", "transcribe audio", "run Whisper on videos", "generate transcripts", "extract text from video audio", or needs batch audio transcription of downloaded video files with a re-runnable provenance record.
+description: Batch Whisper transcription of video or audio (WAV, podcasts) with a re-runnable provenance record. Use to transcribe recordings.
 ---
 
 # Video transcription with Whisper
@@ -175,9 +175,9 @@ mkdir -p transcripts/{twitter,tiktok,youtube,instagram,facebook}
 
 Per video, three files land in `transcripts/{platform}/`:
 
-- `{video-id}.txt` — plain text transcript
-- `{video-id}.json` — segments with timestamps
-- `{video-id}.transcript.meta.json` — the provenance sidecar (below)
+- `{video-id}.txt`, plain text transcript
+- `{video-id}.json`, segments with timestamps
+- `{video-id}.transcript.meta.json`, the provenance sidecar (below)
 
 ### Step 3: Normalize the audio
 
@@ -289,7 +289,7 @@ Notes on the fields that are easy to get wrong:
 
 Report per-platform transcript counts, total words, failures, and time elapsed.
 Spot-check a few transcripts against their audio. Confirm every transcript has a
-sidecar — a transcript without one cannot be audited later.
+sidecar, a transcript without one cannot be audited later.
 
 ## What "repeatable" means here, and what it does not
 
@@ -341,7 +341,7 @@ Someone with no usable CPU path can transcribe through a hosted API. This is an
 explicit opt-in, not a default: it forfeits the local-only property, so the audio
 leaves the machine and the run depends on an API key and a network. Say so in the
 sidecar (`"engine": "<service> <model>"`) and do not treat the result as
-reproducible — the provider can change the model under a stable name.
+reproducible, the provider can change the model under a stable name.
 
 ## Key lessons
 
@@ -355,6 +355,6 @@ reproducible — the provider can change the model under a stable name.
 
 ## Credits
 
-The provenance design — recording the engine and model build alongside the text,
-and hashing the source media so a re-run can be checked against the original —
+The provenance design, recording the engine and model build alongside the text,
+and hashing the source media so a re-run can be checked against the original,
 was contributed by [@sophymarine](https://github.com/jamditis/claude-skills-journalism/issues/115#issuecomment-4746674899).

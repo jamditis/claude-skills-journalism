@@ -1,6 +1,6 @@
 ---
 name: secure-auth
-description: Secure authentication implementation patterns. Use when implementing user login, registration, password reset, session management, JWT authentication, OAuth, MFA, or passkeys. Provides production-ready patterns aligned with NIST SP 800-63B-4, OWASP 2026 cheat sheets, OAuth 2.1, and WebAuthn L3, with breach-driven lessons.
+description: Secure authentication patterns (OWASP, NIST). Use for login, registration, password reset, sessions, JWT, OAuth, MFA, passkeys.
 ---
 
 # Secure authentication
@@ -23,13 +23,13 @@ Run the 4-angle research below by default. Skip ONLY when ALL of these hold:
 
 Each subagent returns at most 300 words of bullets with citations. Dispatch all 4 in a single message so they run concurrently.
 
-**Angle 1 — Authoritative standards.** Have NIST / OWASP / IETF (RFCs and Internet-Drafts) / W3C / CISA published anything new about the authentication primitive being implemented (passwords, sessions, JWT, OAuth, MFA, passkeys) in the last 6-12 months? Look for: spec finalizations, deprecations, replacement specs, RFC publications, draft revisions, NIST SP updates, OWASP project version bumps. Cite by document number plus publication date.
+**Angle 1, Authoritative standards.** Have NIST / OWASP / IETF (RFCs and Internet-Drafts) / W3C / CISA published anything new about the authentication primitive being implemented (passwords, sessions, JWT, OAuth, MFA, passkeys) in the last 6-12 months? Look for: spec finalizations, deprecations, replacement specs, RFC publications, draft revisions, NIST SP updates, OWASP project version bumps. Cite by document number plus publication date.
 
-**Angle 2 — Active exploitation.** What's actively being exploited that targets the authentication primitive being implemented (passwords, sessions, JWT, OAuth, MFA, passkeys)? Pull from: CISA Known Exploited Vulnerabilities (KEV) catalog (filter to last 6-12 months), recent CVE / GHSA entries with high CVSS or in-the-wild exploitation, breach postmortems and incident reports (CSRB, vendor RCAs, security-vendor research). Surface CWE patterns dominating recent KEV adds. Cite by CVE number plus advisory URL.
+**Angle 2, Active exploitation.** What's actively being exploited that targets the authentication primitive being implemented (passwords, sessions, JWT, OAuth, MFA, passkeys)? Pull from: CISA Known Exploited Vulnerabilities (KEV) catalog (filter to last 6-12 months), recent CVE / GHSA entries with high CVSS or in-the-wild exploitation, breach postmortems and incident reports (CSRB, vendor RCAs, security-vendor research). Surface CWE patterns dominating recent KEV adds. Cite by CVE number plus advisory URL.
 
-**Angle 3 — Tooling and library state.** Are the libraries this skill recommends still current? What are the latest major versions in the relevant package registry (npm / PyPI / RubyGems / crates.io)? Have any been deprecated, replaced, or merged into another project? Have any flipped a secure default? Look up current versions in: registry.npmjs.org, pypi.org, rubygems.org, crates.io, pkg.go.dev. Cite by package plus version plus release date.
+**Angle 3, Tooling and library state.** Are the libraries this skill recommends still current? What are the latest major versions in the relevant package registry (npm / PyPI / RubyGems / crates.io)? Have any been deprecated, replaced, or merged into another project? Have any flipped a secure default? Look up current versions in: registry.npmjs.org, pypi.org, rubygems.org, crates.io, pkg.go.dev. Cite by package plus version plus release date.
 
-**Angle 4 — Practitioner discourse.** What are practitioners and security teams talking about in the last 6 months? Pull from: OWASP Cheat Sheet Series (last-modified date matters), GitHub Security Lab posts, vendor security blogs (Cloudflare, Fastly, Snyk, Datadog, Wiz, GitGuardian), conference talks (Black Hat, DEF CON, OWASP Global AppSec, USENIX Security), SANS ISC, Krebs, recent OWASP project re-releases. Surface the patterns being adopted and the anti-patterns being called out. Cite by post URL plus author plus date.
+**Angle 4, Practitioner discourse.** What are practitioners and security teams talking about in the last 6 months? Pull from: OWASP Cheat Sheet Series (last-modified date matters), GitHub Security Lab posts, vendor security blogs (Cloudflare, Fastly, Snyk, Datadog, Wiz, GitGuardian), conference talks (Black Hat, DEF CON, OWASP Global AppSec, USENIX Security), SANS ISC, Krebs, recent OWASP project re-releases. Surface the patterns being adopted and the anti-patterns being called out. Cite by post URL plus author plus date.
 
 ### Synthesize before applying recipes
 
@@ -48,7 +48,7 @@ If subagents are not available in your runtime, the same shape applies in-line: 
 
 ---
 
-Production-ready authentication patterns. These aren't the simplest implementations — they're the ones that won't get you sued.
+Production-ready authentication patterns. These aren't the simplest implementations, they're the ones that won't get you sued.
 
 ## Authentication architecture decision
 
@@ -80,7 +80,7 @@ Use passkeys (WebAuthn / FIDO2) as the primary factor when:
 
 The passkey-first stance reflects 2026 consensus: WebAuthn L3 reached W3C Candidate Recommendation Snapshot 2026-01-13 (https://www.w3.org/TR/webauthn-3/) and CTAP 2.3 became a FIDO Alliance Proposed Standard 2026-02-26. See the Passkeys / WebAuthn section below.
 
-**Common mistake:** Using JWTs because a tutorial did, then storing them in localStorage (XSS-vulnerable) and having no revocation strategy. Refresh-token reuse detection and full token validation (issuer, audience, scope, signing-key tenancy) are non-optional in 2026 — see the Storm-0558 lesson.
+**Common mistake:** Using JWTs because a tutorial did, then storing them in localStorage (XSS-vulnerable) and having no revocation strategy. Refresh-token reuse detection and full token validation (issuer, audience, scope, signing-key tenancy) are non-optional in 2026, see the Storm-0558 lesson.
 
 ## Password storage
 
@@ -97,12 +97,12 @@ OWASP Password Storage Cheat Sheet (last updated 2026-05-07, https://cheatsheets
 - m=7168 KiB (7 MiB), t=5, p=1
 
 ```javascript
-// Node — argon2 package (current 0.44.0; pre-1.0, pin by minor)
+// Node, argon2 package (current 0.44.0; pre-1.0, pin by minor)
 const argon2 = require('argon2');
 
 const hash = await argon2.hash(password, {
   type: argon2.argon2id,
-  memoryCost: 19456, // KiB — one of the 5 OWASP-equivalent profiles
+  memoryCost: 19456, // KiB, one of the 5 OWASP-equivalent profiles
   timeCost: 2,
   parallelism: 1
 });
@@ -112,7 +112,7 @@ const valid = await argon2.verify(hash, password);
 ```
 
 ```python
-# Python — argon2-cffi
+# Python, argon2-cffi
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
@@ -135,10 +135,10 @@ RFC 9106 (https://datatracker.ietf.org/doc/rfc9106/) defines a more aggressive "
 
 ### Alternate: bcrypt
 
-Still acceptable. OWASP says cost 10 minimum, "as large as performance allows." The current code uses cost 12, which is fine — just know the floor moved.
+Still acceptable. OWASP says cost 10 minimum, "as large as performance allows." The current code uses cost 12, which is fine, just know the floor moved.
 
 ```javascript
-// Node — bcrypt (current 6.0.0)
+// Node, bcrypt (current 6.0.0)
 const bcrypt = require('bcrypt');
 
 // bcrypt has a 72-byte input limit. Pre-hash with SHA-256
@@ -168,7 +168,7 @@ PBKDF2 is the algorithm to use when FIPS-140 compliance is a hard requirement. O
 
 ### Never
 
-- The OS shell-execution primitive composing a password into a command line — pass via stdin or argv.
+- The OS shell-execution primitive composing a password into a command line, pass via stdin or argv.
 - Plain-text storage. No exceptions, no "just for now," no "we'll fix it before launch."
 - Logging the plain-text password in any code path, including error handlers.
 - A custom hashing scheme. Roll-your-own is the most common breach precondition.
@@ -195,7 +195,7 @@ NIST SP 800-63B-4 went FINAL 2025-07-31 (https://csrc.nist.gov/pubs/sp/800/63/b/
 
 ### Blocklist (mandatory in 2026)
 
-The verifier MUST check candidate passwords against a list of known-compromised values. Use the HaveIBeenPwned k-anonymity API (https://haveibeenpwned.com/API/v3#PwnedPasswords) — you submit the first 5 chars of a SHA-1 hash, get back the suffixes that match, never send the password itself.
+The verifier MUST check candidate passwords against a list of known-compromised values. Use the HaveIBeenPwned k-anonymity API (https://haveibeenpwned.com/API/v3#PwnedPasswords), you submit the first 5 chars of a SHA-1 hash, get back the suffixes that match, never send the password itself.
 
 ```javascript
 // Check candidate password against HIBP
@@ -221,7 +221,7 @@ async function isPwned(password) {
 
 ### Phishing resistance
 
-NIST 800-63B-4 REQUIRES phishing resistance at AAL3. Passwords alone never reach AAL3. AAL2 with phishing resistance is what most consumer apps should target now — that means WebAuthn (passkey) or PIV/CAC, not TOTP and not SMS.
+NIST 800-63B-4 REQUIRES phishing resistance at AAL3. Passwords alone never reach AAL3. AAL2 with phishing resistance is what most consumer apps should target now, that means WebAuthn (passkey) or PIV/CAC, not TOTP and not SMS.
 
 ## Session-based authentication
 
@@ -276,7 +276,7 @@ function checkRateLimit(ip) {
   return true;
 }
 
-// Argon2id parameters — one of the 5 OWASP-equivalent profiles
+// Argon2id parameters, one of the 5 OWASP-equivalent profiles
 const ARGON2_OPTS = {
   type: argon2.argon2id,
   memoryCost: 19456, // KiB
@@ -286,7 +286,7 @@ const ARGON2_OPTS = {
 
 // Precompute a real argon2id hash for the user-not-found timing-attack defense.
 // Must be a valid hash string at the same parameters used for storage so that
-// argon2.verify does the full work — a malformed string would short-circuit at
+// argon2.verify does the full work, a malformed string would short-circuit at
 // parse time and reintroduce the timing channel.
 let DUMMY_VERIFY_HASH = null;
 (async () => {
@@ -362,7 +362,7 @@ app.post('/auth/login', async (req, res) => {
 
   if (result.rows.length === 0) {
     // Timing attack prevention: full-cost verify against a real precomputed hash.
-    // A malformed hash string would make argon2.verify fail at parse time —
+    // A malformed hash string would make argon2.verify fail at parse time,
     // that's faster than the valid-user path and leaks "user not found" via
     // timing. DUMMY_VERIFY_HASH is computed once at module init below so
     // this path does the same work as the real verify.
@@ -439,13 +439,13 @@ app.get('/api/profile', requireAuth, async (req, res) => {
 
 ### Full token validation: the Storm-0558 lesson
 
-Microsoft's Storm-0558 incident (CSRB review, https://www.cisa.gov/resources-tools/resources/CSRB-Review-Summer-2023-MEO-Intrusion) traced to OWA accepting a consumer-key-signed token for enterprise mailboxes — the token-validation library skipped the issuer / audience / scope / signing-key-tenancy checks. Validate every claim every time:
+Microsoft's Storm-0558 incident (CSRB review, https://www.cisa.gov/resources-tools/resources/CSRB-Review-Summer-2023-MEO-Intrusion) traced to OWA accepting a consumer-key-signed token for enterprise mailboxes, the token-validation library skipped the issuer / audience / scope / signing-key-tenancy checks. Validate every claim every time:
 
-- `iss` (issuer) — MUST match your expected issuer string
-- `aud` (audience) — MUST include your service identifier
-- `exp`, `nbf` (expiration / not-before) — MUST be enforced; reject expired or future-dated tokens
-- `scope` — MUST contain the scope required for the endpoint
-- Signing key — MUST belong to the issuer's tenancy, not "any key the JWKS endpoint hands out"
+- `iss` (issuer), MUST match your expected issuer string
+- `aud` (audience), MUST include your service identifier
+- `exp`, `nbf` (expiration / not-before), MUST be enforced; reject expired or future-dated tokens
+- `scope`, MUST contain the scope required for the endpoint
+- Signing key, MUST belong to the issuer's tenancy, not "any key the JWKS endpoint hands out"
 
 ### Complete implementation with refresh tokens
 
@@ -600,19 +600,19 @@ app.post('/auth/logout', (req, res) => {
 // Auth middleware for protected routes.
 //
 // Scope of THIS sample: single-issuer private-token deployments using HS256
-// (shared secret). It enforces iss / aud / exp / scope / pinned algorithm —
+// (shared secret). It enforces iss / aud / exp / scope / pinned algorithm,
 // the claim-level half of the Storm-0558 lesson.
 //
 // What this sample does NOT cover and you MUST add for multi-issuer / OIDC
 // (Azure AD / Auth0 / Cognito / etc.): the signing-key tenancy half. There:
-// 1. Use a public-key algorithm (RS256, ES256, EdDSA) — not HS256.
+// 1. Use a public-key algorithm (RS256, ES256, EdDSA), not HS256.
 // 2. Resolve the issuer's JWKS at the issuer's well-known URL.
 // 3. Pin which JWKS each trusted issuer is allowed to use, and reject any
 //    token whose iss does not match the JWKS that signed it. Storm-0558's
 //    proximate failure was OWA accepting a consumer-tenant key for an
 //    enterprise-tenant token because the verifier did NOT enforce this
 //    issuer-to-key-set binding.
-// 4. Select the verifying key by the JWT's `kid` — but only from within
+// 4. Select the verifying key by the JWT's `kid`, but only from within
 //    the pinned key set for that issuer.
 function requireAuth(requiredScope) {
   return function (req, res, next) {
@@ -662,8 +662,8 @@ function requireAuth(requiredScope) {
 
 Bearer tokens are stealable. For payments, healthcare, government, or any context where token theft is catastrophic, use sender-constrained tokens:
 
-- **DPoP (RFC 9449, https://datatracker.ietf.org/doc/rfc9449/)** — client signs each request with a private key; the access token is bound to the public-key thumbprint (`cnf.jkt` claim). Token alone is useless without the key.
-- **mTLS (RFC 8705, https://datatracker.ietf.org/doc/rfc8705/)** — token bound to the client certificate used in the TLS handshake (`cnf.x5t#S256` claim).
+- **DPoP (RFC 9449, https://datatracker.ietf.org/doc/rfc9449/)**, client signs each request with a private key; the access token is bound to the public-key thumbprint (`cnf.jkt` claim). Token alone is useless without the key.
+- **mTLS (RFC 8705, https://datatracker.ietf.org/doc/rfc8705/)**, token bound to the client certificate used in the TLS handshake (`cnf.x5t#S256` claim).
 
 Both make stolen tokens worthless to the attacker.
 
@@ -759,7 +759,7 @@ class AuthManager {
 export const auth = new AuthManager();
 ```
 
-Don't store access tokens in `localStorage` — they're readable by any XSS payload. In-memory (as above) plus an httpOnly refresh cookie is the standard shape. For SPAs that need to survive a page refresh, use the BroadcastChannel API to share the in-memory token across tabs and accept that a hard refresh forces a `/auth/refresh` call.
+Don't store access tokens in `localStorage`, they're readable by any XSS payload. In-memory (as above) plus an httpOnly refresh cookie is the standard shape. For SPAs that need to survive a page refresh, use the BroadcastChannel API to share the in-memory token across tabs and accept that a hard refresh forces a `/auth/refresh` call.
 
 ## Passkeys / WebAuthn
 
@@ -768,12 +768,12 @@ WebAuthn L3 is at W3C Candidate Recommendation Snapshot as of 2026-01-13 (https:
 Recommended libraries:
 
 - **Node:** `@simplewebauthn/server` (current 13.3.0). Companion browser package: `@simplewebauthn/browser`.
-- **Python:** `webauthn` on PyPI (current 2.7.1). Note: the GitHub repo is `duo-labs/py_webauthn`, but the install command is `pip install webauthn` — the PyPI package name is `webauthn`, NOT `py_webauthn`.
+- **Python:** `webauthn` on PyPI (current 2.7.1). Note: the GitHub repo is `duo-labs/py_webauthn`, but the install command is `pip install webauthn`, the PyPI package name is `webauthn`, NOT `py_webauthn`.
 
 ### Registration ceremony
 
 ```javascript
-// Node — @simplewebauthn/server
+// Node, @simplewebauthn/server
 const {
   generateRegistrationOptions,
   verifyRegistrationResponse,
@@ -884,7 +884,7 @@ sha256sum -c public/vendor/SHA256SUMS
 ```
 
 ```html
-<!-- Browser — local @simplewebauthn/browser bundle -->
+<!-- Browser, local @simplewebauthn/browser bundle -->
 <script type="module" nonce="{{CSP_NONCE}}">
   import { startRegistration }
     from '/vendor/simplewebauthn-browser-13.3.0.mjs';
@@ -910,10 +910,10 @@ sha256sum -c public/vendor/SHA256SUMS
 
 ### Authentication ceremony (with conditional UI)
 
-Conditional UI lets the browser surface passkeys directly inside the username autofill dropdown — the user picks a passkey from the same UI they'd use to autofill an email.
+Conditional UI lets the browser surface passkeys directly inside the username autofill dropdown, the user picks a passkey from the same UI they'd use to autofill an email.
 
 ```javascript
-// Node — server side
+// Node, server side
 const {
   generateAuthenticationOptions,
   verifyAuthenticationResponse,
@@ -987,7 +987,7 @@ app.post('/auth/passkey/login/verify', async (req, res) => {
 ```
 
 ```html
-<!-- Browser — discoverable credential + conditional UI -->
+<!-- Browser, discoverable credential + conditional UI -->
 <input type="email" name="email" autocomplete="username webauthn">
 <script type="module" nonce="{{CSP_NONCE}}">
   import { startAuthentication, browserSupportsWebAuthnAutofill }
@@ -1017,9 +1017,9 @@ app.post('/auth/passkey/login/verify', async (req, res) => {
 
 L3 adds `PublicKeyCredential` static methods so the relying party can keep syncable passkeys aligned with server state without forcing a re-enrollment:
 
-- `signalUnknownCredential({ rpId, credentialId })` — call after a verify attempt against a credential the server no longer knows about. The authenticator hides it from the user's account-picker UI.
-- `signalAllAcceptedCredentials({ rpId, userId, allAcceptedCredentialIds })` — call after the server's credential list changes (revoke, enroll). The authenticator prunes anything not on the list.
-- `signalCurrentUserDetails({ rpId, userId, name, displayName })` — call after profile changes. The authenticator updates labels in the picker UI.
+- `signalUnknownCredential({ rpId, credentialId })`, call after a verify attempt against a credential the server no longer knows about. The authenticator hides it from the user's account-picker UI.
+- `signalAllAcceptedCredentials({ rpId, userId, allAcceptedCredentialIds })`, call after the server's credential list changes (revoke, enroll). The authenticator prunes anything not on the list.
+- `signalCurrentUserDetails({ rpId, userId, name, displayName })`, call after profile changes. The authenticator updates labels in the picker UI.
 
 These are advisory and best-effort; treat them as housekeeping, not security boundaries.
 
@@ -1151,7 +1151,7 @@ OAuth 2.1 is currently `draft-ietf-oauth-v2-1-15` dated 2026-03-02 (https://data
 
 ### What 2.1 requires (and removes)
 
-- **PKCE mandatory for ALL clients, including confidential clients.** S256 only — `plain` is deprecated.
+- **PKCE mandatory for ALL clients, including confidential clients.** S256 only, `plain` is deprecated.
 - **Exact-string redirect-URI matching.** No prefix or wildcard matching.
 - **No implicit grant (`response_type=token`).** Use authorization code with PKCE.
 - **No Resource Owner Password Credentials (ROPC).** First-party login flows go through the authorization endpoint.
@@ -1213,7 +1213,7 @@ app.get('/auth/google/callback', async (req, res) => {
   }
 
   try {
-    // Exchange code for tokens — include the PKCE verifier
+    // Exchange code for tokens, include the PKCE verifier
     const { tokens } = await oauth2Client.getToken({
       code,
       codeVerifier: verifier,
@@ -1260,7 +1260,7 @@ app.get('/auth/google/callback', async (req, res) => {
 });
 ```
 
-The same pattern applies to any OAuth 2.1 / OIDC provider — substitute issuer, client, scopes, and the userinfo lookup. Confirm exact-string redirect URIs in the provider console match what your server sends.
+The same pattern applies to any OAuth 2.1 / OIDC provider, substitute issuer, client, scopes, and the userinfo lookup. Confirm exact-string redirect URIs in the provider console match what your server sends.
 
 ## MFA (passkey-first)
 
@@ -1274,7 +1274,7 @@ In 2026: **don't add SMS as a new factor.** Migrate users off it where you can.
 
 ### Passkey-as-second-factor
 
-If passwords are still your first factor, a registered passkey is the strongest second factor available. The registration and authentication ceremonies in the Passkeys / WebAuthn section above work unchanged — gate `/auth/login` on a successful passkey verify after password verify.
+If passwords are still your first factor, a registered passkey is the strongest second factor available. The registration and authentication ceremonies in the Passkeys / WebAuthn section above work unchanged, gate `/auth/login` on a successful passkey verify after password verify.
 
 ### TOTP (still valid for AAL2)
 
@@ -1378,7 +1378,7 @@ Vignettes anchoring patterns to actual incidents. Each is a 2-3 sentence summary
 
 Attackers used compromised credentials on a Citrix remote-access portal that lacked MFA. Disruption ran for weeks; UnitedHealth Group disclosed an approximately $22M ransom and exposure of records for roughly 1 in 3 US patients. Per the UnitedHealth Group RCA at https://www.unitedhealthgroup.com/newsroom/2024/2024-04-22-uhg-update-on-change-healthcare-cyberattack.html.
 
-**Lesson:** MFA on every remote-access portal — VPN, Citrix, RDP gateway, jump host — not just user-facing apps. The "internal" portal is the one attackers target precisely because it's less guarded.
+**Lesson:** MFA on every remote-access portal, VPN, Citrix, RDP gateway, jump host, not just user-facing apps. The "internal" portal is the one attackers target precisely because it's less guarded.
 
 ### Snowflake / UNC5537 (Apr-Jun 2024)
 
@@ -1388,15 +1388,15 @@ Approximately 165 customer tenants were breached because Snowflake's MFA was opt
 
 ### Storm-0558 (CSRB review, 2024-04)
 
-A Microsoft consumer signing key was compromised; attackers forged Azure AD tokens and accessed enterprise OWA mailboxes. The proximate failure was that OWA's token-validation library accepted a consumer-key-signed token for enterprise mailboxes — it skipped scope, issuer, and signing-key tenancy validation. CSRB report: https://www.cisa.gov/resources-tools/resources/CSRB-Review-Summer-2023-MEO-Intrusion. (Microsoft's MSRC postmortem URL is decommissioned.)
+A Microsoft consumer signing key was compromised; attackers forged Azure AD tokens and accessed enterprise OWA mailboxes. The proximate failure was that OWA's token-validation library accepted a consumer-key-signed token for enterprise mailboxes, it skipped scope, issuer, and signing-key tenancy validation. CSRB report: https://www.cisa.gov/resources-tools/resources/CSRB-Review-Summer-2023-MEO-Intrusion. (Microsoft's MSRC postmortem URL is decommissioned.)
 
-**Lesson:** Validate every claim every time — issuer, audience, scope, expiration, pinned algorithm. AND for multi-issuer / OIDC deployments, validate signing-key tenancy: pin which JWKS each trusted issuer is allowed to use, and never select a verifying key from a different issuer's set, even if the `kid` matches. The JWT recipe above bakes in `iss` / `aud` / `scope` / pinned algorithm — that's the claim-level half of the lesson and covers single-issuer private-token deployments. The signing-key tenancy half (JWKS resolution and issuer-to-key-set binding) is not in the sample; see the comment block above the `requireAuth` function for what to add when accepting tokens from multiple tenants.
+**Lesson:** Validate every claim every time, issuer, audience, scope, expiration, pinned algorithm. AND for multi-issuer / OIDC deployments, validate signing-key tenancy: pin which JWKS each trusted issuer is allowed to use, and never select a verifying key from a different issuer's set, even if the `kid` matches. The JWT recipe above bakes in `iss` / `aud` / `scope` / pinned algorithm, that's the claim-level half of the lesson and covers single-issuer private-token deployments. The signing-key tenancy half (JWKS resolution and issuer-to-key-set binding) is not in the sample; see the comment block above the `requireAuth` function for what to add when accepting tokens from multiple tenants.
 
 ### Okta HAR breach (Oct 2023)
 
 Customers uploaded HAR (HTTP Archive) debug files to Okta support; the files contained live session tokens. Five customer sessions were hijacked. Per Okta's writeup at https://sec.okta.com/articles/harfiles/.
 
-**Lesson:** Sanitize session tokens and other bearer credentials at log boundaries. HAR uploads, error reports, debug dumps — strip Authorization headers, set-cookie, and known token-shaped values before they leave the user's browser.
+**Lesson:** Sanitize session tokens and other bearer credentials at log boundaries. HAR uploads, error reports, debug dumps, strip Authorization headers, set-cookie, and known token-shaped values before they leave the user's browser.
 
 ### 23andMe credential stuffing (Oct 2023, settled 2024)
 

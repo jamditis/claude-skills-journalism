@@ -26,7 +26,7 @@ cp -r video-toolkit/skills/video-download ~/.claude/skills/
 | [video-dashboard](./skills/video-dashboard/) | Aggregate transcripts and frame analysis into topic, tone, and cross-platform views behind a single-page dashboard |
 
 Each stage reads what the previous one wrote, so run them in order the first
-time. After that they are independent — re-run `video-frames` alone when you add
+time. After that they are independent, re-run `video-frames` alone when you add
 clips, and the dashboard picks up the new JSON.
 
 ## Security boundaries

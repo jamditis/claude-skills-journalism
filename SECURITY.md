@@ -21,7 +21,7 @@ This collection contains instruction files (markdown) and some helper scripts. S
 - **Scripts** in `scripts/` directories that execute shell commands
 - **Hooks** that run automatically and could have unintended side effects
 - **Plugin configurations** that could expose data or credentials
-- **Templates** that generate code — injection risks in generated output
+- **Templates** that generate code, injection risks in generated output
 
 ## Supported versions
 

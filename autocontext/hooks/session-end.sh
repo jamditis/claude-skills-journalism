@@ -10,7 +10,7 @@ PENDING_FILE="$CACHE_DIR/pending-lessons.json"
 PLAYBOOK_FILE="$AUTOCONTEXT_DIR/playbook.md"
 GENERATE_PLAYBOOK="$PLUGIN_ROOT/scripts/generate-playbook.py"
 
-# Read stdin — extract session_id for skill tracking cleanup
+# Read stdin, extract session_id for skill tracking cleanup
 INPUT=$(cat)
 SESSION_ID=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('session_id',''))" 2>/dev/null || echo "")
 

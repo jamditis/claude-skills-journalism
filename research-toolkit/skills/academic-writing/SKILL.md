@@ -1,6 +1,6 @@
 ---
 name: academic-writing
-description: Academic writing, research methodology, and scholarly communication workflows. Use when writing papers, literature reviews, grant proposals, conducting research, managing citations, preparing for peer review, choosing OA routes under Plan S / 2026 OSTP Nelson Memo, posting preprints, working with persistent identifiers (ORCID, DOI, ROR), assigning CRediT contributor roles, preregistering analyses on OSF / AsPredicted, or disclosing LLM use to journals and funders. Essential for researchers, graduate students, and academics across disciplines.
+description: Scholarly writing and research compliance. Use for CRediT, preregistration, Plan S, Nelson Memo, preprints, ORCID, LLM disclosure.
 ---
 
 # Academic writing and research methodology
@@ -419,10 +419,10 @@ For each aim:
 - Transcription services
 - Equipment maintenance
 
-### Indirect costs (F&A — facilities and administrative)
+### Indirect costs (F&A, facilities and administrative)
 - Each institution negotiates an F&A rate with its cognizant federal agency.
 - The rate applies to **modified total direct costs (MTDC)**, not raw total
-  direct costs — exclude equipment >$5K, tuition, participant support,
+  direct costs, exclude equipment >$5K, tuition, participant support,
   subaward portions over $25K, and a few other categories per the
   institution's negotiated agreement.
 - R1 universities commonly negotiate 55-70% of MTDC; smaller institutions
@@ -452,29 +452,29 @@ For each aim:
 - Open access route (see below)
 
 ### Open access routes
-- **Gold OA** — published OA in a fully OA journal; usually requires an
+- **Gold OA**, published OA in a fully OA journal; usually requires an
   Article Processing Charge (APC), often $1,000-$3,000+.
-- **Green OA** — closed-access journal but author self-archives an
+- **Green OA**, closed-access journal but author self-archives an
   accepted manuscript in a repository (institutional, arXiv, etc.) under
   the publisher's allowed embargo.
-- **Diamond / Platinum OA** — fully OA journal with no APC; supported
+- **Diamond / Platinum OA**, fully OA journal with no APC; supported
   by a sponsor (society, university, consortium). Increasingly common
   in social sciences and humanities.
-- **Hybrid** — a closed-access journal that lets individual articles
+- **Hybrid**, a closed-access journal that lets individual articles
   go OA for an APC. Note: hybrid is *excluded* from Plan S compliance
-  and from many funder OA mandates — verify before paying an APC.
-- **Bronze** — free to read but no formal OA license; the publisher
+  and from many funder OA mandates, verify before paying an APC.
+- **Bronze**, free to read but no formal OA license; the publisher
   can revoke access. Treat as not-actually-OA for compliance purposes.
 
 ### Funder mandates (US + Europe, as of 2026)
-- **OSTP Nelson Memo (US)** — federally-funded research must be made
+- **OSTP Nelson Memo (US)**, federally-funded research must be made
   immediately publicly accessible upon publication, with no embargo.
   Implementation deadline was **end of 2025**, so as of 2026 this is
   in effect for all major US federal funders (NIH, NSF, DOE, NASA, etc.).
-- **Plan S (cOAlition S)** — European funders (Wellcome, UKRI, ANR,
+- **Plan S (cOAlition S)**, European funders (Wellcome, UKRI, ANR,
   many others) require immediate Gold or Diamond OA, or Green OA
   with no embargo and a CC-BY license. Hybrid is not compliant.
-- Verify the funder's most recent policy before submission — accepted
+- Verify the funder's most recent policy before submission, accepted
   routes shift, and some funders cap APCs.
 
 ### Red flags (predatory journals)
@@ -486,18 +486,18 @@ For each aim:
 - Poor website quality
 
 ### Resources for vetting journals + ethics
-- **Think. Check. Submit.** (thinkchecksubmit.org) — checklist for legitimacy.
-- **DOAJ** (Directory of Open Access Journals) — vetted OA-journal index.
-- **Journal Citation Reports** — paid Web of Science product for impact factor.
-- **Cabells Predatory Reports** — subscription-based replacement for the
+- **Think. Check. Submit.** (thinkchecksubmit.org), checklist for legitimacy.
+- **DOAJ** (Directory of Open Access Journals), vetted OA-journal index.
+- **Journal Citation Reports**, paid Web of Science product for impact factor.
+- **Cabells Predatory Reports**, subscription-based replacement for the
   original Beall's List, which was taken down in 2017 (only stale mirrors
-  remain — don't rely on them as a current source of truth).
-- **Retraction Watch Database** — searchable record of retractions and
+  remain, don't rely on them as a current source of truth).
+- **Retraction Watch Database**, searchable record of retractions and
   publisher misconduct; useful for vetting authors and journals.
-- **COPE** (Committee on Publication Ethics, publicationethics.org) —
+- **COPE** (Committee on Publication Ethics, publicationethics.org),
   authoritative guidelines for editors and authors on ethics and integrity.
 - **ICMJE** (International Committee of Medical Journal Editors,
-  icmje.org/recommendations) — defines authorship criteria, conflict-of-
+  icmje.org/recommendations), defines authorship criteria, conflict-of-
   interest disclosure, and reporting standards used across many fields.
 ```
 
@@ -551,7 +551,7 @@ verify the target journal's policy before posting if you're unsure.
 | Server | Field | Notes |
 |--------|-------|-------|
 | **arXiv** (arxiv.org) | Physics, math, CS, quantitative bio, econ, stats | Oldest, largest; moderation by section. |
-| **SSRN** (ssrn.com) | Social sciences, law, econ, finance | Owned by Elsevier since 2016 — some authors prefer SocArXiv as an alternative. |
+| **SSRN** (ssrn.com) | Social sciences, law, econ, finance | Owned by Elsevier since 2016, some authors prefer SocArXiv as an alternative. |
 | **bioRxiv** (biorxiv.org) | Biology | Cold Spring Harbor Laboratory; widely cited. |
 | **medRxiv** (medrxiv.org) | Health sciences, medicine | Light moderation for safety claims; do not preprint clinical-trial results without preregistration. |
 | **EarthArXiv** | Earth, planetary, environmental sciences | Community-run via the OSF infrastructure. |
@@ -562,22 +562,22 @@ verify the target journal's policy before posting if you're unsure.
 **Why preprint:** Faster timestamp on priority claims, citable months
 before journal acceptance, and broader feedback before final review.
 (The 2026 OSTP Nelson Memo governs immediate public access to the
-*peer-reviewed* version of federally-funded US research at publication
-— it is not a preprint mandate. Preprinting is a separate, voluntary
+*peer-reviewed* version of federally-funded US research at publication,
+it is not a preprint mandate. Preprinting is a separate, voluntary
 choice that complements but doesn't satisfy Nelson Memo compliance.)
 
-### Persistent identifiers — get an ORCID and use DOIs
+### Persistent identifiers, get an ORCID and use DOIs
 
-- **ORCID iD** (orcid.org) — Free 16-digit identifier that
+- **ORCID iD** (orcid.org), Free 16-digit identifier that
   unambiguously links you across publishers, funders, and institutions.
   Required by most major journals and funders. Connect it to your
   CV, manuscripts, datasets, software, and grant applications.
-- **DOI** (doi.org) — Persistent identifier for scholarly objects.
+- **DOI** (doi.org), Persistent identifier for scholarly objects.
   Assigned automatically by journals at acceptance; you can also mint
   DOIs for your own datasets, code, posters, and preprints via Zenodo
-  (zenodo.org) or your institutional repository — useful for citing
+  (zenodo.org) or your institutional repository, useful for citing
   non-journal outputs.
-- **ROR** (ror.org) — Persistent identifier for research organizations,
+- **ROR** (ror.org), Persistent identifier for research organizations,
   used by funders and publishers to disambiguate institutional names.
 
 ## Research ethics
@@ -609,10 +609,10 @@ choice that complements but doesn't satisfy Nelson Memo compliance.)
 - [ ] All contributors will meet authorship criteria
 - [ ] Acknowledgments planned for non-author contributors
 - [ ] **CRediT taxonomy** (credit.niso.org) roles assigned for each
-      author — most major journals now require or recommend CRediT,
+      author, most major journals now require or recommend CRediT,
       which has 14 standardized contributor roles (Conceptualization,
       Methodology, Software, Validation, Formal analysis, Investigation,
-      Resources, Data curation, Writing — original draft, Writing —
+      Resources, Data curation, Writing - original draft, Writing -
       review & editing, Visualization, Supervision, Project administration,
       Funding acquisition).
 
@@ -623,11 +623,11 @@ choice that complements but doesn't satisfy Nelson Memo compliance.)
 
 ### Reproducibility
 - [ ] Analysis plan pre-registered on **OSF** (osf.io) or **AsPredicted**
-      (aspredicted.org) before data collection — distinguishes
+      (aspredicted.org) before data collection, distinguishes
       confirmatory from exploratory analyses and protects against
       HARKing. Check whether the target journal accepts **Registered
       Reports** (peer review of the design *before* data collection,
-      with in-principle acceptance regardless of results) — this format
+      with in-principle acceptance regardless of results), this format
       now exists at 350+ journals across psychology, biomedical, and
       social sciences as of 2026.
 - [ ] Code will be shared (consider a GitHub release + Zenodo DOI for
@@ -668,7 +668,7 @@ choice that complements but doesn't satisfy Nelson Memo compliance.)
 
 LLM-assisted writing is the defining 2024-2026 ethics issue across
 academic publishing. Every major journal, funder, and ethics body has
-issued policy in this window — and policies are still tightening.
+issued policy in this window, and policies are still tightening.
 Treat anything below as the floor, not the ceiling: read your target
 journal's current submission guidelines AND your funder's most recent
 policy before submitting.
@@ -680,11 +680,11 @@ policy before submitting.
   listing an LLM (ChatGPT, Claude, Gemini, etc.) as a co-author. LLMs
   cannot meet the accountability and approval criteria authorship
   requires. Use the acknowledgments section or a methods/disclosure
-  statement instead — never the author byline.
+  statement instead, never the author byline.
 - **Generating fabricated citations.** LLMs are well-documented to
   produce plausible-looking but fabricated DOIs, page numbers, and
   even author/title combinations that don't exist. Every citation in
-  a manuscript must be verified against the source — the LLM-induced
+  a manuscript must be verified against the source, the LLM-induced
   fake-citation rate has been a top retraction trigger since 2023.
 - **Generating data, results, or images.** Synthesizing experimental
   data, fabricating figures, or using generative AI to "fill in"
@@ -716,7 +716,7 @@ tool, version (if available), and what it was used for. Example:
 > the author(s) reviewed and edited the content as needed and take(s)
 > full responsibility for the content of the publication.
 
-Adjust to match the target journal's exact required wording — Elsevier,
+Adjust to match the target journal's exact required wording, Elsevier,
 Springer Nature, Wiley, Taylor & Francis, IEEE, and ACM each publish
 their own preferred language.
 
@@ -724,10 +724,10 @@ their own preferred language.
 
 - [ ] Read the target journal's AI/LLM policy in the current submission
       guidelines (policies updated multiple times per year).
-- [ ] Read your funder's policy — some (Wellcome, NSF) have stricter
+- [ ] Read your funder's policy, some (Wellcome, NSF) have stricter
       rules than the journal.
 - [ ] Add a disclosure statement using the journal's preferred language.
-- [ ] Verify every citation manually — do not trust LLM output for any
+- [ ] Verify every citation manually, do not trust LLM output for any
       DOI, author list, page range, or quoted passage.
 - [ ] Verify every numerical claim, date, and named fact.
 - [ ] Re-read the full manuscript to ensure your voice and argument
@@ -739,7 +739,7 @@ their own preferred language.
 
 GPTZero, Turnitin AI Detection, Originality.ai, and similar tools have
 documented high false-positive rates against non-native-English writers
-and against legitimately human-written technical text — and high false-
+and against legitimately human-written technical text, and high false-
 negative rates against current models with light editing. **Pangram
 Labs** (pangram.com) has published more rigorous benchmarks and tends
 to outperform the older detectors at roughly equivalent settings, but
@@ -786,7 +786,7 @@ author, not as evidence on their own.
 | Reference management | Zotero (recommended; open source, syncs across devices), Paperpile (web-first, Google Docs integration), EndNote, Citavi. **Note on Mendeley:** Elsevier announced an end to Mendeley Desktop downloads in September 2022, then later restored availability. Mendeley Desktop remains legacy software with no further feature development; the Mendeley Reference Manager (web/cloud) is the actively maintained product. New users are better served by Zotero or Paperpile. |
 | Writing | Scrivener, Overleaf (LaTeX collaboration), Word, Typst (newer LaTeX alternative) |
 | Collaboration | Google Docs, Overleaf, Hedgedoc |
-| Version control | Git / GitHub / GitLab (true version control). **Word's Track Changes is collaborative editing, not version control** — it lacks branching, merging, history rewrite, and atomic commits. |
+| Version control | Git / GitHub / GitLab (true version control). **Word's Track Changes is collaborative editing, not version control**, it lacks branching, merging, history rewrite, and atomic commits. |
 | Task management | Todoist, Notion, Trello |
 | Focus | Forest, Freedom, Cold Turkey |
 | Analysis | R, Python, SPSS, Stata, NVivo, Julia |

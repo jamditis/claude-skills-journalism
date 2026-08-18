@@ -1,6 +1,6 @@
 ---
 name: api-hardening
-description: API security hardening patterns. Use when implementing rate limiting, input validation, CORS configuration, API key management, request throttling, or protecting endpoints from abuse. Covers defense-in-depth strategies for REST APIs with practical implementations for Express, FastAPI, and serverless, oriented around the OWASP API Security Top 10:2023.
+description: API hardening for Express, FastAPI, and serverless. Use for rate limiting, CORS, input validation, API keys, or OWASP API Top 10.
 ---
 
 # API hardening
@@ -25,13 +25,13 @@ Run the 4-angle research below by default. Skip ONLY when ALL of these hold:
 
 Each subagent returns ≤300 words of bullets with citations. Dispatch all 4 in a single message so they run concurrently.
 
-**Angle 1 — Authoritative standards.** Have NIST / OWASP / IETF (RFCs and Internet-Drafts) / W3C / CISA published anything new about the API surface or web defense being added in the last 6-12 months? Look for: spec finalizations, deprecations, replacement specs, RFC publications, draft revisions, NIST SP updates, OWASP project version bumps. Cite by document number + publication date.
+**Angle 1, Authoritative standards.** Have NIST / OWASP / IETF (RFCs and Internet-Drafts) / W3C / CISA published anything new about the API surface or web defense being added in the last 6-12 months? Look for: spec finalizations, deprecations, replacement specs, RFC publications, draft revisions, NIST SP updates, OWASP project version bumps. Cite by document number + publication date.
 
-**Angle 2 — Active exploitation.** What's actively being exploited that targets the API surface or web defense being added? Pull from: CISA Known Exploited Vulnerabilities (KEV) catalog (filter to last 6-12 months), recent CVE / GHSA entries with high CVSS or in-the-wild exploitation, breach postmortems and incident reports (CSRB, vendor RCAs, security-vendor research). Surface CWE patterns dominating recent KEV adds. Cite by CVE number + advisory URL.
+**Angle 2, Active exploitation.** What's actively being exploited that targets the API surface or web defense being added? Pull from: CISA Known Exploited Vulnerabilities (KEV) catalog (filter to last 6-12 months), recent CVE / GHSA entries with high CVSS or in-the-wild exploitation, breach postmortems and incident reports (CSRB, vendor RCAs, security-vendor research). Surface CWE patterns dominating recent KEV adds. Cite by CVE number + advisory URL.
 
-**Angle 3 — Tooling and library state.** Are the libraries this skill recommends still current? What are the latest major versions in the relevant package registry (npm / PyPI / RubyGems / crates.io)? Have any been deprecated, replaced, or merged into another project? Have any flipped a secure default? Look up current versions in: registry.npmjs.org, pypi.org, rubygems.org, crates.io, pkg.go.dev. Cite by package + version + release date.
+**Angle 3, Tooling and library state.** Are the libraries this skill recommends still current? What are the latest major versions in the relevant package registry (npm / PyPI / RubyGems / crates.io)? Have any been deprecated, replaced, or merged into another project? Have any flipped a secure default? Look up current versions in: registry.npmjs.org, pypi.org, rubygems.org, crates.io, pkg.go.dev. Cite by package + version + release date.
 
-**Angle 4 — Practitioner discourse.** What are practitioners and security teams talking about in the last 6 months? Pull from: OWASP Cheat Sheet Series (last-modified date matters), GitHub Security Lab posts, vendor security blogs (Cloudflare, Fastly, Snyk, Datadog, Wiz, GitGuardian), conference talks (Black Hat, DEF CON, OWASP Global AppSec, USENIX Security), SANS ISC, Krebs, recent OWASP project re-releases. Surface the patterns being adopted and the anti-patterns being called out. Cite by post URL + author + date.
+**Angle 4, Practitioner discourse.** What are practitioners and security teams talking about in the last 6 months? Pull from: OWASP Cheat Sheet Series (last-modified date matters), GitHub Security Lab posts, vendor security blogs (Cloudflare, Fastly, Snyk, Datadog, Wiz, GitGuardian), conference talks (Black Hat, DEF CON, OWASP Global AppSec, USENIX Security), SANS ISC, Krebs, recent OWASP project re-releases. Surface the patterns being adopted and the anti-patterns being called out. Cite by post URL + author + date.
 
 ### Synthesize before applying recipes
 
@@ -54,18 +54,18 @@ The active edition for API-specific threat modeling is the OWASP API Security To
 
 The 2023 categories, and which sections of this skill speak to each:
 
-- **API1:2023 Broken object level authorization** — enforce per-object access checks; covered alongside API key management and per-user rate limiting.
-- **API2:2023 Broken authentication** — see the `secure-auth` skill for the auth primitive itself; this skill covers rate limits, request size, and timeout protections that flank auth endpoints.
-- **API3:2023 Broken object property level authorization** — input validation (Zod / Pydantic) and explicit allowlist of writable fields.
-- **API4:2023 Unrestricted resource consumption** — rate limiting, request size limits, timeout protection, file upload limits.
-- **API5:2023 Broken function level authorization** — out of scope here; route-level auth lives in your framework.
-- **API6:2023 Unrestricted access to sensitive business flows** — graph-traversal quotas, per-account read budgets, behavioral signals for credential stuffing.
-- **API7:2023 Server side request forgery** — outbound URL allowlists; covered briefly under timeout protection and external API calls.
-- **API8:2023 Security misconfiguration** — security headers, TLS posture, CORS configuration.
-- **API9:2023 Improper inventory management** — out of scope here; an API gateway / catalog problem.
-- **API10:2023 Unsafe consumption of APIs** — input validation on data fetched from upstream, plus deserialization safety.
+- **API1:2023 Broken object level authorization**, enforce per-object access checks; covered alongside API key management and per-user rate limiting.
+- **API2:2023 Broken authentication**, see the `secure-auth` skill for the auth primitive itself; this skill covers rate limits, request size, and timeout protections that flank auth endpoints.
+- **API3:2023 Broken object property level authorization**, input validation (Zod / Pydantic) and explicit allowlist of writable fields.
+- **API4:2023 Unrestricted resource consumption**, rate limiting, request size limits, timeout protection, file upload limits.
+- **API5:2023 Broken function level authorization**, out of scope here; route-level auth lives in your framework.
+- **API6:2023 Unrestricted access to sensitive business flows**, graph-traversal quotas, per-account read budgets, behavioral signals for credential stuffing.
+- **API7:2023 Server side request forgery**, outbound URL allowlists; covered briefly under timeout protection and external API calls.
+- **API8:2023 Security misconfiguration**, security headers, TLS posture, CORS configuration.
+- **API9:2023 Improper inventory management**, out of scope here; an API gateway / catalog problem.
+- **API10:2023 Unsafe consumption of APIs**, input validation on data fetched from upstream, plus deserialization safety.
 
-For the broader web context, OWASP Top 10:2025 reorders the 2021 list. Notable shifts: A03:2025 "Software Supply Chain Failures" absorbs the old 2021 A06 "Vulnerable and Outdated Components" — that 2021 category is dissolved into the supply-chain category. A09:2025 is "Security Logging and Alerting Failures" (previously "Logging and Monitoring"). The 2025 ordering: A01 Broken Access Control / A02 Security Misconfiguration / A03 Software Supply Chain Failures / A04 Cryptographic Failures / A05 Injection / A06 Insecure Design / A07 Authentication Failures / A08 Software or Data Integrity Failures / A09 Security Logging and Alerting Failures / A10 Mishandling of Exceptional Conditions.
+For the broader web context, OWASP Top 10:2025 reorders the 2021 list. Notable shifts: A03:2025 "Software Supply Chain Failures" absorbs the old 2021 A06 "Vulnerable and Outdated Components", that 2021 category is dissolved into the supply-chain category. A09:2025 is "Security Logging and Alerting Failures" (previously "Logging and Monitoring"). The 2025 ordering: A01 Broken Access Control / A02 Security Misconfiguration / A03 Software Supply Chain Failures / A04 Cryptographic Failures / A05 Injection / A06 Insecure Design / A07 Authentication Failures / A08 Software or Data Integrity Failures / A09 Security Logging and Alerting Failures / A10 Mishandling of Exceptional Conditions.
 
 ## Threat exemplars
 
@@ -88,11 +88,11 @@ Without rate limiting:
 - One bad actor affects all users
 - You get a surprise bill from your cloud provider
 
-Distributed credential stuffing defeats per-IP limits — attackers rotate through residential proxy networks and one IP rarely hits the threshold. Pair per-IP limits with per-account quotas, behavioral signals (impossible-travel, device fingerprint anomalies), and a WAF in front for botnet patterns.
+Distributed credential stuffing defeats per-IP limits, attackers rotate through residential proxy networks and one IP rarely hits the threshold. Pair per-IP limits with per-account quotas, behavioral signals (impossible-travel, device fingerprint anomalies), and a WAF in front for botnet patterns.
 
 ### Express.js with express-rate-limit
 
-Library versions current as of 2026-05-08: `express-rate-limit` and `rate-limit-redis` — verify in registry.npmjs.org before pinning.
+Library versions current as of 2026-05-08: `express-rate-limit` and `rate-limit-redis`, verify in registry.npmjs.org before pinning.
 
 ```javascript
 const rateLimit = require('express-rate-limit');
@@ -279,7 +279,7 @@ Maps to API3:2023 (broken object property level authorization) and API10:2023 (u
 
 `zod` is on the 4.x line as of 2026-05-08 (4.4.3 current; verify before pinning). Patterns below work on v4; if you're still on 3.x, `safeParse` and the schema builders below are unchanged.
 
-Untrusted input also has a deserialization dimension — see the dedicated section below. CWE-502 (deserialization of untrusted data) dominated the CISA KEV catalog in 2024-2025, so JSON-only at trust boundaries plus schema validation is the baseline.
+Untrusted input also has a deserialization dimension, see the dedicated section below. CWE-502 (deserialization of untrusted data) dominated the CISA KEV catalog in 2024-2025, so JSON-only at trust boundaries plus schema validation is the baseline.
 
 ```javascript
 const { z } = require('zod');
@@ -331,7 +331,7 @@ app.post('/users', validate(createUserSchema), async (req, res) => {
 
 ### Sanitization
 
-Trusted Types is a related browser-side defense — it forces dangerous DOM sinks to consume policy-vetted objects instead of strings, which kills entire classes of DOM-based XSS. As of 2026-05-08 Trusted Types is cross-browser (Chromium since 2020, Firefox 148, Safari 26.0; caniuse global usage ~89%), so `require-trusted-types-for 'script'` is now a realistic CSP directive rather than a Chrome-only nice-to-have. See the security headers section.
+Trusted Types is a related browser-side defense, it forces dangerous DOM sinks to consume policy-vetted objects instead of strings, which kills entire classes of DOM-based XSS. As of 2026-05-08 Trusted Types is cross-browser (Chromium since 2020, Firefox 148, Safari 26.0; caniuse global usage ~89%), so `require-trusted-types-for 'script'` is now a realistic CSP directive rather than a Chrome-only nice-to-have. See the security headers section.
 
 ```javascript
 const createDOMPurify = require('dompurify');
@@ -425,11 +425,11 @@ const query = `SELECT * FROM users ORDER BY ${sortColumn}`; // Safe because allo
 
 ## Command injection (CWE-78)
 
-CWE-78 (OS command injection) dominated the CISA KEV catalog over 2024-2025 — 14 entries in 2024 and 18 in 2025, more than classic SQL injection. The Ivanti Connect Secure chain (CVE-2024-21887) is the marquee example. The rule is simple: never compose a shell command from untrusted input. Use the language's argv-list spawn primitives with the shell disabled, and allowlist any path or filename that flows into a process.
+CWE-78 (OS command injection) dominated the CISA KEV catalog over 2024-2025, 14 entries in 2024 and 18 in 2025, more than classic SQL injection. The Ivanti Connect Secure chain (CVE-2024-21887) is the marquee example. The rule is simple: never compose a shell command from untrusted input. Use the language's argv-list spawn primitives with the shell disabled, and allowlist any path or filename that flows into a process.
 
 ### Node.js
 
-Avoid the shell-execution primitives in the Node child-process module when any argument can be influenced by user input — they pass the full string through `/bin/sh -c` and any metacharacter (`;`, `&`, `|`, backtick, `$()`) becomes injection. Prefer the argv-list spawn family with the shell disabled, which is the default.
+Avoid the shell-execution primitives in the Node child-process module when any argument can be influenced by user input, they pass the full string through `/bin/sh -c` and any metacharacter (`;`, `&`, `|`, backtick, `$()`) becomes injection. Prefer the argv-list spawn family with the shell disabled, which is the default.
 
 ```javascript
 const { exec, execFile, spawn } = require('child_process');
@@ -454,7 +454,7 @@ const child = spawn('convert', [safeFilename, 'out.png'], { shell: false });
 
 ### Python
 
-Avoid the OS shell-execution primitives — the `os.system` call, `subprocess.run` with `shell=True`, `subprocess.Popen` with `shell=True`, and `os.popen` — when any argument can be influenced by user input. Use `subprocess.run` with an argv list and `shell=False` (the default), and allowlist any filename or path that crosses the trust boundary.
+Avoid the OS shell-execution primitives, the `os.system` call, `subprocess.run` with `shell=True`, `subprocess.Popen` with `shell=True`, and `os.popen`, when any argument can be influenced by user input. Use `subprocess.run` with an argv list and `shell=False` (the default), and allowlist any filename or path that crosses the trust boundary.
 
 ```python
 import subprocess
@@ -491,11 +491,11 @@ if not candidate.is_relative_to(allowed_root):
 
 ## Deserialization (CWE-502)
 
-CWE-502 (deserialization of untrusted data) was the second-most-common KEV CWE in 2024-2025 — 11 entries in 2024 and 14 in 2025. The native binary serializers and unrestricted YAML loaders treat the input as a program: arbitrary code runs at parse time, before any of your validation logic. The rule is: JSON-only at trust boundaries, and validate the parsed JSON with a schema (Zod / Pydantic) before using it.
+CWE-502 (deserialization of untrusted data) was the second-most-common KEV CWE in 2024-2025, 11 entries in 2024 and 14 in 2025. The native binary serializers and unrestricted YAML loaders treat the input as a program: arbitrary code runs at parse time, before any of your validation logic. The rule is: JSON-only at trust boundaries, and validate the parsed JSON with a schema (Zod / Pydantic) before using it.
 
 ### Python
 
-Avoid the native binary deserialization primitive (the `pickle` loaders) and the unsafe YAML loader (the bare `yaml.load` call without `Loader=SafeLoader`) on any input that crosses a trust boundary — both will execute arbitrary objects on parse. The same warning applies to the `marshal` loader.
+Avoid the native binary deserialization primitive (the `pickle` loaders) and the unsafe YAML loader (the bare `yaml.load` call without `Loader=SafeLoader`) on any input that crosses a trust boundary, both will execute arbitrary objects on parse. The same warning applies to the `marshal` loader.
 
 ```python
 import json
@@ -529,7 +529,7 @@ config = yaml.safe_load(request.body)
 
 In Node, the equivalent risk lives in any library that accepts a "this is a serialized object" payload (the `node-serialize` package, older `funcster`-style packages, eval-based JSON5 forks). Stick to `JSON.parse` and validate with Zod.
 
-In Java, avoid the binary deserialization primitive (`ObjectInputStream.readObject`) on untrusted input — Jackson, GSON, or another JSON library is the safe choice. In .NET, avoid the legacy binary formatter (`BinaryFormatter`, `NetDataContractSerializer`, `LosFormatter`, `SoapFormatter`) — Microsoft has flagged it for removal precisely because of CWE-502 (per https://learn.microsoft.com/en-us/dotnet/standard/serialization/binaryformatter-security-guide). Use `System.Text.Json` for cross-trust-boundary input.
+In Java, avoid the binary deserialization primitive (`ObjectInputStream.readObject`) on untrusted input, Jackson, GSON, or another JSON library is the safe choice. In .NET, avoid the legacy binary formatter (`BinaryFormatter`, `NetDataContractSerializer`, `LosFormatter`, `SoapFormatter`), Microsoft has flagged it for removal precisely because of CWE-502 (per https://learn.microsoft.com/en-us/dotnet/standard/serialization/binaryformatter-security-guide). Use `System.Text.Json` for cross-trust-boundary input.
 
 ```javascript
 // DO NOT USE: a third-party deserializer on untrusted input
@@ -624,7 +624,7 @@ const origin = /^https:\/\/(www\.)?yourapp\.com$/;
 
 ### Private Network Access (draft)
 
-Private Network Access (PNA) is a WICG draft (https://wicg.github.io/private-network-access/) that adds CORS-style preflight when a public origin tries to reach a private-network resource (LAN IPs, localhost, intranet hostnames). As of 2026-05-08 only Chromium enforces it, and even there enforcement has been gradually rolled back to warnings while the spec evolves. Treat it as a draft: don't rely on PNA as a primary defense, but do plan for the day it lights up everywhere — keep your private-network APIs behind real authentication, not just network position.
+Private Network Access (PNA) is a WICG draft (https://wicg.github.io/private-network-access/) that adds CORS-style preflight when a public origin tries to reach a private-network resource (LAN IPs, localhost, intranet hostnames). As of 2026-05-08 only Chromium enforces it, and even there enforcement has been gradually rolled back to warnings while the spec evolves. Treat it as a draft: don't rely on PNA as a primary defense, but do plan for the day it lights up everywhere, keep your private-network APIs behind real authentication, not just network position.
 
 ## API key management
 
@@ -714,7 +714,7 @@ app.delete('/api-keys/:id', requireAuth, async (req, res) => {
 
 ### Rotate on a schedule, not just on compromise
 
-Even without a compromise signal, rotate API keys on a schedule (90 days is a common baseline; tighten for high-privilege keys). Long-lived keys collect risk: leaked log lines, stale CI secrets, departed employees, forgotten test scripts. The rotation flow should support overlap — a "next" key live alongside the "current" one for the rotation window — so callers can swap without an outage.
+Even without a compromise signal, rotate API keys on a schedule (90 days is a common baseline; tighten for high-privilege keys). Long-lived keys collect risk: leaked log lines, stale CI secrets, departed employees, forgotten test scripts. The rotation flow should support overlap, a "next" key live alongside the "current" one for the rotation window, so callers can swap without an outage.
 
 ```javascript
 // Add columns: rotated_from, rotation_due_at
@@ -737,7 +737,7 @@ const stale = await db.query(
 
 ```javascript
 async function apiKeyAuth(req, res, next) {
-  // Accept the key from headers ONLY — never query strings.
+  // Accept the key from headers ONLY, never query strings.
   // Query strings are routinely logged by web servers, reverse proxies, CDN
   // edge nodes, and analytics tooling, so a key in `?api_key=...` becomes a
   // credential leak by way of access logs. OWASP API Top 10 (API2:2023) and
@@ -845,10 +845,10 @@ res.status(400).json({
 
 Maps to OWASP Top 10:2025 A05 (injection). The 2026 shape of XSS defense is, in priority order:
 
-1. **CSP3 with nonce + `'strict-dynamic'`** — modern strict CSP. Allowlists (`script-src https://cdn.foo.com …`) are no longer recommended; per Weichselbaum et al. they're routinely bypassable. Nonce-or-hash plus `'strict-dynamic'` is the W3C-blessed strict CSP.
-2. **Trusted Types (`require-trusted-types-for 'script'`)** — kills DOM-based XSS by forcing dangerous sinks (`innerHTML`, `eval`, `setTimeout(string)`) to consume policy-vetted objects. Cross-browser as of 2026 (Chromium since 2020, Firefox 148, Safari 26.0; ~89% global usage per https://caniuse.com/trusted-types).
-3. **Framework auto-escaping** — React, Vue, Angular, Svelte, modern template engines all escape interpolated strings by default. Don't reach for the bypass APIs (`dangerouslySetInnerHTML`, `v-html`, `[innerHTML]`, `{@html}`) without DOMPurify.
-4. **Manual escaping at the last server-side boundary** — when you genuinely need to inject a value into a non-templated HTML response, use a vetted escaper.
+1. **CSP3 with nonce + `'strict-dynamic'`**, modern strict CSP. Allowlists (`script-src https://cdn.foo.com …`) are no longer recommended; per Weichselbaum et al. they're routinely bypassable. Nonce-or-hash plus `'strict-dynamic'` is the W3C-blessed strict CSP.
+2. **Trusted Types (`require-trusted-types-for 'script'`)**, kills DOM-based XSS by forcing dangerous sinks (`innerHTML`, `eval`, `setTimeout(string)`) to consume policy-vetted objects. Cross-browser as of 2026 (Chromium since 2020, Firefox 148, Safari 26.0; ~89% global usage per https://caniuse.com/trusted-types).
+3. **Framework auto-escaping**, React, Vue, Angular, Svelte, modern template engines all escape interpolated strings by default. Don't reach for the bypass APIs (`dangerouslySetInnerHTML`, `v-html`, `[innerHTML]`, `{@html}`) without DOMPurify.
+4. **Manual escaping at the last server-side boundary**, when you genuinely need to inject a value into a non-templated HTML response, use a vetted escaper.
 
 ```javascript
 // BAD: Directly inserting user content
@@ -869,7 +869,7 @@ res.json({ name: userName }); // Express sets correct headers
 // Don't use dangerouslySetInnerHTML / v-html / [innerHTML] / {@html} on user input.
 ```
 
-For the `'unsafe-inline'` and inline-script story, see the security headers section — strict CSP3 makes the inline question moot when nonces are wired through the template.
+For the `'unsafe-inline'` and inline-script story, see the security headers section, strict CSP3 makes the inline question moot when nonces are wired through the template.
 
 ## Security headers
 
@@ -918,7 +918,7 @@ app.use(helmet.contentSecurityPolicy({
 }));
 
 // HSTS: 2 years + includeSubDomains + preload (per https://hstspreload.org)
-// Operationally irreversible once preload-listed — verify subdomains first.
+// Operationally irreversible once preload-listed, verify subdomains first.
 app.use(helmet.hsts({
   maxAge: 63072000,
   includeSubDomains: true,
@@ -937,7 +937,7 @@ app.use((req, res, next) => {
 
 // Permissions-Policy: structured-fields syntax, opt-out of dangerous features.
 // Per https://www.w3.org/TR/permissions-policy/ (W3C WD 2025-10-06; per-directive
-// caniuse lookup required — this is "Limited Availability", not Baseline).
+// caniuse lookup required, this is "Limited Availability", not Baseline).
 app.use((req, res, next) => {
   res.setHeader(
     'Permissions-Policy',
@@ -959,7 +959,7 @@ app.use((req, res, next) => {
 // Keep nosniff
 app.use(helmet.noSniff());
 
-// Note: X-XSS-Protection is deprecated and ignored by modern browsers — do not set it.
+// Note: X-XSS-Protection is deprecated and ignored by modern browsers, do not set it.
 // X-Frame-Options is replaced by CSP's frame-ancestors directive (set above).
 ```
 
@@ -998,17 +998,17 @@ cdnjs and jsdelivr include `integrity` attributes in their copy-paste snippets; 
 
 Maps to OWASP Top 10:2025 A04 (cryptographic failures) and API8:2023 (security misconfiguration).
 
-- **Default to TLS 1.3** — RFC 8446 (https://datatracker.ietf.org/doc/rfc8446/), published August 2018.
-- **Minimum TLS 1.2** — older versions are deprecated.
-- **Disable TLS 1.0 and TLS 1.1** — RFC 8996 / BCP 195 (https://datatracker.ietf.org/doc/rfc8996/), March 2021, formally deprecates both.
+- **Default to TLS 1.3**, RFC 8446 (https://datatracker.ietf.org/doc/rfc8446/), published August 2018.
+- **Minimum TLS 1.2**, older versions are deprecated.
+- **Disable TLS 1.0 and TLS 1.1**, RFC 8996 / BCP 195 (https://datatracker.ietf.org/doc/rfc8996/), March 2021, formally deprecates both.
 - **SSL Labs caps non-TLS-1.3 servers at A-** since v2009r (16 May 2025). If you want an A or A+ grade, TLS 1.3 has to be available.
 - **Direction of travel: post-quantum hybrid key exchange.** Cloudflare reported that more than half of its HTTPS traffic in late 2025 negotiated post-quantum hybrid key exchange (X25519+Kyber / X25519MLKEM768). This is moving fast; check your CDN / load balancer for current support.
 
-If you operate behind a managed edge (Cloudflare, Fastly, AWS CloudFront, Azure Front Door), the right knob is usually a single "minimum TLS version" setting — set it to 1.2 at minimum, prefer 1.3, and let the edge handle the cipher suite negotiation. If you terminate TLS yourself, consult the Mozilla SSL Configuration Generator (https://ssl-config.mozilla.org/) for current "intermediate" or "modern" profiles.
+If you operate behind a managed edge (Cloudflare, Fastly, AWS CloudFront, Azure Front Door), the right knob is usually a single "minimum TLS version" setting, set it to 1.2 at minimum, prefer 1.3, and let the edge handle the cipher suite negotiation. If you terminate TLS yourself, consult the Mozilla SSL Configuration Generator (https://ssl-config.mozilla.org/) for current "intermediate" or "modern" profiles.
 
 ## Timeout protection
 
-Maps to API4:2023 (unrestricted resource consumption) and API7:2023 (server side request forgery — pair timeouts with outbound URL allowlists).
+Maps to API4:2023 (unrestricted resource consumption) and API7:2023 (server side request forgery, pair timeouts with outbound URL allowlists).
 
 ```javascript
 // Request timeout middleware
@@ -1051,7 +1051,7 @@ const result = await db.query({
 
 Library versions current as of 2026-05-08 (verify on PyPI before pinning):
 
-- `fastapi` is on the 0.x line (0.136.1 current; pre-1.0, so pin by minor — breaking changes can land between minors).
+- `fastapi` is on the 0.x line (0.136.1 current; pre-1.0, so pin by minor, breaking changes can land between minors).
 - `slowapi` is on the 0.1.x line (pre-1.0; pin by minor).
 - `pydantic` is on the 2.x line (2.13.4 current).
 

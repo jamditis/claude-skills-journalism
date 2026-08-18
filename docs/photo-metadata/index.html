@@ -172,7 +172,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Why this matters</h2>
             <p class="text-clay/80">
-                Metadata embedded in an image file travels with the file. Photo CMSs (Photo Mechanic, Lightroom, Capture One) and wire intake systems read a photo's caption, credit, and rights from its IPTC and XMP blocks — not from a separate document or the email it arrived in. If the caption, credit, alt text, and license are not <em>inside</em> the file, they are gone the moment the photo is downloaded, forwarded, or re-uploaded.
+                Metadata embedded in an image file travels with the file. Photo CMSs (Photo Mechanic, Lightroom, Capture One) and wire intake systems read a photo's caption, credit, and rights from its IPTC and XMP blocks, not from a separate document or the email it arrived in. If the caption, credit, alt text, and license are not <em>inside</em> the file, they are gone the moment the photo is downloaded, forwarded, or re-uploaded.
             </p>
             <p class="text-clay/80">
                 One <code>exiftool</code> pass writes the EXIF, IPTC, and XMP layers together and leaves every other tag (camera settings, shot time) untouched. Embedded metadata is what lets a partner newsroom find a photo, credit it correctly, and republish it under a clear license without contacting the photographer. Strip it, and the same photo is an orphaned file.
@@ -232,7 +232,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded flex-shrink-0">2</span>
                         <div>
                             <h3 class="font-semibold">Label people from visible evidence</h3>
-                            <p class="text-sm text-clay/70 mt-1">Name an agency or role only from a visible marking — a labeled vest, a uniform, a badge, a patch. Otherwise write "officers in tactical gear," "a man in a blue shirt." Never assert someone's immigration or legal status unless it is unambiguous in the frame.</p>
+                            <p class="text-sm text-clay/70 mt-1">Name an agency or role only from a visible marking, a labeled vest, a uniform, a badge, a patch. Otherwise write "officers in tactical gear," "a man in a blue shirt." Never assert someone's immigration or legal status unless it is unambiguous in the frame.</p>
                         </div>
                     </div>
                 </div>
@@ -240,7 +240,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <div class="flex items-start gap-4">
                         <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded flex-shrink-0">3</span>
                         <div>
-                            <h3 class="font-semibold">Always write alt text — it is not the caption</h3>
+                            <h3 class="font-semibold">Always write alt text, it is not the caption</h3>
                             <p class="text-sm text-clay/70 mt-1">Write both: a short screen-reader description in <code>XMP-iptcCore:AltTextAccessibility</code> and the publishable caption in <code>IPTC:Caption-Abstract</code>. Models routinely write the caption and skip the alt text.</p>
                         </div>
                     </div>
@@ -259,7 +259,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded flex-shrink-0">5</span>
                         <div>
                             <h3 class="font-semibold">Verify the round-trip from the file</h3>
-                            <p class="text-sm text-clay/70 mt-1">Read the metadata back <em>from the written file</em>, not from your buffer. After any upload or transfer, re-read it <em>from the destination</em> — a 200 response proves the bytes were accepted, not that the metadata survived.</p>
+                            <p class="text-sm text-clay/70 mt-1">Read the metadata back <em>from the written file</em>, not from your buffer. After any upload or transfer, re-read it <em>from the destination</em>, a 200 response proves the bytes were accepted, not that the metadata survived.</p>
                         </div>
                     </div>
                 </div>
@@ -291,7 +291,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <td class="px-5 py-3 font-medium">Credit (org / full)</td>
                             <td class="px-5 py-3 text-clay/70"><code>IPTC:Credit</code> (org, max 32 chars)</td>
                             <td class="px-5 py-3 text-clay/70"><code>XMP-photoshop:Credit</code> (full name / org)</td>
-                            <td class="px-5 py-3 text-clay/70">—</td>
+                            <td class="px-5 py-3 text-clay/70">-</td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3 font-medium">Caption</td>
@@ -301,15 +301,15 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </tr>
                         <tr>
                             <td class="px-5 py-3 font-medium">Alt text (short)</td>
-                            <td class="px-5 py-3 text-clay/70">—</td>
+                            <td class="px-5 py-3 text-clay/70">-</td>
                             <td class="px-5 py-3 text-clay/70"><code>XMP-iptcCore:AltTextAccessibility</code></td>
-                            <td class="px-5 py-3 text-clay/70">—</td>
+                            <td class="px-5 py-3 text-clay/70">-</td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3 font-medium">Keywords</td>
                             <td class="px-5 py-3 text-clay/70"><code>IPTC:Keywords</code> (repeatable)</td>
                             <td class="px-5 py-3 text-clay/70"><code>XMP-dc:Subject</code></td>
-                            <td class="px-5 py-3 text-clay/70">—</td>
+                            <td class="px-5 py-3 text-clay/70">-</td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3 font-medium">Copyright</td>
@@ -319,21 +319,21 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </tr>
                         <tr>
                             <td class="px-5 py-3 font-medium">License (CC, machine-readable)</td>
-                            <td class="px-5 py-3 text-clay/70">—</td>
+                            <td class="px-5 py-3 text-clay/70">-</td>
                             <td class="px-5 py-3 text-clay/70"><code>XMP-cc:License</code>, <code>XMP-xmpRights:Marked</code>, <code>XMP-xmpRights:WebStatement</code>, <code>XMP-xmpRights:UsageTerms</code></td>
-                            <td class="px-5 py-3 text-clay/70">—</td>
+                            <td class="px-5 py-3 text-clay/70">-</td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3 font-medium">Headline</td>
                             <td class="px-5 py-3 text-clay/70"><code>IPTC:Headline</code></td>
                             <td class="px-5 py-3 text-clay/70"><code>XMP-photoshop:Headline</code></td>
-                            <td class="px-5 py-3 text-clay/70">—</td>
+                            <td class="px-5 py-3 text-clay/70">-</td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3 font-medium">Location</td>
                             <td class="px-5 py-3 text-clay/70"><code>IPTC:Sub-location</code>, <code>IPTC:City</code>, <code>IPTC:Province-State</code>, <code>IPTC:Country-*</code></td>
                             <td class="px-5 py-3 text-clay/70"><code>XMP-iptcCore:Location</code>, <code>XMP-photoshop:City</code>, <code>XMP-photoshop:State</code>, <code>XMP-photoshop:Country</code></td>
-                            <td class="px-5 py-3 text-clay/70">—</td>
+                            <td class="px-5 py-3 text-clay/70">-</td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3 font-medium">Date</td>
@@ -349,7 +349,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <!-- One-pass exiftool example -->
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">One pass that writes all three layers</h2>
-            <p class="text-clay/80 mb-4">This command tags a single file with photographer, credit, caption, alt text, keywords, copyright, Creative Commons license, and location — then copies the shoot date from EXIF rather than typing it.</p>
+            <p class="text-clay/80 mb-4">This command tags a single file with photographer, credit, caption, alt text, keywords, copyright, Creative Commons license, and location, then copies the shoot date from EXIF rather than typing it.</p>
             <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable code block">
                 <pre class="text-white/90 whitespace-pre m-0 bg-transparent p-0 rounded-none overflow-visible"><code>CAPTION="A crowd holds signs outside the Mercer County Courthouse, Friday, June 19, 2026, in Trenton, N.J. (Dana Rivera/Example News Collective)"
 ALT="A crowd of people holding handmade signs stands on the steps of a stone courthouse."
@@ -376,7 +376,7 @@ exiftool -codedcharacterset=utf8 -overwrite_original \
     "-XMP-photoshop:DateCreated&lt;EXIF:DateTimeOriginal" \
   photo.jpg</code></pre>
             </div>
-            <p class="text-clay/80 mt-4 mb-2">Then <strong>verify from the file</strong> — the step that gets skipped:</p>
+            <p class="text-clay/80 mt-4 mb-2">Then <strong>verify from the file</strong>, the step that gets skipped:</p>
             <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable code block">
                 <pre class="text-white/90 whitespace-pre m-0 bg-transparent p-0 rounded-none overflow-visible"><code>exiftool -G1 -s -IPTC:By-line -IPTC:Caption-Abstract \
   -XMP-iptcCore:AltTextAccessibility -XMP-cc:License -IPTC:Keywords photo.jpg</code></pre>
@@ -387,7 +387,7 @@ exiftool -codedcharacterset=utf8 -overwrite_original \
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Batch tagging a folder</h2>
             <p class="text-clay/80">
-                For a shoot, drive <code>exiftool</code> from a manifest instead of one command per file. <code>embed.py</code> in this skill's directory takes a folder plus a JSON manifest — constant credit and license fields, then per-image alt text, caption, and keywords — writes tagged copies, and reads each one back to confirm the metadata landed. Run <code>python3 embed.py --help</code>.
+                For a shoot, drive <code>exiftool</code> from a manifest instead of one command per file. <code>embed.py</code> in this skill's directory takes a folder plus a JSON manifest, constant credit and license fields, then per-image alt text, caption, and keywords, writes tagged copies, and reads each one back to confirm the metadata landed. Run <code>python3 embed.py --help</code>.
             </p>
         </section>
 
@@ -405,7 +405,7 @@ exiftool -codedcharacterset=utf8 -overwrite_original \
                     <tbody class="divide-y divide-mist/20">
                         <tr>
                             <td class="px-5 py-3 font-medium">Wrote a caption, no alt text</td>
-                            <td class="px-5 py-3 text-clay/70">Always write <code>AltTextAccessibility</code> too — they are different fields</td>
+                            <td class="px-5 py-3 text-clay/70">Always write <code>AltTextAccessibility</code> too, they are different fields</td>
                         </tr>
                         <tr>
                             <td class="px-5 py-3 font-medium"><code>By-line</code> / <code>Credit</code> / <code>City</code> silently truncated</td>
@@ -534,7 +534,7 @@ exiftool -codedcharacterset=utf8 -overwrite_original \
             <div class="bg-gradient-to-br from-accent to-accentDark rounded-xl p-8 text-white">
                 <h2 class="font-display text-xl font-bold mb-3">Metadata that travels with the photo</h2>
                 <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
-                    Caption, credit, alt text, and license embedded in the file — readable by any wire system or photo CMS.
+                    Caption, credit, alt text, and license embedded in the file, readable by any wire system or photo CMS.
                 </p>
                 <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/journalism-core/skills/photo-metadata" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors" rel="noopener noreferrer">
                     View on GitHub

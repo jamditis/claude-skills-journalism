@@ -14,9 +14,9 @@ Run '/autocontext:init' to set up knowledge tracking.
 ```
 
 Otherwise, the script reads:
-- `.autocontext/lessons.json` — active and archived lessons
-- `.autocontext/config.json` — project configuration
-- `.autocontext/cache/` — any pending lessons
+- `.autocontext/lessons.json`, active and archived lessons
+- `.autocontext/config.json`, project configuration
+- `.autocontext/cache/`, any pending lessons
 
 ## Status report
 
@@ -57,11 +57,11 @@ Top 5 lessons with the highest `validated_count` (most confirmed across sessions
 
 ```
 Most-validated lessons (by developer/session confirmations):
-  1. [Architecture] "Split domain logic from infrastructure" — validated 34 times
-  2. [Workflow] "Always run tests before commit" — validated 28 times
-  3. [Bug-fix] "Regex patterns need raw strings" — validated 22 times
-  4. [Pattern] "Use dependency injection for testing" — validated 18 times
-  5. [Test-strategy] "Write integration tests for API changes" — validated 16 times
+  1. [Architecture] "Split domain logic from infrastructure", validated 34 times
+  2. [Workflow] "Always run tests before commit", validated 28 times
+  3. [Bug-fix] "Regex patterns need raw strings", validated 22 times
+  4. [Pattern] "Use dependency injection for testing", validated 18 times
+  5. [Test-strategy] "Write integration tests for API changes", validated 16 times
 ```
 
 ### 4. Stalest lessons
@@ -70,11 +70,11 @@ Top 5 lessons with lowest confidence or oldest `last_validated` timestamp (need 
 
 ```
 Stalest lessons (lowest confidence or oldest validation):
-  1. [Workflow] "Use Docker for local dev" — confidence 0.3, last validated 120 days ago
-  2. [Integration] "Slack API batch operations" — confidence 0.4, last validated 89 days ago
-  3. [Gotcha] "Python timezone handling edge case" — confidence 0.5, last validated 73 days ago
-  4. [Architecture] "Consider microservices for X" — confidence 0.4, last validated 95 days ago
-  5. [Pattern] "SQL query optimization with indexes" — confidence 0.5, last validated 67 days ago
+  1. [Workflow] "Use Docker for local dev", confidence 0.3, last validated 120 days ago
+  2. [Integration] "Slack API batch operations", confidence 0.4, last validated 89 days ago
+  3. [Gotcha] "Python timezone handling edge case", confidence 0.5, last validated 73 days ago
+  4. [Architecture] "Consider microservices for X", confidence 0.4, last validated 95 days ago
+  5. [Pattern] "SQL query optimization with indexes", confidence 0.5, last validated 67 days ago
 ```
 
 ### 5. Lessons by developer
@@ -95,9 +95,9 @@ Lessons added in the last 7 days:
 
 ```
 Added in the last 7 days: 3 lessons
-  • [Bug-fix] "Array slice doesn't mutate original" — 2 days ago
-  • [Gotcha] "Event listener cleanup in unmount" — 4 days ago
-  • [Pattern] "Memoize expensive computations" — 6 days ago
+  • [Bug-fix] "Array slice doesn't mutate original", 2 days ago
+  • [Gotcha] "Event listener cleanup in unmount", 4 days ago
+  • [Pattern] "Memoize expensive computations", 6 days ago
 ```
 
 If no lessons were added in the last 7 days, that's noted: `No lessons added in the last 7 days.`

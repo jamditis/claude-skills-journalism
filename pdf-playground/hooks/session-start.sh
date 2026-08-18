@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# pdf-playground SessionStart hook — checks GitHub for a newer plugin version
+# pdf-playground SessionStart hook, checks GitHub for a newer plugin version
 # once every 24 hours and prints a one-line warning if the installed copy is
 # out of date. Silent on network failure so the user's session never gets
 # delayed or polluted by this check.
@@ -9,7 +9,7 @@ set -eu
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(dirname "$(dirname "$0")")}"
 PLUGIN_JSON="$PLUGIN_ROOT/.claude-plugin/plugin.json"
 
-# Marketplace raw URL — points at master so it always reflects the latest
+# Marketplace raw URL, points at master so it always reflects the latest
 # published version of pdf-playground regardless of tag cadence.
 REMOTE_URL="https://raw.githubusercontent.com/jamditis/claude-skills-journalism/master/pdf-playground/.claude-plugin/plugin.json"
 
@@ -17,7 +17,7 @@ CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/pdf-playground"
 CACHE_FILE="$CACHE_DIR/last-version-check"
 CACHE_TTL_SECONDS=86400  # 24 hours
 
-# Drain stdin — Claude Code pipes session context here and we want to
+# Drain stdin, Claude Code pipes session context here and we want to
 # acknowledge it without blocking the caller. The contents are unused.
 cat > /dev/null || true
 
@@ -26,7 +26,7 @@ cat > /dev/null || true
 [ -r "$PLUGIN_JSON" ] || exit 0
 
 # Need jq + curl for this to work at all. If either is missing, skip silently
-# — we don't want an optional update check to become a hard dependency.
+#, we don't want an optional update check to become a hard dependency.
 command -v jq   >/dev/null 2>&1 || exit 0
 command -v curl >/dev/null 2>&1 || exit 0
 
@@ -50,7 +50,7 @@ fi
 # rate-limited. Without this, an offline user or a captive portal would add
 # up to --max-time seconds to every single session start until connectivity
 # returned. If we can't even create the cache file (read-only home, full
-# disk), bail silently — never propagate the error.
+# disk), bail silently, never propagate the error.
 if ! { : > "$CACHE_FILE"; } 2>/dev/null; then
   exit 0
 fi

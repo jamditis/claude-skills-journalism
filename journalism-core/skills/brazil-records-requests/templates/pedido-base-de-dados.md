@@ -23,7 +23,7 @@ Especificamente, solicito:
 
 a) A exportação completa dos registros no formato digital já disponível
    [CSV, XLSX, JSON OU OUTRO],
-   contendo os campos [LISTAR CAMPOS, se conhecidos — ou "todos os campos
+   contendo os campos [LISTAR CAMPOS, se conhecidos, ou "todos os campos
    não protegidos por sigilo"];
 
 b) O dicionário de dados ou layout do arquivo, com a descrição de cada campo
@@ -54,7 +54,7 @@ da base com a supressão exclusiva desses campos, preservados os demais.
 
 - O parágrafo que antecipa o art. 13, III é deliberado: ele fecha a porta
   antes de o órgão abri-la.
-  *The paragraph pre-empting art. 13 III is deliberate — it closes the door
+  *The paragraph pre-empting art. 13 III is deliberate, it closes the door
   before the agency opens it.*
 - Se você já conhece os campos por uma publicação anterior do órgão, cite-a.
   Fica difícil alegar que a base não existe.

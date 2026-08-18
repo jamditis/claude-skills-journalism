@@ -3,28 +3,28 @@ name: one-way-door-check
 event: PreToolUse
 tools:
   - Write
-description: Blocks creation of files that represent irreversible architectural decisions until the user confirms. Requires the companion PostToolUse:AskUserQuestion hook (one-way-door-approve), which promotes the session's pending files to approved so the retry passes — install both, not just this check.
+description: Blocks creation of files that represent irreversible architectural decisions until the user confirms. Requires the companion PostToolUse:AskUserQuestion hook (one-way-door-approve), which promotes the session's pending files to approved so the retry passes, install both, not just this check.
 ---
 
 # One-way door check
 
-This hook intercepts `Write` tool calls and checks whether the target file represents a one-way door — an architectural decision that becomes hard to reverse once other code, data, or users depend on it.
+This hook intercepts `Write` tool calls and checks whether the target file represents a one-way door, an architectural decision that becomes hard to reverse once other code, data, or users depend on it.
 
 It ships as two scripts that share a session-scoped approval ledger:
 
 - **`one-way-door-check.sh`** (`PreToolUse:Write`) blocks the first write to a one-way-door file and records it as pending.
-- **`one-way-door-approve.sh`** (`PostToolUse:AskUserQuestion`) promotes the pending files to approved once the user answers any `AskUserQuestion` — normally the one the check told Claude to ask.
+- **`one-way-door-approve.sh`** (`PostToolUse:AskUserQuestion`) promotes the pending files to approved once the user answers any `AskUserQuestion`, normally the one the check told Claude to ask.
 
 Behavior-matched PowerShell ports for Windows (`one-way-door-check.ps1`, `one-way-door-approve.ps1`) ship in the [`one-way-door` skill directory](../dev-toolkit/skills/one-way-door/); see [Windows (PowerShell)](#windows-powershell) below.
 
-The ledger is what makes the hook stateful. A stateless check would re-block the same file on the retry, so the "ask, then retry" instruction would loop forever. With the ledger, answering the question promotes every file currently pending — usually just the one the check told Claude to ask about — and keeps it open for the rest of the session. A one-way-door file you have not tried to write yet is not pending, so it still blocks the first time Claude attempts it.
+The ledger is what makes the hook stateful. A stateless check would re-block the same file on the retry, so the "ask, then retry" instruction would loop forever. With the ledger, answering the question promotes every file currently pending, usually just the one the check told Claude to ask about, and keeps it open for the rest of the session. A one-way-door file you have not tried to write yet is not pending, so it still blocks the first time Claude attempts it.
 
-The promoter keys on the `AskUserQuestion` event, not on which question was answered: it approves the whole pending set at once, so if two one-way-door files are blocked before Claude asks — or it asks an unrelated question while a file is pending — they are all approved together. The block-then-discuss prompt is the guardrail; the ledger only stops an already-discussed file from re-blocking.
+The promoter keys on the `AskUserQuestion` event, not on which question was answered: it approves the whole pending set at once, so if two one-way-door files are blocked before Claude asks, or it asks an unrelated question while a file is pending, they are all approved together. The block-then-discuss prompt is the guardrail; the ledger only stops an already-discussed file from re-blocking.
 
 ## When this hook fires
 
 - **Event:** PreToolUse (the check, before Claude writes a file) and PostToolUse:AskUserQuestion (the approval promoter)
-- **Tools:** Write only for the check (not Edit — editing an existing file is a two-way door); AskUserQuestion for the approval promoter
+- **Tools:** Write only for the check (not Edit, editing an existing file is a two-way door); AskUserQuestion for the approval promoter
 
 ## Detection logic
 
@@ -54,7 +54,7 @@ Before any pattern check, the hook early-exits an explicit safelist of always-re
 
 Some of these are enforced by the early-exit safelist rather than left to the absence of a match. The hook hard-codes pass-through for:
 
-- Test files by convention — `test_*.py`, `*_test.py`, `*.test.{ts,tsx,js,jsx}`, `*.spec.{ts,tsx,js,jsx}`
+- Test files by convention, `test_*.py`, `*_test.py`, `*.test.{ts,tsx,js,jsx}`, `*.spec.{ts,tsx,js,jsx}`
 - Anything under a `tests/`, `__tests__/`, `fixtures/`, `mocks/`, or `__mocks__/` directory
 - All Markdown (`*.md`)
 - `*.txt` / `*.rst` under a `plans/`, `docs/`, `notes/`, or `superpowers` directory
@@ -74,16 +74,16 @@ The check hook records the file path as pending for the session, then outputs a 
 
 The check allows the write in two cases:
 
-- The file is a two-way door (no pattern match) — exits silently, no output.
-- The file path is already in the session's approved ledger — the decision was discussed earlier this session, so the write proceeds. This case is not silent: the hook logs `one-way-door: proceeding with previously-approved <file>` to stderr first.
+- The file is a two-way door (no pattern match), exits silently, no output.
+- The file path is already in the session's approved ledger, the decision was discussed earlier this session, so the write proceeds. This case is not silent: the hook logs `one-way-door: proceeding with previously-approved <file>` to stderr first.
 
 ### When the approval promoter runs
 
-After the user answers any `AskUserQuestion`, the PostToolUse:AskUserQuestion hook promotes every pending path into the approved ledger and clears the pending list. It never blocks (exit 0 always) — PostToolUse hooks must not interrupt the flow. Claude's retried write then proceeds because the path is now approved.
+After the user answers any `AskUserQuestion`, the PostToolUse:AskUserQuestion hook promotes every pending path into the approved ledger and clears the pending list. It never blocks (exit 0 always), PostToolUse hooks must not interrupt the flow. Claude's retried write then proceeds because the path is now approved.
 
 ### State
 
-The ledger lives in `~/.claude/hooks/state/one-way-door/`, one pair of files per session: `<session_id>.pending` and `<session_id>.approved`. Approval is per file path, per session — a new session starts with an empty ledger, so the same decision is surfaced again rather than inherited from a past session. The key is the file path as Claude Code delivers it, which is normally absolute. If a single session writes identically-named files through relative paths in different directories, the path key can collide and approve the second without its own discussion; wiring on absolute paths avoids that.
+The ledger lives in `~/.claude/hooks/state/one-way-door/`, one pair of files per session: `<session_id>.pending` and `<session_id>.approved`. Approval is per file path, per session, a new session starts with an empty ledger, so the same decision is surfaced again rather than inherited from a past session. The key is the file path as Claude Code delivers it, which is normally absolute. If a single session writes identically-named files through relative paths in different directories, the path key can collide and approve the second without its own discussion; wiring on absolute paths avoids that.
 
 ## Hook scripts
 
@@ -93,7 +93,7 @@ The ledger lives in `~/.claude/hooks/state/one-way-door/`, one pair of files per
 #!/bin/sh
 # One-way door check hook (PreToolUse:Write)
 # Flags architectural decisions that are hard to reverse.
-# The most expensive mistakes aren't bugs — they're irreversible decisions.
+# The most expensive mistakes aren't bugs, they're irreversible decisions.
 
 INPUT=$(cat)
 [ -z "$INPUT" ] && exit 0
@@ -302,10 +302,10 @@ Save both scripts, make them executable (`chmod +x one-way-door-check.sh one-way
 
 ### Windows (PowerShell)
 
-The shell scripts assume a POSIX shell. On Windows, Claude Code invokes hooks through PowerShell, and `tool_input.file_path` can arrive with backslashes, which `basename` does not split on — so the shell version's safelist would misfire. Behavior-matched PowerShell ports ship in the [`one-way-door` skill directory](../dev-toolkit/skills/one-way-door/):
+The shell scripts assume a POSIX shell. On Windows, Claude Code invokes hooks through PowerShell, and `tool_input.file_path` can arrive with backslashes, which `basename` does not split on, so the shell version's safelist would misfire. Behavior-matched PowerShell ports ship in the [`one-way-door` skill directory](../dev-toolkit/skills/one-way-door/):
 
-- `one-way-door-check.ps1` — the `PreToolUse:Write` check
-- `one-way-door-approve.ps1` — the `PostToolUse:AskUserQuestion` promoter
+- `one-way-door-check.ps1`, the `PreToolUse:Write` check
+- `one-way-door-approve.ps1`, the `PostToolUse:AskUserQuestion` promoter
 
 They use the same session ledger (`%USERPROFILE%\.claude\hooks\state\one-way-door\`), the same early-exit safelist, and the same categories as the shell version. Filename and directory splitting goes through `[System.IO.Path]`, and the directory patterns are matched after normalizing `\` to `/`, so the check is correct for backslash and forward-slash paths alike.
 
@@ -342,7 +342,7 @@ Copy both `.ps1` files from the skill directory into your hooks folder (for exam
 
 ## Examples
 
-### Example 1: Blocked — new database schema
+### Example 1: Blocked, new database schema
 
 Claude attempts: `Write schema.prisma`
 
@@ -353,13 +353,13 @@ ONE_WAY_DOOR: You tried to create schema.prisma (data model / database schema).
 
 Claude must ask the user about the data model design before proceeding.
 
-### Example 2: Allowed — new React component
+### Example 2: Allowed, new React component
 
 Claude attempts: `Write src/components/UserCard.tsx`
 
-Hook allows (exit 0) — UI components are two-way doors.
+Hook allows (exit 0), UI components are two-way doors.
 
-### Example 3: Blocked — new CI/CD pipeline
+### Example 3: Blocked, new CI/CD pipeline
 
 Claude attempts: `Write .github/workflows/deploy.yml`
 
@@ -370,13 +370,13 @@ ONE_WAY_DOOR: You tried to create deploy.yml (CI/CD pipeline).
 
 Claude must discuss the deployment strategy before proceeding.
 
-### Example 4: Approved — retry after the discussion
+### Example 4: Approved, retry after the discussion
 
 Continuing from Example 3: Claude uses `AskUserQuestion` to walk through the deployment trade-offs, and the user picks an option. The approval hook promotes `deploy.yml` to approved for the session.
 
 Claude retries: `Write .github/workflows/deploy.yml`
 
-Hook allows (exit 0) — the file is already approved this session:
+Hook allows (exit 0), the file is already approved this session:
 ```
 one-way-door: proceeding with previously-approved deploy.yml
 ```

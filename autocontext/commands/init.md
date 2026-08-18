@@ -11,8 +11,8 @@ First, the script checks if `.autocontext/` already exists in the project root. 
 **Question:** This project already has autocontext initialized. Reinitialize?
 
 **Options:**
-- Yes — set up fresh configuration (existing lessons are NOT deleted)
-- No — exit and use current setup
+- Yes, set up fresh configuration (existing lessons are NOT deleted)
+- No, exit and use current setup
 
 If you choose to reinitialize, existing lessons in `.autocontext/lessons.json` will be preserved but all config files will be reset.
 
@@ -25,9 +25,9 @@ If a `CLAUDE.md` file exists in the project root:
 **Question:** This project has a CLAUDE.md. Seed initial lessons from it?
 
 **Options:**
-- Yes, extract and let me review each one — parses CLAUDE.md and shows each extracted lesson for approval
-- Yes, extract automatically — extracts all lessons without review
-- No, start fresh — begins with empty lessons
+- Yes, extract and let me review each one, parses CLAUDE.md and shows each extracted lesson for approval
+- Yes, extract automatically, extracts all lessons without review
+- No, start fresh, begins with empty lessons
 
 This helps bootstrap project knowledge from existing documentation.
 
@@ -36,8 +36,8 @@ This helps bootstrap project knowledge from existing documentation.
 **Question:** Will other developers use Claude Code on this repo?
 
 **Options:**
-- Yes, set up cross-developer sharing — enables the union merge driver for collaborative lesson management
-- No, just me — single-developer setup, simpler merge strategy
+- Yes, set up cross-developer sharing, enables the union merge driver for collaborative lesson management
+- No, just me, single-developer setup, simpler merge strategy
 
 Cross-developer sharing allows multiple Claude instances to work on the same lessons.json without conflicts.
 
@@ -46,8 +46,8 @@ Cross-developer sharing allows multiple Claude instances to work on the same les
 **Question:** Track test/build performance baselines?
 
 **Options:**
-- Yes — initialize baseline tracking for test and build performance
-- No — skip baseline tracking
+- Yes, initialize baseline tracking for test and build performance
+- No, skip baseline tracking
 
 Performance baselines help detect regressions in test suite and build times over time.
 
@@ -73,11 +73,11 @@ The script will create the following structure in `.autocontext/`:
 ## Configuration templates
 
 The script copies template files from `${CLAUDE_PLUGIN_ROOT}/templates/`:
-- `config.json` — project-level settings
-- `config.local.json` — developer identity and preferences
-- `lessons.json` — empty initial lessons
-- `.gitignore` — excludes cache and local files
-- `.gitattributes` — (if sharing) configures union merge driver
+- `config.json`, project-level settings
+- `config.local.json`, developer identity and preferences
+- `lessons.json`, empty initial lessons
+- `.gitignore`, excludes cache and local files
+- `.gitattributes`, (if sharing) configures union merge driver
 
 The `project_name` in config.json will be set to the git repository name or directory basename if not in a git repo.
 

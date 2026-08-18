@@ -1,6 +1,6 @@
 ---
 name: web-scraping
-description: Authorized web content extraction with trust-boundary controls, scraping cascades, poison-pill detection, browser rendering, observed API analysis, and social-media archiving. Use when extracting public content, diagnosing access failures, implementing respectful scrapers, or processing social-media sources with requests, trafilatura, Playwright, yt-dlp, or instaloader.
+description: Authorized web scraping with fallback cascades and access-failure handling. Use for social media, yt-dlp, CAPTCHA or 403 blocks.
 ---
 
 # Web scraping methodology
@@ -316,7 +316,7 @@ class ScrapingCascade:
 
 ## Access-control and bot-protection failures
 
-Treat a login wall, paywall, CAPTCHA, `401`, `403`, `429`, Turnstile page, or explicit blocking response as a stop signal—not an invitation to escalate evasion.
+Treat a login wall, paywall, CAPTCHA, `401`, `403`, `429`, Turnstile page, or explicit blocking response as a stop signal, not an invitation to escalate evasion.
 
 Use this fallback order:
 
@@ -338,7 +338,7 @@ Use browser developer tools to discover APIs:
 2. **Go to the Network tab** to monitor all requests
 3. **Filter by Fetch/XHR** to show only API calls
 4. **Trigger the action** you want to capture (search, scroll, click)
-5. **Analyze the response** — usually JSON with key-value pairs
+5. **Analyze the response**, usually JSON with key-value pairs
 6. **Copy as cURL** (right-click the request)
 7. **Convert to code** using [curlconverter.com](https://curlconverter.com/)
 
@@ -745,11 +745,11 @@ Scraping is technically simple, ethically nuanced, and legally a moving target. 
 
 **Computer Fraud and Abuse Act (CFAA).** *Van Buren v. United States* (2021) and *hiQ Labs v. LinkedIn* (2022) narrowed the CFAA so that scraping public, non-credentialed pages does NOT constitute "unauthorized access." Logging in (or using credentials), bypassing technical access controls, or scraping after an explicit cease-and-desist letter remains legally fraught. State equivalents (e.g., California's CDAFA) sometimes go further than federal law.
 
-**Terms of service.** Many sites' ToS forbid scraping. ToS is a contract, not a criminal statute — breach exposes you to civil claims (breach of contract, tortious interference, trespass to chattels in some jurisdictions), not jail. The risk profile differs sharply from CFAA.
+**Terms of service.** Many sites' ToS forbid scraping. ToS is a contract, not a criminal statute, breach exposes you to civil claims (breach of contract, tortious interference, trespass to chattels in some jurisdictions), not jail. The risk profile differs sharply from CFAA.
 
 **robots.txt** is a polite request, not a legal mandate. Ignoring it doesn't make you criminally liable, but courts have cited it as evidence of intent. For journalism in the public interest, that intent can be defensible; for commercial use, it's harder.
 
-**EU GDPR / UK DPA.** If your scraping pulls personal data of EU/UK residents, GDPR/DPA apply regardless of where you run the scraper. Public availability does NOT exempt personal data from these regimes — `Lloyd v. Google` (UK Supreme Court 2021) and CJEU's `Schrems II` lineage make scraping personal data without a lawful basis a real liability.
+**EU GDPR / UK DPA.** If your scraping pulls personal data of EU/UK residents, GDPR/DPA apply regardless of where you run the scraper. Public availability does NOT exempt personal data from these regimes, `Lloyd v. Google` (UK Supreme Court 2021) and CJEU's `Schrems II` lineage make scraping personal data without a lawful basis a real liability.
 
 **Practical baseline:**
 - Always read `robots.txt`. Honor crawl delays. Honor `Disallow:`.
@@ -758,6 +758,6 @@ Scraping is technically simple, ethically nuanced, and legally a moving target. 
 - Don't scrape personal data (names, emails, photos) without a lawful basis.
 - Identify yourself with a descriptive User-Agent and a contact URL when crawling at volume.
 - Cache aggressively to avoid redundant requests.
-- Stop if you receive a cease-and-desist or explicit blocking signal — escalating past one is the move that turns a civil dispute into a CFAA case.
+- Stop if you receive a cease-and-desist or explicit blocking signal, escalating past one is the move that turns a civil dispute into a CFAA case.
 
 **Notes on specific platforms.** Instagram's `instaloader` and TikTok extraction via `yt-dlp` change frequently as platforms update access controls. Do not use credentialed sessions without explicit user approval and documented authorization. For journalism, prefer the official Meta Content Library and TikTok Research API when eligible.

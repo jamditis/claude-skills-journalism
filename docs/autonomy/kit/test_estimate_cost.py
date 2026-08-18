@@ -274,7 +274,7 @@ def test_inputs_from_config_reads_review_enabled():
 
 def test_inputs_from_config_nudge_off_disables_review():
     # nudges.review gates whether the wake prompt asks for review at all, so it
-    # disables review the same way review.enabled does — even with enabled true.
+    # disables review the same way review.enabled does, even with enabled true.
     assert (
         ec.inputs_from_config({"nudges": {"review": False}})["review_enabled"] is False
     )
@@ -316,7 +316,7 @@ def test_disabled_wake_zeroes_runs_and_monthly():
 
 def test_disabled_wake_skips_cron_restriction_refusal():
     # A disabled loop's cadence is moot, so an otherwise-unsupported cron does not
-    # raise — it just reports zero runs.
+    # raise, it just reports zero runs.
     est = ec.estimate(_inputs(cron="0 9 1 * *", wake_enabled=False))
     assert est.runs_per_month == 0
 
@@ -332,12 +332,12 @@ def test_disabled_review_zeroes_review_cost():
     off = ec.metered_cost_per_run(_inputs(review_enabled=False))
     assert off[0] < on[0]
     assert off[1] < on[1]
-    # With review off, max_passes is irrelevant — it bills no review tokens.
+    # With review off, max_passes is irrelevant, it bills no review tokens.
     assert ec.metered_cost_per_run(_inputs(review_enabled=False, max_passes=99)) == off
 
 
 def test_subscription_total_drops_reviewer_when_review_off():
-    # issue #110: the subscription helper mirrors the metered side — review on
+    # issue #110: the subscription helper mirrors the metered side, review on
     # sums every plan, review off drops the reviewer plan only.
     assert ec.subscription_total(True) == sum(ec.SUBSCRIPTION_PLANS_USD.values())
     assert ec.subscription_total(False) == sum(
@@ -359,7 +359,7 @@ def test_disabled_review_lowers_subscription_headline():
 
 
 def test_format_report_shows_with_reviewer_footnote_when_review_off():
-    # issue #110: with review off the report shows both — the worker-only
+    # issue #110: with review off the report shows both, the worker-only
     # headline and the with-reviewer figure for someone who keeps that plan.
     off = _inputs(review_enabled=False)
     report_off = ec.format_report(off, ec.estimate(off), source="flags")
@@ -442,7 +442,7 @@ def test_config_review_disabled_lowers_cost(tmp_path):
 
 
 def test_disabled_wake_without_cron_reports_zero(tmp_path):
-    # wake.enabled: false with no cron must NOT fail "no cadence given" — the
+    # wake.enabled: false with no cron must NOT fail "no cadence given", the
     # cadence is moot when the loop is off, so it estimates 0 runs.
     path = _write_config(tmp_path, {"schedule": {"wake": {"enabled": False}}})
     inputs, _ = ec.resolve_inputs(ec.build_parser().parse_args([path]))
@@ -452,7 +452,7 @@ def test_disabled_wake_without_cron_reports_zero(tmp_path):
 
 
 def test_enabled_wake_without_cron_still_errors(tmp_path):
-    # An ENABLED loop with no cadence is still an error — the placeholder only
+    # An ENABLED loop with no cadence is still an error, the placeholder only
     # applies when the schedule is off.
     path = _write_config(tmp_path, {"schedule": {"wake": {"enabled": True}}})
     with pytest.raises(SystemExit):
@@ -461,7 +461,7 @@ def test_enabled_wake_without_cron_still_errors(tmp_path):
 
 def test_hard_timeout_caps_average_session(tmp_path):
     # A 10-minute hard cap is tighter than the 30-minute default average, so it
-    # pulls the assumed average down — the timeout dial has to do something.
+    # pulls the assumed average down, the timeout dial has to do something.
     path = _write_config(
         tmp_path,
         {"schedule": {"wake": {"cron": "0 * * * *"}, "timeouts": {"hard_minutes": 10}}},

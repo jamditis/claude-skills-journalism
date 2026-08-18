@@ -1,5 +1,5 @@
 # Recurso à CGU
-*Third-level appeal — Controladoria-Geral da União*
+*Third-level appeal, Controladoria-Geral da União*
 
 **Prazo:** 10 dias contados da ciência da decisão da autoridade máxima
 (art. 16 da Lei 12.527/2011). A CGU deve decidir em 5 dias.
@@ -8,7 +8,7 @@
 
 Este é o degrau onde jornalistas mais ganham. A CGU publica suas decisões, e
 elas formam um corpo de precedentes que pode ser citado.
-*This is where journalists most often win. CGU publishes its decisions —
+*This is where journalists most often win. CGU publishes its decisions,
 cite them.*
 
 ---
@@ -26,12 +26,12 @@ decisão da autoridade máxima do(a) [ÓRGÃO] que manteve a negativa de acesso.
 
 O recurso se enquadra na hipótese de [ESCOLHA UMA]:
 
-- I — negativa de acesso à informação não classificada;
-- II — decisão de negativa de acesso total ou parcial a informação classificada
+- I, negativa de acesso à informação não classificada;
+- II, decisão de negativa de acesso total ou parcial a informação classificada
   sem indicação da autoridade classificadora ou da autoridade hierarquicamente
   superior competente para decidir sobre acesso ou desclassificação;
-- III — procedimentos de classificação de informação não foram observados; ou
-- IV — prazos ou outros procedimentos previstos nesta Lei não foram observados.
+- III, procedimentos de classificação de informação não foram observados; ou
+- IV, prazos ou outros procedimentos previstos nesta Lei não foram observados.
 
 Nos termos do art. 16 da Lei nº 12.527/2011, esta é a hipótese aplicável:
 [EXPLIQUE EM UMA FRASE].
@@ -40,7 +40,7 @@ Nos termos do art. 16 da Lei nº 12.527/2011, esta é a hipótese aplicável:
 
 | Etapa | Data | Fundamento invocado |
 | --- | --- | --- |
-| Pedido | | — |
+| Pedido | | - |
 | Resposta | | |
 | 1ª instância | | |
 | 2ª instância | | |
@@ -72,7 +72,7 @@ formato.
 ## Como achar o precedente / Finding the precedent
 
 Antes de escrever, pesquise decisões anteriores da CGU sobre o mesmo
-fundamento de negativa — na Busca de Pedidos e Respostas e nas bases de
+fundamento de negativa, na Busca de Pedidos e Respostas e nas bases de
 recursos da própria CGU. Um precedente citado corretamente vale mais que três
 parágrafos de argumentação nova.
 
@@ -83,5 +83,5 @@ Se o pedido envolver órgão estadual ou municipal, este recurso não se aplica:
 o último degrau costuma ser a controladoria ou ouvidoria local, e depois a via
 judicial.
 
-*For state or municipal bodies, this step does not exist — the last
+*For state or municipal bodies, this step does not exist, the last
 administrative stop is usually the local controladoria, then the courts.*

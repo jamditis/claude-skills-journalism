@@ -1,6 +1,6 @@
 ---
 name: pdf-design
-description: Design and edit professional PDF reports and proposals with local HTML/PDF generation, iterative previews, print layouts, brand systems, and opt-in uploads. Use when creating, revising, previewing, exporting, or securely uploading a report, proposal, budget summary, or other designed PDF.
+description: Designs PDF reports and proposals from HTML with previews and branding. Use to create, export, or securely upload a PDF.
 ---
 
 # PDF Design System
@@ -54,17 +54,17 @@ chromium-browser --headless --disable-gpu \
 
 ## Document types
 
-- **Funding proposals** — Grant requests with budgets
-- **Program reports** — Initiative updates
-- **Impact reports** — Metrics and outcomes
-- **Budget summaries** — Financial breakdowns
+- **Funding proposals**, Grant requests with budgets
+- **Program reports**, Initiative updates
+- **Impact reports**, Metrics and outcomes
+- **Budget summaries**, Financial breakdowns
 
 ## Key principles
 
-1. **Sentence case** — Never Title Case
-2. **Left-aligned** — Never justified text
-3. **Print-ready** — 8.5" × 11" letter size
-4. **Brand consistent** — CCM red or program palettes
+1. **Sentence case**, Never Title Case
+2. **Left-aligned**, Never justified text
+3. **Print-ready**, 8.5" × 11" letter size
+4. **Brand consistent**, CCM red or program palettes
 
 ---
 
@@ -196,12 +196,12 @@ h1, h2, h3 {
 
 ## Footer clearance
 
-Content must not touch or overlap the page footer. These rules apply to **content pages** — cover pages and special layouts may use different structures.
+Content must not touch or overlap the page footer. These rules apply to **content pages**, cover pages and special layouts may use different structures.
 
 - Content pages must use `display: grid; grid-template-rows: auto 1fr auto` on `.page`
 - Content pages must have exactly 3 direct children: header, content wrapper (`.page-body`), footer
 - The content wrapper must have `overflow: hidden` to prevent text bleeding
-- Never use `position: absolute` for footers — keep them in normal document flow as the third grid row
+- Never use `position: absolute` for footers, keep them in normal document flow as the third grid row
 - Use `.page-footer:empty { display: none; }` so pages without footer content don't render a blank border
 - If content is too long, reduce content rather than shrinking the footer gap
 
@@ -353,7 +353,7 @@ For breaking one topic into three parallel facets with a dashed divider between 
 
 ### Four-tile pillars
 
-Numbered cards with a red top rule — for parallel capabilities, themes, or commitments. Common on proposal executive summary pages.
+Numbered cards with a red top rule, for parallel capabilities, themes, or commitments. Common on proposal executive summary pages.
 
 ```html
 <div class="four-col-tiles">
@@ -434,7 +434,7 @@ Every block above was tightened based on real presentation feedback. Key princip
 - Accent rule sits ~0.14in below the headline, not further
 - Lede paragraph sits ~0.18in below the headline or rule
 - Body content sits ~0.22in below the lede
-- Between body sections, 0.25–0.3in gap is enough — don't add more
+- Between body sections, 0.25–0.3in gap is enough, don't add more
 - Between grid cards, use 0.15–0.2in gaps
 - The instinct to "add breathing room" almost always makes pages feel emptier rather than cleaner
 
@@ -444,9 +444,9 @@ If a page feels too crowded, *reduce content*, don't expand spacing.
 
 ## Known issues
 
-1. **Base64 images** — Don't read HTML with large base64 using Read tool (API error). Use sed/grep/Python.
-2. **Snap confinement** — Chromium can only write to `~/snap/chromium/common/`
-3. **Fonts** — Google Fonts via CDN; for sensitive or offline documents, use bundled local fonts
+1. **Base64 images**, Don't read HTML with large base64 using Read tool (API error). Use sed/grep/Python.
+2. **Snap confinement**, Chromium can only write to `~/snap/chromium/common/`
+3. **Fonts**, Google Fonts via CDN; for sensitive or offline documents, use bundled local fonts
 
 ## Brand assets
 

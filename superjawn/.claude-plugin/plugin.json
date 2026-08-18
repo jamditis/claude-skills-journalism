@@ -1,7 +1,7 @@
 {
   "name": "superjawn",
-  "version": "1.0.1",
-  "description": "Research-augmented fork of obra/superpowers. Default-on research phase at entry-point stages, narrow freshness check on stale-artifact consumers, pure consumer ports for the rest. The package ships all 14 skills with no soft dependencies on the upstream superpowers plugin — code-reviewer agent dispatches now target pr-review-toolkit:code-reviewer.",
+  "version": "1.0.2",
+  "description": "Research-augmented fork of obra/superpowers. Ships all 14 workflow skills (brainstorming, planning, TDD, code review, debugging, worktrees, parallel agents) standalone, with no dependency on the upstream superpowers plugin.",
   "author": {
     "name": "Joe Amditis",
     "email": "jamditis@gmail.com"

@@ -30,7 +30,7 @@
             --font-heading: 'Playfair Display', Georgia, serif;
             --font-body: 'Source Sans 3', Arial, sans-serif;
 
-            /* Slide dimensions — default 16:9 widescreen.
+            /* Slide dimensions, default 16:9 widescreen.
                For 4:3, set --slide-width: 10in AND update the @page rule below to
                `size: 10in 7.5in`. CSS custom properties are not permitted inside
                @page, so the two values must be kept in sync manually. */
@@ -77,7 +77,7 @@
         }
 
         /* ============================================================
-           TITLE SLIDE — gradient background (no photo needed)
+           TITLE SLIDE, gradient background (no photo needed)
            ============================================================ */
         .slide-title {
             display: flex;
@@ -126,7 +126,7 @@
         }
 
         /* ============================================================
-           HERO PHOTO SLIDE — full-bleed background photo with overlay.
+           HERO PHOTO SLIDE, full-bleed background photo with overlay.
            Set the photo via inline style on the child .hero-bg.
            Headline is right-aligned by default to match the Montclair
            template look.
@@ -185,7 +185,7 @@
 
         /* Closing hero variant: headline left-aligned, subtitle tight to it.
            Tightening the subtitle to the headline is a lesson from the
-           Montclair deck — floating it far below read as disconnected. */
+           Montclair deck, floating it far below read as disconnected. */
         .slide-hero.slide-closing .hero-content {
             justify-content: center;
             align-items: flex-start;
@@ -204,7 +204,7 @@
         }
 
         /* ============================================================
-           SECTION DIVIDER — solid red (original; still works)
+           SECTION DIVIDER, solid red (original; still works)
            ============================================================ */
         .slide-section {
             display: flex;
@@ -232,7 +232,7 @@
         }
 
         /* ============================================================
-           SECTION DIVIDER WITH PHOTO — background image + section chip.
+           SECTION DIVIDER WITH PHOTO, background image + section chip.
            Add .with-photo to .slide-section and set the photo inline.
            ============================================================ */
         .slide-section.with-photo {
@@ -290,7 +290,7 @@
         }
 
         /* ============================================================
-           CONTENT SLIDE — white background, headline + red accent rule.
+           CONTENT SLIDE, white background, headline + red accent rule.
            Spacing tightened based on real presentation feedback.
            ============================================================ */
         .slide-header {
@@ -307,7 +307,7 @@
         }
 
         /* Red accent rule under the headline. Sits tight to the title,
-           not across the full body — cleaner than a border-bottom. */
+           not across the full body, cleaner than a border-bottom. */
         .slide-header h2::after {
             content: '';
             display: block;
@@ -323,7 +323,7 @@
             font-size: 18pt;
         }
 
-        /* Intro paragraph — sits directly under the headline, slightly heavier. */
+        /* Intro paragraph, sits directly under the headline, slightly heavier. */
         .slide-body .lede {
             font-size: 19pt;
             font-weight: 600;
@@ -368,7 +368,7 @@
         .slide-body li strong { color: var(--ink); font-weight: 700; }
 
         /* ============================================================
-           FOOTER — two variants. Use .slide-footer for a muted text
+           FOOTER, two variants. Use .slide-footer for a muted text
            footer, or .slide-footer-red for a filled red bar (branded
            decks with wordmarks).
            ============================================================ */
@@ -438,7 +438,7 @@
         }
 
         /* ============================================================
-           THREE-COLUMN CONTENT — for breaking a topic into three
+           THREE-COLUMN CONTENT, for breaking a topic into three
            related facets with dashed dividers between columns.
            ============================================================ */
         .three-col {
@@ -472,7 +472,7 @@
         }
 
         /* ============================================================
-           FOUR-COLUMN TILES ("pillars") — numbered cards with a
+           FOUR-COLUMN TILES ("pillars"), numbered cards with a
            short description. Great for pitch-deck capabilities.
            ============================================================ */
         .four-col-tiles {
@@ -516,7 +516,7 @@
         }
 
         /* ============================================================
-           STATS STRIP — row of big numbers with small labels, each
+           STATS STRIP, row of big numbers with small labels, each
            with a red left rule. Best with 3–4 stats.
            Set --stat-cols on .stats-strip to change column count.
            ============================================================ */
@@ -553,7 +553,7 @@
         }
 
         /* ============================================================
-           COMPARISON / BUDGET TABLE — red header row, grid rules.
+           COMPARISON / BUDGET TABLE, red header row, grid rules.
            ============================================================ */
         .slide-table {
             width: 100%;
@@ -589,7 +589,7 @@
         }
 
         /* ============================================================
-           PARTNER / LABEL GRID — tiles for lists of sponsors,
+           PARTNER / LABEL GRID, tiles for lists of sponsors,
            organizations, or letters of support.
            ============================================================ */
         .partner-grid {
@@ -651,7 +651,7 @@
         }
 
         /* ============================================================
-           BIG STAT SLIDE — single huge number centered
+           BIG STAT SLIDE, single huge number centered
            ============================================================ */
         .slide-stat {
             display: flex;
@@ -678,7 +678,7 @@
         }
 
         /* ============================================================
-           END SLIDE — dark background "thank you"
+           END SLIDE, dark background "thank you"
            ============================================================ */
         .slide-end {
             display: flex;
@@ -712,7 +712,7 @@
 <body>
 
     <!-- ==========================================================
-         SLIDE 1 — TITLE (gradient, no photo required)
+         SLIDE 1, TITLE (gradient, no photo required)
          For a photo-backed title slide, use .slide-hero instead.
          ========================================================== -->
     <div class="slide slide-title">
@@ -723,7 +723,7 @@
     </div>
 
     <!-- ==========================================================
-         SLIDE 2 — HERO PHOTO (branded pitch-deck style)
+         SLIDE 2, HERO PHOTO (branded pitch-deck style)
          ========================================================== -->
     <div class="slide slide-hero">
         <div class="hero-bg" style="background-image: url('photos/campus-aerial.jpg');"></div>
@@ -738,7 +738,7 @@
     </div>
 
     <!-- ==========================================================
-         SLIDE 3 — SECTION DIVIDER (solid red)
+         SLIDE 3, SECTION DIVIDER (solid red)
          ========================================================== -->
     <div class="slide slide-section">
         <div class="section-number">01</div>
@@ -746,7 +746,7 @@
     </div>
 
     <!-- ==========================================================
-         SLIDE 4 — SECTION DIVIDER WITH PHOTO
+         SLIDE 4, SECTION DIVIDER WITH PHOTO
          ========================================================== -->
     <div class="slide slide-section with-photo">
         <div class="photo-bg" style="background-image: url('photos/campus-detail.jpg');"></div>
@@ -761,7 +761,7 @@
     </div>
 
     <!-- ==========================================================
-         SLIDE 5 — CONTENT WITH BULLETS
+         SLIDE 5, CONTENT WITH BULLETS
          The headline gets a red accent rule automatically.
          ========================================================== -->
     <div class="slide slide-content">
@@ -769,12 +769,12 @@
             <h2>[Slide title in sentence case]</h2>
         </div>
         <div class="slide-body">
-            <p class="lede">[Optional intro paragraph sitting under the headline — keep to two lines.]</p>
+            <p class="lede">[Optional intro paragraph sitting under the headline, keep to two lines.]</p>
             <ul>
-                <li>[Key point 1 — keep it brief]</li>
-                <li>[Key point 2 — one line is ideal]</li>
+                <li>[Key point 1, keep it brief]</li>
+                <li>[Key point 2, one line is ideal]</li>
                 <li><strong>[Bolded phrase]</strong> [can anchor important points]</li>
-                <li>[Key point 4 — max 5-6 bullets per slide]</li>
+                <li>[Key point 4, max 5-6 bullets per slide]</li>
             </ul>
         </div>
         <div class="slide-footer">
@@ -784,7 +784,7 @@
     </div>
 
     <!-- ==========================================================
-         SLIDE 6 — TWO-COLUMN
+         SLIDE 6, TWO-COLUMN
          ========================================================== -->
     <div class="slide slide-content slide-two-col">
         <div class="slide-header">
@@ -818,7 +818,7 @@
     </div>
 
     <!-- ==========================================================
-         SLIDE 7 — THREE-COLUMN CONTENT
+         SLIDE 7, THREE-COLUMN CONTENT
          ========================================================== -->
     <div class="slide slide-content">
         <div class="slide-header">
@@ -848,7 +848,7 @@
     </div>
 
     <!-- ==========================================================
-         SLIDE 8 — FOUR-TILE PILLARS
+         SLIDE 8, FOUR-TILE PILLARS
          Use for four parallel capabilities, themes, or promises.
          ========================================================== -->
     <div class="slide slide-content">
@@ -861,7 +861,7 @@
                 <div class="tile">
                     <div class="tile-num">Pillar 01</div>
                     <h3>[Pillar 1 name]</h3>
-                    <p>[Short description — two or three lines.]</p>
+                    <p>[Short description, two or three lines.]</p>
                 </div>
                 <div class="tile">
                     <div class="tile-num">Pillar 02</div>
@@ -887,7 +887,7 @@
     </div>
 
     <!-- ==========================================================
-         SLIDE 9 — STATS STRIP
+         SLIDE 9, STATS STRIP
          ========================================================== -->
     <div class="slide slide-content">
         <div class="slide-header">
@@ -913,7 +913,7 @@
     </div>
 
     <!-- ==========================================================
-         SLIDE 10 — COMPARISON TABLE (e.g. budget scenarios)
+         SLIDE 10, COMPARISON TABLE (e.g. budget scenarios)
          ========================================================== -->
     <div class="slide slide-content">
         <div class="slide-header">
@@ -959,7 +959,7 @@
     </div>
 
     <!-- ==========================================================
-         SLIDE 11 — PARTNER / LABEL GRID
+         SLIDE 11, PARTNER / LABEL GRID
          ========================================================== -->
     <div class="slide slide-content">
         <div class="slide-header">
@@ -985,17 +985,17 @@
     </div>
 
     <!-- ==========================================================
-         SLIDE 12 — QUOTE
+         SLIDE 12, QUOTE
          ========================================================== -->
     <div class="slide slide-quote">
         <blockquote>
             "[Impactful quote that supports your message.]"
         </blockquote>
-        <cite>— [Name], [Title/Organization]</cite>
+        <cite>- [Name], [Title/Organization]</cite>
     </div>
 
     <!-- ==========================================================
-         SLIDE 13 — BIG STAT
+         SLIDE 13, BIG STAT
          ========================================================== -->
     <div class="slide slide-stat">
         <div class="big-number">[Number]</div>
@@ -1003,7 +1003,7 @@
     </div>
 
     <!-- ==========================================================
-         SLIDE 14 — CLOSING HERO ("Ready on [date]")
+         SLIDE 14, CLOSING HERO ("Ready on [date]")
          ========================================================== -->
     <div class="slide slide-hero slide-closing">
         <div class="hero-bg" style="background-image: url('photos/closing-photo.jpg');"></div>
@@ -1018,7 +1018,7 @@
     </div>
 
     <!-- ==========================================================
-         SLIDE 15 — END / THANK YOU
+         SLIDE 15, END / THANK YOU
          ========================================================== -->
     <div class="slide slide-end">
         <h2>Thank you</h2>

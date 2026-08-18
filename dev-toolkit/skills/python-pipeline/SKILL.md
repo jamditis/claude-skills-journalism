@@ -1,6 +1,6 @@
 ---
 name: python-pipeline
-description: Python data processing pipelines with modular architecture. Use when building content processing workflows, implementing dispatcher patterns, integrating Google Sheets/Drive APIs, or creating batch processing systems. Covers patterns from rosen-scraper, image-analyzer, and social-scraper projects.
+description: Python data pipelines with modular architecture. Use for content workflows, batch jobs, or Google Sheets/Drive integration.
 ---
 
 # Python data pipeline development
@@ -68,7 +68,7 @@ import pandas as pd
 pdf = df.to_pandas()
 ```
 
-If your pipeline already uses pandas everywhere, don't pre-emptively rewrite. Migrate the bottleneck stages first — typically the CSV-load + filter step.
+If your pipeline already uses pandas everywhere, don't pre-emptively rewrite. Migrate the bottleneck stages first, typically the CSV-load + filter step.
 
 ## Architecture patterns
 
@@ -247,7 +247,7 @@ def fetch_with_rate_limit(url: str):
 
 ## Concurrent fetching with asyncio.TaskGroup (3.11+)
 
-For I/O-bound stages (HTTP fetches, API calls), `asyncio.TaskGroup` plus `httpx.AsyncClient` runs many requests in parallel without the boilerplate of `asyncio.gather`. TaskGroup's structured-concurrency model means an exception in one task cancels the rest and surfaces as an `ExceptionGroup` — easier to reason about than `gather(return_exceptions=True)`.
+For I/O-bound stages (HTTP fetches, API calls), `asyncio.TaskGroup` plus `httpx.AsyncClient` runs many requests in parallel without the boilerplate of `asyncio.gather`. TaskGroup's structured-concurrency model means an exception in one task cancels the rest and surfaces as an `ExceptionGroup`, easier to reason about than `gather(return_exceptions=True)`.
 
 ```python
 import asyncio
@@ -425,7 +425,7 @@ class BatchAIProcessor:
         return results
 ```
 
-`response.usage_metadata` carries the actual token counts, which is more accurate than length heuristics. Without `response_mime_type='application/json'`, Gemini returns prose (often wrapped in markdown fences) and `json.loads` fails — every JSON-returning call needs both the config flag and a JSON-shaped prompt. For multimodal calls, pass content as a list (text + parts), not a single string.
+`response.usage_metadata` carries the actual token counts, which is more accurate than length heuristics. Without `response_mime_type='application/json'`, Gemini returns prose (often wrapped in markdown fences) and `json.loads` fails, every JSON-returning call needs both the config flag and a JSON-shaped prompt. For multimodal calls, pass content as a list (text + parts), not a single string.
 
 ## Image classification with Gemini Vision
 

@@ -1,6 +1,6 @@
 ---
 name: interview-transcription
-description: Transcription workflows, recording management, and quote extraction for journalists. Use when processing audio/video recordings, generating transcripts with timestamps, extracting quotes for fact-checking, or building source-and-recording databases. For interview question design and pre-interview preparation, see the interview-prep skill.
+description: Transcription, recording management, and quote extraction. Use when processing audio/video or generating timestamped transcripts.
 ---
 
 # Interview transcription and management
@@ -43,7 +43,7 @@ RECORDING_SETTINGS = {
 
 ### Automated transcription pipeline
 
-Vanilla OpenAI Whisper transcribes audio to text but does **not** assign speaker labels. To get diarized output ("Speaker 1:" / "Speaker 2:" / etc.) you need a tool that combines Whisper with a diarization model — typically **WhisperX** (`m-bain/whisperX`), which wraps faster-whisper transcription with pyannote.audio diarization and produces word-level timestamps with speaker IDs in one pass.
+Vanilla OpenAI Whisper transcribes audio to text but does **not** assign speaker labels. To get diarized output ("Speaker 1:" / "Speaker 2:" / etc.) you need a tool that combines Whisper with a diarization model, typically **WhisperX** (`m-bain/whisperX`), which wraps faster-whisper transcription with pyannote.audio diarization and produces word-level timestamps with speaker IDs in one pass.
 
 ```python
 from pathlib import Path
@@ -107,7 +107,7 @@ def format_timestamp(seconds: float) -> str:
     return f"{h:02d}:{m:02d}:{s:02d}"
 ```
 
-**Falling back to plain Whisper.** If diarization is overkill or you can't get a Hugging Face token, drop the `--diarize` flag — the model still produces accurate timestamped transcription and you label speakers manually based on context. `faster-whisper` (CTranslate2 backend) is the speed-optimized variant and works the same way at the CLI. `whisper.cpp` is the C++ port for resource-constrained machines (Raspberry Pi, older laptops); it doesn't include diarization but runs the small/medium models on CPU comfortably.
+**Falling back to plain Whisper.** If diarization is overkill or you can't get a Hugging Face token, drop the `--diarize` flag, the model still produces accurate timestamped transcription and you label speakers manually based on context. `faster-whisper` (CTranslate2 backend) is the speed-optimized variant and works the same way at the CLI. `whisper.cpp` is the C++ port for resource-constrained machines (Raspberry Pi, older laptops); it doesn't include diarization but runs the small/medium models on CPU comfortably.
 
 ### Manual transcription template
 
@@ -194,7 +194,7 @@ class QuoteBank:
         output = []
         for q in self.quotes:
             if q.verified:
-                output.append(f'"{q.text}"\n— {q.speaker}\n[Timestamp: {q.timestamp}]')
+                output.append(f'"{q.text}"\n- {q.speaker}\n[Timestamp: {q.timestamp}]')
         return '\n\n'.join(output)
 ```
 
@@ -378,7 +378,7 @@ def extract_audio_from_video(video_path: str, output_path: str = None) -> str:
 
 ### Recording-consent jurisdiction
 
-For the per-state breakdown of one-party vs. all-party consent, hidden-recording rules, and federal preemption, use the **interview-prep** skill (which points to the Reporters Committee for Freedom of the Press *Reporter's Recording Guide* — the authoritative continuously-updated source).
+For the per-state breakdown of one-party vs. all-party consent, hidden-recording rules, and federal preemption, use the **interview-prep** skill (which points to the Reporters Committee for Freedom of the Press *Reporter's Recording Guide*, the authoritative continuously-updated source).
 
 **Always get explicit consent on recording** regardless of jurisdiction. Note the consent verbatim at the head of every transcript file (timestamp, speaker, response). This protects you legally everywhere and gives the fact-checker a clean starting point.
 
@@ -392,7 +392,7 @@ For the per-state breakdown of one-party vs. all-party consent, hidden-recording
 | whisper.cpp | CPU-friendly Whisper port | C++ implementation. Runs the small/medium models on a Raspberry Pi |
 | pyannote.audio | Standalone speaker diarization | Use directly when you already have transcripts from another source |
 | MacWhisper / Buzz | GUI wrappers for Whisper | macOS / cross-platform GUIs for journalists who don't want a CLI |
-| Otter.ai | Cloud transcription, real-time | Verify privacy posture before using with sensitive sources — Otter Pilot has historically joined meetings unannounced and indexed transcripts; check current settings |
+| Otter.ai | Cloud transcription, real-time | Verify privacy posture before using with sensitive sources, Otter Pilot has historically joined meetings unannounced and indexed transcripts; check current settings |
 | Descript | Edit audio like text | Good for pulling clips. Cloud-hosted |
 | Rev (human + AI) | Human transcription for sensitive material | Slower, more accurate. Cloud-hosted |
 | Trint | Journalist-focused, collaboration | Cloud-hosted. Has team features |
@@ -400,12 +400,12 @@ For the per-state breakdown of one-party vs. all-party consent, hidden-recording
 
 ## Related skills
 
-- **interview-prep** — Pre-interview research, question design, consent scripts, and recording-law jurisdiction
-- **source-verification** — Verify source credentials before interview
-- **fact-check-workflow** — Verify quotes against the recording before publication
-- **foia-requests** — Get documents to inform interview questions
-- **data-journalism** — Analyze data sources mentioned in interviews
-- **newsroom-style** — Convert verbatim quotes into AP-style copy for publication
+- **interview-prep**, Pre-interview research, question design, consent scripts, and recording-law jurisdiction
+- **source-verification**, Verify source credentials before interview
+- **fact-check-workflow**, Verify quotes against the recording before publication
+- **foia-requests**, Get documents to inform interview questions
+- **data-journalism**, Analyze data sources mentioned in interviews
+- **newsroom-style**, Convert verbatim quotes into AP-style copy for publication
 
 ---
 

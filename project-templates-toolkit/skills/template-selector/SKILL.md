@@ -1,11 +1,11 @@
 ---
 name: template-selector
-description: Choose the correct CLAUDE.md or LESSONS.md template for journalism projects. Use when starting a new project, setting up documentation, or unsure which template category fits best. Provides decision trees and selection guidance for 6 journalism-focused template types.
+description: Selects the correct CLAUDE.md or LESSONS.md template via decision trees. Use when starting a project or unsure which fits.
 ---
 
 # Template selector
 
-Match projects to the correct template category. Don't guess—use the decision tree.
+Match projects to the correct template category. Don't guess, use the decision tree.
 
 ## Quick reference
 
@@ -137,7 +137,7 @@ If you're still unsure, ask:
 1. Identify project category
 2. Copy appropriate template from `project-retrospective/templates/`
 3. Fill in as the project progresses or at completion
-4. Be specific about failures—that's the valuable part
+4. Be specific about failures, that's the valuable part
 
 ## Template locations
 

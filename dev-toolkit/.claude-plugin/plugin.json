@@ -1,7 +1,7 @@
 {
   "name": "dev-toolkit",
-  "version": "1.2.1",
-  "description": "Twelve development-focused skills for journalists, researchers, and small newsroom dev teams. Covers accessibility (WCAG 2.2), Electron app patterns, mobile/remote debugging, irreversible-decision discipline, Python data pipelines, test-first bug fixing, AI-assisted development workflows, ethical web scraping, no-build frontend patterns, signs-of-taste guidance for web UI, CLAUDE.md context maintenance, and context-engineering fundamentals for managing attention across long sessions.",
+  "version": "1.2.2",
+  "description": "Twelve development skills for newsroom and research dev teams: accessibility (WCAG 2.2), Electron, mobile and remote debugging, Python data pipelines, test-first bug fixing, ethical web scraping, no-build frontend patterns, web UI craft, and CLAUDE.md context maintenance.",
   "author": {
     "name": "Joe Amditis",
     "email": "jamditis@gmail.com"

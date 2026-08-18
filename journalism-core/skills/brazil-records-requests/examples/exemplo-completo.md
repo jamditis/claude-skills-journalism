@@ -29,25 +29,25 @@ Filing separately meant one denial could not sink the others, and all three
 
 ## What came back
 
-**Request 1 — partial.** A CSV arrived, but without the data dictionary and
+**Request 1, partial.** A CSV arrived, but without the data dictionary and
 with the CPF/CNPJ column removed entirely.
 
-**Request 2 — denied.** Ground: art. 13, III of Decree 7.724/2012, additional
+**Request 2, denied.** Ground: art. 13, III of Decree 7.724/2012, additional
 work of analysis and consolidation.
 
-**Request 3 — granted**, in a format nobody wanted: a 400-page PDF.
+**Request 3, granted**, in a format nobody wanted: a 400-page PDF.
 
 ## What was done about each
 
 **Request 1 → first-instance appeal.** Two arguments. First, CNPJ is not
-personal data — it identifies a legal entity, and IBAMA itself publishes
+personal data, it identifies a legal entity, and IBAMA itself publishes
 sanctioned companies' CNPJs elsewhere. Second, on the individual CPFs, art. 7
 §2º requires partial access, so masking the CPF column and delivering the rest
 was the correct outcome, not deleting it. The data dictionary was requested
 again in the same appeal.
 
 *Result: CNPJ restored, CPF masked, dictionary delivered. This is the ordinary
-outcome — the personal-data objection is the most over-applied ground in
+outcome, the personal-data objection is the most over-applied ground in
 Brazilian practice, and it rarely survives an appeal that cites art. 7 §2º.*
 
 **Request 2 → appeal, not refiling.** The "additional work" ground is the one
@@ -61,7 +61,7 @@ state whether it had that knowledge and to identify the source if it did.
 
 **Request 3 → appeal on the format, within the 10-day window.** The agency
 had a CSV export in its own open-data release (see request 1), so the PDF was
-not full compliance — LAI art. 11 §5 entitles the requester to digitally
+not full compliance, LAI art. 11 §5 entitles the requester to digitally
 stored information in that digital format. The appeal cited art. 11 §5
 alongside art. 8 §3º, II and III, and asked for the same content in CSV. A
 fresh request would have worked too, but it forfeits the shorter 10-day

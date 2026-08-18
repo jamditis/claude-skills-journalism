@@ -1,6 +1,6 @@
 ---
 name: test-first-bugs
-description: This skill should be used when the user reports a bug, describes unexpected behavior, says something is "broken", "not working", "failing", mentions an "error", "issue", or "problem" in code, or asks to "fix" something. Enforces test-driven bug fixing workflow.
+description: Enforces a test-driven bug-fixing workflow. Use when a user reports a bug, failing code, an error, or asks to fix something.
 ---
 
 # Test-first bug fixing
@@ -13,20 +13,20 @@ When a bug is reported, follow these steps in order:
 
 ### Phase 1: Reproduce and document
 
-1. **Understand the bug** — Gather details about expected vs actual behavior
-2. **Identify the test location** — Determine where tests live in the project (check for `tests/`, `__tests__/`, `spec/`, `*.test.*`, `*.spec.*` patterns)
-3. **Write a failing test** — Create a test that demonstrates the bug
+1. **Understand the bug**, Gather details about expected vs actual behavior
+2. **Identify the test location**, Determine where tests live in the project (check for `tests/`, `__tests__/`, `spec/`, `*.test.*`, `*.spec.*` patterns)
+3. **Write a failing test**, Create a test that demonstrates the bug
 
 ### Phase 2: Fix with subagents
 
-4. **Launch fix subagents** — Use the Task tool with `subagent_type=general-purpose` to attempt fixes
-5. **Run the test** — Verify the fix by running the specific test
-6. **Iterate if needed** — If test still fails, launch additional subagents with new approaches
+4. **Launch fix subagents**, Use the Task tool with `subagent_type=general-purpose` to attempt fixes
+5. **Run the test**, Verify the fix by running the specific test
+6. **Iterate if needed**, If test still fails, launch additional subagents with new approaches
 
 ### Phase 3: Verify and complete
 
-7. **Run full test suite** — Ensure no regressions were introduced
-8. **Report success** — Confirm the bug is fixed with passing test as proof
+7. **Run full test suite**, Ensure no regressions were introduced
+8. **Report success**, Confirm the bug is fixed with passing test as proof
 
 ## Writing the failing test
 
@@ -107,9 +107,9 @@ Task tool parameters:
 
 Launch multiple subagents with different approaches:
 
-1. **Direct fix agent** — Focus on the immediate code causing the bug
-2. **Root cause agent** — Investigate deeper architectural issues
-3. **Edge case agent** — Look for similar bugs in related code
+1. **Direct fix agent**, Focus on the immediate code causing the bug
+2. **Root cause agent**, Investigate deeper architectural issues
+3. **Edge case agent**, Look for similar bugs in related code
 
 ## When projects lack tests
 
@@ -155,7 +155,7 @@ go test ./...
 
 **User reports:** "The login function crashes when email has spaces"
 
-**Phase 1 — Write failing test:**
+**Phase 1, Write failing test:**
 ```python
 # tests/test_auth.py
 def test_login_handles_email_with_spaces():
@@ -175,7 +175,7 @@ pytest tests/test_auth.py::test_login_handles_email_with_spaces -v
 # Expected: FAILED (demonstrates the bug)
 ```
 
-**Phase 2 — Launch subagent:**
+**Phase 2, Launch subagent:**
 ```
 Task tool:
 - subagent_type: "general-purpose"
@@ -191,7 +191,7 @@ Task tool:
   The test must pass to confirm the fix."
 ```
 
-**Phase 3 — Verify:**
+**Phase 3, Verify:**
 ```bash
 # Specific test passes
 pytest tests/test_auth.py::test_login_handles_email_with_spaces -v
@@ -213,14 +213,14 @@ The `bug-report-detector` hook in this plugin automatically:
 
 ### Reference files
 
-- **`references/test-frameworks.md`** — Framework-specific test patterns
-- **`references/common-bugs.md`** — Common bug patterns and test strategies
+- **`references/test-frameworks.md`**, Framework-specific test patterns
+- **`references/common-bugs.md`**, Common bug patterns and test strategies
 
 ### Example files
 
-- **`examples/python-bug-test.py`** — Python pytest example
-- **`examples/js-bug-test.js`** — JavaScript Jest example
+- **`examples/python-bug-test.py`**, Python pytest example
+- **`examples/js-bug-test.js`**, JavaScript Jest example
 
 ### Scripts
 
-- **`scripts/find-tests.sh`** — Locate test infrastructure in a project
+- **`scripts/find-tests.sh`**, Locate test infrastructure in a project

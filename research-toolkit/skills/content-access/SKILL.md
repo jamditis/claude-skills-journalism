@@ -1,6 +1,6 @@
 ---
 name: content-access
-description: Legal methods for accessing paywalled and geo-blocked content. Use when researching behind paywalls, accessing academic papers, bypassing geographic restrictions, or finding open access alternatives. Covers Unpaywall, library databases, VPNs, and ethical access strategies for journalists and researchers.
+description: Legal methods for paywalled and geo-blocked content. Use for paywalls, academic papers, or open access via Unpaywall.
 ---
 
 # Content access methodology
@@ -221,14 +221,14 @@ def get_paper_by_doi(doi: str) -> dict:
 ### OpenAlex API (250M+ scholarly works)
 
 OpenAlex replaced Microsoft Academic Graph after MAG was retired and
-has become the de-facto open scholarly data backbone — many tools
+has become the de-facto open scholarly data backbone, many tools
 (Unpaywall companion data, Local Citation Network, OpenCitations)
 now resolve via OpenAlex.
 
 **Auth note (2026):** OpenAlex moved to API-key-required access on
 February 13, 2026, with a credit-based rate model. Anonymous access
 to the website is still free; API access via key has metered limits
-that step up with paid tiers — verify the current model at
+that step up with paid tiers, verify the current model at
 https://docs.openalex.org/. Get a free key from your OpenAlex account.
 
 ```python
@@ -246,7 +246,7 @@ def search_openalex(query: str, api_key: str, limit: int = 25,
         query: free-text search string.
         api_key: OpenAlex API key (required as of 2026-02-13).
         limit: max results per page (1-200).
-        email: contact email for the polite pool — recommended even
+        email: contact email for the polite pool, recommended even
                with a key, since OpenAlex prioritizes requests with
                an identifiable sender.
     """
@@ -283,9 +283,9 @@ def search_openalex(query: str, api_key: str, limit: int = 25,
 
 ### Other open-access sources worth checking
 
-- **DOAJ** (`doaj.org/api/v3`) — Directory of Open Access Journals; useful when you need to verify a publisher is fully OA before trusting a "journal lookup" claim.
-- **EuropePMC** (`europepmc.org/RestfulWebService`) — Mirror of PubMed Central plus preprints, OA full-text search, and ORCID-aware author lookup.
-- **PubMed Central** (`eutils.ncbi.nlm.nih.gov`) — NIH OA biomedical archive; required for NIH-funded papers under the 2026 OSTP Nelson Memo.
+- **DOAJ** (`doaj.org/api/v3`), Directory of Open Access Journals; useful when you need to verify a publisher is fully OA before trusting a "journal lookup" claim.
+- **EuropePMC** (`europepmc.org/RestfulWebService`), Mirror of PubMed Central plus preprints, OA full-text search, and ORCID-aware author lookup.
+- **PubMed Central** (`eutils.ncbi.nlm.nih.gov`), NIH OA biomedical archive; required for NIH-funded papers under the 2026 OSTP Nelson Memo.
 
 ### Deliberately excluded (legally risky, likely ToS / copyright violation)
 
@@ -304,12 +304,12 @@ rates without legal exposure.
 
 This bookmarklet only works for **soft / metered paywalls** where the
 publisher loads the article HTML and visually overlays a subscription
-prompt — the content is already in the DOM, just hidden. It does
+prompt, the content is already in the DOM, just hidden. It does
 **not** defeat hard paywalls (NYT, WSJ, FT, The Atlantic, Bloomberg,
 Stratechery, etc.) where article HTML is server-side gated; on those
 sites the bookmarklet simply removes overlays and reveals nothing
 useful. Systematic use to read otherwise-paywalled content may
-violate the publisher's ToS — use it only as a reader-mode shim for
+violate the publisher's ToS, use it only as a reader-mode shim for
 content you legitimately have access to.
 
 ```javascript
@@ -446,16 +446,16 @@ def request_via_ill(paper_info: dict, library_email: str) -> str:
 
 ### VPN service evaluation
 
-VPN ratings age badly — privacy claims, ownership structures, and
+VPN ratings age badly, privacy claims, ownership structures, and
 audit findings change yearly. Rather than maintain a stale ranked
 table here (the major commercial VPNs have undergone notable
 ownership consolidation: ExpressVPN by Kape Technologies, Surfshark
 merging with Nord), consult an independent reviewer at point-of-use:
 
-- **PrivacyGuides** (`privacyguides.org/en/vpn/`) — community-maintained,
+- **PrivacyGuides** (`privacyguides.org/en/vpn/`), community-maintained,
   privacy-prioritized recommendations with explicit criteria.
 - **Privacy Tools** historical comparisons.
-- **Tor Browser** (`torproject.org`) — maximum-anonymity option,
+- **Tor Browser** (`torproject.org`), maximum-anonymity option,
   free, no provider trust required; slow but the right tool for
   source protection or genuinely sensitive research.
 
@@ -672,11 +672,11 @@ Best regards,
 5. **Google search** - Sometimes cached versions appear
 
 ## Tips:
-- Some publishers offer institutional access via .edu email — check the publisher's institutional-access page rather than assuming the program still exists; most major outlets have wound these programs down.
+- Some publishers offer institutional access via .edu email, check the publisher's institutional-access page rather than assuming the program still exists; most major outlets have wound these programs down.
 - Press releases often contain the same factual content as the paywalled article and can be quoted directly.
 - Local library cards often include digital news access via PressReader, OverDrive, or the library's own login portal.
 - Some publications have free tiers (5-10 articles/month) reset by clearing cookies; mind the publisher's ToS before relying on this.
-- Archive.today snapshots of news articles work for ad-hoc research access but should not be the citation in your final piece — link the original article and keep the archive as a backup, with the FBI/Wikipedia caveat noted in the archive section above.
+- Archive.today snapshots of news articles work for ad-hoc research access but should not be the citation in your final piece, link the original article and keep the archive as a backup, with the FBI/Wikipedia caveat noted in the archive section above.
 ```
 
 ### Academic papers

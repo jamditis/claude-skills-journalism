@@ -1,6 +1,6 @@
 ---
 name: supply-chain-hardening
-description: Configure install-time cooldowns for npm/bun (minimum release age) and run a sandboxed pre-install scan when the cooldown has to be bypassed. Use when the user asks about supply-chain attacks, npm/bun security, "minimum release age", a "cooldown" for installs, hardening against Shai-Hulud-class worms, or how to safely install a package that was just published. Also use after any recent supply-chain incident in the npm ecosystem.
+description: Install-time cooldowns for npm/bun plus a sandboxed pre-install scan for bypasses. Use for supply-chain attacks or npm security.
 ---
 
 # Supply-chain hardening
@@ -9,9 +9,9 @@ Defends a journalism toolchain against the dominant npm/bun supply-chain attack 
 
 The defense is **layered** and intentionally simple:
 
-1. **Install-time cooldown** — only install package versions older than N days (default 7). This is the primary defense. By the time the cooldown expires, the security community has almost always flagged a compromised version and the registry has yanked it.
-2. **Sandboxed pre-install scan** — when the cooldown has to be bypassed (CVE patch, fresh dep, urgent install), run the candidate tarball through a static-analysis scan that looks for the diagnostic signatures of supply-chain malware. The scan runs inside `bwrap`/`firejail`/`unshare` so a malicious package can't escape the inspection.
-3. **`--ignore-scripts` at install** — postinstall is the #1 attack vector. Skip lifecycle scripts on every cooldown-bypass install.
+1. **Install-time cooldown**, only install package versions older than N days (default 7). This is the primary defense. By the time the cooldown expires, the security community has almost always flagged a compromised version and the registry has yanked it.
+2. **Sandboxed pre-install scan**, when the cooldown has to be bypassed (CVE patch, fresh dep, urgent install), run the candidate tarball through a static-analysis scan that looks for the diagnostic signatures of supply-chain malware. The scan runs inside `bwrap`/`firejail`/`unshare` so a malicious package can't escape the inspection.
+3. **`--ignore-scripts` at install**, postinstall is the #1 attack vector. Skip lifecycle scripts on every cooldown-bypass install.
 
 These three together would have blocked the Mini Shai-Hulud TanStack attack on a stock laptop with no human in the loop.
 
@@ -21,7 +21,7 @@ Verified config keys (npm v11+ and bun 1.3+):
 
 | Manager | File | Key | Units | Exclusion key |
 |---|---|---|---|---|
-| npm | `~/.npmrc` (or project `.npmrc`) | `min-release-age` | days | none yet — proposed in [npm/cli#8994](https://github.com/npm/cli/issues/8994) |
+| npm | `~/.npmrc` (or project `.npmrc`) | `min-release-age` | days | none yet, proposed in [npm/cli#8994](https://github.com/npm/cli/issues/8994) |
 | bun | `~/.bunfig.toml` (or project `bunfig.toml`) | `[install] minimumReleaseAge` | seconds | `[install] minimumReleaseAgeExcludes = []` (exact names, no globs) |
 
 Minimal config:
@@ -49,7 +49,7 @@ npm install <pkg>@<version> --min-release-age=0 --ignore-scripts
 bun add     <pkg>@<version> --minimum-release-age=0 --ignore-scripts
 ```
 
-The `bun add --minimum-release-age=0` CLI flag works in 1.3+ even though the docs don't list it — it follows bun's `bunfig key → kebab-case flag` convention.
+The `bun add --minimum-release-age=0` CLI flag works in 1.3+ even though the docs don't list it, it follows bun's `bunfig key → kebab-case flag` convention.
 
 **Always pair the bypass with `--ignore-scripts`.** Postinstall is the most common payload-execution path in supply-chain malware (Mini Shai-Hulud, event-stream, ua-parser-js, coa, all used it). Native modules that legitimately need postinstall can have the script run manually after a human-readable review:
 
@@ -60,7 +60,7 @@ The `bun add --minimum-release-age=0` CLI flag works in 1.3+ even though the doc
 
 ## When to scan before bypassing
 
-The scan is for the dangerous moment: you've decided to bypass the cooldown and need a sanity check. The skill ships a reference script (`scripts/hotpatch.example.sh`) implementing the heuristics. Adapt it to your machine — Bash assumes `bwrap` (Linux); macOS users substitute `sandbox-exec` or skip the sandbox layer with the trade-off documented.
+The scan is for the dangerous moment: you've decided to bypass the cooldown and need a sanity check. The skill ships a reference script (`scripts/hotpatch.example.sh`) implementing the heuristics. Adapt it to your machine, Bash assumes `bwrap` (Linux); macOS users substitute `sandbox-exec` or skip the sandbox layer with the trade-off documented.
 
 Static checks the scan should perform (each backed by a real attack):
 
@@ -81,7 +81,7 @@ Static checks the scan should perform (each backed by a real attack):
 
 Be honest about the limits with whoever you're configuring this for:
 
-- **Old packages with new malicious versions still in the cooldown window are blocked**, but if the bad version *also* passes the cooldown (rare but possible — a compromise that goes >7 days undetected), the cooldown alone won't help. The scan catches most of those.
+- **Old packages with new malicious versions still in the cooldown window are blocked**, but if the bad version *also* passes the cooldown (rare but possible, a compromise that goes >7 days undetected), the cooldown alone won't help. The scan catches most of those.
 - **Transitive deps**. A clean `<pkg>` you install can pull in a compromised transitive. Defenses: scan against the *resolved* tree (`npm audit`, `osv-scanner`), and keep the cooldown active globally so transitive resolution also waits.
 - **`npm ci`** against an existing lockfile. The cooldown applies during *resolution*, not installation of already-pinned versions. If your lockfile pins a compromised version, `npm ci` will install it. Mitigation: scan lockfiles in CI with `osv-scanner --lockfile=package-lock.json`.
 - **Pre-existing compromised packages in `node_modules`**. Hardening protects future installs, not past ones. Audit existing deps separately (`npm audit`, `osv-scanner`, manual review of recently-published deps in your tree).
@@ -100,7 +100,7 @@ Be honest about the limits with whoever you're configuring this for:
 |---|---|
 | Maintainer account compromise (npm token theft) | Targeted attack tailored to wait through the cooldown |
 | CI/CD pipeline hijack (Mini Shai-Hulud, valid OIDC tokens, SLSA-attested malice) | Compromise of a transitive dep already pinned in a lockfile |
-| Typosquatting (lookalike package names) — when paired with `npm pkg fix` and lockfile review | Malicious code in your own dev dependencies that you authored |
+| Typosquatting (lookalike package names), when paired with `npm pkg fix` and lockfile review | Malicious code in your own dev dependencies that you authored |
 | Postinstall payload execution (cooldown + `--ignore-scripts` = belt and suspenders) | Runtime supply-chain attacks (e.g., dynamic loading of bad code from a CDN) |
 | Drive-by `npm install` of a brand-new transitive | Compromise of the registry itself (very rare; out of scope) |
 

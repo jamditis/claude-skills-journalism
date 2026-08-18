@@ -54,7 +54,7 @@ superjawn/
 - `LICENSE` + `CREDITS.md` carry the MIT obligations
 - `README.md` is human documentation
 - Each `SKILL.md` is the agent-facing skill text Claude reads at invocation
-- The non-SKILL files inside each skill directory are reference material the SKILL.md links to (visual companion, reviewer prompts, browser-companion server scripts) — copied verbatim because they don't need research-phase additions
+- The non-SKILL files inside each skill directory are reference material the SKILL.md links to (visual companion, reviewer prompts, browser-companion server scripts), copied verbatim because they don't need research-phase additions
 
 ---
 
@@ -78,7 +78,7 @@ Write `superjawn/.claude-plugin/plugin.json`:
 {
   "name": "superjawn",
   "version": "0.1.0",
-  "description": "Research-augmented skills derived from obra/superpowers — adds default-on research phases to each skill in the workflow",
+  "description": "Research-augmented skills derived from obra/superpowers, adds default-on research phases to each skill in the workflow",
   "author": {
     "name": "Joe Amditis",
     "email": "jamditis@gmail.com"
@@ -153,7 +153,7 @@ Synced against upstream `obra/superpowers` v5.0.7 (commit: <fill in upstream com
 
 ## Upstream changes ported since baseline
 
-(none yet — list each port as it lands, with link to upstream commit)
+(none yet, list each port as it lands, with link to upstream commit)
 
 ## Modifications from upstream
 
@@ -181,7 +181,7 @@ Write `superjawn/README.md`:
 ```markdown
 # superjawn
 
-Research-augmented Claude Code skills derived from [obra/superpowers](https://github.com/obra/superpowers) v5.0.7. Each skill grows a default-on research phase tailored to its stage of the workflow — gather trends, pitfalls, patterns, and discourse before building or proposing.
+Research-augmented Claude Code skills derived from [obra/superpowers](https://github.com/obra/superpowers) v5.0.7. Each skill grows a default-on research phase tailored to its stage of the workflow, gather trends, pitfalls, patterns, and discourse before building or proposing.
 
 ## Skills
 
@@ -208,7 +208,7 @@ During the rollout (v0.1.0 through v0.5.0), keep both `superpowers` and `superja
 
 ## Research phase
 
-Every ported skill includes a `## Research phase` section. By default, the research runs via subagent dispatch (`Explore` for codebase questions, `general-purpose` for web/discourse). Findings are written into the skill's existing artifact (spec, plan, debug log). Skipping research requires an explicit, justified line in the artifact — see each skill's Skip protocol.
+Every ported skill includes a `## Research phase` section. By default, the research runs via subagent dispatch (`Explore` for codebase questions, `general-purpose` for web/discourse). Findings are written into the skill's existing artifact (spec, plan, debug log). Skipping research requires an explicit, justified line in the artifact, see each skill's Skip protocol.
 
 ## Credits
 
@@ -235,7 +235,7 @@ git commit -m "docs(superjawn): add README with skill status table and coexisten
 cat .claude-plugin/marketplace.json | python3 -m json.tool | head -40
 ```
 
-Note the existing plugin entries (autocontext, pdf-design, pdf-playground) — superjawn entry will follow the same shape.
+Note the existing plugin entries (autocontext, pdf-design, pdf-playground), superjawn entry will follow the same shape.
 
 - [ ] **Step 2: Add superjawn entry**
 
@@ -244,7 +244,7 @@ Edit `.claude-plugin/marketplace.json`. Inside the `"plugins"` array, add a new 
 ```json
     {
       "name": "superjawn",
-      "description": "Research-augmented skills derived from obra/superpowers — default-on research phase per skill",
+      "description": "Research-augmented skills derived from obra/superpowers, default-on research phase per skill",
       "version": "0.1.0",
       "author": {
         "name": "Joe Amditis",
@@ -278,7 +278,7 @@ git commit -m "feat(marketplace): register superjawn plugin"
 
 **Files:** None (validation step)
 
-**Discovery during execution (2026-05-05):** The `claude-skills-journalism` marketplace pulls from the GitHub remote (`https://github.com/jamditis/claude-skills-journalism.git`), cached at `~/.claude/plugins/marketplaces/claude-skills-journalism/`. `claude plugin install` reads only from that cache — it cannot see local feature-branch edits before they're pushed and merged. Live install verification therefore can't run until this PR merges to master and the marketplace cache refreshes.
+**Discovery during execution (2026-05-05):** The `claude-skills-journalism` marketplace pulls from the GitHub remote (`https://github.com/jamditis/claude-skills-journalism.git`), cached at `~/.claude/plugins/marketplaces/claude-skills-journalism/`. `claude plugin install` reads only from that cache, it cannot see local feature-branch edits before they're pushed and merged. Live install verification therefore can't run until this PR merges to master and the marketplace cache refreshes.
 
 The substitute is `claude plugin validate <plugin-dir>`, which confirms the manifest would install correctly without actually pulling it through the marketplace.
 
@@ -289,7 +289,7 @@ cd /home/jamditis/projects/claude-skills-journalism
 claude plugin validate ./superjawn
 ```
 
-Expected: `✔ Validation passed`. Any failure means the manifest has a problem — fix before continuing.
+Expected: `✔ Validation passed`. Any failure means the manifest has a problem, fix before continuing.
 
 - [ ] **Step 2: Verify the marketplace entry agrees with `plugin.json`**
 
@@ -297,7 +297,7 @@ Expected: `✔ Validation passed`. Any failure means the manifest has a problem 
 claude plugin tag --dry-run ./superjawn
 ```
 
-Expected: success, with no version-mismatch warnings for superjawn (other plugins in the marketplace may have pre-existing drift — see issue #33; ignore those for this task).
+Expected: success, with no version-mismatch warnings for superjawn (other plugins in the marketplace may have pre-existing drift, see issue #33; ignore those for this task).
 
 - [ ] **Step 3: Defer live install verification until post-merge**
 
@@ -313,7 +313,7 @@ Then in a fresh `claude` session, confirm `superjawn:` skill triggers DO appear 
 
 ---
 
-## Task 6: Port `brainstorming` — copy upstream files
+## Task 6: Port `brainstorming`, copy upstream files
 
 **Files:**
 - Create: `superjawn/skills/brainstorming/` (full upstream tree)
@@ -353,11 +353,11 @@ diff superjawn/skills/brainstorming/SKILL.md \
      ~/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/SKILL.md
 ```
 
-Expected: no output (files identical at this point — modifications come in next task).
+Expected: no output (files identical at this point, modifications come in next task).
 
 ---
 
-## Task 7: Port `brainstorming` — add MIT attribution + research phase + visual companion branding
+## Task 7: Port `brainstorming`, add MIT attribution + research phase + visual companion branding
 
 **Files:**
 - Modify: `superjawn/skills/brainstorming/SKILL.md`
@@ -381,12 +381,12 @@ See CREDITS.md.
 
 - [ ] **Step 2: Insert research phase as checklist item 4 (renumber subsequent)**
 
-Find the `## Checklist` section. Item 3 currently reads `3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria`. Item 4 currently reads `4. **Propose 2-3 approaches** — with trade-offs and your recommendation`.
+Find the `## Checklist` section. Item 3 currently reads `3. **Ask clarifying questions**, one at a time, understand purpose/constraints/success criteria`. Item 4 currently reads `4. **Propose 2-3 approaches**, with trade-offs and your recommendation`.
 
 Insert a new item 4 between them, and renumber existing items 4–9 to become 5–10:
 
 ```markdown
-4. **Research phase** — gather outside context (default-on; skip only with explicit justification). See "Research phase" section below.
+4. **Research phase**, gather outside context (default-on; skip only with explicit justification). See "Research phase" section below.
 ```
 
 - [ ] **Step 3: Add the Research phase section body**
@@ -400,9 +400,9 @@ After clarifying questions, before proposing approaches, gather outside context.
 
 ### 1. Pick research kinds
 
-From the menu — trends + discourse, patterns, pitfalls, authoritative verification, user-context.
+From the menu, trends + discourse, patterns, pitfalls, authoritative verification, user-context.
 
-For brainstorming, the **defaults are: web (trends + discourse) and codebase (prior art)**. Add others if the topic warrants — e.g. authoritative verification when an external API is in scope, or user-context when prior decisions in memory are relevant.
+For brainstorming, the **defaults are: web (trends + discourse) and codebase (prior art)**. Add others if the topic warrants, e.g. authoritative verification when an external API is in scope, or user-context when prior decisions in memory are relevant.
 
 ### 2. Dispatch
 
@@ -423,7 +423,7 @@ If skipping, write one line into the spec doc: `Skipped research because <reason
 
 **Valid reasons:**
 - Trivial scope (typo, comment edit, single-line config)
-- Fresh prior research — same topic in current session OR within last 7 days with verifiable spec/plan pointer
+- Fresh prior research, same topic in current session OR within last 7 days with verifiable spec/plan pointer
 - User explicit (quote the phrase)
 - Repeat of identical task (with pointer to prior instance)
 
@@ -455,7 +455,7 @@ Insert the node declaration `"Research phase" [shape=box];` near the other shape
 Find the "**Spec Self-Review:**" subsection. Add a fifth item to the numbered list (after the "Ambiguity check" item):
 
 ```markdown
-5. **Research phase check:** Does the spec contain either a `## Research notes` section with findings, or a one-line `Skipped research because <reason>` declaration? If neither, the brainstorming flow didn't run correctly — go back to the research phase before continuing.
+5. **Research phase check:** Does the spec contain either a `## Research notes` section with findings, or a one-line `Skipped research because <reason>` declaration? If neither, the brainstorming flow didn't run correctly, go back to the research phase before continuing.
 ```
 
 - [ ] **Step 6: Update visual companion header to dual-link**
@@ -477,7 +477,7 @@ This shows "superjawn Brainstorming" linked to your repo as the primary identity
 - [ ] **Step 7: Verify edits parse as valid markdown**
 
 ```bash
-# Quick sanity check — confirm SKILL.md still has the expected sections
+# Quick sanity check, confirm SKILL.md still has the expected sections
 grep -c "^## " superjawn/skills/brainstorming/SKILL.md
 ```
 
@@ -487,7 +487,7 @@ Expected: count is 1 higher than the upstream count (we added `## Research phase
 grep -c "^## " ~/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/SKILL.md
 ```
 
-Compare the two — superjawn should be exactly +1.
+Compare the two, superjawn should be exactly +1.
 
 Also verify the HTML edit didn't break the file:
 
@@ -516,18 +516,18 @@ parenthetical 'forked from superpowers' attribution."
 
 ---
 
-## Task 8: Port `brainstorming` — rewrite cross-references (with explicit non-renames)
+## Task 8: Port `brainstorming`, rewrite cross-references (with explicit non-renames)
 
 **Files:**
 - Modify: `superjawn/skills/brainstorming/SKILL.md`
 
-Cross-refs from brainstorming go to `writing-plans` (which IS being ported in this batch — rewrite to `superjawn:writing-plans`) and possibly other skills (which are NOT yet ported — keep at `superpowers:` for now per dual-namespace mode).
+Cross-refs from brainstorming go to `writing-plans` (which IS being ported in this batch, rewrite to `superjawn:writing-plans`) and possibly other skills (which are NOT yet ported, keep at `superpowers:` for now per dual-namespace mode).
 
-**EXPLICIT NON-RENAMES** — DO NOT mechanically grep-replace `superpowers` → `superjawn`. The following strings refer to user-data layouts and project conventions that are SHARED across forks, not to skill identifiers, and must remain unchanged:
+**EXPLICIT NON-RENAMES**, DO NOT mechanically grep-replace `superpowers` → `superjawn`. The following strings refer to user-data layouts and project conventions that are SHARED across forks, not to skill identifiers, and must remain unchanged:
 
-- `.superpowers/` (runtime directory, e.g. `<project>/.superpowers/brainstorm/<session-id>/`) — referenced in `start-server.sh`, `stop-server.sh`, `visual-companion.md`. Renaming would break any user with existing brainstorm sessions.
-- `docs/superpowers/specs/` (project spec directory) — referenced in `SKILL.md` and `spec-document-reviewer-prompt.md`. Renaming would force every superjawn user to choose a different spec home and break continuity with prior work.
-- `https://github.com/obra/superpowers` (upstream attribution link) — Task 7 already handled the visual-companion header rebranding to dual-link form. Any other occurrences of this URL are pure attribution and stay as-is.
+- `.superpowers/` (runtime directory, e.g. `<project>/.superpowers/brainstorm/<session-id>/`), referenced in `start-server.sh`, `stop-server.sh`, `visual-companion.md`. Renaming would break any user with existing brainstorm sessions.
+- `docs/superpowers/specs/` (project spec directory), referenced in `SKILL.md` and `spec-document-reviewer-prompt.md`. Renaming would force every superjawn user to choose a different spec home and break continuity with prior work.
+- `https://github.com/obra/superpowers` (upstream attribution link), Task 7 already handled the visual-companion header rebranding to dual-link form. Any other occurrences of this URL are pure attribution and stay as-is.
 
 Only the `superpowers:<skill-name>` namespaced references inside SKILL.md get rewritten. Bare-name references to `writing-plans` (skill name, not directory path) also get rewritten. Everything else stays.
 
@@ -577,7 +577,7 @@ Open a fresh `claude` session in `~/projects/claude-skills-journalism`. The avai
 
 - [ ] **Step 2: Invoke on a tiny real task**
 
-Pick something trivial — e.g. "I want to add a one-line ASCII art header to a script." Invoke `superjawn:brainstorming` on it.
+Pick something trivial, e.g. "I want to add a one-line ASCII art header to a script." Invoke `superjawn:brainstorming` on it.
 
 - [ ] **Step 3: Verify the research phase fires**
 
@@ -587,9 +587,9 @@ The skill should:
 3. **Reach the research phase** (this is the new behavior)
 4. EITHER dispatch subagents and record findings, OR write a skip line because the task is trivial
 
-Expected outcome: visible evidence that step 3 happened. If the skill jumped from clarifying questions to approach proposal without a research-phase or skip line, the additions didn't take effect — debug before continuing.
+Expected outcome: visible evidence that step 3 happened. If the skill jumped from clarifying questions to approach proposal without a research-phase or skip line, the additions didn't take effect, debug before continuing.
 
-- [ ] **Step 4: If skip path — verify skip line format**
+- [ ] **Step 4: If skip path, verify skip line format**
 
 The skip line should be exactly: `Skipped research because trivial scope. <Verifiable pointer if applicable>.` Recorded in the spec doc.
 
@@ -616,7 +616,7 @@ git commit -m "docs(superjawn): record brainstorming smoke test pass"
 
 ---
 
-## Task 10: Port `writing-plans` — copy upstream files
+## Task 10: Port `writing-plans`, copy upstream files
 
 **Files:**
 - Create: `superjawn/skills/writing-plans/` (full upstream tree)
@@ -652,7 +652,7 @@ Expected: no output.
 
 ---
 
-## Task 11: Port `writing-plans` — add MIT attribution + research phase
+## Task 11: Port `writing-plans`, add MIT attribution + research phase
 
 **Files:**
 - Modify: `superjawn/skills/writing-plans/SKILL.md`
@@ -687,7 +687,7 @@ Before drafting plan steps, gather outside context. **Default-on**: skip only wi
 For writing-plans, defaults are:
 - **Web (pitfalls in chosen approach):** What's gone wrong for others doing this kind of plan? Recent post-mortems, GitHub issues, conference talks?
 - **Codebase (similar features):** Has this codebase done something similar before? What patterns can be reused?
-- **Authoritative verification:** If the plan involves external APIs/services/standards, hit the real source — current docs, live curl, current spec — to confirm the plan's assumptions.
+- **Authoritative verification:** If the plan involves external APIs/services/standards, hit the real source, current docs, live curl, current spec, to confirm the plan's assumptions.
 
 Add user-context if a prior plan or session is relevant.
 
@@ -718,7 +718,7 @@ Valid reasons: trivial scope, fresh prior research within 7 days, user explicit,
 Find the `## Self-Review` section. Add a fourth check after the "Type consistency" check:
 
 ```markdown
-**4. Research phase check:** Does the plan contain either a `## Research notes` section with findings, or a `Skipped research because <reason>` declaration? If neither, the plan was drafted without the research step — return to the research phase.
+**4. Research phase check:** Does the plan contain either a `## Research notes` section with findings, or a `Skipped research because <reason>` declaration? If neither, the plan was drafted without the research step, return to the research phase.
 ```
 
 - [ ] **Step 4: Verify section count**
@@ -743,12 +743,12 @@ recorded at top of plan doc. Self-review check added."
 
 ---
 
-## Task 12: Port `writing-plans` — rewrite cross-references
+## Task 12: Port `writing-plans`, rewrite cross-references
 
 **Files:**
 - Modify: `superjawn/skills/writing-plans/SKILL.md`
 
-writing-plans references `superpowers:subagent-driven-development` and `superpowers:executing-plans`. executing-plans IS being ported in this batch — rewrite. subagent-driven-development is NOT (Batch 4) — keep at `superpowers:` for now.
+writing-plans references `superpowers:subagent-driven-development` and `superpowers:executing-plans`. executing-plans IS being ported in this batch, rewrite. subagent-driven-development is NOT (Batch 4), keep at `superpowers:` for now.
 
 - [ ] **Step 1: Inventory existing cross-refs**
 
@@ -760,7 +760,7 @@ grep -nE "superpowers:|subagent-driven-development|executing-plans" \
 - [ ] **Step 2: Rewrite refs to ported skills**
 
 - `superpowers:executing-plans` → `superjawn:executing-plans` (executing-plans is in this batch)
-- `superpowers:subagent-driven-development` → leave as-is (Batch 4 — not yet ported)
+- `superpowers:subagent-driven-development` → leave as-is (Batch 4, not yet ported)
 - Bare `executing-plans` mentions → `superjawn:executing-plans` only when context makes the namespace clear
 
 - [ ] **Step 3: Verify**
@@ -796,7 +796,7 @@ Restart `claude` so the new skill is registered.
 
 - [ ] **Step 2: Invoke on a tiny real task**
 
-Pick a small spec — e.g. the 2-line README change above. Invoke `superjawn:writing-plans` referencing that spec. (You can use any small spec doc as input.)
+Pick a small spec, e.g. the 2-line README change above. Invoke `superjawn:writing-plans` referencing that spec. (You can use any small spec doc as input.)
 
 - [ ] **Step 3: Verify research phase fires**
 
@@ -824,7 +824,7 @@ git commit -m "docs(superjawn): record writing-plans smoke test pass"
 
 ---
 
-## Task 14: Port `executing-plans` — copy upstream file
+## Task 14: Port `executing-plans`, copy upstream file
 
 **Files:**
 - Create: `superjawn/skills/executing-plans/SKILL.md`
@@ -859,12 +859,12 @@ Expected: no output.
 
 ---
 
-## Task 15: Port `executing-plans` — add MIT attribution + research phase
+## Task 15: Port `executing-plans`, add MIT attribution + research phase
 
 **Files:**
 - Modify: `superjawn/skills/executing-plans/SKILL.md`
 
-executing-plans research stage is "Before each step's implementation". Default kind is **authoritative re-verification** (drift check) — has the API/file/state changed since the plan was written?
+executing-plans research stage is "Before each step's implementation". Default kind is **authoritative re-verification** (drift check), has the API/file/state changed since the plan was written?
 
 - [ ] **Step 1: Add MIT attribution comment**
 
@@ -881,7 +881,7 @@ See CREDITS.md.
 
 - [ ] **Step 2: Insert per-step Research phase section**
 
-Find a logical insertion point in the existing executing-plans flow — typically after a section describing how to begin a task and before actual implementation steps. Insert:
+Find a logical insertion point in the existing executing-plans flow, typically after a section describing how to begin a task and before actual implementation steps. Insert:
 
 ````markdown
 ## Research phase (per task)
@@ -904,10 +904,10 @@ Inline for single-file or single-API checks. `general-purpose` subagent only whe
 Append a short note to the execution journal (or PR description) for each task:
 
 ```
-Task N drift check: <PASS / FAIL> — <one-line summary>
+Task N drift check: <PASS / FAIL>, <one-line summary>
 ```
 
-If FAIL, escalate before implementing — the plan may need revision.
+If FAIL, escalate before implementing, the plan may need revision.
 
 ### 4. Skip protocol
 
@@ -941,7 +941,7 @@ checks. Findings recorded in execution journal."
 
 ---
 
-## Task 16: Port `executing-plans` — rewrite cross-references
+## Task 16: Port `executing-plans`, rewrite cross-references
 
 **Files:**
 - Modify: `superjawn/skills/executing-plans/SKILL.md`
@@ -985,7 +985,7 @@ git commit -m "refactor(superjawn): rewrite executing-plans cross-refs (writing-
 
 - [ ] **Step 2: Invoke on a tiny real plan**
 
-Pick a single-task plan — e.g. "Add one line to README.md saying 'See CREDITS.md.'" Invoke `superjawn:executing-plans` against it.
+Pick a single-task plan, e.g. "Add one line to README.md saying 'See CREDITS.md.'" Invoke `superjawn:executing-plans` against it.
 
 - [ ] **Step 3: Verify per-task drift check fires**
 
@@ -995,7 +995,7 @@ Before implementing, the skill should verify:
 
 - [ ] **Step 4: Verify journal entry**
 
-After the task is implemented (or skipped), confirm the journal has a `Task 1 drift check: PASS — <summary>` line or a skip declaration.
+After the task is implemented (or skipped), confirm the journal has a `Task 1 drift check: PASS, <summary>` line or a skip declaration.
 
 - [ ] **Step 5: Document the smoke test**
 
@@ -1046,7 +1046,7 @@ In a fresh session, invoke `superpowers:brainstorming` (the upstream version) an
 
 - [ ] **Step 4: Bump plugin version**
 
-Edit `superjawn/.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` — bump the superjawn version from `0.1.0` to `0.1.0` (it stays — this is the v0.1.0 cut). If you've made enough changes that you want a v0.1.1, bump now.
+Edit `superjawn/.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`, bump the superjawn version from `0.1.0` to `0.1.0` (it stays, this is the v0.1.0 cut). If you've made enough changes that you want a v0.1.1, bump now.
 
 (Decision deferred to engineer at this point: hold at 0.1.0 if Batch 1 is the v0.1.0 release, or bump if there's been iteration since last tag.)
 
@@ -1109,8 +1109,8 @@ Note: PR title and body intentionally have zero AI attribution per global rules.
 
 ### Placeholder scan
 
-- "fill in upstream commit SHA at first port" in `CREDITS.md` — intentional placeholder, surfaced as a clear instruction. Engineer fills it during Task 2 by running `cd ~/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7 && git rev-parse HEAD 2>/dev/null` (or noting "tagged release v5.0.7" if the cache isn't a git checkout).
-- "the actual date of the test" in Tasks 9/13/17 — intentional, instructs engineer to substitute current date.
+- "fill in upstream commit SHA at first port" in `CREDITS.md`, intentional placeholder, surfaced as a clear instruction. Engineer fills it during Task 2 by running `cd ~/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7 && git rev-parse HEAD 2>/dev/null` (or noting "tagged release v5.0.7" if the cache isn't a git checkout).
+- "the actual date of the test" in Tasks 9/13/17, intentional, instructs engineer to substitute current date.
 - No "TBD", "TODO", "implement later", or "similar to Task N" patterns.
 
 ### Type consistency check
@@ -1134,7 +1134,7 @@ Each task has explicit file paths, exact commands, expected outputs. The HTML at
 
 Two execution options for this plan (per the writing-plans skill):
 
-1. **Subagent-Driven (recommended)** — dispatch a fresh subagent per task, review between tasks, fast iteration. Best when iterating on the research-phase wording is likely.
-2. **Inline Execution** — execute tasks in this session using `superpowers:executing-plans`, batch execution with checkpoints. Faster when the wording is settled.
+1. **Subagent-Driven (recommended)**, dispatch a fresh subagent per task, review between tasks, fast iteration. Best when iterating on the research-phase wording is likely.
+2. **Inline Execution**, execute tasks in this session using `superpowers:executing-plans`, batch execution with checkpoints. Faster when the wording is settled.
 
 Which approach?

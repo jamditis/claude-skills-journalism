@@ -524,7 +524,7 @@ def test_domain_neutral_type_validates(tmp_path):
 
 
 def test_invalid_date_shape_reports_cleanly(tmp_path):
-    # date-shaped but invalid (month 13) — PyYAML raises ValueError during parse,
+    # date-shaped but invalid (month 13), PyYAML raises ValueError during parse,
     # which is not a YAMLError. Must report cleanly, not crash with a traceback.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
@@ -618,8 +618,8 @@ def test_entropy_scan_ignores_low_entropy_name(tmp_path):
 def test_entropy_scan_flags_secret_just_above_floor(tmp_path):
     # Recall is the flag's whole reason to exist, so pin it at the knife-edge: a
     # 24-char base64url value whose entropy is 4.054, just over the 4.0 floor,
-    # must still flag. Below this the scan silently misses — the acknowledged
-    # precision-for-recall tradeoff — so this marks where that boundary sits.
+    # must still flag. Below this the scan silently misses, the acknowledged
+    # precision-for-recall tradeoff, so this marks where that boundary sits.
     marginal = "Ab-Cd" + "_Ef-Gh" + "_Ij-Kl" + "_Mn-Op1"
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
@@ -730,7 +730,7 @@ def test_link_escaping_bundle_fails(tmp_path):
 
 
 def test_link_with_title_resolves(tmp_path):
-    # a CommonMark link with a title — [text](dest "title") — must not be flagged
+    # a CommonMark link with a title, [text](dest "title"), must not be flagged
     # dangling: the title is not part of the path.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
@@ -770,7 +770,7 @@ def test_inline_code_link_example_ignored(tmp_path):
 
 def test_dangling_link_with_parens_caught(tmp_path):
     # a real (non-fenced) dangling link whose filename has balanced parens must
-    # still be caught — the regex must not stop at the first ')'.
+    # still be caught, the regex must not stop at the first ')'.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
     write_concept(b, GOOD.rstrip() + "\nSee [x](missing(v2).md).\n")
@@ -1499,7 +1499,7 @@ def test_example_spec_matches_canonical():
     # different contract than the validator enforces. Drift bit us twice (#149, #159).
     assert (SKILL / "example" / "SPEC.md").read_text(encoding="utf-8") == \
            (SKILL / "spec" / "SPEC.md").read_text(encoding="utf-8"), \
-           "okf-wiki/example/SPEC.md drifted from spec/SPEC.md — re-sync the copy"
+           "okf-wiki/example/SPEC.md drifted from spec/SPEC.md, re-sync the copy"
 
 
 def test_example_validator_matches_canonical():
@@ -1507,7 +1507,7 @@ def test_example_validator_matches_canonical():
     # committed example against stale rules.
     assert (SKILL / "example" / "scripts" / "validate.py").read_text(encoding="utf-8") == \
            (SKILL / "scripts" / "validate.py").read_text(encoding="utf-8"), \
-           "okf-wiki/example/scripts/validate.py drifted from scripts/validate.py — re-sync the copy"
+           "okf-wiki/example/scripts/validate.py drifted from scripts/validate.py, re-sync the copy"
 
 
 # --- source-quoting enforcement in block style (#155) -----------------------
@@ -1539,7 +1539,7 @@ def test_source_block_unquoted_hash_fails(tmp_path):
 
 
 def test_source_block_quoted_hash_passes(tmp_path):
-    # quoting the element protects it — this is the documented fix, so it must pass.
+    # quoting the element protects it, this is the documented fix, so it must pass.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
     write_concept(b, _concept_with_source('source:\n  - "README.md"\n  - "issue #445"'))
@@ -1548,7 +1548,7 @@ def test_source_block_quoted_hash_passes(tmp_path):
 
 
 def test_source_block_hash_no_space_ok(tmp_path):
-    # `issue#445` (no space before #) is NOT a YAML comment — it stays intact, so the
+    # `issue#445` (no space before #) is NOT a YAML comment, it stays intact, so the
     # guard must not false-positive on it.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
@@ -1625,8 +1625,8 @@ def test_source_trailing_comment_after_quoted_block_item_ok(tmp_path):
 def test_source_duplicate_key_later_unquoted_hash_fails(tmp_path):
     # YAML keeps the LAST of duplicate keys, so a valid first source followed by a later
     # duplicate that drops "#445" must still fail. A duplicate `source:` key is malformed
-    # regardless of whether the later value is lossy — the effective source must come from
-    # exactly one literal key — so this is rejected as a duplicate, closing the gap where two
+    # regardless of whether the later value is lossy, the effective source must come from
+    # exactly one literal key, so this is rejected as a duplicate, closing the gap where two
     # clean duplicate source keys used to pass silently.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
@@ -1638,7 +1638,7 @@ def test_source_duplicate_key_later_unquoted_hash_fails(tmp_path):
 
 
 def test_source_two_clean_duplicate_keys_rejected(tmp_path):
-    # regression: two literal `source:` keys that are BOTH clean used to pass silently —
+    # regression: two literal `source:` keys that are BOTH clean used to pass silently,
     # safe_load kept the last and discarded the first with no warning, so a lost provenance
     # list went unreported. The "exactly one source key" invariant now rejects any duplicate,
     # lossy or not.
@@ -1653,7 +1653,7 @@ def test_source_two_clean_duplicate_keys_rejected(tmp_path):
 
 def test_source_unquoted_with_apostrophe_then_hash_fails(tmp_path):
     # a quote mid plain-scalar (the apostrophe in "Joe's") is literal YAML content, so
-    # `- Joe's issue #445` is an unquoted scalar that still drops "#445" — the scan must
+    # `- Joe's issue #445` is an unquoted scalar that still drops "#445", the scan must
     # not mistake the apostrophe for the start of a quoted string and skip the comment.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
@@ -1771,7 +1771,7 @@ def _concept_with_frontmatter(fm_body):
 
 def test_source_alias_drops_comment_now_rejected(tmp_path):
     # #169 false-negative: an aliased block item (`*p`) shares its anchor's node, whose
-    # end mark sits at the anchor definition — so the dropped `#445` after the alias was
+    # end mark sits at the anchor definition, so the dropped `#445` after the alias was
     # never inspected and the lossy bundle passed. An alias in source is now a hard error.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
@@ -1784,7 +1784,7 @@ def test_source_alias_drops_comment_now_rejected(tmp_path):
 def test_source_flow_alias_rejected(tmp_path):
     # #169 false-positive shape: `source: [*p]` reads the same node as the anchor def on
     # another key, so the quoting check flagged that line's comment instead of the real
-    # problem. The alias use itself is what's wrong — reject it, with an honest message.
+    # problem. The alias use itself is what's wrong, reject it, with an honest message.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
     write_concept(b, _concept_with_frontmatter(
@@ -1833,7 +1833,7 @@ def test_source_anchor_definition_still_passes(tmp_path):
 
 def test_alias_outside_source_with_clean_source_passes(tmp_path):
     # an anchor/alias used OUTSIDE source must not fail a bundle whose top-level source
-    # is clean and literal — the check is scoped to the source value only.
+    # is clean and literal, the check is scoped to the source value only.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
     write_concept(b, _concept_with_frontmatter(
@@ -1877,7 +1877,7 @@ def test_source_via_merge_key_drops_comment_now_rejected(tmp_path):
 
 
 def test_source_via_merge_key_clean_still_rejected(tmp_path):
-    # even a merge-supplied source with no dropped comment is rejected — the indirection
+    # even a merge-supplied source with no dropped comment is rejected, the indirection
     # itself is invalid, so the check does not depend on the merged value being lossy.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
@@ -1929,7 +1929,7 @@ def test_source_alias_as_key_rejected(tmp_path):
     # #169 sibling (review): an alias in KEY position (`*k` resolving to "source") makes
     # compose reuse the anchor's node, so the key reads as a literal "source" while the real
     # key is an alias. safe_load still materializes source, so this must be rejected like any
-    # other non-literal source key — even when the aliased key's value is itself clean.
+    # other non-literal source key, even when the aliased key's value is itself clean.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
     write_concept(b, _concept_with_frontmatter(
@@ -1943,7 +1943,7 @@ def test_source_alias_as_key_rejected(tmp_path):
 
 def test_merge_key_outside_source_with_clean_source_passes(tmp_path):
     # scope guard: a merge key that supplies OTHER fields, with a literal clean source,
-    # must still pass — the check rejects merged/aliased source only, not every merge key.
+    # must still pass, the check rejects merged/aliased source only, not every merge key.
     scaffold(tmp_path / "kb", "--no-validate")
     b = tmp_path / "kb" / "bundle"
     write_concept(b, _concept_with_frontmatter(
@@ -1956,7 +1956,7 @@ def test_merge_key_outside_source_with_clean_source_passes(tmp_path):
 
 def test_source_explicit_merge_tag_key_with_clean_source_passes(tmp_path):
     # #169 sibling (review round 2): a key SPELLED "source" but carrying the explicit !!merge
-    # tag is a merge directive, not a source key — PyYAML identifies merge by the key's tag,
+    # tag is a merge directive, not a source key, PyYAML identifies merge by the key's tag,
     # not its scalar spelling. safe_load merges it and the effective mapping has only the
     # separate literal `source:`, so the file is valid. Classifying by spelling alone counts
     # the merge-tagged key as a second "source" key and falsely rejects it.
@@ -1971,7 +1971,7 @@ def test_source_explicit_merge_tag_key_with_clean_source_passes(tmp_path):
 
 
 def test_source_explicit_merge_tag_supplies_lossy_source_rejected(tmp_path):
-    # #169 sibling (review round 2): the other direction — a merge key written with the
+    # #169 sibling (review round 2): the other direction, a merge key written with the
     # explicit !!merge tag but spelled "source" merges a nested source in, so safe_load's
     # effective source is lossy ("issue", #445 dropped) while no literal source key exists.
     # Classifying by spelling counts the merge-tagged key as the one literal source and lets

@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-14
 **Status:** Approved
-**Approach:** B — capture in autocontext, evolve separately
+**Approach:** B, capture in autocontext, evolve separately
 
 ## Summary
 
@@ -10,15 +10,15 @@ Extend the autocontext plugin so that lessons captured during skill usage are ta
 
 ## Problem
 
-Skills in claude-skills-journalism are static markdown files. When Claude is corrected while using a skill, that correction becomes a project-local autocontext lesson — but the skill itself never improves. The same correction may need to happen again in a different project, or by a different user. There's no feedback loop from usage back to the skill content.
+Skills in claude-skills-journalism are static markdown files. When Claude is corrected while using a skill, that correction becomes a project-local autocontext lesson, but the skill itself never improves. The same correction may need to happen again in a different project, or by a different user. There's no feedback loop from usage back to the skill content.
 
 ## Design principles
 
-1. **Opt-in** — existing autocontext users get zero overhead unless they enable `skill_learning` in config
-2. **Evidence-based evolution** — skills only change when lessons have high confidence and multiple validations
-3. **Human-in-the-loop** — all skill file edits require explicit user approval via diff review
-4. **Minimal autocontext changes** — the core capture/curate/validate loop stays intact; evolution is a separate module
-5. **Local-first** — global skill lessons live on each machine independently, with optional export/import for sharing
+1. **Opt-in**, existing autocontext users get zero overhead unless they enable `skill_learning` in config
+2. **Evidence-based evolution**, skills only change when lessons have high confidence and multiple validations
+3. **Human-in-the-loop**, all skill file edits require explicit user approval via diff review
+4. **Minimal autocontext changes**, the core capture/curate/validate loop stays intact; evolution is a separate module
+5. **Local-first**, global skill lessons live on each machine independently, with optional export/import for sharing
 
 ## Architecture overview
 
@@ -88,7 +88,7 @@ The `session-end.sh` hook cleans up `/tmp/claude-skills-{session_id}` to prevent
 
 ### Skill tracking: added to existing `hooks/post-tool-use.sh`
 
-The existing `post-tool-use.sh` already receives all PostToolUse events and dispatches by `TOOL_NAME`. Skill tracking is added as a new branch in this file — **not a separate hook file** — to follow the established convention-based auto-discovery pattern.
+The existing `post-tool-use.sh` already receives all PostToolUse events and dispatches by `TOOL_NAME`. Skill tracking is added as a new branch in this file, **not a separate hook file**, to follow the established convention-based auto-discovery pattern.
 
 The existing code already does:
 
@@ -111,7 +111,7 @@ if [[ "$TOOL_NAME" == "Skill" ]]; then
 fi
 ```
 
-This runs alongside the existing test-quality and performance-baseline checks — the `if` block handles the Skill tool, while the existing code handles Edit/Write/Bash. No new file needed, no `plugin.json` changes for this hook.
+This runs alongside the existing test-quality and performance-baseline checks, the `if` block handles the Skill tool, while the existing code handles Edit/Write/Bash. No new file needed, no `plugin.json` changes for this hook.
 
 ### Changes to `hooks/user-prompt-submit.sh`
 
@@ -128,7 +128,7 @@ Pending lesson format gains a new field:
 }
 ```
 
-If no skills are active, `active_skills` is an empty array — the lesson is project-only, same as today.
+If no skills are active, `active_skills` is an empty array, the lesson is project-only, same as today.
 
 ### Changes to `hooks/session-start.sh` curator phase
 
@@ -187,7 +187,7 @@ if [[ -n "$SESSION_ID" ]]; then
 fi
 ```
 
-Skill-tagged lessons are validated identically to other lessons — confidence bumps on unchallenged usage, no bump on contradiction. No changes to validation logic.
+Skill-tagged lessons are validated identically to other lessons, confidence bumps on unchallenged usage, no bump on contradiction. No changes to validation logic.
 
 ### Changes to `commands/review.md`
 
@@ -208,10 +208,10 @@ New section in `.autocontext/config.json`:
 }
 ```
 
-- `enabled` — master toggle, defaults to `false` for existing users
-- `scope` — `"all"` (track all skills) or an array like `["web-scraping", "data-journalism"]`
-- `confidence_for_promotion` — minimum confidence before a lesson is eligible for promotion or evolution
-- `global_store` — path to global skill lesson directory
+- `enabled`, master toggle, defaults to `false` for existing users
+- `scope`, `"all"` (track all skills) or an array like `["web-scraping", "data-journalism"]`
+- `confidence_for_promotion`, minimum confidence before a lesson is eligible for promotion or evolution
+- `global_store`, path to global skill lesson directory
 
 ### Changes to `/autocontext-setup`
 
@@ -224,9 +224,9 @@ Two new steps added to the wizard:
 **Step 12: Evolution settings**
 > "When running /autocontext-evolve, how aggressive should the evolution be?"
 > Options:
-> - Conservative (confidence >= 0.9, 5+ validations) — only proven lessons
-> - Moderate (confidence >= 0.85, 3+ validations) — recommended
-> - Aggressive (confidence >= 0.7, 2+ validations) — faster evolution, more risk
+> - Conservative (confidence >= 0.9, 5+ validations), only proven lessons
+> - Moderate (confidence >= 0.85, 3+ validations), recommended
+> - Aggressive (confidence >= 0.7, 2+ validations), faster evolution, more risk
 
 ## Component 2: Global skill lesson store
 
@@ -283,9 +283,9 @@ Two new steps added to the wizard:
 }
 ```
 
-- `source_projects` — tracks which projects contributed this lesson
-- `promoted_from` — ID of the project-level lesson this was promoted from
-- `folded` — true once the lesson has been integrated into the skill file via evolution
+- `source_projects`, tracks which projects contributed this lesson
+- `promoted_from`, ID of the project-level lesson this was promoted from
+- `folded`, true once the lesson has been integrated into the skill file via evolution
 
 ## Component 3: Evolution engine
 
@@ -296,29 +296,29 @@ Engine: `scripts/skill-evolution/`
 
 The command accepts optional arguments parsed from the user's slash command input. Claude Code passes the full argument string after the command name to the command's markdown prompt, which instructs Claude to interpret it:
 
-- `/autocontext-evolve` — default mode: scan, present, and evolve skills interactively
-- `/autocontext-evolve --rollback <skill>` — restore a skill from its most recent backup
-- `/autocontext-evolve --export` — export global lessons to a JSON file
-- `/autocontext-evolve --import <path>` — import lessons from an export file
+- `/autocontext-evolve`, default mode: scan, present, and evolve skills interactively
+- `/autocontext-evolve --rollback <skill>`, restore a skill from its most recent backup
+- `/autocontext-evolve --export`, export global lessons to a JSON file
+- `/autocontext-evolve --import <path>`, import lessons from an export file
 
-The `evolve.md` command prompt includes instructions for Claude to parse these arguments from the user's input and route to the appropriate action. No separate command registrations needed — the single command handles all modes via argument parsing within the markdown prompt.
+The `evolve.md` command prompt includes instructions for Claude to parse these arguments from the user's input and route to the appropriate action. No separate command registrations needed, the single command handles all modes via argument parsing within the markdown prompt.
 
 ### Command flow (default mode)
 
-1. **Scan** — read `~/.claude/skill-lessons/` for skills with eligible lessons (confidence >= threshold, validated_count >= min, folded == false)
-2. **Present** — show summary per skill: lesson count, average confidence, source projects
-3. **Select** — user picks which skill(s) to evolve, or skips
-4. **Generate** — for each selected skill:
+1. **Scan**, read `~/.claude/skill-lessons/` for skills with eligible lessons (confidence >= threshold, validated_count >= min, folded == false)
+2. **Present**, show summary per skill: lesson count, average confidence, source projects
+3. **Select**, user picks which skill(s) to evolve, or skips
+4. **Generate**, for each selected skill:
    a. Read current skill .md file content
    b. Read all eligible lessons for that skill
    c. Shell out to `claude -p` with the evolution prompt (see below)
    d. Receive full updated skill content
-5. **Review** — present diff to user with four options:
-   - **Accept** — write updated content to skill .md file
-   - **Edit** — user makes manual adjustments, then write
-   - **Reject** — skip this skill, lessons stay in the store
-   - **Append** — fall back to adding a `## Learned patterns` section at the bottom
-6. **Cleanup** — mark evolved lessons as `folded: true`, update `index.json`, back up the original skill file
+5. **Review**, present diff to user with four options:
+   - **Accept**, write updated content to skill .md file
+   - **Edit**, user makes manual adjustments, then write
+   - **Reject**, skip this skill, lessons stay in the store
+   - **Append**, fall back to adding a `## Learned patterns` section at the bottom
+6. **Cleanup**, mark evolved lessons as `folded: true`, update `index.json`, back up the original skill file
 
 ### Evolution prompt
 
@@ -329,7 +329,7 @@ are provided below.
 
 RULES:
 - Integrate lessons naturally into the existing content
-- Don't create a separate "lessons" section — weave guidance
+- Don't create a separate "lessons" section, weave guidance
   into the flow where it belongs
 - Preserve the skill's existing structure, voice, and formatting
 - Higher-confidence lessons should be treated as more authoritative
@@ -367,10 +367,10 @@ On the next `/autocontext-evolve` run, the command can re-attempt to integrate t
 
 ### Safety guardrails
 
-1. **Backup before edit** — copy original to `~/.claude/skill-lessons/backups/<skill>-<timestamp>.md`
-2. **Minimum evidence threshold** — configurable, defaults to confidence >= 0.85 AND validated_count >= 3
-3. **Diff review is mandatory** — no silent edits, user always sees what's changing
-4. **Rollback** — `/autocontext-evolve --rollback <skill>` restores from most recent backup
+1. **Backup before edit**, copy original to `~/.claude/skill-lessons/backups/<skill>-<timestamp>.md`
+2. **Minimum evidence threshold**, configurable, defaults to confidence >= 0.85 AND validated_count >= 3
+3. **Diff review is mandatory**, no silent edits, user always sees what's changing
+4. **Rollback**, `/autocontext-evolve --rollback <skill>` restores from most recent backup
 
 ### Consolidated config schema
 
@@ -471,20 +471,20 @@ Reports what was added/updated after merge.
 
 ## Testing strategy
 
-1. **Unit tests for tagging** — verify user-prompt-submit correctly reads skill names and tags pending lessons
-2. **Unit tests for promotion** — verify lessons are correctly copied to global store with proper metadata
-3. **Integration test for evolution** — set up a test skill with known content, add mock lessons, run evolution, verify diff output
-4. **Rollback test** — verify backup is created before edit and `/autocontext-evolve --rollback` restores correctly
-5. **Sync round-trip** — export from machine A, import on machine B, verify union merge semantics
-6. **Backward compatibility** — verify autocontext works identically when `skill_learning.enabled` is false (default)
+1. **Unit tests for tagging**, verify user-prompt-submit correctly reads skill names and tags pending lessons
+2. **Unit tests for promotion**, verify lessons are correctly copied to global store with proper metadata
+3. **Integration test for evolution**, set up a test skill with known content, add mock lessons, run evolution, verify diff output
+4. **Rollback test**, verify backup is created before edit and `/autocontext-evolve --rollback` restores correctly
+5. **Sync round-trip**, export from machine A, import on machine B, verify union merge semantics
+6. **Backward compatibility**, verify autocontext works identically when `skill_learning.enabled` is false (default)
 
 ## Resolved design decisions
 
-1. **Skill path resolution** — at evolve time, the engine resolves skill paths dynamically by searching `CLAUDE_PLUGIN_ROOT` directories and the plugin cache (`~/.claude/plugins/`) for the skill name. The `index.json` `skill_path` is a hint/cache, not authoritative. If the path is stale (file doesn't exist), the engine searches for the skill and updates `index.json`. If the skill can't be found, the evolution is skipped with a warning.
+1. **Skill path resolution**, at evolve time, the engine resolves skill paths dynamically by searching `CLAUDE_PLUGIN_ROOT` directories and the plugin cache (`~/.claude/plugins/`) for the skill name. The `index.json` `skill_path` is a hint/cache, not authoritative. If the path is stale (file doesn't exist), the engine searches for the skill and updates `index.json`. If the skill can't be found, the evolution is skipped with a warning.
 
-2. **Multi-skill corrections** — if multiple skills are active during a correction, all are tagged in `active_skills`. The curator decides which skill(s) the lesson applies to based on the lesson's content. A lesson about Selenium belongs to `web-scraping` even if `data-journalism` was also active.
+2. **Multi-skill corrections**, if multiple skills are active during a correction, all are tagged in `active_skills`. The curator decides which skill(s) the lesson applies to based on the lesson's content. A lesson about Selenium belongs to `web-scraping` even if `data-journalism` was also active.
 
-3. **Version conflicts** — if the plugin repo updates a skill upstream, the user's local evolutions are overwritten. The backup system at `~/.claude/skill-lessons/backups/` preserves the evolved version. Users can re-apply evolutions after an upstream update by running `/autocontext-evolve` again — the un-folded lessons are still in the global store and will generate a new diff against the updated skill content. This is acceptable because evolved skills should eventually feed improvements back upstream via PRs.
+3. **Version conflicts**, if the plugin repo updates a skill upstream, the user's local evolutions are overwritten. The backup system at `~/.claude/skill-lessons/backups/` preserves the evolved version. Users can re-apply evolutions after an upstream update by running `/autocontext-evolve` again, the un-folded lessons are still in the global store and will generate a new diff against the updated skill content. This is acceptable because evolved skills should eventually feed improvements back upstream via PRs.
 
 ## Future considerations
 

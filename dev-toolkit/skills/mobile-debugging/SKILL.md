@@ -1,6 +1,6 @@
 ---
 name: mobile-debugging
-description: Remote JavaScript console access and debugging on mobile devices. Use when debugging web pages on phones/tablets, accessing console errors without desktop DevTools, testing responsive designs on real devices, or diagnosing mobile-specific issues. Covers locally hosted Eruda and vConsole, Chrome/Safari remote debugging, and cloud testing platforms.
+description: Remote JavaScript console and debugging on mobile. Use for phone/tablet console errors, responsive testing, Eruda, and vConsole.
 ---
 
 # Mobile debugging methodology
@@ -344,7 +344,7 @@ def test_on_lambdatest():
 
 ```python
 # BrowserStack: $29/month+, 10,000+ real devices
-# Selenium 4 removed DesiredCapabilities — pass capabilities via Options instead.
+# Selenium 4 removed DesiredCapabilities, pass capabilities via Options instead.
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options

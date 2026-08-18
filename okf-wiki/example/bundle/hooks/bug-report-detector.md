@@ -11,6 +11,6 @@ tags: ["hook", "development"]
 
 Detects bug reports and reminds Claude to follow test-first workflow
 
-**Event:** `UserPromptSubmit`  |  **Tools:** —  |  **Category:** Development
+**Event:** `UserPromptSubmit`  |  **Tools:**, |  **Category:** Development
 
 One of the repository's standalone [hooks](index.md). Source: `hooks/bug-report-detector.md`.

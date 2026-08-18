@@ -1,6 +1,6 @@
 ---
 name: web-archiving
-description: Web page archiving and retrieval from cached/deleted sources. Use when accessing unavailable pages, preserving web content, creating legal evidence archives, or building redundant archival workflows. Covers Wayback Machine, Archive.today, ArchiveBox, and evidence preservation tools.
+description: Web archiving and retrieval via Wayback Machine and Archive.today. Use to preserve content, reach dead pages, or save evidence.
 ---
 
 # Web archiving methodology
@@ -42,7 +42,7 @@ Try services in this order for maximum coverage:
 │  2. Archive.today (archive.is/archive.ph)                       │
 │     └─ On-demand snapshots, paywall bypass                      │
 │     └─ Caveat (2026): FBI subpoenaed registrar in Oct 2025;     │
-│        Wikipedia deprecated as citation source in Feb 2026 —    │
+│        Wikipedia deprecated as citation source in Feb 2026, │
 │        prefer Wayback / Perma.cc for legal or citation use      │
 │                         ↓ not found                              │
 │  3. Memento Time Travel (aggregator)                            │
@@ -195,7 +195,7 @@ def save_to_archive_today(url: str) -> Optional[str]:
     registrar in October 2025; Wikipedia stopped accepting it as a
     citation source in February 2026 after the site shipped
     DDoS-attack code in January 2026. Still useful for capturing
-    content the Wayback Machine can't render — but treat as
+    content the Wayback Machine can't render, but treat as
     secondary to Wayback / Perma.cc for legal or citation use.
     """
     submit_url = "https://archive.today/submit/"
@@ -650,7 +650,7 @@ javascript:(function(){
 | Service | Best For | API | Deletions | Max Size | Notes |
 |---------|----------|-----|-----------|----------|-------|
 | **Wayback Machine** | Historical research | Yes (free) | On request | Unlimited | Anonymous SPN ~15/min; auth via S3 keys raises cap |
-| **Archive.today** | Paywall bypass, quick saves | Informal | Never | 50MB | FBI subpoena Oct 2025; Wikipedia deprecated as citation source Feb 2026 — avoid for legal/citation use |
+| **Archive.today** | Paywall bypass, quick saves | Informal | Never | 50MB | FBI subpoena Oct 2025; Wikipedia deprecated as citation source Feb 2026, avoid for legal/citation use |
 | **Perma.cc** | Legal citations | Yes (free tier) | By creator | Standard pages | Used by US courts; `Authorization: ApiKey <key>` |
 | **ArchiveBox** | Self-hosted, privacy | Local | Never | Disk space | v0.8 ships Docker Compose with Chromium / yt-dlp / wget |
 | **Browsertrix Cloud** | Interactive / JS-heavy capture | Yes | By creator | Plan-based | Webrecorder.net successor to Conifer; outputs WARC |

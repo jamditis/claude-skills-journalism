@@ -22,7 +22,7 @@ Com fundamento na Lei nº 12.527/2011 (Lei de Acesso à Informação), solicito
 o acesso às seguintes informações:
 
 1. [DESCRIÇÃO ESPECÍFICA DO DOCUMENTO OU CONJUNTO DE DADOS, com recorte
-   temporal explícito — ex.: "os autos de infração lavrados entre
+   temporal explícito, ex.: "os autos de infração lavrados entre
    01/01/2020 e 31/12/2024"]
 
 2. [SE HOUVER: número do processo SEI ou protocolo, que elimina qualquer
@@ -53,7 +53,7 @@ Lei nº 12.527/2011.
 ## Notas de redação / Drafting notes
 
 - **Um pedido, um objeto.** Vários assuntos num único pedido facilitam a
-  negativa por "genérico". Divida — cada pedido corre em paralelo.
+  negativa por "genérico". Divida, cada pedido corre em paralelo.
   *One request, one object. Split broad questions; the clocks run in parallel.*
 - **Peça o dado bruto, não um relatório.** Para o Poder Executivo federal,
   pedir a exportação de uma base existente afasta a alegação de "trabalho

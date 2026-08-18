@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Black-box tests for embed.py — run with `python3 -m unittest` from this dir.
+"""Black-box tests for embed.py, run with `python3 -m unittest` from this dir.
 
 Needs exiftool on PATH and Pillow (for generating fixture JPEGs). Each test runs
 embed.py as a CLI against a throwaway temp folder, then reads the result back with
@@ -68,7 +68,7 @@ class EmbedCLITests(unittest.TestCase):
         self.assertEqual(data.get("AltTextAccessibility"), "A solid red rectangle.")
 
     def test_optional_fields_only_alt_is_success(self):
-        # Manifest sets only alt text — no byline, no caption. The write succeeds,
+        # Manifest sets only alt text, no byline, no caption. The write succeeds,
         # so the run must report success (verify must not demand fields nobody asked for).
         m = self.write_manifest({
             "constants": {},
@@ -218,7 +218,7 @@ class EmbedCLITests(unittest.TestCase):
         self.assertEqual(read_back(str(self.src / "-dash.jpg")).get("By-line"), "Dana")
 
     def test_digital_source_type_shorthand_expands_to_full_uri(self):
-        # A newsroom shorthand must be written as the full IPTC CV URI — exiftool does
+        # A newsroom shorthand must be written as the full IPTC CV URI, exiftool does
         # not validate DigitalSourceType, so the tool is responsible for the URI.
         m = self.write_manifest({
             "constants": {"digital_source_type": "digitalCapture"},

@@ -1,5 +1,5 @@
 {
-  "_comment": "Manifest of ported skills and per-file parity expectations. Maintained alongside CREDITS.md divergence log. The validator at scripts/validate-skill.sh reads this file. supporting_file_overrides covers two cases: (1) a local file that diverges from its upstream counterpart, and (2) a local-only file with no upstream equivalent. Both require an explicit entry — the manifest is the authoritative record of every intentional deviation from upstream.",
+  "_comment": "Manifest of ported skills and per-file parity expectations. Maintained alongside CREDITS.md divergence log. The validator at scripts/validate-skill.sh reads this file. supporting_file_overrides covers two cases: (1) a local file that diverges from its upstream counterpart, and (2) a local-only file with no upstream equivalent. Both require an explicit entry, the manifest is the authoritative record of every intentional deviation from upstream.",
   "skills": {
     "brainstorming": {
       "category": "research",
@@ -9,13 +9,17 @@
         "scripts/helper.js": "PR #34 review: XSS-safe DOM construction",
         "scripts/server.cjs": "PR #34 review: WebSocket frame size cap",
         "scripts/start-server.sh": "PR #34 review: exec-based PID preservation",
-        "scripts/stop-server.sh": "PR #34 review: SESSION_DIR validation"
+        "scripts/stop-server.sh": "PR #34 review: SESSION_DIR validation",
+        "spec-document-reviewer-prompt.md": "Repo-wide em-dash to comma conversion",
+        "visual-companion.md": "Repo-wide em-dash to comma conversion"
       }
     },
     "writing-plans": {
       "category": "consumer",
       "skill_md_parity": false,
-      "supporting_file_overrides": {}
+      "supporting_file_overrides": {
+        "plan-document-reviewer-prompt.md": "Repo-wide em-dash to comma conversion"
+      }
     },
     "executing-plans": {
       "category": "freshness",
@@ -36,17 +40,17 @@
     },
     "test-driven-development": {
       "category": "consumer",
-      "skill_md_parity": true,
+      "skill_md_parity": false,
       "supporting_file_overrides": {}
     },
     "verification-before-completion": {
       "category": "consumer",
-      "skill_md_parity": true,
+      "skill_md_parity": false,
       "supporting_file_overrides": {}
     },
     "receiving-code-review": {
       "category": "consumer",
-      "skill_md_parity": true,
+      "skill_md_parity": false,
       "supporting_file_overrides": {}
     },
     "requesting-code-review": {
@@ -58,12 +62,13 @@
       "category": "consumer",
       "skill_md_parity": false,
       "supporting_file_overrides": {
-        "code-quality-reviewer-prompt.md": "v1.0.0: Task tool dispatch target rewritten from superpowers:code-reviewer to pr-review-toolkit:code-reviewer to remove the soft dependency on the upstream superpowers plugin (uninstalled at v1.0.0)"
+        "code-quality-reviewer-prompt.md": "v1.0.0: Task tool dispatch target rewritten from superpowers:code-reviewer to pr-review-toolkit:code-reviewer to remove the soft dependency on the upstream superpowers plugin (uninstalled at v1.0.0)",
+        "implementer-prompt.md": "Repo-wide em-dash to comma conversion"
       }
     },
     "dispatching-parallel-agents": {
       "category": "consumer",
-      "skill_md_parity": true,
+      "skill_md_parity": false,
       "supporting_file_overrides": {}
     },
     "using-git-worktrees": {
@@ -73,14 +78,18 @@
     },
     "finishing-a-development-branch": {
       "category": "consumer",
-      "skill_md_parity": true,
+      "skill_md_parity": false,
       "supporting_file_overrides": {}
     },
     "using-superjawn": {
       "category": "consumer",
       "skill_md_parity": false,
       "upstream_name": "using-superpowers",
-      "supporting_file_overrides": {}
+      "supporting_file_overrides": {
+        "references/codex-tools.md": "Repo-wide em-dash to comma conversion",
+        "references/copilot-tools.md": "Repo-wide em-dash to comma conversion",
+        "references/gemini-tools.md": "Repo-wide em-dash to comma conversion"
+      }
     },
     "writing-skills": {
       "category": "research",

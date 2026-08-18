@@ -1,6 +1,6 @@
 ---
 name: editorial-workflow
-description: Manage editorial workflows for newsrooms and publications. Use when tracking story assignments, managing deadlines, coordinating editorial calendars, or establishing handoff protocols between reporters and editors. Includes templates for assignment tracking, editorial calendars, and workflow documentation.
+description: Manages newsroom editorial workflows. Use when tracking assignments, managing deadlines, or coordinating editorial calendars.
 ---
 
 # Editorial workflow management

@@ -1,6 +1,6 @@
 ---
 name: story-pitch
-description: Craft effective story pitches for different publication types and formats. Use when pitching to editors, preparing query letters, or developing story angles. Includes templates for daily news, features, investigations, op-eds, and freelance queries.
+description: Crafts story pitches for different outlets. Use when pitching editors, writing query letters, or shaping feature or op-ed angles.
 ---
 
 # Story pitch guide
@@ -94,7 +94,7 @@ Example:
 ## The last ferry captain
 
 **The story in one sentence:**
-After 47 years, the last original captain of the Staten Island Ferry is retiring—and taking decades of institutional knowledge with him.
+After 47 years, the last original captain of the Staten Island Ferry is retiring, and taking decades of institutional knowledge with him.
 
 **The hook:**
 8 million New Yorkers depend on this ferry. Most have never met the people who run it. Captain Mike Carbone has seen mayors come and go, survived 9/11 from the water, and trained every current captain. His retirement is the end of an era.
@@ -242,11 +242,11 @@ Subject: Op-ed submission: School board's DEI cuts will hurt all students
 
 Dear Opinion Editor,
 
-When the Westfield school board votes Tuesday to eliminate diversity coordinators, they won't just hurt minority students—they'll deprive every student of the skills employers demand. I've spent 20 years in HR at Fortune 500 companies, and I can tell you: businesses want graduates who can work across difference. This decision makes our kids less competitive.
+When the Westfield school board votes Tuesday to eliminate diversity coordinators, they won't just hurt minority students, they'll deprive every student of the skills employers demand. I've spent 20 years in HR at Fortune 500 companies, and I can tell you: businesses want graduates who can work across difference. This decision makes our kids less competitive.
 
 As the former Chief People Officer at [Company] and a Westfield parent, I've seen both sides of this issue. I'm not an activist; I'm a business leader who knows what the job market requires.
 
-Your editorial page has covered school budget debates extensively. Your readers—many of them parents in our district—need to hear from someone who can translate business needs into educational priorities.
+Your editorial page has covered school budget debates extensively. Your readers, many of them parents in our district, need to hear from someone who can translate business needs into educational priorities.
 
 The piece is 750 words and is exclusive to [Publication].
 
@@ -265,17 +265,17 @@ Subject: Pitch: [Compelling headline]
 
 Dear [Editor name],
 
-[Opening hook—the most compelling detail or question from your story]
+[Opening hook, the most compelling detail or question from your story]
 
 [What the story is, who it's about, what you'll show]
 
-[Why now—the news hook or timely angle]
+[Why now, the news hook or timely angle]
 
-[What you have—sources confirmed, access secured, documents obtained]
+[What you have, sources confirmed, access secured, documents obtained]
 
-[Why this publication—how it fits their coverage, audience]
+[Why this publication, how it fits their coverage, audience]
 
-[Why you—relevant clips, expertise, access]
+[Why you, relevant clips, expertise, access]
 
 I estimate [word count] words and can deliver in [timeframe].
 
@@ -294,11 +294,11 @@ Subject: Pitch: The nurse who tracks fake diplomas
 
 Dear [Editor],
 
-Maria Chen has caught 47 nurses with fake degrees in three years. None of them through background checks—through a spreadsheet she maintains in her free time.
+Maria Chen has caught 47 nurses with fake degrees in three years. None of them through background checks, but through a spreadsheet she maintains in her free time.
 
 Chen, a nursing supervisor at a rural Oklahoma hospital, started her database after discovering a colleague had purchased credentials from a diploma mill. State nursing boards, she found, rarely verify foreign credentials thoroughly. Her volunteer work has exposed a patient safety gap that regulators have ignored.
 
-Her story comes as Oklahoma debates licensure reform this session—a bill she's testified for and the hospital lobby has opposed. The vote is in six weeks.
+Her story comes as Oklahoma debates licensure reform this session, a bill she's testified for and the hospital lobby has opposed. The vote is in six weeks.
 
 I've interviewed Chen twice, reviewed her database and documentation, and spoken with three of the fraudulent nurses she identified (two on background). The state nursing board has agreed to comment.
 
@@ -335,7 +335,7 @@ Can you explain this story in one sentence to someone at dinner?
 
 **Too inside baseball:** "It's about how HHS regulations from 2018 created incentive misalignment in Title IV-E funding."
 
-**Just right:** "Kids in foster care are being moved to different homes so often that some have attended 10 schools in one year—and no one's tracking the damage."
+**Just right:** "Kids in foster care are being moved to different homes so often that some have attended 10 schools in one year, and no one's tracking the damage."
 
 ### Angle versus topic
 
@@ -386,7 +386,7 @@ Can you explain this story in one sentence to someone at dinner?
 ### If silence
 - Follow up once after 1-2 weeks
 - If still nothing, you can pitch elsewhere (unless exclusive)
-- Don't take it personally—editors are overwhelmed
+- Don't take it personally, editors are overwhelmed
 
 ---
 

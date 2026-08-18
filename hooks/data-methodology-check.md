@@ -120,7 +120,7 @@ If methodology is missing, suggest adding:
 
 ## Non-blocking
 
-This hook reminds about transparency. Not all data mentions need full methodology boxes—use judgment about what level of documentation fits the content.
+This hook reminds about transparency. Not all data mentions need full methodology boxes, use judgment about what level of documentation fits the content.
 
 ## Skip conditions
 

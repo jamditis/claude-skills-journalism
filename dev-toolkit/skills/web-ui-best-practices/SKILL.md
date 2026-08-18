@@ -1,24 +1,24 @@
 ---
 name: web-ui-best-practices
-description: Signs of taste in web UI. Use when building or reviewing any user-facing web interface — dashboards, SaaS apps, marketing sites, internal tools. Covers interaction speed, navigation depth, visual restraint, copy quality, and the small details that separate polished products from rough ones.
+description: Signs of taste in web UI. Use when building or reviewing web interfaces, dashboards, SaaS apps, or internal tools.
 ---
 
 # Web UI best practices
 
-Principles for building web interfaces that feel fast, intentional, and respectful of the user's time. Every rule here is a smell test — violating one is fine if you have a reason, violating several means the UI needs work.
+Principles for building web interfaces that feel fast, intentional, and respectful of the user's time. Every rule here is a smell test, violating one is fine if you have a reason, violating several means the UI needs work.
 
 ## Speed
 
 Every interaction completes in under 100ms. If it can't, fake it.
 
-- Optimistic UI updates — show the result before the server confirms
+- Optimistic UI updates, show the result before the server confirms
 - Debounce inputs, but never debounce perceived response
 - Prefetch likely next routes on hover or viewport entry
 - Use `will-change` and `transform` for animations, never `top`/`left`
 - Measure with `performance.now()`, not gut feel
 
 ```js
-// Optimistic delete — remove from UI immediately, reconcile later
+// Optimistic delete, remove from UI immediately, reconcile later
 async function handleDelete(id) {
   setItems(prev => prev.filter(i => i.id !== id));
   try {
@@ -71,7 +71,7 @@ Stable in all major browsers since 2023. Replaces most "the same component in tw
 
 ### `:has()` parent selector
 
-`:has()` lets a parent style itself based on its descendants — the long-requested "parent selector." Useful for marking a form field as in-error, a card as having an attached image, or a row as containing a focused input — all without JS.
+`:has()` lets a parent style itself based on its descendants, the long-requested "parent selector." Useful for marking a form field as in-error, a card as having an attached image, or a row as containing a focused input, all without JS.
 
 ```css
 /* Highlight a form group when its input has focus */
@@ -133,7 +133,7 @@ Stable in Chromium-based browsers (Chrome 115+, Edge); not yet in Safari or Fire
 If you need a tour to explain your UI, the UI is wrong. Instead:
 
 - Empty states that teach by doing ("Create your first project")
-- Progressive disclosure — show features when they become relevant
+- Progressive disclosure, show features when they become relevant
 - Inline hints that disappear after first use
 - Defaults that work without configuration
 
@@ -153,7 +153,7 @@ Bad:   /projects/550e8400-e29b-41d4-a716-446655440000
 
 - Use slugs derived from user-provided names
 - Keep nesting to 3 segments max
-- Make URLs copyable and shareable — they are the product's memory
+- Make URLs copyable and shareable, they are the product's memory
 
 ## Persistent resumable state
 
@@ -162,7 +162,7 @@ Users leave and come back. Respect that.
 - Save draft form state to `localStorage` or the server
 - Restore scroll position on back navigation
 - Preserve filter/sort selections across sessions
-- URL encodes the current view state — sharing a URL reproduces the view
+- URL encodes the current view state, sharing a URL reproduces the view
 
 ```js
 // Persist form state across sessions
@@ -301,7 +301,7 @@ input, select, textarea {
 
 - Adjacent clickable elements need at least 8px gap
 - Icon-only buttons get larger padding than labeled buttons
-- Don't rely on hover states for critical affordances — they don't exist on touch
+- Don't rely on hover states for critical affordances, they don't exist on touch
 
 ## Honest cancellation
 
@@ -336,7 +336,7 @@ Bad:   "Your project has been successfully created!"
        "Are you sure you want to permanently delete this file? This action cannot be undone."
 ```
 
-- Buttons are verbs: "Save", "Delete", "Send" — not "Submit", "OK", "Confirm"
+- Buttons are verbs: "Save", "Delete", "Send", not "Submit", "OK", "Confirm"
 - Error messages say what happened and what to do next
 - Never blame the user ("Invalid input" → "Enter a valid email")
 - Use sentence case everywhere, never Title Case in UI copy
@@ -348,7 +348,7 @@ Optical alignment over geometric alignment. The eye doesn't see pixels, it sees 
 - Play icons shift 2-3px right inside circles to look centered
 - Text with leading capital letters aligns optically left of its bounding box
 - Icons next to text need 1-2px vertical offset depending on the glyph
-- Padding around text is visually balanced, not mathematically equal — bottom padding is often 1-2px more than top
+- Padding around text is visually balanced, not mathematically equal, bottom padding is often 1-2px more than top
 
 ```css
 /* Geometric center ≠ optical center */
@@ -370,7 +370,7 @@ Optimized for L-to-R reading and the F-pattern scan.
 - Primary actions on the right (where the eye ends a line)
 - Labels above inputs, not beside them
 - Tables: most-scanned column is leftmost
-- Don't center-align body text — left-align everything except single-line headings
+- Don't center-align body text, left-align everything except single-line headings
 
 ## Reassurance about loss
 

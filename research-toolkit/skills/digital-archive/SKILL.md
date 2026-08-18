@@ -1,6 +1,6 @@
 ---
 name: digital-archive
-description: Digital archiving workflows with AI enrichment, entity extraction, and knowledge graph construction. Use when building content archives, implementing AI-powered categorization, extracting entities and relationships, or integrating multiple data sources. Covers patterns from the Jay Rosen Digital Archive project.
+description: Digital archiving with AI enrichment and entity extraction. Use when building content archives or knowledge graphs.
 ---
 
 # Digital archive methodology
@@ -150,7 +150,7 @@ def generate_record_id(source: str, sequence: int) -> str:
 
 ```python
 # pip install google-genai
-# (the legacy `google-generativeai` SDK was deprecated in 2024 — the
+# (the legacy `google-generativeai` SDK was deprecated in 2024, the
 # new `google-genai` package is the supported path. Imports below
 # use the new shape.)
 import os
@@ -237,7 +237,7 @@ IMPORTANT:
 """
 
         # response_mime_type='application/json' makes Gemini emit raw
-        # JSON without ```json fences — the markdown-stripping fallback
+        # JSON without ```json fences, the markdown-stripping fallback
         # in _parse_response() is kept as defense-in-depth for older
         # models that still wrap output.
         response = self.client.models.generate_content(

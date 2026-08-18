@@ -6,7 +6,7 @@ Configure your organization's colors, fonts, and branding once, then generate on
 
 ## Before you start
 
-You need **Claude Code** installed and working on your computer. Claude Code is a command-line tool made by Anthropic — it runs inside your terminal (the black window where you type commands).
+You need **Claude Code** installed and working on your computer. Claude Code is a command-line tool made by Anthropic, it runs inside your terminal (the black window where you type commands).
 
 **Not sure if you have it?** Open your terminal and type:
 
@@ -30,7 +30,7 @@ claude plugin marketplace add https://github.com/jamditis/claude-skills-journali
 
 **If you get an error:**
 - Make sure you're connected to the internet
-- Make sure you typed the URL exactly — no extra spaces, no missing letters
+- Make sure you typed the URL exactly, no extra spaces, no missing letters
 - Try running `claude --version` to confirm Claude Code is installed
 
 ### Step 2: Install the plugin
@@ -49,7 +49,7 @@ claude plugin install pdf-playground@claude-skills-journalism
 
 Close your Claude Code session and open a new one. The plugin loads when Claude Code starts, so you need a fresh session for it to appear.
 
-That's it — you can start creating documents now. Brand customization (below) is optional.
+That's it, you can start creating documents now. Brand customization (below) is optional.
 
 ---
 
@@ -103,13 +103,13 @@ After Claude generates your document, it saves an HTML file in your current fold
 
 The proposal command (`/pdf-playground:proposal`) includes a step-by-step wizard that walks you through setup:
 
-**Phase 1 — Content:** Choose the proposal type, sections to include, page count, and budget line items. Each question appears as a multiple-choice prompt you can click through.
+**Phase 1, Content:** Choose the proposal type, sections to include, page count, and budget line items. Each question appears as a multiple-choice prompt you can click through.
 
-**Phase 2 — Design:** Pick a color scheme, typography style, and visual style. Presets are available (brand colors, professional blue, bold red/black) or go fully custom.
+**Phase 2, Design:** Pick a color scheme, typography style, and visual style. Presets are available (brand colors, professional blue, bold red/black) or go fully custom.
 
-**Phase 3 — Review:** The proposal generates and opens in a live preview with an interactive control panel on the right side. You can tweak colors, fonts, spacing, and toggle sections on or off in real time. Click "Copy all changes" in the panel, paste the prompt back into the conversation, and the changes get applied to the HTML source.
+**Phase 3, Review:** The proposal generates and opens in a live preview with an interactive control panel on the right side. You can tweak colors, fonts, spacing, and toggle sections on or off in real time. Click "Copy all changes" in the panel, paste the prompt back into the conversation, and the changes get applied to the HTML source.
 
-**Phase 4 — Finalization:** Save the file, get PDF export instructions, or go back for more tweaks.
+**Phase 4, Finalization:** Save the file, get PDF export instructions, or go back for more tweaks.
 
 The wizard is currently available for proposals. Other templates will get wizard support in future updates.
 
@@ -119,21 +119,21 @@ The wizard is currently available for proposals. Other templates will get wizard
 
 When you use `/pdf-playground:preview` to open a document, a wrapper page opens with your document in an iframe on the left and a control panel sidebar on the right. The panel includes:
 
-- **Presets** — One-click theme buttons (CCM brand, Professional blue, Modern green, Warm earth, Elegant purple) that apply coordinated colors and fonts
-- **Colors** — Color pickers for all CSS variables (primary, dark, text, background, accent)
-- **Typography** — Font dropdowns (heading and body) with Google Fonts, plus sliders for body size, heading scale, and line height
-- **Spacing** — Slider for page padding
-- **Sections** — Toggles to show or hide individual content blocks (stat grid, case studies, budget table, etc.)
-- **Layout** — Button groups for stat columns, dropdown for heading case
-- **Undo/Redo** — Step backward and forward through your changes
+- **Presets**, One-click theme buttons (CCM brand, Professional blue, Modern green, Warm earth, Elegant purple) that apply coordinated colors and fonts
+- **Colors**, Color pickers for all CSS variables (primary, dark, text, background, accent)
+- **Typography**, Font dropdowns (heading and body) with Google Fonts, plus sliders for body size, heading scale, and line height
+- **Spacing**, Slider for page padding
+- **Sections**, Toggles to show or hide individual content blocks (stat grid, case studies, budget table, etc.)
+- **Layout**, Button groups for stat columns, dropdown for heading case
+- **Undo/Redo**, Step backward and forward through your changes
 
-Every change you make applies instantly in the preview. A "Pending changes" list at the bottom tracks your adjustments. When you're ready, click **Copy changes** — it puts a formatted prompt on your clipboard that you can paste back into the conversation. Claude applies those changes to the actual HTML source file.
+Every change you make applies instantly in the preview. A "Pending changes" list at the bottom tracks your adjustments. When you're ready, click **Copy changes**, it puts a formatted prompt on your clipboard that you can paste back into the conversation. Claude applies those changes to the actual HTML source file.
 
-The panel collapses to a thin sidebar tab when you don't need it. It's hidden during print, so it won't appear if you print to PDF. Your document HTML stays completely unchanged — the controls live in the wrapper page, separate from your document.
+The panel collapses to a thin sidebar tab when you don't need it. It's hidden during print, so it won't appear if you print to PDF. Your document HTML stays completely unchanged, the controls live in the wrapper page, separate from your document.
 
 ### Adding control panel support for other templates
 
-The control panel is driven by template maps — data files that describe which CSS variables, selectors, and sections exist in each template. Currently only the proposal template has a map. To add support for another template, create a new map file in `controls/template-maps/`. See the README in that directory for the format.
+The control panel is driven by template maps, data files that describe which CSS variables, selectors, and sections exist in each template. Currently only the proposal template has a map. To add support for another template, create a new map file in `controls/template-maps/`. See the README in that directory for the format.
 
 ---
 
@@ -156,13 +156,13 @@ The full path for the config file is:
 
 ### How to create the config file
 
-**Option A — Let Claude do it:** Inside Claude Code, just say:
+**Option A, Let Claude do it:** Inside Claude Code, just say:
 
 > "Create a brand config for PDF Playground. My organization is called [your org name] and our main color is [your color]."
 
 Claude will create the file in the right place.
 
-**Option B — Create it yourself:** Open a text editor (VS Code, Notepad, TextEdit, nano — any editor works) and create a new file at `~/.claude/pdf-playground.local.md` with this content:
+**Option B, Create it yourself:** Open a text editor (VS Code, Notepad, TextEdit, nano, any editor works) and create a new file at `~/.claude/pdf-playground.local.md` with this content:
 
 ```yaml
 ---
@@ -173,13 +173,13 @@ colors:
 ---
 ```
 
-Replace `Your Organization Name Here` with your actual organization name. Replace `#0066CC` with your brand's main color (any hex color code works — google "hex color picker" if you're not sure what yours is).
+Replace `Your Organization Name Here` with your actual organization name. Replace `#0066CC` with your brand's main color (any hex color code works, google "hex color picker" if you're not sure what yours is).
 
 **That's the minimum config. Everything else is optional.** The two lines above (`name` and `primary` color) are enough to get branded documents.
 
 ### Full config (all options)
 
-If you want more control, here's every option available. Only include the lines you want to customize — you can leave out anything you don't need:
+If you want more control, here's every option available. Only include the lines you want to customize, you can leave out anything you don't need:
 
 ```yaml
 ---
@@ -218,11 +218,11 @@ Add any specific guidelines here, like:
 
 | Part | Customize it? | How |
 |------|---------------|-----|
-| `brand: name:` | **Yes** — put your org's name | Replace the text in quotes |
-| `colors: primary:` | **Yes** — put your brand color | Replace the hex code (e.g., `"#FF5733"`) |
+| `brand: name:` | **Yes**, put your org's name | Replace the text in quotes |
+| `colors: primary:` | **Yes**, put your brand color | Replace the hex code (e.g. `"#FF5733"`) |
 | Everything else | **Only if you want to** | Replace the example values with your own, or delete lines you don't need |
-| The `---` lines | **No — don't change these** | They mark the beginning and end of the config section |
-| The words before the colons (`brand:`, `colors:`, `fonts:`, etc.) | **No — don't change these** | They're field names that the plugin looks for |
+| The `---` lines | **No, don't change these** | They mark the beginning and end of the config section |
+| The words before the colons (`brand:`, `colors:`, `fonts:`, etc.) | **No, don't change these** | They're field names that the plugin looks for |
 
 ---
 
@@ -314,4 +314,4 @@ Created by [Joe Amditis](https://github.com/jamditis) at the [Center for Coopera
 
 ## License
 
-MIT License — use freely, attribution appreciated.
+MIT License, use freely, attribution appreciated.

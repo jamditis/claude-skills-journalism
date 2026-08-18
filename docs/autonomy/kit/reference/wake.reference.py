@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""REFERENCE IMPLEMENTATION — read it, adapt it, do NOT run it as-is.
+"""REFERENCE IMPLEMENTATION, read it, adapt it, do NOT run it as-is.
 
 The wake loop: one scheduled run. It picks one issue, assembles the prompt, spawns
 the agent CLI under a hard timeout, watches for a stuck session, then hands off to
@@ -24,7 +24,7 @@ import pick_one  # the sibling reference picker
 
 def receipt_token():
     """A unique, sortable, non-secret session marker. Goes in commit/PR/comment
-    text so a verifier can attribute the work — never inside a committed file."""
+    text so a verifier can attribute the work, never inside a committed file."""
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M")
     return f"wake-{stamp}-{uuid.uuid4().hex[:6]}"
 
@@ -33,13 +33,13 @@ def assemble_prompt(pick, cfg, token, summary_path):
     """Concatenate the chosen issue, the scope constraints, the summary-file
     instruction, and the standing nudges whose flags are on. Block text lives in
     prompts.md; load it from there so you edit wording in one place. Order
-    matters — keep it as written."""
+    matters, keep it as written."""
     issue = pick["chosen"]
     scope = cfg["scope"]
     parts = [
         render_block("task", token=token, issue=issue, scope=scope),  # always first
         # The notifier reads this file after the run, so the session has to be told
-        # where to write it — otherwise the wake always reports "(no summary)".
+        # where to write it, otherwise the wake always reports "(no summary)".
         f"When you finish, write a short (<=800 char) summary of what you did to:\n  {summary_path}",
     ]
     order = ["quality_bar", "verify_from_code", "review", "wrap_up",
@@ -84,7 +84,7 @@ def spawn_session(cfg, prompt, log_path):
 
 def monitor(proc, log_path, cfg):
     """Watch the session. If the log stops growing for idle_minutes (likely stuck),
-    kill the whole process group — not just the timeout wrapper, which would orphan
+    kill the whole process group, not just the timeout wrapper, which would orphan
     the agent and let it keep spending tokens after we report 'killed-idle'. The
     hard ceiling is enforced by the timeout wrapper on its own."""
     idle = cfg["schedule"]["timeouts"]["idle_minutes"] * 60
@@ -124,7 +124,7 @@ def enforce_scope_and_open_pr(cfg, token):
          do NOT open a merge-ready PR (a second model must see the diff first).
       3. Otherwise open the PR (never merge).
 
-    Stubbed here — see BUILD-WITH-YOUR-AGENT.md steps 7-8 for what to implement."""
+    Stubbed here, see BUILD-WITH-YOUR-AGENT.md steps 7-8 for what to implement."""
     return  # replace with the real diff-guard + gh pr create
 
 
@@ -149,7 +149,7 @@ def run_wake(cfg):
     token = receipt_token()
     pick = pick_one.pick_one(cfg["github"])
     if pick is None:
-        print(f"[{token}] no eligible issues — nothing to do")  # invariant 8: fail safe
+        print(f"[{token}] no eligible issues, nothing to do")  # invariant 8: fail safe
         return
     log_path = f"/tmp/wake-{token}.log"
     summary_path = f"/tmp/wake-{token}.summary"
@@ -157,7 +157,7 @@ def run_wake(cfg):
     proc, log = spawn_session(cfg, prompt, log_path)
     status = monitor(proc, log_path, cfg)
     log.close()
-    # Scope enforcement and PR creation are the harness's job, not the session's —
+    # Scope enforcement and PR creation are the harness's job, not the session's,
     # they have to run after the session commits but before any PR exists.
     enforce_scope_and_open_pr(cfg, token)
     summarize_and_notify(cfg, token, status, summary_path)

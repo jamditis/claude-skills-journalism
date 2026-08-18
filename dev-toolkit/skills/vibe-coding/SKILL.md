@@ -1,6 +1,6 @@
 ---
 name: vibe-coding
-description: Methodology for effective AI-assisted software development. Use when helping users build software with AI coding assistants, debugging AI-generated code, planning features for AI implementation, managing version control in AI workflows, or when users mention "vibe coding," Claude Code, Cursor, GitHub Copilot, Aider, Continue, Cline, Codex, Windsurf, or similar AI coding tools. Provides strategies for planning, testing, debugging, and iterating on code written with LLM assistance.
+description: AI-assisted coding with Claude Code, Cursor, Copilot, Codex, Aider, or Windsurf. Use to build or debug generated code.
 ---
 
 # Vibe coding methodology
@@ -13,7 +13,7 @@ Practical strategies for building software effectively with AI coding assistants
 
 Start by working with the AI to write a detailed implementation plan in a markdown file.
 
-**Scope management**: Review and refine the plan—delete unnecessary items, mark complex features as "won't do," and keep a separate section for ideas to implement later. This prevents scope creep and maintains focus.
+**Scope management**: Review and refine the plan, delete unnecessary items, mark complex features as "won't do," and keep a separate section for ideas to implement later. This prevents scope creep and maintains focus.
 
 **Incremental implementation**: Work section by section rather than building everything at once. Have the AI mark sections complete after successful implementation, and commit each working section to git before moving to the next.
 
@@ -21,17 +21,17 @@ Start by working with the AI to write a detailed implementation plan in a markdo
 
 ## Version control strategies
 
-Git is your safety net — don't rely solely on the AI tool's revert functionality.
+Git is your safety net, don't rely solely on the AI tool's revert functionality.
 
-**Branch per attempt**: Begin each new feature on a fresh feature branch (`git switch -c feature/xyz`) and commit small chunks as the AI makes progress. The branch boundary is your "if this goes off the rails, throw it away" boundary — you discard the branch, not your working tree.
+**Branch per attempt**: Begin each new feature on a fresh feature branch (`git switch -c feature/xyz`) and commit small chunks as the AI makes progress. The branch boundary is your "if this goes off the rails, throw it away" boundary, you discard the branch, not your working tree.
 
-**When the AI goes down a bad path**: Prefer reversible commands. `git restore .` discards uncommitted changes; `git stash` parks them; `git switch -` jumps back to your previous branch. Reach for `git reset --hard HEAD` only when you've confirmed there's nothing in the working tree worth keeping — destructive commands skip the reflog niceties and can swallow uncommitted experiments. (If the agent has been creating new files, a separate `git clean -fd` is also part of "really, throw it all away" — same caveats.)
+**When the AI goes down a bad path**: Prefer reversible commands. `git restore .` discards uncommitted changes; `git stash` parks them; `git switch -` jumps back to your previous branch. Reach for `git reset --hard HEAD` only when you've confirmed there's nothing in the working tree worth keeping, destructive commands skip the reflog niceties and can swallow uncommitted experiments. (If the agent has been creating new files, a separate `git clean -fd` is also part of "really, throw it all away", same caveats.)
 
-**Clean re-implementation**: When you finally find a working solution after several attempts, branch from main, implement it fresh, and discard the throwaway branch. Multiple failed AI attempts leave layers of dead code that compound future confusion — a clean re-implementation of a known-good solution is faster and more maintainable than untangling the spaghetti.
+**Clean re-implementation**: When you finally find a working solution after several attempts, branch from main, implement it fresh, and discard the throwaway branch. Multiple failed AI attempts leave layers of dead code that compound future confusion, a clean re-implementation of a known-good solution is faster and more maintainable than untangling the spaghetti.
 
 ## Testing framework
 
-Prioritize end-to-end integration tests over unit tests. Focus on simulating user behavior—testing features by simulating someone clicking through the site or app.
+Prioritize end-to-end integration tests over unit tests. Focus on simulating user behavior, testing features by simulating someone clicking through the site or app.
 
 **Regression prevention**: LLMs often make unnecessary changes to unrelated logic. Tests catch these regressions before they compound.
 
@@ -60,7 +60,7 @@ The current tools cluster into four shapes. Pick by where you work, not by hype.
 | IDE extensions | GitHub Copilot, Continue, Cline, Roo Code, Amazon Q | Stay in your existing editor (VS Code, JetBrains, Neovim) |
 | Cloud agents | Devin, OpenHands, Jules, GitHub Copilot Coding Agent | Async / background work via PR, no local terminal needed |
 
-A common stack many developers converge on: **Cursor or Copilot for daily editing + Claude Code (or Codex CLI) for repo-wide / agentic tasks**. They're complementary — fast inline edits in the IDE, longer agentic loops at the terminal.
+A common stack many developers converge on: **Cursor or Copilot for daily editing + Claude Code (or Codex CLI) for repo-wide / agentic tasks**. They're complementary, fast inline edits in the IDE, longer agentic loops at the terminal.
 
 ## AI tool optimization
 
@@ -69,7 +69,7 @@ A common stack many developers converge on: **Cursor or Copilot for daily editin
 | Tool | File(s) | Notes |
 |---|---|---|
 | Claude Code | `CLAUDE.md` (per-directory, nested) | Loaded automatically; see [docs.anthropic.com/en/docs/claude-code/memory](https://docs.anthropic.com/en/docs/claude-code/memory) |
-| Cursor | `.cursor/rules/*.mdc` (modern) — Markdown + YAML frontmatter (`description`, `globs`, `alwaysApply`) | Legacy `.cursorrules` single-file still works but Cursor recommends migrating |
+| Cursor | `.cursor/rules/*.mdc` (modern), Markdown + YAML frontmatter (`description`, `globs`, `alwaysApply`) | Legacy `.cursorrules` single-file still works but Cursor recommends migrating |
 | Windsurf | `.windsurfrules` or `.windsurf/rules/*.md` | Same dual pattern as Cursor |
 | GitHub Copilot | `.github/copilot-instructions.md` | Single repo-level file, ~4k char practical cap |
 | Cline | `.clinerules` | Single file |
@@ -79,7 +79,7 @@ A common stack many developers converge on: **Cursor or Copilot for daily editin
 
 When working across multiple tools, keep the canonical guidance in `AGENTS.md` and reference it from tool-specific files (`CLAUDE.md`: "Also read AGENTS.md."). That avoids drift between siblings.
 
-**Local documentation**: Download API documentation to your project folder. AI tools work more accurately against local docs than against recalled training data — especially for libraries that release breaking changes faster than training cutoffs (e.g., Sentry SDK, Google GenAI SDK, Selenium).
+**Local documentation**: Download API documentation to your project folder. AI tools work more accurately against local docs than against recalled training data, especially for libraries that release breaking changes faster than training cutoffs (e.g. Sentry SDK, Google GenAI SDK, Selenium).
 
 **Run multiple tools**: There's no penalty for running Cursor for inline edits while a Claude Code or Codex CLI session works in another terminal on a separate task. Different shapes for different work.
 
@@ -99,7 +99,7 @@ When working across multiple tools, keep the canonical guidance in `AGENTS.md` a
 
 **Training data matters**: Newer languages like Rust or Elixir may have less training data, leading to more errors or outdated patterns.
 
-**Modularity**: Small, modular files are easier for both humans and AIs to work with. Avoid files with thousands of lines—they exceed context windows and create confusion.
+**Modularity**: Small, modular files are easier for both humans and AIs to work with. Avoid files with thousands of lines, they exceed context windows and create confusion.
 
 ## Beyond coding
 
@@ -116,4 +116,4 @@ AI assistants help with more than writing code:
 
 **Regular refactoring**: Once tests are in place, refactor frequently. Ask the AI to identify refactoring candidates.
 
-**Stay current**: Try every new model release. Different models excel at different tasks—experiment to find which works best for your use case.
+**Stay current**: Try every new model release. Different models excel at different tasks, experiment to find which works best for your use case.

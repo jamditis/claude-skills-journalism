@@ -32,7 +32,7 @@ def generate_evolved_skill(skill_content, lessons, model_cmd="claude -p"):
 
 RULES:
 - Integrate lessons naturally into the existing content
-- Don't create a separate "lessons" section — weave guidance into the flow where it belongs
+- Don't create a separate "lessons" section, weave guidance into the flow where it belongs
 - Preserve the skill's existing structure, voice, and formatting
 - Higher-confidence lessons should be treated as more authoritative
 - If a lesson contradicts existing guidance, the lesson wins (it's from real usage)

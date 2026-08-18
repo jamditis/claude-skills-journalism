@@ -18,14 +18,14 @@ The biggest lever is which credential your CLIs use.
   pay-as-you-go. An unattended loop firing on a schedule bills continuously.
 
 If an API key is set in your environment, confirm which auth mode each CLI is
-actually using before you schedule anything — the worker and the reviewer both.
+actually using before you schedule anything, the worker and the reviewer both.
 Don't assume the subscription login wins; check, because a metered key billing in
 the background is the surprise you're trying to avoid.
 
 ## The high end
 
-Maxed out — a metered API key, a wake every 15 minutes around the clock, top
-reasoning effort, no hard timeout — this is a loop that can run a meaningful
+Maxed out, a metered API key, a wake every 15 minutes around the clock, top
+reasoning effort, no hard timeout, this is a loop that can run a meaningful
 monthly bill on its own, because it's paying per token for ~100 sessions a day,
 each running as long as it likes. That's the ceiling. The rest of this file is how
 far below it you choose to sit.
@@ -36,7 +36,7 @@ For reference, not as a recommendation:
 
 - Both CLIs (worker and reviewer) on subscriptions, so the marginal cost of a wake
   is effectively zero.
-- An hourly wake during work hours only — about 13 sessions a day, not 100.
+- An hourly wake during work hours only, about 13 sessions a day, not 100.
 - Work at a real reasoning effort; review at low effort, because a fast literal
   read is what catches bugs.
 - One issue per session, with a 90-minute hard timeout, so no single run can spend
@@ -48,16 +48,16 @@ That setup does real work daily and stays inside flat-rate plans.
 
 ## Calibrating to your needs
 
-Each of these is a dial in `config.yaml` — turn it toward cheaper or toward more,
+Each of these is a dial in `config.yaml`, turn it toward cheaper or toward more,
 to taste:
 
-- **Cadence** (`schedule.wake.cron`) — the largest dial. Hourly during work hours
+- **Cadence** (`schedule.wake.cron`), the largest dial. Hourly during work hours
   is ~13 runs a day; every 15 minutes is ~50.
-- **Active hours** — a narrower window is fewer runs.
-- **Effort** (`model.work_effort`, `model.review_effort`) — higher tiers cost more
+- **Active hours**, a narrower window is fewer runs.
+- **Effort** (`model.work_effort`, `model.review_effort`), higher tiers cost more
   per run and take longer.
-- **One issue per session** (built in) — bounds how much any single wake can do.
-- **Hard timeout** (`schedule.timeouts.hard_minutes`) — the backstop on a runaway
+- **One issue per session** (built in), bounds how much any single wake can do.
+- **Hard timeout** (`schedule.timeouts.hard_minutes`), the backstop on a runaway
   session.
 
 If you're on metered billing and want a firm ceiling, the practical budget is
@@ -75,10 +75,10 @@ python3 estimate_cost.py --cron "*/15 7-19 * * *" --work-effort high
 
 It prints estimated runs per day, runs per month, and a monthly cost range for
 subscription vs. metered billing side by side, so the gap is concrete. The same
-math runs in the browser at `cost-estimator.html` — no setup. The price
+math runs in the browser at `cost-estimator.html`, no setup. The price
 assumptions live in one editable block at the top of `estimate_cost.py`. The
-subscription defaults assume the common plan tiers — a $100/mo worker plan and a
-$20/mo reviewer plan — so swap in whichever tier ($20, $100, $200) you're
+subscription defaults assume the common plan tiers, a $100/mo worker plan and a
+$20/mo reviewer plan, so swap in whichever tier ($20, $100, $200) you're
 actually on, and replace the metered figures with your observed per-session
 token use.
 
@@ -91,5 +91,5 @@ current terms for your own accounts:
   automated PR review can draw on Actions minutes on private repos. Running review
   locally via a CLI keeps it off that meter.
 - Anthropic has signaled changes to how non-interactive (`-p`) sessions count
-  against a plan — the mode this loop runs in. Worth confirming what your plan
+  against a plan, the mode this loop runs in. Worth confirming what your plan
   currently allows for unattended `-p` runs before you raise the cadence.

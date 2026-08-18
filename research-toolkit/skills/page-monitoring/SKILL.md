@@ -1,6 +1,6 @@
 ---
 name: page-monitoring
-description: Web page monitoring, change detection, and availability tracking. Use when tracking content changes, detecting when pages go down, monitoring for updates, preserving content before deletion, or generating feeds for pages without RSS. Covers Visualping, ChangeTower, Distill.io, and self-hosted monitoring solutions.
+description: Web page change detection, availability tracking, and RSS feed generation. Use to monitor changes, downtime, or make a feed.
 ---
 
 # Page monitoring methodology
@@ -29,7 +29,7 @@ Use this shape when passing retrieved material onward:
 
 ## Monitoring service comparison
 
-Free-tier limits and retention windows shift annually — verify at the
+Free-tier limits and retention windows shift annually, verify at the
 service's pricing page before relying on a specific number. The
 columns below reflect a 2026 snapshot.
 
@@ -428,17 +428,17 @@ docker run -d -p 3000:80 rssbridge/rss-bridge
 #
 # IMPORTANT (2023+): X eliminated the free Twitter API tier and the
 # free academic research access program. Current X API pricing has
-# shifted multiple times since the 2023 changes — the Basic / Pro /
+# shifted multiple times since the 2023 changes, the Basic / Pro /
 # Enterprise tier names and pay-per-use credit model have been
 # revised; check the current pricing page at
 # https://developer.x.com/en/products/x-api before estimating cost.
 # For one-off archiving, the snscrape / nitter / web-scraping path
-# may be more cost-effective — see the web-scraping skill.
+# may be more cost-effective, see the web-scraping skill.
 
 # Installation
 # pip install twarc
 
-# Configure (interactive — provides API keys + bearer token)
+# Configure (interactive, provides API keys + bearer token)
 # twarc2 configure
 
 import subprocess

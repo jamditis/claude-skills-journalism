@@ -125,7 +125,7 @@ The fundamental building block. A colored card representing a system component, 
   border-color: var(--border);
 }
 
-/* Hero: executive summaries, focal elements — demands attention */
+/* Hero: executive summaries, focal elements, demands attention */
 .ve-card--hero {
   background: color-mix(in srgb, var(--surface) 92%, var(--accent) 8%);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
@@ -253,13 +253,13 @@ For implementation plans and architecture docs, **don't display entire source fi
    <div class="file-structure">
      <div class="file-structure__path">src/extension.ts</div>
      <ul class="file-structure__outline">
-       <li><code>BOOMERANG_INSTRUCTIONS</code> — System prompt for autonomous mode</li>
-       <li><code>clearState()</code> — Reset extension state</li>
-       <li><code>updateStatus()</code> — Update UI status indicator</li>
-       <li><code>/boomerang</code> command — Start autonomous task</li>
-       <li><code>/boomerang-cancel</code> command — Cancel active task</li>
-       <li><code>before_agent_start</code> hook — Inject instructions</li>
-       <li><code>agent_end</code> hook — Generate summary</li>
+       <li><code>BOOMERANG_INSTRUCTIONS</code>, System prompt for autonomous mode</li>
+       <li><code>clearState()</code>, Reset extension state</li>
+       <li><code>updateStatus()</code>, Update UI status indicator</li>
+       <li><code>/boomerang</code> command, Start autonomous task</li>
+       <li><code>/boomerang-cancel</code> command, Cancel active task</li>
+       <li><code>before_agent_start</code> hook, Inject instructions</li>
+       <li><code>agent_end</code> hook, Generate summary</li>
      </ul>
    </div>
    ```
@@ -290,7 +290,7 @@ If someone needs the full file, put it in a collapsible section or link to it.
 
 ## Directory Tree
 
-For file structures, use `<pre>` with monospace + `white-space: pre`. Tree connectors (`├──`, `└──`, `│`) only work when vertically aligned — they become noise if text wraps.
+For file structures, use `<pre>` with monospace + `white-space: pre`. Tree connectors (`├──`, `└──`, `│`) only work when vertically aligned, they become noise if text wraps.
 
 ```css
 .dir-tree {
@@ -312,7 +312,7 @@ For file structures, use `<pre>` with monospace + `white-space: pre`. Tree conne
 ```html
 <pre class="dir-tree">my-project/
 ├── src/
-│   ├── <span class="hl">index.ts</span>       <span class="ann">— entry point</span>
+│   ├── <span class="hl">index.ts</span>       <span class="ann">- entry point</span>
 │   ├── services/
 │   │   └── <span class="hl">api.py</span>     <span class="ann">(142 lines)</span>
 │   └── utils/
@@ -337,7 +337,7 @@ For labeled trees, wrap in a card. For side-by-side comparisons, put two cards i
 @media (max-width: 900px) { .dir-compare { grid-template-columns: 1fr; } }
 ```
 
-**Never** render tree connectors inside wrapping text (`white-space: normal`), flex children, or grid items — the vertical pipes lose alignment and the hierarchy becomes unreadable.
+**Never** render tree connectors inside wrapping text (`white-space: normal`), flex children, or grid items, the vertical pipes lose alignment and the hierarchy becomes unreadable.
 
 ## Overflow Protection
 
@@ -385,7 +385,7 @@ Using `display: flex` on a list item to position a `::before` marker creates an 
 Use absolute positioning for markers instead:
 
 ```css
-/* WRONG — causes overflow with inline code badges */
+/* WRONG, causes overflow with inline code badges */
 li {
   display: flex;
   align-items: baseline;
@@ -396,7 +396,7 @@ li::before {
   flex-shrink: 0;
 }
 
-/* RIGHT — text wraps normally */
+/* RIGHT, text wraps normally */
 li {
   padding-left: 14px;
   position: relative;
@@ -413,22 +413,22 @@ li::before {
 By default, `list-style-position: outside` places list markers (bullets, numbers) outside the content box. When lists are inside bordered containers (cards, callout boxes), the markers can overlap or extend beyond the border.
 
 ```css
-/* WRONG — markers overlap container border */
+/* WRONG, markers overlap container border */
 .card ol, .card ul {
   padding-left: 20px;  /* Not enough for outside markers */
 }
 
-/* RIGHT — use inside positioning */
+/* RIGHT, use inside positioning */
 .card ol, .card ul {
   list-style-position: inside;
 }
 
-/* OR — adequate padding for outside markers */
+/* OR, adequate padding for outside markers */
 .card ol, .card ul {
   padding-left: 2em;  /* ~32px gives room for markers */
 }
 
-/* OR — custom markers with absolute positioning (most control) */
+/* OR, custom markers with absolute positioning (most control) */
 .card ol {
   list-style: none;
   padding-left: 0;
@@ -456,16 +456,16 @@ Mermaid diagrams have two common layout issues: they render too small to read, a
 
 ### Centering (Required)
 
-Mermaid SVGs render at a fixed size based on content. Without explicit centering, they default to top-left alignment. **Always center Mermaid diagrams** — narrow vertical flowcharts look particularly bad when left-aligned in a wide container.
+Mermaid SVGs render at a fixed size based on content. Without explicit centering, they default to top-left alignment. **Always center Mermaid diagrams**, narrow vertical flowcharts look particularly bad when left-aligned in a wide container.
 
 ```css
-/* WRONG — diagram hugs left edge */
+/* WRONG, diagram hugs left edge */
 .mermaid-container {
   padding: 24px;
   border: 1px solid var(--border);
 }
 
-/* RIGHT — diagram centers in container */
+/* RIGHT, diagram centers in container */
 .mermaid-wrap {
   display: flex;
   justify-content: center;
@@ -510,7 +510,7 @@ mermaid.initialize({
 
 Add zoom controls to every `.mermaid-wrap` container for complex diagrams.
 
-**Small diagrams in slides.** If a diagram has fewer than ~7 nodes with no branching, it will render tiny in a full-viewport slide container. For simple linear flows (A → B → C → D), use CSS pipeline cards instead of Mermaid — see `slide-patterns.md` "CSS Pipeline Slide." Reserve Mermaid for complex graphs where automatic edge routing is actually needed.
+**Small diagrams in slides.** If a diagram has fewer than ~7 nodes with no branching, it will render tiny in a full-viewport slide container. For simple linear flows (A → B → C → D), use CSS pipeline cards instead of Mermaid, see `slide-patterns.md` "CSS Pipeline Slide." Reserve Mermaid for complex graphs where automatic edge routing is actually needed.
 
 ### Full Pattern
 
@@ -1112,10 +1112,10 @@ Uses `@property` to animate a custom property as an integer, then display it via
 
 Don't use the same animation for everything. Mix types by element role, with easing stagger (fast-then-slow, not linear):
 
-- **Cards**: `fadeUp` — the default entrance, reliable and subtle
-- **KPI / badges**: `fadeScale` — scale draws the eye to important numbers
-- **SVG connectors**: `drawIn` — reveals flow direction, pairs with card stagger
-- **Hero numbers**: `countUp` — counting motion signals "this number matters"
+- **Cards**: `fadeUp`, the default entrance, reliable and subtle
+- **KPI / badges**: `fadeScale`, scale draws the eye to important numbers
+- **SVG connectors**: `drawIn`, reveals flow direction, pairs with card stagger
+- **Hero numbers**: `countUp`, counting motion signals "this number matters"
 - **Stagger timing**: `calc(var(--i) * 0.06s)` with lower `--i` values on important elements so they appear first
 
 ### Respect Reduced Motion
@@ -1455,10 +1455,10 @@ Opening paragraph styled distinctly from body text.
 
 ### Pull Quotes
 
-Key insights pulled out for emphasis. Use sparingly — one or two per article maximum.
+Key insights pulled out for emphasis. Use sparingly, one or two per article maximum.
 
 ```css
-/* Border left — most versatile */
+/* Border left, most versatile */
 .pullquote {
   margin: 48px 0;
   padding-left: 24px;
@@ -1507,7 +1507,7 @@ hr {
   margin: 48px 0;
 }
 
-/* Ornamental divider — use: <div class="divider">✦ ✦ ✦</div> */
+/* Ornamental divider, use: <div class="divider">✦ ✦ ✦</div> */
 .divider {
   text-align: center;
   margin: 48px 0;
@@ -1520,7 +1520,7 @@ hr {
 ### Article Hero Patterns
 
 ```css
-/* Centered minimal — essays, personal posts */
+/* Centered minimal, essays, personal posts */
 .hero--centered {
   text-align: center;
   padding: 80px 24px 64px;
@@ -1553,7 +1553,7 @@ hr {
   color: var(--text-dim);
 }
 
-/* Left-aligned editorial — features, documentation */
+/* Left-aligned editorial, features, documentation */
 .hero--editorial {
   padding: 100px 40px 60px;
   max-width: 1000px;
@@ -1708,7 +1708,7 @@ Avoid these in reading-first content:
 
 ## Generated Images
 
-For AI-generated illustrations embedded as base64 data URIs via `surf gemini --generate-image`. Use sparingly — hero banners, conceptual illustrations, educational diagrams, decorative accents.
+For AI-generated illustrations embedded as base64 data URIs via `surf gemini --generate-image`. Use sparingly, hero banners, conceptual illustrations, educational diagrams, decorative accents.
 
 ### Hero Banner
 

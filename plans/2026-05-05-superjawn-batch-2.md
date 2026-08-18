@@ -1,10 +1,10 @@
 # superjawn Batch 2 implementation plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. Use `superpowers:` namespace for the meta-skills here because the session executing this plan likely cannot load `superjawn:*` skills due to the loadability caveat in the spec — the two are byte-equivalent for plan-execution purposes after the v0.2.0 strip.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. Use `superpowers:` namespace for the meta-skills here because the session executing this plan likely cannot load `superjawn:*` skills due to the loadability caveat in the spec, the two are byte-equivalent for plan-execution purposes after the v0.2.0 strip.
 
-**Goal:** Port the second batch of three superpowers skills into superjawn under the v0.2.0 architecture: `systematic-debugging` (research category — design-heavy), `test-driven-development` (consumer — pure port), `verification-before-completion` (consumer — pure port). Ship as v0.3.0.
+**Goal:** Port the second batch of three superpowers skills into superjawn under the v0.2.0 architecture: `systematic-debugging` (research category, design-heavy), `test-driven-development` (consumer, pure port), `verification-before-completion` (consumer, pure port). Ship as v0.3.0.
 
-**Architecture:** Three skill ports inside the existing `superjawn/skills/` tree. systematic-debugging gets a research-phase section inserted between its existing Phase 1 (Root Cause Investigation) and Phase 2 (Pattern Analysis) per the spec's locked design (4 research kinds, 3 parallel subagents + inline memory, findings at `.superpowers/debug-log-<slug>.md`, locked Batch 1 skip protocol). The two consumers receive only an MIT attribution comment and dual-namespace cross-reference rewrites — no research/freshness phase.
+**Architecture:** Three skill ports inside the existing `superjawn/skills/` tree. systematic-debugging gets a research-phase section inserted between its existing Phase 1 (Root Cause Investigation) and Phase 2 (Pattern Analysis) per the spec's locked design (4 research kinds, 3 parallel subagents + inline memory, findings at `.superpowers/debug-log-<slug>.md`, locked Batch 1 skip protocol). The two consumers receive only an MIT attribution comment and dual-namespace cross-reference rewrites, no research/freshness phase.
 
 **Tech Stack:** Markdown (skill files), JSON (plugin manifest + marketplace), bash (verification commands).
 
@@ -39,19 +39,19 @@ superjawn/skills/verification-before-completion/
 
 ```
 superjawn/.claude-plugin/plugin.json      # Version bump 0.2.0 → 0.3.0, description update
-superjawn/README.md                       # Skill status table — mark Batch 2 entries Ported
+superjawn/README.md                       # Skill status table, mark Batch 2 entries Ported
 superjawn/CREDITS.md                      # Add v0.3.0 entry under Modifications from upstream
 ```
 
 **Responsibility split:**
 - `systematic-debugging/SKILL.md` carries the research-phase design from the spec
 - The two consumer SKILL.md files port byte-for-byte except for attribution + cross-refs
-- The supporting files inside each skill directory are reference material the SKILL.md links to (root-cause-tracing, defense-in-depth, condition-based-waiting for systematic-debugging; testing-anti-patterns for TDD) — copied verbatim because they don't have research phases or cross-refs to rewrite
+- The supporting files inside each skill directory are reference material the SKILL.md links to (root-cause-tracing, defense-in-depth, condition-based-waiting for systematic-debugging; testing-anti-patterns for TDD), copied verbatim because they don't have research phases or cross-refs to rewrite
 - `plugin.json`, `README.md`, `CREDITS.md` carry the version/status/attribution metadata
 
 ---
 
-## Task 1: Port `systematic-debugging` — copy upstream files
+## Task 1: Port `systematic-debugging`, copy upstream files
 
 **Files:**
 - Create: `superjawn/skills/systematic-debugging/` (full upstream tree)
@@ -87,7 +87,7 @@ superjawn/skills/systematic-debugging/defense-in-depth.md
 superjawn/skills/systematic-debugging/root-cause-tracing.md
 ```
 
-If the upstream directory has additional files not listed here, copy them too — the upstream tree is the source of truth.
+If the upstream directory has additional files not listed here, copy them too, the upstream tree is the source of truth.
 
 - [ ] **Step 4: Verify SKILL.md is unchanged from upstream**
 
@@ -96,11 +96,11 @@ diff superjawn/skills/systematic-debugging/SKILL.md \
      ~/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/systematic-debugging/SKILL.md
 ```
 
-Expected: no output (files identical at this point — modifications come in next task).
+Expected: no output (files identical at this point, modifications come in next task).
 
 ---
 
-## Task 2: Port `systematic-debugging` — add MIT attribution + research phase
+## Task 2: Port `systematic-debugging`, add MIT attribution + research phase
 
 **Files:**
 - Modify: `superjawn/skills/systematic-debugging/SKILL.md`
@@ -117,7 +117,7 @@ Adapted from obra/superpowers systematic-debugging skill (v5.0.7), MIT-licensed,
 copyright 2025 Jesse Vincent. Modifications copyright 2026 Joe Amditis.
 v0.3.0 adds a research phase between Phase 1 (Root Cause Investigation)
 and Phase 2 (Pattern Analysis) per the v0.2.0 architecture's
-research-at-entry-point rule (debugging is an entry-point stage —
+research-at-entry-point rule (debugging is an entry-point stage,
 the work begins from a bug report, not an upstream artifact).
 See CREDITS.md.
 -->
@@ -184,9 +184,9 @@ If skipping, write one line to `.superpowers/debug-log-<slug>.md`: `Skipped rese
 
 **Valid reasons:**
 - Trivial scope (typo, comment edit, single-line config)
-- Fresh prior research — same topic in current session OR within last 7 days with verifiable spec/plan pointer. **If the pointer doesn't resolve, the skip is invalid.** (Beyond 7 days, repeat the research even if you remember the prior findings — the landscape drifts.)
-- User explicit — **must quote the phrase** that authorized the skip.
-- Repeat of identical task — **must include a pointer** to the prior successful run.
+- Fresh prior research, same topic in current session OR within last 7 days with verifiable spec/plan pointer. **If the pointer doesn't resolve, the skip is invalid.** (Beyond 7 days, repeat the research even if you remember the prior findings, the landscape drifts.)
+- User explicit, **must quote the phrase** that authorized the skip.
+- Repeat of identical task, **must include a pointer** to the prior successful run.
 
 **Invalid reasons:** "I think I know", "seems straightforward", "moving fast", "user wants this done quickly", "already familiar with this codebase". If those are tempting, do the research.
 
@@ -199,7 +199,7 @@ grep -c "^## " superjawn/skills/systematic-debugging/SKILL.md
 grep -c "^## " ~/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/systematic-debugging/SKILL.md
 ```
 
-The two counts should be identical — we added a `###` section, not a `##`.
+The two counts should be identical, we added a `###` section, not a `##`.
 
 ```bash
 grep -c "^### " superjawn/skills/systematic-debugging/SKILL.md
@@ -216,7 +216,7 @@ Expected to see, in order: Phase 1, Research phase, Phase 2, Phase 3, Phase 4. T
 
 - [ ] **Step 5: Verify the locked skip-protocol text is byte-identical to Batch 1**
 
-The valid/invalid skip reasons in Step 3's inserted text are LOCKED — they must match the text in Batch 1's ported skills (`superjawn/skills/brainstorming/SKILL.md` and the v0.2.0-stripped `superjawn/skills/writing-plans/SKILL.md` had it before strip; brainstorming still does).
+The valid/invalid skip reasons in Step 3's inserted text are LOCKED, they must match the text in Batch 1's ported skills (`superjawn/skills/brainstorming/SKILL.md` and the v0.2.0-stripped `superjawn/skills/writing-plans/SKILL.md` had it before strip; brainstorming still does).
 
 ```bash
 # Extract just the locked block from brainstorming
@@ -253,17 +253,17 @@ condition-based-waiting) ported verbatim alongside the modified SKILL.md."
 
 ---
 
-## Task 3: Port `systematic-debugging` — rewrite cross-references
+## Task 3: Port `systematic-debugging`, rewrite cross-references
 
 **Files:**
 - Modify: `superjawn/skills/systematic-debugging/SKILL.md`
 
-Per the spec's Section 2 cross-ref handling rules, references to ported-this-batch-or-prior skills become `superjawn:`. The two cross-refs to handle in systematic-debugging are `superpowers:test-driven-development` and `superpowers:verification-before-completion` — both ported in this batch.
+Per the spec's Section 2 cross-ref handling rules, references to ported-this-batch-or-prior skills become `superjawn:`. The two cross-refs to handle in systematic-debugging are `superpowers:test-driven-development` and `superpowers:verification-before-completion`, both ported in this batch.
 
-**EXPLICIT NON-RENAMES** — same as Batch 1's locked rule:
-- `.superpowers/` (runtime directory, including the new `.superpowers/debug-log-*.md` paths) — keeps the upstream convention
-- `docs/superpowers/` (project doc directory paths) if they appear — keeps the convention
-- `obra/superpowers` (upstream attribution links) — pure attribution, stays as-is
+**EXPLICIT NON-RENAMES**, same as Batch 1's locked rule:
+- `.superpowers/` (runtime directory, including the new `.superpowers/debug-log-*.md` paths), keeps the upstream convention
+- `docs/superpowers/` (project doc directory paths) if they appear, keeps the convention
+- `obra/superpowers` (upstream attribution links), pure attribution, stays as-is
 
 Only `superpowers:<skill-name>` namespaced skill references get rewritten, and only when the skill is in the ported set.
 
@@ -289,7 +289,7 @@ grep -n "test-driven-development" superjawn/skills/systematic-debugging/SKILL.md
 grep -n "verification-before-completion" superjawn/skills/systematic-debugging/SKILL.md
 ```
 
-Every match should now show `superjawn:test-driven-development` or `superjawn:verification-before-completion` — no `superpowers:` prefix on those two skills, and no bare names without a namespace.
+Every match should now show `superjawn:test-driven-development` or `superjawn:verification-before-completion`, no `superpowers:` prefix on those two skills, and no bare names without a namespace.
 
 - [ ] **Step 4: Verify no fictional namespaces**
 
@@ -304,7 +304,7 @@ grep -oE "superpowers:[a-z-]+" superjawn/skills/systematic-debugging/SKILL.md | 
 done
 ```
 
-Expected: every `superpowers:` reference left in the file resolves to a real upstream skill directory. Any "MISSING UPSTREAM" output means a fictional reference exists — track it down and either rewrite it or remove the namespace prefix per the Batch 1 fictional-namespace lesson (Task 8 of Batch 1 caught `superpowers:frontend-design` and `superpowers:mcp-builder`; both rolled back to bare names).
+Expected: every `superpowers:` reference left in the file resolves to a real upstream skill directory. Any "MISSING UPSTREAM" output means a fictional reference exists, track it down and either rewrite it or remove the namespace prefix per the Batch 1 fictional-namespace lesson (Task 8 of Batch 1 caught `superpowers:frontend-design` and `superpowers:mcp-builder`; both rolled back to bare names).
 
 - [ ] **Step 5: Commit**
 
@@ -319,7 +319,7 @@ All remaining superpowers: references verified to exist upstream."
 
 ---
 
-## Task 4: Port `test-driven-development` — copy upstream files
+## Task 4: Port `test-driven-development`, copy upstream files
 
 **Files:**
 - Create: `superjawn/skills/test-driven-development/` (full upstream tree)
@@ -344,7 +344,7 @@ superjawn/skills/test-driven-development/SKILL.md
 superjawn/skills/test-driven-development/testing-anti-patterns.md
 ```
 
-If the upstream tree has additional files (e.g., a `references/` subdirectory), they should also have copied — verify the count matches the upstream:
+If the upstream tree has additional files (e.g. a `references/` subdirectory), they should also have copied, verify the count matches the upstream:
 
 ```bash
 find ~/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/test-driven-development -type f | wc -l
@@ -364,7 +364,7 @@ Expected: no output.
 
 ---
 
-## Task 5: Port `test-driven-development` — add MIT attribution + rewrite cross-references
+## Task 5: Port `test-driven-development`, add MIT attribution + rewrite cross-references
 
 **Files:**
 - Modify: `superjawn/skills/test-driven-development/SKILL.md`
@@ -379,7 +379,7 @@ Edit `superjawn/skills/test-driven-development/SKILL.md`. Add this HTML comment 
 <!--
 Adapted from obra/superpowers test-driven-development skill (v5.0.7),
 MIT-licensed, copyright 2025 Jesse Vincent. Modifications copyright
-2026 Joe Amditis. v0.3.0 ports as a consumer category — no research
+2026 Joe Amditis. v0.3.0 ports as a consumer category, no research
 phase per the v0.2.0 architecture, since TDD is a sub-skill called
 within other workflows whose specs/plans already encode the research
 conclusions. The artifact handoff carries those conclusions.
@@ -426,7 +426,7 @@ grep -oE "superpowers:[a-z-]+" superjawn/skills/test-driven-development/SKILL.md
 done
 ```
 
-Expected: every entry "OK". Any "MISSING UPSTREAM" means a fictional reference — fix per Batch 1's lesson.
+Expected: every entry "OK". Any "MISSING UPSTREAM" means a fictional reference, fix per Batch 1's lesson.
 
 - [ ] **Step 6: Commit**
 
@@ -435,14 +435,14 @@ git add superjawn/skills/test-driven-development/
 git commit -m "feat(superjawn): port test-driven-development as consumer
 
 Pure port: MIT attribution comment + dual-namespace cross-reference
-rewrites only. No research phase per the v0.2.0 architecture — TDD
+rewrites only. No research phase per the v0.2.0 architecture, TDD
 is a sub-skill called within other workflows whose specs/plans already
 encode the research conclusions."
 ```
 
 ---
 
-## Task 6: Port `verification-before-completion` — copy upstream files
+## Task 6: Port `verification-before-completion`, copy upstream files
 
 **Files:**
 - Create: `superjawn/skills/verification-before-completion/` (full upstream tree)
@@ -474,7 +474,7 @@ Expected: no output.
 
 ---
 
-## Task 7: Port `verification-before-completion` — add MIT attribution + rewrite cross-references
+## Task 7: Port `verification-before-completion`, add MIT attribution + rewrite cross-references
 
 **Files:**
 - Modify: `superjawn/skills/verification-before-completion/SKILL.md`
@@ -489,7 +489,7 @@ Edit `superjawn/skills/verification-before-completion/SKILL.md`. Add this HTML c
 <!--
 Adapted from obra/superpowers verification-before-completion skill
 (v5.0.7), MIT-licensed, copyright 2025 Jesse Vincent. Modifications
-copyright 2026 Joe Amditis. v0.3.0 ports as a consumer category — no
+copyright 2026 Joe Amditis. v0.3.0 ports as a consumer category, no
 research phase per the v0.2.0 architecture. Verification is a gate
 function: the verification command is determined by what was just
 built, so external research adds no value here.
@@ -540,7 +540,7 @@ git add superjawn/skills/verification-before-completion/
 git commit -m "feat(superjawn): port verification-before-completion as consumer
 
 Pure port: MIT attribution comment + dual-namespace cross-reference
-rewrites only. No research phase per the v0.2.0 architecture —
+rewrites only. No research phase per the v0.2.0 architecture,
 verification is a gate function whose command is determined by what
 was just built; external research adds no value."
 ```
@@ -587,13 +587,13 @@ Edit `superjawn/CREDITS.md`. Find the `## Modifications from upstream` section. 
 
 ```markdown
 **v0.3.0 Batch 2 (current).** Three skills ported under the v0.2.0 architecture:
-- `systematic-debugging` — research category. Research phase inserted between Phase 1 (Root Cause Investigation) and Phase 2 (Pattern Analysis), default-on. Four research kinds (web, codebase prior-bugs, authoritative, user-context) dispatched as 3 parallel subagents + inline memory. Findings at `.superpowers/debug-log-<slug>.md`. Skip protocol byte-identical to Batch 1's locked text.
-- `test-driven-development` — consumer category. Pure port (attribution + cross-refs only). No research phase: TDD is a sub-skill whose triggering spec/plan already encodes research conclusions.
-- `verification-before-completion` — consumer category. Pure port. No research phase: verification is a gate function determined by what was just built.
+- `systematic-debugging`, research category. Research phase inserted between Phase 1 (Root Cause Investigation) and Phase 2 (Pattern Analysis), default-on. Four research kinds (web, codebase prior-bugs, authoritative, user-context) dispatched as 3 parallel subagents + inline memory. Findings at `.superpowers/debug-log-<slug>.md`. Skip protocol byte-identical to Batch 1's locked text.
+- `test-driven-development`, consumer category. Pure port (attribution + cross-refs only). No research phase: TDD is a sub-skill whose triggering spec/plan already encodes research conclusions.
+- `verification-before-completion`, consumer category. Pure port. No research phase: verification is a gate function determined by what was just built.
 
 ```
 
-The blank line at the end is intentional — it separates the v0.3.0 block from the existing v0.2.0 block beneath it.
+The blank line at the end is intentional, it separates the v0.3.0 block from the existing v0.2.0 block beneath it.
 
 - [ ] **Step 5: Commit**
 
@@ -631,7 +631,7 @@ grep -rEh "superjawn:[a-z-]+" \
   | grep -oE "superjawn:[a-z-]+" | sort -u
 ```
 
-Expected output is a subset of the six-skill ported set: `superjawn:brainstorming`, `superjawn:writing-plans`, `superjawn:executing-plans`, `superjawn:systematic-debugging`, `superjawn:test-driven-development`, `superjawn:verification-before-completion`. Any other name in the output indicates a typo or fictional reference — fix it.
+Expected output is a subset of the six-skill ported set: `superjawn:brainstorming`, `superjawn:writing-plans`, `superjawn:executing-plans`, `superjawn:systematic-debugging`, `superjawn:test-driven-development`, `superjawn:verification-before-completion`. Any other name in the output indicates a typo or fictional reference, fix it.
 
 - [ ] **Step 3: Upstream-existence sweep on remaining `superpowers:` references**
 
@@ -682,7 +682,7 @@ Expected: `✔ Validation passed`.
 git log master..HEAD --oneline
 ```
 
-Expected: 8 commits in this batch — three for systematic-debugging (copy implicit, modify, cross-refs), one for TDD (copy implicit + modify combined under the consumer pattern), one for verification-before-completion (same), one for the version/README/CREDITS bump, and the spec doc commit from brainstorming. Plus this verification commit if you choose to make one. Commit count being slightly off is fine; the commits should be logically distinct.
+Expected: 8 commits in this batch, three for systematic-debugging (copy implicit, modify, cross-refs), one for TDD (copy implicit + modify combined under the consumer pattern), one for verification-before-completion (same), one for the version/README/CREDITS bump, and the spec doc commit from brainstorming. Plus this verification commit if you choose to make one. Commit count being slightly off is fine; the commits should be logically distinct.
 
 - [ ] **Step 7: Push branch**
 
@@ -699,9 +699,9 @@ gh pr create --title "superjawn v0.3.0: Batch 2 ports (debugging triad)" \
 
 Ports the second batch of three superpowers skills into superjawn under the v0.2.0 architecture. Ships as v0.3.0. After this PR, 6 of 14 upstream skills are ported.
 
-- `systematic-debugging` (research category) — research phase inserted between Phase 1 (Root Cause Investigation) and Phase 2 (Pattern Analysis). Four default research kinds dispatched as 3 parallel subagents + inline memory check. Findings at `.superpowers/debug-log-<slug>.md`. Skip protocol byte-identical to Batch 1's locked text.
-- `test-driven-development` (consumer) — pure port: MIT attribution + cross-refs only.
-- `verification-before-completion` (consumer) — pure port: MIT attribution + cross-refs only.
+- `systematic-debugging` (research category), research phase inserted between Phase 1 (Root Cause Investigation) and Phase 2 (Pattern Analysis). Four default research kinds dispatched as 3 parallel subagents + inline memory check. Findings at `.superpowers/debug-log-<slug>.md`. Skip protocol byte-identical to Batch 1's locked text.
+- `test-driven-development` (consumer), pure port: MIT attribution + cross-refs only.
+- `verification-before-completion` (consumer), pure port: MIT attribution + cross-refs only.
 
 ## Spec and plan
 
@@ -715,11 +715,11 @@ Ports the second batch of three superpowers skills into superjawn under the v0.2
 - [x] Upstream-existence: every remaining `superpowers:` reference resolves to a real upstream skill
 - [x] Attribution comment present in all three SKILL.md files
 - [x] `claude plugin validate ./superjawn` passes
-- [ ] Post-merge smoke test in a fresh session: invoke `superjawn:systematic-debugging` on a small contrived bug, confirm research phase fires correctly, findings land at `.superpowers/debug-log-<slug>.md`, skip protocol works (deferred per the loadability caveat — sessions started before plugin install/reinstall can't load `superjawn:*`).
+- [ ] Post-merge smoke test in a fresh session: invoke `superjawn:systematic-debugging` on a small contrived bug, confirm research phase fires correctly, findings land at `.superpowers/debug-log-<slug>.md`, skip protocol works (deferred per the loadability caveat, sessions started before plugin install/reinstall can't load `superjawn:*`).
 
 ## Out of scope
 
-- Smoke testing must happen in a fresh session post-merge — the same session as the marketplace operation can't load the new skill.
+- Smoke testing must happen in a fresh session post-merge, the same session as the marketplace operation can't load the new skill.
 - Batches 3-5 each get their own brainstorm/spec/plan cycle after this PR lands.
 EOF
 )"
@@ -735,19 +735,19 @@ The PR title and body have zero AI attribution per global rules.
 
 | Spec section | Plan task(s) covering it |
 |---|---|
-| §1 Per-skill plan — systematic-debugging research phase | Tasks 1-3 (copy, attribution + research phase insertion, cross-refs) |
-| §1 Per-skill plan — test-driven-development consumer port | Tasks 4-5 (copy, attribution + cross-refs) |
-| §1 Per-skill plan — verification-before-completion consumer port | Tasks 6-7 (copy, attribution + cross-refs) |
+| §1 Per-skill plan, systematic-debugging research phase | Tasks 1-3 (copy, attribution + research phase insertion, cross-refs) |
+| §1 Per-skill plan, test-driven-development consumer port | Tasks 4-5 (copy, attribution + cross-refs) |
+| §1 Per-skill plan, verification-before-completion consumer port | Tasks 6-7 (copy, attribution + cross-refs) |
 | §2 Cross-ref handling rules (six-skill ported set, fictional-namespace verification) | Tasks 3, 5, 7 each include the upstream-existence verification grep |
 | §3 Build sequence (systematic-debugging first, then consumers, then version bump, then verification) | Tasks 1-9 follow that order exactly |
-| §4 Testing approach — cross-ref resolution, upstream-existence, attribution presence | Task 9 sweep covers all three |
-| §4 Testing approach — research-phase smoke test (post-merge, fresh session) | Task 9 PR test plan flags this as deferred per the loadability caveat |
-| §5 Versioning — v0.3.0 ships this PR | Task 8 |
+| §4 Testing approach, cross-ref resolution, upstream-existence, attribution presence | Task 9 sweep covers all three |
+| §4 Testing approach, research-phase smoke test (post-merge, fresh session) | Task 9 PR test plan flags this as deferred per the loadability caveat |
+| §5 Versioning, v0.3.0 ships this PR | Task 8 |
 
 ### Placeholder scan
 
-- "YYYY-MM-DD-<short-bug-description>" in Task 2 Step 3's slug examples — intentional, this is the format users substitute when invoking the skill, not a placeholder for the engineer to fill.
-- "v0.3.0 Batch 2 (current)" in Task 8 Step 4 — intentional copy text, not a placeholder.
+- "YYYY-MM-DD-<short-bug-description>" in Task 2 Step 3's slug examples, intentional, this is the format users substitute when invoking the skill, not a placeholder for the engineer to fill.
+- "v0.3.0 Batch 2 (current)" in Task 8 Step 4, intentional copy text, not a placeholder.
 - No "TBD", "TODO", "implement later", "fill in details", or "similar to Task N" patterns in any task.
 
 ### Type consistency check
@@ -772,7 +772,7 @@ Each task has explicit file paths, exact bash commands, and expected outputs. Th
 
 Two execution options:
 
-1. **Subagent-Driven (recommended)** — dispatch a fresh subagent per task, two-stage review (spec compliance + code quality), fast iteration. The locked skip-protocol text in Task 2 Step 3 and the Phase-2-entry clarification language are the most likely places for drift, so per-task review catches them early.
-2. **Inline Execution** — execute tasks in this session using `superpowers:executing-plans`. Faster wall-clock but no automatic review checkpoints.
+1. **Subagent-Driven (recommended)**, dispatch a fresh subagent per task, two-stage review (spec compliance + code quality), fast iteration. The locked skip-protocol text in Task 2 Step 3 and the Phase-2-entry clarification language are the most likely places for drift, so per-task review catches them early.
+2. **Inline Execution**, execute tasks in this session using `superpowers:executing-plans`. Faster wall-clock but no automatic review checkpoints.
 
 Which approach?

@@ -1,6 +1,6 @@
 ---
 name: fact-check-workflow
-description: Structured workflow for fact-checking claims in journalism. Use when verifying statements for publication, rating claims for fact-check articles, or building pre-publication verification processes. Includes claim extraction, evidence gathering, rating scales, and correction protocols.
+description: Structured fact-checking workflow. Use when verifying claims for publication, rating claims, or setting pre-publication checks.
 ---
 
 # Fact-check workflow

@@ -21,10 +21,10 @@ The page uses a two-column CSS Grid: sidebar (TOC) + main content. On mobile it 
     <h1>Page Title</h1>
     <p class="subtitle">Subtitle text</p>
 
-    <div id="s1" class="sec-head ...">1 — First Section</div>
+    <div id="s1" class="sec-head ...">1, First Section</div>
     <!-- section content -->
 
-    <div id="s2" class="sec-head ...">2 — Second Section</div>
+    <div id="s2" class="sec-head ...">2, Second Section</div>
     <!-- section content -->
   </div><!-- /main -->
 
@@ -54,7 +54,7 @@ Key structural rules:
 .main { min-width: 0; }
 ```
 
-### TOC — Desktop (sticky sidebar)
+### TOC, Desktop (sticky sidebar)
 
 ```css
 .toc {
@@ -99,7 +99,7 @@ Key structural rules:
 
 Replace `var(--accent)` with your page's primary accent color variable (e.g., `var(--orange)`, `var(--blue)`).
 
-### TOC — Mobile (sticky horizontal bar)
+### TOC, Mobile (sticky horizontal bar)
 
 ```css
 @media (max-width: 1000px) {
@@ -151,7 +151,7 @@ Replace `var(--accent)` with your page's primary accent color variable (e.g., `v
 
 Adjust `margin: 0 -40px` and `padding-left/right: 40px` to match your `body` padding so the bar bleeds edge-to-edge.
 
-## JavaScript — Scroll Spy
+## JavaScript, Scroll Spy
 
 Place before `</body>`, after any Mermaid init:
 
@@ -206,7 +206,7 @@ Place before `</body>`, after any Mermaid init:
 ## Adaptation Notes
 
 - The `.toc-title` text, link labels, accent color, and section IDs change per page. Everything else is copy-paste.
-- For pages with fewer than 4 sections, skip the TOC entirely — it adds clutter without value.
+- For pages with fewer than 4 sections, skip the TOC entirely, it adds clutter without value.
 - The `grid-template-columns: 170px 1fr` width works for most TOCs. If section names are longer, go up to `200px`.
 - The `rootMargin: '-10% 0px -80% 0px'` means a section is "active" when its heading enters the top 10-20% of the viewport. This works well with sticky headers.
 - On mobile, the horizontal bar uses `overflow-x: auto` with hidden scrollbar. The active tab auto-scrolls into the center of the bar as the user scrolls the page.
