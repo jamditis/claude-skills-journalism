@@ -550,3 +550,15 @@ more than one Codex installation path in the same profile, test:
 Record duplicate identity, precedence, activation, update, uninstall, recovery,
 and drift results here. Until then, documentation must recommend one Codex
 installation path per skill or package.
+
+## dev-toolkit per-skill portability
+
+The `dev-toolkit` row above is package-level. The per-skill breakdown lives in
+[dev-toolkit-portability-matrix.md](dev-toolkit-portability-matrix.md),
+generated from the repository by `scripts/dev-toolkit-portability.mjs` and
+guarded against drift by `scripts/dev-toolkit-portability.test.mjs`. It
+discovers 12 skills (not the stale 11 named above): 9 shared, 3
+adapter-required (`claude-md-updater`, `one-way-door`, `test-first-bugs`), 0
+Claude-only. `one-way-door` stays adapter-required for its automatic
+`AskUserQuestion` approval hooks, whose failure and approval semantics an
+adapter must reproduce, not drop.
