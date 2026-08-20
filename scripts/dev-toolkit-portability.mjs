@@ -6,7 +6,7 @@
 // The drift test in scripts/dev-toolkit-portability.test.mjs fails if the
 // committed matrix and this classifier disagree.
 
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -19,16 +19,34 @@ export const ADAPTER_REQUIRED = 'adapter-required';
 export const CLAUDE_ONLY = 'claude-only';
 export const CLASSES = [SHARED, ADAPTER_REQUIRED, CLAUDE_ONLY];
 
+function readBundledText(dir) {
+  const bodies = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      bodies.push(readBundledText(path));
+      continue;
+    }
+    if (!entry.isFile()) continue;
+    const bytes = readFileSync(path);
+    if (!bytes.includes(0)) bodies.push(bytes.toString('utf8'));
+  }
+  return bodies.filter(Boolean).join('\n');
+}
+
 // Discover skills from the repository. A skill is any directory under
-// dev-toolkit/skills that holds a SKILL.md. Returns records sorted by name.
+// dev-toolkit/skills that holds a SKILL.md. The classifier reads all bundled
+// text because scripts, references, and templates can carry runtime coupling
+// that SKILL.md does not repeat. Returns records sorted by name.
 export function discoverSkills(root = ROOT) {
   const dir = join(root, SKILLS_SUBDIR);
   const skills = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (!entry.isDirectory()) continue;
-    const skillPath = join(dir, entry.name, 'SKILL.md');
+    const skillDir = join(dir, entry.name);
+    const skillPath = join(skillDir, 'SKILL.md');
     if (!existsSync(skillPath)) continue;
-    skills.push({ name: entry.name, body: readFileSync(skillPath, 'utf8') });
+    skills.push({ name: entry.name, body: readBundledText(skillDir) });
   }
   return skills.sort((a, b) => a.name.localeCompare(b.name));
 }
@@ -132,6 +150,15 @@ export function classifySkill(skill, hooks = new Map()) {
   for (const [hookFile, hookName] of hooks) {
     if (skill.body.includes(hookName)) hookFiles.push(hookFile);
   }
+  if (hookFiles.length > 0 && !signals.some((s) => s.kind === 'claude-hook')) {
+    signals.push({
+      kind: 'claude-hook',
+      mappable: true,
+      detail:
+        `names Claude auto-activation hooks (${hookFiles.sort().join(', ')}); ` +
+        'reproduce their trigger and failure semantics before mapping',
+    });
+  }
   const automatic =
     signals.some((s) => s.kind === 'claude-hook') || hookFiles.length > 0;
 
@@ -223,6 +250,12 @@ export function renderMatrixMarkdown(rows) {
 const MATRIX_PATH = join('plans', 'dev-toolkit-portability-matrix.md');
 export { MATRIX_PATH };
 
+export function writeMatrix(root = ROOT) {
+  const path = join(root, MATRIX_PATH);
+  writeFileSync(path, renderMatrixMarkdown(buildMatrix(root)), 'utf8');
+  return path;
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  process.stdout.write(renderMatrixMarkdown(buildMatrix()));
+  writeMatrix();
 }

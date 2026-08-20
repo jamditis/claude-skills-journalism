@@ -1,5 +1,14 @@
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
@@ -16,6 +25,7 @@ import {
   classifySkill,
   buildMatrix,
   renderMatrixMarkdown,
+  writeMatrix,
 } from './dev-toolkit-portability.mjs';
 
 function skillDirsOnDisk() {
@@ -61,8 +71,67 @@ test('tool coupling is the mechanic, not the noun', () => {
   // record its auto-activation as "no".
   assert.equal(rows['test-first-bugs'].automatic, true);
   assert.ok(rows['test-first-bugs'].hooks.includes('bug-report-detector.md'));
+  assert.match(rows['test-first-bugs'].reason, /hook/u);
   // Mentions "subagents" only as design advice -> portable.
   assert.equal(rows['context-engineering-fundamentals'].class, SHARED);
+});
+
+test('a named top-level hook is an adapter-required signal', () => {
+  const hooks = new Map([['prompt-check.md', 'prompt-check']]);
+  const row = classifySkill(
+    { name: 'hook-only', body: 'Activated by the prompt-check hook.' },
+    hooks,
+  );
+
+  assert.equal(row.class, ADAPTER_REQUIRED);
+  assert.equal(row.automatic, true);
+  assert.deepEqual(row.hooks, ['prompt-check.md']);
+  assert.match(row.reason, /hook/u);
+  assert.doesNotMatch(row.reason, /No Claude-specific mechanic/u);
+});
+
+test('classification scans bundled text files, not only SKILL.md', () => {
+  const root = mkdtempSync(join(tmpdir(), 'dev-toolkit-portability-'));
+  try {
+    const skillDir = join(root, SKILLS_SUBDIR, 'bundled-hook');
+    mkdirSync(skillDir, { recursive: true });
+    writeFileSync(
+      join(skillDir, 'SKILL.md'),
+      '---\nname: bundled-hook\n---\n\n# Portable-looking instructions\n',
+    );
+    writeFileSync(
+      join(skillDir, 'runtime.ps1'),
+      '# Runtime wiring uses PreToolUse and $HOME/.claude state.\n',
+    );
+
+    const row = buildMatrix(root)[0];
+    assert.equal(row.class, ADAPTER_REQUIRED);
+    assert.match(row.reason, /hook/u);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('the regeneration helper writes the matrix it generates', () => {
+  const root = mkdtempSync(join(tmpdir(), 'dev-toolkit-portability-'));
+  try {
+    const skillDir = join(root, SKILLS_SUBDIR, 'portable');
+    mkdirSync(skillDir, { recursive: true });
+    mkdirSync(join(root, 'plans'), { recursive: true });
+    writeFileSync(
+      join(skillDir, 'SKILL.md'),
+      '---\nname: portable\n---\n\n# Portable instructions\n',
+    );
+
+    writeMatrix(root);
+
+    assert.equal(
+      readFileSync(join(root, MATRIX_PATH), 'utf8'),
+      renderMatrixMarkdown(buildMatrix(root)),
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('one-way-door is adapter-required and automatic with approval semantics (AC6)', () => {
