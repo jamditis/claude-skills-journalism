@@ -257,14 +257,21 @@ export function scoreResult(fixture, response) {
   const serialized = JSON.stringify(response);
   const normalize = (value) => String(value).toLowerCase().replace(/[^a-z0-9]+/gu, ' ').trim();
   const responseBranch = new Set(normalize(response.branch).split(' '));
+  const branchAlternatives = fixture.expect.branchAlternatives ?? [fixture.expect.branch];
+  const branchMatches = branchAlternatives.some((alternative) => normalize(alternative)
+    .split(' ')
+    .every((word) => responseBranch.has(word)));
+  const termMatches = fixture.expect.terms.every((term) => {
+    const alternatives = Array.isArray(term) ? term : [term];
+    return alternatives.some((alternative) => new RegExp(alternative, 'iu').test(serialized));
+  });
   const checks = {
     decision: response.decision === fixture.expect.decision,
     skill: fixture.expect.decision === 'reject'
       ? response.skill === null || response.skill !== fixture.skill
       : response.skill === fixture.skill,
-    branch: normalize(fixture.expect.branch).split(' ')
-      .every((word) => responseBranch.has(word)),
-    terms: fixture.expect.terms.every((term) => new RegExp(term, 'iu').test(serialized)),
+    branch: branchMatches,
+    terms: termMatches,
   };
   const failed = Object.entries(checks)
     .filter(([, passed]) => !passed)

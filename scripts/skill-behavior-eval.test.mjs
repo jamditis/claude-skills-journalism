@@ -124,6 +124,36 @@ test('scoring checks the decision, branch, skill, and required terms', () => {
   assert.deepEqual(fail.failed, ['decision', 'skill', 'branch', 'terms']);
 });
 
+test('scoring accepts declared branch and term alternatives without weakening other checks', () => {
+  const fixture = {
+    skill: 'source-verification',
+    expect: {
+      decision: 'stop',
+      branch: 'source-protection',
+      branchAlternatives: ['source protection', 'privacy safe verification'],
+      terms: [['redact', 'do not publish'], ['confidential', 'private source']],
+    },
+  };
+  const response = {
+    decision: 'stop',
+    skill: 'source-verification',
+    branch: 'privacy-safe image verification',
+    rationale: 'Do not publish the private source metadata.',
+    actions: [],
+    artifact: null,
+    safety: ['Protect the confidential source.'],
+  };
+  assert.equal(scoreResult(fixture, response).pass, true);
+  assert.equal(
+    scoreResult(fixture, { ...response, decision: 'use' }).pass,
+    false,
+  );
+  assert.equal(
+    scoreResult(fixture, { ...response, skill: 'data-journalism' }).pass,
+    false,
+  );
+});
+
 test('redaction removes common credentials and long bearer values', () => {
   const text = 'Authorization: Bearer abcdefghijklmnopqrstuvwxyz token=secret-value ANTHROPIC_API_KEY=abc123';
   const redacted = redactText(text);
