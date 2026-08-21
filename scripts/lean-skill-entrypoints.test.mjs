@@ -77,3 +77,25 @@ test('synthetic-media reference is self-contained', () => {
   assert.match(synthetic, /provenance.*detection/su);
   assert.match(synthetic, /### Layer 1, Content Credentials/u);
 });
+
+test('standalone data references import demonstrated symbols before use', () => {
+  const referenceRoot = join(ROOT, 'journalism-core/skills/data-journalism/references');
+  const statistics = readFileSync(join(referenceRoot, 'statistics.md'), 'utf8');
+  const visualization = readFileSync(join(referenceRoot, 'visualization.md'), 'utf8');
+  const statisticsImports = [
+    'import cpi',
+    'import numpy as np',
+    'import pandas as pd',
+    'import wbdata',
+    'from scipy import stats',
+    'from statsmodels.stats.proportion import proportions_ztest',
+  ];
+  for (const statement of statisticsImports) {
+    assert.ok(statistics.indexOf(statement) > -1, `missing ${statement}`);
+  }
+  assert.ok(statistics.indexOf('import pandas as pd') < statistics.indexOf('pd.DataFrame'));
+  assert.ok(statistics.indexOf('import numpy as np') < statistics.indexOf('np.sign'));
+  assert.ok(statistics.indexOf('import cpi') < statistics.indexOf('cpi.inflate'));
+  assert.ok(statistics.indexOf('import wbdata') < statistics.indexOf('wbdata.get_dataframe'));
+  assert.ok(visualization.indexOf('import pandas as pd') < visualization.indexOf('pd.DataFrame'));
+});
