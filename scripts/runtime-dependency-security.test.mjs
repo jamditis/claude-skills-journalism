@@ -382,10 +382,18 @@ test('published code has no mutable runtime CDN package specifiers', () => {
 });
 
 test('audited security examples execute dependencies only from local paths', () => {
+  const zeroBuildReferences = readdirSync(
+    join(ROOT, 'dev-toolkit/skills/zero-build-frontend/references'),
+    { withFileTypes: true },
+  )
+    .filter((entry) => entry.isFile() && extname(entry.name) === '.md')
+    .map((entry) => `dev-toolkit/skills/zero-build-frontend/references/${entry.name}`)
+    .sort();
   const audited = [
     'dev-toolkit/skills/accessibility-compliance/SKILL.md',
     'dev-toolkit/skills/mobile-debugging/SKILL.md',
     'dev-toolkit/skills/zero-build-frontend/SKILL.md',
+    ...zeroBuildReferences,
     'security-toolkit/skills/secure-auth/SKILL.md',
     'visual-explainer/references/libraries.md',
     'visual-explainer/templates/mermaid-flowchart.html',

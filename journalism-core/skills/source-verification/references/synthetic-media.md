@@ -1,3 +1,9 @@
+## Detecting AI-generated and synthetic media
+
+By 2026, naked-eye detection of high-end synthetic media is no longer reliable. The Columbia Journalism Review's 2025 guide is blunt: detection tools "have largely not kept up with diffusion models." Treat any single tool's verdict as one input, not a ruling.
+
+The verification stack now has two layers, **provenance** (was this content cryptographically signed when created?) and **detection** (does it look or sound generated?). Provenance is the stronger signal when present, but its absence doesn't mean fake.
+
 ### Layer 1, Content Credentials (C2PA) provenance check
 
 The Coalition for Content Provenance and Authenticity (C2PA) standard ships cryptographic manifests inside image, audio, and video files describing their origin and edit history. Specification 2.2 was released in April–May 2025; the C2PA Conformance Program and Trust List launched mid-2025 and the legacy ingredient trust list was frozen January 1, 2026.

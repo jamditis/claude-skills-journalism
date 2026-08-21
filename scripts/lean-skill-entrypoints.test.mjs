@@ -55,3 +55,13 @@ test('zero-build frontend fails closed for combined local and production request
   assert.match(skill, /classify the whole request as `stop`/u);
   assert.match(skill, /separately offer local design and preparation/u);
 });
+
+test('synthetic-media reference is self-contained', () => {
+  const skillRoot = join(ROOT, 'journalism-core/skills/source-verification/references');
+  const video = readFileSync(join(skillRoot, 'video.md'), 'utf8');
+  const synthetic = readFileSync(join(skillRoot, 'synthetic-media.md'), 'utf8');
+  assert.doesNotMatch(video, /## Detecting AI-generated and synthetic media/u);
+  assert.match(synthetic, /^## Detecting AI-generated and synthetic media/u);
+  assert.match(synthetic, /provenance.*detection/su);
+  assert.match(synthetic, /### Layer 1, Content Credentials/u);
+});
