@@ -1,0 +1,3 @@
+interface:
+  display_name: "Zero build frontend"
+  short_description: "Zero-build frontend (React, Tailwind, vanilla JS)"

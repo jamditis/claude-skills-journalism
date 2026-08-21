@@ -1,0 +1,3 @@
+interface:
+  display_name: "Photo metadata"
+  short_description: "Embeds photo IPTC/EXIF/XMP metadata, caption, credit, alt text, license…"

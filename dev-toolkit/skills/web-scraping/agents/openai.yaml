@@ -1,0 +1,3 @@
+interface:
+  display_name: "Web scraping"
+  short_description: "Authorized web scraping with fallback cascades and access-failure handling"

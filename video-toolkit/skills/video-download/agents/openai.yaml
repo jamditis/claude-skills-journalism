@@ -1,0 +1,3 @@
+interface:
+  display_name: "Video download"
+  short_description: "Collects videos from public social accounts"

@@ -1,0 +1,3 @@
+interface:
+  display_name: "Project retrospective"
+  short_description: "Generates LESSONS.md files capturing institutional knowledge and failures"

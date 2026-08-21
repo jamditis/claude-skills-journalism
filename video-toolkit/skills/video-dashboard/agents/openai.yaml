@@ -1,0 +1,3 @@
+interface:
+  display_name: "Video dashboard"
+  short_description: "Aggregates transcript and frame data into an interactive web dashboard"

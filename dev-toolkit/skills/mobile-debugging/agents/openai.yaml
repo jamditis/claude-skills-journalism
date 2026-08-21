@@ -1,0 +1,3 @@
+interface:
+  display_name: "Mobile debugging"
+  short_description: "Remote JavaScript console and debugging on mobile"

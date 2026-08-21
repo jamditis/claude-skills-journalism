@@ -1,0 +1,3 @@
+interface:
+  display_name: "Using git worktrees"
+  short_description: "Creates isolated git worktrees with smart directory selection and safety checks"

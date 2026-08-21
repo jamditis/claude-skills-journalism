@@ -1,0 +1,3 @@
+interface:
+  display_name: "Systematic debugging"
+  short_description: "Use when encountering any bug, test failure, or unexpected behavior, before…"

@@ -1,0 +1,3 @@
+interface:
+  display_name: "Source verification"
+  short_description: "Source verification and fact-checking with SIFT"

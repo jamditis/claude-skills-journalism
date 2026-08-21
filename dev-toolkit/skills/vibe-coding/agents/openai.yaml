@@ -1,0 +1,3 @@
+interface:
+  display_name: "Vibe coding"
+  short_description: "AI-assisted coding with Claude Code, Cursor, Copilot, Codex, Aider, or Windsurf"

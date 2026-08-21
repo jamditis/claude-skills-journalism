@@ -1,0 +1,3 @@
+interface:
+  display_name: "PDF design"
+  short_description: "Designs PDF reports and proposals from HTML with previews and branding"

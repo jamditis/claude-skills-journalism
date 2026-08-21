@@ -6,6 +6,8 @@ on:
       - '**/SKILL.md'
       - 'hooks/*.md'
       - 'scripts/**/*.mjs'
+      - 'scripts/fixtures/**'
+      - 'skills-catalog.yaml'
       - '.claude-plugin/marketplace.json'
       - '**/.claude-plugin/plugin.json'
       - '.agents/plugins/**'
@@ -14,6 +16,7 @@ on:
       - 'README.md'
       - 'docs/index.html'
       - 'docs/superjawn/index.html'
+      - 'docs/skill-behavior-evaluations.md'
       - 'superjawn/README.md'
       - 'superjawn/CREDITS.md'
       - 'plans/codex-compatibility-matrix.md'
@@ -33,7 +36,12 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 22
+          cache: npm
       - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+      - run: npm ci
+
+      - name: Validate repository catalog
+        run: npm run validate:catalog
 
       - name: Validate Agent Skills metadata
         run: npm run validate:agent-skills

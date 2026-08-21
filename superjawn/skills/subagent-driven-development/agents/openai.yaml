@@ -1,0 +1,3 @@
+interface:
+  display_name: "Subagent driven development"
+  short_description: "Use when executing implementation plans with independent tasks in the…"

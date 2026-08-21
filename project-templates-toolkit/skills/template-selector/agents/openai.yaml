@@ -1,0 +1,3 @@
+interface:
+  display_name: "Template selector"
+  short_description: "Selects the correct CLAUDE.md or LESSONS.md template via decision trees"

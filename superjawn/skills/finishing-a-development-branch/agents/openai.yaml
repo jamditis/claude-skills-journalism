@@ -1,0 +1,3 @@
+interface:
+  display_name: "Finishing a development branch"
+  short_description: "Presents options for merge, PR, or cleanup"

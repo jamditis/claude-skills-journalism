@@ -1,0 +1,3 @@
+interface:
+  display_name: "Security checklist"
+  short_description: "Pre-deployment security audit organized by OWASP Top 10"

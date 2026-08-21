@@ -1,0 +1,3 @@
+interface:
+  display_name: "Secure auth"
+  short_description: "Secure authentication patterns (OWASP, NIST)"

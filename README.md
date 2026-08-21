@@ -18,6 +18,20 @@ Setup and workflow guides, separate from the skills themselves:
 
 Skills are modular instruction sets that an AI coding agent loads when relevant to a task. Each skill contains domain knowledge, workflows, templates, and supporting files. Shared skills in this repository follow the [Agent Skills specification](https://agentskills.io/specification); Claude and Codex provide their own installation and runtime layers around that shared content.
 
+## Repository control plane
+
+[`skills-catalog.yaml`](./skills-catalog.yaml) lists every package and stable
+skill. It records each skill's package, path, lifecycle, and invocation mode.
+The defaults preserve the existing model-selected invocation behavior.
+
+Each stable skill includes `agents/openai.yaml` for Codex display metadata.
+These files do not change invocation policy. Run `npm run validate:catalog` to
+check catalog coverage, package mappings, skill names, and metadata files.
+
+See [INFLUENCES.md](./INFLUENCES.md) and
+[THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md) for design credit and
+license notices.
+
 ## Installation
 
 Choose the section for your client. During the Codex pilot, use only one Codex installation path for a given skill or package.
@@ -92,7 +106,7 @@ codex plugin marketplace add jamditis/claude-skills-journalism
 codex plugin add journalism-core@claude-skills-journalism
 ```
 
-This legacy-compatible package route exposes the 15 nested `journalism-core` skills. It does not convert Claude commands, agents, hooks, or root-level skills into Codex components. This repository does not ship native Codex manifests yet.
+This legacy-compatible package route exposes the 15 nested `journalism-core` skills. It does not convert Claude commands, agents, hooks, or root-level skills into Codex components. This repository ships Codex UI metadata but no native Codex plugin manifests.
 
 You can instead install standards-based skills with the `skills` CLI. This user-level command makes the 15 core skills available across your Codex projects:
 
