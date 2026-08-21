@@ -87,8 +87,6 @@ test('standalone data references import demonstrated symbols before use', () => 
     'import numpy as np',
     'import pandas as pd',
     'import wbdata',
-    'from scipy import stats',
-    'from statsmodels.stats.proportion import proportions_ztest',
   ];
   for (const statement of statisticsImports) {
     assert.ok(statistics.indexOf(statement) > -1, `missing ${statement}`);

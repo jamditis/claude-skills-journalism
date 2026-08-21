@@ -7,8 +7,6 @@ import cpi
 import numpy as np
 import pandas as pd
 import wbdata
-from scipy import stats
-from statsmodels.stats.proportion import proportions_ztest
 
 # Essential statistics for any dataset
 def describe_for_journalism(df: pd.DataFrame, col: str) -> pd.DataFrame:
