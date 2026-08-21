@@ -19,8 +19,9 @@ This repo contains modular instruction sets that extend supported coding agents 
 ## Directory structure
 
 Packages use `.claude-plugin/plugin.json`. Codex supports standards-based skill
-installs and a verified legacy-compatible journalism-core package route. This
-repository does not ship native Codex manifests.
+installs and a verified legacy-compatible journalism-core package route. Each
+stable skill has Codex UI metadata. The repository does not ship native Codex
+plugin manifests.
 
 ```
 claude-skills-journalism/

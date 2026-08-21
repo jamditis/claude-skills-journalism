@@ -1,0 +1,3 @@
+interface:
+  display_name: "Brainstorming"
+  short_description: "Explores intent and design before implementation. MUST use before creating…"

@@ -1,0 +1,3 @@
+interface:
+  display_name: "Electron dev"
+  short_description: "Electron desktop apps with React, TypeScript, and Vite"

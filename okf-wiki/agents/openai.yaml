@@ -1,0 +1,3 @@
+interface:
+  display_name: "OKF wiki"
+  short_description: "Builds an Open Knowledge Format (OKF) knowledge base from existing docs…"

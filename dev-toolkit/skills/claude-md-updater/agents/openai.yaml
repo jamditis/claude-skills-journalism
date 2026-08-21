@@ -1,0 +1,3 @@
+interface:
+  display_name: "Claude md updater"
+  short_description: "Scans the session for lessons and workflows, then proposes scoped CLAUDE.md…"

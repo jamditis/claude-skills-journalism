@@ -1,0 +1,3 @@
+interface:
+  display_name: "Supply chain hardening"
+  short_description: "Install-time cooldowns for npm/bun plus a sandboxed pre-install scan for…"

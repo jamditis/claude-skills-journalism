@@ -1,0 +1,3 @@
+interface:
+  display_name: "Newsroom style"
+  short_description: "Enforces AP Style and newsroom conventions"

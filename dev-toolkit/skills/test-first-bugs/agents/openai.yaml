@@ -1,0 +1,3 @@
+interface:
+  display_name: "Test first bugs"
+  short_description: "Enforces a test-driven bug-fixing workflow"

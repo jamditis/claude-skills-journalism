@@ -1,0 +1,3 @@
+interface:
+  display_name: "Python pipeline"
+  short_description: "Python data pipelines with modular architecture"

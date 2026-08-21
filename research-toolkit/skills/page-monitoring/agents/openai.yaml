@@ -1,0 +1,3 @@
+interface:
+  display_name: "Page monitoring"
+  short_description: "Web page change detection, availability tracking, and RSS feed generation"

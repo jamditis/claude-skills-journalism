@@ -1,0 +1,3 @@
+interface:
+  display_name: "Video transcribe"
+  short_description: "Batch Whisper transcription of video or audio (WAV, podcasts) with a…"

@@ -1,0 +1,3 @@
+interface:
+  display_name: "Document design"
+  short_description: "Creates print-ready HTML that exports to PDF"

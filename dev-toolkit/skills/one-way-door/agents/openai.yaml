@@ -1,0 +1,3 @@
+interface:
+  display_name: "One way door"
+  short_description: "Flags irreversible decisions before commit"

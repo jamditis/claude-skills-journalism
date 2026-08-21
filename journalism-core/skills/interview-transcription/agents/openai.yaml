@@ -1,0 +1,3 @@
+interface:
+  display_name: "Interview transcription"
+  short_description: "Transcription, recording management, and quote extraction"

@@ -1,0 +1,3 @@
+interface:
+  display_name: "Project memory"
+  short_description: "Generates CLAUDE.md project memory files that transfer institutional knowledge"

@@ -1,0 +1,217 @@
+schema_version: 1
+defaults:
+  lifecycle: stable
+  invocation: model
+  ui_metadata: agents/openai.yaml
+packages:
+  - name: autocontext
+    source: ./autocontext
+  - name: dev-toolkit
+    source: ./dev-toolkit
+  - name: journalism-core
+    source: ./journalism-core
+  - name: okf-wiki
+    source: ./okf-wiki
+  - name: pdf-design
+    source: ./pdf-design
+  - name: pdf-playground
+    source: ./pdf-playground
+  - name: project-templates-toolkit
+    source: ./project-templates-toolkit
+  - name: research-toolkit
+    source: ./research-toolkit
+  - name: security-toolkit
+    source: ./security-toolkit
+  - name: superjawn
+    source: ./superjawn
+  - name: video-toolkit
+    source: ./video-toolkit
+  - name: visual-explainer
+    source: ./visual-explainer
+skills:
+  - name: accessibility-compliance
+    package: dev-toolkit
+    path: dev-toolkit/skills/accessibility-compliance
+  - name: claude-md-updater
+    package: dev-toolkit
+    path: dev-toolkit/skills/claude-md-updater
+  - name: context-engineering-fundamentals
+    package: dev-toolkit
+    path: dev-toolkit/skills/context-engineering-fundamentals
+  - name: electron-dev
+    package: dev-toolkit
+    path: dev-toolkit/skills/electron-dev
+  - name: mobile-debugging
+    package: dev-toolkit
+    path: dev-toolkit/skills/mobile-debugging
+  - name: one-way-door
+    package: dev-toolkit
+    path: dev-toolkit/skills/one-way-door
+  - name: python-pipeline
+    package: dev-toolkit
+    path: dev-toolkit/skills/python-pipeline
+  - name: test-first-bugs
+    package: dev-toolkit
+    path: dev-toolkit/skills/test-first-bugs
+  - name: vibe-coding
+    package: dev-toolkit
+    path: dev-toolkit/skills/vibe-coding
+  - name: web-scraping
+    package: dev-toolkit
+    path: dev-toolkit/skills/web-scraping
+  - name: web-ui-best-practices
+    package: dev-toolkit
+    path: dev-toolkit/skills/web-ui-best-practices
+  - name: zero-build-frontend
+    package: dev-toolkit
+    path: dev-toolkit/skills/zero-build-frontend
+  - name: ai-writing-detox
+    package: journalism-core
+    path: journalism-core/skills/ai-writing-detox
+  - name: brazil-records-requests
+    package: journalism-core
+    path: journalism-core/skills/brazil-records-requests
+  - name: crisis-communications
+    package: journalism-core
+    path: journalism-core/skills/crisis-communications
+  - name: data-journalism
+    package: journalism-core
+    path: journalism-core/skills/data-journalism
+  - name: editorial-workflow
+    package: journalism-core
+    path: journalism-core/skills/editorial-workflow
+  - name: fact-check-workflow
+    package: journalism-core
+    path: journalism-core/skills/fact-check-workflow
+  - name: foia-requests
+    package: journalism-core
+    path: journalism-core/skills/foia-requests
+  - name: interview-prep
+    package: journalism-core
+    path: journalism-core/skills/interview-prep
+  - name: interview-transcription
+    package: journalism-core
+    path: journalism-core/skills/interview-transcription
+  - name: newsletter-publishing
+    package: journalism-core
+    path: journalism-core/skills/newsletter-publishing
+  - name: newsroom-style
+    package: journalism-core
+    path: journalism-core/skills/newsroom-style
+  - name: photo-metadata
+    package: journalism-core
+    path: journalism-core/skills/photo-metadata
+  - name: social-media-intelligence
+    package: journalism-core
+    path: journalism-core/skills/social-media-intelligence
+  - name: source-verification
+    package: journalism-core
+    path: journalism-core/skills/source-verification
+  - name: story-pitch
+    package: journalism-core
+    path: journalism-core/skills/story-pitch
+  - name: okf-wiki
+    package: okf-wiki
+    path: okf-wiki
+  - name: pdf-design
+    package: pdf-design
+    path: pdf-design
+  - name: document-design
+    package: pdf-playground
+    path: pdf-playground/skills/document-design
+  - name: project-memory
+    package: project-templates-toolkit
+    path: project-templates-toolkit/skills/project-memory
+  - name: project-retrospective
+    package: project-templates-toolkit
+    path: project-templates-toolkit/skills/project-retrospective
+  - name: template-selector
+    package: project-templates-toolkit
+    path: project-templates-toolkit/skills/template-selector
+  - name: academic-writing
+    package: research-toolkit
+    path: research-toolkit/skills/academic-writing
+  - name: content-access
+    package: research-toolkit
+    path: research-toolkit/skills/content-access
+  - name: digital-archive
+    package: research-toolkit
+    path: research-toolkit/skills/digital-archive
+  - name: free-apis-catalog
+    package: research-toolkit
+    path: research-toolkit/skills/free-apis-catalog
+  - name: page-monitoring
+    package: research-toolkit
+    path: research-toolkit/skills/page-monitoring
+  - name: web-archiving
+    package: research-toolkit
+    path: research-toolkit/skills/web-archiving
+  - name: api-hardening
+    package: security-toolkit
+    path: security-toolkit/skills/api-hardening
+  - name: secure-auth
+    package: security-toolkit
+    path: security-toolkit/skills/secure-auth
+  - name: security-checklist
+    package: security-toolkit
+    path: security-toolkit/skills/security-checklist
+  - name: supply-chain-hardening
+    package: security-toolkit
+    path: security-toolkit/skills/supply-chain-hardening
+  - name: brainstorming
+    package: superjawn
+    path: superjawn/skills/brainstorming
+  - name: dispatching-parallel-agents
+    package: superjawn
+    path: superjawn/skills/dispatching-parallel-agents
+  - name: executing-plans
+    package: superjawn
+    path: superjawn/skills/executing-plans
+  - name: finishing-a-development-branch
+    package: superjawn
+    path: superjawn/skills/finishing-a-development-branch
+  - name: receiving-code-review
+    package: superjawn
+    path: superjawn/skills/receiving-code-review
+  - name: requesting-code-review
+    package: superjawn
+    path: superjawn/skills/requesting-code-review
+  - name: subagent-driven-development
+    package: superjawn
+    path: superjawn/skills/subagent-driven-development
+  - name: systematic-debugging
+    package: superjawn
+    path: superjawn/skills/systematic-debugging
+  - name: test-driven-development
+    package: superjawn
+    path: superjawn/skills/test-driven-development
+  - name: using-git-worktrees
+    package: superjawn
+    path: superjawn/skills/using-git-worktrees
+  - name: using-superjawn
+    package: superjawn
+    path: superjawn/skills/using-superjawn
+  - name: verification-before-completion
+    package: superjawn
+    path: superjawn/skills/verification-before-completion
+  - name: writing-plans
+    package: superjawn
+    path: superjawn/skills/writing-plans
+  - name: writing-skills
+    package: superjawn
+    path: superjawn/skills/writing-skills
+  - name: video-dashboard
+    package: video-toolkit
+    path: video-toolkit/skills/video-dashboard
+  - name: video-download
+    package: video-toolkit
+    path: video-toolkit/skills/video-download
+  - name: video-frames
+    package: video-toolkit
+    path: video-toolkit/skills/video-frames
+  - name: video-transcribe
+    package: video-toolkit
+    path: video-toolkit/skills/video-transcribe
+  - name: visual-explainer
+    package: visual-explainer
+    path: visual-explainer

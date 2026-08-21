@@ -1,0 +1,3 @@
+interface:
+  display_name: "Video frames"
+  short_description: "Extracts and visually analyzes frames from video files"

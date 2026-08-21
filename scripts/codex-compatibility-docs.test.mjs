@@ -7,12 +7,12 @@ import test from 'node:test';
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SKIP_DIRECTORIES = new Set(['.git', 'node_modules']);
 
-function findNativeCodexManifests(directory = ROOT, manifests = []) {
+function findNativeCodexPluginManifests(directory = ROOT, manifests = []) {
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     if (entry.isDirectory() && SKIP_DIRECTORIES.has(entry.name)) continue;
     const path = join(directory, entry.name);
     if (entry.isDirectory()) {
-      findNativeCodexManifests(path, manifests);
+      findNativeCodexPluginManifests(path, manifests);
       continue;
     }
     const repoPath = relative(ROOT, path).replaceAll('\\', '/');
@@ -20,8 +20,6 @@ function findNativeCodexManifests(directory = ROOT, manifests = []) {
       repoPath === '.agents/plugins/marketplace.json'
       || repoPath.endsWith('/.codex-plugin/plugin.json')
       || repoPath === '.codex-plugin/plugin.json'
-      || repoPath.endsWith('/agents/openai.yaml')
-      || repoPath === 'agents/openai.yaml'
     ) {
       manifests.push(repoPath);
     }
@@ -211,7 +209,7 @@ test('the README routes Codex users without implying mixed-install support', () 
   assert.match(readme, /codex plugin marketplace add jamditis\/claude-skills-journalism/u);
   assert.match(readme, /codex plugin add journalism-core@claude-skills-journalism/u);
   assert.match(readme, /use only one Codex installation path/u);
-  assert.match(readme, /does not ship native Codex manifests yet/u);
+  assert.match(readme, /ships Codex UI metadata but no native Codex plugin manifests/u);
   assert.doesNotMatch(readme, /Every skill in this repo now lives inside a plugin's `skills\/` directory/u);
   assert.match(readme, /root-skill packages/u);
   assert.match(readme, /visual-explainer\/SKILL\.md/u);
@@ -258,6 +256,6 @@ test('skill lint runs for compatibility claims and native Codex manifests', () =
   }
 });
 
-test('the legacy package route adds no native Codex manifests', () => {
-  assert.deepEqual(findNativeCodexManifests(), []);
+test('the legacy package route adds no native Codex plugin manifests', () => {
+  assert.deepEqual(findNativeCodexPluginManifests(), []);
 });

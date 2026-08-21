@@ -1,0 +1,3 @@
+interface:
+  display_name: "Verification before completion"
+  short_description: "Runs verification commands and confirms output before success claims"

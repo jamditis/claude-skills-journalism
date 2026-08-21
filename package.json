@@ -1,11 +1,12 @@
 {
   "name": "claude-skills-journalism",
-  "version": "1.0.0",
+  "version": "2.5.0",
   "description": "Agent Skills for journalists, researchers, academics, media professionals, and communications practitioners.",
   "main": "index.js",
   "scripts": {
     "test": "node --test \"scripts/**/*.test.mjs\"",
     "validate:agent-skills": "node scripts/validate-agent-skills.mjs",
+    "validate:catalog": "node scripts/repository-catalog.mjs",
     "validate:agent-skills:upstream": "node scripts/validate-agent-skills.mjs --upstream",
     "canary:journalism-core:claude": "node scripts/journalism-core-install-canary.mjs claude",
     "canary:journalism-core:codex": "node scripts/journalism-core-install-canary.mjs codex",
@@ -22,11 +23,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://local_proxy@127.0.0.1:65060/git/jamditis/claude-skills-journalism"
+    "url": "git+https://github.com/jamditis/claude-skills-journalism.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Joe Amditis",
+  "license": "MIT",
   "dependencies": {
     "playwright": "^1.57.0"
   },

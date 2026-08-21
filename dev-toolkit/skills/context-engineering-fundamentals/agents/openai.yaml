@@ -1,0 +1,3 @@
+interface:
+  display_name: "Context engineering fundamentals"
+  short_description: "Manages attention and evidence in long agent sessions"

@@ -1,0 +1,3 @@
+interface:
+  display_name: "Dispatching parallel agents"
+  short_description: "Use when facing 2+ independent tasks that can be worked on without shared…"
