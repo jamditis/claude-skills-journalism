@@ -24,6 +24,9 @@ Thumbs.db
 pre-pr-linter
 pre-pr-linter/
 
+# Local cross-model review snapshots
+.cross-model-review-*/
+
 # Python
 __pycache__/
 *.py[cod]

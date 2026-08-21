@@ -4,7 +4,7 @@ description: Builds an Open Knowledge Format (OKF) knowledge base from existing 
 license: MIT
 metadata:
   author: jamditis
-  version: "0.8.2"
+  version: "0.8.3"
   okf_spec: v1
 ---
 
