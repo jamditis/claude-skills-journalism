@@ -48,7 +48,7 @@ claude-skills-journalism/
 │   ├── pre-commit-review.md     # Development: Review staged diff before commit
 │   └── no-ai-attribution.md     # Development: Block AI attribution in commits, PRs, and comments
 │
-├── # Plugin: journalism-core (15 skills, v1.4.1), registered in marketplace.json
+├── # Plugin: journalism-core (15 skills, v1.5.0), registered in marketplace.json
 ├── journalism-core/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -69,7 +69,7 @@ claude-skills-journalism/
 │       ├── source-verification/        # SIFT method, verification, deepfakes/C2PA
 │       └── story-pitch/                # Pitch templates
 │
-├── # Plugin: research-toolkit (6 skills, v1.1.2), registered in marketplace.json
+├── # Plugin: research-toolkit (6 skills, v1.1.3), registered in marketplace.json
 ├── research-toolkit/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -114,7 +114,7 @@ claude-skills-journalism/
 ├── pdf-design/                  # PDF reports, proposals, brand system
 │   └── templates/               # HTML templates (Democracy Day, etc.)
 │
-├── # Plugin: video-toolkit (4 skills, v1.0.5), registered in marketplace.json
+├── # Plugin: video-toolkit (4 skills, v1.0.6), registered in marketplace.json
 ├── video-toolkit/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -162,7 +162,7 @@ claude-skills-journalism/
 │   ├── templates/              # Lesson and archive templates
 │   └── tests/
 │
-├── # Plugin: pdf-playground (8 commands, v1.3.4), registered in marketplace.json
+├── # Plugin: pdf-playground (8 commands, v1.3.5), registered in marketplace.json
 ├── pdf-playground/              # Interactive proposal/report/slide builder with live control panel
 │   ├── .claude-plugin/plugin.json
 │   ├── brands/                  # Brand presets
@@ -172,7 +172,7 @@ claude-skills-journalism/
 │   ├── templates/               # Document templates
 │   └── skills/                  # document-design/ + playground.md (user-invocable entry skill)
 │
-└── # Plugin: superjawn (14 skills, v1.0.2), registered in marketplace.json
+└── # Plugin: superjawn (14 skills, v1.1.0), registered in marketplace.json
     ├── # Research-augmented fork of obra/superpowers; standalone, no upstream dependency
     ├── .claude-plugin/plugin.json
     ├── README.md

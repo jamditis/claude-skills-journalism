@@ -11,6 +11,7 @@ import { tmpdir } from 'node:os';
 import { basename, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { parseDocument } from 'yaml';
 
 export const SKILLS_REF_REVISION = '38a2ff82958afee88dadf4831509e6f7e9d8ef4e';
 export const SKILLS_REF_SOURCE =
@@ -52,11 +53,10 @@ export function validateSkillDirectories(
     if (existsSync(skillPath)) {
       const skill = readFileSync(skillPath, 'utf8');
       const frontmatter = skill.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/u);
-      const field = frontmatter?.[1]
-        .split(/\r?\n/u)
-        .filter((line) => line.startsWith(`${CLAUDE_EXPLICIT_FIELD}:`)) ?? [];
+      const document = frontmatter ? parseDocument(frontmatter[1], { uniqueKeys: true }) : null;
+      const explicitValue = document?.get(CLAUDE_EXPLICIT_FIELD);
 
-      if (field.length > 1 || (field.length === 1 && !/^disable-model-invocation: (?:true|false)$/u.test(field[0]))) {
+      if (document?.errors.length || (explicitValue !== undefined && typeof explicitValue !== 'boolean')) {
         return {
           directory,
           status: 1,
@@ -65,14 +65,12 @@ export function validateSkillDirectories(
         };
       }
 
-      if (field.length === 1) {
+      if (explicitValue !== undefined) {
         temporaryRoot = mkdtempSync(join(tmpdir(), 'agent-skills-validation-'));
         validationDirectory = join(temporaryRoot, basename(directory));
         cpSync(directory, validationDirectory, { recursive: true });
-        const projected = skill.replace(
-          /^disable-model-invocation: (?:true|false)\r?\n/mu,
-          '',
-        );
+        document.delete(CLAUDE_EXPLICIT_FIELD);
+        const projected = skill.replace(frontmatter[0], `---\n${document.toString()}---\n`);
         writeFileSync(join(validationDirectory, 'SKILL.md'), projected, 'utf8');
       }
     }

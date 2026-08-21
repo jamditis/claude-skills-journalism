@@ -139,6 +139,27 @@ test('Claude explicit-only frontmatter is checked before standards validation', 
   assert.equal(existsSync(projectedDirectory), false);
 });
 
+test('Claude explicit-only frontmatter accepts YAML boolean formatting', (t) => {
+  const root = mkdtempSync(join(tmpdir(), 'agent-skills-validation-'));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const skill = join(root, 'director');
+  mkdirSync(skill, { recursive: true });
+  writeFileSync(
+    join(skill, 'SKILL.md'),
+    '---\nname: director\ndescription: Direct work\ndisable-model-invocation: true # explicit only\n---\n',
+  );
+
+  const results = validateSkillDirectories([skill], {
+    run(command, args) {
+      const projected = readFileSync(join(args.at(-1), 'SKILL.md'), 'utf8');
+      assert.doesNotMatch(projected, /disable-model-invocation/u);
+      return { status: 0, stdout: '', stderr: '' };
+    },
+  });
+
+  assert.equal(results[0].status, 0);
+});
+
 test('Claude explicit-only frontmatter must be one boolean field', (t) => {
   const root = mkdtempSync(join(tmpdir(), 'agent-skills-validation-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));

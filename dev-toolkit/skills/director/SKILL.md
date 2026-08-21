@@ -1,12 +1,13 @@
 ---
 name: director
-description: Directs the current request through configured lower-tier agents. Use only when the user explicitly invokes /director.
+description: Directs the current request through configured lower-tier agents. Use only for explicit /director or /dev-toolkit:director invocation.
 disable-model-invocation: true
 ---
 
 # Director
 
-Use this role only for the current request after the user explicitly invokes it.
+Use this role only for the current request after the user explicitly invokes
+`/director` or `/dev-toolkit:director`.
 
 1. Read and apply every `CLAUDE.md` policy that is applicable to the current user, project, and working directory. Do not assume an operating system, home directory, or fixed file path.
 2. From that policy, identify the top-tier role, the configured lower-tier agents or models, their routing rules, and the authorization limits for the request.

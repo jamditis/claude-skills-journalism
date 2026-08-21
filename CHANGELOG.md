@@ -14,7 +14,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and models configured for that environment. A standalone install invokes
   `/director`; the plugin form invokes `/dev-toolkit:director`.
 
+## [2.6.0] - 2026-08-21
+
+This release adds a validated control plane for the full skills catalog and
+measures skill behavior across Codex and Claude. It also makes three large
+skills load their detailed guidance only when the task needs it.
+
+### Added
+
+- Added one validated catalog for package, lifecycle, and invocation metadata,
+  with Codex UI metadata for all 62 skills and drift checks for package files.
+- Added isolated behavior evaluations that check decisions, skill selection,
+  safety, authority, and artifact contracts across Codex and Claude outputs.
+- Added support for Claude Opus 5 event arrays, legacy output envelopes,
+  explicit model pins, semantic fixture aliases, named-neighbor rejection, and
+  expanded token redaction in behavior evaluations.
+- Added a repository-driven portability classifier and generated matrix for all
+  12 dev-toolkit skills. The current result is nine shared skills, three that
+  need adapters, and no Claude-only skills.
+
 ### Changed
+
+- Moved branch-specific guidance from `zero-build-frontend`,
+  `source-verification`, and `data-journalism` into 25 focused reference files.
+  The shorter entry skills preserve their safety, authority, provenance, and
+  artifact contracts while loading less context for unrelated tasks.
+- Updated every plugin version so installed packages receive the new Codex
+  metadata, catalog data, and progressive-disclosure files.
 
 - Shortened every skill `description` to at most 130 characters (aggregate
   7,719 across 63 skills) so the full set stays within Codex's skills-metadata
@@ -669,7 +695,8 @@ Initial commit with foundational skills.
 
 ---
 
-[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.5.0...HEAD
+[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.6.0...HEAD
+[2.6.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.5.0...v2.6.0
 [2.5.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.3.3...v2.4.0
 [2.3.3]: https://github.com/jamditis/claude-skills-journalism/compare/v2.2.0...v2.3.3
