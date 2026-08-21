@@ -1,6 +1,6 @@
 {
   "name": "superjawn",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Research-augmented fork of obra/superpowers. Ships all 14 workflow skills (brainstorming, planning, TDD, code review, debugging, worktrees, parallel agents) standalone, with no dependency on the upstream superpowers plugin.",
   "author": {
     "name": "Joe Amditis",

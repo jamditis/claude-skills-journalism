@@ -1,6 +1,6 @@
 {
   "name": "journalism-core",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Fifteen core journalism skills for reporting, verification, publishing, and digital investigations: AP-style writing, AI-slop detox, source verification, FOIA/OPRA and Brazilian LAI requests, fact-checking, interview prep and transcription, story pitches, editorial workflow, crisis comms, newsletter publishing, data journalism, social-media OSINT, and embedded photo metadata.",
   "author": {
     "name": "Joe Amditis",

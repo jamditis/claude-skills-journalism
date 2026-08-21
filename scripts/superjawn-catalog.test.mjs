@@ -29,6 +29,12 @@ test('current Superjawn catalog copy does not present 1.0.0 as the current relea
   );
 });
 
+test('public Superjawn badges match the plugin version', () => {
+  const manifest = JSON.parse(read('superjawn/.claude-plugin/plugin.json'));
+  assert.match(read('docs/index.html'), new RegExp(`v${manifest.version} &middot; standalone`, 'u'));
+  assert.match(read('docs/superjawn/index.html'), new RegExp(`>v${manifest.version}<`, 'u'));
+});
+
 test('skill-lint CI runs when any guarded Superjawn catalog file changes', () => {
   const workflow = read('.github/workflows/skill-lint.yml');
   for (const path of GUARDED_PATHS) {
