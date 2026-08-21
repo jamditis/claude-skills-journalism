@@ -11,6 +11,7 @@ import {
   parseCliArgs,
   prepareVariant,
   redactText,
+  runInvocation,
   scoreResult,
 } from './skill-behavior-eval.mjs';
 
@@ -159,6 +160,45 @@ test('redaction removes common credentials and long bearer values', () => {
   const redacted = redactText(text);
   assert.doesNotMatch(redacted, /abcdefghijklmnopqrstuvwxyz|secret-value|abc123/u);
   assert.match(redacted, /\[REDACTED\]/u);
+});
+
+test('runtime failures include safe process launch and timeout details', () => {
+  const invocation = {
+    command: 'missing-client',
+    args: [],
+    cwd: '/tmp',
+    env: {},
+  };
+  assert.throws(
+    () => runInvocation(invocation, '/tmp/no-response', 'codex', () => ({
+      status: null,
+      signal: null,
+      stderr: '',
+      stdout: '',
+      error: Object.assign(new Error('spawnSync missing-client ENOENT'), { code: 'ENOENT' }),
+    })),
+    /ENOENT: spawnSync missing-client ENOENT/u,
+  );
+  assert.throws(
+    () => runInvocation(invocation, '/tmp/no-response', 'codex', () => ({
+      status: null,
+      signal: 'SIGTERM',
+      stderr: '',
+      stdout: '',
+      error: Object.assign(new Error('spawnSync missing-client ETIMEDOUT'), { code: 'ETIMEDOUT' }),
+    })),
+    /signal SIGTERM; ETIMEDOUT: spawnSync missing-client ETIMEDOUT/u,
+  );
+  assert.throws(
+    () => runInvocation(invocation, '/tmp/no-response', 'codex', () => ({
+      status: null,
+      signal: null,
+      stderr: 'x'.repeat(3_000),
+      stdout: '',
+      error: Object.assign(new Error('spawnSync missing-client ENOENT'), { code: 'ENOENT' }),
+    })),
+    /ENOENT: spawnSync missing-client ENOENT/u,
+  );
 });
 
 test('CLI requires an explicit bounded selection and rejects unsafe overlap', () => {

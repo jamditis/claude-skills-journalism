@@ -23,6 +23,10 @@ export function loadCatalog(path = CATALOG_PATH) {
   return parse(readFileSync(path, 'utf8'));
 }
 
+export function normalizeRepositoryPath(path) {
+  return path.replaceAll('\\', '/');
+}
+
 function readSkillName(path) {
   const source = readFileSync(path, 'utf8');
   const match = source.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/u);
@@ -66,7 +70,8 @@ export function validateCatalog(catalog, root = ROOT) {
     else if (entry.source !== source) errors.push(`${name}: catalog source does not match marketplace`);
   }
 
-  const actualPaths = findSkillFiles(root).map((path) => relative(root, dirname(path)));
+  const actualPaths = findSkillFiles(root)
+    .map((path) => normalizeRepositoryPath(relative(root, dirname(path))));
   const catalogPaths = new Set();
   const catalogNames = new Set();
   for (const skill of catalog.skills ?? []) {

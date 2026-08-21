@@ -279,7 +279,7 @@ export function scoreResult(fixture, response) {
   return { pass: failed.length === 0, score: 4 - failed.length, failed };
 }
 
-function runInvocation(invocation, responsePath, client, run = spawnSync) {
+export function runInvocation(invocation, responsePath, client, run = spawnSync) {
   const result = run(invocation.command, invocation.args, {
     cwd: invocation.cwd,
     env: { ...process.env, ...invocation.env },
@@ -290,10 +290,19 @@ function runInvocation(invocation, responsePath, client, run = spawnSync) {
     windowsHide: true,
   });
   if (result.status !== 0) {
-    const detail = result.stderr || result.stdout || 'no client output';
+    const processDetails = [];
+    if (result.stderr) processDetails.push(result.stderr);
+    else if (result.stdout) processDetails.push(result.stdout);
+    if (result.signal) processDetails.push(`signal ${result.signal}`);
+    if (result.error) {
+      processDetails.push(
+        `${result.error.code ?? result.error.name}: ${result.error.message}`,
+      );
+    }
+    if (processDetails.length === 0) processDetails.push('no client output');
     throw new Error(
       `${invocation.command} failed with status ${result.status ?? 'unknown'}: `
-      + redactText(detail).slice(-2000),
+      + redactText(processDetails.join('; ')).slice(-2000),
     );
   }
   return parseResponse(client, result.stdout, responsePath);

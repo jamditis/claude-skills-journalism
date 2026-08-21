@@ -8,6 +8,7 @@ import {
   ROOT,
   findSkillFiles,
   loadCatalog,
+  normalizeRepositoryPath,
   validateCatalog,
 } from './repository-catalog.mjs';
 
@@ -52,6 +53,26 @@ test('the catalog validator rejects missing, duplicate, and unsafe skill entries
   assert.ok(
     validateCatalog(unsafe).includes('../outside: path must stay inside the repository'),
   );
+});
+
+test('repository catalog paths use forward slashes on Windows-style input', () => {
+  assert.equal(
+    normalizeRepositoryPath('journalism-core\\skills\\source-verification'),
+    'journalism-core/skills/source-verification',
+  );
+});
+
+test('skill lint watches and directly validates repository catalog inputs', () => {
+  const workflow = readFileSync(join(ROOT, '.github', 'workflows', 'skill-lint.yml'), 'utf8');
+  for (const path of [
+    'skills-catalog.yaml',
+    'scripts/fixtures/**',
+    'docs/skill-behavior-evaluations.md',
+  ]) {
+    assert.match(workflow, new RegExp(`- '${path.replaceAll('*', '\\*')}'`, 'u'));
+  }
+  assert.match(workflow, /lint-skills:[\s\S]*?run: npm ci[\s\S]*?name: Validate repository catalog/u);
+  assert.match(workflow, /name: Validate repository catalog\s+run: npm run validate:catalog/u);
 });
 
 test('root package metadata matches the public repository', () => {
