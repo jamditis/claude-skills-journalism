@@ -43,6 +43,11 @@ export function readSkillBody(root = ROOT) {
 // makes it portable. `mappable: true` means an adapter exists; nothing here is
 // Claude-only, because both couplings are about where files live, not about a
 // Claude mechanic.
+// A home-anchored path can be written tilde-style (~/x) or through the HOME
+// variable ($HOME/x or ${HOME}/x). The detector recognizes all three spellings
+// so a later edit cannot slip a coupling past the guard by swapping ~ for $HOME.
+const HOME = '(?:~|\\$HOME|\\$\\{HOME\\})';
+
 export function detectPathAssumptions(body) {
   const findings = [];
 
@@ -51,7 +56,7 @@ export function detectPathAssumptions(body) {
   // only exists on a Claude plugin install. A Codex or standards-based install
   // puts the skill somewhere else and has no ~/.claude at all, so the copy fails
   // before the skill does any work.
-  if (/~\/\.claude\/(?:plugins|skills)\//u.test(body)) {
+  if (new RegExp(`${HOME}/\\.claude/(?:plugins|skills)/`, 'u').test(body)) {
     findings.push({
       kind: 'claude-install-path',
       mappable: true,
@@ -64,7 +69,7 @@ export function detectPathAssumptions(body) {
   // ~/snap/chromium/common/, so the default PDF and preview steps stage files
   // there. That directory does not exist for a non-snap Chrome, on macOS, or in
   // a disposable CI working directory.
-  if (/(?:~|\$HOME)\/snap\/chromium\//u.test(body)) {
+  if (new RegExp(`${HOME}/snap/chromium/`, 'u').test(body)) {
     findings.push({
       kind: 'snap-confined-browser',
       mappable: true,
