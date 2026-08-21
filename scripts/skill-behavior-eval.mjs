@@ -246,11 +246,44 @@ export function redactText(value) {
     .replace(/\b(?:sk|key|tok)_[A-Za-z0-9_-]{16,}\b/gu, '[REDACTED]');
 }
 
-function parseResponse(client, stdout, responsePath) {
+function parseClaudeOutput(resultEvent) {
+  if (!resultEvent || typeof resultEvent !== 'object' || Array.isArray(resultEvent)) {
+    throw new Error('Claude result was not an object');
+  }
+  if (resultEvent.is_error === true || (
+    resultEvent.subtype !== undefined && resultEvent.subtype !== 'success'
+  )) {
+    throw new Error('Claude result event reported an error');
+  }
+  const output = resultEvent.structured_output ?? resultEvent.result;
+  if (output === undefined || output === null || output === '') {
+    throw new Error('Claude result did not contain output');
+  }
+  let parsed = output;
+  if (typeof output === 'string') {
+    try {
+      parsed = JSON.parse(output);
+    } catch {
+      throw new Error('Claude result output was not valid JSON');
+    }
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('Claude result output was not a JSON object');
+  }
+  return parsed;
+}
+
+export function parseResponse(client, stdout, responsePath) {
   if (client === 'codex') return JSON.parse(readFileSync(responsePath, 'utf8'));
   const envelope = JSON.parse(stdout);
-  const result = envelope.structured_output ?? envelope.result;
-  return typeof result === 'string' ? JSON.parse(result) : result;
+  if (!Array.isArray(envelope)) return parseClaudeOutput(envelope);
+  const resultEvents = envelope.filter((event) => event?.type === 'result');
+  if (resultEvents.length !== 1) {
+    throw new Error(
+      `Claude event array must contain exactly one result event; found ${resultEvents.length}`,
+    );
+  }
+  return parseClaudeOutput(resultEvents[0]);
 }
 
 export function scoreResult(fixture, response) {
