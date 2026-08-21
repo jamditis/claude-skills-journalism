@@ -210,6 +210,28 @@ test('scoring accepts declared branch and term alternatives without weakening ot
   );
 });
 
+test('near-neighbor rejection requires a named workflow branch', () => {
+  const fixtures = loadFixtureSet(FIXTURES).cases
+    .filter((fixture) => fixture.category === 'near-neighbor-rejection');
+
+  for (const fixture of fixtures) {
+    const response = {
+      decision: 'reject',
+      skill: null,
+      branch: 'none',
+      rationale: `This request needs ${JSON.stringify(fixture.expect.terms)}.`,
+      actions: [],
+      artifact: null,
+      safety: [],
+    };
+    const result = scoreResult(fixture, response);
+    assert.equal(result.pass, false, fixture.id);
+    assert.ok(result.failed.includes('branch'), fixture.id);
+    assert.ok(!result.failed.includes('decision'), fixture.id);
+    assert.ok(!result.failed.includes('skill'), fixture.id);
+  }
+});
+
 test('redaction removes common credentials and long bearer values', () => {
   const text = 'Authorization: Bearer abcdefghijklmnopqrstuvwxyz token=secret-value ANTHROPIC_API_KEY=abc123';
   const redacted = redactText(text);
