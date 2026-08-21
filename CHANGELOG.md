@@ -7,12 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-08-21
+
+This release adds explicit multi-agent direction and guards against hidden
+filesystem assumptions in portable skills.
+
 ### Added
 
 - **dev-toolkit director:** added an explicit-only director role that reads the
   applicable `CLAUDE.md` policy and directs work through the lower-tier agents
   and models configured for that environment. A standalone install invokes
   `/director`; the plugin form invokes `/dev-toolkit:director`.
+- **pdf-design path detector:** added a repository check that inventories
+  Claude installation paths and Snap confinement paths before portability work.
+
+### Changed
+
+- Parsed Claude-only frontmatter as YAML during Agent Skills projection, so
+  supported whitespace and inline comments do not cause false failures.
+- Updated the catalog, public documentation, and compatibility guidance for 63
+  skills. Bumped the marketplace to 2.7.0 and dev-toolkit to 1.4.0.
 
 ## [2.6.0] - 2026-08-21
 
@@ -695,7 +709,8 @@ Initial commit with foundational skills.
 
 ---
 
-[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.6.0...HEAD
+[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.7.0...HEAD
+[2.7.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.5.0...v2.6.0
 [2.5.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.3.3...v2.4.0
