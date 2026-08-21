@@ -56,7 +56,16 @@ export function validateSkillDirectories(
       const document = frontmatter ? parseDocument(frontmatter[1], { uniqueKeys: true }) : null;
       const explicitValue = document?.get(CLAUDE_EXPLICIT_FIELD);
 
-      if (document?.errors.length || (explicitValue !== undefined && typeof explicitValue !== 'boolean')) {
+      if (document?.errors.length) {
+        return {
+          directory,
+          status: 1,
+          stdout: '',
+          stderr: document.errors.map((error) => error.toString()).join('\n'),
+        };
+      }
+
+      if (explicitValue !== undefined && typeof explicitValue !== 'boolean') {
         return {
           directory,
           status: 1,

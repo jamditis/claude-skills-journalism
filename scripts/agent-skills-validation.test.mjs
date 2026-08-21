@@ -179,3 +179,36 @@ test('Claude explicit-only frontmatter must be one boolean field', (t) => {
   assert.equal(results[0].status, 1);
   assert.match(results[0].stderr, /must be one top-level boolean field/u);
 });
+
+test('YAML parser errors preserve their details when the Claude-only field is absent', (t) => {
+  const fixtures = [
+    {
+      name: 'malformed YAML',
+      frontmatter: 'name: director\ndescription: [unterminated\n',
+      error: /Flow sequence .* end with a \]/u,
+    },
+    {
+      name: 'duplicate unrelated key',
+      frontmatter: 'name: director\ndescription: Direct work\ndescription: Duplicate\n',
+      error: /Map keys must be unique/u,
+    },
+  ];
+
+  for (const fixture of fixtures) {
+    const root = mkdtempSync(join(tmpdir(), 'agent-skills-validation-'));
+    t.after(() => rmSync(root, { recursive: true, force: true }));
+    const skill = join(root, fixture.name.replaceAll(' ', '-'));
+    mkdirSync(skill);
+    writeFileSync(join(skill, 'SKILL.md'), `---\n${fixture.frontmatter}---\n`);
+
+    const results = validateSkillDirectories([skill], {
+      run() {
+        assert.fail('standards validator must not run for invalid YAML frontmatter');
+      },
+    });
+
+    assert.equal(results[0].status, 1, fixture.name);
+    assert.match(results[0].stderr, fixture.error, fixture.name);
+    assert.doesNotMatch(results[0].stderr, /must be one top-level boolean field/u, fixture.name);
+  }
+});
