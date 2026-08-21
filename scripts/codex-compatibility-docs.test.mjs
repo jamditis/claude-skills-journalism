@@ -29,6 +29,9 @@ function findNativeCodexPluginManifests(directory = ROOT, manifests = []) {
 
 test('the compatibility matrix classifies every marketplace package', () => {
   const matrix = readFileSync(join(ROOT, 'plans', 'codex-compatibility-matrix.md'), 'utf8');
+  const marketplace = JSON.parse(
+    readFileSync(join(ROOT, '.claude-plugin', 'marketplace.json'), 'utf8'),
+  );
   const rows = [...matrix.matchAll(/^\| `([^`]+)` \|/gmu)].map((match) => match[1]);
 
   assert.deepEqual(rows, [
@@ -71,6 +74,10 @@ test('the compatibility matrix classifies every marketplace package', () => {
   assert.match(matrix, /scripts\/okf-wiki-runtime-pilot\.mjs/u);
   assert.match(matrix, /scripts\/visual-explainer-runtime-pilot\.mjs/u);
   assert.match(matrix, /2026-07-23-document-design-lock-migration\.md/u);
+  assert.match(
+    matrix,
+    new RegExp(`Claude marketplace, current structure \\| ${marketplace.version.replaceAll('.', '\\.')} \\|`, 'u'),
+  );
 
   const evidenceCells = matrix
     .split('\n')
