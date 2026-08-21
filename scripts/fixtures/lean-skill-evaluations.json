@@ -15,7 +15,7 @@
       "package": "dev-toolkit",
       "category": "near-neighbor-rejection",
       "prompt": "Optimize the existing Vite build for faster production chunk loading. Keep the build system.",
-      "expect": { "decision": "reject", "branch": "existing-build", "branchAlternatives": ["existing build", "build optimization", "neighboring build", "bundler toolchain", "no branch"], "terms": ["Vite"] }
+      "expect": { "decision": "reject", "branch": "existing-build", "branchAlternatives": ["existing build", "build optimization", "neighboring build", "bundler toolchain", "no branch", "none"], "terms": ["Vite"] }
     },
     {
       "id": "zbf-branch",
