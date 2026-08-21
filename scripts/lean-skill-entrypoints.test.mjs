@@ -56,6 +56,17 @@ test('zero-build frontend fails closed for combined local and production request
   assert.match(skill, /separately offer local design and preparation/u);
 });
 
+test('zero-build frontend rejection output never keeps the skill active', () => {
+  const skill = readFileSync(
+    join(ROOT, 'dev-toolkit/skills/zero-build-frontend/SKILL.md'),
+    'utf8',
+  );
+  assert.match(skill, /return `decision: reject`/u);
+  assert.match(skill, /Set `skill` to `null` or name the neighboring skill/u);
+  assert.match(skill, /Never name `zero-build-frontend` as the active skill/u);
+  assert.match(skill, /Set `branch` to `none` or name the neighboring skill/u);
+});
+
 test('synthetic-media reference is self-contained', () => {
   const skillRoot = join(ROOT, 'journalism-core/skills/source-verification/references');
   const video = readFileSync(join(skillRoot, 'video.md'), 'utf8');

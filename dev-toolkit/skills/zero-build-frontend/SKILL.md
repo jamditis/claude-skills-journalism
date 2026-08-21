@@ -99,6 +99,10 @@ Complete the work only when:
 - Core tasks work with a keyboard and at narrow viewport widths.
 - Loading, empty, error, and stale-data states are visible and safe.
 
+## Rejection output contract
+
+When this skill does not apply, return `decision: reject`. Set `skill` to `null` or name the neighboring skill. Never name `zero-build-frontend` as the active skill. Set `branch` to `none` or name the neighboring skill.
+
 ## Stop conditions
 
 Stop and ask for direction before adding a backend, exposing non-public sheet data, publishing, uploading, using credentials, or changing live hosting.
