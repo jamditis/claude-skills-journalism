@@ -32,6 +32,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
   const marketplace = JSON.parse(
     readFileSync(join(ROOT, '.claude-plugin', 'marketplace.json'), 'utf8'),
   );
+  const marketplaceVersionPattern = marketplace.version.replaceAll('.', '\\.');
   const rows = [...matrix.matchAll(/^\| `([^`]+)` \|/gmu)].map((match) => match[1]);
 
   assert.deepEqual(rows, [
@@ -76,7 +77,11 @@ test('the compatibility matrix classifies every marketplace package', () => {
   assert.match(matrix, /2026-07-23-document-design-lock-migration\.md/u);
   assert.match(
     matrix,
-    new RegExp(`Claude marketplace, current structure \\| ${marketplace.version.replaceAll('.', '\\.')} \\|`, 'u'),
+    new RegExp(`Claude marketplace, current structure \\| ${marketplaceVersionPattern} \\|`, 'u'),
+  );
+  assert.match(
+    matrix,
+    new RegExp(`Marketplace ${marketplaceVersionPattern} contains`, 'u'),
   );
 
   const evidenceCells = matrix
