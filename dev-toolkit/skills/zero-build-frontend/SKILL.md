@@ -101,7 +101,7 @@ Complete the work only when:
 
 ## Rejection output contract
 
-When this skill does not apply, return `decision: reject`. Set `skill` to `null` or name the neighboring skill. Never name `zero-build-frontend` as the active skill. Set `branch` to `none` or name the neighboring skill.
+When this skill does not apply, return `decision: reject`. Set `skill` to `null` or name the neighboring skill. Never name `zero-build-frontend` as the active skill. Set `branch` to the neighboring workflow. Never use `none` for a rejection branch.
 
 ## Stop conditions
 

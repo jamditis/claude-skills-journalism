@@ -64,7 +64,8 @@ test('zero-build frontend rejection output never keeps the skill active', () => 
   assert.match(skill, /return `decision: reject`/u);
   assert.match(skill, /Set `skill` to `null` or name the neighboring skill/u);
   assert.match(skill, /Never name `zero-build-frontend` as the active skill/u);
-  assert.match(skill, /Set `branch` to `none` or name the neighboring skill/u);
+  assert.match(skill, /Set `branch` to the neighboring workflow/u);
+  assert.match(skill, /Never use `none` for a rejection branch/u);
 });
 
 test('synthetic-media reference is self-contained', () => {
