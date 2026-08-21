@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.2] - 2026-08-21
+
+### Fixed
+
+- Aligned the compatibility matrix's current marketplace references with the
+  published release while keeping historical runtime evidence unchanged.
+- Added a regression check that derives the matrix's current marketplace version
+  from the marketplace manifest.
+
 ## [2.7.1] - 2026-08-21
 
 ### Fixed
@@ -717,7 +726,8 @@ Initial commit with foundational skills.
 
 ---
 
-[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.7.1...HEAD
+[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.7.2...HEAD
+[2.7.2]: https://github.com/jamditis/claude-skills-journalism/compare/v2.7.1...v2.7.2
 [2.7.1]: https://github.com/jamditis/claude-skills-journalism/compare/v2.7.0...v2.7.1
 [2.7.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.5.0...v2.6.0
