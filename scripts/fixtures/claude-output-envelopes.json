@@ -1,0 +1,47 @@
+{
+  "response": {
+    "decision": "use",
+    "skill": "source-verification",
+    "branch": "documents",
+    "rationale": "Verify the claim.",
+    "actions": ["Trace the original."],
+    "artifact": null,
+    "safety": []
+  },
+  "legacy": {
+    "type": "result",
+    "subtype": "success",
+    "is_error": false,
+    "structured_output": {
+      "decision": "use",
+      "skill": "source-verification",
+      "branch": "documents",
+      "rationale": "Verify the claim.",
+      "actions": ["Trace the original."],
+      "artifact": null,
+      "safety": []
+    }
+  },
+  "current": [
+    { "type": "system", "subtype": "init", "model": "claude-opus-5" },
+    { "type": "assistant", "message": { "role": "assistant", "content": [] } },
+    {
+      "type": "result",
+      "subtype": "success",
+      "is_error": false,
+      "result": "{\"decision\":\"use\",\"skill\":\"source-verification\",\"branch\":\"documents\",\"rationale\":\"Verify the claim.\",\"actions\":[\"Trace the original.\"],\"artifact\":null,\"safety\":[]}"
+    }
+  ],
+  "error": [
+    { "type": "system", "subtype": "init", "model": "claude-opus-5" },
+    { "type": "result", "subtype": "success", "is_error": true, "result": "API error" }
+  ],
+  "ambiguous": [
+    { "type": "result", "subtype": "success", "is_error": false, "result": "{}" },
+    { "type": "result", "subtype": "success", "is_error": false, "result": "{}" }
+  ],
+  "missing": [
+    { "type": "system", "subtype": "init", "model": "claude-opus-5" },
+    { "type": "assistant", "message": { "role": "assistant", "content": [] } }
+  ]
+}

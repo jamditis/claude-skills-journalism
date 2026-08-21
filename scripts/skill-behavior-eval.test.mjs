@@ -9,6 +9,7 @@ import {
   buildInvocation,
   loadFixtureSet,
   parseCliArgs,
+  parseResponse,
   prepareVariant,
   redactText,
   runCli,
@@ -18,6 +19,10 @@ import {
 
 const ROOT = resolve(import.meta.dirname, '..');
 const FIXTURES = join(ROOT, 'scripts', 'fixtures', 'lean-skill-evaluations.json');
+const CLAUDE_ENVELOPES = JSON.parse(readFileSync(
+  join(ROOT, 'scripts', 'fixtures', 'claude-output-envelopes.json'),
+  'utf8',
+));
 
 test('fixture set covers every required category for each pilot skill', () => {
   const fixtureSet = loadFixtureSet(FIXTURES);
@@ -97,6 +102,55 @@ test('invocations use bounded isolated print sessions without direct APIs', () =
     ['--sandbox', 'read-only'],
   );
   assert.equal(EVALUATION_TIMEOUT_MS, 180_000);
+
+  const pinnedClaude = buildInvocation('claude', fixture, {
+    projectDir: '/tmp/eval/project',
+    pluginDir: '/tmp/eval/plugin',
+    outputSchema: '/tmp/eval/schema.json',
+    claudeConfigDir: '/home/test/.claude',
+  }, { SKILL_EVAL_CLAUDE_MODEL: 'claude-opus-5' });
+  assert.deepEqual(
+    pinnedClaude.args.slice(pinnedClaude.args.indexOf('--model'), pinnedClaude.args.indexOf('--model') + 2),
+    ['--model', 'claude-opus-5'],
+  );
+});
+
+test('Claude parser accepts legacy objects and current event arrays', () => {
+  assert.deepEqual(
+    parseResponse('claude', JSON.stringify(CLAUDE_ENVELOPES.legacy)),
+    CLAUDE_ENVELOPES.response,
+  );
+  assert.deepEqual(
+    parseResponse('claude', JSON.stringify(CLAUDE_ENVELOPES.current)),
+    CLAUDE_ENVELOPES.response,
+  );
+});
+
+test('Claude parser fails closed on error, ambiguous, missing, and malformed results', () => {
+  assert.throws(
+    () => parseResponse('claude', JSON.stringify(CLAUDE_ENVELOPES.error)),
+    /reported an error/u,
+  );
+  assert.throws(
+    () => parseResponse('claude', JSON.stringify(CLAUDE_ENVELOPES.ambiguous)),
+    /exactly one result event/u,
+  );
+  assert.throws(
+    () => parseResponse('claude', JSON.stringify(CLAUDE_ENVELOPES.missing)),
+    /exactly one result event/u,
+  );
+  assert.throws(
+    () => parseResponse('claude', JSON.stringify({ type: 'result', subtype: 'success' })),
+    /did not contain output/u,
+  );
+  assert.throws(
+    () => parseResponse('claude', JSON.stringify({
+      type: 'result',
+      subtype: 'success',
+      result: 'not JSON',
+    })),
+    /output was not valid JSON/u,
+  );
 });
 
 test('scoring checks the decision, branch, skill, and required terms', () => {
@@ -156,11 +210,63 @@ test('scoring accepts declared branch and term alternatives without weakening ot
   );
 });
 
+test('near-neighbor rejection requires a named workflow branch', () => {
+  const fixtures = loadFixtureSet(FIXTURES).cases
+    .filter((fixture) => fixture.category === 'near-neighbor-rejection');
+
+  for (const fixture of fixtures) {
+    const response = {
+      decision: 'reject',
+      skill: null,
+      branch: 'none',
+      rationale: `This request needs ${JSON.stringify(fixture.expect.terms)}.`,
+      actions: [],
+      artifact: null,
+      safety: [],
+    };
+    const result = scoreResult(fixture, response);
+    assert.equal(result.pass, false, fixture.id);
+    assert.ok(result.failed.includes('branch'), fixture.id);
+    assert.ok(!result.failed.includes('decision'), fixture.id);
+    assert.ok(!result.failed.includes('skill'), fixture.id);
+  }
+});
+
 test('redaction removes common credentials and long bearer values', () => {
   const text = 'Authorization: Bearer abcdefghijklmnopqrstuvwxyz token=secret-value ANTHROPIC_API_KEY=abc123';
   const redacted = redactText(text);
   assert.doesNotMatch(redacted, /abcdefghijklmnopqrstuvwxyz|secret-value|abc123/u);
   assert.match(redacted, /\[REDACTED\]/u);
+});
+
+test('redaction removes provider token formats without matching short lookalikes', () => {
+  const secrets = [
+    'sk-ant-api03-abcdefghijklmnopqrstuvwxyz0123456789',
+    'sk-proj-abcdefghijklmnopqrstuvwxyz0123456789',
+    'sk-abcdefghijklmnopqrstuvwxyz0123456789',
+    'ghp_abcdefghijklmnopqrstuvwxyz0123456789',
+    'gho_abcdefghijklmnopqrstuvwxyz0123456789',
+    'ghu_abcdefghijklmnopqrstuvwxyz0123456789',
+    'ghs_abcdefghijklmnopqrstuvwxyz0123456789',
+    'ghr_abcdefghijklmnopqrstuvwxyz0123456789',
+    'github_pat_abcdefghijklmnopqrstuvwxyz_0123456789',
+  ];
+  const nearMisses = [
+    'sk-ant-example',
+    'sk-proj-demo',
+    'sk-documentation',
+    'ghp_example',
+    'gho_sample',
+    'ghu_placeholder',
+    'ghs_test',
+    'ghr_short',
+    'github_pat_example',
+  ];
+  const redacted = redactText([...secrets, ...nearMisses].join(' '));
+
+  for (const secret of secrets) assert.ok(!redacted.includes(secret), secret);
+  for (const nearMiss of nearMisses) assert.ok(redacted.includes(nearMiss), nearMiss);
+  assert.equal(redacted.match(/\[REDACTED\]/gu)?.length, secrets.length);
 });
 
 test('runtime failures include safe process launch and timeout details', () => {
