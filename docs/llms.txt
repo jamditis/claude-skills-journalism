@@ -12,7 +12,7 @@ Source: https://github.com/jamditis/claude-skills-journalism
 Joe Amditis, associate director of operations, Center for Cooperative Media, Montclair State University.
 Personal site: https://jamditis.com
 
-## Skills (62 total)
+## Skills (63 total)
 
 ### Journalism and verification
 - source-verification, SIFT method, verification trails, source credibility, deepfakes/C2PA
@@ -56,6 +56,7 @@ Personal site: https://jamditis.com
 - web-ui-best-practices, signs of craft in web UI
 - claude-md-updater, propose scoped CLAUDE.md updates from a session
 - context-engineering-fundamentals, preserve instructions, evidence, and state in long agent sessions
+- director, explicit top-tier direction through the lower-tier agents and models configured in CLAUDE.md
 
 ### Security
 - security-checklist, pre-deployment security audit
@@ -147,7 +148,7 @@ codex plugin add journalism-core@claude-skills-journalism
 
 This repository does not ship native Codex manifests. The route does not convert Claude-specific commands, agents, hooks, or root-level skills into Codex components.
 
-Plugins (12): `journalism-core` (15 skills), `research-toolkit` (6), `dev-toolkit` (12), `security-toolkit` (4 skills + /hotpatch command), `project-templates-toolkit` (3), `pdf-design` (1), `pdf-playground` (1), `visual-explainer` (1), `video-toolkit` (4), `okf-wiki` (1), `superjawn` (14), `autocontext` (cross-session knowledge persistence, hooks, commands, and agents rather than skills).
+Plugins (12): `journalism-core` (15 skills), `research-toolkit` (6), `dev-toolkit` (13), `security-toolkit` (4 skills + /hotpatch command), `project-templates-toolkit` (3), `pdf-design` (1), `pdf-playground` (1), `visual-explainer` (1), `video-toolkit` (4), `okf-wiki` (1), `superjawn` (14), `autocontext` (cross-session knowledge persistence, hooks, commands, and agents rather than skills).
 
 ## Alternate installation
 

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Direct one request through the lower-tier agents and models configured in the applicable Claude Code policy.">
+    <title>Director - Agent skills for journalism</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="stylesheet" href="../assets/tailwind/director.css" data-tailwind-build="3.4.19">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Fraunces', serif; }
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.45), transparent 60%);
+            pointer-events: none;
+        }
+        .skip-link { position: absolute; left: -9999px; top: 0; z-index: 100; }
+        .skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1rem; background: #121212; color: #fff; }
+        :focus-visible { outline: 2px solid #4338ca; outline-offset: 4px; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; }
+        }
+    </style>
+    <meta property="og:title" content="Director">
+    <meta property="og:description" content="Direct one request through the agents and models configured for the current environment.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/director/">
+    <meta property="og:image" content="https://skills.amditis.tech/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Director">
+    <meta name="twitter:description" content="Direct one request through the agents and models configured for the current environment.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/og-image.png">
+    <link rel="stylesheet" href="../updated.css">
+    <script src="../ask-ai.js" defer></script>
+</head>
+<body class="bg-canvas text-ink">
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <div class="paper-overlay" aria-hidden="true"></div>
+
+    <nav aria-label="Primary" class="relative z-10 border-b border-mist/40">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="../" class="text-sm font-semibold text-accent hover:underline">All skills</a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/dev-toolkit/skills/director" class="text-sm font-semibold text-accent hover:underline">View source</a>
+        </div>
+    </nav>
+
+    <header class="relative z-10 bg-gradient-to-br from-accent to-accentDark text-white">
+        <div class="max-w-4xl mx-auto px-6 py-16">
+            <p class="text-sm font-semibold mb-4">Development skill</p>
+            <h1 class="text-4xl md:text-5xl font-bold">Director</h1>
+            <p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-08-21T15:46:56-04:00" data-updated-slug="director">Updated <time datetime="2026-08-21T15:46:56-04:00">Aug 21, 2026</time></p>
+            <p class="text-xl text-white/90 max-w-2xl mt-5">Direct, decide, delegate, and review without taking over implementation work.</p>
+        </div>
+    </header>
+
+    <main id="main" class="relative z-10 max-w-4xl mx-auto px-6 py-12">
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">Use this skill when</h2>
+            <ul class="space-y-3 list-disc pl-6 text-clay">
+                <li>The user explicitly wants the top-tier model to direct the current request.</li>
+                <li>The environment policy defines lower-tier agents or models for execution.</li>
+                <li>Research, edits, tests, and commands must stay delegated.</li>
+            </ul>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">Role contract</h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                <article class="bg-white/60 border border-mist/40 rounded-xl p-5">
+                    <h3 class="text-lg font-semibold">Director work</h3>
+                    <p class="text-clay mt-2">Set the outcome, divide the work, make decisions, resolve conflicts, and review the results.</p>
+                </article>
+                <article class="bg-white/60 border border-mist/40 rounded-xl p-5">
+                    <h3 class="text-lg font-semibold">Delegated work</h3>
+                    <p class="text-clay mt-2">Send research, code, file changes, tests, and command execution to the configured lower-tier agents.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">Policy-driven routing</h2>
+            <div class="bg-white/60 border border-mist/40 rounded-xl p-6 text-clay space-y-3">
+                <p>The skill reads the applicable <code>CLAUDE.md</code> policy for the current user and project.</p>
+                <p>It does not contain a home-directory path or fixed model name. Each environment keeps its own routing policy.</p>
+                <p>If required delegation is unavailable, the director stops and tells the user. Activating the role does not grant new authority.</p>
+            </div>
+        </section>
+
+        <section class="border-t border-mist/40 pt-8">
+            <h2 class="text-2xl font-semibold mb-4">Install and invoke</h2>
+            <p class="text-clay mb-4">The plugin form is namespaced:</p>
+            <pre class="bg-ink text-white rounded-xl p-4 overflow-x-auto mb-4"><code>/plugin install dev-toolkit@claude-skills-journalism
+/dev-toolkit:director</code></pre>
+            <p class="text-clay mb-4">For the literal <code>/director</code> command, install the standalone skill:</p>
+            <pre class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>mkdir -p ~/.claude/skills
+cp -r dev-toolkit/skills/director ~/.claude/skills/
+/director</code></pre>
+        </section>
+    </main>
+
+    <footer class="relative z-10 border-t border-mist/40 mt-8">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-sm text-clay flex flex-wrap gap-4 justify-between">
+            <span>Joe Amditis</span>
+            <a href="https://github.com/jamditis/claude-skills-journalism" class="text-accent hover:underline">GitHub repository</a>
+        </div>
+    </footer>
+    <script defer src="../updated.js"></script>
+</body>
+</html>

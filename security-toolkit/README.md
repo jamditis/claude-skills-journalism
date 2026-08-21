@@ -32,5 +32,5 @@ Four defensive security skills for web applications, APIs, and toolchain hardeni
 ## See also
 
 - [`dev-toolkit`](../dev-toolkit/README.md), 11 development skills (accessibility, Electron, scraping, frontend patterns, CLAUDE.md maintenance)
-- [`journalism-core`](../journalism-core/README.md), 13 skills for reporting, verification, publishing
-- [`research-toolkit`](../research-toolkit/README.md), 5 skills for research, archives, academic workflows
+- [`journalism-core`](../journalism-core/README.md), 15 skills for reporting, verification, publishing
+- [`research-toolkit`](../research-toolkit/README.md), 6 skills for research, archives, academic workflows

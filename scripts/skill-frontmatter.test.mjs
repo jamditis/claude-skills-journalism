@@ -14,6 +14,7 @@ const ALLOWED_FIELDS = new Set([
   'compatibility',
   'metadata',
   'allowed-tools',
+  'disable-model-invocation',
 ]);
 const NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 
@@ -27,7 +28,7 @@ function findSkillFiles(dir = ROOT, files = []) {
   return files;
 }
 
-test('every SKILL.md follows the Agent Skills frontmatter contract', () => {
+test('every SKILL.md follows the repository frontmatter contract', () => {
   const files = findSkillFiles().sort();
   const names = new Map();
   const errors = [];
@@ -94,6 +95,12 @@ test('every SKILL.md follows the Agent Skills frontmatter contract', () => {
     if ('allowed-tools' in data && typeof data['allowed-tools'] !== 'string') {
       errors.push(`${displayPath}: allowed-tools must be a string`);
     }
+    if (
+      'disable-model-invocation' in data
+      && typeof data['disable-model-invocation'] !== 'boolean'
+    ) {
+      errors.push(`${displayPath}: disable-model-invocation must be a boolean`);
+    }
     if ('metadata' in data) {
       const metadata = data.metadata;
       if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
@@ -119,7 +126,7 @@ test('published package versions stay aligned with the marketplace', () => {
   assert.equal(marketplace.version, '2.5.0', 'marketplace version');
   const expected = new Map([
     ['autocontext', '1.1.1'],
-    ['dev-toolkit', '1.2.2'],
+    ['dev-toolkit', '1.3.0'],
     ['journalism-core', '1.4.1'],
     ['okf-wiki', '0.8.2'],
     ['pdf-design', '1.1.2'],

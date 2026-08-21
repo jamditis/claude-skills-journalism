@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import test from 'node:test';
@@ -107,4 +107,54 @@ test('validator runner can select the current upstream source', () => {
 
   assert.equal(results[0].status, 0);
   assert.equal(calls[0].args[1], UPSTREAM_SKILLS_REF_SOURCE);
+});
+
+test('Claude explicit-only frontmatter is checked before standards validation', (t) => {
+  const root = mkdtempSync(join(tmpdir(), 'agent-skills-validation-'));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const skill = join(root, 'director');
+  mkdirSync(join(skill, 'references'), { recursive: true });
+  writeFileSync(
+    join(skill, 'SKILL.md'),
+    '---\nname: director\ndescription: Direct work\ndisable-model-invocation: true\n---\n',
+  );
+  writeFileSync(join(skill, 'references', 'policy.md'), 'policy\n');
+
+  let projectedDirectory;
+  const results = validateSkillDirectories([skill], {
+    run(command, args) {
+      projectedDirectory = args.at(-1);
+      assert.notEqual(projectedDirectory, skill);
+      assert.doesNotMatch(
+        readFileSync(join(projectedDirectory, 'SKILL.md'), 'utf8'),
+        /disable-model-invocation/u,
+      );
+      assert.equal(readFileSync(join(projectedDirectory, 'references', 'policy.md'), 'utf8'), 'policy\n');
+      return { status: 0, stdout: `Valid skill: ${projectedDirectory}\n`, stderr: '' };
+    },
+  });
+
+  assert.equal(results[0].status, 0);
+  assert.match(results[0].stdout, new RegExp(`Valid skill: ${skill}`, 'u'));
+  assert.equal(existsSync(projectedDirectory), false);
+});
+
+test('Claude explicit-only frontmatter must be one boolean field', (t) => {
+  const root = mkdtempSync(join(tmpdir(), 'agent-skills-validation-'));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const skill = join(root, 'director');
+  mkdirSync(skill);
+  writeFileSync(
+    join(skill, 'SKILL.md'),
+    '---\nname: director\ndescription: Direct work\ndisable-model-invocation: yes\n---\n',
+  );
+
+  const results = validateSkillDirectories([skill], {
+    run() {
+      assert.fail('standards validator must not run for invalid Claude frontmatter');
+    },
+  });
+
+  assert.equal(results[0].status, 1);
+  assert.match(results[0].stderr, /must be one top-level boolean field/u);
 });

@@ -4,6 +4,8 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
+import { findSkillFiles } from './repository-catalog.mjs';
+
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const DOCS = join(ROOT, 'docs');
 const PAGE = join(DOCS, 'video-toolkit', 'index.html');
@@ -36,9 +38,10 @@ test('video toolkit docs explain the four-stage reporting pipeline and its bound
 
 test('homepage lists video toolkit once, before visual explainer, with accurate counts', () => {
   const index = readFileSync(join(DOCS, 'index.html'), 'utf8');
+  const skillCount = findSkillFiles().length;
 
-  assert.match(index, />62 Skills \/\/ 12 Plugins \/\/ 17 Hooks</u);
-  assert.match(index, /id="finder-count">62 skills, 12 plugins</u);
+  assert.match(index, new RegExp(`>${skillCount} Skills // 12 Plugins // 17 Hooks`, 'u'));
+  assert.match(index, new RegExp(`id="finder-count">${skillCount} skills, 12 plugins`, 'u'));
   assert.match(index, />12 Plugins<\/span>/u);
   assert.equal((index.match(/href="video-toolkit\/"/gu) || []).length, 1);
 

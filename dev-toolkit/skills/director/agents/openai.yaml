@@ -1,0 +1,3 @@
+interface:
+  display_name: "Director"
+  short_description: "Directs work through configured lower-tier agents"
