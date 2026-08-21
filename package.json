@@ -17,6 +17,8 @@
     "pilot:journalism-core": "node scripts/journalism-core-runtime-pilot.mjs",
     "pilot:okf-wiki": "node scripts/okf-wiki-runtime-pilot.mjs",
     "pilot:visual-explainer": "node scripts/visual-explainer-runtime-pilot.mjs",
+    "eval:skills": "node scripts/skill-behavior-eval.mjs",
+    "test:skill-eval": "node --test scripts/skill-behavior-eval.test.mjs",
     "a11y": "node scripts/verify_a11y.mjs",
     "build:docs-css": "node scripts/docs-tailwind.mjs --write",
     "check:docs-css": "node scripts/docs-tailwind.mjs --check"
