@@ -379,8 +379,8 @@ function commandVersion(command) {
   return result.status === 0 ? redactText(result.stdout.trim()) : 'unavailable';
 }
 
-function runCli() {
-  const options = parseCliArgs(process.argv.slice(2));
+export function runCli(args = process.argv.slice(2), { run = spawnSync } = {}) {
+  const options = parseCliArgs(args);
   const fixtureSet = loadFixtureSet();
   const fixtures = resolveCases(options, fixtureSet);
   const clients = options.runtime === 'both' ? ['claude', 'codex'] : [options.runtime];
@@ -391,6 +391,10 @@ function runCli() {
   }
   if (!lstatSync(outputDir).isDirectory() || lstatSync(outputDir).isSymbolicLink()) {
     throw new Error('The output directory must be a real directory');
+  }
+  const reportPath = join(outputDir, 'skill-behavior-evaluation.json');
+  if (existsSync(reportPath)) {
+    throw new Error(`Report already exists: ${reportPath}`);
   }
 
   const results = [];
@@ -427,6 +431,7 @@ function runCli() {
               invocation,
               prepared.responsePath,
               client,
+              run,
             );
             results.push({
               case: fixture.id,
@@ -454,7 +459,6 @@ function runCli() {
     selection: { caseId: options.caseId ?? null, all: options.all, maxCases: options.maxCases },
     results,
   };
-  const reportPath = join(outputDir, 'skill-behavior-evaluation.json');
   writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, {
     flag: 'wx',
     mode: 0o600,

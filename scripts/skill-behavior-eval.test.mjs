@@ -11,6 +11,7 @@ import {
   parseCliArgs,
   prepareVariant,
   redactText,
+  runCli,
   runInvocation,
   scoreResult,
 } from './skill-behavior-eval.mjs';
@@ -229,4 +230,32 @@ test('CLI requires an explicit bounded selection and rejects unsafe overlap', ()
       maxCases: 1,
     },
   );
+});
+
+test('CLI rejects an existing report before any client invocation', () => {
+  const temp = mkdtempSync(join(tmpdir(), 'skill-eval-existing-report-'));
+  try {
+    const reportPath = join(temp, 'skill-behavior-evaluation.json');
+    writeFileSync(reportPath, '{}\n');
+    let clientInvocations = 0;
+    assert.throws(
+      () => runCli([
+        '--baseline', join(temp, 'baseline'),
+        '--candidate', join(temp, 'candidate'),
+        '--case', 'zbf-activation',
+        '--runtime', 'codex',
+        '--output', temp,
+      ], {
+        run: () => {
+          clientInvocations += 1;
+          return { status: 0, stderr: '', stdout: '' };
+        },
+      }),
+      /Report already exists/u,
+    );
+    assert.equal(clientInvocations, 0);
+    assert.equal(readFileSync(reportPath, 'utf8'), '{}\n');
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
 });
