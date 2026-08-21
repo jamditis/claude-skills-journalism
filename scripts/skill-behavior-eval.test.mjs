@@ -239,6 +239,36 @@ test('redaction removes common credentials and long bearer values', () => {
   assert.match(redacted, /\[REDACTED\]/u);
 });
 
+test('redaction removes provider token formats without matching short lookalikes', () => {
+  const secrets = [
+    'sk-ant-api03-abcdefghijklmnopqrstuvwxyz0123456789',
+    'sk-proj-abcdefghijklmnopqrstuvwxyz0123456789',
+    'sk-abcdefghijklmnopqrstuvwxyz0123456789',
+    'ghp_abcdefghijklmnopqrstuvwxyz0123456789',
+    'gho_abcdefghijklmnopqrstuvwxyz0123456789',
+    'ghu_abcdefghijklmnopqrstuvwxyz0123456789',
+    'ghs_abcdefghijklmnopqrstuvwxyz0123456789',
+    'ghr_abcdefghijklmnopqrstuvwxyz0123456789',
+    'github_pat_abcdefghijklmnopqrstuvwxyz_0123456789',
+  ];
+  const nearMisses = [
+    'sk-ant-example',
+    'sk-proj-demo',
+    'sk-documentation',
+    'ghp_example',
+    'gho_sample',
+    'ghu_placeholder',
+    'ghs_test',
+    'ghr_short',
+    'github_pat_example',
+  ];
+  const redacted = redactText([...secrets, ...nearMisses].join(' '));
+
+  for (const secret of secrets) assert.ok(!redacted.includes(secret), secret);
+  for (const nearMiss of nearMisses) assert.ok(redacted.includes(nearMiss), nearMiss);
+  assert.equal(redacted.match(/\[REDACTED\]/gu)?.length, secrets.length);
+});
+
 test('runtime failures include safe process launch and timeout details', () => {
   const invocation = {
     command: 'missing-client',

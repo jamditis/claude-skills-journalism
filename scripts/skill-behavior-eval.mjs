@@ -243,6 +243,8 @@ export function redactText(value) {
   return String(value)
     .replace(/(authorization\s*:\s*bearer\s+)[^\s"']+/giu, '$1[REDACTED]')
     .replace(/((?:api[_-]?key|token|secret|password)\s*[=:]\s*)[^\s"']+/giu, '$1[REDACTED]')
+    .replace(/\bsk-(?:ant-|proj-)?[A-Za-z0-9_-]{16,}\b/gu, '[REDACTED]')
+    .replace(/\b(?:gh[opusr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})\b/gu, '[REDACTED]')
     .replace(/\b(?:sk|key|tok)_[A-Za-z0-9_-]{16,}\b/gu, '[REDACTED]');
 }
 
