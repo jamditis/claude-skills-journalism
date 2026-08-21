@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **dev-toolkit director:** added an explicit-only director role that reads the
+  applicable `CLAUDE.md` policy and directs work through the lower-tier agents
+  and models configured for that environment. A standalone install invokes
+  `/director`; the plugin form invokes `/dev-toolkit:director`.
+
 ## [2.6.0] - 2026-08-21
 
 This release adds a validated control plane for the full skills catalog and
@@ -36,7 +43,7 @@ skills load their detailed guidance only when the task needs it.
   metadata, catalog data, and progressive-disclosure files.
 
 - Shortened every skill `description` to at most 130 characters (aggregate
-  7,464 across 62 skills) so the full set stays within Codex's skills-metadata
+  7,719 across 63 skills) so the full set stays within Codex's skills-metadata
   budget and no longer triggers overflow warnings on load. Descriptions keep
   their trigger keywords, so discovery is unaffected. Plugin and marketplace
   blurbs were shortened to match (journalism-core dropped from 1,036 to 378).

@@ -1,6 +1,6 @@
 # dev-toolkit
 
-Twelve development-focused skills for journalists, researchers, and small newsroom dev teams.
+Thirteen development-focused skills for journalists, researchers, and small newsroom dev teams.
 
 ## Skills in this plugin
 
@@ -9,6 +9,7 @@ Twelve development-focused skills for journalists, researchers, and small newsro
 | accessibility-compliance | WCAG 2.2 baseline, alt text, focus management, motion preferences |
 | claude-md-updater | Detect session lessons, new paths, infra changes, and workflows and propose scoped CLAUDE.md edits |
 | context-engineering-fundamentals | Attention budget, lost-in-middle recall, context degradation patterns, and mitigations for long sessions |
+| director | Explicit top-tier direction through the lower-tier agents and models configured in CLAUDE.md |
 | electron-dev | Electron security model (contextIsolation, sandbox), IPC patterns, packaging |
 | mobile-debugging | Eruda, vConsole, Chrome DevTools on Android, Safari Web Inspector for iOS |
 | one-way-door | Block irreversible architectural decisions during planning |
@@ -26,7 +27,16 @@ Twelve development-focused skills for journalists, researchers, and small newsro
 /plugin install dev-toolkit@claude-skills-journalism
 ```
 
+The plugin form invokes the skill as `/dev-toolkit:director`. For the literal
+`/director` command, copy or symlink the standalone skill into the personal
+Claude Code skills directory:
+
+```sh
+mkdir -p ~/.claude/skills
+cp -r dev-toolkit/skills/director ~/.claude/skills/
+```
+
 ## See also
 
-- [`journalism-core`](../journalism-core/README.md), 13 skills for reporting, verification, publishing
-- [`research-toolkit`](../research-toolkit/README.md), 5 skills for research, archives, academic workflows
+- [`journalism-core`](../journalism-core/README.md), 15 skills for reporting, verification, publishing
+- [`research-toolkit`](../research-toolkit/README.md), 6 skills for research, archives, academic workflows

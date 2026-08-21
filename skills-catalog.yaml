@@ -38,6 +38,10 @@ skills:
   - name: context-engineering-fundamentals
     package: dev-toolkit
     path: dev-toolkit/skills/context-engineering-fundamentals
+  - name: director
+    package: dev-toolkit
+    path: dev-toolkit/skills/director
+    invocation: explicit
   - name: electron-dev
     package: dev-toolkit
     path: dev-toolkit/skills/electron-dev

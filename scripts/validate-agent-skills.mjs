@@ -1,7 +1,17 @@
-import { readdirSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
 import { basename, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { parseDocument } from 'yaml';
 
 export const SKILLS_REF_REVISION = '38a2ff82958afee88dadf4831509e6f7e9d8ef4e';
 export const SKILLS_REF_SOURCE =
@@ -10,6 +20,7 @@ export const UPSTREAM_SKILLS_REF_SOURCE =
   'git+https://github.com/agentskills/agentskills.git#subdirectory=skills-ref';
 
 const SKIP_DIRECTORIES = new Set(['.agents', '.git', 'node_modules']);
+const CLAUDE_EXPLICIT_FIELD = 'disable-model-invocation';
 
 export function findSkillDirectories(root, current = root, directories = []) {
   for (const entry of readdirSync(current, { withFileTypes: true })) {
@@ -35,20 +46,54 @@ export function validateSkillDirectories(
   } = {},
 ) {
   return directories.map((directory) => {
-    const result = run(
-      command,
-      ['--from', source, 'skills-ref', 'validate', directory],
-      {
-        encoding: 'utf8',
-        env: { ...process.env, PYTHONUTF8: '1' },
-      },
-    );
+    let validationDirectory = directory;
+    let temporaryRoot = null;
+
+    const skillPath = join(directory, 'SKILL.md');
+    if (existsSync(skillPath)) {
+      const skill = readFileSync(skillPath, 'utf8');
+      const frontmatter = skill.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/u);
+      const document = frontmatter ? parseDocument(frontmatter[1], { uniqueKeys: true }) : null;
+      const explicitValue = document?.get(CLAUDE_EXPLICIT_FIELD);
+
+      if (document?.errors.length || (explicitValue !== undefined && typeof explicitValue !== 'boolean')) {
+        return {
+          directory,
+          status: 1,
+          stdout: '',
+          stderr: `${CLAUDE_EXPLICIT_FIELD} must be one top-level boolean field`,
+        };
+      }
+
+      if (explicitValue !== undefined) {
+        temporaryRoot = mkdtempSync(join(tmpdir(), 'agent-skills-validation-'));
+        validationDirectory = join(temporaryRoot, basename(directory));
+        cpSync(directory, validationDirectory, { recursive: true });
+        document.delete(CLAUDE_EXPLICIT_FIELD);
+        const projected = skill.replace(frontmatter[0], `---\n${document.toString()}---\n`);
+        writeFileSync(join(validationDirectory, 'SKILL.md'), projected, 'utf8');
+      }
+    }
+
+    let result;
+    try {
+      result = run(
+        command,
+        ['--from', source, 'skills-ref', 'validate', validationDirectory],
+        {
+          encoding: 'utf8',
+          env: { ...process.env, PYTHONUTF8: '1' },
+        },
+      );
+    } finally {
+      if (temporaryRoot) rmSync(temporaryRoot, { recursive: true, force: true });
+    }
 
     return {
       directory,
       status: result.status ?? 1,
-      stdout: result.stdout ?? '',
-      stderr: result.stderr ?? result.error?.message ?? '',
+      stdout: (result.stdout ?? '').replaceAll(validationDirectory, directory),
+      stderr: (result.stderr ?? result.error?.message ?? '').replaceAll(validationDirectory, directory),
     };
   });
 }

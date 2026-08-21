@@ -8,13 +8,14 @@ Classes: **shared** runs as written; **adapter-required** needs a documented
 Codex mapping (instruction file, tool vocabulary, or hook); **Claude-only**
 depends on a Claude runtime mechanic with no Codex equivalent.
 
-Inventory: 12 skills discovered from `dev-toolkit/skills` (9 shared, 3 adapter-required, 0 Claude-only).
+Inventory: 13 skills discovered from `dev-toolkit/skills` (9 shared, 4 adapter-required, 0 Claude-only).
 
 | Skill | Class | Auto-activation | Reason |
 | --- | --- | --- | --- |
 | `accessibility-compliance` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
 | `claude-md-updater` | adapter-required | no | Targets CLAUDE.md; map the instruction file to AGENTS.md for Codex. |
 | `context-engineering-fundamentals` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
+| `director` | adapter-required | no | Targets CLAUDE.md; map the instruction file to AGENTS.md for Codex. |
 | `electron-dev` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
 | `mobile-debugging` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
 | `one-way-door` | adapter-required | yes (one-way-door-check.md) | Targets CLAUDE.md; map the instruction file to AGENTS.md for Codex; uses the AskUserQuestion tool; map to a Codex prompt or approval step; wires Claude PreToolUse/PostToolUse hooks; reproduce the failure and approval semantics before mapping, do not drop them. |

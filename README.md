@@ -56,7 +56,7 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | Plugin | Description | Commands | Updated |
 |--------|-------------|----------|--------|
 | [autocontext](./autocontext/) | Cross-session knowledge persistence with skill evolution. Lessons accumulate per-skill, and `/autocontext:evolve` folds them back into skill files | `/autocontext:setup`, `/autocontext:init`, `/autocontext:review`, `/autocontext:status`, `/autocontext:evolve` | Aug 21, 2026 |
-| [dev-toolkit](./dev-toolkit/) | Twelve development-focused skills for journalists, researchers, and small newsroom dev teams: accessibility (WCAG 2.2), Electron app patterns, mobile/remote debugging, irreversible-decision discipline, Python data pipelines, test-first bug fixing, AI-assisted development workflows, ethical web scraping, no-build frontend patterns, signs-of-taste guidance for web UI, CLAUDE.md context maintenance, and managing attention across long sessions | n/a, skills only | Aug 21, 2026 |
+| [dev-toolkit](./dev-toolkit/) | Thirteen development-focused skills for journalists, researchers, and small newsroom dev teams: accessibility, context management, directed multi-agent execution, Electron, mobile debugging, Python pipelines, test-first bug fixing, ethical scraping, no-build frontends, web UI craft, and CLAUDE.md maintenance | `/dev-toolkit:director`; other skills model-selected | Aug 21, 2026 |
 | [journalism-core](./journalism-core/) | Fifteen core journalism skills, including AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, Brazilian LAI requests, fact-checking, interview prep + transcription, story pitches, editorial workflow, crisis communications, newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements, and embedded photo metadata for wire distribution | n/a, skills only | Aug 21, 2026 |
 | [okf-wiki](./okf-wiki/) | Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with YAML frontmatter, directory navigation, and a validator. Generates a starter wiki that passes its own conformance and secret-leak checks, ships session-start hooks that orient Claude on the knowledge base before it works, and includes an optional GitHub-wiki bootstrap. For newsroom institutional memory, research atlases, decision logs, and infrastructure maps | n/a, skill only | Aug 21, 2026 |
 | [pdf-design](./pdf-design/) | PDF report and proposal design system with brand variables, budget tables, and reusable content blocks (stats strips, three-column, four-tile pillars, partner grids) | n/a, skill-only | Aug 21, 2026 |
@@ -82,6 +82,7 @@ cp -r journalism-core/skills/source-verification ~/.claude/skills/
 cp -r research-toolkit/skills/free-apis-catalog ~/.claude/skills/
 cp -r research-toolkit/skills/web-archiving ~/.claude/skills/
 cp -r dev-toolkit/skills/web-scraping ~/.claude/skills/
+cp -r dev-toolkit/skills/director ~/.claude/skills/
 cp -r security-toolkit/skills/secure-auth ~/.claude/skills/
 cp -r project-templates-toolkit/skills/project-memory ~/.claude/skills/
 
@@ -90,8 +91,13 @@ cp -r okf-wiki ~/.claude/skills/
 
 # Or symlink so git pull updates them in place (ln -sfn replaces an existing link):
 ln -sfn "$PWD/research-toolkit/skills/free-apis-catalog" ~/.claude/skills/free-apis-catalog
+ln -sfn "$PWD/dev-toolkit/skills/director" ~/.claude/skills/director
 ln -sfn "$PWD/visual-explainer" ~/.claude/skills/visual-explainer
 ```
+
+The standalone copy or link invokes the skill as `/director`. The installed
+plugin invokes it as `/dev-toolkit:director` because Claude Code namespaces
+plugin skills.
 
 Do not clone the repo directly into `~/.claude/skills/journalism-skills/`, that nests each `SKILL.md` too deep and Claude Code won't find them.
 
@@ -227,13 +233,14 @@ These three skills ship together as the [project-templates-toolkit](./project-te
 
 ### Development skills (in `dev-toolkit` plugin)
 
-These twelve skills ship together as the [dev-toolkit](./dev-toolkit/) plugin. Install via `/plugin install dev-toolkit@claude-skills-journalism` to get all of them at once, or copy individual skills from `dev-toolkit/skills/<name>/`.
+These thirteen skills ship together as the [dev-toolkit](./dev-toolkit/) plugin. Install via `/plugin install dev-toolkit@claude-skills-journalism` to get all of them at once, or copy individual skills from `dev-toolkit/skills/<name>/`.
 
 | Skill | Description | Updated |
 |-------|-------------|--------|
 | [accessibility-compliance](./dev-toolkit/skills/accessibility-compliance/) | WCAG 2.2 baseline, alt text, focus management, motion preferences, accessible charts | Aug 21, 2026 |
 | [claude-md-updater](./dev-toolkit/skills/claude-md-updater/) | Detect session lessons, new paths, infra changes, and workflows and propose scoped CLAUDE.md edits for approval | Aug 21, 2026 |
 | [context-engineering-fundamentals](./dev-toolkit/skills/context-engineering-fundamentals/) | Attention budget, lost-in-middle recall, context degradation patterns, and mitigations for long sessions | Aug 21, 2026 |
+| [director](./dev-toolkit/skills/director/) | Explicit top-tier direction through lower-tier agents and models configured in the applicable CLAUDE.md policy | Aug 21, 2026 |
 | [electron-dev](./dev-toolkit/skills/electron-dev/) | Electron security model (contextIsolation, sandbox), IPC patterns, packaging | Aug 21, 2026 |
 | [mobile-debugging](./dev-toolkit/skills/mobile-debugging/) | Eruda, vConsole, Chrome DevTools on Android, Safari Web Inspector for iOS, console capture | Aug 21, 2026 |
 | [one-way-door](./dev-toolkit/skills/one-way-door/) | Flag irreversible architectural decisions (data models, infra, auth, APIs) before committing | Aug 21, 2026 |
