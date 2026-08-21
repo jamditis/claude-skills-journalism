@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.1] - 2026-08-21
+
+### Fixed
+
+- Preserved YAML parser diagnostics for malformed skill frontmatter and duplicate
+  unrelated keys. The Claude-only boolean error now applies only to invalid
+  `disable-model-invocation` values.
+
 ## [2.7.0] - 2026-08-21
 
 This release adds explicit multi-agent direction and guards against hidden
@@ -709,7 +717,8 @@ Initial commit with foundational skills.
 
 ---
 
-[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.7.0...HEAD
+[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.7.1...HEAD
+[2.7.1]: https://github.com/jamditis/claude-skills-journalism/compare/v2.7.0...v2.7.1
 [2.7.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.5.0...v2.6.0
 [2.5.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.4.0...v2.5.0
