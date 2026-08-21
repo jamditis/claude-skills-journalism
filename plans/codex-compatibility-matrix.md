@@ -1,10 +1,10 @@
 # Codex compatibility matrix
 
 - Status: phase-two runtime pilots; journalism-core, visual-explainer, and portable okf-wiki scaffolding have scoped passes
-- Last evidence update: August 15, 2026
+- Last evidence update: August 21, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
-> **Historical runtime results stay tied to their tested snapshots.** The v2.6.0
+> **Historical runtime results stay tied to their tested snapshots.** The v2.7.0
 > refresh updates current installation guidance without adding a native Codex
 > marketplace or plugin manifests. Every older version recorded below is the
 > version that was actually exercised. Those values are deliberately not bumped,
@@ -14,11 +14,11 @@
 >
 > The release catalog validation confirms the repository still follows the tested
 > legacy package and Agent Skills routes. It does not convert the older runtime
-> pilots into v2.6.0 runtime evidence.
+> pilots into v2.7.0 runtime evidence.
 
 ## August 2026 structure refresh
 
-- Marketplace 2.6.0 contains 12 Claude packages and 62 shared skills.
+- Marketplace 2.7.0 contains 12 Claude packages and 63 shared skills.
 - Codex can install the 15 nested journalism-core skills through the verified legacy-compatible package route.
 - The Agent Skills route supports root and nested skill layouts without converting Claude commands, agents, or hooks.
 - No native `.agents/plugins/marketplace.json` or `.codex-plugin/plugin.json` manifests are published.
@@ -50,7 +50,7 @@ Status labels:
 | Tool | Version or revision | Role |
 |---|---|---|
 | Codex structure refresh | 0.147.0 | Legacy package and Agent Skills route verification on August 15, 2026 |
-| Claude marketplace, current structure | 2.6.0 | Current catalog and version alignment; historical runtime results below remain snapshot-specific |
+| Claude marketplace, current structure | 2.7.0 | Current catalog and version alignment; historical runtime results below remain snapshot-specific |
 | Repository | `b0617649515d24ebfcd51f15bceb1d76b03db668` | Architecture commit used as the phase-one worktree base |
 | Repository release verification | [`9eef57629edbaa19bf47ec35296acebdd7b4ab1f`](https://github.com/jamditis/claude-skills-journalism/commit/9eef57629edbaa19bf47ec35296acebdd7b4ab1f) | July 23 post-merge `master` head used for the phase-one release evidence |
 | Repository visual-explainer pilot | [`f6a4b84dd2e9feafc6c2bf067f873e9301a083c2`](https://github.com/jamditis/claude-skills-journalism/commit/f6a4b84dd2e9feafc6c2bf067f873e9301a083c2) | July 23 `master` head installed for the V-ex-1 runtime evidence |
