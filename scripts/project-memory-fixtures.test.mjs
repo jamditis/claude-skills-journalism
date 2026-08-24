@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
 import {
   mkdtempSync,
+  mkdirSync,
   readFileSync,
   rmSync,
+  symlinkSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -139,6 +141,47 @@ test('output verifier rejects overwritten guidance and scope leakage', () => {
   );
 });
 
+test('output verifier rejects reordered sections and duplicated preserved lines', () => {
+  const reordered = newProject('claude').project;
+  const fixture = PROJECT_MEMORY_FIXTURES.claude;
+  writeAcceptedOutput(reordered, fixture);
+  writeFileSync(
+    join(reordered, fixture.output.root.path),
+    `${fixture.existing.root}${fixture.output.root.requiredText[1]}\n`
+      + `${fixture.output.root.requiredText[0]}\n`,
+  );
+  assert.throws(
+    () => verifyProjectMemoryOutput(reordered, 'claude'),
+    /root output does not keep required guidance under its heading/iu,
+  );
+
+  const duplicatedLine = newProject('codex').project;
+  const codex = PROJECT_MEMORY_FIXTURES.codex;
+  writeAcceptedOutput(duplicatedLine, codex);
+  writeFileSync(
+    join(duplicatedLine, codex.output.root.path),
+    `${readFileSync(join(duplicatedLine, codex.output.root.path), 'utf8')}`
+      + '- Keep the manual sign-off before public releases.\n',
+  );
+  assert.throws(
+    () => verifyProjectMemoryOutput(duplicatedLine, 'codex'),
+    /did not preserve the existing root guidance exactly once/u,
+  );
+});
+
+test('output verifier rejects other-client instruction files anywhere in the tree', () => {
+  const { project } = newProject('codex');
+  const fixture = PROJECT_MEMORY_FIXTURES.codex;
+  writeAcceptedOutput(project, fixture);
+  mkdirSync(join(project, '.claude'));
+  writeFileSync(join(project, '.claude/CLAUDE.md'), '# Wrong client output\n');
+
+  assert.throws(
+    () => verifyProjectMemoryOutput(project, 'codex'),
+    /created the other client's \.claude\/CLAUDE\.md/u,
+  );
+});
+
 test('non-trigger check detects any instruction-file mutation', () => {
   const unchanged = newProject('codex');
   assert.doesNotThrow(() => verifyProjectMemoryNonTrigger(
@@ -187,6 +230,52 @@ test('non-trigger check detects any instruction-file mutation', () => {
       createdUnrelatedFile.prepared.snapshot,
     ),
     /non-trigger changed README\.md/u,
+  );
+
+  const createdEmptyDirectory = newProject('claude');
+  mkdirSync(join(createdEmptyDirectory.project, 'empty-output'));
+  assert.throws(
+    () => verifyProjectMemoryNonTrigger(
+      createdEmptyDirectory.project,
+      'claude',
+      createdEmptyDirectory.prepared.snapshot,
+    ),
+    /non-trigger changed empty-output/u,
+  );
+});
+
+test('prepare and cleanup reject symlinked existing ancestors', () => {
+  const prepareProject = mkdtempSync(join(tmpdir(), 'project-memory-symlink-prepare-'));
+  const prepareOutside = mkdtempSync(join(tmpdir(), 'project-memory-symlink-outside-'));
+  disposableRoots.push(prepareProject, prepareOutside);
+  symlinkSync(prepareOutside, join(prepareProject, 'packages'));
+  assert.throws(
+    () => prepareProjectMemoryFixture(prepareProject, 'codex'),
+    /Fixture input ancestor must not be a symbolic link/u,
+  );
+  assert.throws(
+    () => readFileSync(join(prepareOutside, 'archive/AGENTS.md'), 'utf8'),
+    /ENOENT/u,
+  );
+
+  const cleanupProject = newProject('claude').project;
+  const cleanupOutside = mkdtempSync(join(tmpdir(), 'project-memory-cleanup-outside-'));
+  disposableRoots.push(cleanupOutside);
+  rmSync(join(cleanupProject, 'packages'), { recursive: true });
+  mkdirSync(join(cleanupOutside, 'archive'));
+  writeFileSync(join(cleanupOutside, 'archive/CLAUDE.md'), '# Keep me\n');
+  symlinkSync(cleanupOutside, join(cleanupProject, 'packages'));
+  assert.throws(
+    () => cleanupProjectMemoryFixture(cleanupProject, 'claude'),
+    /Cleanup path ancestor must not be a symbolic link/u,
+  );
+  assert.equal(
+    readFileSync(join(cleanupOutside, 'archive/CLAUDE.md'), 'utf8'),
+    '# Keep me\n',
+  );
+  assert.equal(
+    readFileSync(join(cleanupProject, 'CLAUDE.md'), 'utf8'),
+    PROJECT_MEMORY_FIXTURES.claude.existing.root,
   );
 });
 

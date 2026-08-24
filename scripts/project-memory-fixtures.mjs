@@ -126,8 +126,68 @@ function requireRegularFile(path, label) {
   }
 }
 
-function countText(body, text) {
-  return body.split(text).length - 1;
+function requireRealAncestors(project, candidate, label) {
+  const parts = relative(project, candidate).split('/').slice(0, -1);
+  let ancestor = project;
+  for (const part of parts) {
+    ancestor = resolve(ancestor, part);
+    let stat;
+    try {
+      stat = lstatSync(ancestor);
+    } catch (error) {
+      if (error.code === 'ENOENT') break;
+      throw error;
+    }
+    if (stat.isSymbolicLink()) {
+      throw new Error(`${label} ancestor must not be a symbolic link: ${ancestor}`);
+    }
+    if (!stat.isDirectory()) {
+      throw new Error(`${label} ancestor must be a directory: ${ancestor}`);
+    }
+  }
+}
+
+function verifyPreservedGuidance(body, existing, label) {
+  const outputLines = body.split(/\r?\n/u);
+  const expectedLines = existing.split(/\r?\n/u).filter(Boolean);
+  for (const line of new Set(expectedLines)) {
+    const expectedCount = expectedLines.filter((candidate) => candidate === line).length;
+    const actualCount = outputLines.filter((candidate) => candidate === line).length;
+    if (actualCount !== expectedCount) {
+      throw new Error(
+        `Project-memory did not preserve the existing ${label} guidance exactly once`,
+      );
+    }
+  }
+}
+
+function verifyRequiredSection(body, requiredText, label) {
+  const [heading, ...guidance] = requiredText;
+  const lines = body.split(/\r?\n/u);
+  const headingIndex = lines.indexOf(heading);
+  const headingMatch = /^(#{1,6})\s/u.exec(heading);
+  if (headingIndex < 0 || !headingMatch) return;
+
+  const headingLevel = headingMatch[1].length;
+  let sectionEnd = lines.length;
+  for (let index = headingIndex + 1; index < lines.length; index += 1) {
+    const nextHeading = /^(#{1,6})\s/u.exec(lines[index]);
+    if (nextHeading && nextHeading[1].length <= headingLevel) {
+      sectionEnd = index;
+      break;
+    }
+  }
+
+  let previousIndex = headingIndex;
+  for (const text of guidance) {
+    const index = lines.indexOf(text, previousIndex + 1);
+    if (index < 0 || index >= sectionEnd) {
+      throw new Error(
+        `Project-memory ${label} output does not keep required guidance under its heading`,
+      );
+    }
+    previousIndex = index;
+  }
 }
 
 function readOutput(project, output, label) {
@@ -144,6 +204,7 @@ function snapshotProjectTree(project) {
       const path = prefix ? `${prefix}/${entry.name}` : entry.name;
       const absolutePath = containedPath(project, path, 'Snapshot path');
       if (entry.isDirectory()) {
+        snapshot[path] = { kind: 'directory' };
         walk(absolutePath, path);
       } else if (entry.isFile()) {
         snapshot[path] = {
@@ -174,12 +235,14 @@ export function prepareProjectMemoryFixture(projectDir, client) {
 
   for (const [path] of entries) {
     const absolutePath = containedPath(project, path, 'Fixture input');
+    requireRealAncestors(project, absolutePath, 'Fixture input');
     if (existsSync(absolutePath)) {
       throw new Error(`Fixture input already exists: ${absolutePath}`);
     }
   }
   for (const [path, body] of entries) {
     const absolutePath = containedPath(project, path, 'Fixture input');
+    requireRealAncestors(project, absolutePath, 'Fixture input');
     mkdirSync(dirname(absolutePath), { recursive: true });
     writeFileSync(absolutePath, body, { flag: 'wx' });
   }
@@ -196,12 +259,8 @@ export function verifyProjectMemoryOutput(projectDir, client) {
   const root = readOutput(project, fixtureDefinition.output.root, 'root output');
   const nested = readOutput(project, fixtureDefinition.output.nested, 'nested output');
 
-  if (countText(root.body, fixtureDefinition.existing.root) !== 1) {
-    throw new Error('Project-memory did not preserve the existing root guidance exactly once');
-  }
-  if (countText(nested.body, fixtureDefinition.existing.nested) !== 1) {
-    throw new Error('Project-memory did not preserve the existing nested guidance exactly once');
-  }
+  verifyPreservedGuidance(root.body, fixtureDefinition.existing.root, 'root');
+  verifyPreservedGuidance(nested.body, fixtureDefinition.existing.nested, 'nested');
 
   for (const text of fixtureDefinition.output.root.requiredText) {
     if (!root.body.includes(text)) {
@@ -220,11 +279,16 @@ export function verifyProjectMemoryOutput(projectDir, client) {
     }
   }
 
+  verifyRequiredSection(root.body, fixtureDefinition.output.root.requiredText, 'root');
+  verifyRequiredSection(nested.body, fixtureDefinition.output.nested.requiredText, 'nested');
+
   const otherClient = client === 'claude' ? 'codex' : 'claude';
-  for (const otherFile of fixtureFor(otherClient).cleanup.paths) {
-    if (existsSync(containedPath(project, otherFile, 'Other-client output'))) {
-      throw new Error(`Project-memory created the other client's ${otherFile}`);
-    }
+  const otherInstructionFile = fixtureFor(otherClient).output.root.path;
+  const otherFile = Object.keys(snapshotProjectTree(project)).find(
+    (path) => path.split('/').at(-1) === otherInstructionFile,
+  );
+  if (otherFile) {
+    throw new Error(`Project-memory created the other client's ${otherFile}`);
   }
 
   return { project, paths: [root.path, nested.path] };
@@ -245,8 +309,13 @@ export function verifyProjectMemoryNonTrigger(projectDir, client, snapshot) {
 export function cleanupProjectMemoryFixture(projectDir, client) {
   const project = requireDisposableProject(projectDir);
   const fixtureDefinition = fixtureFor(client);
-  return fixtureDefinition.cleanup.paths.map((path) => {
-    const absolutePath = containedPath(project, path, 'Cleanup path');
+  const cleanupPaths = fixtureDefinition.cleanup.paths.map((path) => (
+    containedPath(project, path, 'Cleanup path')
+  ));
+  for (const absolutePath of cleanupPaths) {
+    requireRealAncestors(project, absolutePath, 'Cleanup path');
+  }
+  return cleanupPaths.map((absolutePath) => {
     rmSync(absolutePath, { force: true });
     return absolutePath;
   });
