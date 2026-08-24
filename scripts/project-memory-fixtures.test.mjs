@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import { syncBuiltinESMExports } from 'node:module';
 import {
   chmodSync,
+  lstatSync,
   mkdtempSync,
   mkdirSync,
   readFileSync,
@@ -244,6 +245,286 @@ test('output verifier rejects guidance inside fenced code blocks and comments', 
   );
 });
 
+test('output verifier rejects required guidance inside raw HTML blocks', () => {
+  const { project } = newProject('claude');
+  const fixture = PROJECT_MEMORY_FIXTURES.claude;
+  writeAcceptedOutput(project, fixture);
+  writeFileSync(
+    join(project, fixture.output.root.path),
+    `${fixture.existing.root}<pre>\n${fixture.output.root.requiredText.join('\n')}\n</pre>\n`,
+  );
+
+  assert.throws(
+    () => verifyOutput(project, 'claude'),
+    /required heading must be an exact Markdown line/iu,
+  );
+});
+
+test('output verifier keeps type-one blocks open through invalid closing tags', () => {
+  const { project } = newProject('claude');
+  const fixture = PROJECT_MEMORY_FIXTURES.claude;
+  writeAcceptedOutput(project, fixture);
+  writeFileSync(
+    join(project, fixture.output.root.path),
+    `${fixture.existing.root}<pre>\n</pre >\n${fixture.output.root.requiredText.join('\n')}\n</pre>\n`,
+  );
+
+  assert.throws(
+    () => verifyOutput(project, 'claude'),
+    /required heading must be an exact Markdown line/iu,
+  );
+});
+
+test('output verifier rejects required guidance inside other raw HTML blocks', () => {
+  const { project } = newProject('claude');
+  const fixture = PROJECT_MEMORY_FIXTURES.claude;
+  writeAcceptedOutput(project, fixture);
+  writeFileSync(
+    join(project, fixture.output.root.path),
+    `${fixture.existing.root}<div>\n${fixture.output.root.requiredText.join('\n')}\n</div>\n`,
+  );
+
+  assert.throws(
+    () => verifyOutput(project, 'claude'),
+    /required heading must be an exact Markdown line/iu,
+  );
+});
+
+test('output verifier rejects required guidance after closing type-six HTML tags', () => {
+  const { project } = newProject('claude');
+  const fixture = PROJECT_MEMORY_FIXTURES.claude;
+  writeAcceptedOutput(project, fixture);
+  writeFileSync(
+    join(project, fixture.output.root.path),
+    `${fixture.existing.root}</div> trailing text\n${fixture.output.root.requiredText.join('\n')}\n\n`,
+  );
+
+  assert.throws(
+    () => verifyOutput(project, 'claude'),
+    /required heading must be an exact Markdown line/iu,
+  );
+});
+
+test('output verifier rejects required guidance after all type-six HTML tags', () => {
+  const { project } = newProject('claude');
+  const fixture = PROJECT_MEMORY_FIXTURES.claude;
+  writeAcceptedOutput(project, fixture);
+  writeFileSync(
+    join(project, fixture.output.root.path),
+    `${fixture.existing.root}Visible context\n<menuitem>\n`
+      + `${fixture.output.root.requiredText.join('\n')}\n\n`,
+  );
+
+  assert.throws(
+    () => verifyOutput(project, 'claude'),
+    /required heading must be an exact Markdown line/iu,
+  );
+});
+
+test('output verifier rejects required guidance inside every raw HTML block form', () => {
+  const fixture = PROJECT_MEMORY_FIXTURES.claude;
+  const cases = [
+    ['processing instruction', '<?project-memory', '?>'],
+    ['CDATA section', '<![CDATA[', ']]>'],
+    ['HTML declaration', '<!DOCTYPE html', '>'],
+    ['type-six HTML block', '<div>', '</div>'],
+    ['type-seven HTML block', '<project-memory>', ''],
+  ];
+
+  for (const [name, opening, closing] of cases) {
+    const { project } = newProject('claude');
+    writeAcceptedOutput(project, fixture);
+    writeFileSync(
+      join(project, fixture.output.root.path),
+      `${fixture.existing.root}${opening}\n${fixture.output.root.requiredText.join('\n')}\n${closing}\n`,
+    );
+
+    assert.throws(
+      () => verifyOutput(project, 'claude'),
+      /required heading must be an exact Markdown line/iu,
+      name,
+    );
+  }
+});
+
+test('output verifier accepts type-seven tags inside paragraphs', () => {
+  const { project } = newProject('claude');
+  const fixture = PROJECT_MEMORY_FIXTURES.claude;
+  writeAcceptedOutput(project, fixture);
+  writeFileSync(
+    join(project, fixture.output.root.path),
+    `${fixture.existing.root}Visible context\n<project-memory>\n`
+      + `${fixture.output.root.requiredText.join('\n')}\n`,
+  );
+
+  assert.doesNotThrow(() => verifyOutput(project, 'claude'));
+});
+
+test('output verifier accepts inline type-one and type-seven HTML', () => {
+  const fixture = PROJECT_MEMORY_FIXTURES.claude;
+  const visibleCases = [
+    'Visible context\n<pre/>',
+    '> Visible context\n<project-memory>',
+  ];
+
+  for (const prefix of visibleCases) {
+    const { project } = newProject('claude');
+    writeAcceptedOutput(project, fixture);
+    writeFileSync(
+      join(project, fixture.output.root.path),
+      `${fixture.existing.root}${prefix}\n${fixture.output.root.requiredText.join('\n')}\n`,
+    );
+
+    assert.doesNotThrow(() => verifyOutput(project, 'claude'));
+  }
+});
+
+test('output verifier ignores raw tags inside existing HTML comments', () => {
+  const { project } = newProject('claude');
+  const fixture = PROJECT_MEMORY_FIXTURES.claude;
+  writeAcceptedOutput(project, fixture);
+  writeFileSync(
+    join(project, fixture.output.root.path),
+    `${fixture.existing.root}<!--\n<pre>\n-->\n${fixture.output.root.requiredText.join('\n')}\n`,
+  );
+
+  assert.doesNotThrow(() => verifyOutput(project, 'claude'));
+});
+
+test('output verifier accepts guidance after an inert HTML comment marker', () => {
+  const { project } = newProject('claude');
+  const fixture = PROJECT_MEMORY_FIXTURES.claude;
+  writeAcceptedOutput(project, fixture);
+  writeFileSync(
+    join(project, fixture.output.root.path),
+    `${fixture.existing.root}<script>\nconst marker = '<!--';\n</script>\n`
+      + `${fixture.output.root.requiredText.join('\n')}\n`,
+  );
+
+  assert.doesNotThrow(() => verifyOutput(project, 'claude'));
+});
+
+test('output verifier preserves existing Markdown section boundaries', () => {
+  const { project } = newProject('codex');
+  const fixture = PROJECT_MEMORY_FIXTURES.codex;
+  const changedExisting = fixture.existing.root.replace(
+    '## Release safety\n- Keep',
+    '## Release safety\n### Release exception\n- Keep',
+  );
+  writeAcceptedOutput(project, fixture);
+  writeFileSync(
+    join(project, fixture.output.root.path),
+    `${changedExisting}${fixture.output.root.requiredText.join('\n')}\n`,
+  );
+
+  assert.throws(
+    () => verifyOutput(project, 'codex'),
+    /changed the structure of existing root guidance/iu,
+  );
+});
+
+test('output verifier rejects headings that reparent existing sections', () => {
+  const { project } = newProject('codex');
+  const fixture = PROJECT_MEMORY_FIXTURES.codex;
+  const changedExisting = fixture.existing.root.replace(
+    '## Release safety',
+    '# Different project\n## Release safety',
+  );
+  writeAcceptedOutput(project, fixture);
+  writeFileSync(
+    join(project, fixture.output.root.path),
+    `${changedExisting}${fixture.output.root.requiredText.join('\n')}\n`,
+  );
+
+  assert.throws(
+    () => verifyOutput(project, 'codex'),
+    /changed the structure of existing root guidance/iu,
+  );
+});
+
+test('output verifier rejects indented headings that reparent existing sections', () => {
+  const { project } = newProject('codex');
+  const fixture = PROJECT_MEMORY_FIXTURES.codex;
+  const changedExisting = fixture.existing.root.replace(
+    '## Release safety',
+    ' # Different project\n## Release safety',
+  );
+  writeAcceptedOutput(project, fixture);
+  writeFileSync(
+    join(project, fixture.output.root.path),
+    `${changedExisting}${fixture.output.root.requiredText.join('\n')}\n`,
+  );
+
+  assert.throws(
+    () => verifyOutput(project, 'codex'),
+    /changed the structure of existing root guidance/iu,
+  );
+});
+
+test('output verifier rejects setext headings that change existing sections', () => {
+  const { project } = newProject('codex');
+  const fixture = PROJECT_MEMORY_FIXTURES.codex;
+  const changedExisting = fixture.existing.root.replace(
+    '- Keep',
+    'Different project\n=================\n- Keep',
+  );
+  writeAcceptedOutput(project, fixture);
+  writeFileSync(
+    join(project, fixture.output.root.path),
+    `${changedExisting}${fixture.output.root.requiredText.join('\n')}\n`,
+  );
+
+  assert.throws(
+    () => verifyOutput(project, 'codex'),
+    /changed the structure of existing root guidance/iu,
+  );
+});
+
+test('output verifier rejects duplicated required guidance', () => {
+  const { project } = newProject('codex');
+  const fixture = PROJECT_MEMORY_FIXTURES.codex;
+  writeAcceptedOutput(project, fixture);
+  writeFileSync(
+    join(project, fixture.output.root.path),
+    `${fixture.existing.root}${fixture.output.root.requiredText.join('\n')}\n`
+      + `${fixture.output.root.requiredText[1]}\n`,
+  );
+
+  assert.throws(
+    () => verifyOutput(project, 'codex'),
+    /required text must appear exactly once/iu,
+  );
+});
+
+test('output verifier rejects required guidance in a nested subsection', () => {
+  const { project } = newProject('claude');
+  const fixture = PROJECT_MEMORY_FIXTURES.claude;
+  writeAcceptedOutput(project, fixture);
+  writeFileSync(
+    join(project, fixture.output.root.path),
+    `${fixture.existing.root}${fixture.output.root.requiredText[0]}\n### Different scope\n`
+      + `${fixture.output.root.requiredText[1]}\n`,
+  );
+
+  assert.throws(
+    () => verifyOutput(project, 'claude'),
+    /changes the required guidance structure/iu,
+  );
+});
+
+test('output verifier accepts quoted headings in a required section', () => {
+  const { project } = newProject('claude');
+  const fixture = PROJECT_MEMORY_FIXTURES.claude;
+  writeAcceptedOutput(project, fixture);
+  writeFileSync(
+    join(project, fixture.output.root.path),
+    `${fixture.existing.root}${fixture.output.root.requiredText[0]}\n> ## Note\n`
+      + `${fixture.output.root.requiredText[1]}\n`,
+  );
+
+  assert.doesNotThrow(() => verifyOutput(project, 'claude'));
+});
+
 test('output verifier requires the prepared snapshot before accepting mutations', () => {
   const fixture = newProject('codex');
   writeAcceptedOutput(fixture.project, PROJECT_MEMORY_FIXTURES.codex);
@@ -391,6 +672,28 @@ test('non-trigger check detects any instruction-file mutation', () => {
       changedMode.prepared.snapshot,
     ),
     /non-trigger changed AGENTS\.md/u,
+  );
+});
+
+test('non-trigger check detects special permission mutations', {
+  skip: process.platform === 'win32',
+}, (context) => {
+  const fixture = newProject('codex');
+  const path = join(fixture.project, 'AGENTS.md');
+  const permissionBits = lstatSync(path).mode & 0o777;
+  chmodSync(path, permissionBits | 0o4000);
+  if ((lstatSync(path).mode & 0o4000) === 0) {
+    context.skip('The filesystem does not preserve the setuid bit');
+    return;
+  }
+
+  assert.throws(
+    () => verifyProjectMemoryNonTrigger(
+      fixture.project,
+      'codex',
+      fixture.prepared.snapshot,
+    ),
+    /non-trigger changed AGENTS\.md/iu,
   );
 });
 

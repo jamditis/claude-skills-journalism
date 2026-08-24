@@ -8,6 +8,7 @@ import {
   rmSync,
   writeFileSync,
 } from 'node:fs';
+import MarkdownIt from 'markdown-it';
 import {
   dirname,
   isAbsolute,
@@ -157,6 +158,8 @@ function requireRealAncestors(project, candidate, label) {
   }
 }
 
+const markdown = new MarkdownIt('commonmark', { html: true });
+
 function commentStateAfter(line, commentOpen) {
   let cursor = 0;
   while (true) {
@@ -173,47 +176,57 @@ function commentStateAfter(line, commentOpen) {
   }
 }
 
-function activeMarkdownLines(body) {
-  const active = [];
-  let fence;
-  let commentOpen = false;
-
-  for (const line of body.split(/\r?\n/u)) {
-    if (commentOpen || line.includes('<!--')) {
-      active.push(null);
-      commentOpen = commentStateAfter(line, commentOpen);
+function activeMarkdownEntries(body) {
+  const lines = body.split(/\r?\n/u);
+  const active = [...lines];
+  const headings = new Map();
+  const code = new Set();
+  const comments = new Set();
+  for (const token of markdown.parse(body, {})) {
+    if (!token.map) continue;
+    const [start, end] = token.map;
+    if (token.type === 'heading_open') {
+      headings.set(start, {
+        level: Number(token.tag.slice(1)),
+        containerLevel: token.level,
+      });
       continue;
     }
-    if (fence) {
-      active.push(null);
-      const closingFence = new RegExp(
-        `^ {0,3}${fence.character}{${fence.length},}[ \\t]*$`,
-        'u',
-      );
-      if (closingFence.test(line)) fence = undefined;
-      continue;
+    if (!['code_block', 'fence', 'html_block'].includes(token.type)) continue;
+    const commentBlock = token.type === 'html_block'
+      && token.content.trimStart().startsWith('<!--');
+    for (let index = start; index < end; index += 1) {
+      active[index] = null;
+      if (token.type !== 'html_block') code.add(index);
+      if (commentBlock) comments.add(index);
     }
-    const openingFence = /^ {0,3}(`{3,}|~{3,})/u.exec(line);
-    if (openingFence) {
-      active.push(null);
-      fence = {
-        character: openingFence[1][0],
-        length: openingFence[1].length,
-      };
-      continue;
-    }
-    active.push(line);
   }
-
-  return active;
+  let commentOpen = false;
+  for (let index = 0; index < active.length; index += 1) {
+    if (code.has(index) || (active[index] === null && !comments.has(index))) continue;
+    if (!commentOpen && !lines[index].includes('<!--')) continue;
+    active[index] = null;
+    commentOpen = commentStateAfter(lines[index], commentOpen);
+  }
+  return active
+    .map((line, index) => {
+      if (line === null) return null;
+      const heading = headings.get(index);
+      return {
+        line,
+        headingLevel: heading?.level,
+        containerLevel: heading?.containerLevel,
+      };
+    })
+    .filter((entry) => entry !== null);
 }
 
 function verifyPreservedGuidance(body, existing, label) {
-  const outputLines = activeMarkdownLines(body).filter((line) => line !== null);
+  const outputLines = activeMarkdownEntries(body);
   const expectedLines = existing.split(/\r?\n/u).filter(Boolean);
   for (const line of new Set(expectedLines)) {
     const expectedCount = expectedLines.filter((candidate) => candidate === line).length;
-    const actualCount = outputLines.filter((candidate) => candidate === line).length;
+    const actualCount = outputLines.filter((candidate) => candidate.line === line).length;
     if (actualCount !== expectedCount) {
       throw new Error(
         `Project-memory did not preserve the existing ${label} guidance exactly once`,
@@ -221,10 +234,28 @@ function verifyPreservedGuidance(body, existing, label) {
     }
   }
   let previousIndex = -1;
+  let previousContainerLevel = 0;
   for (const line of expectedLines) {
-    const index = outputLines.indexOf(line, previousIndex + 1);
+    const index = outputLines.findIndex(
+      (candidate, candidateIndex) => candidateIndex > previousIndex && candidate.line === line,
+    );
     if (index < 0) {
       throw new Error(`Project-memory changed the order of existing ${label} guidance`);
+    }
+    const insertedHeadingLevels = outputLines
+      .slice(previousIndex + 1, index)
+      .filter((candidate) => candidate.containerLevel === previousContainerLevel)
+      .map((candidate) => candidate.headingLevel)
+      .filter((level) => level !== undefined);
+    const existingHeadingLevel = outputLines[index].headingLevel;
+    const changesStructure = insertedHeadingLevels.some(
+      (level) => existingHeadingLevel === undefined || level < existingHeadingLevel,
+    );
+    if (changesStructure) {
+      throw new Error(`Project-memory changed the structure of existing ${label} guidance`);
+    }
+    if (outputLines[index].containerLevel !== undefined) {
+      previousContainerLevel = outputLines[index].containerLevel;
     }
     previousIndex = index;
   }
@@ -232,20 +263,29 @@ function verifyPreservedGuidance(body, existing, label) {
 
 function verifyRequiredSection(body, requiredText, label) {
   const [heading, ...guidance] = requiredText;
-  const lines = activeMarkdownLines(body);
-  const headingIndex = lines.indexOf(heading);
+  const lines = activeMarkdownEntries(body);
+  const headingIndex = lines.findIndex((entry) => entry.line === heading);
   const headingMatch = /^(#{1,6})\s/u.exec(heading);
   if (headingIndex < 0 || !headingMatch) {
     throw new Error(
       `Project-memory ${label} required heading must be an exact Markdown line`,
     );
   }
+  for (const text of requiredText) {
+    const count = lines.filter((entry) => entry.line === text).length;
+    if (count !== 1) {
+      throw new Error(`Project-memory ${label} required text must appear exactly once`);
+    }
+  }
 
-  const headingLevel = headingMatch[1].length;
+  const requiredHeadingLevel = headingMatch[1].length;
+  const requiredContainerLevel = lines[headingIndex].containerLevel;
   let sectionEnd = lines.length;
   for (let index = headingIndex + 1; index < lines.length; index += 1) {
-    const nextHeading = /^(#{1,6})\s/u.exec(lines[index]);
-    if (nextHeading && nextHeading[1].length <= headingLevel) {
+    if (
+      lines[index].containerLevel === requiredContainerLevel
+      && lines[index].headingLevel <= requiredHeadingLevel
+    ) {
       sectionEnd = index;
       break;
     }
@@ -253,10 +293,21 @@ function verifyRequiredSection(body, requiredText, label) {
 
   let previousIndex = headingIndex;
   for (const text of guidance) {
-    const index = lines.indexOf(text, previousIndex + 1);
+    const index = lines.findIndex(
+      (entry, entryIndex) => entryIndex > previousIndex && entry.line === text,
+    );
     if (index < 0 || index >= sectionEnd) {
       throw new Error(
         `Project-memory ${label} output does not keep required guidance under its heading`,
+      );
+    }
+    const changesStructure = lines
+      .slice(previousIndex + 1, index)
+      .some((entry) => entry.containerLevel === requiredContainerLevel
+        && entry.headingLevel !== undefined);
+    if (changesStructure) {
+      throw new Error(
+        `Project-memory ${label} output changes the required guidance structure`,
       );
     }
     previousIndex = index;
@@ -278,7 +329,7 @@ function snapshotProjectTree(project) {
       const path = prefix ? `${prefix}/${entry.name}` : entry.name;
       const absolutePath = containedPath(project, path, 'Snapshot path');
       const stat = lstatSync(absolutePath);
-      const mode = stat.mode & 0o777;
+      const mode = stat.mode & 0o7777;
       if (stat.isDirectory()) {
         snapshot[path] = { kind: 'directory', mode };
         walk(absolutePath, path);
