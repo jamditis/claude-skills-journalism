@@ -10,6 +10,14 @@ Three skills for setting up and closing out journalism projects, the institution
 | project-retrospective | LESSONS.md generation that names specific failures and the decisions that caused them. Templates for research projects, event post-mortems, editorial tools, and publications. |
 | template-selector | Decision tree that picks the right starting template across both skills. Use when starting a new project or unsure which template category fits. |
 
+## Client support
+
+`project-retrospective` and `template-selector` remain shared-skill candidates.
+`project-memory` currently generates `CLAUDE.md` for Claude Code. Paired test
+fixtures define the intended merge and nested-scope contract for both clients,
+but Codex `AGENTS.md` output is not supported yet. The Codex fixture must pass
+against an installed client before the shared instructions or an adapter change.
+
 ## Installation
 
 ```
