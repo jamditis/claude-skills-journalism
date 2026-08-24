@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.3] - 2026-08-24
+
+### Fixed
+
+- Hardened the project-memory fixture verifier against inert Markdown, changed
+  section boundaries, duplicate required guidance, unexpected activation mutations,
+  special permission changes, and unknown filesystem entry types.
+
 ## [2.7.2] - 2026-08-21
 
 ### Fixed
@@ -726,7 +734,8 @@ Initial commit with foundational skills.
 
 ---
 
-[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.7.2...HEAD
+[Unreleased]: https://github.com/jamditis/claude-skills-journalism/compare/v2.7.3...HEAD
+[2.7.3]: https://github.com/jamditis/claude-skills-journalism/compare/v2.7.2...v2.7.3
 [2.7.2]: https://github.com/jamditis/claude-skills-journalism/compare/v2.7.1...v2.7.2
 [2.7.1]: https://github.com/jamditis/claude-skills-journalism/compare/v2.7.0...v2.7.1
 [2.7.0]: https://github.com/jamditis/claude-skills-journalism/compare/v2.6.0...v2.7.0
