@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { syncBuiltinESMExports } from 'node:module';
 import {
   chmodSync,
   mkdtempSync,
@@ -27,15 +29,22 @@ import {
 } from './project-memory-fixtures.mjs';
 
 const disposableRoots = [];
+const preparedSnapshots = new Map();
 const repositoryRoot = fileURLToPath(new URL('..', import.meta.url));
 
 function newProject(fixtureId) {
   const project = mkdtempSync(join(tmpdir(), `project-memory-${fixtureId}-`));
   disposableRoots.push(project);
-  return {
+  const fixture = {
     project,
     prepared: prepareProjectMemoryFixture(project, fixtureId),
   };
+  preparedSnapshots.set(project, fixture.prepared.snapshot);
+  return fixture;
+}
+
+function verifyOutput(project, client, preparedSnapshot = preparedSnapshots.get(project)) {
+  return verifyProjectMemoryOutput(project, client, preparedSnapshot);
 }
 
 function writeAcceptedOutput(project, fixture) {
@@ -53,6 +62,7 @@ function writeAcceptedOutput(project, fixture) {
 
 afterEach(() => {
   for (const root of disposableRoots.splice(0)) {
+    preparedSnapshots.delete(root);
     rmSync(root, { recursive: true, force: true });
   }
 });
@@ -85,7 +95,7 @@ test('Claude fixture preserves existing guidance and keeps nested scope local', 
   const fixture = PROJECT_MEMORY_FIXTURES.claude;
   writeAcceptedOutput(project, fixture);
 
-  const result = verifyProjectMemoryOutput(project, 'claude');
+  const result = verifyOutput(project, 'claude');
   assert.deepEqual(result.paths, [
     join(project, 'CLAUDE.md'),
     join(project, 'packages/archive/CLAUDE.md'),
@@ -97,7 +107,7 @@ test('Codex fixture preserves existing guidance and keeps nested scope local', (
   const fixture = PROJECT_MEMORY_FIXTURES.codex;
   writeAcceptedOutput(project, fixture);
 
-  const result = verifyProjectMemoryOutput(project, 'codex');
+  const result = verifyOutput(project, 'codex');
   assert.deepEqual(result.paths, [
     join(project, 'AGENTS.md'),
     join(project, 'packages/archive/AGENTS.md'),
@@ -113,7 +123,7 @@ test('output verifier rejects overwritten guidance and scope leakage', () => {
     `${fixture.output.root.requiredText.join('\n')}\n`,
   );
   assert.throws(
-    () => verifyProjectMemoryOutput(overwritten, 'codex'),
+    () => verifyOutput(overwritten, 'codex'),
     /did not preserve the existing root guidance/u,
   );
 
@@ -126,7 +136,7 @@ test('output verifier rejects overwritten guidance and scope leakage', () => {
       + `${claude.output.nested.requiredText[0]}\n`,
   );
   assert.throws(
-    () => verifyProjectMemoryOutput(leaked, 'claude'),
+    () => verifyOutput(leaked, 'claude'),
     /root output contains nested-only guidance/iu,
   );
 
@@ -137,7 +147,7 @@ test('output verifier rejects overwritten guidance and scope leakage', () => {
     '# Wrong client output\n',
   );
   assert.throws(
-    () => verifyProjectMemoryOutput(otherClientNested, 'codex'),
+    () => verifyOutput(otherClientNested, 'codex'),
     /created the other client's packages\/archive\/CLAUDE\.md/u,
   );
 });
@@ -152,7 +162,7 @@ test('output verifier rejects reordered sections and duplicated preserved lines'
       + `${fixture.output.root.requiredText[0]}\n`,
   );
   assert.throws(
-    () => verifyProjectMemoryOutput(reordered, 'claude'),
+    () => verifyOutput(reordered, 'claude'),
     /root output does not keep required guidance under its heading/iu,
   );
 
@@ -164,7 +174,7 @@ test('output verifier rejects reordered sections and duplicated preserved lines'
       + `${fixture.output.root.requiredText[1]}\n`,
   );
   assert.throws(
-    () => verifyProjectMemoryOutput(embeddedHeading, 'claude'),
+    () => verifyOutput(embeddedHeading, 'claude'),
     /required heading must be an exact Markdown line/iu,
   );
 
@@ -179,7 +189,7 @@ test('output verifier rejects reordered sections and duplicated preserved lines'
       + `${reorderedCodex.output.root.requiredText.join('\n')}\n`,
   );
   assert.throws(
-    () => verifyProjectMemoryOutput(reorderedExisting, 'codex'),
+    () => verifyOutput(reorderedExisting, 'codex'),
     /changed the order of existing root guidance/iu,
   );
 
@@ -192,8 +202,77 @@ test('output verifier rejects reordered sections and duplicated preserved lines'
       + '- Keep the manual sign-off before public releases.\n',
   );
   assert.throws(
-    () => verifyProjectMemoryOutput(duplicatedLine, 'codex'),
+    () => verifyOutput(duplicatedLine, 'codex'),
     /did not preserve the existing root guidance exactly once/u,
+  );
+});
+
+test('output verifier rejects guidance inside fenced code blocks and comments', () => {
+  const fixture = PROJECT_MEMORY_FIXTURES.claude;
+  const fenced = newProject('claude').project;
+  writeAcceptedOutput(fenced, fixture);
+  writeFileSync(
+    join(fenced, fixture.output.root.path),
+    `${fixture.existing.root}\`\`\`md\n${fixture.output.root.requiredText.join('\n')}\n\`\`\`\n`,
+  );
+  assert.throws(
+    () => verifyOutput(fenced, 'claude'),
+    /required heading must be an exact Markdown line/iu,
+  );
+
+  const commented = newProject('claude').project;
+  writeAcceptedOutput(commented, fixture);
+  writeFileSync(
+    join(commented, fixture.output.root.path),
+    `${fixture.existing.root}<!--\n${fixture.output.root.requiredText.join('\n')}\n-->\n`,
+  );
+  assert.throws(
+    () => verifyOutput(commented, 'claude'),
+    /required heading must be an exact Markdown line/iu,
+  );
+
+  const reopenedComment = newProject('claude').project;
+  writeAcceptedOutput(reopenedComment, fixture);
+  writeFileSync(
+    join(reopenedComment, fixture.output.root.path),
+    `${fixture.existing.root}<!-- closed --> <!--\n`
+      + `${fixture.output.root.requiredText.join('\n')}\n-->\n`,
+  );
+  assert.throws(
+    () => verifyOutput(reopenedComment, 'claude'),
+    /required heading must be an exact Markdown line/iu,
+  );
+});
+
+test('output verifier requires the prepared snapshot before accepting mutations', () => {
+  const fixture = newProject('codex');
+  writeAcceptedOutput(fixture.project, PROJECT_MEMORY_FIXTURES.codex);
+  writeFileSync(join(fixture.project, 'unrelated-output.txt'), 'Unexpected output\n');
+
+  assert.throws(
+    () => verifyProjectMemoryOutput(fixture.project, 'codex'),
+    /requires a prepared snapshot/iu,
+  );
+});
+
+test('output verifier allows mutations only at expected output paths', () => {
+  const project = mkdtempSync(join(tmpdir(), 'project-memory-activation-tree-'));
+  disposableRoots.push(project);
+  writeFileSync(join(project, 'README.md'), '# Original project\n');
+  const prepared = prepareProjectMemoryFixture(project, 'codex');
+  writeAcceptedOutput(project, PROJECT_MEMORY_FIXTURES.codex);
+
+  writeFileSync(join(project, 'README.md'), '# Changed project\n');
+  assert.throws(
+    () => verifyProjectMemoryOutput(project, 'codex', prepared.snapshot),
+    /activation changed README\.md/iu,
+  );
+
+  writeFileSync(join(project, 'README.md'), '# Original project\n');
+  writeFileSync(join(project, 'unrelated-output.txt'), 'Unexpected output\n');
+  assert.throws(
+    () => verifyProjectMemoryOutput(project, 'codex', prepared.snapshot),
+    /activation changed unrelated-output\.txt/iu,
   );
 });
 
@@ -205,7 +284,7 @@ test('output verifier rejects other-client instruction files anywhere in the tre
   writeFileSync(join(project, '.claude/CLAUDE.md'), '# Wrong client output\n');
 
   assert.throws(
-    () => verifyProjectMemoryOutput(project, 'codex'),
+    () => verifyOutput(project, 'codex'),
     /created the other client's \.claude\/CLAUDE\.md/u,
   );
 });
@@ -313,6 +392,33 @@ test('non-trigger check detects any instruction-file mutation', () => {
     ),
     /non-trigger changed AGENTS\.md/u,
   );
+});
+
+test('snapshot classification uses lstat when directory entry types are unknown', () => {
+  const fixture = newProject('codex');
+  const originalReadDirectory = fs.readdirSync;
+  fs.readdirSync = (...args) => {
+    const entries = originalReadDirectory(...args);
+    if (!args[1]?.withFileTypes) return entries;
+    return entries.map((entry) => ({
+      name: entry.name,
+      isDirectory: () => false,
+      isFile: () => false,
+      isSymbolicLink: () => false,
+    }));
+  };
+  syncBuiltinESMExports();
+
+  try {
+    assert.doesNotThrow(() => verifyProjectMemoryNonTrigger(
+      fixture.project,
+      'codex',
+      fixture.prepared.snapshot,
+    ));
+  } finally {
+    fs.readdirSync = originalReadDirectory;
+    syncBuiltinESMExports();
+  }
 });
 
 test('fixture containment accepts legal dot-prefixed names', () => {

@@ -157,8 +157,59 @@ function requireRealAncestors(project, candidate, label) {
   }
 }
 
+function commentStateAfter(line, commentOpen) {
+  let cursor = 0;
+  while (true) {
+    const opening = line.indexOf('<!--', cursor);
+    const closing = line.indexOf('-->', cursor);
+    if (opening < 0 && closing < 0) return commentOpen;
+    if (opening >= 0 && (closing < 0 || opening < closing)) {
+      commentOpen = true;
+      cursor = opening + '<!--'.length;
+    } else {
+      commentOpen = false;
+      cursor = closing + '-->'.length;
+    }
+  }
+}
+
+function activeMarkdownLines(body) {
+  const active = [];
+  let fence;
+  let commentOpen = false;
+
+  for (const line of body.split(/\r?\n/u)) {
+    if (commentOpen || line.includes('<!--')) {
+      active.push(null);
+      commentOpen = commentStateAfter(line, commentOpen);
+      continue;
+    }
+    if (fence) {
+      active.push(null);
+      const closingFence = new RegExp(
+        `^ {0,3}${fence.character}{${fence.length},}[ \\t]*$`,
+        'u',
+      );
+      if (closingFence.test(line)) fence = undefined;
+      continue;
+    }
+    const openingFence = /^ {0,3}(`{3,}|~{3,})/u.exec(line);
+    if (openingFence) {
+      active.push(null);
+      fence = {
+        character: openingFence[1][0],
+        length: openingFence[1].length,
+      };
+      continue;
+    }
+    active.push(line);
+  }
+
+  return active;
+}
+
 function verifyPreservedGuidance(body, existing, label) {
-  const outputLines = body.split(/\r?\n/u);
+  const outputLines = activeMarkdownLines(body).filter((line) => line !== null);
   const expectedLines = existing.split(/\r?\n/u).filter(Boolean);
   for (const line of new Set(expectedLines)) {
     const expectedCount = expectedLines.filter((candidate) => candidate === line).length;
@@ -181,7 +232,7 @@ function verifyPreservedGuidance(body, existing, label) {
 
 function verifyRequiredSection(body, requiredText, label) {
   const [heading, ...guidance] = requiredText;
-  const lines = body.split(/\r?\n/u);
+  const lines = activeMarkdownLines(body);
   const headingIndex = lines.indexOf(heading);
   const headingMatch = /^(#{1,6})\s/u.exec(heading);
   if (headingIndex < 0 || !headingMatch) {
@@ -228,16 +279,16 @@ function snapshotProjectTree(project) {
       const absolutePath = containedPath(project, path, 'Snapshot path');
       const stat = lstatSync(absolutePath);
       const mode = stat.mode & 0o777;
-      if (entry.isDirectory()) {
+      if (stat.isDirectory()) {
         snapshot[path] = { kind: 'directory', mode };
         walk(absolutePath, path);
-      } else if (entry.isFile()) {
+      } else if (stat.isFile()) {
         snapshot[path] = {
           kind: 'file',
           mode,
           body: readFileSync(absolutePath).toString('base64'),
         };
-      } else if (entry.isSymbolicLink()) {
+      } else if (stat.isSymbolicLink()) {
         snapshot[path] = {
           kind: 'symlink',
           mode,
@@ -250,6 +301,19 @@ function snapshotProjectTree(project) {
   };
   walk(project);
   return snapshot;
+}
+
+function verifyExpectedOutputMutations(current, preparedSnapshot, outputPaths) {
+  const paths = [...new Set([
+    ...Object.keys(preparedSnapshot),
+    ...Object.keys(current),
+  ])].sort();
+  for (const path of paths) {
+    if (outputPaths.has(path)) continue;
+    if (JSON.stringify(current[path]) !== JSON.stringify(preparedSnapshot[path])) {
+      throw new Error(`Project-memory activation changed ${path}`);
+    }
+  }
 }
 
 export function prepareProjectMemoryFixture(projectDir, client) {
@@ -280,9 +344,12 @@ export function prepareProjectMemoryFixture(projectDir, client) {
   };
 }
 
-export function verifyProjectMemoryOutput(projectDir, client, preparedSnapshot = {}) {
+export function verifyProjectMemoryOutput(projectDir, client, preparedSnapshot) {
   const project = requireDisposableProject(projectDir);
   const fixtureDefinition = fixtureFor(client);
+  if (!preparedSnapshot || Object.keys(preparedSnapshot).length === 0) {
+    throw new Error('Project-memory output verification requires a prepared snapshot');
+  }
   const root = readOutput(project, fixtureDefinition.output.root, 'root output');
   const nested = readOutput(project, fixtureDefinition.output.nested, 'nested output');
 
@@ -309,15 +376,25 @@ export function verifyProjectMemoryOutput(projectDir, client, preparedSnapshot =
   verifyRequiredSection(root.body, fixtureDefinition.output.root.requiredText, 'root');
   verifyRequiredSection(nested.body, fixtureDefinition.output.nested.requiredText, 'nested');
 
+  const current = snapshotProjectTree(project);
   const otherClient = client === 'claude' ? 'codex' : 'claude';
   const otherInstructionFile = fixtureFor(otherClient).output.root.path;
-  const otherFile = Object.keys(snapshotProjectTree(project)).find(
+  const otherFile = Object.keys(current).find(
     (path) => path.split('/').at(-1) === otherInstructionFile
       && !Object.hasOwn(preparedSnapshot, path),
   );
   if (otherFile) {
     throw new Error(`Project-memory created the other client's ${otherFile}`);
   }
+
+  verifyExpectedOutputMutations(
+    current,
+    preparedSnapshot,
+    new Set([
+      fixtureDefinition.output.root.path,
+      fixtureDefinition.output.nested.path,
+    ]),
+  );
 
   return { project, paths: [root.path, nested.path] };
 }
