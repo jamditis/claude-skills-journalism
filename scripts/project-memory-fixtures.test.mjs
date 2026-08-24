@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {
+  chmodSync,
   mkdtempSync,
   mkdirSync,
   readFileSync,
@@ -155,6 +156,33 @@ test('output verifier rejects reordered sections and duplicated preserved lines'
     /root output does not keep required guidance under its heading/iu,
   );
 
+  const embeddedHeading = newProject('claude').project;
+  writeAcceptedOutput(embeddedHeading, fixture);
+  writeFileSync(
+    join(embeddedHeading, fixture.output.root.path),
+    `${fixture.existing.root}prefix ${fixture.output.root.requiredText[0]} suffix\n`
+      + `${fixture.output.root.requiredText[1]}\n`,
+  );
+  assert.throws(
+    () => verifyProjectMemoryOutput(embeddedHeading, 'claude'),
+    /required heading must be an exact Markdown line/iu,
+  );
+
+  const reorderedExisting = newProject('codex').project;
+  const reorderedCodex = PROJECT_MEMORY_FIXTURES.codex;
+  writeAcceptedOutput(reorderedExisting, reorderedCodex);
+  writeFileSync(
+    join(reorderedExisting, reorderedCodex.output.root.path),
+    '# Existing project guidance\n\n'
+      + '- Keep the manual sign-off before public releases.\n'
+      + '## Release safety\n\n'
+      + `${reorderedCodex.output.root.requiredText.join('\n')}\n`,
+  );
+  assert.throws(
+    () => verifyProjectMemoryOutput(reorderedExisting, 'codex'),
+    /changed the order of existing root guidance/iu,
+  );
+
   const duplicatedLine = newProject('codex').project;
   const codex = PROJECT_MEMORY_FIXTURES.codex;
   writeAcceptedOutput(duplicatedLine, codex);
@@ -179,6 +207,27 @@ test('output verifier rejects other-client instruction files anywhere in the tre
   assert.throws(
     () => verifyProjectMemoryOutput(project, 'codex'),
     /created the other client's \.claude\/CLAUDE\.md/u,
+  );
+});
+
+test('output verifier allows only other-client files present in the prepared snapshot', () => {
+  const project = mkdtempSync(join(tmpdir(), 'project-memory-existing-client-'));
+  disposableRoots.push(project);
+  mkdirSync(join(project, '.claude'));
+  writeFileSync(join(project, '.claude/CLAUDE.md'), '# Existing other-client file\n');
+  const prepared = prepareProjectMemoryFixture(project, 'codex');
+  writeAcceptedOutput(project, PROJECT_MEMORY_FIXTURES.codex);
+
+  assert.doesNotThrow(() => verifyProjectMemoryOutput(
+    project,
+    'codex',
+    prepared.snapshot,
+  ));
+
+  writeFileSync(join(project, 'packages/archive/CLAUDE.md'), '# Newly created leak\n');
+  assert.throws(
+    () => verifyProjectMemoryOutput(project, 'codex', prepared.snapshot),
+    /created the other client's packages\/archive\/CLAUDE\.md/u,
   );
 });
 
@@ -242,6 +291,35 @@ test('non-trigger check detects any instruction-file mutation', () => {
     ),
     /non-trigger changed empty-output/u,
   );
+
+  const prototypeName = newProject('codex');
+  writeFileSync(join(prototypeName.project, '__proto__'), 'new file\n');
+  assert.throws(
+    () => verifyProjectMemoryNonTrigger(
+      prototypeName.project,
+      'codex',
+      prototypeName.prepared.snapshot,
+    ),
+    /non-trigger changed __proto__/u,
+  );
+
+  const changedMode = newProject('codex');
+  chmodSync(join(changedMode.project, 'AGENTS.md'), 0o600);
+  assert.throws(
+    () => verifyProjectMemoryNonTrigger(
+      changedMode.project,
+      'codex',
+      changedMode.prepared.snapshot,
+    ),
+    /non-trigger changed AGENTS\.md/u,
+  );
+});
+
+test('fixture containment accepts legal dot-prefixed names', () => {
+  const project = mkdtempSync(join(tmpdir(), 'project-memory-dot-name-'));
+  disposableRoots.push(project);
+  mkdirSync(join(project, '..notes'));
+  assert.doesNotThrow(() => prepareProjectMemoryFixture(project, 'codex'));
 });
 
 test('prepare and cleanup reject symlinked existing ancestors', () => {
@@ -276,6 +354,33 @@ test('prepare and cleanup reject symlinked existing ancestors', () => {
   assert.equal(
     readFileSync(join(cleanupProject, 'CLAUDE.md'), 'utf8'),
     PROJECT_MEMORY_FIXTURES.claude.existing.root,
+  );
+});
+
+test('output verification rejects symlinked existing ancestors', () => {
+  const verifiedProject = newProject('codex');
+  const fixture = PROJECT_MEMORY_FIXTURES.codex;
+  const outside = mkdtempSync(join(tmpdir(), 'project-memory-verify-outside-'));
+  disposableRoots.push(outside);
+  writeFileSync(
+    join(verifiedProject.project, fixture.output.root.path),
+    `${fixture.existing.root}${fixture.output.root.requiredText.join('\n')}\n`,
+  );
+  rmSync(join(verifiedProject.project, 'packages'), { recursive: true });
+  mkdirSync(join(outside, 'archive'));
+  writeFileSync(
+    join(outside, 'archive/AGENTS.md'),
+    `${fixture.existing.nested}${fixture.output.nested.requiredText.join('\n')}\n`,
+  );
+  symlinkSync(outside, join(verifiedProject.project, 'packages'));
+
+  assert.throws(
+    () => verifyProjectMemoryOutput(
+      verifiedProject.project,
+      'codex',
+      verifiedProject.prepared.snapshot,
+    ),
+    /nested output ancestor must not be a symbolic link/iu,
   );
 });
 

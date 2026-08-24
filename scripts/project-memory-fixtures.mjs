@@ -13,6 +13,7 @@ import {
   isAbsolute,
   relative,
   resolve,
+  sep,
 } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -100,7 +101,12 @@ function containedPath(projectDir, path, label) {
   const project = resolve(projectDir);
   const candidate = resolve(project, path);
   const fromProject = relative(project, candidate);
-  if (!fromProject || fromProject.startsWith('..') || isAbsolute(fromProject)) {
+  if (
+    !fromProject
+    || fromProject === '..'
+    || fromProject.startsWith(`..${sep}`)
+    || isAbsolute(fromProject)
+  ) {
     throw new Error(`${label} must resolve below the disposable project`);
   }
   return candidate;
@@ -127,10 +133,14 @@ function requireRegularFile(path, label) {
 }
 
 function requireRealAncestors(project, candidate, label) {
-  const parts = relative(project, candidate).split('/').slice(0, -1);
-  let ancestor = project;
-  for (const part of parts) {
-    ancestor = resolve(ancestor, part);
+  const ancestors = [];
+  for (let ancestor = dirname(candidate); ancestor !== project; ancestor = dirname(ancestor)) {
+    if (dirname(ancestor) === ancestor) {
+      throw new Error(`${label} ancestor escaped the disposable project`);
+    }
+    ancestors.push(ancestor);
+  }
+  for (const ancestor of ancestors.reverse()) {
     let stat;
     try {
       stat = lstatSync(ancestor);
@@ -159,6 +169,14 @@ function verifyPreservedGuidance(body, existing, label) {
       );
     }
   }
+  let previousIndex = -1;
+  for (const line of expectedLines) {
+    const index = outputLines.indexOf(line, previousIndex + 1);
+    if (index < 0) {
+      throw new Error(`Project-memory changed the order of existing ${label} guidance`);
+    }
+    previousIndex = index;
+  }
 }
 
 function verifyRequiredSection(body, requiredText, label) {
@@ -166,7 +184,11 @@ function verifyRequiredSection(body, requiredText, label) {
   const lines = body.split(/\r?\n/u);
   const headingIndex = lines.indexOf(heading);
   const headingMatch = /^(#{1,6})\s/u.exec(heading);
-  if (headingIndex < 0 || !headingMatch) return;
+  if (headingIndex < 0 || !headingMatch) {
+    throw new Error(
+      `Project-memory ${label} required heading must be an exact Markdown line`,
+    );
+  }
 
   const headingLevel = headingMatch[1].length;
   let sectionEnd = lines.length;
@@ -192,32 +214,37 @@ function verifyRequiredSection(body, requiredText, label) {
 
 function readOutput(project, output, label) {
   const path = containedPath(project, output.path, label);
+  requireRealAncestors(project, path, label);
   requireRegularFile(path, label);
   return { path, body: readFileSync(path, 'utf8') };
 }
 
 function snapshotProjectTree(project) {
-  const snapshot = {};
+  const snapshot = Object.create(null);
   const walk = (directory, prefix = '') => {
     for (const entry of readdirSync(directory, { withFileTypes: true })
       .sort((left, right) => left.name.localeCompare(right.name))) {
       const path = prefix ? `${prefix}/${entry.name}` : entry.name;
       const absolutePath = containedPath(project, path, 'Snapshot path');
+      const stat = lstatSync(absolutePath);
+      const mode = stat.mode & 0o777;
       if (entry.isDirectory()) {
-        snapshot[path] = { kind: 'directory' };
+        snapshot[path] = { kind: 'directory', mode };
         walk(absolutePath, path);
       } else if (entry.isFile()) {
         snapshot[path] = {
           kind: 'file',
+          mode,
           body: readFileSync(absolutePath).toString('base64'),
         };
       } else if (entry.isSymbolicLink()) {
         snapshot[path] = {
           kind: 'symlink',
+          mode,
           target: readlinkSync(absolutePath),
         };
       } else {
-        snapshot[path] = { kind: 'other' };
+        snapshot[path] = { kind: 'other', mode };
       }
     }
   };
@@ -253,7 +280,7 @@ export function prepareProjectMemoryFixture(projectDir, client) {
   };
 }
 
-export function verifyProjectMemoryOutput(projectDir, client) {
+export function verifyProjectMemoryOutput(projectDir, client, preparedSnapshot = {}) {
   const project = requireDisposableProject(projectDir);
   const fixtureDefinition = fixtureFor(client);
   const root = readOutput(project, fixtureDefinition.output.root, 'root output');
@@ -285,7 +312,8 @@ export function verifyProjectMemoryOutput(projectDir, client) {
   const otherClient = client === 'claude' ? 'codex' : 'claude';
   const otherInstructionFile = fixtureFor(otherClient).output.root.path;
   const otherFile = Object.keys(snapshotProjectTree(project)).find(
-    (path) => path.split('/').at(-1) === otherInstructionFile,
+    (path) => path.split('/').at(-1) === otherInstructionFile
+      && !Object.hasOwn(preparedSnapshot, path),
   );
   if (otherFile) {
     throw new Error(`Project-memory created the other client's ${otherFile}`);
