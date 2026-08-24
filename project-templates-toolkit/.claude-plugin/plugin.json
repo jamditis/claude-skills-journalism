@@ -1,6 +1,6 @@
 {
   "name": "project-templates-toolkit",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Three skills for starting and closing out journalism projects: a CLAUDE.md project-memory writer, a LESSONS.md retrospective writer, and a template-selector decision tree for editorial tools, events, publications, research, pipelines, and archives.",
   "author": {
     "name": "Joe Amditis",

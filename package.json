@@ -1,6 +1,6 @@
 {
   "name": "claude-skills-journalism",
-  "version": "2.7.2",
+  "version": "2.7.3",
   "description": "Agent Skills for journalists, researchers, academics, media professionals, and communications practitioners.",
   "main": "index.js",
   "scripts": {

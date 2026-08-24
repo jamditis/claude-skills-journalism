@@ -1,6 +1,6 @@
 {
   "name": "claude-skills-journalism",
-  "version": "2.7.2",
+  "version": "2.7.3",
   "description": "Agent skills and Claude Code plugins for journalism, research, and media organizations",
   "owner": {
     "name": "Joe Amditis",
@@ -76,7 +76,7 @@
     {
       "name": "project-templates-toolkit",
       "description": "Three skills for starting and closing out journalism projects: a CLAUDE.md project-memory writer, a LESSONS.md retrospective writer, and a template-selector decision tree for editorial tools, events, publications, research, pipelines, and archives.",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"
