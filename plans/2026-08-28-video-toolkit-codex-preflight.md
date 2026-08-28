@@ -102,7 +102,8 @@ credential content was copied into the project or repository.
 ## Next proof
 
 Provision reviewed, pinned fixtures for the CPU Whisper binary and model,
-ffmpeg, Pillow, yt-dlp, and local Chart.js. Then run one small local media item
-through download, transcript, frame, provenance, analysis, dashboard, browser,
-sandbox, resource-cap, and cleanup checks. Keep the browser fallback and any
-hosted API in separate opt-in fixtures.
+ffmpeg, Pillow, yt-dlp, and local Chart.js. Use a controlled eligible HTTPS
+social target for the download fixture. Begin the pinned local artifact at
+transcription, then run it through frame, provenance, analysis, dashboard,
+browser, sandbox, resource-cap, and cleanup checks. Keep the browser fallback
+and any hosted API in separate opt-in fixtures.

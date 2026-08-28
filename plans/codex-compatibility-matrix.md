@@ -1,7 +1,7 @@
 # Codex compatibility matrix
 
 - Status: phase-two runtime pilots; journalism-core, visual-explainer, and portable okf-wiki scaffolding have scoped passes
-- Last evidence update: August 21, 2026
+- Last evidence update: August 28, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
 > **Historical runtime results stay tied to their tested snapshots.** The v2.7.0
@@ -56,8 +56,10 @@ Status labels:
 | Repository visual-explainer pilot | [`f6a4b84dd2e9feafc6c2bf067f873e9301a083c2`](https://github.com/jamditis/claude-skills-journalism/commit/f6a4b84dd2e9feafc6c2bf067f873e9301a083c2) | July 23 `master` head installed for the V-ex-1 runtime evidence |
 | Repository okf-wiki pilot | [`cabb43bc2515c6c30a3d0839909f786e7afbcba8`](https://github.com/jamditis/claude-skills-journalism/commit/cabb43bc2515c6c30a3d0839909f786e7afbcba8) | July 23 `master` head installed for the Okf-1 no-Claude runtime evidence |
 | Repository Document design lock pilot | [`d49ed1022a012269a237f7749b0e47c099e7add6`](https://github.com/jamditis/claude-skills-journalism/commit/d49ed1022a012269a237f7749b0e47c099e7add6) | July 23 `master` head used for the D-lock-1 update target |
+| Repository video-toolkit preflight | [`bc681b79a3eaba846a494582368501e0b4d75b1b`](https://github.com/jamditis/claude-skills-journalism/commit/bc681b79a3eaba846a494582368501e0b4d75b1b) | August 28 source revision used for the scoped video-toolkit preflight |
 | Claude Code | 2.1.215; 2.1.218 | Phase-one marketplace validation, then the post-merge clean `journalism-core` install |
 | Codex CLI | 0.145.0 | Legacy-compatible marketplace and clean `journalism-core` install |
+| Codex video-toolkit preflight | 0.149.1 | Scoped video-toolkit activation and dependency preflight on August 28, 2026 |
 | skills CLI | 1.5.19; 1.5.20 | Phase-one standards discovery, then post-merge project and user install canaries |
 | Agent Skills validator | `agentskills/agentskills@38a2ff82958afee88dadf4831509e6f7e9d8ef4e` | Shared frontmatter contract |
 | Agent Skills validator, scheduled | Default-branch head (`38a2ff82958afee88dadf4831509e6f7e9d8ef4e` on July 23, 2026) | Upstream drift signal |

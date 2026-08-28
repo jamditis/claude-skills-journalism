@@ -32,11 +32,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
   const marketplace = JSON.parse(
     readFileSync(join(ROOT, '.claude-plugin', 'marketplace.json'), 'utf8'),
   );
-  const videoPlugin = JSON.parse(
-    readFileSync(join(ROOT, 'video-toolkit', '.claude-plugin', 'plugin.json'), 'utf8'),
-  );
   const marketplaceVersionPattern = marketplace.version.replaceAll('.', '\\.');
-  const videoVersionPattern = videoPlugin.version.replaceAll('.', '\\.');
   const rows = [...matrix.matchAll(/^\| `([^`]+)` \|/gmu)].map((match) => match[1]);
 
   assert.deepEqual(rows, [
@@ -54,10 +50,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
     'visual-explainer',
   ]);
   assert.match(matrix, /`pdf-playground` \| 1\.3\.2/u);
-  assert.match(
-    matrix,
-    new RegExp('`video-toolkit` \\| ' + videoVersionPattern + ';', 'u'),
-  );
+  assert.match(matrix, /`video-toolkit` \| 1\.0\.6;/u);
   assert.match(matrix, /V-phase-1: repaired standards baseline/u);
   assert.match(matrix, /J-release-1: paired journalism-core runtime pilot/u);
   assert.match(matrix, /V-ex-release-1: visual-explainer root-skill runtime pilot/u);
@@ -228,6 +221,7 @@ test('video-toolkit evidence stays limited to the tested preflight', () => {
   );
 
   assert.match(record, /Tracking issue: \[#238\]/u);
+  assert.match(record, /tested `video-toolkit` 1\.0\.6/u);
   assert.match(record, /Codex CLI 0\.149\.1/u);
   assert.match(record, /Skills CLI\s+1\.5\.20/u);
   assert.match(record, /`bc681b79a3eaba846a494582368501e0b4d75b1b`/u);
@@ -252,7 +246,25 @@ test('video-toolkit evidence stays limited to the tested preflight', () => {
     matrix,
     /Observed manual Codex preflight; durable harness and media execution pending/u,
   );
+  assert.match(matrix, /Last evidence update: August 28, 2026/u);
+  assert.match(matrix, /Codex video-toolkit preflight \| 0\.149\.1/u);
+  assert.match(
+    matrix,
+    /Repository video-toolkit preflight \| \[`bc681b79a3eaba846a494582368501e0b4d75b1b`\]/u,
+  );
+  assert.match(record, /controlled eligible HTTPS\s+social target/u);
+  assert.match(record, /pinned local artifact at\s+transcription/u);
+  assert.doesNotMatch(record, /one small local media item\s+through download/iu);
   assert.doesNotMatch(matrix, /video-toolkit` \|[^\n]*preflight passed/iu);
+});
+
+test('video-toolkit evidence changes run the compatibility checks', () => {
+  const workflow = readFileSync(
+    join(ROOT, '.github', 'workflows', 'skill-lint.yml'),
+    'utf8',
+  );
+
+  assert.match(workflow, /plans\/2026-08-28-video-toolkit-codex-preflight\.md/u);
 });
 
 test('the README routes Codex users without implying mixed-install support', () => {
