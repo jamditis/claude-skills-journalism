@@ -50,11 +50,12 @@ test('the compatibility matrix classifies every marketplace package', () => {
     'visual-explainer',
   ]);
   assert.match(matrix, /`pdf-playground` \| 1\.3\.2/u);
-  assert.match(matrix, /`video-toolkit` \| 1\.0\.3/u);
+  assert.match(matrix, /`video-toolkit` \| 1\.0\.6;/u);
   assert.match(matrix, /V-phase-1: repaired standards baseline/u);
   assert.match(matrix, /J-release-1: paired journalism-core runtime pilot/u);
   assert.match(matrix, /V-ex-release-1: visual-explainer root-skill runtime pilot/u);
   assert.match(matrix, /Okf-release-1: okf-wiki no-Claude runtime pilot/u);
+  assert.match(matrix, /V-tool-preflight-1: video-toolkit Codex preflight/u);
   assert.match(matrix, /D-lock-release-1: Document design standards lock migration/u);
   assert.match(
     matrix,
@@ -207,6 +208,63 @@ test('visual-explainer runtime evidence stays scoped to the tested Codex path', 
   assert.match(record, /three untested migrated-command wrapper skills/u);
   assert.match(record, /outside this root-skill pilot/u);
   assert.doesNotMatch(record, /repository-wide Codex support/u);
+});
+
+test('video-toolkit evidence stays limited to the tested preflight', () => {
+  const matrix = readFileSync(
+    join(ROOT, 'plans', 'codex-compatibility-matrix.md'),
+    'utf8',
+  );
+  const record = readFileSync(
+    join(ROOT, 'plans', '2026-08-28-video-toolkit-codex-preflight.md'),
+    'utf8',
+  );
+
+  assert.match(record, /Tracking issue: \[#238\]/u);
+  assert.match(record, /tested `video-toolkit` 1\.0\.6/u);
+  assert.match(record, /Codex CLI 0\.149\.1/u);
+  assert.match(record, /Skills CLI\s+1\.5\.20/u);
+  assert.match(record, /`bc681b79a3eaba846a494582368501e0b4d75b1b`/u);
+  for (const skill of [
+    'video-dashboard',
+    'video-download',
+    'video-frames',
+    'video-transcribe',
+  ]) {
+    assert.match(record, new RegExp(`\\$${skill}`, 'u'));
+  }
+  assert.match(record, /104\.14 seconds/u);
+  assert.match(record, /203,144 KiB/u);
+  assert.match(record, /prompt injection attempt/u);
+  assert.match(record, /bwrap: loopback: Failed RTM_NEWADDR/u);
+  assert.match(record, /media execution remain pending/u);
+  assert.match(record, /observed manual preflight/u);
+  assert.match(record, /raw session outputs were not preserved/u);
+  assert.match(record, /does\s+not prove that ffmpeg, Pillow, Whisper, yt-dlp/u);
+  assert.doesNotMatch(record, /end-to-end runtime support passed/iu);
+  assert.match(
+    matrix,
+    /Observed manual Codex preflight; durable harness and media execution pending/u,
+  );
+  assert.match(matrix, /Last evidence update: August 28, 2026/u);
+  assert.match(matrix, /Codex video-toolkit preflight \| 0\.149\.1/u);
+  assert.match(
+    matrix,
+    /Repository video-toolkit preflight \| \[`bc681b79a3eaba846a494582368501e0b4d75b1b`\]/u,
+  );
+  assert.match(record, /controlled eligible HTTPS\s+social target/u);
+  assert.match(record, /pinned local artifact at\s+transcription/u);
+  assert.doesNotMatch(record, /one small local media item\s+through download/iu);
+  assert.doesNotMatch(matrix, /video-toolkit` \|[^\n]*preflight passed/iu);
+});
+
+test('video-toolkit evidence changes run the compatibility checks', () => {
+  const workflow = readFileSync(
+    join(ROOT, '.github', 'workflows', 'skill-lint.yml'),
+    'utf8',
+  );
+
+  assert.match(workflow, /plans\/2026-08-28-video-toolkit-codex-preflight\.md/u);
 });
 
 test('the README routes Codex users without implying mixed-install support', () => {

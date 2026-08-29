@@ -20,6 +20,7 @@ on:
       - 'superjawn/README.md'
       - 'superjawn/CREDITS.md'
       - 'plans/codex-compatibility-matrix.md'
+      - 'plans/2026-08-28-video-toolkit-codex-preflight.md'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/compatibility-canary.yml'

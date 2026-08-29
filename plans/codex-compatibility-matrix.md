@@ -1,7 +1,7 @@
 # Codex compatibility matrix
 
 - Status: phase-two runtime pilots; journalism-core, visual-explainer, and portable okf-wiki scaffolding have scoped passes
-- Last evidence update: August 21, 2026
+- Last evidence update: August 28, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
 > **Historical runtime results stay tied to their tested snapshots.** The v2.7.0
@@ -56,8 +56,10 @@ Status labels:
 | Repository visual-explainer pilot | [`f6a4b84dd2e9feafc6c2bf067f873e9301a083c2`](https://github.com/jamditis/claude-skills-journalism/commit/f6a4b84dd2e9feafc6c2bf067f873e9301a083c2) | July 23 `master` head installed for the V-ex-1 runtime evidence |
 | Repository okf-wiki pilot | [`cabb43bc2515c6c30a3d0839909f786e7afbcba8`](https://github.com/jamditis/claude-skills-journalism/commit/cabb43bc2515c6c30a3d0839909f786e7afbcba8) | July 23 `master` head installed for the Okf-1 no-Claude runtime evidence |
 | Repository Document design lock pilot | [`d49ed1022a012269a237f7749b0e47c099e7add6`](https://github.com/jamditis/claude-skills-journalism/commit/d49ed1022a012269a237f7749b0e47c099e7add6) | July 23 `master` head used for the D-lock-1 update target |
+| Repository video-toolkit preflight | [`bc681b79a3eaba846a494582368501e0b4d75b1b`](https://github.com/jamditis/claude-skills-journalism/commit/bc681b79a3eaba846a494582368501e0b4d75b1b) | August 28 source revision used for the scoped video-toolkit preflight |
 | Claude Code | 2.1.215; 2.1.218 | Phase-one marketplace validation, then the post-merge clean `journalism-core` install |
 | Codex CLI | 0.145.0 | Legacy-compatible marketplace and clean `journalism-core` install |
+| Codex video-toolkit preflight | 0.149.1 | Scoped video-toolkit activation and dependency preflight on August 28, 2026 |
 | skills CLI | 1.5.19; 1.5.20 | Phase-one standards discovery, then post-merge project and user install canaries |
 | Agent Skills validator | `agentskills/agentskills@38a2ff82958afee88dadf4831509e6f7e9d8ef4e` | Shared frontmatter contract |
 | Agent Skills validator, scheduled | Default-branch head (`38a2ff82958afee88dadf4831509e6f7e9d8ef4e` on July 23, 2026) | Upstream drift signal |
@@ -373,6 +375,26 @@ Codex project behavior. Removing the installed skill left the generated
 project intact and valid, while the empty lock entry, Claude adapter directory,
 and OKF user data remained independently removable.
 
+### V-tool-preflight-1: video-toolkit Codex preflight
+
+Environment: source revision
+[`bc681b79a3eaba846a494582368501e0b4d75b1b`](https://github.com/jamditis/claude-skills-journalism/commit/bc681b79a3eaba846a494582368501e0b4d75b1b)
+installed into a disposable Codex project on Aug. 28, 2026. The
+[preflight record](2026-08-28-video-toolkit-codex-preflight.md) contains the
+installed-source hashes, exact dependency state, accepted runtime results,
+resource measurements, sandbox limit, Claude argument check, and cleanup.
+
+Observed result: Codex CLI 0.149.1 discovered and explicitly activated all four
+`video-toolkit` 1.0.6 skills through the project standards path. Each skill
+checked its own local prerequisites and stopped without installing or
+downloading. The CPU transcript-of-record path and no-GPU behavior were
+selected correctly, the unrelated fixture did not activate a video skill, and
+an embedded transcript instruction did not authorize a command. Real media,
+output paths, browser behavior, hosted APIs, and media-parser sandboxing remain
+untested. The manual session outputs were not preserved as repository
+artifacts, so this is an observed preflight rather than a repeatable or passed
+runtime fixture.
+
 ### D-lock-release-1: Document design standards lock migration
 
 Environment: Codex CLI 0.145.0 with a disposable skills CLI 1.5.20 project on
@@ -409,7 +431,7 @@ migration evidence, not public catalog history or a mixed-install claim.
 | `research-toolkit` | 1.1.0; six nested skills | Candidate | Include shared instruction-led skills. Network and external-content trust boundaries stay unchanged. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add representative activation, non-activation, network-boundary, and resource checks. |
 | `security-toolkit` | 1.2.0; four nested skills; one command | Candidate plus Claude-only surface | The four shared skills are candidates. `/security-toolkit:hotpatch` and its sandbox lifecycle remain Claude-only. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; [R-phase-1](#r-phase-1-phase-one-repository-checks) covers security tests | Test skill activation separately; do not map `hotpatch` without authority and failure-semantics tests. |
 | `superjawn` | 1.0.0; 14 nested skills | Not assessed | No package-wide claim. Each skill needs review for Claude tool names, namespacing, agent dispatch, and parallel-agent assumptions. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure only | Evaluate one skill at a time with client-specific tool traces. Do not bulk-port. |
-| `video-toolkit` | 1.0.3; four nested skills; external media runtimes | Candidate; runtime dependencies pending | Shared frontmatter and Claude argument delivery pass. GPU, CPU, browser, media sandbox, and hosted-API behavior remain unclaimed. | [V-phase-1](#v-phase-1-repaired-standards-baseline), [F-phase-1](#f-phase-1-affected-claude-package-regression), and [R-phase-1](#r-phase-1-phase-one-repository-checks) | Run dependency, no-GPU, activation, non-activation, and output fixtures. |
+| `video-toolkit` | 1.0.6; four nested skills; external media runtimes | Observed manual Codex preflight; durable harness and media execution pending | Include explicit activation, dependency refusal, CPU and no-GPU selection, unrelated non-trigger behavior, and the tested untrusted-transcript boundary as manual observations only. Exclude a repeatable runtime claim, real media, output paths, browser fallback, hosted APIs, and media-parser sandboxing. | [V-tool-preflight-1](#v-tool-preflight-1-video-toolkit-codex-preflight), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [F-phase-1](#f-phase-1-affected-claude-package-regression) | Add a repeatable harness with sanitized raw results, then run pinned local media through transcript, frame, provenance, dashboard, browser, sandbox, resource-cap, and cleanup fixtures. |
 | `visual-explainer` | 0.7.1; one root skill; eight source commands | Runtime pilot passed on the Codex project-standards path; command surfaces unclaimed | Include the root skill and its relative resources only through `.agents/skills`. The legacy route omits root-skill registration. Its three client-generated command wrappers and all eight source commands remain outside this claim. | [V-ex-release-1](#v-ex-release-1-visual-explainer-root-skill-runtime-pilot), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [Cv-base-1](#cv-base-1-codex-creator-helper-comparison) | Add a no-Claude-environment gate and scheduled runtime regression before a broader package claim; test command wrappers only in a separately scoped issue. |
 
 ## Pilot fixtures
