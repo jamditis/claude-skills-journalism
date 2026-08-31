@@ -169,6 +169,7 @@ These fifteen skills ship together as the [journalism-core](./journalism-core/) 
 | [newsroom-style](./journalism-core/skills/newsroom-style/) | AP Style enforcement, attribution rules, headline formatting, number conventions | Aug 21, 2026 |
 | [photo-metadata](./journalism-core/skills/photo-metadata/) | Embed caption, byline, credit, alt text, keywords, copyright / Creative Commons license, AI-source labeling (IPTC Digital Source Type), and Google-Images licensing into a photo's IPTC/EXIF/XMP metadata; strip GPS for source protection; read C2PA Content Credentials; batch-tag a folder for a news wire | Aug 21, 2026 |
 | [social-media-intelligence](./journalism-core/skills/social-media-intelligence/) | Narrative tracking, coordinated-campaign analysis, account authenticity checks, OSINT for digital investigations | Aug 21, 2026 |
+| [verify-citations](./journalism-core/skills/verify-citations/) | Verify citations resolve and support claims in news articles and investigative reports; flag unsupported claims; recompute arithmetic | Aug 31, 2026 |
 | [source-verification](./journalism-core/skills/source-verification/) | SIFT method, image and video verification, deepfake detection (2026), C2PA Content Credentials, verification trails | Aug 21, 2026 |
 | [story-pitch](./journalism-core/skills/story-pitch/) | Pitch templates for daily news, features, investigations, op-eds, and freelance queries | Aug 21, 2026 |
 
