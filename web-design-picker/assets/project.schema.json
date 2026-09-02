@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Web design picker project configuration",
+  "type": "object",
+  "required": [
+    "name",
+    "slug"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "language": {
+      "type": "string",
+      "default": "en"
+    },
+    "review_title": {
+      "type": "string"
+    },
+    "review_subtitle": {
+      "type": "string"
+    },
+    "review_description": {
+      "type": "string"
+    },
+    "theme_color": {
+      "type": "string"
+    },
+    "active_color": {
+      "type": "string"
+    },
+    "robots": {
+      "type": "string"
+    },
+    "default_direction": {
+      "type": "string"
+    },
+    "library_note": {
+      "type": "string"
+    },
+    "review_favicon": {
+      "type": "string"
+    },
+    "asset_zip_name": {
+      "type": "string"
+    },
+    "identity_mark": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

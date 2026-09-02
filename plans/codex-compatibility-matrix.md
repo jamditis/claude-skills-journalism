@@ -1,10 +1,10 @@
 # Codex compatibility matrix
 
 - Status: phase-two runtime pilots; journalism-core, visual-explainer, and portable okf-wiki scaffolding have scoped passes
-- Last evidence update: August 28, 2026
+- Last evidence update: September 1, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
-> **Historical runtime results stay tied to their tested snapshots.** The v2.7.0
+> **Historical runtime results stay tied to their tested snapshots.** The v2.8.0
 > refresh updates current installation guidance without adding a native Codex
 > marketplace or plugin manifests. Every older version recorded below is the
 > version that was actually exercised. Those values are deliberately not bumped,
@@ -14,11 +14,11 @@
 >
 > The release catalog validation confirms the repository still follows the tested
 > legacy package and Agent Skills routes. It does not convert the older runtime
-> pilots into v2.7.0 runtime evidence.
+> pilots into v2.8.0 runtime evidence.
 
-## August 2026 structure refresh
+## September 2026 structure refresh
 
-- Marketplace 2.7.3 contains 12 Claude packages and 63 shared skills.
+- Marketplace 2.8.0 contains 13 Claude packages and 64 shared skills.
 - Codex can install the 15 nested journalism-core skills through the verified legacy-compatible package route.
 - The Agent Skills route supports root and nested skill layouts without converting Claude commands, agents, or hooks.
 - No native `.agents/plugins/marketplace.json` or `.codex-plugin/plugin.json` manifests are published.
@@ -50,7 +50,7 @@ Status labels:
 | Tool | Version or revision | Role |
 |---|---|---|
 | Codex structure refresh | 0.147.0 | Legacy package and Agent Skills route verification on August 15, 2026 |
-| Claude marketplace, current structure | 2.7.3 | Current catalog and version alignment; historical runtime results below remain snapshot-specific |
+| Claude marketplace, current structure | 2.8.0 | Current catalog and version alignment; historical runtime results below remain snapshot-specific |
 | Repository | `b0617649515d24ebfcd51f15bceb1d76b03db668` | Architecture commit used as the phase-one worktree base |
 | Repository release verification | [`9eef57629edbaa19bf47ec35296acebdd7b4ab1f`](https://github.com/jamditis/claude-skills-journalism/commit/9eef57629edbaa19bf47ec35296acebdd7b4ab1f) | July 23 post-merge `master` head used for the phase-one release evidence |
 | Repository visual-explainer pilot | [`f6a4b84dd2e9feafc6c2bf067f873e9301a083c2`](https://github.com/jamditis/claude-skills-journalism/commit/f6a4b84dd2e9feafc6c2bf067f873e9301a083c2) | July 23 `master` head installed for the V-ex-1 runtime evidence |
@@ -417,6 +417,20 @@ installed directory, frontmatter, and content hash matched. The second update
 left the lock and installed-tree digests unchanged. This is local lock
 migration evidence, not public catalog history or a mixed-install claim.
 
+### Wdp-structure-1: web-design-picker repository preflight
+
+Environment: Windows 11 on Legion with Python 3.13, Node.js 22.17.0, Claude
+Code 2.1.251, and a disposable Python virtual environment on September 1,
+2026.
+
+Result: the root skill passed the pinned Agent Skills validator, the repository
+catalog validator, strict Claude plugin validation, and its own scaffold,
+build, static validation, distinctness, anti-slop, packaging, and browser QA
+self-test. The self-test used Pillow, resvg-cli, Playwright, and Chromium. No Codex
+activation, non-activation, resource-read, runtime, or no-Claude-environment
+fixture ran, so this is repository structure evidence rather than a Codex
+support claim.
+
 ## Package matrix
 
 | Package | Version and components | Current classification | Included and excluded scope | Evidence | Next proof |
@@ -432,6 +446,7 @@ migration evidence, not public catalog history or a mixed-install claim.
 | `security-toolkit` | 1.2.0; four nested skills; one command | Candidate plus Claude-only surface | The four shared skills are candidates. `/security-toolkit:hotpatch` and its sandbox lifecycle remain Claude-only. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; [R-phase-1](#r-phase-1-phase-one-repository-checks) covers security tests | Test skill activation separately; do not map `hotpatch` without authority and failure-semantics tests. |
 | `superjawn` | 1.0.0; 14 nested skills | Not assessed | No package-wide claim. Each skill needs review for Claude tool names, namespacing, agent dispatch, and parallel-agent assumptions. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure only | Evaluate one skill at a time with client-specific tool traces. Do not bulk-port. |
 | `video-toolkit` | 1.0.6; four nested skills; external media runtimes | Observed manual Codex preflight; durable harness and media execution pending | Include explicit activation, dependency refusal, CPU and no-GPU selection, unrelated non-trigger behavior, and the tested untrusted-transcript boundary as manual observations only. Exclude a repeatable runtime claim, real media, output paths, browser fallback, hosted APIs, and media-parser sandboxing. | [V-tool-preflight-1](#v-tool-preflight-1-video-toolkit-codex-preflight), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [F-phase-1](#f-phase-1-affected-claude-package-regression) | Add a repeatable harness with sanitized raw results, then run pinned local media through transcript, frame, provenance, dashboard, browser, sandbox, resource-cap, and cleanup fixtures. |
+| `web-design-picker` | 1.0.0; one root skill; 16 Python scripts; optional browser and media runtimes | Not assessed for Codex | Include no Codex runtime claim. Repository structure, plugin metadata, deterministic scaffold, build, validation, and packaging are locally checked; Codex activation and runtime behavior remain untested. | [Wdp-structure-1](#wdp-structure-1-web-design-picker-repository-preflight) | Run paired activation, non-activation, installed-resource, disposable-project, and no-Claude-environment fixtures before making a Codex support claim. |
 | `visual-explainer` | 0.7.1; one root skill; eight source commands | Runtime pilot passed on the Codex project-standards path; command surfaces unclaimed | Include the root skill and its relative resources only through `.agents/skills`. The legacy route omits root-skill registration. Its three client-generated command wrappers and all eight source commands remain outside this claim. | [V-ex-release-1](#v-ex-release-1-visual-explainer-root-skill-runtime-pilot), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [Cv-base-1](#cv-base-1-codex-creator-helper-comparison) | Add a no-Claude-environment gate and scheduled runtime regression before a broader package claim; test command wrappers only in a separately scoped issue. |
 
 ## Pilot fixtures

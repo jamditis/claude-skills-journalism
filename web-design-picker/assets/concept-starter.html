@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>__PROJECT_NAME__: __DIRECTION_LABEL__</title>
+  <meta name="description" content="__DIRECTION_DESCRIPTION__">
+  <link rel="icon" href="../assets/brand/__DIRECTION_KEY__/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../assets/brand/__DIRECTION_KEY__/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="../assets/brand/__DIRECTION_KEY__/favicon-180.png">
+  <style>
+    :root { --background: __BACKGROUND__; --text: __TEXT__; --accent: __ACCENT__; --line: __LINE__; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--background); color: var(--text); font-family: Arial, Helvetica, sans-serif; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    header, main, footer { width: min(1180px, calc(100% - 36px)); margin-inline: auto; }
+    .site-header { min-height: 76px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+    .site-header strong { letter-spacing: .06em; text-transform: uppercase; }
+    .site-header nav { display: flex; gap: 22px; }
+    .hero { min-height: 68vh; display: grid; align-content: center; grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr); gap: 56px; border-bottom: 1px solid var(--line); }
+    h1 { margin: 0; font-size: clamp(48px, 8vw, 112px); line-height: .9; letter-spacing: -.06em; }
+    .hero p { margin: 0; align-self: end; font-size: clamp(18px, 2vw, 26px); line-height: 1.35; }
+    .section { padding: 84px 0; border-bottom: 1px solid var(--line); }
+    .section h2 { max-width: 850px; margin: 0 0 28px; font-size: clamp(32px, 5vw, 64px); letter-spacing: -.04em; }
+    .section p { max-width: 760px; font-size: 18px; line-height: 1.6; }
+    footer { padding: 28px 0 42px; }
+    @media (max-width: 760px) {
+      .site-header nav { display: none; }
+      .hero { min-height: auto; grid-template-columns: 1fr; gap: 34px; padding: 74px 0; }
+      .section { padding: 58px 0; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <strong>__PROJECT_NAME__</strong>
+    <nav aria-label="Primary"><a href="#offer">Offer</a><a href="#proof">Proof</a><a href="#process">Process</a><a href="#contact">Start</a></nav>
+  </header>
+  <main>
+    <section class="hero">
+      <h1>Replace this with the direction’s specific promise.</h1>
+      <p>This file is only a semantic scaffold. Rebuild its composition, typography, rhythm, and interactions around the approved direction brief.</p>
+    </section>
+    <section class="section" id="offer"><h2>Explain the offer through concrete deliverables.</h2><p>Do not leave this starter structure intact across all directions. The final concepts should differ materially in architecture and emphasis.</p></section>
+    <section class="section" id="proof"><h2>Feature the strongest evidence.</h2><p>Use real work, tools, media, methods, or outcomes supplied by the user. Avoid invented claims.</p></section>
+    <section class="section" id="process"><h2>Make the working relationship legible.</h2><p>Show inputs, decisions, reviews, and outputs in a form appropriate to this direction.</p></section>
+    <section class="section" id="contact"><h2>Use an honest conversion path.</h2><p>Connect a real endpoint or provide a clearly labeled local prototype action such as downloading a project brief.</p></section>
+  </main>
+  <footer>__PROJECT_NAME__ / __DIRECTION_LABEL__</footer>
+</body>
+</html>

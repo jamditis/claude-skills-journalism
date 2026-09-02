@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Website design directions",
+  "type": "array",
+  "minItems": 2,
+  "items": {
+    "type": "object",
+    "required": [
+      "key",
+      "label",
+      "file"
+    ],
+    "properties": {
+      "key": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      },
+      "label": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "file": {
+        "type": "string"
+      },
+      "accent": {
+        "type": "string"
+      },
+      "background": {
+        "type": "string"
+      },
+      "text": {
+        "type": "string"
+      },
+      "line": {
+        "type": "string"
+      },
+      "tradeoff": {
+        "type": "string"
+      },
+      "favicon_base": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": true
+  },
+  "maxItems": 5
+}

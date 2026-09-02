@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="__LANG__">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="__ROBOTS__">
+  <meta name="theme-color" content="__THEME_COLOR__">
+  <title>__PROJECT_NAME__: design assets</title>
+  <meta name="description" content="Downloadable brand and website assets for __PROJECT_NAME__ design directions.">
+  <link rel="icon" href="__FAVICON_SVG__" type="image/svg+xml">
+  <link rel="icon" href="__FAVICON_ICO__" sizes="any">
+  <link rel="apple-touch-icon" href="__TOUCH_ICON__">
+  <style>
+    :root { --ink: #151719; --paper: #f3f2ed; --muted: #5d6366; --line: #a9aca9; --panel: #fff; --accent: __ACTIVE_COLOR__; }
+    * { box-sizing: border-box; }
+    html { background: var(--paper); }
+    body { margin: 0; color: var(--ink); background: var(--paper); font-family: Arial, Helvetica, sans-serif; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid #176b87; outline-offset: 3px; }
+    .topbar {
+      position: sticky; top: 0; z-index: 10;
+      display: grid; grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center; gap: 20px; min-height: 68px;
+      padding: 12px max(18px, calc((100vw - 1260px) / 2));
+      color: #fff; background: var(--ink); border-bottom: 1px solid #3f4548;
+    }
+    .topbar strong { display: block; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; }
+    .topbar span { display: block; margin-top: 4px; color: #c1c6c8; font: 12px/1.2 "Courier New", monospace; }
+    .top-actions { display: flex; align-items: stretch; border: 1px solid #666b6d; }
+    .top-actions a, .top-actions button { display: flex; align-items: center; min-height: 40px; padding: 0 14px; border: 0; border-right: 1px solid #666b6d; border-radius: 0; color: #fff; background: transparent; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; cursor: pointer; }
+    .top-actions > :last-child { border-right: 0; }
+    .top-actions a:hover, .top-actions button:hover { background: #2b3033; }
+    .top-actions button:disabled { color: #9aa0a3; cursor: progress; }
+    main { width: min(1260px, calc(100% - 36px)); margin: 0 auto; padding: 54px 0 90px; }
+    .intro { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(260px, .55fr); gap: 50px; padding-bottom: 42px; border-bottom: 2px solid var(--ink); }
+    .intro h1 { max-width: 900px; margin: 0; font-size: clamp(40px, 7vw, 92px); line-height: .93; letter-spacing: -.055em; }
+    .intro p { margin: 4px 0 0; color: var(--muted); font-size: 16px; line-height: 1.55; }
+    .search { align-self: end; }
+    .search label { display: block; margin-bottom: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+    .search input { width: 100%; min-height: 48px; padding: 10px 12px; border: 1px solid var(--ink); border-radius: 0; background: #fff; color: var(--ink); font: 16px/1.2 inherit; }
+    .notes { margin: 28px 0 0; padding: 18px 0; border-bottom: 1px solid var(--line); color: var(--muted); line-height: 1.55; }
+    .download-status { min-height: 22px; margin: 16px 0 0; color: var(--muted); font: 12px/1.45 "Courier New", monospace; }
+    .direction { margin-top: 64px; border-top: 8px solid var(--accent); }
+    .direction > header { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 24px; padding: 20px 0 22px; border-bottom: 1px solid var(--ink); }
+    .direction > header p { margin: 4px 0 0; font: 12px/1.3 "Courier New", monospace; text-transform: uppercase; }
+    .direction > header h2 { margin: 0; font-size: clamp(30px, 4vw, 54px); letter-spacing: -.035em; }
+    .asset-row { display: grid; grid-template-columns: minmax(260px, .85fr) minmax(0, 1.15fr); gap: 30px; padding: 28px 0; border-bottom: 1px solid var(--line); }
+    .preview { min-height: 220px; display: grid; place-items: center; overflow: hidden; background: var(--panel); border: 1px solid #d2d4d1; }
+    .preview.checker { background-color: #fff; background-image: linear-gradient(45deg,#e8e8e8 25%,transparent 25%),linear-gradient(-45deg,#e8e8e8 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e8e8e8 75%),linear-gradient(-45deg,transparent 75%,#e8e8e8 75%); background-size: 24px 24px; background-position: 0 0,0 12px,12px -12px,-12px 0; }
+    .preview img, .preview video { display: block; max-width: 100%; max-height: 420px; object-fit: contain; }
+    .asset-copy h3 { margin: 0; font-size: 25px; letter-spacing: -.02em; }
+    .asset-copy p { max-width: 720px; color: var(--muted); line-height: 1.55; }
+    .meta { font: 12px/1.5 "Courier New", monospace; }
+    .downloads { display: flex; flex-wrap: wrap; border-top: 1px solid var(--ink); margin-top: 20px; }
+    .downloads a, .downloads button { min-width: 94px; padding: 12px 14px; border: 0; border-right: 1px solid var(--ink); border-bottom: 1px solid var(--ink); border-radius: 0; background: transparent; color: inherit; cursor: pointer; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+    .downloads a:hover, .downloads button:hover { background: var(--ink); color: #fff; }
+    .graphic-list { padding: 24px 0; border-bottom: 1px solid var(--line); }
+    .graphic-list h3 { margin: 0 0 14px; font-size: 20px; }
+    .graphic-list a { display: inline-block; margin: 0 16px 10px 0; font-size: 14px; }
+    .empty { padding: 48px 0; color: var(--muted); border-bottom: 1px solid var(--line); }
+    footer { padding: 26px max(18px, calc((100vw - 1260px) / 2)); border-top: 1px solid var(--ink); color: var(--muted); font: 12px/1.5 "Courier New", monospace; }
+    [hidden] { display: none !important; }
+    @media (max-width: 760px) {
+      .topbar { grid-template-columns: 1fr; gap: 10px; }
+      .top-actions { width: 100%; }
+      .top-actions a, .top-actions button { flex: 1; justify-content: center; }
+      main { padding-top: 36px; }
+      .intro { grid-template-columns: 1fr; gap: 28px; }
+      .direction > header { grid-template-columns: 1fr; gap: 8px; }
+      .asset-row { grid-template-columns: 1fr; }
+      .preview { min-height: 180px; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div><strong>__PROJECT_NAME__</strong><span>Design asset library</span></div>
+    <nav class="top-actions" aria-label="Asset library actions">
+      <a href="index.html">Back to review</a>
+      <a href="asset-manifest.json" download>Manifest</a>
+      __DOWNLOAD_ALL_ACTION__
+    </nav>
+  </header>
+  <main>
+    <section class="intro">
+      <h1>Design assets, separated and ready to use.</h1>
+      <div class="search">
+        <label for="asset-search">Filter assets</label>
+        <input id="asset-search" type="search" placeholder="Logo, favicon, SVG, video…" autocomplete="off">
+      </div>
+    </section>
+    <p class="notes">__LIBRARY_NOTE__</p>
+    <p class="download-status" role="status" aria-live="polite" data-download-status></p>
+    __ASSET_SECTIONS__
+  </main>
+  <footer>__PROJECT_NAME__ / website design review package / __YEAR__</footer>
+  <script>
+    __DOWNLOAD_ALL_SCRIPT__
+
+    const search = document.querySelector('#asset-search');
+    const searchable = [...document.querySelectorAll('[data-search]')];
+    search?.addEventListener('input', () => {
+      const query = search.value.trim().toLowerCase();
+      searchable.forEach(item => { item.hidden = Boolean(query) && !item.dataset.search.toLowerCase().includes(query); });
+      document.querySelectorAll('.direction').forEach(section => {
+        const visible = [...section.querySelectorAll('[data-search]')].some(item => !item.hidden);
+        section.hidden = Boolean(query) && !visible;
+      });
+    });
+  </script>
+</body>
+</html>

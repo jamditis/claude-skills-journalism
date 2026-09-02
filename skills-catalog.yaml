@@ -26,6 +26,8 @@ packages:
     source: ./superjawn
   - name: video-toolkit
     source: ./video-toolkit
+  - name: web-design-picker
+    source: ./web-design-picker
   - name: visual-explainer
     source: ./visual-explainer
 skills:
@@ -216,6 +218,9 @@ skills:
   - name: video-transcribe
     package: video-toolkit
     path: video-toolkit/skills/video-transcribe
+  - name: web-design-picker
+    package: web-design-picker
+    path: web-design-picker
   - name: visual-explainer
     package: visual-explainer
     path: visual-explainer

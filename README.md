@@ -66,11 +66,12 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | [security-toolkit](./security-toolkit/) | Four defensive security skills covering OWASP Top 10 fundamentals and supply-chain hardening: pre-deployment audit checklists (auth, input validation, secrets management), secure authentication patterns (password hashing, session management, JWT, OAuth, passkeys), API hardening (rate limiting, CORS, request throttling, defense-in-depth for Express, FastAPI, and serverless), and npm/bun supply-chain hardening with install-time cooldown plus a sandboxed pre-install scan for the bypass case (defends against Mini Shai-Hulud-class worms) | `/security-toolkit:hotpatch` | Aug 21, 2026 |
 | [superjawn](./superjawn/) | Research-augmented fork of obra/superpowers. Default-on research phase fires before brainstorming, systematic-debugging, and writing-skills. Includes all 14 skills with no soft dependencies on the upstream `superpowers` plugin | invoked indirectly via skills (e.g. `superjawn:brainstorming`, `superjawn:systematic-debugging`, `superjawn:writing-plans`) | Aug 21, 2026 |
 | [video-toolkit](./video-toolkit/) | Four composable skills for social-video accountability reporting: downloading public video from Twitter/X, TikTok, YouTube, Instagram, and Facebook; transcribing it with a provenance sidecar and a CPU path any evaluator can re-run; extracting and vision-analyzing frames; and aggregating the result into an interactive dashboard | n/a, skills only | Aug 21, 2026 |
+| [web-design-picker](./web-design-picker/) | Build two to five distinct website directions, a switchable client review site, downloadable design assets, preview images, static QA reports, and separate Cloudflare Drop and design-handoff packages | n/a, skill only | Sep 1, 2026 |
 | [visual-explainer](./visual-explainer/) | HTML diagrams, data tables, architecture views, slide decks, and KPI dashboards adapted from nicobailon/visual-explainer with journalism, newsroom, and academic design sensibilities | `/visual-explainer:project-recap` | Aug 21, 2026 |
 
 #### Skills (manual installation)
 
-Most skills live inside a plugin's `skills/` directory. The `okf-wiki/SKILL.md`, `pdf-design/SKILL.md`, and `visual-explainer/SKILL.md` root-skill packages keep the skill at the package root. To install one skill without taking a whole plugin, clone the repo and copy or symlink the directory that directly contains its `SKILL.md`. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md`, one level deep:
+Most skills live inside a plugin's `skills/` directory. The `okf-wiki/SKILL.md`, `pdf-design/SKILL.md`, `visual-explainer/SKILL.md`, and `web-design-picker/SKILL.md` root-skill packages keep the skill at the package root. To install one skill without taking a whole plugin, clone the repo and copy or symlink the directory that directly contains its `SKILL.md`. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md`, one level deep:
 
 ```
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
@@ -88,10 +89,12 @@ cp -r project-templates-toolkit/skills/project-memory ~/.claude/skills/
 
 # A root-skill package is already the directory to copy:
 cp -r okf-wiki ~/.claude/skills/
+cp -r web-design-picker ~/.claude/skills/
 
 # Or symlink so git pull updates them in place (ln -sfn replaces an existing link):
 ln -sfn "$PWD/research-toolkit/skills/free-apis-catalog" ~/.claude/skills/free-apis-catalog
 ln -sfn "$PWD/dev-toolkit/skills/director" ~/.claude/skills/director
+ln -sfn "$PWD/web-design-picker" ~/.claude/skills/web-design-picker
 ln -sfn "$PWD/visual-explainer" ~/.claude/skills/visual-explainer
 ```
 
@@ -190,6 +193,7 @@ These six skills ship together as the [research-toolkit](./research-toolkit/) pl
 | Skill | Description | Updated |
 |-------|-------------|--------|
 | [pdf-design](./pdf-design/) | Professional PDF reports and proposals with brand system, budget tables, and multi-page layouts. For the full interactive experience, use [pdf-playground](./pdf-playground/) instead | Aug 21, 2026 |
+| [web-design-picker](./web-design-picker/) | Produce distinct responsive website directions, a client review picker, downloadable design assets, preview images, static QA reports, and deployment and handoff packages | Sep 1, 2026 |
 | [visual-explainer](./visual-explainer/) | Turn complex data into styled HTML pages, architecture diagrams, data tables, flowcharts, timelines, source maps, and dashboards with dark/light theme support. Now registered as a plugin (`/plugin install visual-explainer@claude-skills-journalism`) | Aug 21, 2026 |
 
 ### PDF Playground skill

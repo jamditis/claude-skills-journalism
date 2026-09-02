@@ -124,6 +124,15 @@ claude-skills-journalism/
 │       ├── video-frames/        # Frame extraction and vision analysis
 │       └── video-transcribe/    # Reproducible Whisper transcription
 │
+├── # Plugin: web-design-picker (1 skill, v1.0.0), registered in marketplace.json
+├── web-design-picker/           # Website directions, review picker, asset handoff
+│   ├── .claude-plugin/plugin.json
+│   ├── agents/openai.yaml
+│   ├── assets/                  # Picker, catalog, concept, schema, and favicon sources
+│   ├── references/              # Design, accessibility, QA, and delivery guidance
+│   ├── scripts/                 # Scaffold, build, preview, validate, and package tools
+│   └── SKILL.md
+│
 ├── # Plugin: visual-explainer (1 skill), registered in marketplace.json
 ├── visual-explainer/            # HTML diagrams, data tables, architecture views
 │   ├── references/              # CSS patterns, library guides, nav patterns
@@ -260,11 +269,11 @@ This repo distributes shared skills as Claude and Codex packages and as standard
 /plugin install journalism-core@claude-skills-journalism
 ```
 
-Available plugins: `autocontext`, `dev-toolkit`, `journalism-core`, `okf-wiki`, `pdf-design`, `pdf-playground`, `project-templates-toolkit`, `research-toolkit`, `security-toolkit`, `superjawn`, `video-toolkit`, `visual-explainer`. See `.claude-plugin/marketplace.json` for the full list.
+Available plugins: `autocontext`, `dev-toolkit`, `journalism-core`, `okf-wiki`, `pdf-design`, `pdf-playground`, `project-templates-toolkit`, `research-toolkit`, `security-toolkit`, `superjawn`, `video-toolkit`, `web-design-picker`, `visual-explainer`. See `.claude-plugin/marketplace.json` for the full list.
 
 ### Alternate: copy a single skill into `~/.claude/skills/`
 
-Most skills live inside a package's `skills/` directory. The `okf-wiki`, `pdf-design`, and `visual-explainer` packages keep `SKILL.md` at the package root. Clone the repo and copy the directory that directly contains the required `SKILL.md`. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md`, one level deep:
+Most skills live inside a package's `skills/` directory. The `okf-wiki`, `pdf-design`, `web-design-picker`, and `visual-explainer` packages keep `SKILL.md` at the package root. Clone the repo and copy the directory that directly contains the required `SKILL.md`. Claude Code discovers skills at `~/.claude/skills/<skill-name>/SKILL.md`, one level deep:
 
 ```bash
 git clone https://github.com/jamditis/claude-skills-journalism.git ~/projects/claude-skills-journalism
@@ -278,6 +287,7 @@ cp -r dev-toolkit/skills/web-scraping ~/.claude/skills/
 cp -r security-toolkit/skills/secure-auth ~/.claude/skills/
 cp -r project-templates-toolkit/skills/project-memory ~/.claude/skills/
 cp -r okf-wiki ~/.claude/skills/
+cp -r web-design-picker ~/.claude/skills/
 
 # Or symlink so git pull updates them in place (ln -sfn replaces an existing link):
 ln -sfn "$PWD/research-toolkit/skills/free-apis-catalog" ~/.claude/skills/free-apis-catalog

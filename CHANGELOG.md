@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.8.0] - 2026-09-01
+
+### Added
+
+- Added the `web-design-picker` plugin for producing distinct website concepts,
+  a switchable client review site, downloadable design assets, preview images,
+  static-site QA, and separate deployment and handoff packages.
+
+### Changed
+
+- Added `web-design-picker` to the shared skill catalog, Claude marketplace,
+  Codex display metadata, repository documentation, and public skill browser.
+
 ## [2.7.3] - 2026-08-24
 
 ### Fixed
