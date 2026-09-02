@@ -12,8 +12,11 @@ import zipfile
 from pathlib import Path
 
 import new_project
-from _common import copy_contents, deterministic_zip, read_json, relative_web_path, utc_now, validate_slug, write_json
+from _common import copy_contents, deterministic_zip, read_json, relative_web_path, utc_now, validate_output_stem, validate_slug, write_json
 from build_picker import ensure_direction_metadata, relative_from_page
+from make_asset_variants import main as make_asset_variants_main, render_svg as render_variant_svg
+from make_palette import main as make_palette_main
+from optimize_video import main as optimize_video_main
 from package_delivery import copy_tree
 from validate_site import check_html
 
@@ -44,6 +47,33 @@ def check_path_helpers() -> None:
         raise RuntimeError(f"Unsafe static path was accepted: {unsafe}")
 
 
+def check_output_stem_guards(parent: Path) -> None:
+    """Output names must stay single portable file stems before any writes."""
+    for safe in ("palette", "brand.v2", "logo_01", "hero-image"):
+        if validate_output_stem(safe) != safe:
+            raise RuntimeError(f"Safe output name was changed: {safe}")
+    for unsafe in (".", "..", "../outside", "nested/name", "C:\\outside", "name.", "name ", "CON", "lpt9.txt"):
+        try:
+            validate_output_stem(unsafe)
+        except ValueError:
+            continue
+        raise RuntimeError(f"Unsafe output name was accepted: {unsafe}")
+
+    with tempfile.TemporaryDirectory(prefix="web-design-picker-output-stem-", dir=parent) as temporary:
+        root = Path(temporary)
+        output = root / "output"
+        source = root / "source.svg"
+        source.write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"/>', encoding="utf-8")
+        commands = (
+            (make_asset_variants_main, [str(source), str(output), "--name", "../escape"]),
+            (make_palette_main, [str(output), "--name", "../escape", "primary=#112233"]),
+            (optimize_video_main, [str(root / "source.mp4"), str(output), "--name", "../escape"]),
+        )
+        for command, arguments in commands:
+            if command(arguments) == 0 or output.exists():
+                raise RuntimeError("An output helper accepted an escaping output name or created output")
+
+
 def check_symlink_guards(parent: Path) -> None:
     """Delivery staging must reject links before copying external content."""
     with tempfile.TemporaryDirectory(prefix="web-design-picker-symlink-", dir=parent) as temporary:
@@ -68,6 +98,69 @@ def check_symlink_guards(parent: Path) -> None:
                 raise RuntimeError(f"Symlinked source was copied by {name} staging")
             if destination.exists():
                 raise RuntimeError(f"{name} staging created output before rejecting a symlink")
+
+
+def check_package_output_symlink_guards(parent: Path) -> None:
+    """Packaging must not unlink or write through symlinked output directories."""
+    with tempfile.TemporaryDirectory(prefix="web-design-picker-package-symlink-", dir=parent) as temporary:
+        root = Path(temporary)
+        script = Path(__file__).with_name("package_delivery.py")
+        for output_name in ("deliverables", "qa"):
+            project = root / output_name
+            config = project / "config"
+            config.mkdir(parents=True)
+            write_json(config / "project.json", {"name": "Package fixture", "slug": "package-fixture"})
+            write_json(config / "directions.json", [{"key": "first"}, {"key": "second"}])
+            write_json(config / "assets.json", {})
+            (project / "dist").mkdir()
+            (project / "dist/index.html").write_text("fixture\n", encoding="utf-8")
+
+            external = root / f"external-{output_name}"
+            external.mkdir()
+            sentinel = external / "sentinel.txt"
+            archive = external / "existing.zip"
+            sentinel.write_text("preserve sentinel\n", encoding="utf-8")
+            archive.write_bytes(b"preserve archive\n")
+            (project / output_name).symlink_to(external, target_is_directory=True)
+
+            internal_archive = None
+            if output_name == "qa":
+                deliverables = project / "deliverables"
+                deliverables.mkdir()
+                internal_archive = deliverables / "existing.zip"
+                internal_archive.write_bytes(b"preserve internal archive\n")
+            else:
+                (project / "qa").mkdir()
+
+            result = subprocess.run(
+                [sys.executable, str(script), str(project)],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            if result.returncode == 0 or "Symlinks are not allowed" not in result.stdout:
+                raise RuntimeError(f"Packaging did not reject symlinked {output_name} output")
+            if sentinel.read_text(encoding="utf-8") != "preserve sentinel\n" or archive.read_bytes() != b"preserve archive\n":
+                raise RuntimeError(f"Packaging modified external {output_name} output before rejecting its symlink")
+            if internal_archive and internal_archive.read_bytes() != b"preserve internal archive\n":
+                raise RuntimeError("Packaging cleaned deliverables before rejecting a symlinked QA directory")
+
+
+def check_svg_variant_dimensions(parent: Path) -> None:
+    """SVG variant exports must use the requested longest edge in either orientation."""
+    with tempfile.TemporaryDirectory(prefix="web-design-picker-svg-variants-", dir=parent) as temporary:
+        root = Path(temporary)
+        for name, width, height in (("portrait", 100, 200), ("landscape", 300, 100)):
+            source = root / f"{name}.svg"
+            source.write_text(
+                f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}"><rect width="{width}" height="{height}"/></svg>',
+                encoding="utf-8",
+            )
+            image = render_variant_svg(source, 320)
+            if max(image.width, image.height) != 320:
+                raise RuntimeError(f"{name} SVG variant did not honor its requested longest edge: {image.size}")
+            if (image.width < image.height) != (name == "portrait"):
+                raise RuntimeError(f"{name} SVG variant changed its orientation: {image.size}")
 
 
 def check_source_map_guard(parent: Path) -> None:
@@ -215,6 +308,9 @@ def main() -> int:
     try:
         project.parent.mkdir(parents=True, exist_ok=True)
         check_symlink_guards(project.parent)
+        check_output_stem_guards(project.parent)
+        check_package_output_symlink_guards(project.parent)
+        check_svg_variant_dimensions(project.parent)
         check_source_map_guard(project.parent)
         check_secret_archive_guard(project.parent)
         check_favicon_metadata_variants(project.parent)

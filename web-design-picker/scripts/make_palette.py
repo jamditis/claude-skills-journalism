@@ -9,6 +9,7 @@ import re
 import sys
 from pathlib import Path
 
+from _common import validate_output_stem
 from make_favicons import FaviconError, render_svg
 
 HEX = re.compile(r"^#[0-9a-fA-F]{6}$")
@@ -31,14 +32,19 @@ def contrast_text(hex_color: str) -> str:
     return "#111111" if luminance > 0.6 else "#ffffff"
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output_dir", type=Path)
     parser.add_argument("--name", default="palette")
     parser.add_argument("--title", default="Color palette")
     parser.add_argument("tokens", nargs="+", type=parse_token, help="Token assignments such as background=#f2efe8")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
+    try:
+        stem = validate_output_stem(args.name)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
     output_dir = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     tokens = dict(args.tokens)
@@ -64,8 +70,8 @@ def main() -> int:
         + '</svg>'
     )
 
-    svg_path = output_dir / f"{args.name}.svg"
-    png_path = output_dir / f"{args.name}.png"
+    svg_path = output_dir / f"{stem}.svg"
+    png_path = output_dir / f"{stem}.png"
     css_path = output_dir / "color-tokens.css"
     json_path = output_dir / "color-tokens.json"
 

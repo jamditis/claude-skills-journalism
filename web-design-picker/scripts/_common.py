@@ -19,6 +19,12 @@ ALREADY_COMPRESSED = {
     ".mp3", ".mp4", ".pdf", ".png", ".webm", ".webp", ".zip",
 }
 SLUG_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+OUTPUT_STEM_PATTERN = re.compile(r"^[A-Za-z0-9._-]+$")
+WINDOWS_RESERVED_NAMES = {
+    "con", "prn", "aux", "nul", "clock$",
+    *(f"com{number}" for number in range(1, 10)),
+    *(f"lpt{number}" for number in range(1, 10)),
+}
 SECRET_SUFFIXES = {".key", ".pem", ".p12", ".pfx", ".pkcs12", ".jks", ".keystore"}
 SSH_PRIVATE_KEY_NAMES = {
     "id_rsa", "id_dsa", "id_ecdsa", "id_ecdsa_sk", "id_ed25519",
@@ -40,6 +46,19 @@ def slugify(value: str) -> str:
 def validate_slug(value: str) -> str:
     if not isinstance(value, str) or not SLUG_PATTERN.fullmatch(value):
         raise ValueError("Slug must contain lowercase letters, numbers, and single hyphens only")
+    return value
+
+
+def validate_output_stem(value: str) -> str:
+    """Accept one portable output-file stem, without any path semantics."""
+    if not isinstance(value, str) or not value or value in {".", ".."}:
+        raise ValueError("Output name must be a non-empty filename stem")
+    if value.endswith((".", " ")) or "/" in value or "\\" in value or Path(value).is_absolute():
+        raise ValueError("Output name must be a single filename stem")
+    if not OUTPUT_STEM_PATTERN.fullmatch(value):
+        raise ValueError("Output name may contain only letters, numbers, dots, underscores, and hyphens")
+    if value.casefold().split(".", 1)[0] in WINDOWS_RESERVED_NAMES:
+        raise ValueError("Output name uses a reserved Windows device name")
     return value
 
 

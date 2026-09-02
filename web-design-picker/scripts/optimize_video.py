@@ -9,7 +9,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from _common import format_bytes
+from _common import format_bytes, validate_output_stem
 
 
 def run(command: list[str]) -> None:
@@ -66,7 +66,7 @@ def poster_times(duration: float, supplied: list[float] | None) -> list[float]:
     return [min(0.5, duration * 0.1), duration * 0.5, duration * 0.78]
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", type=Path)
     parser.add_argument("output_dir", type=Path)
@@ -82,8 +82,13 @@ def main() -> int:
     parser.add_argument("--gif-start", type=float, default=0.0)
     parser.add_argument("--gif-duration", type=float, default=6.0)
     parser.add_argument("--gif-width", type=int, default=800)
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
+    try:
+        stem = validate_output_stem(args.name or args.source.stem)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
     if not shutil.which("ffmpeg") or not shutil.which("ffprobe"):
         print("error: ffmpeg and ffprobe must be installed", file=sys.stderr)
         return 1
@@ -93,7 +98,6 @@ def main() -> int:
         return 1
     output_dir = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
-    stem = args.name or source.stem
     audio = [] if args.keep_audio else ["-an"]
     vf = scale_filter(args.width, args.fps, args.crop)
 

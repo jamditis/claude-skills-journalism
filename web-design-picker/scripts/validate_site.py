@@ -30,6 +30,10 @@ CSS_URL_RE = re.compile(
     r"url\(\s*(?:\"(?P<double>[^\"]*)\"|'(?P<single>[^']*)'|(?P<bare>[^)\s'\"]+))\s*\)",
     re.I,
 )
+CSS_QUOTED_IMPORT_RE = re.compile(
+    r"@import\s+(?:\"(?P<double>[^\"]*)\"|'(?P<single>[^']*)')(?=\s|;)",
+    re.I,
+)
 
 
 def srcset_urls(value: str) -> list[str]:
@@ -73,6 +77,7 @@ class DocumentParser(HTMLParser):
         self._in_title = False
         self.meta_names: dict[str, str] = {}
         self.icons: list[str] = []
+        self.web_manifests: list[str] = []
         self.h1_count = 0
         self.images: list[dict[str, str]] = []
         self.videos: list[tuple[dict[str, str], list[str]]] = []
@@ -83,10 +88,10 @@ class DocumentParser(HTMLParser):
         self.ids: set[str] = set()
         self.inline_css: list[str] = []
         self.mailto_links: list[str] = []
-        self.buttons_without_label = 0
         self._button_depth = 0
         self._button_has_text: list[bool] = []
         self._button_attrs: list[dict[str, str]] = []
+        self.buttons: list[tuple[dict[str, str], bool]] = []
         self.invalid_button_types: list[str] = []
 
     def handle_starttag(self, tag: str, attrs_list: list[tuple[str, str | None]]) -> None:
@@ -102,6 +107,8 @@ class DocumentParser(HTMLParser):
                 self.meta_names[name] = attrs.get("content", "")
         if tag == "link" and "icon" in attrs.get("rel", "").lower():
             self.icons.append(attrs.get("href", ""))
+        if tag == "link" and "manifest" in attrs.get("rel", "").lower().split() and attrs.get("href"):
+            self.web_manifests.append(attrs["href"])
         if tag == "h1":
             self.h1_count += 1
         if tag == "img":
@@ -154,8 +161,7 @@ class DocumentParser(HTMLParser):
         if tag == "button" and self._button_depth:
             has_text = self._button_has_text.pop()
             attrs = self._button_attrs.pop()
-            if not has_text and not attrs.get("aria-label") and not attrs.get("aria-labelledby") and not attrs.get("title"):
-                self.buttons_without_label += 1
+            self.buttons.append((attrs, has_text))
             self._button_depth -= 1
 
     def handle_data(self, data: str) -> None:
@@ -191,21 +197,93 @@ def is_within(path: Path, root: Path) -> bool:
         return False
 
 
-def check_css_urls(root: Path, source: Path, css: str, findings: list[Finding]) -> None:
+def check_css_reference(root: Path, source: Path, url: str, findings: list[Finding]) -> None:
     relative = source.relative_to(root)
+    parsed = urlsplit(url)
+    if not url or parsed.scheme.lower() in IGNORE_SCHEMES or parsed.netloc or not parsed.path:
+        return
+    target = resolve_local(root, source, url)
+    if target is None:
+        return
+    if not is_within(target, root):
+        add(findings, "error", "css-path-escape", relative, f"CSS URL leaves site root: {url}")
+        return
+    if not target.exists():
+        add(findings, "error", "css-missing-reference", relative, f"Missing CSS URL target: {url}")
+
+
+def check_css_urls(root: Path, source: Path, css: str, findings: list[Finding]) -> None:
+    for match in CSS_QUOTED_IMPORT_RE.finditer(css):
+        url = next((value for value in match.group("double", "single") if value is not None), "").strip()
+        check_css_reference(root, source, url, findings)
     for match in CSS_URL_RE.finditer(css):
         url = next((value for value in match.group("double", "single", "bare") if value is not None), "").strip()
-        parsed = urlsplit(url)
-        if not url or parsed.scheme.lower() in IGNORE_SCHEMES or parsed.netloc or not parsed.path:
+        check_css_reference(root, source, url, findings)
+
+
+def check_aria_labelledby(
+    tag: str,
+    attrs: dict[str, str],
+    ids: set[str],
+    relative: Path,
+    findings: list[Finding],
+) -> tuple[bool, bool]:
+    if "aria-labelledby" not in attrs:
+        return False, False
+    labelled_by_ids = attrs["aria-labelledby"].split()
+    if not labelled_by_ids:
+        add(findings, "error", "aria-labelledby", relative, f"{tag} has an empty aria-labelledby attribute")
+        return False, True
+    missing_ids = [label_id for label_id in labelled_by_ids if label_id not in ids]
+    if missing_ids:
+        add(findings, "error", "aria-labelledby", relative, f"{tag} references missing aria-labelledby ID(s): {', '.join(missing_ids)}")
+        return False, True
+    return True, False
+
+
+def webmanifest_urls(data: Any) -> list[str]:
+    if not isinstance(data, dict):
+        return []
+    urls = [value for value in [data.get("start_url")] if isinstance(value, str)]
+    for key in ("icons", "screenshots"):
+        for item in data.get(key, []):
+            if isinstance(item, dict) and isinstance(item.get("src"), str):
+                urls.append(item["src"])
+    for shortcut in data.get("shortcuts", []):
+        if not isinstance(shortcut, dict):
             continue
-        target = resolve_local(root, source, url)
-        if target is None:
+        if isinstance(shortcut.get("url"), str):
+            urls.append(shortcut["url"])
+        for icon in shortcut.get("icons", []):
+            if isinstance(icon, dict) and isinstance(icon.get("src"), str):
+                urls.append(icon["src"])
+    return urls
+
+
+def check_webmanifest(root: Path, html_file: Path, url: str, findings: list[Finding]) -> None:
+    target = resolve_local(root, html_file, url)
+    if target is None or not is_within(target, root) or not target.is_file():
+        return
+    relative = target.relative_to(root)
+    try:
+        data = json.loads(target.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        add(findings, "error", "webmanifest-json", relative, f"Invalid web manifest JSON: {exc.msg}")
+        return
+    if not isinstance(data, dict):
+        add(findings, "error", "webmanifest-json", relative, "Web manifest must contain a JSON object")
+        return
+    for raw in webmanifest_urls(data):
+        parsed = urlsplit(raw)
+        if parsed.scheme.lower() in IGNORE_SCHEMES or parsed.netloc or not parsed.path:
             continue
-        if not is_within(target, root):
-            add(findings, "error", "css-path-escape", relative, f"CSS URL leaves site root: {url}")
+        resource = resolve_local(root, target, raw)
+        if resource is None:
             continue
-        if not target.exists():
-            add(findings, "error", "css-missing-reference", relative, f"Missing CSS URL target: {url}")
+        if not is_within(resource, root):
+            add(findings, "error", "webmanifest-path-escape", relative, f"Web manifest target leaves site root: {raw}")
+        elif not resource.exists():
+            add(findings, "error", "webmanifest-missing", relative, f"Web manifest target missing from site: {raw}")
 
 
 def check_html(root: Path, path: Path, findings: list[Finding], allow_external: bool) -> None:
@@ -250,23 +328,19 @@ def check_html(root: Path, path: Path, findings: list[Finding], allow_external: 
         control_type = attrs.get("type", "").lower()
         if control_type in {"hidden", "submit", "button", "reset", "image"}:
             continue
-        labelled_by_ids = attrs.get("aria-labelledby", "").split()
-        valid_labelled_by = False
-        if "aria-labelledby" in attrs:
-            if not labelled_by_ids:
-                add(findings, "error", "aria-labelledby", relative, f"{tag} has an empty aria-labelledby attribute")
-            else:
-                missing_ids = [label_id for label_id in labelled_by_ids if label_id not in parser.ids]
-                if missing_ids:
-                    add(findings, "error", "aria-labelledby", relative, f"{tag} references missing aria-labelledby ID(s): {', '.join(missing_ids)}")
-                else:
-                    valid_labelled_by = True
+        valid_labelled_by, invalid_labelled_by = check_aria_labelledby(tag, attrs, parser.ids, relative, findings)
         control_id = attrs.get("id")
-        labelled = bool(attrs.get("aria-label") or valid_labelled_by or (control_id and control_id in parser.labels_for))
-        if not labelled:
+        labelled = bool(attrs.get("aria-label", "").strip() or valid_labelled_by or (control_id and control_id in parser.labels_for))
+        if not labelled and not invalid_labelled_by:
             add(findings, "error", "form-label", relative, f"Unlabelled {tag}: id={control_id or '(none)'} name={attrs.get('name', '(none)')}")
-    if parser.buttons_without_label:
-        add(findings, "error", "button-label", relative, f"{parser.buttons_without_label} button(s) have no accessible name")
+    buttons_without_label = 0
+    for attrs, has_text in parser.buttons:
+        valid_labelled_by, invalid_labelled_by = check_aria_labelledby("button", attrs, parser.ids, relative, findings)
+        labelled = has_text or bool(attrs.get("aria-label", "").strip()) or valid_labelled_by
+        if not labelled and not invalid_labelled_by:
+            buttons_without_label += 1
+    if buttons_without_label:
+        add(findings, "error", "button-label", relative, f"{buttons_without_label} button(s) have no accessible name")
     for button_type in parser.invalid_button_types:
         detail = "missing type" if not button_type else f"invalid type: {button_type}"
         add(findings, "error", "button-type", relative, f"Button has {detail}; use button, submit, or reset")
@@ -307,6 +381,8 @@ def check_html(root: Path, path: Path, findings: list[Finding], allow_external: 
                 css = target.read_text(encoding="utf-8", errors="ignore")
                 check_css_urls(root, target, css, findings)
                 external_css += "\n" + css
+    for url in parser.web_manifests:
+        check_webmanifest(root, path, url, findings)
     combined = (text + "\n" + external_css).lower()
 
     slop_checks = [

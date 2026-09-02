@@ -110,10 +110,17 @@ def main() -> int:
         return 1
 
     deliverables = root / "deliverables"
+    qa = root / "qa"
+    try:
+        reject_symlinks(deliverables)
+        reject_symlinks(qa)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
     deliverables.mkdir(parents=True, exist_ok=True)
     for stale in deliverables.glob("*.zip*"):
         stale.unlink()
-    qa = root / "qa"
     qa.mkdir(parents=True, exist_ok=True)
     slug = project["slug"]
     remove_validation_reports(qa, slug)
