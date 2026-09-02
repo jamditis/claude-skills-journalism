@@ -11,6 +11,7 @@ import tempfile
 import zipfile
 from pathlib import Path
 
+import new_project
 from _common import copy_contents, deterministic_zip, read_json, relative_web_path, utc_now, validate_slug, write_json
 from build_picker import ensure_direction_metadata, relative_from_page
 from package_delivery import copy_tree
@@ -88,6 +89,41 @@ def check_source_map_guard(parent: Path) -> None:
             raise RuntimeError("Source map guard wrote a delivery archive")
 
 
+def check_secret_archive_guard(parent: Path) -> None:
+    """Delivery archives must reject common secrets before writing output."""
+    fixtures = {
+        ".env": b"TOKEN=secret\n",
+        "nested/.ENV.production": b"TOKEN=secret\n",
+        "keys/client.KEY": b"key fixture\n",
+        "keys/certificate.PFX": b"container fixture\n",
+        "keys/id_ED25519": b"ssh key fixture\n",
+        "keys/material.txt": b"-----BEGIN OPENSSH PRIVATE KEY-----\nfixture\n",
+    }
+    with tempfile.TemporaryDirectory(prefix="web-design-picker-secret-", dir=parent) as temporary:
+        root = Path(temporary)
+        for index, (relative, content) in enumerate(fixtures.items()):
+            source = root / f"source-{index}"
+            target = source / relative
+            target.parent.mkdir(parents=True)
+            target.write_bytes(content)
+            output = root / f"delivery-{index}.zip"
+            try:
+                deterministic_zip(source, output)
+            except ValueError as exc:
+                if "Secret files" not in str(exc):
+                    raise RuntimeError("Secret archive guard raised an unexpected error") from exc
+            else:
+                raise RuntimeError(f"Secret fixture was accepted into a delivery archive: {relative}")
+            if output.exists():
+                raise RuntimeError(f"Secret archive guard wrote output for: {relative}")
+
+        safe_source = root / "safe"
+        safe_source.mkdir()
+        (safe_source / ".envrc").write_text("export DEMO=1\n", encoding="utf-8")
+        (safe_source / "id_ed25519.pub").write_text("ssh-ed25519 public-key\n", encoding="utf-8")
+        deterministic_zip(safe_source, root / "safe.zip")
+
+
 def check_favicon_metadata_variants(parent: Path) -> None:
     """Every required favicon variant must survive one-off authored icons."""
     with tempfile.TemporaryDirectory(prefix="web-design-picker-favicon-", dir=parent) as temporary:
@@ -131,6 +167,33 @@ def check_aria_labelledby_controls(parent: Path) -> None:
             raise RuntimeError("Hidden control was checked for aria-labelledby")
 
 
+def check_force_scaffold_preserves_existing_project(parent: Path) -> None:
+    """A failed forced scaffold must not replace an existing project."""
+    with tempfile.TemporaryDirectory(prefix="web-design-picker-force-", dir=parent) as temporary:
+        root = Path(temporary)
+        project = root / "project"
+        project.mkdir()
+        marker = project / "keep.txt"
+        marker.write_text("preserve this project\n", encoding="utf-8")
+        original_generator = new_project.generate_favicon_set
+
+        def fail_scaffold(*_args, **_kwargs):
+            raise new_project.FaviconError("injected scaffold failure")
+
+        new_project.generate_favicon_set = fail_scaffold
+        try:
+            result = new_project.main([str(project), "--name", "Failure fixture", "--force"])
+        finally:
+            new_project.generate_favicon_set = original_generator
+
+        if result != 1 or marker.read_text(encoding="utf-8") != "preserve this project\n":
+            raise RuntimeError("Forced scaffold failure did not preserve the existing project")
+        if [path.name for path in project.iterdir()] != ["keep.txt"]:
+            raise RuntimeError("Forced scaffold failure replaced the destination with partial output")
+        if any(root.glob(".project.staging-*")):
+            raise RuntimeError("Forced scaffold failure left a staging project behind")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--work-dir", type=Path, help="Keep the generated test project at this location")
@@ -153,8 +216,10 @@ def main() -> int:
         project.parent.mkdir(parents=True, exist_ok=True)
         check_symlink_guards(project.parent)
         check_source_map_guard(project.parent)
+        check_secret_archive_guard(project.parent)
         check_favicon_metadata_variants(project.parent)
         check_aria_labelledby_controls(project.parent)
+        check_force_scaffold_preserves_existing_project(project.parent)
         with tempfile.TemporaryDirectory(prefix="web-design-picker-slug-guard-", dir=project.parent) as guard_dir:
             slug_guard = Path(guard_dir)
             marker = slug_guard / "keep.txt"

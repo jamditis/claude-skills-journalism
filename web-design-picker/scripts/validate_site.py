@@ -32,6 +32,29 @@ CSS_URL_RE = re.compile(
 )
 
 
+def srcset_urls(value: str) -> list[str]:
+    urls = []
+    index = 0
+    length = len(value)
+    while index < length:
+        while index < length and (value[index].isspace() or value[index] == ","):
+            index += 1
+        start = index
+        if value[index:index + 5].lower() == "data:":
+            while index < length and not value[index].isspace():
+                index += 1
+        else:
+            while index < length and not value[index].isspace() and value[index] != ",":
+                index += 1
+        if start < index:
+            urls.append(value[start:index])
+        while index < length and value[index] != ",":
+            index += 1
+        if index < length:
+            index += 1
+    return urls
+
+
 @dataclass
 class Finding:
     severity: str
@@ -52,7 +75,8 @@ class DocumentParser(HTMLParser):
         self.icons: list[str] = []
         self.h1_count = 0
         self.images: list[dict[str, str]] = []
-        self.videos: list[dict[str, str]] = []
+        self.videos: list[tuple[dict[str, str], list[str]]] = []
+        self._open_video_indexes: list[int] = []
         self.iframes: list[dict[str, str]] = []
         self.labels_for: set[str] = set()
         self.controls: list[tuple[str, dict[str, str]]] = []
@@ -83,7 +107,10 @@ class DocumentParser(HTMLParser):
         if tag == "img":
             self.images.append(attrs)
         if tag == "video":
-            self.videos.append(attrs)
+            self.videos.append((attrs, []))
+            self._open_video_indexes.append(len(self.videos) - 1)
+        if tag == "source" and self._open_video_indexes and attrs.get("src", "").strip():
+            self.videos[self._open_video_indexes[-1]][1].append(attrs["src"].strip())
         if tag == "iframe":
             self.iframes.append(attrs)
         if tag == "label" and attrs.get("for"):
@@ -111,10 +138,8 @@ class DocumentParser(HTMLParser):
             if not value:
                 continue
             if attr == "srcset":
-                for candidate in value.split(","):
-                    url = candidate.strip().split()[0] if candidate.strip() else ""
-                    if url:
-                        self.references.append((tag, attr, url))
+                for url in srcset_urls(value):
+                    self.references.append((tag, attr, url))
             else:
                 self.references.append((tag, attr, value))
 
@@ -124,6 +149,8 @@ class DocumentParser(HTMLParser):
             self._in_title = False
         if tag == "style":
             self._in_style = False
+        if tag == "video" and self._open_video_indexes:
+            self._open_video_indexes.pop()
         if tag == "button" and self._button_depth:
             has_text = self._button_has_text.pop()
             attrs = self._button_attrs.pop()
@@ -197,7 +224,7 @@ def check_html(root: Path, path: Path, findings: list[Finding], allow_external: 
         add(findings, "error", "missing-title", relative, "Missing non-empty <title>")
     if "viewport" not in parser.meta_names:
         add(findings, "error", "missing-viewport", relative, "Missing viewport meta tag")
-    if not parser.icons:
+    if not any(href.strip() for href in parser.icons):
         add(findings, "error", "missing-favicon", relative, "No favicon declaration found")
     is_picker_shell = 'role="tablist"' in text.lower() and '<iframe' in text.lower()
     if parser.h1_count != 1 and not is_picker_shell:
@@ -206,7 +233,9 @@ def check_html(root: Path, path: Path, findings: list[Finding], allow_external: 
     for image in parser.images:
         if "alt" not in image:
             add(findings, "error", "missing-alt", relative, f"Image lacks alt attribute: {image.get('src', '(inline)')}")
-    for video in parser.videos:
+    for video, source_srcs in parser.videos:
+        if not video.get("src", "").strip() and not source_srcs:
+            add(findings, "error", "video-source", relative, "Video requires a non-empty src or child source src")
         if not video.get("poster"):
             add(findings, "warning", "video-poster", relative, f"Video lacks poster: {video.get('src', '(source child)')}")
         if "playsinline" not in video:
@@ -262,8 +291,9 @@ def check_html(root: Path, path: Path, findings: list[Finding], allow_external: 
             add(findings, "error", "missing-reference", relative, f"Missing {tag} {attr} target: {url}")
         if parsed.fragment and target.exists() and target.suffix.lower() in {".html", ".htm", ""}:
             target_text = target.read_text(encoding="utf-8", errors="ignore")
-            fragment = re.escape(unquote(parsed.fragment))
-            if not re.search(rf'\bid=["\']{fragment}["\']', target_text):
+            target_parser = DocumentParser()
+            target_parser.feed(target_text)
+            if unquote(parsed.fragment) not in target_parser.ids:
                 add(findings, "warning", "missing-fragment", relative, f"Fragment target not found: {url}")
 
     for css in parser.inline_css:
@@ -332,7 +362,7 @@ def main() -> int:
     if not (root / "index.html").is_file():
         add(findings, "error", "missing-index", ".", "index.html is not at site root")
 
-    html_files = sorted(root.rglob("*.html"))
+    html_files = sorted(path for path in root.rglob("*") if path.is_file() and path.suffix.lower() in {".html", ".htm"})
     if not html_files:
         add(findings, "error", "no-html", ".", "No HTML files found")
     for path in html_files:

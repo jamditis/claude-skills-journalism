@@ -73,7 +73,7 @@ def main() -> int:
         ]
         if args.strict:
             distinct_cmd.append("--strict")
-        steps.append(run_step("direction distinctness", distinct_cmd, qa / "distinctness.txt", required=args.strict))
+        steps.append(run_step("direction distinctness", distinct_cmd, qa / "distinctness.txt"))
 
         slop_cmd = [
             sys.executable,

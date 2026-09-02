@@ -119,6 +119,26 @@ def main() -> int:
                     if open_href != direction["file"]:
                         errors.append(f"Open-selected link is wrong for {key}: {open_href!r}")
 
+                    if index == 0:
+                        open_selected = page.locator("[data-open-selected]")
+                        open_selected.focus()
+                        page.keyboard.press("ArrowRight")
+                        selected_after_action = page.locator('[role="tab"][aria-selected="true"]').get_attribute("data-key")
+                        if selected_after_action != key:
+                            errors.append("ArrowRight on Open concept changed the selected direction")
+                        if not open_selected.evaluate("link => document.activeElement === link"):
+                            errors.append("ArrowRight on Open concept moved focus away from the action link")
+
+                        tab = page.locator(f'[role="tab"][data-key="{key}"]')
+                        tab.focus()
+                        page.keyboard.press("ArrowRight")
+                        expected_key = directions[(index + 1) % len(directions)]["key"]
+                        selected_after_tab = page.locator('[role="tab"][aria-selected="true"]').get_attribute("data-key")
+                        focused_key = page.locator(":focus").get_attribute("data-key")
+                        if selected_after_tab != expected_key or focused_key != expected_key:
+                            errors.append("ArrowRight on a direction tab did not select and focus the next direction")
+                        page.goto(f"{base}/index.html#{key}", wait_until="networkidle")
+
                     if size_name == "mobile":
                         asset_catalog = page.locator('a[href="design-assets.html"]')
                         open_selected = page.locator("[data-open-selected]")

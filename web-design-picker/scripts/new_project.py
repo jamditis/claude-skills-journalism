@@ -7,6 +7,8 @@ import html
 import json
 import shutil
 import sys
+import tempfile
+import uuid
 from itertools import combinations
 from pathlib import Path
 
@@ -151,25 +153,7 @@ def render_concept(template: str, project_name: str, direction: dict) -> str:
     return template
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("project_dir", type=Path)
-    parser.add_argument("--name", required=True, help="Organization or project name")
-    parser.add_argument("--slug", help="Output slug; generated from name by default")
-    parser.add_argument("--directions", type=int, default=3, choices=range(2, 6))
-    parser.add_argument("--force", action="store_true", help="Replace an existing project directory")
-    args = parser.parse_args()
-
-    root = args.project_dir.resolve()
-    if root.exists() and any(root.iterdir()) and not args.force:
-        print(f"error: {root} is not empty; use --force to replace it", file=sys.stderr)
-        return 1
-    try:
-        slug = validate_slug(args.slug) if args.slug else slugify(args.name)
-    except ValueError as exc:
-        print(f"error: {exc}", file=sys.stderr)
-        return 1
-
+def scaffold_project(root: Path, args: argparse.Namespace, slug: str) -> None:
     ensure_clean_dir(root)
     directions = []
     for index, seed in enumerate(DIRECTION_SEEDS[: args.directions]):
@@ -350,6 +334,55 @@ Cloudflare Drop receives `deliverables/{slug}-cloudflare-drop.zip`.
 """,
     )
     write_text(root / "design-package/notes/README.md", "# Asset notes\n\nRecord source, creator, license, modifications, trademark constraints, and intended use for every third-party or generated asset.\n")
+
+def replace_project(staged: Path, destination: Path) -> None:
+    backup = None
+    try:
+        if destination.exists():
+            backup = destination.with_name(f".{destination.name}.backup-{uuid.uuid4().hex}")
+            destination.replace(backup)
+        staged.replace(destination)
+    except OSError:
+        if backup and backup.exists():
+            backup.replace(destination)
+        raise
+    if backup and backup.exists():
+        shutil.rmtree(backup)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("project_dir", type=Path)
+    parser.add_argument("--name", required=True, help="Organization or project name")
+    parser.add_argument("--slug", help="Output slug; generated from name by default")
+    parser.add_argument("--directions", type=int, default=3, choices=range(2, 6))
+    parser.add_argument("--force", action="store_true", help="Replace an existing project directory")
+    args = parser.parse_args(argv)
+
+    root = args.project_dir.resolve()
+    if root.exists() and not root.is_dir():
+        print(f"error: {root} is not a directory", file=sys.stderr)
+        return 1
+    if root.exists() and any(root.iterdir()) and not args.force:
+        print(f"error: {root} is not empty; use --force to replace it", file=sys.stderr)
+        return 1
+    try:
+        slug = validate_slug(args.slug) if args.slug else slugify(args.name)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    root.parent.mkdir(parents=True, exist_ok=True)
+    staged = Path(tempfile.mkdtemp(prefix=f".{root.name}.staging-", dir=root.parent))
+    try:
+        scaffold_project(staged, args, slug)
+        replace_project(staged, root)
+    except Exception as exc:
+        print(f"error: could not create {root}: {exc}", file=sys.stderr)
+        return 1
+    finally:
+        if staged.exists():
+            shutil.rmtree(staged)
 
     print(f"Created {root}")
     print("Next: complete the evidence and direction briefs, replace the starter concepts, register assets, and score distinctness.")

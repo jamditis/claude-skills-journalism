@@ -211,11 +211,13 @@
       }
     });
     document.addEventListener('keydown', event => {
-      const activeIndex = Math.max(0, tabs.findIndex(tab => tab.getAttribute('aria-selected') === 'true'));
       if (event.key === 'Escape') {
         document.body.classList.remove('presentation');
         return;
       }
+      const sourceTab = event.target.closest?.('[role="tab"]');
+      if (!sourceTab || !tabs.includes(sourceTab)) return;
+      const activeIndex = Math.max(0, tabs.findIndex(tab => tab.getAttribute('aria-selected') === 'true'));
       let targetIndex = null;
       if (event.key === 'ArrowRight') targetIndex = (activeIndex + 1) % tabs.length;
       if (event.key === 'ArrowLeft') targetIndex = (activeIndex - 1 + tabs.length) % tabs.length;

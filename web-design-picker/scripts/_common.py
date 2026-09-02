@@ -19,6 +19,15 @@ ALREADY_COMPRESSED = {
     ".mp3", ".mp4", ".pdf", ".png", ".webm", ".webp", ".zip",
 }
 SLUG_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+SECRET_SUFFIXES = {".key", ".pem", ".p12", ".pfx", ".pkcs12", ".jks", ".keystore"}
+SSH_PRIVATE_KEY_NAMES = {
+    "id_rsa", "id_dsa", "id_ecdsa", "id_ecdsa_sk", "id_ed25519",
+    "id_ed25519_sk", "id_xmss", "identity", "private_key", "privatekey",
+}
+PRIVATE_KEY_MARKERS = (
+    b"-----BEGIN PRIVATE KEY-----", b"-----BEGIN OPENSSH PRIVATE KEY-----",
+    b"-----BEGIN RSA PRIVATE KEY-----", b"-----BEGIN EC PRIVATE KEY-----",
+)
 
 
 def slugify(value: str) -> str:
@@ -117,6 +126,20 @@ def _zip_order(path: Path, root: Path) -> tuple[int, str]:
     return (0 if relative == "index.html" else 1, relative)
 
 
+def archive_secrets(source_files: Iterable[Path]) -> list[Path]:
+    secrets = []
+    for path in source_files:
+        name = path.name.lower()
+        if name == ".env" or name.startswith(".env.") or name in SSH_PRIVATE_KEY_NAMES or path.suffix.lower() in SECRET_SUFFIXES:
+            secrets.append(path)
+            continue
+        with path.open("rb") as handle:
+            sample = handle.read(4096)
+        if any(marker in sample for marker in PRIVATE_KEY_MARKERS):
+            secrets.append(path)
+    return secrets
+
+
 def deterministic_zip(
     source_dir: Path,
     output_zip: Path,
@@ -137,6 +160,9 @@ def deterministic_zip(
     source_maps = [path.relative_to(source_dir).as_posix() for path in source_files if path.suffix.lower() == ".map"]
     if source_maps:
         raise ValueError(f"Source map files are not allowed in delivery archives: {', '.join(source_maps)}")
+    secrets = [path.relative_to(source_dir).as_posix() for path in archive_secrets(source_files)]
+    if secrets:
+        raise ValueError(f"Secret files are not allowed in delivery archives: {', '.join(secrets)}")
 
     files = [
         path for path in source_files
