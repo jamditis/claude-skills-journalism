@@ -23,6 +23,8 @@ def run(command: list[str]) -> None:
 
 
 def check_path_helpers() -> None:
+    if relative_web_path("concepts\\example.html") != "concepts/example.html":
+        raise RuntimeError("Relative static paths must normalize to forward slashes")
     if relative_from_page("assets/brand/example/favicon.svg", "concepts/example.html") != "../assets/brand/example/favicon.svg":
         raise RuntimeError("Relative browser paths must use forward slashes")
     for unsafe in ("/absolute.html", "C:\\absolute.html", "../outside.html", "folder/../outside.html"):

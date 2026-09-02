@@ -169,12 +169,13 @@ def build_frames(directions: list[dict[str, Any]], default_key: str) -> str:
     rows = []
     for index, direction in enumerate(directions):
         key = esc(direction["key"])
+        source = esc(relative_web_path(str(direction["file"])))
         active = direction["key"] == default_key
         loading = "" if active or index == 0 else ' loading="lazy"'
         rows.append(
             f'<iframe id="frame-{key}" class="concept-frame" role="tabpanel" '
             f'aria-labelledby="tab-{key}" data-key="{key}" data-active="{str(active).lower()}" '
-            f'aria-hidden="{str(not active).lower()}" src="{esc(direction["file"])}" '
+            f'aria-hidden="{str(not active).lower()}" src="{source}" '
             f'title="{esc(direction["label"])} website direction"{loading}></iframe>'
         )
     return "\n    ".join(rows)
@@ -411,10 +412,15 @@ def main() -> int:
             "REVIEW_SUBTITLE": esc(project.get("review_subtitle", "Website direction review")),
             "TABS": build_tabs(directions, default_key),
             "FRAMES": build_frames(directions, default_key),
-            "DEFAULT_STANDALONE": esc(default_direction["file"]),
+            "DEFAULT_STANDALONE": esc(relative_web_path(str(default_direction["file"]))),
             "DEFAULT_ANNOUNCEMENT": esc(f'{default_direction["label"]} direction selected.'),
             "DIRECTIONS_JSON": json.dumps([
-                {"key": direction["key"], "label": direction["label"], "file": direction["file"], "accent": direction.get("accent", active_color)}
+                {
+                    "key": direction["key"],
+                    "label": direction["label"],
+                    "file": relative_web_path(str(direction["file"])),
+                    "accent": direction.get("accent", active_color),
+                }
                 for direction in directions
             ], ensure_ascii=False).replace("</", "<\\/"),
             "DEFAULT_KEY_JSON": json.dumps(default_key),

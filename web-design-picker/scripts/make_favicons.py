@@ -16,7 +16,7 @@ class FaviconError(RuntimeError):
 
 
 def render_svg(source: Path, render_width: int, render_height: int | None = None) -> bytes:
-    """Render SVG bytes with resvg, then fall back to a working CairoSVG install."""
+    """Render SVG bytes with resvg, or use CairoSVG when resvg is unavailable."""
     render_height = render_height or render_width
     executable_name = "resvg.exe" if sys.platform == "win32" else "resvg"
     resvg = shutil.which("resvg")
