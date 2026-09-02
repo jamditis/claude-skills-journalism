@@ -120,9 +120,8 @@
     @media (max-width: 620px) {
       :root { --review-bar-height: 122px; }
       .identity strong { font-size: 11px; }
-      .actions { grid-template-columns: 1fr; width: 104px; }
-      .actions a { display: none; }
-      .actions button { border-right: 0; }
+      .actions { grid-template-columns: repeat(3, minmax(0, 1fr)); width: 198px; }
+      .actions a, .actions button { padding: 0 4px; font-size: 11px; line-height: 1.1; letter-spacing: .035em; }
       .tab { padding-inline: 5px; text-align: center; }
       .tab b { font-size: 12px; }
     }
@@ -142,8 +141,8 @@
       __TABS__
     </nav>
     <div class="actions">
-      <a href="design-assets.html">Assets</a>
-      <a href="__DEFAULT_STANDALONE__" data-open-selected>Open selected</a>
+      <a href="design-assets.html">Asset catalog</a>
+      <a href="__DEFAULT_STANDALONE__" data-open-selected>Open concept</a>
       <button type="button" data-presentation>Full-screen view</button>
     </div>
   </header>

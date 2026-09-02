@@ -50,6 +50,7 @@ python scripts/web_design_picker.py validate PROJECT_DIR --strict
 python scripts/web_design_picker.py preview PROJECT_DIR --test-downloads
 python scripts/web_design_picker.py package PROJECT_DIR
 python scripts/web_design_picker.py run PROJECT_DIR --strict --test-downloads
+python scripts/web_design_picker.py run PROJECT_DIR --allow-external  # permit intentional external http(s) references
 ```
 
 The `preview` command requires Playwright and a Chromium environment permitted to open a local HTTP server. Static validation and packaging do not require browser automation.

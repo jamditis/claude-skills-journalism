@@ -57,6 +57,7 @@ def main(argv: list[str] | None = None) -> int:
     run_parser.add_argument("--skip-browser", action="store_true")
     run_parser.add_argument("--test-downloads", action="store_true")
     run_parser.add_argument("--strict", action="store_true")
+    run_parser.add_argument("--allow-external", action="store_true", help="Permit external http(s) references during static validation")
     run_parser.add_argument("--fail-on-slop", action="store_true")
     run_parser.add_argument("--skip-package-validation", action="store_true")
 
@@ -139,6 +140,7 @@ def main(argv: list[str] | None = None) -> int:
             (args.skip_browser, "--skip-browser"),
             (args.test_downloads, "--test-downloads"),
             (args.strict, "--strict"),
+            (args.allow_external, "--allow-external"),
             (args.fail_on_slop, "--fail-on-slop"),
             (args.skip_package_validation, "--skip-package-validation"),
         ):

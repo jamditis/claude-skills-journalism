@@ -119,6 +119,28 @@ def main() -> int:
                     if open_href != direction["file"]:
                         errors.append(f"Open-selected link is wrong for {key}: {open_href!r}")
 
+                    if size_name == "mobile":
+                        asset_catalog = page.locator('a[href="design-assets.html"]')
+                        open_selected = page.locator("[data-open-selected]")
+                        if not asset_catalog.is_visible():
+                            errors.append("Asset catalog control is hidden at mobile size")
+                        if not open_selected.is_visible():
+                            errors.append("Open concept control is hidden at mobile size")
+                        if index == 0:
+                            try:
+                                asset_catalog.click()
+                                page.wait_for_url(f"{base}/design-assets.html", timeout=5_000)
+                            except PlaywrightTimeoutError:
+                                errors.append("Asset catalog control did not open at mobile size")
+                            page.goto(f"{base}/index.html#{key}", wait_until="networkidle")
+                            try:
+                                page.locator("[data-open-selected]").click()
+                                page.wait_for_url(f"{base}/{direction['file']}", timeout=5_000)
+                            except PlaywrightTimeoutError:
+                                errors.append("Open concept control did not open at mobile size")
+                            finally:
+                                page.goto(f"{base}/index.html#{key}", wait_until="networkidle")
+
                     if index == 0:
                         page.locator("[data-presentation]").click()
                         page.wait_for_timeout(100)

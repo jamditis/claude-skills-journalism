@@ -211,6 +211,8 @@ def check_html(root: Path, path: Path, findings: list[Finding], allow_external: 
             add(findings, "warning", "video-poster", relative, f"Video lacks poster: {video.get('src', '(source child)')}")
         if "playsinline" not in video:
             add(findings, "warning", "video-playsinline", relative, "Video lacks playsinline")
+        if "autoplay" in video and "muted" not in video:
+            add(findings, "error", "video-autoplay-muted", relative, "Autoplay video must include muted")
     for iframe in parser.iframes:
         if not iframe.get("title"):
             add(findings, "error", "iframe-title", relative, f"Iframe lacks title: {iframe.get('src', '(unknown)')}")
@@ -219,8 +221,19 @@ def check_html(root: Path, path: Path, findings: list[Finding], allow_external: 
         control_type = attrs.get("type", "").lower()
         if control_type in {"hidden", "submit", "button", "reset", "image"}:
             continue
+        labelled_by_ids = attrs.get("aria-labelledby", "").split()
+        valid_labelled_by = False
+        if "aria-labelledby" in attrs:
+            if not labelled_by_ids:
+                add(findings, "error", "aria-labelledby", relative, f"{tag} has an empty aria-labelledby attribute")
+            else:
+                missing_ids = [label_id for label_id in labelled_by_ids if label_id not in parser.ids]
+                if missing_ids:
+                    add(findings, "error", "aria-labelledby", relative, f"{tag} references missing aria-labelledby ID(s): {', '.join(missing_ids)}")
+                else:
+                    valid_labelled_by = True
         control_id = attrs.get("id")
-        labelled = bool(attrs.get("aria-label") or attrs.get("aria-labelledby") or (control_id and control_id in parser.labels_for))
+        labelled = bool(attrs.get("aria-label") or valid_labelled_by or (control_id and control_id in parser.labels_for))
         if not labelled:
             add(findings, "error", "form-label", relative, f"Unlabelled {tag}: id={control_id or '(none)'} name={attrs.get('name', '(none)')}")
     if parser.buttons_without_label:

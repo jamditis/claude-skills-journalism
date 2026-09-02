@@ -31,6 +31,12 @@ def remove_archives(root: Path) -> list[str]:
     return removed
 
 
+def remove_validation_reports(qa: Path, slug: str) -> None:
+    for package in (f"{slug}-cloudflare-drop", f"{slug}-review-site"):
+        for suffix in (".json", ".txt"):
+            (qa / f"{package}-validation{suffix}").unlink(missing_ok=True)
+
+
 def inspect_zip(zip_path: Path, *, require_root_index: bool, max_file_bytes: int | None = None) -> dict[str, Any]:
     with zipfile.ZipFile(zip_path) as archive:
         bad = archive.testzip()
@@ -110,6 +116,7 @@ def main() -> int:
     qa = root / "qa"
     qa.mkdir(parents=True, exist_ok=True)
     slug = project["slug"]
+    remove_validation_reports(qa, slug)
     results: dict[str, Any] = {"project": project["name"], "slug": slug, "generated_at": utc_now(), "packages": {}}
 
     try:
@@ -151,6 +158,10 @@ def main() -> int:
             write_checksum(review_zip)
             results["packages"]["review_site"] = review_result
 
+            if not args.skip_validation:
+                results["packages"]["cloudflare_drop"]["validation"] = validate_extracted(drop_zip, root, cloudflare=True)
+                results["packages"]["review_site"]["validation"] = validate_extracted(review_zip, root, cloudflare=False)
+
             design_zip = deliverables / f"{slug}-design-assets.zip"
             design_result = deterministic_zip(design_stage, design_zip, include_root=True, exclude_names=EXCLUDE_NAMES, allow_zip64=False)
             design_result["inspection"] = inspect_zip(design_zip, require_root_index=False)
@@ -188,10 +199,6 @@ The asset catalog builds family and all-assets ZIPs in the browser from static f
             handoff_result["inspection"] = inspect_zip(handoff_zip, require_root_index=False)
             write_checksum(handoff_zip)
             results["packages"]["full_handoff"] = handoff_result
-
-            if not args.skip_validation:
-                results["packages"]["cloudflare_drop"]["validation"] = validate_extracted(drop_zip, root, cloudflare=True)
-                results["packages"]["review_site"]["validation"] = validate_extracted(review_zip, root, cloudflare=False)
 
     except Exception as exc:
         print(f"error: {exc}", file=sys.stderr)

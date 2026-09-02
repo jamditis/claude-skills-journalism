@@ -158,6 +158,29 @@ def validate_directions(directions: list[dict[str, Any]]) -> None:
         files.add(file)
 
 
+def validate_asset_directions(assets: dict[str, Any], directions: list[dict[str, Any]]) -> None:
+    configured_keys = [str(direction["key"]) for direction in directions]
+    asset_directions = assets.get("directions")
+    if not isinstance(asset_directions, list):
+        raise ValueError("assets.json must contain a directions array")
+
+    asset_keys = []
+    for item in asset_directions:
+        if not isinstance(item, dict) or not isinstance(item.get("key"), str) or not item["key"]:
+            raise ValueError("Every assets.json direction requires a non-empty string key")
+        asset_keys.append(item["key"])
+
+    duplicates = sorted({key for key in asset_keys if asset_keys.count(key) > 1})
+    unknown = sorted(set(asset_keys) - set(configured_keys))
+    missing = sorted(set(configured_keys) - set(asset_keys))
+    if duplicates:
+        raise ValueError(f"assets.json direction keys must be unique; duplicate: {', '.join(duplicates)}")
+    if unknown:
+        raise ValueError(f"assets.json contains unknown direction key(s): {', '.join(unknown)}")
+    if missing:
+        raise ValueError(f"assets.json omits configured direction key(s): {', '.join(missing)}")
+
+
 def build_tabs(directions: list[dict[str, Any]], default_key: str) -> str:
     rows = []
     for direction in directions:
@@ -194,6 +217,17 @@ def relative_from_page(target: str, page: str) -> str:
     return posixpath.relpath(target, start=start)
 
 
+def has_favicon_link(text: str, relation: str, href: str) -> bool:
+    for match in re.finditer(r"<link\b[^>]*>", text, re.I):
+        attributes: dict[str, str] = {}
+        for attribute in re.finditer(r"\b(rel|href)\s*=\s*(?:\"([^\"]*)\"|'([^']*)'|([^\s>]+))", match.group(), re.I):
+            value = next((part for part in attribute.group(2, 3, 4) if part is not None), "")
+            attributes[attribute.group(1).lower()] = html.unescape(value)
+        if relation in attributes.get("rel", "").lower().split() and attributes.get("href") == href:
+            return True
+    return False
+
+
 def ensure_direction_metadata(dist: Path, direction: dict[str, Any]) -> None:
     page_rel = relative_web_path(str(direction["file"]))
     page = dist / page_rel
@@ -208,12 +242,15 @@ def ensure_direction_metadata(dist: Path, direction: dict[str, Any]) -> None:
         additions.append('<meta name="viewport" content="width=device-width, initial-scale=1">')
     if "name=\"robots\"" not in lower and "name='robots'" not in lower:
         additions.append('<meta name="robots" content="noindex,nofollow">')
-    if not re.search(r"<link\b[^>]*rel=[\"'][^\"']*icon", text, re.I):
-        additions.extend([
-            f'<link rel="icon" href="{esc(relative_from_page(favicon_base + "/favicon.svg", page_rel))}" type="image/svg+xml">',
-            f'<link rel="icon" href="{esc(relative_from_page(favicon_base + "/favicon.ico", page_rel))}" sizes="any">',
-            f'<link rel="apple-touch-icon" href="{esc(relative_from_page(favicon_base + "/favicon-180.png", page_rel))}">',
-        ])
+    favicon_links = [
+        ("icon", relative_from_page(favicon_base + "/favicon.svg", page_rel), 'type="image/svg+xml"'),
+        ("icon", relative_from_page(favicon_base + "/favicon.ico", page_rel), 'sizes="any"'),
+        ("apple-touch-icon", relative_from_page(favicon_base + "/favicon-180.png", page_rel), ""),
+    ]
+    for relation, href, attributes in favicon_links:
+        if not has_favicon_link(text, relation, href):
+            suffix = f" {attributes}" if attributes else ""
+            additions.append(f'<link rel="{relation}" href="{esc(href)}"{suffix}>')
     if additions:
         text = re.sub(r"</head\s*>", "  " + "\n  ".join(additions) + "\n</head>", text, count=1, flags=re.I)
         page.write_text(text, encoding="utf-8")
@@ -365,6 +402,7 @@ def main() -> int:
     project, directions, assets = load_project(root)
     try:
         validate_directions(directions)
+        validate_asset_directions(assets, directions)
     except ValueError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1

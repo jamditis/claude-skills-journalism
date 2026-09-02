@@ -11,9 +11,10 @@ import tempfile
 import zipfile
 from pathlib import Path
 
-from _common import copy_contents, read_json, relative_web_path, utc_now, validate_slug, write_json
-from build_picker import relative_from_page
+from _common import copy_contents, deterministic_zip, read_json, relative_web_path, utc_now, validate_slug, write_json
+from build_picker import ensure_direction_metadata, relative_from_page
 from package_delivery import copy_tree
+from validate_site import check_html
 
 
 def run(command: list[str]) -> None:
@@ -68,6 +69,68 @@ def check_symlink_guards(parent: Path) -> None:
                 raise RuntimeError(f"{name} staging created output before rejecting a symlink")
 
 
+def check_source_map_guard(parent: Path) -> None:
+    """Delivery archives must reject nested source maps before writing output."""
+    with tempfile.TemporaryDirectory(prefix="web-design-picker-source-map-", dir=parent) as temporary:
+        root = Path(temporary)
+        source = root / "source" / "nested"
+        source.mkdir(parents=True)
+        (source / "app.MAP").write_text("source map fixture\n", encoding="utf-8")
+        output = root / "delivery.zip"
+        try:
+            deterministic_zip(root / "source", output)
+        except ValueError as exc:
+            if "Source map files" not in str(exc):
+                raise RuntimeError("Source map guard raised an unexpected error") from exc
+        else:
+            raise RuntimeError("Source map was accepted into a delivery archive")
+        if output.exists():
+            raise RuntimeError("Source map guard wrote a delivery archive")
+
+
+def check_favicon_metadata_variants(parent: Path) -> None:
+    """Every required favicon variant must survive one-off authored icons."""
+    with tempfile.TemporaryDirectory(prefix="web-design-picker-favicon-", dir=parent) as temporary:
+        root = Path(temporary)
+        page = root / "concepts" / "first.html"
+        page.parent.mkdir(parents=True)
+        page.write_text(
+            '<!doctype html><html><head><link rel="icon" href="authored-icon.svg"></head><body></body></html>',
+            encoding="utf-8",
+        )
+        direction = {"key": "first", "file": "concepts/first.html"}
+        ensure_direction_metadata(root, direction)
+        ensure_direction_metadata(root, direction)
+        rendered = page.read_text(encoding="utf-8")
+        expected = (
+            "../assets/brand/first/favicon.svg",
+            "../assets/brand/first/favicon.ico",
+            "../assets/brand/first/favicon-180.png",
+        )
+        if any(rendered.count(href) != 1 for href in expected):
+            raise RuntimeError("Required favicon variants were missing or duplicated")
+        if rendered.count("authored-icon.svg") != 1:
+            raise RuntimeError("Authored favicon link was unexpectedly changed")
+
+
+def check_aria_labelledby_controls(parent: Path) -> None:
+    """Skipped controls must not be checked for labels or label references."""
+    with tempfile.TemporaryDirectory(prefix="web-design-picker-aria-", dir=parent) as temporary:
+        root = Path(temporary)
+        page = root / "index.html"
+        page.write_text(
+            '<!doctype html><html lang="en"><head><title>Fixture</title><meta name="viewport" content="width=device-width"><link rel="icon" href="data:,x"></head><body><h1>Fixture</h1><input type="hidden" aria-labelledby="missing-hidden"><input aria-labelledby="missing-visible"></body></html>',
+            encoding="utf-8",
+        )
+        findings = []
+        check_html(root, page, findings, allow_external=False)
+        labelled_by = [finding for finding in findings if finding.code == "aria-labelledby"]
+        if len(labelled_by) != 1 or "missing-visible" not in labelled_by[0].message:
+            raise RuntimeError("aria-labelledby validation did not reject the visible control correctly")
+        if any("missing-hidden" in finding.message for finding in findings):
+            raise RuntimeError("Hidden control was checked for aria-labelledby")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--work-dir", type=Path, help="Keep the generated test project at this location")
@@ -89,6 +152,9 @@ def main() -> int:
     try:
         project.parent.mkdir(parents=True, exist_ok=True)
         check_symlink_guards(project.parent)
+        check_source_map_guard(project.parent)
+        check_favicon_metadata_variants(project.parent)
+        check_aria_labelledby_controls(project.parent)
         with tempfile.TemporaryDirectory(prefix="web-design-picker-slug-guard-", dir=project.parent) as guard_dir:
             slug_guard = Path(guard_dir)
             marker = slug_guard / "keep.txt"

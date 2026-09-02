@@ -9,10 +9,44 @@ from itertools import combinations
 from pathlib import Path
 
 from _common import read_json, utc_now, write_json
+from new_project import DISTINCTNESS_DIMENSIONS
+
+MINIMUM_TARGET = 15
 
 
 def valid_score(value: object) -> bool:
     return type(value) is int and value in (0, 1, 2)
+
+
+def rubric_errors(dimensions: object, target: object) -> list[str]:
+    errors = []
+    if not isinstance(dimensions, list):
+        errors.append("dimensions must be a JSON array")
+    else:
+        if not all(isinstance(dimension, str) for dimension in dimensions):
+            errors.append("dimensions must contain only strings")
+        duplicates = []
+        seen = set()
+        for dimension in dimensions:
+            if isinstance(dimension, str) and dimension in seen and dimension not in duplicates:
+                duplicates.append(dimension)
+            if isinstance(dimension, str):
+                seen.add(dimension)
+        missing = [dimension for dimension in DISTINCTNESS_DIMENSIONS if dimension not in dimensions]
+        unknown = [dimension for dimension in dimensions if dimension not in DISTINCTNESS_DIMENSIONS]
+        if duplicates:
+            errors.append(f"dimensions contain duplicates: {', '.join(str(dimension) for dimension in duplicates)}")
+        if missing:
+            errors.append(f"dimensions omit required rubric entries: {', '.join(missing)}")
+        if unknown:
+            errors.append(f"dimensions contain unknown rubric entries: {', '.join(str(dimension) for dimension in unknown)}")
+        if dimensions != DISTINCTNESS_DIMENSIONS:
+            errors.append("dimensions must exactly match the canonical 11-item rubric")
+    if type(target) is not int:
+        errors.append("target must be an integer")
+    elif target < MINIMUM_TARGET:
+        errors.append(f"target must be at least {MINIMUM_TARGET}")
+    return errors
 
 
 def main() -> int:
@@ -46,9 +80,17 @@ def main() -> int:
         print("ERROR: directions.json direction keys must be unique strings")
         return 1
 
-    dimensions = data.get("dimensions") or []
+    dimensions = data.get("dimensions")
     pairs = data.get("pairs") or []
-    target = int(data.get("target", 15))
+    target = data.get("target", MINIMUM_TARGET)
+    errors = rubric_errors(dimensions, target)
+    if errors:
+        report_path = args.report_json or (root / "qa/distinctness.json")
+        write_json(report_path, {"generated_at": utc_now(), "target": target, "dimensions": dimensions, "complete": False, "passed": False, "errors": errors, "pairs": []})
+        for error in errors:
+            print(f"ERROR: {error}")
+        return 1
+
     findings = []
     complete = True
     passed = True

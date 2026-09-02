@@ -133,14 +133,19 @@ def deterministic_zip(
     package that silently exceeds conservative static-host limits fails loudly.
     """
     source_dir = source_dir.resolve()
-    output_zip.parent.mkdir(parents=True, exist_ok=True)
-    output_zip.unlink(missing_ok=True)
+    source_files = list(iter_files(source_dir, exclude_names=exclude_names))
+    source_maps = [path.relative_to(source_dir).as_posix() for path in source_files if path.suffix.lower() == ".map"]
+    if source_maps:
+        raise ValueError(f"Source map files are not allowed in delivery archives: {', '.join(source_maps)}")
 
     files = [
-        path for path in iter_files(source_dir, exclude_names=exclude_names)
+        path for path in source_files
         if not (exclude_suffixes and path.name.lower().endswith(exclude_suffixes))
     ]
     files.sort(key=lambda path: _zip_order(path, source_dir))
+
+    output_zip.parent.mkdir(parents=True, exist_ok=True)
+    output_zip.unlink(missing_ok=True)
 
     with zipfile.ZipFile(output_zip, "w", allowZip64=allow_zip64) as archive:
         for path in files:

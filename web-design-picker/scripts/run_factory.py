@@ -33,6 +33,7 @@ def main() -> int:
     parser.add_argument("--skip-browser", action="store_true", help="Skip Playwright screenshots and interaction tests")
     parser.add_argument("--test-downloads", action="store_true", help="Generate family and all-assets ZIPs in the browser during QA")
     parser.add_argument("--strict", action="store_true", help="Require completed distinctness scores and fail on static warnings")
+    parser.add_argument("--allow-external", action="store_true", help="Permit external http(s) references during static validation")
     parser.add_argument("--fail-on-slop", action="store_true", help="Treat heuristic anti-slop findings as a build failure")
     parser.add_argument("--skip-package-validation", action="store_true")
     args = parser.parse_args()
@@ -59,6 +60,8 @@ def main() -> int:
         ]
         if args.strict:
             static_cmd.append("--strict")
+        if args.allow_external:
+            static_cmd.append("--allow-external")
         steps.append(run_step("static validation", static_cmd, qa / "static-validation.txt"))
 
         distinct_cmd = [
