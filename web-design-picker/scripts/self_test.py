@@ -60,27 +60,28 @@ def main() -> int:
         project = Path(temporary.name) / "project"
 
     try:
-        slug_guard = project.parent / "slug-guard"
-        slug_guard.mkdir(parents=True)
-        marker = slug_guard / "keep.txt"
-        marker.write_text("keep\n", encoding="utf-8")
-        invalid_slug = subprocess.run(
-            [
-                sys.executable,
-                str(scripts / "new_project.py"),
-                str(slug_guard),
-                "--name",
-                "Invalid slug guard",
-                "--slug",
-                "../outside",
-                "--force",
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-        )
-        if invalid_slug.returncode == 0 or not marker.is_file():
-            raise RuntimeError("Invalid slug validation modified the target project")
+        project.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="web-design-picker-slug-guard-", dir=project.parent) as guard_dir:
+            slug_guard = Path(guard_dir)
+            marker = slug_guard / "keep.txt"
+            marker.write_text("keep\n", encoding="utf-8")
+            invalid_slug = subprocess.run(
+                [
+                    sys.executable,
+                    str(scripts / "new_project.py"),
+                    str(slug_guard),
+                    "--name",
+                    "Invalid slug guard",
+                    "--slug",
+                    "../outside",
+                    "--force",
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            if invalid_slug.returncode == 0 or not marker.is_file():
+                raise RuntimeError("Invalid slug validation modified the target project")
 
         run([sys.executable, str(scripts / "new_project.py"), str(project), "--name", "Factory self-test", "--directions", "3"])
 
