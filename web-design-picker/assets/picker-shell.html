@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="__LANG__">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="__THEME_COLOR__">
+  <meta name="robots" content="__ROBOTS__">
+  <title>__PAGE_TITLE__</title>
+  <meta name="description" content="__PAGE_DESCRIPTION__">
+  <link rel="icon" href="__FAVICON_SVG__" type="image/svg+xml">
+  <link rel="icon" href="__FAVICON_ICO__" sizes="any">
+  <link rel="apple-touch-icon" href="__TOUCH_ICON__">
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    :root {
+      --review-bar-height: 78px;
+      --shell-bg: #111315;
+      --shell-panel: #252a2d;
+      --shell-hover: #1b1f21;
+      --shell-line: #4b5053;
+      --shell-text: #ffffff;
+      --shell-muted: #b8bec1;
+      --active: __ACTIVE_COLOR__;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; overflow: hidden; background: var(--shell-bg); font-family: Arial, Helvetica, sans-serif; }
+    button, a { font: inherit; }
+    :focus-visible { outline: 3px solid #66d6ff; outline-offset: -3px; }
+    .review-bar {
+      position: relative;
+      z-index: 10;
+      height: var(--review-bar-height);
+      display: grid;
+      grid-template-columns: minmax(220px, .85fr) minmax(500px, 1.75fr) minmax(300px, .9fr);
+      color: var(--shell-text);
+      background: var(--shell-bg);
+      border-bottom: 1px solid var(--shell-line);
+    }
+    .identity {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 20px;
+      border-right: 1px solid var(--shell-line);
+    }
+    .identity img, .identity svg { width: 38px; height: 38px; object-fit: contain; flex: 0 0 auto; }
+    .identity-copy { min-width: 0; }
+    .identity strong { display: block; font-size: 13px; line-height: 1.1; letter-spacing: .07em; text-transform: uppercase; }
+    .identity span { display: block; margin-top: 5px; color: var(--shell-muted); font: 12px/1.2 "Courier New", monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tabs { display: grid; grid-template-columns: repeat(__DIRECTION_COUNT__, minmax(0, 1fr)); }
+    .tab {
+      border: 0;
+      border-right: 1px solid var(--shell-line);
+      background: transparent;
+      color: var(--shell-muted);
+      padding: 10px 16px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .tab:last-child { border-right: 0; }
+    .tab:hover { color: var(--shell-text); background: var(--shell-hover); }
+    .tab[aria-selected="true"] { color: var(--shell-text); background: var(--shell-panel); box-shadow: inset 0 -5px 0 var(--active); }
+    .tab b { display: block; font-size: 15px; line-height: 1.2; }
+    .tab span { display: block; margin-top: 5px; color: inherit; font: 11px/1.2 "Courier New", monospace; }
+    .actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-left: 1px solid var(--shell-line); }
+    .actions a, .actions button {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-right: 1px solid var(--shell-line);
+      background: transparent;
+      color: var(--shell-text);
+      text-decoration: none;
+      text-align: center;
+      padding: 0 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .actions > :last-child { border-right: 0; }
+    .actions a:hover, .actions button:hover { background: var(--shell-panel); }
+    .stage { position: relative; height: calc(100dvh - var(--review-bar-height)); background: #222; }
+    .concept-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; visibility: hidden; }
+    .concept-frame[data-active="true"] { visibility: visible; }
+    .restore {
+      display: none;
+      position: fixed;
+      z-index: 20;
+      top: 12px;
+      right: 12px;
+      border: 1px solid #fff;
+      background: var(--shell-bg);
+      color: #fff;
+      padding: 11px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    body.presentation .review-bar { display: none; }
+    body.presentation .stage { height: 100dvh; }
+    body.presentation .restore { display: block; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+    @media (max-width: 1060px) {
+      :root { --review-bar-height: 114px; }
+      .review-bar { grid-template-columns: 1fr auto; grid-template-rows: 49px 65px; }
+      .identity { grid-column: 1; grid-row: 1; border-right: 0; padding: 0 14px; }
+      .identity img, .identity svg { width: 30px; height: 30px; }
+      .identity span { display: none; }
+      .actions { grid-column: 2; grid-row: 1; }
+      .tabs { grid-column: 1 / -1; grid-row: 2; border-top: 1px solid var(--shell-line); }
+      .tab { padding: 8px 12px; }
+      .tab span { display: none; }
+    }
+    @media (max-width: 620px) {
+      :root { --review-bar-height: 122px; }
+      .identity strong { font-size: 11px; }
+      .actions { grid-template-columns: repeat(3, minmax(0, 1fr)); width: 198px; }
+      .actions a, .actions button { padding: 0 4px; font-size: 11px; line-height: 1.1; letter-spacing: .035em; }
+      .tab { padding-inline: 5px; text-align: center; }
+      .tab b { font-size: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <header class="review-bar" aria-label="Design review controls">
+    <div class="identity">
+      __IDENTITY_MARK__
+      <div class="identity-copy">
+        <strong>__PROJECT_NAME__</strong>
+        <span>__REVIEW_SUBTITLE__</span>
+      </div>
+    </div>
+    <nav class="tabs" aria-label="Choose a website direction" role="tablist">
+      __TABS__
+    </nav>
+    <div class="actions">
+      <a href="design-assets.html">Asset catalog</a>
+      <a href="__DEFAULT_STANDALONE__" data-open-selected>Open concept</a>
+      <button type="button" data-presentation>Full-screen view</button>
+    </div>
+  </header>
+  <main class="stage">
+    __FRAMES__
+  </main>
+  <button class="restore" type="button" data-restore>Show design controls</button>
+  <p class="sr-only" aria-live="polite" data-live>__DEFAULT_ANNOUNCEMENT__</p>
+  <script>
+    const directions = __DIRECTIONS_JSON__;
+    const tabs = [...document.querySelectorAll('[role="tab"]')];
+    const frames = [...document.querySelectorAll('.concept-frame')];
+    const live = document.querySelector('[data-live]');
+    const openSelected = document.querySelector('[data-open-selected]');
+    const defaultKey = __DEFAULT_KEY_JSON__;
+
+    function directionFor(key) {
+      return directions.find(direction => direction.key === key) || directions.find(direction => direction.key === defaultKey) || directions[0];
+    }
+
+    function setDesign(requestedKey, updateHash = true, focusTab = false) {
+      const direction = directionFor(requestedKey);
+      if (!direction) return;
+      const key = direction.key;
+      tabs.forEach(tab => {
+        const active = tab.dataset.key === key;
+        tab.setAttribute('aria-selected', String(active));
+        tab.tabIndex = active ? 0 : -1;
+        if (active && focusTab) tab.focus();
+      });
+      frames.forEach(frame => {
+        const active = frame.dataset.key === key;
+        frame.dataset.active = String(active);
+        frame.setAttribute('aria-hidden', String(!active));
+        try {
+          frame.contentDocument?.querySelectorAll('video').forEach(video => {
+            if (active && video.muted && video.autoplay) video.play().catch(() => {});
+            if (!active) video.pause();
+          });
+        } catch (_) {}
+      });
+      if (live) live.textContent = `${direction.label} direction selected.`;
+      if (openSelected) openSelected.href = direction.file;
+      if (updateHash && location.hash !== `#${key}`) history.replaceState(null, '', `#${key}`);
+      document.documentElement.style.setProperty('--active', direction.accent || '__ACTIVE_COLOR__');
+    }
+
+    tabs.forEach(tab => tab.addEventListener('click', () => setDesign(tab.dataset.key)));
+    frames.forEach(frame => frame.addEventListener('load', () => {
+      if (frame.dataset.active !== 'true') {
+        try { frame.contentDocument.querySelectorAll('video').forEach(video => video.pause()); } catch (_) {}
+      }
+    }));
+
+    document.querySelector('[data-presentation]').addEventListener('click', async () => {
+      document.body.classList.add('presentation');
+      try { await document.documentElement.requestFullscreen?.(); } catch (_) {}
+    });
+    document.querySelector('[data-restore]').addEventListener('click', async () => {
+      document.body.classList.remove('presentation');
+      try { if (document.fullscreenElement) await document.exitFullscreen(); } catch (_) {}
+    });
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement && document.body.classList.contains('presentation')) {
+        document.body.classList.remove('presentation');
+      }
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        document.body.classList.remove('presentation');
+        return;
+      }
+      const sourceTab = event.target.closest?.('[role="tab"]');
+      if (!sourceTab || !tabs.includes(sourceTab)) return;
+      const activeIndex = Math.max(0, tabs.findIndex(tab => tab.getAttribute('aria-selected') === 'true'));
+      let targetIndex = null;
+      if (event.key === 'ArrowRight') targetIndex = (activeIndex + 1) % tabs.length;
+      if (event.key === 'ArrowLeft') targetIndex = (activeIndex - 1 + tabs.length) % tabs.length;
+      if (event.key === 'Home') targetIndex = 0;
+      if (event.key === 'End') targetIndex = tabs.length - 1;
+      if (/^[1-9]$/.test(event.key)) targetIndex = Number(event.key) - 1;
+      if (targetIndex !== null && tabs[targetIndex]) {
+        event.preventDefault();
+        setDesign(tabs[targetIndex].dataset.key, true, true);
+      }
+    });
+    window.addEventListener('hashchange', () => setDesign(location.hash.slice(1), false));
+    setDesign(location.hash.slice(1) || defaultKey, false);
+  </script>
+</body>
+</html>

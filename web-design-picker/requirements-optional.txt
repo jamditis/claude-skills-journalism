@@ -1,0 +1,4 @@
+Pillow>=10
+playwright>=1.45
+PyYAML>=6
+resvg-cli>=0.44

@@ -1,6 +1,6 @@
 {
   "name": "claude-skills-journalism",
-  "version": "2.7.3",
+  "version": "2.8.0",
   "description": "Agent skills and Claude Code plugins for journalism, research, and media organizations",
   "owner": {
     "name": "Joe Amditis",
@@ -127,6 +127,17 @@
       },
       "source": "./video-toolkit",
       "category": "Journalism"
+    },
+    {
+      "name": "web-design-picker",
+      "description": "Build distinct website directions, a client review picker, asset catalog, previews, and Cloudflare-ready handoff packages.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Joe Amditis",
+        "email": "jamditis@gmail.com"
+      },
+      "source": "./web-design-picker",
+      "category": "Design"
     },
     {
       "name": "visual-explainer",

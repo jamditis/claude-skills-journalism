@@ -47,6 +47,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
     'security-toolkit',
     'superjawn',
     'video-toolkit',
+    'web-design-picker',
     'visual-explainer',
   ]);
   assert.match(matrix, /`pdf-playground` \| 1\.3\.2/u);
@@ -89,7 +90,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
     .split('\n')
     .filter((line) => /^\| `[^`]+` \|/u.test(line))
     .map((line) => line.split('|')[5].trim());
-  assert.equal(evidenceCells.length, 12);
+  assert.equal(evidenceCells.length, 13);
   for (const evidence of evidenceCells) {
     assert.match(evidence, /\[[^\]]+\]\(#[^)]+\)/u);
   }
@@ -246,7 +247,7 @@ test('video-toolkit evidence stays limited to the tested preflight', () => {
     matrix,
     /Observed manual Codex preflight; durable harness and media execution pending/u,
   );
-  assert.match(matrix, /Last evidence update: August 28, 2026/u);
+  assert.match(matrix, /Last evidence update: September 1, 2026/u);
   assert.match(matrix, /Codex video-toolkit preflight \| 0\.149\.1/u);
   assert.match(
     matrix,

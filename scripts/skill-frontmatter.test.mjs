@@ -123,7 +123,7 @@ test('published package versions stay aligned with the marketplace', () => {
   const marketplace = JSON.parse(
     readFileSync(join(ROOT, '.claude-plugin', 'marketplace.json'), 'utf8'),
   );
-  assert.equal(marketplace.version, '2.7.3', 'marketplace version');
+  assert.equal(marketplace.version, '2.8.0', 'marketplace version');
   const expected = new Map([
     ['autocontext', '1.1.2'],
     ['dev-toolkit', '1.4.0'],
@@ -136,6 +136,7 @@ test('published package versions stay aligned with the marketplace', () => {
     ['security-toolkit', '1.2.3'],
     ['superjawn', '1.1.0'],
     ['video-toolkit', '1.0.6'],
+    ['web-design-picker', '1.0.0'],
     ['visual-explainer', '0.7.4'],
   ]);
 

@@ -1,0 +1,9 @@
+{
+  "name": "web-design-picker",
+  "description": "Build distinct website directions, a client review picker, asset catalog, previews, and Cloudflare-ready handoff packages.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Joe Amditis",
+    "email": "jamditis@gmail.com"
+  }
+}
