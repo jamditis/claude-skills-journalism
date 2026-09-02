@@ -11,7 +11,7 @@ metadata:
 
 # Web design picker
 
-Build a complete website-concept review package rather than isolated mockups. The default deliverable is three materially different, responsive website directions; a review shell that switches among them without losing the presentation context; a full-screen presentation mode; a searchable asset catalog with per-format, per-family, and download-all controls; and two clean release archives.
+Build a complete website-concept review package rather than isolated mockups. The default deliverable is three materially different, responsive website directions; a review shell that switches among them without losing the presentation context; a full-screen presentation mode; a searchable asset catalog with per-format, per-family, and download-all controls; two primary release archives; and supporting review, source, and full-handoff archives.
 
 When invoked for an actual website project, perform the work. Do not stop at a strategy document unless the user asks only for strategy.
 
@@ -171,7 +171,7 @@ python scripts/web_design_picker.py preview PROJECT_DIR --test-downloads
 
 Treat missing files, missing root `index.html`, broken local references, missing favicons, unlabeled controls, unsafe archive paths, nested archives, and oversized deployment assets as release blockers. Treat heuristic slop findings as design-review prompts, not automatic proof of a defect.
 
-### 9. Package two archives
+### 9. Package the release and handoff archives
 
 Run:
 
@@ -183,6 +183,9 @@ Produce:
 
 - `PROJECT_SLUG-cloudflare-drop.zip`: only deployable static files, with `index.html` at the archive root and no enclosing folder or nested ZIP.
 - `PROJECT_SLUG-design-assets.zip`: the full editable/raster asset handoff, manifest, tokens, notes, and source derivatives.
+- `PROJECT_SLUG-review-site.zip`: the review site with its downloadable assets.
+- `PROJECT_SLUG-source-project.zip`: the editable source project and configuration.
+- `PROJECT_SLUG-website-design-handoff.zip`: the full review, source, QA, and delivery bundle.
 
 Follow [the QA and Cloudflare Drop checklist](references/qa-and-cloudflare-drop.md). Never tell the user a site has been deployed when only a ZIP was created.
 

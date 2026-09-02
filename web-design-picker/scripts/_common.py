@@ -18,6 +18,7 @@ ALREADY_COMPRESSED = {
     ".7z", ".avif", ".gif", ".gz", ".ico", ".jpeg", ".jpg", ".mov",
     ".mp3", ".mp4", ".pdf", ".png", ".webm", ".webp", ".zip",
 }
+SLUG_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
 def slugify(value: str) -> str:
@@ -25,6 +26,12 @@ def slugify(value: str) -> str:
     value = re.sub(r"[^a-z0-9]+", "-", value)
     value = re.sub(r"-+", "-", value).strip("-")
     return value or "website-project"
+
+
+def validate_slug(value: str) -> str:
+    if not isinstance(value, str) or not SLUG_PATTERN.fullmatch(value):
+        raise ValueError("Slug must contain lowercase letters, numbers, and single hyphens only")
+    return value
 
 
 def read_json(path: Path) -> Any:
@@ -183,6 +190,10 @@ def load_project(project_root: Path) -> tuple[dict[str, Any], list[dict[str, Any
     assets = read_json(config / "assets.json")
     if not isinstance(project, dict):
         raise SystemExit("project.json must contain a JSON object")
+    try:
+        validate_slug(project.get("slug"))
+    except ValueError as exc:
+        raise SystemExit(f"project.json has an invalid slug: {exc}") from exc
     if not isinstance(directions, list) or not 2 <= len(directions) <= 5:
         raise SystemExit("directions.json must contain two to five directions")
     if not isinstance(assets, dict):

@@ -442,6 +442,12 @@ def main() -> int:
         download_action = ""
         all_script = BROWSER_ZIP_JS
 
+    try:
+        asset_sections = build_asset_sections(assets, directions)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
     asset_template = (SKILL_ROOT / "assets/asset-page.html").read_text(encoding="utf-8")
     asset_page = replace_tokens(
         asset_template,
@@ -457,7 +463,7 @@ def main() -> int:
             "DOWNLOAD_ALL_ACTION": download_action,
             "DOWNLOAD_ALL_SCRIPT": all_script,
             "LIBRARY_NOTE": esc(project.get("library_note", "Review licensing and production requirements before public use.")),
-            "ASSET_SECTIONS": build_asset_sections(assets, directions),
+            "ASSET_SECTIONS": asset_sections,
             "YEAR": str(datetime.now().year),
         },
     )

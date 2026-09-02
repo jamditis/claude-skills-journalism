@@ -17,7 +17,6 @@ class FaviconError(RuntimeError):
 
 def render_svg(source: Path, render_width: int, render_height: int | None = None) -> bytes:
     """Render SVG bytes with resvg, or use CairoSVG when resvg is unavailable."""
-    render_height = render_height or render_width
     executable_name = "resvg.exe" if sys.platform == "win32" else "resvg"
     resvg = shutil.which("resvg")
     if not resvg:
@@ -28,16 +27,11 @@ def render_svg(source: Path, render_width: int, render_height: int | None = None
     if resvg:
         with tempfile.TemporaryDirectory(prefix="web-design-picker-svg-") as temporary:
             output = Path(temporary) / "rendered.png"
+            command = [resvg, str(source), str(output), "--width", str(render_width)]
+            if render_height is not None:
+                command.extend(["--height", str(render_height)])
             result = subprocess.run(
-                [
-                    resvg,
-                    str(source),
-                    str(output),
-                    "--width",
-                    str(render_width),
-                    "--height",
-                    str(render_height),
-                ],
+                command,
                 capture_output=True,
                 text=True,
             )
@@ -49,11 +43,10 @@ def render_svg(source: Path, render_width: int, render_height: int | None = None
     try:
         import cairosvg
 
-        return cairosvg.svg2png(
-            url=str(source),
-            output_width=render_width,
-            output_height=render_height,
-        )
+        options = {"url": str(source), "output_width": render_width}
+        if render_height is not None:
+            options["output_height"] = render_height
+        return cairosvg.svg2png(**options)
     except (ImportError, OSError) as exc:
         raise FaviconError(
             "SVG input requires resvg-cli, or CairoSVG with its native Cairo library: "
@@ -67,7 +60,7 @@ def load_image(source: Path, render_size: int):
     except ImportError as exc:
         raise FaviconError("Pillow is required: python -m pip install Pillow") from exc
     if source.suffix.lower() == ".svg":
-        png = render_svg(source, render_size)
+        png = render_svg(source, render_size, render_size)
         return Image.open(io.BytesIO(png)).convert("RGBA")
     return Image.open(source).convert("RGBA")
 

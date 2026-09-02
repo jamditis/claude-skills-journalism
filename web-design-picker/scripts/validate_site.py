@@ -304,7 +304,10 @@ def main() -> int:
             parsed = urlsplit(raw)
             if parsed.scheme or parsed.netloc or not parsed.path:
                 continue
-            target = root / parsed.path.lstrip("/")
+            target = (root / unquote(parsed.path).lstrip("/")).resolve()
+            if not is_within(target, root):
+                add(findings, "error", "manifest-path-escape", args.manifest, f"Manifest target leaves site root: {raw}")
+                continue
             if not target.exists():
                 add(findings, "error", "manifest-missing", args.manifest, f"Manifest target missing from site: {raw}")
 

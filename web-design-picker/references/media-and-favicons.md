@@ -79,4 +79,4 @@ Requirements:
 python scripts/make_favicons.py source-mark.svg PROJECT/src/assets/brand/direction-a --background transparent
 ```
 
-The script requires Pillow. SVG input also requires CairoSVG. Inspect 16 px and 32 px results manually; automated resizing cannot fix a mark that is too detailed.
+The script requires Pillow. SVG input also requires resvg-cli. Inspect 16 px and 32 px results manually; automated resizing cannot fix a mark that is too detailed.

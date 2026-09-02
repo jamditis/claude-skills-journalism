@@ -10,8 +10,8 @@ import sys
 from itertools import combinations
 from pathlib import Path
 
-from _common import SKILL_ROOT, ensure_clean_dir, slugify, write_json, write_text
-from make_favicons import generate_favicon_set
+from _common import SKILL_ROOT, ensure_clean_dir, slugify, validate_slug, write_json, write_text
+from make_favicons import FaviconError, generate_favicon_set, render_svg
 
 DIRECTION_SEEDS = [
     {
@@ -116,13 +116,12 @@ def palette_files(output_dir: Path, direction: dict) -> list[Path]:
     write_text(svg_path, svg)
     write_text(css_path, ":root {\n" + "\n".join(f"  --color-{name}: {value};" for name, value in colors.items()) + "\n}\n")
     write_json(json_path, {"color": colors})
+    png_path = output_dir / "palette.png"
     try:
-        import cairosvg
-        png_path = output_dir / "palette.png"
-        cairosvg.svg2png(bytestring=svg.encode("utf-8"), write_to=str(png_path))
-        return [svg_path, png_path, css_path, json_path]
-    except Exception:
+        png_path.write_bytes(render_svg(svg_path, swatch_w * len(colors), 280))
+    except FaviconError:
         return [svg_path, css_path, json_path]
+    return [svg_path, png_path, css_path, json_path]
 
 
 def favicon_file_entries(prefix: str) -> list[dict[str, str]]:
@@ -138,9 +137,9 @@ def favicon_file_entries(prefix: str) -> list[dict[str, str]]:
 
 def render_concept(template: str, project_name: str, direction: dict) -> str:
     replacements = {
-        "__PROJECT_NAME__": project_name,
-        "__DIRECTION_LABEL__": direction["label"],
-        "__DIRECTION_DESCRIPTION__": direction["description"],
+        "__PROJECT_NAME__": html.escape(project_name),
+        "__DIRECTION_LABEL__": html.escape(str(direction["label"])),
+        "__DIRECTION_DESCRIPTION__": html.escape(str(direction["description"])),
         "__DIRECTION_KEY__": direction["key"],
         "__BACKGROUND__": direction["background"],
         "__TEXT__": direction["text"],
@@ -167,7 +166,11 @@ def main() -> int:
         return 1
     ensure_clean_dir(root)
 
-    slug = args.slug or slugify(args.name)
+    try:
+        slug = validate_slug(args.slug) if args.slug else slugify(args.name)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
     directions = []
     for index, seed in enumerate(DIRECTION_SEEDS[: args.directions]):
         direction = dict(seed)

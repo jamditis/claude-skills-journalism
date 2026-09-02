@@ -11,7 +11,7 @@ import tempfile
 import zipfile
 from pathlib import Path
 
-from _common import read_json, relative_web_path, utc_now, write_json
+from _common import read_json, relative_web_path, utc_now, validate_slug, write_json
 from build_picker import relative_from_page
 
 
@@ -23,6 +23,12 @@ def run(command: list[str]) -> None:
 
 
 def check_path_helpers() -> None:
+    try:
+        validate_slug("../../outside")
+    except ValueError:
+        pass
+    else:
+        raise RuntimeError("Unsafe project slug was accepted")
     if relative_web_path("concepts\\example.html") != "concepts/example.html":
         raise RuntimeError("Relative static paths must normalize to forward slashes")
     if relative_from_page("assets/brand/example/favicon.svg", "concepts/example.html") != "../assets/brand/example/favicon.svg":

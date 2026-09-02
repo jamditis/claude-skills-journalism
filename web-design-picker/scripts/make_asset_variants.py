@@ -13,10 +13,7 @@ try:
 except ImportError as exc:  # pragma: no cover
     raise SystemExit("Pillow is required: pip install Pillow") from exc
 
-try:
-    import cairosvg
-except ImportError:
-    cairosvg = None
+from make_favicons import FaviconError, render_svg as render_svg_png
 
 
 def parse_sizes(value: str) -> list[int]:
@@ -33,9 +30,10 @@ def parse_sizes(value: str) -> list[int]:
 
 
 def render_svg(source: Path, long_edge: int) -> Image.Image:
-    if cairosvg is None:
-        raise SystemExit("CairoSVG is required for SVG input: pip install CairoSVG")
-    png = cairosvg.svg2png(url=str(source), output_width=long_edge)
+    try:
+        png = render_svg_png(source, long_edge)
+    except FaviconError as exc:
+        raise SystemExit(str(exc)) from exc
     return Image.open(io.BytesIO(png)).convert("RGBA")
 
 
