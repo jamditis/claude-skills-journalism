@@ -428,7 +428,13 @@ def main() -> int:
     )
     write_text(dist / "index.html", picker)
 
-    asset_manifest = flatten_asset_manifest(project, assets)
+    try:
+        asset_manifest = flatten_asset_manifest(project, assets)
+        asset_sections = build_asset_sections(assets, directions)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
     all_asset_paths = [item["path"] for item in asset_manifest["assets"]]
     bundle_name = project.get("asset_zip_name") or f'{project["slug"]}-all-design-assets.zip'
     if all_asset_paths:
@@ -441,12 +447,6 @@ def main() -> int:
     else:
         download_action = ""
         all_script = BROWSER_ZIP_JS
-
-    try:
-        asset_sections = build_asset_sections(assets, directions)
-    except ValueError as exc:
-        print(f"error: {exc}", file=sys.stderr)
-        return 1
 
     asset_template = (SKILL_ROOT / "assets/asset-page.html").read_text(encoding="utf-8")
     asset_page = replace_tokens(

@@ -164,13 +164,13 @@ def main() -> int:
     if root.exists() and any(root.iterdir()) and not args.force:
         print(f"error: {root} is not empty; use --force to replace it", file=sys.stderr)
         return 1
-    ensure_clean_dir(root)
-
     try:
         slug = validate_slug(args.slug) if args.slug else slugify(args.name)
     except ValueError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
+
+    ensure_clean_dir(root)
     directions = []
     for index, seed in enumerate(DIRECTION_SEEDS[: args.directions]):
         direction = dict(seed)
