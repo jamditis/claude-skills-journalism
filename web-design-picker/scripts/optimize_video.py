@@ -31,8 +31,31 @@ def duration_seconds(source: Path) -> float:
     return float(data["format"]["duration"])
 
 
-def scale_filter(width: int, fps: int) -> str:
-    return f"scale='min({width},iw)':-2:flags=lanczos,fps={fps}"
+def parse_crop(value: str) -> tuple[int, int, int, int]:
+    try:
+        x, y, width, height = (int(part) for part in value.split(":"))
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("Crop must use X:Y:W:H with integer values") from exc
+    if x < 0 or y < 0 or width <= 0 or height <= 0:
+        raise argparse.ArgumentTypeError("Crop X and Y must be non-negative; W and H must be positive")
+    return x, y, width, height
+
+
+def crop_filter(crop: tuple[int, int, int, int] | None) -> str | None:
+    if crop is None:
+        return None
+    x, y, width, height = crop
+    return f"crop={width}:{height}:{x}:{y}"
+
+
+def scale_filter(width: int, fps: int, crop: tuple[int, int, int, int] | None = None) -> str:
+    filters = [filter_value for filter_value in (crop_filter(crop), f"scale='min({width},iw)':-2:flags=lanczos", f"fps={fps}") if filter_value]
+    return ",".join(filters)
+
+
+def poster_filter(width: int, crop: tuple[int, int, int, int] | None = None) -> str:
+    filters = [filter_value for filter_value in (crop_filter(crop), f"scale='min({width},iw)':-2:flags=lanczos") if filter_value]
+    return ",".join(filters)
 
 
 def poster_times(duration: float, supplied: list[float] | None) -> list[float]:
@@ -53,6 +76,7 @@ def main() -> int:
     parser.add_argument("--mp4-crf", type=int, default=24)
     parser.add_argument("--webm-crf", type=int, default=34)
     parser.add_argument("--keep-audio", action="store_true")
+    parser.add_argument("--crop", type=parse_crop, metavar="X:Y:W:H", help="Crop before scaling video, poster, and GIF derivatives")
     parser.add_argument("--poster-times", type=float, nargs="*")
     parser.add_argument("--gif", action="store_true", help="Create a short GIF fallback")
     parser.add_argument("--gif-start", type=float, default=0.0)
@@ -71,7 +95,7 @@ def main() -> int:
     output_dir.mkdir(parents=True, exist_ok=True)
     stem = args.name or source.stem
     audio = [] if args.keep_audio else ["-an"]
-    vf = scale_filter(args.width, args.fps)
+    vf = scale_filter(args.width, args.fps, args.crop)
 
     mp4 = output_dir / f"{stem}.mp4"
     webm = output_dir / f"{stem}.webm"
@@ -96,12 +120,12 @@ def main() -> int:
             webp = output_dir / f"{stem}-poster-{label}.webp"
             run([
                 "ffmpeg", "-y", "-ss", f"{timestamp:.3f}", "-i", str(source),
-                "-frames:v", "1", "-vf", f"scale='min({args.width},iw)':-2:flags=lanczos",
+                "-frames:v", "1", "-vf", poster_filter(args.width, args.crop),
                 "-q:v", "3", str(jpg),
             ])
             run([
                 "ffmpeg", "-y", "-ss", f"{timestamp:.3f}", "-i", str(source),
-                "-frames:v", "1", "-vf", f"scale='min({args.width},iw)':-2:flags=lanczos",
+                "-frames:v", "1", "-vf", poster_filter(args.width, args.crop),
                 "-quality", "82", str(webp),
             ])
             poster_outputs.extend([jpg, webp])
@@ -110,7 +134,7 @@ def main() -> int:
         if args.gif:
             gif = output_dir / f"{stem}-loop.gif"
             palette = output_dir / f".{stem}-palette.png"
-            gif_vf = f"fps=12,scale='min({args.gif_width},iw)':-2:flags=lanczos"
+            gif_vf = scale_filter(args.gif_width, 12, args.crop)
             run([
                 "ffmpeg", "-y", "-ss", str(args.gif_start), "-t", str(args.gif_duration),
                 "-i", str(source), "-vf", f"{gif_vf},palettegen=max_colors=128", str(palette),

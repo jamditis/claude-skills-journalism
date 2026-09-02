@@ -20,10 +20,12 @@ from _common import (
     copy_contents,
     ensure_clean_dir,
     load_project,
+    reject_symlinks,
     relative_web_path,
     replace_tokens,
     slugify,
     utc_now,
+    validate_slug,
     write_json,
     write_text,
 )
@@ -138,10 +140,15 @@ def validate_directions(directions: list[dict[str, Any]]) -> None:
     keys: set[str] = set()
     files: set[str] = set()
     for direction in directions:
+        if not isinstance(direction, dict):
+            raise ValueError("Every direction must be a JSON object")
         for field in ("key", "label", "file"):
             if not direction.get(field):
                 raise ValueError(f"Every direction requires {field!r}")
-        key = str(direction["key"])
+        try:
+            key = validate_slug(direction["key"])
+        except ValueError as exc:
+            raise ValueError(f"Invalid direction key {direction['key']!r}: {exc}") from exc
         file = relative_web_path(str(direction["file"]))
         if key in keys:
             raise ValueError(f"Duplicate direction key: {key}")
@@ -343,6 +350,7 @@ def flatten_asset_manifest(project: dict[str, Any], assets: dict[str, Any]) -> d
 
 def copy_review_favicon_to_root(dist: Path) -> None:
     source = dist / "assets/brand/review/favicon.ico"
+    reject_symlinks(source)
     if source.exists():
         shutil.copy2(source, dist / "favicon.ico")
 
@@ -478,13 +486,14 @@ def main() -> int:
         "browser_asset_zip": bundle_name,
     })
 
-    webmanifest_template = (SKILL_ROOT / "assets/manifest.webmanifest").read_text(encoding="utf-8")
-    webmanifest = replace_tokens(webmanifest_template, {
-        "PROJECT_NAME": project["name"],
-        "SHORT_NAME": project.get("short_name") or project["name"][:24],
-        "THEME_COLOR": project.get("theme_color", "#111315"),
+    webmanifest = json.loads((SKILL_ROOT / "assets/manifest.webmanifest").read_text(encoding="utf-8"))
+    project_name = str(project["name"])
+    webmanifest.update({
+        "name": f"{project_name} design review",
+        "short_name": str(project.get("short_name") or project_name[:24]),
+        "theme_color": str(project.get("theme_color", "#111315")),
     })
-    write_text(dist / "manifest.webmanifest", webmanifest)
+    write_json(dist / "manifest.webmanifest", webmanifest)
     shutil.copy2(SKILL_ROOT / "assets/robots.txt", dist / "robots.txt")
     copy_review_favicon_to_root(dist)
 

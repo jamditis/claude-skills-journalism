@@ -1,10 +1,10 @@
 {
-  "name": "__PROJECT_NAME__ design review",
-  "short_name": "__SHORT_NAME__",
+  "name": "Website design review",
+  "short_name": "Website",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#111315",
-  "theme_color": "__THEME_COLOR__",
+  "theme_color": "#111315",
   "icons": [
     {"src": "assets/brand/review/favicon-192.png", "sizes": "192x192", "type": "image/png"},
     {"src": "assets/brand/review/favicon-512.png", "sizes": "512x512", "type": "image/png"}

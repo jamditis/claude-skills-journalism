@@ -68,6 +68,7 @@ def format_bytes(size: int) -> str:
 
 
 def copy_contents(source: Path, destination: Path, *, overwrite: bool = True) -> None:
+    reject_symlinks(source)
     if not source.exists():
         return
     destination.mkdir(parents=True, exist_ok=True)
@@ -78,6 +79,21 @@ def copy_contents(source: Path, destination: Path, *, overwrite: bool = True) ->
         elif overwrite or not target.exists():
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(item, target)
+
+
+def reject_symlinks(root: Path, *, exclude_names: set[str] | None = None) -> None:
+    """Fail before copying a tree that could follow an external link."""
+    exclude_names = exclude_names or set()
+    if root.is_symlink():
+        raise ValueError(f"Symlinks are not allowed in delivery packages: {root}")
+    if not root.exists():
+        return
+    for path in root.rglob("*"):
+        relative = path.relative_to(root)
+        if any(part in exclude_names for part in relative.parts):
+            continue
+        if path.is_symlink():
+            raise ValueError(f"Symlinks are not allowed in delivery packages: {path}")
 
 
 def safe_archive_path(relative_path: Path) -> str:

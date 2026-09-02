@@ -11,8 +11,9 @@ import tempfile
 import zipfile
 from pathlib import Path
 
-from _common import read_json, relative_web_path, utc_now, validate_slug, write_json
+from _common import copy_contents, read_json, relative_web_path, utc_now, validate_slug, write_json
 from build_picker import relative_from_page
+from package_delivery import copy_tree
 
 
 def run(command: list[str]) -> None:
@@ -41,6 +42,32 @@ def check_path_helpers() -> None:
         raise RuntimeError(f"Unsafe static path was accepted: {unsafe}")
 
 
+def check_symlink_guards(parent: Path) -> None:
+    """Delivery staging must reject links before copying external content."""
+    with tempfile.TemporaryDirectory(prefix="web-design-picker-symlink-", dir=parent) as temporary:
+        root = Path(temporary)
+        source = root / "source"
+        source.mkdir()
+        external = root / "outside.txt"
+        external.write_text("outside\n", encoding="utf-8")
+        link = source / "external.txt"
+        try:
+            link.symlink_to(external)
+        except OSError as exc:
+            raise RuntimeError("Could not create the symlink security fixture") from exc
+
+        for copy, name in ((copy_contents, "contents"), (copy_tree, "tree")):
+            destination = root / f"{name}-stage"
+            try:
+                copy(source, destination)
+            except ValueError:
+                pass
+            else:
+                raise RuntimeError(f"Symlinked source was copied by {name} staging")
+            if destination.exists():
+                raise RuntimeError(f"{name} staging created output before rejecting a symlink")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--work-dir", type=Path, help="Keep the generated test project at this location")
@@ -61,6 +88,7 @@ def main() -> int:
 
     try:
         project.parent.mkdir(parents=True, exist_ok=True)
+        check_symlink_guards(project.parent)
         with tempfile.TemporaryDirectory(prefix="web-design-picker-slug-guard-", dir=project.parent) as guard_dir:
             slug_guard = Path(guard_dir)
             marker = slug_guard / "keep.txt"
@@ -137,6 +165,12 @@ def main() -> int:
                 raise RuntimeError("Drop ZIP has a CRC error")
             if any(Path(name).suffix.lower() == ".zip" for name in names):
                 raise RuntimeError("Drop ZIP contains a nested ZIP")
+
+        design_zip = project / "deliverables/factory-self-test-design-assets.zip"
+        with zipfile.ZipFile(design_zip) as archive:
+            manifest_name = "factory-self-test-design-assets/asset-manifest.json"
+            if manifest_name not in archive.namelist():
+                raise RuntimeError("Design-assets ZIP omits the generated asset manifest")
 
         report = {
             "generated_at": utc_now(),

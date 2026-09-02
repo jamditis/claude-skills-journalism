@@ -11,12 +11,13 @@ import zipfile
 from pathlib import Path
 from typing import Any
 
-from _common import deterministic_zip, format_bytes, load_project, utc_now, write_checksum, write_json, write_text
+from _common import deterministic_zip, format_bytes, load_project, reject_symlinks, utc_now, write_checksum, write_json, write_text
 
 EXCLUDE_NAMES = {".DS_Store", "Thumbs.db", "__pycache__", ".git", "node_modules"}
 
 
 def copy_tree(source: Path, destination: Path) -> None:
+    reject_symlinks(source, exclude_names=EXCLUDE_NAMES)
     if source.exists():
         shutil.copytree(source, destination, dirs_exist_ok=True, ignore=shutil.ignore_patterns(*EXCLUDE_NAMES))
 
@@ -83,6 +84,7 @@ def stage_source(root: Path, destination: Path) -> None:
     for name in ["BRIEF.md", "CLAIM-LEDGER.md", "DIRECTION-BRIEFS.md", "README.md"]:
         source = root / name
         if source.exists():
+            reject_symlinks(source)
             destination.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, destination / name)
 
@@ -122,6 +124,11 @@ def main() -> int:
             copy_tree(dist, drop_stage)
             copy_tree(dist, review_stage)
             copy_tree(root / "design-package", design_stage)
+            asset_manifest = dist / "asset-manifest.json"
+            if not asset_manifest.is_file():
+                raise RuntimeError("Build output is missing asset-manifest.json")
+            design_stage.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(asset_manifest, design_stage / asset_manifest.name)
             stage_source(root, source_stage)
 
             removed = remove_archives(drop_stage)

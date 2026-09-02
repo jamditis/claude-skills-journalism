@@ -26,6 +26,10 @@ REFERENCE_ATTRS = {
     "object": ["data"],
 }
 IGNORE_SCHEMES = {"http", "https", "mailto", "tel", "data", "javascript", "blob"}
+CSS_URL_RE = re.compile(
+    r"url\(\s*(?:\"(?P<double>[^\"]*)\"|'(?P<single>[^']*)'|(?P<bare>[^)\s'\"]+))\s*\)",
+    re.I,
+)
 
 
 @dataclass
@@ -59,6 +63,7 @@ class DocumentParser(HTMLParser):
         self._button_depth = 0
         self._button_has_text: list[bool] = []
         self._button_attrs: list[dict[str, str]] = []
+        self.invalid_button_types: list[str] = []
 
     def handle_starttag(self, tag: str, attrs_list: list[tuple[str, str | None]]) -> None:
         attrs = {key.lower(): (value or "") for key, value in attrs_list}
@@ -89,9 +94,14 @@ class DocumentParser(HTMLParser):
             self.ids.add(attrs["id"])
         if tag == "style":
             self._in_style = True
+        if attrs.get("style"):
+            self.inline_css.append(attrs["style"])
         if tag == "a" and attrs.get("href", "").lower().startswith("mailto:"):
             self.mailto_links.append(attrs["href"])
         if tag == "button":
+            button_type = attrs.get("type", "").lower()
+            if button_type not in {"button", "submit", "reset"}:
+                self.invalid_button_types.append(button_type)
             self._button_depth += 1
             self._button_has_text.append(False)
             self._button_attrs.append(attrs)
@@ -154,6 +164,23 @@ def is_within(path: Path, root: Path) -> bool:
         return False
 
 
+def check_css_urls(root: Path, source: Path, css: str, findings: list[Finding]) -> None:
+    relative = source.relative_to(root)
+    for match in CSS_URL_RE.finditer(css):
+        url = next((value for value in match.group("double", "single", "bare") if value is not None), "").strip()
+        parsed = urlsplit(url)
+        if not url or parsed.scheme.lower() in IGNORE_SCHEMES or parsed.netloc or not parsed.path:
+            continue
+        target = resolve_local(root, source, url)
+        if target is None:
+            continue
+        if not is_within(target, root):
+            add(findings, "error", "css-path-escape", relative, f"CSS URL leaves site root: {url}")
+            continue
+        if not target.exists():
+            add(findings, "error", "css-missing-reference", relative, f"Missing CSS URL target: {url}")
+
+
 def check_html(root: Path, path: Path, findings: list[Finding], allow_external: bool) -> None:
     text = path.read_text(encoding="utf-8", errors="replace")
     parser = DocumentParser()
@@ -198,6 +225,9 @@ def check_html(root: Path, path: Path, findings: list[Finding], allow_external: 
             add(findings, "error", "form-label", relative, f"Unlabelled {tag}: id={control_id or '(none)'} name={attrs.get('name', '(none)')}")
     if parser.buttons_without_label:
         add(findings, "error", "button-label", relative, f"{parser.buttons_without_label} button(s) have no accessible name")
+    for button_type in parser.invalid_button_types:
+        detail = "missing type" if not button_type else f"invalid type: {button_type}"
+        add(findings, "error", "button-type", relative, f"Button has {detail}; use button, submit, or reset")
     if parser.mailto_links:
         add(findings, "warning", "mailto-cta", relative, "mailto link present; do not present it as a submitted intake workflow")
 
@@ -223,12 +253,17 @@ def check_html(root: Path, path: Path, findings: list[Finding], allow_external: 
             if not re.search(rf'\bid=["\']{fragment}["\']', target_text):
                 add(findings, "warning", "missing-fragment", relative, f"Fragment target not found: {url}")
 
+    for css in parser.inline_css:
+        check_css_urls(root, path, css, findings)
+
     external_css = ""
     for tag, attr, url in parser.references:
         if tag == "link" and attr == "href" and urlsplit(url).path.lower().endswith(".css"):
             target = resolve_local(root, path, url)
             if target and target.exists() and is_within(target, root):
-                external_css += "\n" + target.read_text(encoding="utf-8", errors="ignore")
+                css = target.read_text(encoding="utf-8", errors="ignore")
+                check_css_urls(root, target, css, findings)
+                external_css += "\n" + css
     combined = (text + "\n" + external_css).lower()
 
     slop_checks = [

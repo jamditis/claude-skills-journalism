@@ -85,7 +85,12 @@ def main() -> int:
                 launch_args["executable_path"] = executable
             browser = playwright.chromium.launch(**launch_args)
 
-            for size_name, width, height in (("desktop", 1440, 1000), ("mobile", 390, 844)):
+            for size_name, width, height in (
+                ("desktop", 1440, 1000),
+                ("laptop", 1280, 800),
+                ("tablet", 768, 1024),
+                ("mobile", 390, 844),
+            ):
                 context = browser.new_context(viewport={"width": width, "height": height}, accept_downloads=True)
                 page = context.new_page()
                 page.on("console", record_console)
