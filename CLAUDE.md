@@ -171,7 +171,7 @@ claude-skills-journalism/
 │   ├── templates/              # Lesson and archive templates
 │   └── tests/
 │
-├── # Plugin: pdf-playground (8 commands, v1.3.5), registered in marketplace.json
+├── # Plugin: pdf-playground (8 commands, v1.3.6), registered in marketplace.json
 ├── pdf-playground/              # Interactive proposal/report/slide builder with live control panel
 │   ├── .claude-plugin/plugin.json
 │   ├── brands/                  # Brand presets

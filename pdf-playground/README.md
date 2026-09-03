@@ -4,6 +4,26 @@ A Claude Code plugin for creating professional, print-ready documents. Designed 
 
 Configure your organization's colors, fonts, and branding once, then generate on-brand documents every time.
 
+## Codex support
+
+Codex can use the shared `document-design` skill through the tested
+standards-based project path. From the project where you want to use it, run:
+
+```bash
+npx skills@latest add jamditis/claude-skills-journalism \
+  --skill document-design --agent codex --copy -y
+```
+
+Invoke it with `$document-design`. This route includes the skill's relative
+templates, brand examples, control assets, and CSS reference. The eight
+`/pdf-playground:*` commands and the SessionStart hook remain Claude Code-only;
+they are not part of the Codex support claim. For project branding in Codex,
+run this from the project root, then customize the copied file:
+
+```bash
+cp .agents/skills/document-design/brands/default.yaml pdf-playground.local.md
+```
+
 ## Before you start
 
 You need **Claude Code** installed and working on your computer. Claude Code is a command-line tool made by Anthropic, it runs inside your terminal (the black window where you type commands).

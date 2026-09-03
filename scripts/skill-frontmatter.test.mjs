@@ -130,7 +130,7 @@ test('published package versions stay aligned with the marketplace', () => {
     ['journalism-core', '1.5.0'],
     ['okf-wiki', '0.8.3'],
     ['pdf-design', '1.1.3'],
-    ['pdf-playground', '1.3.5'],
+    ['pdf-playground', '1.3.6'],
     ['project-templates-toolkit', '1.0.4'],
     ['research-toolkit', '1.1.3'],
     ['security-toolkit', '1.2.3'],

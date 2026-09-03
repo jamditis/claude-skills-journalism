@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[Newsletter Name]</title>
+    <style>
+        /* Email-safe CSS - uses tables for layout */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f5f4f2;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #2d2a28;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+
+        /* Reset table styles */
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        td {
+            padding: 0;
+        }
+
+        img {
+            border: 0;
+            display: block;
+        }
+
+        a {
+            color: #CA3553;
+            text-decoration: none;
+        }
+
+        /* Header */
+        .header {
+            background-color: #CA3553;
+            padding: 30px 40px;
+            text-align: center;
+        }
+
+        .header-logo {
+            font-family: Georgia, serif;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .header-tagline {
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Content sections */
+        .content {
+            padding: 30px 40px;
+        }
+
+        .section-title {
+            font-family: Georgia, serif;
+            font-size: 22px;
+            font-weight: bold;
+            color: #000000;
+            margin: 0 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #CA3553;
+        }
+
+        .article {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #e8e6e3;
+        }
+
+        .article:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .article-title {
+            font-family: Georgia, serif;
+            font-size: 18px;
+            font-weight: bold;
+            color: #000000;
+            margin: 0 0 8px 0;
+        }
+
+        .article-meta {
+            font-size: 12px;
+            color: #9a9590;
+            margin-bottom: 10px;
+        }
+
+        .article-excerpt {
+            font-size: 15px;
+            color: #5c5754;
+            margin: 0 0 10px 0;
+        }
+
+        .read-more {
+            font-size: 14px;
+            font-weight: bold;
+            color: #CA3553;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Featured article */
+        .featured {
+            background-color: #faf9f7;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .featured-label {
+            font-size: 11px;
+            font-weight: bold;
+            color: #CA3553;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        /* CTA Button */
+        .button {
+            display: inline-block;
+            background-color: #CA3553;
+            color: #ffffff !important;
+            padding: 12px 25px;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+
+        /* Events section */
+        .event {
+            display: table;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .event-date {
+            display: table-cell;
+            width: 60px;
+            vertical-align: top;
+            background-color: #CA3553;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .event-month {
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .event-day {
+            font-family: Georgia, serif;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .event-details {
+            display: table-cell;
+            vertical-align: top;
+            padding: 10px 15px;
+            background-color: #f5f4f2;
+        }
+
+        .event-title {
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 3px;
+        }
+
+        .event-info {
+            font-size: 13px;
+            color: #5c5754;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #000000;
+            color: #ffffff;
+            padding: 30px 40px;
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-family: Georgia, serif;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .footer-links {
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: #ffffff;
+            font-size: 13px;
+            margin: 0 10px;
+        }
+
+        .footer-address {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 15px;
+        }
+
+        .unsubscribe {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .unsubscribe a {
+            color: rgba(255,255,255,0.5);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <center>
+        <table role="presentation" class="email-container" width="600" cellpadding="0" cellspacing="0">
+            <!-- Header -->
+            <tr>
+                <td class="header">
+                    <div class="header-logo">Center for Cooperative Media</div>
+                    <div class="header-tagline">[Newsletter Name] • [Month Year]</div>
+                </td>
+            </tr>
+
+            <!-- Featured Article -->
+            <tr>
+                <td class="content">
+                    <div class="featured">
+                        <div class="featured-label">Featured</div>
+                        <h2 class="article-title">[Featured article headline in sentence case]</h2>
+                        <p class="article-excerpt">
+                            [Brief description or excerpt of the featured article. Keep it to 2-3 sentences that capture the key message.]
+                        </p>
+                        <a href="[article-url]" class="button">Read More</a>
+                    </div>
+                </td>
+            </tr>
+
+            <!-- News Section -->
+            <tr>
+                <td class="content">
+                    <h2 class="section-title">News</h2>
+
+                    <div class="article">
+                        <h3 class="article-title">[Article headline 1]</h3>
+                        <p class="article-meta">[Date] • [Category]</p>
+                        <p class="article-excerpt">
+                            [Brief excerpt or description of the article.]
+                        </p>
+                        <a href="[url]" class="read-more">Read More →</a>
+                    </div>
+
+                    <div class="article">
+                        <h3 class="article-title">[Article headline 2]</h3>
+                        <p class="article-meta">[Date] • [Category]</p>
+                        <p class="article-excerpt">
+                            [Brief excerpt or description of the article.]
+                        </p>
+                        <a href="[url]" class="read-more">Read More →</a>
+                    </div>
+
+                    <div class="article">
+                        <h3 class="article-title">[Article headline 3]</h3>
+                        <p class="article-meta">[Date] • [Category]</p>
+                        <p class="article-excerpt">
+                            [Brief excerpt or description of the article.]
+                        </p>
+                        <a href="[url]" class="read-more">Read More →</a>
+                    </div>
+                </td>
+            </tr>
+
+            <!-- Events Section -->
+            <tr>
+                <td class="content">
+                    <h2 class="section-title">Upcoming events</h2>
+
+                    <div class="event">
+                        <div class="event-date">
+                            <div class="event-month">[Mon]</div>
+                            <div class="event-day">[DD]</div>
+                        </div>
+                        <div class="event-details">
+                            <div class="event-title">[Event name]</div>
+                            <div class="event-info">[Time] • [Location/Virtual]</div>
+                        </div>
+                    </div>
+
+                    <div class="event">
+                        <div class="event-date">
+                            <div class="event-month">[Mon]</div>
+                            <div class="event-day">[DD]</div>
+                        </div>
+                        <div class="event-details">
+                            <div class="event-title">[Event name]</div>
+                            <div class="event-info">[Time] • [Location/Virtual]</div>
+                        </div>
+                    </div>
+
+                    <p style="text-align: center; margin-top: 20px;">
+                        <a href="[events-page-url]" class="button">View All Events</a>
+                    </p>
+                </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+                <td class="footer">
+                    <div class="footer-logo">Center for Cooperative Media</div>
+                    <div class="footer-links">
+                        <a href="https://centerforcooperativemedia.org">Website</a>
+                        <a href="https://twitter.com/CoopMedia">Twitter</a>
+                        <a href="https://linkedin.com/company/centerforcooperativemedia">LinkedIn</a>
+                    </div>
+                    <div class="footer-address">
+                        Montclair State University<br>
+                        College of Communication and Media<br>
+                        Montclair, NJ 07043
+                    </div>
+                    <div class="unsubscribe">
+                        <a href="[unsubscribe-url]">Unsubscribe</a> | <a href="[preferences-url]">Update Preferences</a>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </center>
+</body>
+</html>

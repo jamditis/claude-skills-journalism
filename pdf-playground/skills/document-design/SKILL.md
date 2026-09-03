@@ -9,11 +9,15 @@ Create professional, print-ready HTML documents that export to PDF with customiz
 
 ## Brand configuration
 
-Before creating documents, check for brand configuration in `.claude/pdf-playground.local.md`. If found, use those settings. If not, use sensible defaults or ask the user for their brand colors.
+Before creating documents, check for `pdf-playground.local.md` in the project
+root. If it is absent, check the legacy Claude Code path
+`.claude/pdf-playground.local.md`. If both exist, use only the project-root
+file. If neither exists, use sensible defaults or ask the user for their brand
+colors.
 
 ### Reading brand config
 
-Look for `.claude/pdf-playground.local.md` in the project root. Parse the YAML frontmatter:
+Parse the selected config file's YAML frontmatter:
 
 ```yaml
 ---
@@ -231,12 +235,15 @@ h1, h2, h3 {
 
 ## Document creation workflow
 
-1. **Check for brand config** in `.claude/pdf-playground.local.md`
-2. **Load template** from `${CLAUDE_PLUGIN_ROOT}/templates/`
-3. **Apply brand settings** to CSS variables and content
-4. **Customize content** based on user requirements
-5. **Save HTML file** in current working directory
-6. **Offer preview** with Playwright browser tools
+1. **Check for brand config** at project-root `pdf-playground.local.md`, then
+   the legacy `.claude/pdf-playground.local.md` fallback
+2. **Locate this installed `SKILL.md`** and resolve bundled resources from its
+   directory. Do not assume a plugin-root environment variable is available.
+3. **Load template** from the skill-relative `templates/` directory
+4. **Apply brand settings** to CSS variables and content
+5. **Customize content** based on user requirements
+6. **Save HTML file** in current working directory
+7. **Offer preview** with Playwright browser tools
 
 ## PDF export instructions
 
@@ -251,7 +258,7 @@ h1, h2, h3 {
 
 ### Templates
 
-Pre-built templates in `${CLAUDE_PLUGIN_ROOT}/templates/`:
+Pre-built templates in the installed skill's `templates/` directory:
 - `proposal-template.html`
 - `report-template.html`
 - `onepager-template.html`
@@ -261,11 +268,18 @@ Pre-built templates in `${CLAUDE_PLUGIN_ROOT}/templates/`:
 
 ### Brand examples
 
-Example brand configurations in `${CLAUDE_PLUGIN_ROOT}/brands/`:
+Example brand configurations in the installed skill's `brands/` directory:
 - `default.yaml` - Default brand settings
 - `ccm.yaml` - Center for Cooperative Media
 - `example-newsroom.yaml` - Sample newsroom config
 
 ### Reference files
 
-For detailed CSS patterns: `references/css-patterns.md`
+For detailed CSS patterns, use the installed skill's
+`references/css-patterns.md`.
+
+### Preview controls
+
+Reusable preview assets are in the installed skill's `controls/` directory.
+These files are resources for document generation; they do not turn the
+Claude-only preview command or plugin hook into Codex features.

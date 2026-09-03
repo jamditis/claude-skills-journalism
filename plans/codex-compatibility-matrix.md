@@ -1,7 +1,7 @@
 # Codex compatibility matrix
 
-- Status: phase-two runtime pilots; journalism-core, visual-explainer, and portable okf-wiki scaffolding have scoped passes
-- Last evidence update: September 1, 2026
+- Status: phase-two runtime pilots; journalism-core, visual-explainer, document-design, and portable okf-wiki scaffolding have scoped passes
+- Last evidence update: September 3, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
 > **Historical runtime results stay tied to their tested snapshots.** The v2.8.0
@@ -57,9 +57,13 @@ Status labels:
 | Repository okf-wiki pilot | [`cabb43bc2515c6c30a3d0839909f786e7afbcba8`](https://github.com/jamditis/claude-skills-journalism/commit/cabb43bc2515c6c30a3d0839909f786e7afbcba8) | July 23 `master` head installed for the Okf-1 no-Claude runtime evidence |
 | Repository Document design lock pilot | [`d49ed1022a012269a237f7749b0e47c099e7add6`](https://github.com/jamditis/claude-skills-journalism/commit/d49ed1022a012269a237f7749b0e47c099e7add6) | July 23 `master` head used for the D-lock-1 update target |
 | Repository video-toolkit preflight | [`bc681b79a3eaba846a494582368501e0b4d75b1b`](https://github.com/jamditis/claude-skills-journalism/commit/bc681b79a3eaba846a494582368501e0b4d75b1b) | August 28 source revision used for the scoped video-toolkit preflight |
+| Repository document-design pilot baseline | [`902cc881b5f9c8a18053d1f60dcc456851db3ee4`](https://github.com/jamditis/claude-skills-journalism/commit/902cc881b5f9c8a18053d1f60dcc456851db3ee4) | September 3 public baseline used to prove the missing-resource failure before testing the candidate adapter |
 | Claude Code | 2.1.215; 2.1.218 | Phase-one marketplace validation, then the post-merge clean `journalism-core` install |
 | Codex CLI | 0.145.0 | Legacy-compatible marketplace and clean `journalism-core` install |
 | Codex video-toolkit preflight | 0.149.1 | Scoped video-toolkit activation and dependency preflight on August 28, 2026 |
+| Codex document-design pilot | 0.153.0 | Scoped project-standards activation, non-trigger, installed-resource, output, and rendering checks on September 3, 2026 |
+| Claude document-design regression | 2.1.239 | Candidate `--plugin-dir` argument-delivery check on September 3, 2026 |
+| skills CLI document-design pilot | 1.5.23 | Public baseline and candidate project-copy installs on September 3, 2026 |
 | skills CLI | 1.5.19; 1.5.20 | Phase-one standards discovery, then post-merge project and user install canaries |
 | Agent Skills validator | `agentskills/agentskills@38a2ff82958afee88dadf4831509e6f7e9d8ef4e` | Shared frontmatter contract |
 | Agent Skills validator, scheduled | Default-branch head (`38a2ff82958afee88dadf4831509e6f7e9d8ef4e` on July 23, 2026) | Upstream drift signal |
@@ -395,6 +399,27 @@ untested. The manual session outputs were not preserved as repository
 artifacts, so this is an observed preflight rather than a repeatable or passed
 runtime fixture.
 
+### D-runtime-1: document-design Codex project-standards pilot
+
+Environment: public baseline revision
+[`902cc881b5f9c8a18053d1f60dcc456851db3ee4`](https://github.com/jamditis/claude-skills-journalism/commit/902cc881b5f9c8a18053d1f60dcc456851db3ee4)
+and the candidate adapter tested in a disposable project on Sept. 3, 2026.
+The [runtime record](2026-09-03-document-design-codex-runtime-pilot.md)
+contains the exact install path, failing baseline, installed manifest digest,
+activation and non-trigger results, resource reads, output hash, render checks,
+Claude argument regression, cleanup, and excluded surfaces.
+
+Result: skills CLI 1.5.23 copied the public `document-design` skill, but its
+template, brand, and control paths were missing because they lived outside the
+installed skill root. The explicit Codex fixture activated and refused to
+write output. The candidate adapter carries exact skill-local copies guarded
+against drift and removes the shared instruction's plugin-root assumption.
+After reinstall, Codex 0.153.0 read all five required installed resources and
+created the accepted one-page HTML output. The unrelated fixture did not
+activate a skill. Claude Code 2.1.239 still received explicit skill arguments.
+This is a scoped project-standards skill claim, not support for user-level or
+legacy Codex installation, Claude commands, preview lifecycle, or hooks.
+
 ### D-lock-release-1: Document design standards lock migration
 
 Environment: Codex CLI 0.145.0 with a disposable skills CLI 1.5.20 project on
@@ -440,7 +465,7 @@ support claim.
 | `journalism-core` | 1.2.0; 14 nested skills | Runtime pilot passed on the Claude package and Codex project-standards paths | Include the 14 shared skills. No commands, agents, or hooks are part of this package. The legacy-compatible Codex package and user-level standards paths remain install-only. | [J-release-1](#j-release-1-paired-journalism-core-runtime-pilot), [C-phase-1](#c-phase-1-repeatable-claude-install-canary), [K-phase-1](#k-phase-1-repeatable-codex-legacy-package-canary), [S-phase-1](#s-phase-1-full-journalism-core-standards-canary), [S-global-phase-1](#s-global-phase-1-user-level-journalism-core-standards-canary), [V-phase-1](#v-phase-1-repaired-standards-baseline) | Add a no-Claude-environment gate and scheduled runtime regression before a broader package support claim. |
 | `okf-wiki` | 0.6.1; one root skill; scripts and generated Claude settings | Pre-set portable runtime pilot passed; instruction and Claude-output adapters remain | Include the tested Okf-1 path: standards discovery, installed spec and scaffolder reads, explicit project-relative scaffolding, validation, examples, and the generated OKF bundle. Exclude the unadapted general instructions that name `AskUserQuestion` and `${CLAUDE_SKILL_DIR}`. The generated `.claude/settings.json` and hook scripts are an inert Claude Code adapter, not Codex configuration or lifecycle behavior. | [Okf-release-1](#okf-release-1-okf-wiki-no-claude-runtime-pilot), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [R-phase-1](#r-phase-1-phase-one-repository-checks) | Port and test general onboarding and skill-root resolution; add scheduled Okf-1 coverage against current Codex; test mixed-client hook trust separately before any cross-client lifecycle claim. |
 | `pdf-design` | 1.1.0; one root skill | Adapter required | Shared design guidance and assets are candidates. Hard-coded `~/.claude` and host-specific browser paths are excluded from a Codex claim. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add a no-Claude path-resolution fixture before editing paths. |
-| `pdf-playground` | 1.3.2; one nested skill; eight commands; one hook file | Candidate plus Claude-only surfaces | `document-design` is shared. Its historical project lock identity has an explicit migration. Commands and hook behavior remain Claude-only until mapped. | [D-lock-release-1](#d-lock-release-1-document-design-standards-lock-migration), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [F-phase-1](#f-phase-1-affected-claude-package-regression); lock migration, standards, Claude install, and argument delivery pass | Test Codex activation, non-activation, resource loading, and output before a runtime claim. |
+| `pdf-playground` | 1.3.6; one nested skill; eight commands; one hook file | Runtime pilot passed on the Codex project-standards path; Claude-only surfaces unclaimed | Include `$document-design`, its self-contained relative resources, and HTML generation through the tested project copy. Its historical project lock identity has an explicit migration. Exclude the Codex user-level and legacy-package paths, all eight Claude commands, preview lifecycle, and hook behavior. | [D-runtime-1](#d-runtime-1-document-design-codex-project-standards-pilot), [D-lock-release-1](#d-lock-release-1-document-design-standards-lock-migration), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [F-phase-1](#f-phase-1-affected-claude-package-regression) | Add a no-Claude scheduled runtime regression and test user-level installation separately before broadening the claim. |
 | `project-templates-toolkit` | 1.0.3; three nested skills | Adapter required; paired contract fixtures added | `project-retrospective` and `template-selector` remain shared candidates. `project-memory` still generates only `CLAUDE.md`; paired contract fixtures now pin Claude `CLAUDE.md` and Codex `AGENTS.md` merge, nested-scope, non-trigger, output, and cleanup behavior. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; `scripts/project-memory-fixtures.test.mjs` proves the current shared output is insufficient and guards both client contracts | Run both fixtures against installed clients, then add the smallest adapter that makes the Codex fixture pass without changing Claude output. |
 | `research-toolkit` | 1.1.0; six nested skills | Candidate | Include shared instruction-led skills. Network and external-content trust boundaries stay unchanged. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add representative activation, non-activation, network-boundary, and resource checks. |
 | `security-toolkit` | 1.2.0; four nested skills; one command | Candidate plus Claude-only surface | The four shared skills are candidates. `/security-toolkit:hotpatch` and its sandbox lifecycle remain Claude-only. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; [R-phase-1](#r-phase-1-phase-one-repository-checks) covers security tests | Test skill activation separately; do not map `hotpatch` without authority and failure-semantics tests. |

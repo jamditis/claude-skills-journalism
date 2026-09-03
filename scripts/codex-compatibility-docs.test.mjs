@@ -50,7 +50,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
     'web-design-picker',
     'visual-explainer',
   ]);
-  assert.match(matrix, /`pdf-playground` \| 1\.3\.2/u);
+  assert.match(matrix, /`pdf-playground` \| 1\.3\.6/u);
   assert.match(matrix, /`video-toolkit` \| 1\.0\.6;/u);
   assert.match(matrix, /V-phase-1: repaired standards baseline/u);
   assert.match(matrix, /J-release-1: paired journalism-core runtime pilot/u);
@@ -58,6 +58,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
   assert.match(matrix, /Okf-release-1: okf-wiki no-Claude runtime pilot/u);
   assert.match(matrix, /V-tool-preflight-1: video-toolkit Codex preflight/u);
   assert.match(matrix, /D-lock-release-1: Document design standards lock migration/u);
+  assert.match(matrix, /D-runtime-1: document-design Codex project-standards pilot/u);
   assert.match(
     matrix,
     /`journalism-core` \| 1\.2\.0; 14 nested skills \| Runtime pilot passed on the Claude package and Codex project-standards paths/u,
@@ -122,6 +123,51 @@ test('Document design lock evidence stays separate from catalog history', () => 
     matrix,
     /That project\s+migration neither restores nor changes public catalog metrics/u,
   );
+});
+
+test('document-design runtime evidence stays on the tested Codex path', () => {
+  const record = readFileSync(
+    join(ROOT, 'plans', '2026-09-03-document-design-codex-runtime-pilot.md'),
+    'utf8',
+  );
+  const matrix = readFileSync(
+    join(ROOT, 'plans', 'codex-compatibility-matrix.md'),
+    'utf8',
+  );
+
+  assert.match(record, /Tracking issue: \[#241\]/u);
+  assert.match(record, /Codex CLI 0\.153\.0/u);
+  assert.match(record, /skills\s+CLI 1\.5\.23/u);
+  assert.match(record, /fff8a1ce4bbfa0f973a7c5f67a4892196556b0b9c8f98bbb32e16299e0beeceb/u);
+  assert.match(record, /bdcf5016e151a2c92f1610f08414f76bd887cca0047d34f746dfb7fa09cf13e1/u);
+  assert.match(record, /1a644113b00ee65344aefc0e4aed0af8f6d0b0ef14bb24204c0794e863172299/u);
+  assert.match(record, /intended output path remained absent/u);
+  assert.match(record, /The eight Claude commands and the\s+SessionStart hook remain outside/u);
+  assert.match(matrix, /Runtime pilot passed on the Codex project-standards path; Claude-only surfaces unclaimed/u);
+  assert.match(matrix, /Last evidence update: September 3, 2026/u);
+  assert.doesNotMatch(record, /package-wide Codex support/iu);
+});
+
+test('document-design evidence changes run compatibility checks', () => {
+  const workflow = readFileSync(
+    join(ROOT, '.github', 'workflows', 'skill-lint.yml'),
+    'utf8',
+  );
+
+  assert.match(
+    workflow,
+    /plans\/2026-09-03-document-design-codex-runtime-pilot\.md/u,
+  );
+  for (const resourcePath of [
+    'pdf-playground/brands/**',
+    'pdf-playground/controls/**',
+    'pdf-playground/templates/**',
+    'pdf-playground/skills/document-design/brands/**',
+    'pdf-playground/skills/document-design/controls/**',
+    'pdf-playground/skills/document-design/templates/**',
+  ]) {
+    assert.match(workflow, new RegExp(resourcePath.replaceAll('*', '\\*'), 'u'));
+  }
 });
 
 test('okf-wiki no-Claude evidence keeps Claude adapters outside Codex behavior', () => {
@@ -247,7 +293,7 @@ test('video-toolkit evidence stays limited to the tested preflight', () => {
     matrix,
     /Observed manual Codex preflight; durable harness and media execution pending/u,
   );
-  assert.match(matrix, /Last evidence update: September 1, 2026/u);
+  assert.match(matrix, /Last evidence update: September 3, 2026/u);
   assert.match(matrix, /Codex video-toolkit preflight \| 0\.149\.1/u);
   assert.match(
     matrix,
