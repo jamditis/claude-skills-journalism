@@ -58,13 +58,36 @@ The candidate installed 18 regular files with no symlinks. Its sorted
 relative-path and content manifest matched the source skill with SHA-256:
 
 ```text
-fff8a1ce4bbfa0f973a7c5f67a4892196556b0b9c8f98bbb32e16299e0beeceb
+2d1f21db9a610185bcd7af043b2134926efcc7ebfa5186c3aaed4fa52d02268b
 ```
 
 `scripts/document-design-portability.test.mjs` compares every duplicated
 brand, control, and template byte for byte, rejects symlinks, requires the CSS
 reference, rejects `CLAUDE_PLUGIN_ROOT` in the shared skill, and pins the
 public support boundary.
+
+### Post-review final-tree verification
+
+After the review follow-ups changed bundled comments and shared skill
+guidance, the final tree was installed again through skills CLI 1.5.23's local
+project route into a new disposable Git repository. `diff -qr` found no drift
+between the source and installed copies, and the installed copy reproduced the
+`2d1f21db9a610185bcd7af043b2134926efcc7ebfa5186c3aaed4fa52d02268b`
+manifest above.
+
+An explicit read-only Codex CLI 0.153.0 probe then selected
+`$document-design` and inspected the final installed `SKILL.md` and
+`templates/slides-template.html`. With no photos directory supplied, it
+reported that every CSS `url(...)` and `<img src>` must be replaced with an
+available asset; otherwise the unresolved references must be removed, the
+gradient or solid-color variants used, and a missing wordmark replaced with
+text. It also stated that no unresolved local asset path may be delivered. The
+probe wrote no artifact.
+
+The rendered one-pager observations below are the original runtime pilot, not
+a claimed rerun. The follow-ups did not change a one-pager template or an
+executable resource; final-tree installation and the changed slides rule are
+covered by the focused verification above.
 
 ## Codex runtime result
 

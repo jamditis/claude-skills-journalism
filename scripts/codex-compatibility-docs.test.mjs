@@ -138,10 +138,13 @@ test('document-design runtime evidence stays on the tested Codex path', () => {
   assert.match(record, /Tracking issue: \[#241\]/u);
   assert.match(record, /Codex CLI 0\.153\.0/u);
   assert.match(record, /skills\s+CLI 1\.5\.23/u);
-  assert.match(record, /fff8a1ce4bbfa0f973a7c5f67a4892196556b0b9c8f98bbb32e16299e0beeceb/u);
+  assert.match(record, /2d1f21db9a610185bcd7af043b2134926efcc7ebfa5186c3aaed4fa52d02268b/u);
   assert.match(record, /bdcf5016e151a2c92f1610f08414f76bd887cca0047d34f746dfb7fa09cf13e1/u);
   assert.match(record, /1a644113b00ee65344aefc0e4aed0af8f6d0b0ef14bb24204c0794e863172299/u);
   assert.match(record, /intended output path remained absent/u);
+  assert.match(record, /Post-review final-tree verification/u);
+  assert.match(record, /no unresolved local asset path may be delivered/u);
+  assert.match(record, /original runtime pilot, not\s+a claimed rerun/u);
   assert.match(record, /The eight Claude commands and the\s+SessionStart hook remain outside/u);
   assert.match(matrix, /Runtime pilot passed on the Codex project-standards path; Claude-only surfaces unclaimed/u);
   assert.match(matrix, /Last evidence update: September 3, 2026/u);

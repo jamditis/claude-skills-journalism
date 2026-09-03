@@ -266,6 +266,13 @@ Pre-built templates in the installed skill's `templates/` directory:
 - `slides-template.html`
 - `event-template.html`
 
+`slides-template.html` contains illustrative local photo and wordmark paths,
+not bundled image assets. Before delivering a deck based on it, replace every
+CSS `url(...)` and `<img src>` reference with an available asset. If the user
+has no suitable images, remove every unresolved reference, use the template's
+gradient or solid-color slide variants, and replace a missing wordmark image
+with text. Never deliver a deck with an unresolved local asset path.
+
 ### Brand examples
 
 Example brand configurations in the installed skill's `brands/` directory:

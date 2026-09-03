@@ -73,6 +73,8 @@ test('document-design resolves resources from its installed skill root', () => {
   ]) {
     assert.match(skill, new RegExp(resource.replace('/', '\\/'), 'u'));
   }
+  assert.match(skill, /replace every\s+CSS `url\(\.\.\.\)` and `<img src>` reference/iu);
+  assert.match(skill, /Never deliver a deck with an unresolved local asset path/u);
 });
 
 test('public Codex wording keeps Claude-only surfaces out of scope', () => {
