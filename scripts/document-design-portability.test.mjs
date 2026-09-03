@@ -16,6 +16,12 @@ const PORTABLE_RESOURCE_DIRECTORIES = ['brands', 'controls', 'templates'];
 function regularFileManifest(directory) {
   const files = [];
 
+  assert.equal(
+    lstatSync(directory).isSymbolicLink(),
+    false,
+    `portable resources must not depend on symlinks: ${directory}`,
+  );
+
   function visit(current) {
     for (const entry of readdirSync(current, { withFileTypes: true })) {
       const path = join(current, entry.name);
@@ -44,7 +50,7 @@ test('the standards-installed skill carries exact package resources', () => {
     assert.deepEqual(
       regularFileManifest(join(SKILL_ROOT, directory)),
       regularFileManifest(join(PACKAGE_ROOT, directory)),
-      `${directory} drifted between the Claude package and portable skill`,
+      `${directory} drifted between package resources and the installed skill`,
     );
   }
 
@@ -74,7 +80,7 @@ test('public Codex wording keeps Claude-only surfaces out of scope', () => {
 
   assert.match(
     readme,
-    /--skill document-design --agent codex --copy -y/u,
+    /npx --yes skills@latest add jamditis\/claude-skills-journalism --skill document-design --agent codex --copy -y/u,
   );
   assert.doesNotMatch(readme, /--copy -g -y/u);
   assert.match(readme, /Invoke it with `\$document-design`/u);

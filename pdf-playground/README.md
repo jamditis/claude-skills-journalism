@@ -10,8 +10,7 @@ Codex can use the shared `document-design` skill through the tested
 standards-based project path. From the project where you want to use it, run:
 
 ```bash
-npx skills@latest add jamditis/claude-skills-journalism \
-  --skill document-design --agent codex --copy -y
+npx --yes skills@latest add jamditis/claude-skills-journalism --skill document-design --agent codex --copy -y
 ```
 
 Invoke it with `$document-design`. This route includes the skill's relative

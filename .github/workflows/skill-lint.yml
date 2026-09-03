@@ -16,6 +16,7 @@ on:
       - 'pdf-playground/brands/**'
       - 'pdf-playground/controls/**'
       - 'pdf-playground/templates/**'
+      - 'pdf-playground/README.md'
       - 'pdf-playground/skills/document-design/brands/**'
       - 'pdf-playground/skills/document-design/controls/**'
       - 'pdf-playground/skills/document-design/templates/**'
