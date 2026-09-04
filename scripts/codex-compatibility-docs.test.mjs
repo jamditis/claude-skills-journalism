@@ -147,7 +147,7 @@ test('document-design runtime evidence stays on the tested Codex path', () => {
   assert.match(record, /original runtime pilot, not\s+a claimed rerun/u);
   assert.match(record, /The eight Claude commands and the\s+SessionStart hook remain outside/u);
   assert.match(matrix, /Runtime pilot passed on the Codex project-standards path; Claude-only surfaces unclaimed/u);
-  assert.match(matrix, /Last evidence update: September 3, 2026/u);
+  assert.match(matrix, /Last evidence update: September 4, 2026/u);
   assert.doesNotMatch(record, /package-wide Codex support/iu);
 });
 
@@ -296,7 +296,7 @@ test('video-toolkit evidence stays limited to the tested preflight', () => {
     matrix,
     /Observed manual Codex preflight; durable harness and media execution pending/u,
   );
-  assert.match(matrix, /Last evidence update: September 3, 2026/u);
+  assert.match(matrix, /Last evidence update: September 4, 2026/u);
   assert.match(matrix, /Codex video-toolkit preflight \| 0\.149\.1/u);
   assert.match(
     matrix,

@@ -1,7 +1,7 @@
 # Codex compatibility matrix
 
 - Status: phase-two runtime pilots; journalism-core, visual-explainer, document-design, and portable okf-wiki scaffolding have scoped passes
-- Last evidence update: September 3, 2026
+- Last evidence update: September 4, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
 > **Historical runtime results stay tied to their tested snapshots.** The v2.8.0
@@ -456,6 +456,21 @@ activation, non-activation, resource-read, runtime, or no-Claude-environment
 fixture ran, so this is repository structure evidence rather than a Codex
 support claim.
 
+### S-tool-preflight-1: security-toolkit project-copy preflight
+
+Environment: Codex CLI 0.153.2 on Linux, using manual copies of the four skill
+directories in a disposable project's `.agents/skills`, on September 4, 2026.
+The current user profile and host guidance remained in scope; this was not a
+clean-profile or no-Claude-environment gate.
+
+The [preflight record](2026-09-04-security-toolkit-codex-preflight.md) separates
+reported activation from installed-resource reads and security enforcement.
+Explicit selection was observed, but nested filesystem reads were reported
+blocked by Bubblewrap. A separate local copy probe confirmed that the supply-chain skill's
+package-level scan script and synthetic fixture are absent from its standalone
+skill directory. Hotpatch remains unmapped and Claude-only; no runtime pass or
+package-wide support claim follows from these observations.
+
 ## Package matrix
 
 | Package | Version and components | Current classification | Included and excluded scope | Evidence | Next proof |
@@ -468,7 +483,7 @@ support claim.
 | `pdf-playground` | 1.3.6; one nested skill; eight commands; one hook file | Runtime pilot passed on the Codex project-standards path; Claude-only surfaces unclaimed | Include `$document-design`, its self-contained relative resources, and HTML generation through the tested project copy. Its historical project lock identity has an explicit migration. Exclude the Codex user-level and legacy-package paths, all eight Claude commands, preview lifecycle, and hook behavior. | [D-runtime-1](#d-runtime-1-document-design-codex-project-standards-pilot), [D-lock-release-1](#d-lock-release-1-document-design-standards-lock-migration), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [F-phase-1](#f-phase-1-affected-claude-package-regression) | Add a no-Claude scheduled runtime regression and test user-level installation separately before broadening the claim. |
 | `project-templates-toolkit` | 1.0.3; three nested skills | Adapter required; paired contract fixtures added | `project-retrospective` and `template-selector` remain shared candidates. `project-memory` still generates only `CLAUDE.md`; paired contract fixtures now pin Claude `CLAUDE.md` and Codex `AGENTS.md` merge, nested-scope, non-trigger, output, and cleanup behavior. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; `scripts/project-memory-fixtures.test.mjs` proves the current shared output is insufficient and guards both client contracts | Run both fixtures against installed clients, then add the smallest adapter that makes the Codex fixture pass without changing Claude output. |
 | `research-toolkit` | 1.1.0; six nested skills | Candidate | Include shared instruction-led skills. Network and external-content trust boundaries stay unchanged. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add representative activation, non-activation, network-boundary, and resource checks. |
-| `security-toolkit` | 1.2.0; four nested skills; one command | Candidate plus Claude-only surface | The four shared skills are candidates. `/security-toolkit:hotpatch` and its sandbox lifecycle remain Claude-only. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; [R-phase-1](#r-phase-1-phase-one-repository-checks) covers security tests | Test skill activation separately; do not map `hotpatch` without authority and failure-semantics tests. |
+| `security-toolkit` | 1.2.0; four nested skills; one command | Candidate with observed preflight and a resource-packaging gap; Claude-only command | The four shared skills remain candidates. Project-copy selection does not prove resource access or security enforcement. `/security-toolkit:hotpatch` and its sandbox lifecycle remain Claude-only. | [S-tool-preflight-1](#s-tool-preflight-1-security-toolkit-project-copy-preflight), [V-phase-1](#v-phase-1-repaired-standards-baseline), [R-phase-1](#r-phase-1-phase-one-repository-checks) | Resolve standalone supply-chain resource packaging; rerun with working sandbox reads and boundary traces. Do not map `hotpatch` without a separately accepted authority, sandbox, cooldown, failure, and cleanup design. |
 | `superjawn` | 1.0.0; 14 nested skills | Not assessed | No package-wide claim. Each skill needs review for Claude tool names, namespacing, agent dispatch, and parallel-agent assumptions. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure only | Evaluate one skill at a time with client-specific tool traces. Do not bulk-port. |
 | `video-toolkit` | 1.0.6; four nested skills; external media runtimes | Observed manual Codex preflight; durable harness and media execution pending | Include explicit activation, dependency refusal, CPU and no-GPU selection, unrelated non-trigger behavior, and the tested untrusted-transcript boundary as manual observations only. Exclude a repeatable runtime claim, real media, output paths, browser fallback, hosted APIs, and media-parser sandboxing. | [V-tool-preflight-1](#v-tool-preflight-1-video-toolkit-codex-preflight), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [F-phase-1](#f-phase-1-affected-claude-package-regression) | Add a repeatable harness with sanitized raw results, then run pinned local media through transcript, frame, provenance, dashboard, browser, sandbox, resource-cap, and cleanup fixtures. |
 | `web-design-picker` | 1.0.0; one root skill; 16 Python scripts; optional browser and media runtimes | Not assessed for Codex | Include no Codex runtime claim. Repository structure, plugin metadata, deterministic scaffold, build, validation, and packaging are locally checked; Codex activation and runtime behavior remain untested. | [Wdp-structure-1](#wdp-structure-1-web-design-picker-repository-preflight) | Run paired activation, non-activation, installed-resource, disposable-project, and no-Claude-environment fixtures before making a Codex support claim. |
