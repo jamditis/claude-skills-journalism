@@ -1,0 +1,64 @@
+# Example newsroom brand configuration
+# A sample showing how a local news organization might configure their brand
+
+---
+brand:
+  name: "The Local Herald"
+  tagline: "Serving Our Community Since 1952"
+  website: "https://localherald.com"
+  email: "editor@localherald.com"
+  phone: "(555) 123-4567"
+  address: "123 Main Street, Anytown, USA 12345"
+
+colors:
+  primary: "#1a5f7a"      # Teal blue - trustworthy, professional
+  secondary: "#002b36"    # Dark navy - authority
+  accent: "#cb4b16"       # Orange - for CTAs and highlights
+  background: "#fdf6e3"   # Warm cream - welcoming
+  text: "#073642"        # Dark text
+  muted: "#586e75"       # Secondary text
+
+fonts:
+  heading: "Merriweather"    # Classic serif for news feel
+  body: "Open Sans"          # Clean sans-serif for readability
+
+style:
+  headingCase: "sentence"
+  useOxfordComma: true
+---
+
+# The Local Herald brand notes
+
+## Our voice
+
+We are:
+- **Trustworthy** - Accurate, verified, fair
+- **Local** - Community-focused, accessible
+- **Clear** - Plain language, no jargon
+- **Engaged** - We care about our readers
+
+## Logo usage
+
+- Full color logo on cover pages
+- Include founding year (1952) on formal documents
+- Tagline appears below logo on external documents
+
+## Document standards
+
+- All proposals should reference our nonprofit status
+- Include our EIN on grant-related documents
+- Feature local impact metrics prominently
+
+## Color guidance
+
+- Use teal (#1a5f7a) for headers and primary accents
+- Orange (#cb4b16) for calls-to-action only
+- Avoid using orange for body text or large areas
+- Cream background creates warm, inviting feel
+
+## Photography
+
+When including images:
+- Prefer local community photos
+- Include photo credits
+- Avoid stock photography when possible
