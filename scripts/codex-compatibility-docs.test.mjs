@@ -51,6 +51,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
     'visual-explainer',
   ]);
   assert.match(matrix, /`pdf-playground` \| 1\.3\.6/u);
+  assert.match(matrix, /`security-toolkit` \| 1\.2\.3;/u);
   assert.match(matrix, /`video-toolkit` \| 1\.0\.6;/u);
   assert.match(matrix, /V-phase-1: repaired standards baseline/u);
   assert.match(matrix, /J-release-1: paired journalism-core runtime pilot/u);
@@ -59,6 +60,11 @@ test('the compatibility matrix classifies every marketplace package', () => {
   assert.match(matrix, /V-tool-preflight-1: video-toolkit Codex preflight/u);
   assert.match(matrix, /D-lock-release-1: Document design standards lock migration/u);
   assert.match(matrix, /D-runtime-1: document-design Codex project-standards pilot/u);
+  assert.match(
+    matrix,
+    /Repository security-toolkit preflight \| \[`9e8e419a916f1f26c57ebe71acc9152c95b5117d`\]/u,
+  );
+  assert.match(matrix, /Codex security-toolkit preflight \| 0\.153\.2/u);
   assert.match(
     matrix,
     /`journalism-core` \| 1\.2\.0; 14 nested skills \| Runtime pilot passed on the Claude package and Codex project-standards paths/u,
@@ -315,6 +321,19 @@ test('video-toolkit evidence changes run the compatibility checks', () => {
   );
 
   assert.match(workflow, /plans\/2026-08-28-video-toolkit-codex-preflight\.md/u);
+});
+
+test('security-toolkit evidence changes run the compatibility checks', () => {
+  const workflow = readFileSync(
+    join(ROOT, '.github', 'workflows', 'skill-lint.yml'),
+    'utf8',
+  );
+
+  assert.match(workflow, /plans\/2026-09-04-security-toolkit-codex-preflight\.md/u);
+  assert.match(
+    workflow,
+    /plans\/evidence\/security-toolkit-codex-preflight-2026-09-04\.json/u,
+  );
 });
 
 test('the README routes Codex users without implying mixed-install support', () => {
