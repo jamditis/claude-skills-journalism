@@ -29,6 +29,8 @@ on:
       - 'plans/codex-compatibility-matrix.md'
       - 'plans/2026-08-28-video-toolkit-codex-preflight.md'
       - 'plans/2026-09-03-document-design-codex-runtime-pilot.md'
+      - 'plans/2026-09-04-security-toolkit-codex-preflight.md'
+      - 'plans/evidence/security-toolkit-codex-preflight-2026-09-04.json'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/compatibility-canary.yml'

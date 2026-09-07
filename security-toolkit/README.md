@@ -11,7 +11,19 @@ Four defensive security skills for web applications, APIs, and toolchain hardeni
 | security-checklist | Pre-deployment audit aligned to OWASP Top 10, authentication, input validation, secrets management, database security, compliance basics |
 | supply-chain-hardening | npm/bun install-time cooldown (`min-release-age` / `minimumReleaseAge`) plus a sandboxed pre-install scan for the bypass case. Defends against Mini Shai-Hulud-class worms that ship within the cooldown window. Includes `/security-toolkit:hotpatch` slash command, a reference Bash implementation, and a synthetic test fixture mimicking the TanStack 2026-05-11 attack signatures. |
 
-## Slash commands
+## Codex compatibility
+
+The four shared skills remain candidates, not a tested package-wide Codex
+workflow. The [project-copy preflight](../plans/2026-09-04-security-toolkit-codex-preflight.md)
+records activation observations, blocked filesystem reads, and a missing-resource
+boundary: copying only `skills/supply-chain-hardening/` does not include the
+package-level scan script or synthetic fixture. Do not run its quick-start as
+though those resources were installed with the skill.
+
+`/security-toolkit:hotpatch` and its sandbox, cooldown-bypass, and install
+lifecycle are **Claude-only**. No Codex command adapter is provided or approved.
+
+## Slash commands (Claude Code only)
 
 | Command | What it does |
 |---|---|

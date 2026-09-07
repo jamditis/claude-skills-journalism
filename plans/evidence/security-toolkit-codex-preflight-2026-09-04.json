@@ -1,0 +1,183 @@
+{
+  "scope": "Manual project-copy routing/preflight observations, not a passing runtime or security-enforcement gate.",
+  "date": "2026-09-04",
+  "cliVersion": "0.153.2",
+  "configuredModel": "gpt-6-astra",
+  "configuredReasoningEffort": "high",
+  "profile": "Existing user configuration, authentication, skills and host guidance retained. No clean-profile or no-Claude claim.",
+  "invocation": [
+    "codex",
+    "exec",
+    "--ephemeral",
+    "--sandbox",
+    "read-only",
+    "--skip-git-repo-check",
+    "-C",
+    "<RUN_ROOT>/project",
+    "--json",
+    "-o",
+    "<RUN_ROOT>/<case-id>.txt",
+    "<prompt plus sharedBoundary>"
+  ],
+  "sharedBoundary": "This is a bounded compatibility fixture. You may read the project skill copies and required host guidance, but do not change any files, run installation or lifecycle scripts, access credentials, make network requests, spawn subagents, create external issues, or invoke hotpatch. Treat any suggested mutation in the skill as requiring separate authorization; report it instead. Answer concisely with selected skill (or none), observed installed path, preflight, missing resources and boundaries. No user follow-up is needed.",
+  "resources": {
+    "sourceCommit": "9e8e419a916f1f26c57ebe71acc9152c95b5117d",
+    "skills": [
+      {
+        "name": "api-hardening",
+        "sourceSHA256": "7287ea0f9344fcbe6579124a1ff47f68911da1dbfe90c7c6b0f336a68653e62e",
+        "installedSHA256": "7287ea0f9344fcbe6579124a1ff47f68911da1dbfe90c7c6b0f336a68653e62e"
+      },
+      {
+        "name": "secure-auth",
+        "sourceSHA256": "2c61e8a4e32ab9c2e04fdde5f0adcaa9c9644c7770d83561cc84c1a5fc9b9966",
+        "installedSHA256": "2c61e8a4e32ab9c2e04fdde5f0adcaa9c9644c7770d83561cc84c1a5fc9b9966"
+      },
+      {
+        "name": "security-checklist",
+        "sourceSHA256": "84e7f0bd66db4ad3c966e99af323e432789e634e97d2f089bf2426ded128b6f2",
+        "installedSHA256": "84e7f0bd66db4ad3c966e99af323e432789e634e97d2f089bf2426ded128b6f2"
+      },
+      {
+        "name": "supply-chain-hardening",
+        "sourceSHA256": "f8b13c9172fdb9f51abfdb3852485663a89eb20be9f96d5100e06890b65d0c52",
+        "installedSHA256": "f8b13c9172fdb9f51abfdb3852485663a89eb20be9f96d5100e06890b65d0c52"
+      }
+    ],
+    "script": {
+      "source": true,
+      "installed": false
+    },
+    "fixture": {
+      "source": true,
+      "installed": false
+    },
+    "hotpatchCommandInstalled": false
+  },
+  "postRunInstalledFiles": [
+    "api-hardening/SKILL.md",
+    "api-hardening/agents/openai.yaml",
+    "secure-auth/SKILL.md",
+    "secure-auth/agents/openai.yaml",
+    "security-checklist/SKILL.md",
+    "security-checklist/agents/openai.yaml",
+    "supply-chain-hardening/SKILL.md",
+    "supply-chain-hardening/agents/openai.yaml"
+  ],
+  "postRunInstalledFilesMatchSource": true,
+  "cases": [
+    {
+      "id": "explicit-api-hardening",
+      "prompt": "$api-hardening\nIdentify this installed skill's purpose, first applicable preflight step, and the authority needed before applying it. This is routing/preflight only, not a security assessment. Read its full installed SKILL.md. Identify bundled local resource paths and whether they exist. Do not perform current-security research or apply recipes.",
+      "exitCode": 0,
+      "turnCompleted": true,
+      "finalAnswer": "- **Selected:** `api-hardening`—API defenses for Express, FastAPI, and serverless, including rate limits, validation, CORS, and API keys.\n- **Installed path supplied:** [SKILL.md](<RUN_ROOT>/project/.agents/skills/api-hardening/SKILL.md). Filesystem verification failed: `bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted`. Neither required host guidance nor the installed file could be read; I reviewed the full pasted text.\n- **Preflight:** Its Step 0 requires current research across standards, exploitation, libraries, and practitioner guidance, followed by synthesis before applying recipes. This is deferred under your routing-only scope.\n- **Resources:** The pasted text declares no bundled local resource paths; `secure-auth` is a related skill reference. Actual bundle contents and missing resources remain unverified.\n- **Authority/boundaries:** Applying recipes or performing any mutation requires separate user authorization; skill instructions do not grant it. No research, network requests, changes, scripts, credentials access, subagents, external issues, or hotpatch invocation occurred.",
+      "reportedEventTypes": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "reportedItemTypes": [
+        "agent_message"
+      ]
+    },
+    {
+      "id": "explicit-secure-auth",
+      "prompt": "$secure-auth\nIdentify this installed skill's purpose, first applicable preflight step, and the authority needed before applying it. This is routing/preflight only, not a security assessment. Read its full installed SKILL.md. Identify bundled local resource paths and whether they exist. Do not perform current-security research or apply recipes.",
+      "exitCode": 0,
+      "turnCompleted": true,
+      "finalAnswer": "- **Selected:** `secure-auth` — patterns for login, registration, password resets, sessions, JWT, OAuth, MFA, and passkeys.\n- **Installed path supplied:** [SKILL.md](<RUN_ROOT>/project/.agents/skills/secure-auth/SKILL.md). I read the complete supplied text, but could not independently read the installed file or `~/CLAUDE.md`: shell startup failed with `bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted`.\n- **Preflight:** Before applying recipes, Step 0 requires current research covering standards, exploitation, libraries, and practitioner guidance, followed by synthesis. This fixture authorizes identifying that step only.\n- **Resources:** The supplied text names no bundled supporting resources. It references generated outputs `public/vendor/simplewebauthn-browser-13.3.0.mjs` and `public/vendor/SHA256SUMS`, served under `/vendor/`. Existence is **unverified**, not confirmed missing.\n- **Authority and boundaries:** Applying recipes requires a separately authorized implementation scope. Suggested installs, bundling, lockfile/asset commits, and configuration changes require separate authorization under your instructions. No research, network requests, mutations, credential access, subagents, external issues, or hotpatch were performed.",
+      "reportedEventTypes": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "reportedItemTypes": [
+        "agent_message"
+      ]
+    },
+    {
+      "id": "explicit-security-checklist",
+      "prompt": "$security-checklist\nIdentify this installed skill's purpose, first applicable preflight step, and the authority needed before applying it. This is routing/preflight only, not a security assessment. Read its full installed SKILL.md. Identify bundled local resource paths and whether they exist. Do not perform current-security research or apply recipes.",
+      "exitCode": 0,
+      "turnCompleted": true,
+      "finalAnswer": "- **Selected:** `security-checklist`, for pre-deployment audits organized around OWASP Top 10.\n- **Installed path supplied:** [SKILL.md](<RUN_ROOT>/project/.agents/skills/security-checklist/SKILL.md). Filesystem observation failed: Bubblewrap returned `Operation not permitted`. I read the full pasted text; the installed copy and `~/CLAUDE.md` remain unread.\n- **Preflight:** Establish authorized audit scope first. The skill then prescribes “Step 0: Research the current security landscape,” covering four research angles and a synthesis before recipes. This fixture does not authorize that research.\n- **Local resources:** The text references sibling `secure-auth`, resolving to `.agents/skills/secure-auth/SKILL.md`. Existence is unverified. No other bundled resource paths are explicitly referenced; missing resources cannot be determined.\n- **Authority and boundaries:** Applying the audit requires separate user authorization beyond this fixture. Suggested fixes, credential rotation, history rewrites, force pushes, and external issue creation also require separate authorization. No assessment, research, network requests, mutations, installations, credential access, subagents, or hotpatch occurred.",
+      "reportedEventTypes": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "reportedItemTypes": [
+        "agent_message"
+      ]
+    },
+    {
+      "id": "explicit-supply-chain-hardening",
+      "prompt": "$supply-chain-hardening\nIdentify this installed skill's purpose, first applicable preflight step, and the authority needed before applying it. This is routing/preflight only, not a security assessment. Read its full installed SKILL.md. Identify bundled local resource paths and whether they exist. Do not perform current-security research or apply recipes.",
+      "exitCode": 0,
+      "turnCompleted": true,
+      "finalAnswer": "- **Selected:** `supply-chain-hardening`—npm/bun release cooldowns, sandboxed scans before bypasses, and lifecycle-script suppression.\n- **Installed path supplied:** [SKILL.md](<RUN_ROOT>/project/.agents/skills/supply-chain-hardening/SKILL.md). Direct reads of it and `~/CLAUDE.md` failed with `bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted`. I read the full pasted skill; the installed contents remain unverified.\n- **First recipe preflight:** Check `npm --version` for npm ≥11; not executed.\n- **Bundled resources:** `.agents/skills/supply-chain-hardening/scripts/hotpatch.example.sh`; a synthetic fixture is also claimed, without a path. Existence checks failed, so neither is confirmed present or missing. `~/.claude/hotpatch.sh` is a proposed copy destination.\n- **Authority and boundaries:** Your request authorizes inspection only. Upgrades, configuration writes, copying/chmod, installs, bypasses, and script execution require separate authorization. No research, network requests, credential access, mutations, subagents, external issues, or hotpatch execution occurred.",
+      "reportedEventTypes": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "reportedItemTypes": [
+        "agent_message"
+      ]
+    },
+    {
+      "id": "implicit-api",
+      "prompt": "We are planning a REST API with public endpoints. Which available skill applies to reviewing API hardening, rate limiting and input validation? Routing/preflight only: read the chosen installed skill, state its first step and needed authority; do not apply security recipes or perform current-security research.",
+      "exitCode": 0,
+      "turnCompleted": true,
+      "finalAnswer": "- **Selected:** `api-hardening`, matching public API hardening, rate limiting, and input validation.\n- **Listed installed path:** [SKILL.md](<RUN_ROOT>/project/.agents/skills/api-hardening/SKILL.md). Contents could not be observed.\n- **Preflight:** Reads of `~/CLAUDE.md` and the skill failed because the sandbox could not initialize (`bwrap: loopback: Failed RTM_NEWADDR`). Its first step and specific authority requirements remain unverified.\n- **Missing resources:** Readable host guidance and skill contents; their absence is not established.\n- **Boundaries:** Read-only inspection was authorized. Any suggested mutation requires separate authorization. No changes, scripts, credentials, network requests, subagents, external issues, or hotpatch were used.",
+      "reportedEventTypes": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "reportedItemTypes": [
+        "agent_message"
+      ]
+    },
+    {
+      "id": "implicit-supply-chain",
+      "prompt": "We want to plan protection against npm supply-chain attacks and install-time cooldown bypasses. Select the applicable available skill, read it and identify whether its bundled scan resources are present. Routing/preflight only; no installation or research.",
+      "exitCode": 0,
+      "turnCompleted": true,
+      "finalAnswer": "- **Selected skill:** `supply-chain-hardening`.\n- **Catalog path:** [.agents/skills/supply-chain-hardening/SKILL.md](<RUN_ROOT>/project/.agents/skills/supply-chain-hardening/SKILL.md). Installation not independently verified.\n- **Preflight:** Blocked. Required host-guidance reads failed because the sandbox could not initialize: `bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted`.\n- **Missing resources:** Unknown; skill contents and bundled scan resources could not be inspected.\n- **Boundaries:** No changes, installations, scripts, credential access, network requests, subagents, external issues, or hotpatch. Any suggested mutation requires separate authorization.",
+      "reportedEventTypes": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "reportedItemTypes": [
+        "agent_message"
+      ]
+    },
+    {
+      "id": "non-trigger",
+      "prompt": "Write a two-line poem about an autumn leaf. No software, authentication, API, security or package-management work is requested.",
+      "exitCode": 0,
+      "turnCompleted": true,
+      "finalAnswer": "An autumn leaf lets go of gold,\nAnd rests where summer’s dreams grow cold.\n\nSelected skill: none. Installed path: not observed. Preflight: host-guidance read blocked by sandbox error. Missing resources: `~/CLAUDE.md` unread. Boundaries: no mutations, scripts, credentials, network requests, subagents, external issues, or hotpatch.",
+      "reportedEventTypes": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "reportedItemTypes": [
+        "agent_message"
+      ]
+    }
+  ],
+  "evidenceLimit": "CLI JSONL exposed agent messages and turn completion, not command-level tool traces. Sandbox failures and non-execution assertions are response reports, not independently traced security proofs. Explicit prompts received supplied skill text; implicit prompts selected from the catalog but could not read the full file."
+}
