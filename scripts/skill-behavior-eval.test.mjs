@@ -1,5 +1,12 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdtempSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import test from 'node:test';
@@ -71,6 +78,25 @@ test('variant preparation copies only the selected regular skill tree', () => {
       '---\nname: zero-build-frontend\ndescription: test\n---\n',
     );
     assert.ok(prepared.outputSchema.endsWith('response-schema.json'));
+    assert.equal(prepared.codexHome, authHome);
+    assert.equal(existsSync(join(prepared.clientHome, '.codex', 'auth.json')), false);
+    const invocation = buildInvocation('codex', {
+      skill: 'zero-build-frontend',
+      category: 'activation',
+      prompt: 'Build a page.',
+    }, prepared);
+    assert.deepEqual(invocation.env, {
+      CODEX_HOME: prepared.codexHome,
+      HOME: prepared.clientHome,
+      USERPROFILE: prepared.clientHome,
+    });
+    assert.deepEqual(
+      invocation.args.slice(
+        invocation.args.indexOf('--enable'),
+        invocation.args.indexOf('--enable') + 2,
+      ),
+      ['--enable', 'skip_host_skill_discovery'],
+    );
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }
@@ -208,6 +234,32 @@ test('runtime evidence detects candidate skill activation in both client transcr
     parseRuntimeEvidence('codex', windowsArrayCommand, 'zero-build-frontend'),
     { candidateSkillActivated: true },
   );
+  for (const command of [
+    'cd .agents/skills/zero-build-frontend && cat SKILL.md',
+    'cd .agents/skills && cat zero-build-frontend/SKILL.md',
+  ]) {
+    const changedDirectoryCommand = codex.replace(
+      JSON.stringify("sed -n '1,220p' .agents/skills/zero-build-frontend/SKILL.md"),
+      JSON.stringify(command),
+    );
+    assert.deepEqual(
+      parseRuntimeEvidence('codex', changedDirectoryCommand, 'zero-build-frontend'),
+      { candidateSkillActivated: true },
+    );
+  }
+  for (const command of [
+    'echo .agents/skills/zero-build-frontend && cat other/SKILL.md',
+    'cat .agents/skills/source-verification/SKILL.md',
+  ]) {
+    const unrelatedRead = codex.replace(
+      JSON.stringify("sed -n '1,220p' .agents/skills/zero-build-frontend/SKILL.md"),
+      JSON.stringify(command),
+    );
+    assert.deepEqual(
+      parseRuntimeEvidence('codex', unrelatedRead, 'zero-build-frontend'),
+      { candidateSkillActivated: false },
+    );
+  }
   assert.throws(
     () => parseRuntimeEvidence('codex', '', 'source-verification'),
     /transcript is empty/u,
@@ -374,10 +426,26 @@ test('unrelated rejection fails when the runtime activated the candidate skill',
     { candidateSkillActivated: true },
   );
   assert.equal(activated.pass, false);
+  assert.equal(activated.score, 4);
   assert.ok(activated.failed.includes('activation'));
   const missingEvidence = scoreResult(fixture, response);
   assert.equal(missingEvidence.pass, false);
   assert.ok(missingEvidence.failed.includes('activation'));
+
+  const failedResponse = scoreResult(fixture, {
+    decision: 'use',
+    skill: fixture.skill,
+    branch: 'none',
+    rationale: 'No match.',
+    actions: [],
+    artifact: null,
+    safety: [],
+  }, { candidateSkillActivated: true });
+  assert.equal(failedResponse.score, 0);
+  assert.deepEqual(
+    failedResponse.failed,
+    ['decision', 'skill', 'branch', 'terms', 'activation'],
+  );
 });
 
 test('redaction removes common credentials and long bearer values', () => {

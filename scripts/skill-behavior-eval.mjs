@@ -14,7 +14,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
-import { basename, isAbsolute, join, relative, resolve } from 'node:path';
+import { basename, isAbsolute, join, posix, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 export const EVALUATION_TIMEOUT_MS = 180_000;
@@ -137,6 +137,7 @@ export function prepareVariant({
 
   let pluginDir;
   let codexHome;
+  let clientHome;
   if (client === 'claude') {
     pluginDir = join(root, 'plugin');
     mkdirSync(join(pluginDir, '.claude-plugin'), { recursive: true, mode: 0o700 });
@@ -151,6 +152,8 @@ export function prepareVariant({
     copySkill(source, join(projectDir, '.agents', 'skills', skillName));
     if (!authSourceHome) throw new Error('Codex authentication home is required');
     codexHome = resolve(authSourceHome);
+    clientHome = join(root, 'client-home');
+    mkdirSync(clientHome, { recursive: true, mode: 0o700 });
   } else {
     throw new Error(`Unsupported evaluation client: ${client}`);
   }
@@ -159,6 +162,7 @@ export function prepareVariant({
     projectDir,
     pluginDir,
     codexHome,
+    clientHome,
     claudeConfigDir: client === 'claude' ? resolve(authSourceHome) : undefined,
     outputSchema,
     responsePath: join(root, 'last-response.json'),
@@ -238,6 +242,8 @@ export function buildInvocation(client, fixture, prepared, env = process.env) {
         'exec',
         '--ignore-user-config',
         '--ignore-rules',
+        '--enable',
+        'skip_host_skill_discovery',
         '--ephemeral',
         '--sandbox',
         'read-only',
@@ -253,7 +259,11 @@ export function buildInvocation(client, fixture, prepared, env = process.env) {
         prompt,
       ],
       cwd: prepared.projectDir,
-      env: { CODEX_HOME: prepared.codexHome },
+      env: {
+        CODEX_HOME: prepared.codexHome,
+        HOME: prepared.clientHome,
+        USERPROFILE: prepared.clientHome,
+      },
     };
   }
   throw new Error(`Unsupported evaluation client: ${client}`);
@@ -344,14 +354,29 @@ export function parseRuntimeEvidence(client, stdout, candidateSkill) {
     if (!events.some((event) => event?.type === 'turn.completed')) {
       throw new Error('Codex runtime transcript did not complete');
     }
-    const skillPath = `.agents/skills/${candidateSkill}/SKILL.md`;
+    const skillPath = `/.agents/skills/${candidateSkill}/SKILL.md`;
     candidateSkillActivated = events.some((event) => {
       const item = event?.item;
       if (event?.type !== 'item.completed' || item?.type !== 'command_execution') return false;
       if (item.status !== undefined && item.status !== 'completed') return false;
       if (item.exit_code !== undefined && item.exit_code !== 0) return false;
       const command = Array.isArray(item.command) ? item.command.join(' ') : item.command;
-      return String(command ?? '').replaceAll('\\', '/').includes(skillPath);
+      const normalized = String(command ?? '').replaceAll('\\', '/');
+      let cwd = '/';
+      for (const clause of normalized.split(/\s*(?:&&|\|\||;|\|)\s*/u)) {
+        const cd = clause.match(/(?:^|[\s"'])cd(?:\s+\/d)?\s+["']?([^\s"']+)/iu);
+        if (cd) cwd = posix.resolve(cwd, cd[1]);
+        const read = clause.match(
+          /\b(?:cat|sed|head|tail|less|more|bat|type|Get-Content|grep|rg|awk)\b(.*)$/iu,
+        );
+        if (!read) continue;
+        const arguments_ = read[1].match(/(?:"[^"]*"|'[^']*'|[^\s]+)/gu) ?? [];
+        if (arguments_.some((argument) => {
+          const path = argument.replace(/^["']|["',)]$/gu, '');
+          return !path.startsWith('-') && posix.resolve(cwd, path).endsWith(skillPath);
+        })) return true;
+      }
+      return false;
     });
   } else {
     throw new Error(`Unsupported evaluation client: ${client}`);
@@ -386,7 +411,8 @@ export function scoreResult(fixture, response, runtimeEvidence = {}) {
   if (isUnrelatedNonTrigger(fixture) && runtimeEvidence.candidateSkillActivated !== false) {
     failed.push('activation');
   }
-  return { pass: failed.length === 0, score: 4 - failed.length, failed };
+  const score = Object.values(checks).filter(Boolean).length;
+  return { pass: failed.length === 0, score, failed };
 }
 
 export function runInvocation(invocation, responsePath, client, run = spawnSync) {
