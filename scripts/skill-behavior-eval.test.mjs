@@ -136,9 +136,27 @@ test('unrelated fixtures use implicit discovery without forcing either client sy
       : invocation.args.at(-1);
 
     assert.doesNotMatch(prompt, forcedSyntax);
+    assert.doesNotMatch(prompt, /project skill/u);
+    assert.match(prompt, /candidate skill/u);
     assert.match(prompt, /Do not activate it merely because it is installed/u);
-    assert.match(prompt, /never name the rejected project skill/u);
+    assert.match(prompt, /never name the rejected candidate skill/u);
+    assert.match(prompt, /Use only the runtime's skill mechanism/u);
+    if (client === 'claude') {
+      assert.deepEqual(
+        invocation.args.slice(-4),
+        ['--tools', 'Skill', '--allowedTools', 'Skill'],
+      );
+    }
   }
+});
+
+test('full-run documentation stays aligned with the fixture count', () => {
+  const fixtureCount = loadFixtureSet(FIXTURES).cases.length;
+  const docs = readFileSync(join(ROOT, 'docs', 'skill-behavior-evaluations.md'), 'utf8');
+
+  assert.match(docs, new RegExp(`full set starts ${fixtureCount * 4} sessions`, 'u'));
+  assert.match(docs, new RegExp(`from ${fixtureCount} cases, two clients, and two variants`, 'u'));
+  assert.match(docs, new RegExp(`--max-cases ${fixtureCount}\\b`, 'u'));
 });
 
 test('Claude parser accepts legacy objects and current event arrays', () => {
