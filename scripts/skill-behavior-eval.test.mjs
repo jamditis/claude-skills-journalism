@@ -90,13 +90,8 @@ test('variant preparation copies only the selected regular skill tree', () => {
       HOME: prepared.clientHome,
       USERPROFILE: prepared.clientHome,
     });
-    assert.deepEqual(
-      invocation.args.slice(
-        invocation.args.indexOf('--enable'),
-        invocation.args.indexOf('--enable') + 2,
-      ),
-      ['--enable', 'skip_host_skill_discovery'],
-    );
+    assert.equal(invocation.args.includes('--enable'), false);
+    assert.equal(invocation.args.includes('skip_host_skill_discovery'), false);
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }

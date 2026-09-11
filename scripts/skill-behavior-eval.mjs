@@ -242,8 +242,6 @@ export function buildInvocation(client, fixture, prepared, env = process.env) {
         'exec',
         '--ignore-user-config',
         '--ignore-rules',
-        '--enable',
-        'skip_host_skill_discovery',
         '--ephemeral',
         '--sandbox',
         'read-only',

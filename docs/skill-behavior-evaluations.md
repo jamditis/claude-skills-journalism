@@ -20,7 +20,7 @@ The runner copies one selected skill into a new temporary directory for each ses
 
 Claude runs with `claude -p`, no session persistence, and only project or local settings enabled. Tools are disabled except for the Skill mechanism in unrelated non-trigger probes.
 
-Codex runs with `codex exec`, an ephemeral session, a read-only sandbox, and ignored user configuration.
+Codex runs with `codex exec`, an ephemeral session, a read-only sandbox, ignored user configuration, and a disposable user home so ordinary user skills are not discovered.
 
 Each client uses its normal authentication home.
 
