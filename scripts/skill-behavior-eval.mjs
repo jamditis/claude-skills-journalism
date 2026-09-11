@@ -198,16 +198,19 @@ export function buildInvocation(client, fixture, prepared, env = process.env) {
     const modelArgs = env.SKILL_EVAL_CLAUDE_MODEL
       ? ['--model', env.SKILL_EVAL_CLAUDE_MODEL]
       : [];
+    const outputArgs = isUnrelatedNonTrigger(fixture)
+      ? ['--output-format', 'stream-json', '--verbose']
+      : ['--output-format', 'json'];
     const toolArgs = isUnrelatedNonTrigger(fixture)
       ? ['--tools', 'Skill', '--allowedTools', 'Skill']
       : ['--tools', ''];
     return {
       command: 'claude',
+      candidateSkill: fixture.skill,
       args: [
         '-p',
         prompt,
-        '--output-format',
-        'json',
+        ...outputArgs,
         '--json-schema',
         JSON.stringify(RESPONSE_SCHEMA),
         '--no-session-persistence',
@@ -230,6 +233,7 @@ export function buildInvocation(client, fixture, prepared, env = process.env) {
       : [];
     return {
       command: 'codex',
+      candidateSkill: fixture.skill,
       args: [
         'exec',
         '--ignore-user-config',
@@ -291,9 +295,21 @@ function parseClaudeOutput(resultEvent) {
   return parsed;
 }
 
+function parseJsonTranscript(stdout) {
+  const text = String(stdout).trim();
+  if (!text) return [];
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text.split(/\r?\n/u)
+      .filter((line) => line.trim())
+      .map((line) => JSON.parse(line));
+  }
+}
+
 export function parseResponse(client, stdout, responsePath) {
   if (client === 'codex') return JSON.parse(readFileSync(responsePath, 'utf8'));
-  const envelope = JSON.parse(stdout);
+  const envelope = parseJsonTranscript(stdout);
   if (!Array.isArray(envelope)) return parseClaudeOutput(envelope);
   const resultEvents = envelope.filter((event) => event?.type === 'result');
   if (resultEvents.length !== 1) {
@@ -304,7 +320,47 @@ export function parseResponse(client, stdout, responsePath) {
   return parseClaudeOutput(resultEvents[0]);
 }
 
-export function scoreResult(fixture, response) {
+export function parseRuntimeEvidence(client, stdout, candidateSkill) {
+  const parsed = parseJsonTranscript(stdout);
+  const events = Array.isArray(parsed) ? parsed : [parsed];
+  if (events.length === 0) throw new Error(`${client} runtime transcript is empty`);
+  let candidateSkillActivated = false;
+
+  if (client === 'claude') {
+    if (!events.some((event) => event?.type === 'result')) {
+      throw new Error('Claude runtime transcript did not complete');
+    }
+    candidateSkillActivated = events.some((event) => event?.type === 'assistant'
+      && Array.isArray(event.message?.content)
+      && event.message.content.some((content) => {
+        if (content?.type !== 'tool_use' || content.name !== 'Skill') return false;
+        const activatedSkill = String(content.input?.skill ?? '')
+          .trim()
+          .replace(/^\/+/, '');
+        return activatedSkill === candidateSkill
+          || activatedSkill.endsWith(`:${candidateSkill}`);
+      }));
+  } else if (client === 'codex') {
+    if (!events.some((event) => event?.type === 'turn.completed')) {
+      throw new Error('Codex runtime transcript did not complete');
+    }
+    const skillPath = `.agents/skills/${candidateSkill}/SKILL.md`;
+    candidateSkillActivated = events.some((event) => {
+      const item = event?.item;
+      if (event?.type !== 'item.completed' || item?.type !== 'command_execution') return false;
+      if (item.status !== undefined && item.status !== 'completed') return false;
+      if (item.exit_code !== undefined && item.exit_code !== 0) return false;
+      const command = Array.isArray(item.command) ? item.command.join(' ') : item.command;
+      return String(command ?? '').replaceAll('\\', '/').includes(skillPath);
+    });
+  } else {
+    throw new Error(`Unsupported evaluation client: ${client}`);
+  }
+
+  return { candidateSkillActivated };
+}
+
+export function scoreResult(fixture, response, runtimeEvidence = {}) {
   const serialized = JSON.stringify(response);
   const normalize = (value) => String(value).toLowerCase().replace(/[^a-z0-9]+/gu, ' ').trim();
   const responseBranch = new Set(normalize(response.branch).split(' '));
@@ -327,6 +383,9 @@ export function scoreResult(fixture, response) {
   const failed = Object.entries(checks)
     .filter(([, passed]) => !passed)
     .map(([name]) => name);
+  if (isUnrelatedNonTrigger(fixture) && runtimeEvidence.candidateSkillActivated !== false) {
+    failed.push('activation');
+  }
   return { pass: failed.length === 0, score: 4 - failed.length, failed };
 }
 
@@ -356,7 +415,10 @@ export function runInvocation(invocation, responsePath, client, run = spawnSync)
       + redactText(processDetails.join('; ')).slice(-2000),
     );
   }
-  return parseResponse(client, result.stdout, responsePath);
+  return {
+    response: parseResponse(client, result.stdout, responsePath),
+    runtimeEvidence: parseRuntimeEvidence(client, result.stdout, invocation.candidateSkill),
+  };
 }
 
 function resolveCases(options, fixtureSet) {
@@ -478,7 +540,7 @@ export function runCli(args = process.argv.slice(2), { run = spawnSync } = {}) {
               args: invocation.args.map((arg) => arg === evaluationPrompt(client, fixture) ? '[PROMPT]' : arg),
             });
           } else {
-            const response = runInvocation(
+            const { response, runtimeEvidence } = runInvocation(
               invocation,
               prepared.responsePath,
               client,
@@ -492,7 +554,8 @@ export function runCli(args = process.argv.slice(2), { run = spawnSync } = {}) {
               variant,
               skillDigest: prepared.skillDigest,
               response,
-              result: scoreResult(fixture, response),
+              runtimeEvidence,
+              result: scoreResult(fixture, response, runtimeEvidence),
             });
           }
         } finally {

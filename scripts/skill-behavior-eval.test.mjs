@@ -10,6 +10,7 @@ import {
   loadFixtureSet,
   parseCliArgs,
   parseResponse,
+  parseRuntimeEvidence,
   prepareVariant,
   redactText,
   runCli,
@@ -142,12 +143,83 @@ test('unrelated fixtures use implicit discovery without forcing either client sy
     assert.match(prompt, /never name the rejected candidate skill/u);
     assert.match(prompt, /Use only the runtime's skill mechanism/u);
     if (client === 'claude') {
+      assert.ok(invocation.args.includes('--verbose'));
+      assert.deepEqual(
+        invocation.args.slice(
+          invocation.args.indexOf('--output-format'),
+          invocation.args.indexOf('--output-format') + 2,
+        ),
+        ['--output-format', 'stream-json'],
+      );
       assert.deepEqual(
         invocation.args.slice(-4),
         ['--tools', 'Skill', '--allowedTools', 'Skill'],
       );
     }
   }
+});
+
+test('runtime evidence detects candidate skill activation in both client transcripts', () => {
+  const claude = [
+    { type: 'system', subtype: 'init' },
+    {
+      type: 'assistant',
+      message: {
+        content: [{
+          type: 'tool_use',
+          name: 'Skill',
+          input: { skill: 'skill-evaluation:zero-build-frontend' },
+        }],
+      },
+    },
+    CLAUDE_ENVELOPES.legacy,
+  ].map((event) => JSON.stringify(event)).join('\n');
+  assert.deepEqual(
+    parseRuntimeEvidence('claude', claude, 'zero-build-frontend'),
+    { candidateSkillActivated: true },
+  );
+
+  const codex = [
+    { type: 'thread.started', thread_id: 'thread-1' },
+    {
+      type: 'item.completed',
+      item: {
+        type: 'command_execution',
+        command: "sed -n '1,220p' .agents/skills/zero-build-frontend/SKILL.md",
+        status: 'completed',
+        exit_code: 0,
+      },
+    },
+    { type: 'turn.completed', usage: { input_tokens: 1, output_tokens: 1 } },
+  ].map((event) => JSON.stringify(event)).join('\n');
+  assert.deepEqual(
+    parseRuntimeEvidence('codex', codex, 'zero-build-frontend'),
+    { candidateSkillActivated: true },
+  );
+  assert.deepEqual(
+    parseRuntimeEvidence('codex', codex, 'source-verification'),
+    { candidateSkillActivated: false },
+  );
+  const windowsArrayCommand = codex.replace(
+    JSON.stringify("sed -n '1,220p' .agents/skills/zero-build-frontend/SKILL.md"),
+    JSON.stringify(['cmd', '/c', 'type .agents\\skills\\zero-build-frontend\\SKILL.md']),
+  );
+  assert.deepEqual(
+    parseRuntimeEvidence('codex', windowsArrayCommand, 'zero-build-frontend'),
+    { candidateSkillActivated: true },
+  );
+  assert.throws(
+    () => parseRuntimeEvidence('codex', '', 'source-verification'),
+    /transcript is empty/u,
+  );
+  assert.throws(
+    () => parseRuntimeEvidence(
+      'codex',
+      JSON.stringify({ type: 'thread.started', thread_id: 'thread-1' }),
+      'source-verification',
+    ),
+    /did not complete/u,
+  );
 });
 
 test('full-run documentation stays aligned with the fixture count', () => {
@@ -276,6 +348,36 @@ test('near-neighbor rejection requires a named workflow branch', () => {
     assert.ok(!result.failed.includes('decision'), fixture.id);
     assert.ok(!result.failed.includes('skill'), fixture.id);
   }
+});
+
+test('unrelated rejection fails when the runtime activated the candidate skill', () => {
+  const fixture = loadFixtureSet(FIXTURES).cases.find(
+    (item) => item.id === 'zbf-unrelated',
+  );
+  const response = {
+    decision: 'reject',
+    skill: null,
+    branch: fixture.expect.branch,
+    rationale: `This request needs ${JSON.stringify(fixture.expect.terms)}.`,
+    actions: [],
+    artifact: null,
+    safety: [],
+  };
+
+  assert.equal(
+    scoreResult(fixture, response, { candidateSkillActivated: false }).pass,
+    true,
+  );
+  const activated = scoreResult(
+    fixture,
+    response,
+    { candidateSkillActivated: true },
+  );
+  assert.equal(activated.pass, false);
+  assert.ok(activated.failed.includes('activation'));
+  const missingEvidence = scoreResult(fixture, response);
+  assert.equal(missingEvidence.pass, false);
+  assert.ok(missingEvidence.failed.includes('activation'));
 });
 
 test('redaction removes common credentials and long bearer values', () => {
