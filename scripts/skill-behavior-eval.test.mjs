@@ -36,13 +36,13 @@ test('fixture set covers every required category for each pilot skill', () => {
     'output-artifact',
   ];
   for (const skill of ['zero-build-frontend', 'source-verification', 'data-journalism']) {
-    const categories = fixtureSet.cases
+    const categories = new Set(fixtureSet.cases
       .filter((item) => item.skill === skill)
-      .map((item) => item.category)
-      .sort();
-    assert.deepEqual(categories, [...required].sort());
+      .map((item) => item.category));
+    for (const category of required) {
+      assert.ok(categories.has(category), `${skill} needs a ${category} fixture`);
+    }
   }
-  assert.equal(fixtureSet.cases.length, 21);
 });
 
 test('variant preparation copies only the selected regular skill tree', () => {
@@ -115,6 +115,32 @@ test('invocations use bounded isolated print sessions without direct APIs', () =
   );
 });
 
+test('unrelated fixtures use implicit discovery without forcing either client syntax', () => {
+  const fixture = loadFixtureSet(FIXTURES).cases.find(
+    (item) => item.id === 'zbf-unrelated',
+  );
+  for (const [client, forcedSyntax] of [
+    ['codex', /\$zero-build-frontend/u],
+    ['claude', /\/skill-evaluation:zero-build-frontend/u],
+  ]) {
+    const invocation = buildInvocation(client, fixture, {
+      projectDir: '/tmp/eval/project',
+      pluginDir: '/tmp/eval/plugin',
+      codexHome: '/tmp/eval/codex',
+      claudeConfigDir: '/home/test/.claude',
+      outputSchema: '/tmp/eval/schema.json',
+      responsePath: '/tmp/eval/response.json',
+    });
+    const prompt = client === 'claude'
+      ? invocation.args[invocation.args.indexOf('-p') + 1]
+      : invocation.args.at(-1);
+
+    assert.doesNotMatch(prompt, forcedSyntax);
+    assert.match(prompt, /Do not activate it merely because it is installed/u);
+    assert.match(prompt, /never name the rejected project skill/u);
+  }
+});
+
 test('Claude parser accepts legacy objects and current event arrays', () => {
   assert.deepEqual(
     parseResponse('claude', JSON.stringify(CLAUDE_ENVELOPES.legacy)),
@@ -154,7 +180,9 @@ test('Claude parser fails closed on error, ambiguous, missing, and malformed res
 });
 
 test('scoring checks the decision, branch, skill, and required terms', () => {
-  const fixture = loadFixtureSet(FIXTURES).cases[0];
+  const fixture = loadFixtureSet(FIXTURES).cases.find(
+    (item) => item.id === 'zbf-activation',
+  );
   const pass = scoreResult(fixture, {
     decision: 'use',
     skill: 'zero-build-frontend',

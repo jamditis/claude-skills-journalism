@@ -36,6 +36,13 @@ function skillDirsOnDisk() {
     .sort();
 }
 
+const TRIGGER_FIXTURES_PATH = join(
+  ROOT,
+  'scripts',
+  'fixtures',
+  'lean-skill-evaluations.json',
+);
+
 test('inventory is discovered from the repository, not hard-coded (AC1)', () => {
   const discovered = discoverSkills().map((s) => s.name);
   assert.deepEqual(discovered, skillDirsOnDisk());
@@ -147,6 +154,29 @@ test('a portable skill stays shared', () => {
   const row = buildMatrix().find((r) => r.name === 'accessibility-compliance');
   assert.equal(row.class, SHARED);
   assert.equal(row.automatic, false);
+});
+
+test('every shared skill has activation and unrelated non-trigger fixtures (AC3)', () => {
+  const fixtureSet = JSON.parse(readFileSync(TRIGGER_FIXTURES_PATH, 'utf8'));
+  const sharedSkills = buildMatrix()
+    .filter((row) => row.class === SHARED)
+    .map((row) => row.name);
+
+  for (const skill of sharedSkills) {
+    const cases = fixtureSet.cases.filter(
+      (fixture) => fixture.package === 'dev-toolkit' && fixture.skill === skill,
+    );
+    const activation = cases.filter((fixture) => fixture.category === 'activation');
+    const unrelated = cases.filter(
+      (fixture) => fixture.category === 'unrelated-non-trigger',
+    );
+
+    assert.equal(activation.length, 1, `${skill} needs one activation fixture`);
+    assert.equal(unrelated.length, 1, `${skill} needs one unrelated non-trigger fixture`);
+    assert.equal(activation[0].expect.decision, 'use');
+    assert.equal(unrelated[0].expect.decision, 'reject');
+    assert.doesNotMatch(unrelated[0].prompt, new RegExp(`\\$?${skill}`, 'iu'));
+  }
 });
 
 test('the classifier reaches all three classes (trigger and non-trigger)', () => {
