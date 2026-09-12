@@ -2,6 +2,134 @@
   "schemaVersion": 1,
   "cases": [
     {
+      "id": "ac-activation",
+      "skill": "accessibility-compliance",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Audit a newsroom article page against WCAG 2.2 AA. Check image alternatives, video captions, keyboard focus, and an interactive chart.",
+      "expect": { "decision": "use", "branch": "accessibility-audit", "branchAlternatives": ["accessibility audit", "WCAG audit"], "terms": ["WCAG", "keyboard"] }
+    },
+    {
+      "id": "ac-unrelated",
+      "skill": "accessibility-compliance",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Copyedit a verified city council story for AP style and active voice.",
+      "expect": { "decision": "reject", "branch": "copyediting", "branchAlternatives": ["copyediting", "newsroom style", "editorial rewriting"], "terms": ["style"] }
+    },
+    {
+      "id": "cef-activation",
+      "skill": "context-engineering-fundamentals",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "A long multi-agent investigation keeps losing early constraints and contradicting prior evidence. Design a bounded checkpoint and evidence-loading strategy before work continues.",
+      "expect": { "decision": "use", "branch": "context-recovery", "branchAlternatives": ["context recovery", "context management", "attention management"], "terms": ["checkpoint", "evidence"] }
+    },
+    {
+      "id": "cef-unrelated",
+      "skill": "context-engineering-fundamentals",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Fix an isolated off-by-one error in a five-line parser. The failing input and expected output are already supplied.",
+      "expect": { "decision": "reject", "branch": "bug-fix", "branchAlternatives": ["bug fix", "systematic debugging", "test first"], "terms": ["parser"] }
+    },
+    {
+      "id": "ed-activation",
+      "skill": "electron-dev",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Build a packaged Electron desktop app with a React renderer, a narrow preload bridge, validated IPC, a tray window, and signed releases.",
+      "expect": { "decision": "use", "branch": "electron-security", "branchAlternatives": ["Electron security", "desktop application", "secure IPC"], "terms": ["preload", "IPC"] }
+    },
+    {
+      "id": "ed-unrelated",
+      "skill": "electron-dev",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Build a responsive browser-only React dashboard for an existing web server.",
+      "expect": { "decision": "reject", "branch": "web-interface", "branchAlternatives": ["web interface", "web UI", "browser application"], "terms": ["browser"] }
+    },
+    {
+      "id": "md-activation",
+      "skill": "mobile-debugging",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "A layout failure occurs only in Safari on a physical iPhone. Set up remote inspection and capture console, network, and viewport evidence.",
+      "expect": { "decision": "use", "branch": "ios-remote-debugging", "branchAlternatives": ["iOS remote debugging", "Safari Web Inspector", "mobile debugging"], "terms": ["Safari", "console"] }
+    },
+    {
+      "id": "md-unrelated",
+      "skill": "mobile-debugging",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Diagnose a Node.js service that returns HTTP 500 by using its server logs and unit test.",
+      "expect": { "decision": "reject", "branch": "backend-debugging", "branchAlternatives": ["backend debugging", "server debugging", "systematic debugging"], "terms": ["server"] }
+    },
+    {
+      "id": "pp-activation",
+      "skill": "python-pipeline",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Build a reproducible Python pipeline that validates incoming CSV schemas, joins large tables, writes partitioned Parquet, and records rejected rows.",
+      "expect": { "decision": "use", "branch": "data-pipeline", "branchAlternatives": ["data pipeline", "batch pipeline", "Python pipeline", "pipeline workflow", "CSV based pipeline"], "terms": ["schema", "Parquet"] }
+    },
+    {
+      "id": "pp-unrelated",
+      "skill": "python-pipeline",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Add one pure function that formats an ISO timestamp in an existing command-line application.",
+      "expect": { "decision": "reject", "branch": "application-code", "branchAlternatives": ["application code", "ordinary implementation", "ordinary development", "ordinary small edit", "ordinary small code edit", "ordinary small code change", "function change", "software development", "small self contained edit", "ponytail dev"], "terms": ["timestamp"] }
+    },
+    {
+      "id": "vc-activation",
+      "skill": "vibe-coding",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Set up a guarded AI-assisted workflow for a newsroom editor who will prototype a small app without a software background. Include planning, version control, and verification stops.",
+      "expect": { "decision": "use", "branch": "guided-development", "branchAlternatives": ["guided development", "AI assisted development", "prototype workflow"], "terms": ["version control", ["verify", "verification"]] }
+    },
+    {
+      "id": "vc-unrelated",
+      "skill": "vibe-coding",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Review a completed patch for a SQL injection flaw and report whether the parameter binding is safe.",
+      "expect": { "decision": "reject", "branch": "security-review", "branchAlternatives": ["security review", "secure coding", "code review"], "terms": ["SQL injection"] }
+    },
+    {
+      "id": "ws-activation",
+      "skill": "web-scraping",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Collect public city council agenda pages into a sourced dataset. Honor robots.txt, identify the client, bound request rates, and preserve page provenance.",
+      "expect": { "decision": "use", "branch": "public-scraping", "branchAlternatives": ["public scraping", "ethical scraping", "content extraction"], "terms": ["robots", "provenance"] }
+    },
+    {
+      "id": "ws-unrelated",
+      "skill": "web-scraping",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Use the vendor's documented SDK to query its authenticated JSON API for our own account records.",
+      "expect": { "decision": "reject", "branch": "api-client", "branchAlternatives": ["API client", "SDK integration", "authenticated API"], "terms": ["SDK"] }
+    },
+    {
+      "id": "wubp-activation",
+      "skill": "web-ui-best-practices",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Review a SaaS dashboard for interaction latency, keyboard operation, responsive layout, loading and empty states, and useful error copy.",
+      "expect": { "decision": "use", "branch": "interface-review", "branchAlternatives": ["interface review", "web UI review", "dashboard review"], "terms": ["loading", "keyboard"] }
+    },
+    {
+      "id": "wubp-unrelated",
+      "skill": "web-ui-best-practices",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Optimize a PostgreSQL query plan in a backend service without changing any screen or user interaction.",
+      "expect": { "decision": "reject", "branch": "database-performance", "branchAlternatives": ["database performance", "query optimization", "backend optimization"], "terms": ["PostgreSQL"] }
+    },
+    {
       "id": "zbf-activation",
       "skill": "zero-build-frontend",
       "package": "dev-toolkit",
@@ -16,6 +144,14 @@
       "category": "near-neighbor-rejection",
       "prompt": "Optimize the existing Vite build for faster production chunk loading. Keep the build system.",
       "expect": { "decision": "reject", "branch": "existing-build", "branchAlternatives": ["existing build", "build optimization", "neighboring build", "bundler toolchain"], "terms": ["Vite"] }
+    },
+    {
+      "id": "zbf-unrelated",
+      "skill": "zero-build-frontend",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Tune a PostgreSQL connection pool for an existing background worker with no browser-facing output.",
+      "expect": { "decision": "reject", "branch": "backend-performance", "branchAlternatives": ["backend performance", "database tuning", "worker configuration"], "terms": ["PostgreSQL"] }
     },
     {
       "id": "zbf-branch",

@@ -1,5 +1,14 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdtempSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  readlinkSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import test from 'node:test';
@@ -10,6 +19,7 @@ import {
   loadFixtureSet,
   parseCliArgs,
   parseResponse,
+  parseRuntimeEvidence,
   prepareVariant,
   redactText,
   runCli,
@@ -36,13 +46,13 @@ test('fixture set covers every required category for each pilot skill', () => {
     'output-artifact',
   ];
   for (const skill of ['zero-build-frontend', 'source-verification', 'data-journalism']) {
-    const categories = fixtureSet.cases
+    const categories = new Set(fixtureSet.cases
       .filter((item) => item.skill === skill)
-      .map((item) => item.category)
-      .sort();
-    assert.deepEqual(categories, [...required].sort());
+      .map((item) => item.category));
+    for (const category of required) {
+      assert.ok(categories.has(category), `${skill} needs a ${category} fixture`);
+    }
   }
-  assert.equal(fixtureSet.cases.length, 21);
 });
 
 test('variant preparation copies only the selected regular skill tree', () => {
@@ -70,6 +80,48 @@ test('variant preparation copies only the selected regular skill tree', () => {
       '---\nname: zero-build-frontend\ndescription: test\n---\n',
     );
     assert.ok(prepared.outputSchema.endsWith('response-schema.json'));
+    assert.notEqual(prepared.codexHome, authHome);
+    assert.equal(existsSync(join(prepared.clientHome, '.codex', 'auth.json')), false);
+    const invocation = buildInvocation('codex', {
+      skill: 'zero-build-frontend',
+      category: 'activation',
+      prompt: 'Build a page.',
+    }, prepared);
+    assert.deepEqual(invocation.env, {
+      CODEX_HOME: prepared.codexHome,
+      HOME: prepared.clientHome,
+      USERPROFILE: prepared.clientHome,
+    });
+    assert.equal(invocation.args.includes('--enable'), false);
+    assert.equal(invocation.args.includes('skip_host_skill_discovery'), false);
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test('client discovery homes expose only linked authentication files', () => {
+  const temp = mkdtempSync(join(tmpdir(), 'skill-eval-auth-test-'));
+  try {
+    for (const [client, authFile] of [['codex', 'auth.json'], ['claude', '.credentials.json']]) {
+      const authHome = join(temp, `${client}-auth`);
+      mkdirSync(join(authHome, 'skills', 'zero-build-frontend'), { recursive: true });
+      writeFileSync(join(authHome, authFile), '{}');
+      writeFileSync(join(authHome, 'skills', 'zero-build-frontend', 'SKILL.md'), 'stale skill');
+      writeFileSync(join(authHome, 'settings.json'), '{}');
+      const prepared = prepareVariant({
+        client, sourceRoot: ROOT, runRoot: join(temp, client),
+        packageName: 'dev-toolkit', skillName: 'zero-build-frontend', authSourceHome: authHome,
+      });
+      const isolated = client === 'codex' ? prepared.codexHome : prepared.claudeConfigDir;
+      assert.notEqual(isolated, authHome);
+      assert.deepEqual(readdirSync(isolated), [authFile]);
+      assert.equal(readlinkSync(join(isolated, authFile)), join(authHome, authFile));
+      const invocation = buildInvocation(client, loadFixtureSet(FIXTURES).cases[0], prepared);
+      assert.equal(invocation.env.HOME, prepared.clientHome);
+      assert.equal(invocation.env.USERPROFILE, prepared.clientHome);
+      rmSync(join(temp, client), { recursive: true });
+      assert.equal(readFileSync(join(authHome, authFile), 'utf8'), '{}');
+    }
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }
@@ -115,6 +167,151 @@ test('invocations use bounded isolated print sessions without direct APIs', () =
   );
 });
 
+test('unrelated fixtures use implicit discovery without forcing either client syntax', () => {
+  const fixture = loadFixtureSet(FIXTURES).cases.find(
+    (item) => item.id === 'zbf-unrelated',
+  );
+  for (const [client, forcedSyntax] of [
+    ['codex', /\$zero-build-frontend/u],
+    ['claude', /\/skill-evaluation:zero-build-frontend/u],
+  ]) {
+    const invocation = buildInvocation(client, fixture, {
+      projectDir: '/tmp/eval/project',
+      pluginDir: '/tmp/eval/plugin',
+      codexHome: '/tmp/eval/codex',
+      claudeConfigDir: '/home/test/.claude',
+      outputSchema: '/tmp/eval/schema.json',
+      responsePath: '/tmp/eval/response.json',
+    });
+    const prompt = client === 'claude'
+      ? invocation.args[invocation.args.indexOf('-p') + 1]
+      : invocation.args.at(-1);
+
+    assert.doesNotMatch(prompt, forcedSyntax);
+    assert.doesNotMatch(prompt, /project skill/u);
+    assert.match(prompt, /candidate skill/u);
+    assert.match(prompt, /Do not activate it merely because it is installed/u);
+    assert.match(prompt, /never name the rejected candidate skill/u);
+    assert.match(prompt, /Use only the runtime's skill mechanism/u);
+    if (client === 'claude') {
+      assert.ok(invocation.args.includes('--verbose'));
+      assert.deepEqual(
+        invocation.args.slice(
+          invocation.args.indexOf('--output-format'),
+          invocation.args.indexOf('--output-format') + 2,
+        ),
+        ['--output-format', 'stream-json'],
+      );
+      assert.deepEqual(
+        invocation.args.slice(-4),
+        ['--tools', 'Skill', '--allowedTools', 'Skill'],
+      );
+    }
+  }
+});
+
+test('runtime evidence detects candidate skill activation in both client transcripts', () => {
+  const claude = [
+    { type: 'system', subtype: 'init' },
+    {
+      type: 'assistant',
+      message: {
+        content: [{
+          type: 'tool_use',
+          name: 'Skill',
+          input: { skill: 'skill-evaluation:zero-build-frontend' },
+        }],
+      },
+    },
+    CLAUDE_ENVELOPES.legacy,
+  ].map((event) => JSON.stringify(event)).join('\n');
+  assert.deepEqual(
+    parseRuntimeEvidence('claude', claude, 'zero-build-frontend'),
+    { candidateSkillActivated: true },
+  );
+
+  const codex = [
+    { type: 'thread.started', thread_id: 'thread-1' },
+    {
+      type: 'item.completed',
+      item: {
+        type: 'command_execution',
+        command: "sed -n '1,220p' .agents/skills/zero-build-frontend/SKILL.md",
+        status: 'completed',
+        exit_code: 0,
+      },
+    },
+    { type: 'turn.completed', usage: { input_tokens: 1, output_tokens: 1 } },
+  ].map((event) => JSON.stringify(event)).join('\n');
+  assert.deepEqual(
+    parseRuntimeEvidence('codex', codex, 'zero-build-frontend'),
+    { candidateSkillActivated: true },
+  );
+  assert.deepEqual(
+    parseRuntimeEvidence('codex', codex, 'source-verification'),
+    { candidateSkillActivated: false },
+  );
+  const windowsArrayCommand = codex.replace(
+    JSON.stringify("sed -n '1,220p' .agents/skills/zero-build-frontend/SKILL.md"),
+    JSON.stringify(['cmd', '/c', 'type .agents\\skills\\zero-build-frontend\\SKILL.md']),
+  );
+  assert.deepEqual(
+    parseRuntimeEvidence('codex', windowsArrayCommand, 'zero-build-frontend'),
+    { candidateSkillActivated: true },
+  );
+  for (const command of [
+    'cd .agents/skills/zero-build-frontend && cat SKILL.md',
+    'cd .agents/skills && cat zero-build-frontend/SKILL.md',
+    'Set-Location .agents\\skills\\zero-build-frontend; Get-Content SKILL.md',
+    'sl -LiteralPath ".agents/skills/zero-build-frontend"; Get-Content SKILL.md',
+    "chdir -Path '.agents/skills/zero-build-frontend'; Get-Content SKILL.md",
+    'Set-Location -Path "C:/work with spaces/.agents/skills/zero-build-frontend"; Get-Content SKILL.md',
+  ]) {
+    const changedDirectoryCommand = codex.replace(
+      JSON.stringify("sed -n '1,220p' .agents/skills/zero-build-frontend/SKILL.md"),
+      JSON.stringify(command),
+    );
+    assert.deepEqual(
+      parseRuntimeEvidence('codex', changedDirectoryCommand, 'zero-build-frontend'),
+      { candidateSkillActivated: true },
+    );
+  }
+  for (const command of [
+    'echo .agents/skills/zero-build-frontend && cat other/SKILL.md',
+    'cat .agents/skills/source-verification/SKILL.md',
+  ]) {
+    const unrelatedRead = codex.replace(
+      JSON.stringify("sed -n '1,220p' .agents/skills/zero-build-frontend/SKILL.md"),
+      JSON.stringify(command),
+    );
+    assert.deepEqual(
+      parseRuntimeEvidence('codex', unrelatedRead, 'zero-build-frontend'),
+      { candidateSkillActivated: false },
+    );
+  }
+  assert.throws(
+    () => parseRuntimeEvidence('codex', '', 'source-verification'),
+    /transcript is empty/u,
+  );
+  assert.throws(
+    () => parseRuntimeEvidence(
+      'codex',
+      JSON.stringify({ type: 'thread.started', thread_id: 'thread-1' }),
+      'source-verification',
+    ),
+    /did not complete/u,
+  );
+});
+
+test('full-run documentation stays aligned with the fixture count', () => {
+  const fixtureCount = loadFixtureSet(FIXTURES).cases.length;
+  const docs = readFileSync(join(ROOT, 'docs', 'skill-behavior-evaluations.md'), 'utf8');
+
+  assert.match(docs, new RegExp(`full set starts ${fixtureCount * 4} sessions`, 'u'));
+  assert.match(docs, new RegExp(`from ${fixtureCount} cases, two clients, and two variants`, 'u'));
+  assert.match(docs, new RegExp(`--max-cases ${fixtureCount}\\b`, 'u'));
+});
+
 test('Claude parser accepts legacy objects and current event arrays', () => {
   assert.deepEqual(
     parseResponse('claude', JSON.stringify(CLAUDE_ENVELOPES.legacy)),
@@ -154,7 +351,9 @@ test('Claude parser fails closed on error, ambiguous, missing, and malformed res
 });
 
 test('scoring checks the decision, branch, skill, and required terms', () => {
-  const fixture = loadFixtureSet(FIXTURES).cases[0];
+  const fixture = loadFixtureSet(FIXTURES).cases.find(
+    (item) => item.id === 'zbf-activation',
+  );
   const pass = scoreResult(fixture, {
     decision: 'use',
     skill: 'zero-build-frontend',
@@ -230,6 +429,57 @@ test('near-neighbor rejection requires a named workflow branch', () => {
     assert.ok(!result.failed.includes('decision'), fixture.id);
     assert.ok(!result.failed.includes('skill'), fixture.id);
   }
+});
+
+test('unrelated rejection fails when the runtime activated the candidate skill', () => {
+  const fixture = loadFixtureSet(FIXTURES).cases.find(
+    (item) => item.id === 'zbf-unrelated',
+  );
+  const response = {
+    decision: 'reject',
+    skill: null,
+    branch: fixture.expect.branch,
+    rationale: `This request needs ${JSON.stringify(fixture.expect.terms)}.`,
+    actions: [],
+    artifact: null,
+    safety: [],
+  };
+
+  assert.equal(
+    scoreResult(fixture, response, { candidateSkillActivated: false }).pass,
+    true,
+  );
+  for (const skill of ['zero-build-frontend', 'skill-evaluation:zero-build-frontend', '/skill-evaluation:zero-build-frontend']) {
+    const rejectedCandidate = scoreResult(fixture, { ...response, skill }, { candidateSkillActivated: false });
+    assert.equal(rejectedCandidate.pass, false);
+    assert.ok(rejectedCandidate.failed.includes('skill'));
+  }
+  const activated = scoreResult(
+    fixture,
+    response,
+    { candidateSkillActivated: true },
+  );
+  assert.equal(activated.pass, false);
+  assert.equal(activated.score, 4);
+  assert.ok(activated.failed.includes('activation'));
+  const missingEvidence = scoreResult(fixture, response);
+  assert.equal(missingEvidence.pass, false);
+  assert.ok(missingEvidence.failed.includes('activation'));
+
+  const failedResponse = scoreResult(fixture, {
+    decision: 'use',
+    skill: fixture.skill,
+    branch: 'none',
+    rationale: 'No match.',
+    actions: [],
+    artifact: null,
+    safety: [],
+  }, { candidateSkillActivated: true });
+  assert.equal(failedResponse.score, 0);
+  assert.deepEqual(
+    failedResponse.failed,
+    ['decision', 'skill', 'branch', 'terms', 'activation'],
+  );
 });
 
 test('redaction removes common credentials and long bearer values', () => {

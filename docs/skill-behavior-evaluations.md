@@ -18,13 +18,13 @@ The first pilot covers `zero-build-frontend`, `source-verification`, and `data-j
 
 The runner copies one selected skill into a new temporary directory for each session.
 
-Claude runs with `claude -p`, no tools, no session persistence, and only project or local settings enabled.
+Claude runs with `claude -p`, no session persistence, and only project or local settings enabled. Tools are disabled except for the Skill mechanism in unrelated non-trigger probes.
 
-Codex runs with `codex exec`, an ephemeral session, a read-only sandbox, and ignored user configuration.
+Codex runs with `codex exec`, an ephemeral session, a read-only sandbox, ignored user configuration, and a disposable user home so ordinary user skills are not discovered.
 
-Each client uses its normal authentication home.
+Each client uses temporary user and configuration homes. Only the normal authentication file is linked into the temporary configuration directory: `auth.json` for Codex and `.credentials.json` for Claude. Personal skills, plugins, and settings are not linked.
 
-The runner does not copy OAuth files because a copied refresh token can rotate and invalidate the normal session.
+The runner does not copy OAuth files because a copied refresh token can rotate and invalidate the normal session. File-backed authentication must already be available, or supplied through the client environment. Creating file links on Windows requires symlink permission.
 
 The runner removes each temporary directory after the session finishes.
 
@@ -59,9 +59,9 @@ The report records the CLI versions, fixture digest, skill digest, model respons
 
 ## Run the full fixture set
 
-The full set starts 84 sessions.
+The full set starts 152 sessions.
 
-This count comes from 21 cases, two clients, and two variants.
+This count comes from 38 cases, two clients, and two variants.
 
 The runner requires an explicit case limit for this costly operation.
 
@@ -70,7 +70,7 @@ npm run eval:skills -- \
   --baseline /path/to/baseline \
   --candidate /path/to/candidate \
   --all \
-  --max-cases 21 \
+  --max-cases 38 \
   --runtime both \
   --output /path/to/private-results
 ```
