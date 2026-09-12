@@ -22,9 +22,9 @@ Claude runs with `claude -p`, no session persistence, and only project or local 
 
 Codex runs with `codex exec`, an ephemeral session, a read-only sandbox, ignored user configuration, and a disposable user home so ordinary user skills are not discovered.
 
-Each client uses its normal authentication home.
+Each client uses temporary user and configuration homes. Only the normal authentication file is linked into the temporary configuration directory: `auth.json` for Codex and `.credentials.json` for Claude. Personal skills, plugins, and settings are not linked.
 
-The runner does not copy OAuth files because a copied refresh token can rotate and invalidate the normal session.
+The runner does not copy OAuth files because a copied refresh token can rotate and invalidate the normal session. File-backed authentication must already be available, or supplied through the client environment. Creating file links on Windows requires symlink permission.
 
 The runner removes each temporary directory after the session finishes.
 

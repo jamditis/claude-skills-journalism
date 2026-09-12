@@ -4,6 +4,8 @@ import {
   mkdtempSync,
   mkdirSync,
   readFileSync,
+  readdirSync,
+  readlinkSync,
   rmSync,
   writeFileSync,
 } from 'node:fs';
@@ -78,7 +80,7 @@ test('variant preparation copies only the selected regular skill tree', () => {
       '---\nname: zero-build-frontend\ndescription: test\n---\n',
     );
     assert.ok(prepared.outputSchema.endsWith('response-schema.json'));
-    assert.equal(prepared.codexHome, authHome);
+    assert.notEqual(prepared.codexHome, authHome);
     assert.equal(existsSync(join(prepared.clientHome, '.codex', 'auth.json')), false);
     const invocation = buildInvocation('codex', {
       skill: 'zero-build-frontend',
@@ -92,6 +94,34 @@ test('variant preparation copies only the selected regular skill tree', () => {
     });
     assert.equal(invocation.args.includes('--enable'), false);
     assert.equal(invocation.args.includes('skip_host_skill_discovery'), false);
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test('client discovery homes expose only linked authentication files', () => {
+  const temp = mkdtempSync(join(tmpdir(), 'skill-eval-auth-test-'));
+  try {
+    for (const [client, authFile] of [['codex', 'auth.json'], ['claude', '.credentials.json']]) {
+      const authHome = join(temp, `${client}-auth`);
+      mkdirSync(join(authHome, 'skills', 'zero-build-frontend'), { recursive: true });
+      writeFileSync(join(authHome, authFile), '{}');
+      writeFileSync(join(authHome, 'skills', 'zero-build-frontend', 'SKILL.md'), 'stale skill');
+      writeFileSync(join(authHome, 'settings.json'), '{}');
+      const prepared = prepareVariant({
+        client, sourceRoot: ROOT, runRoot: join(temp, client),
+        packageName: 'dev-toolkit', skillName: 'zero-build-frontend', authSourceHome: authHome,
+      });
+      const isolated = client === 'codex' ? prepared.codexHome : prepared.claudeConfigDir;
+      assert.notEqual(isolated, authHome);
+      assert.deepEqual(readdirSync(isolated), [authFile]);
+      assert.equal(readlinkSync(join(isolated, authFile)), join(authHome, authFile));
+      const invocation = buildInvocation(client, loadFixtureSet(FIXTURES).cases[0], prepared);
+      assert.equal(invocation.env.HOME, prepared.clientHome);
+      assert.equal(invocation.env.USERPROFILE, prepared.clientHome);
+      rmSync(join(temp, client), { recursive: true });
+      assert.equal(readFileSync(join(authHome, authFile), 'utf8'), '{}');
+    }
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }
@@ -232,6 +262,10 @@ test('runtime evidence detects candidate skill activation in both client transcr
   for (const command of [
     'cd .agents/skills/zero-build-frontend && cat SKILL.md',
     'cd .agents/skills && cat zero-build-frontend/SKILL.md',
+    'Set-Location .agents\\skills\\zero-build-frontend; Get-Content SKILL.md',
+    'sl -LiteralPath ".agents/skills/zero-build-frontend"; Get-Content SKILL.md',
+    "chdir -Path '.agents/skills/zero-build-frontend'; Get-Content SKILL.md",
+    'Set-Location -Path "C:/work with spaces/.agents/skills/zero-build-frontend"; Get-Content SKILL.md',
   ]) {
     const changedDirectoryCommand = codex.replace(
       JSON.stringify("sed -n '1,220p' .agents/skills/zero-build-frontend/SKILL.md"),
@@ -415,6 +449,11 @@ test('unrelated rejection fails when the runtime activated the candidate skill',
     scoreResult(fixture, response, { candidateSkillActivated: false }).pass,
     true,
   );
+  for (const skill of ['zero-build-frontend', 'skill-evaluation:zero-build-frontend', '/skill-evaluation:zero-build-frontend']) {
+    const rejectedCandidate = scoreResult(fixture, { ...response, skill }, { candidateSkillActivated: false });
+    assert.equal(rejectedCandidate.pass, false);
+    assert.ok(rejectedCandidate.failed.includes('skill'));
+  }
   const activated = scoreResult(
     fixture,
     response,

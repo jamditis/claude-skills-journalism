@@ -11,6 +11,7 @@ import {
   realpathSync,
   rmSync,
   statSync,
+  symlinkSync,
   writeFileSync,
 } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
@@ -137,7 +138,9 @@ export function prepareVariant({
 
   let pluginDir;
   let codexHome;
-  let clientHome;
+  const clientHome = join(root, 'client-home');
+  mkdirSync(clientHome, { recursive: true, mode: 0o700 });
+  let claudeConfigDir;
   if (client === 'claude') {
     pluginDir = join(root, 'plugin');
     mkdirSync(join(pluginDir, '.claude-plugin'), { recursive: true, mode: 0o700 });
@@ -148,12 +151,13 @@ export function prepareVariant({
     );
     copySkill(source, join(pluginDir, 'skills', skillName));
     if (!authSourceHome) throw new Error('Claude authentication home is required');
+    claudeConfigDir = join(clientHome, '.claude');
+    prepareAuthDirectory(authSourceHome, claudeConfigDir, '.credentials.json');
   } else if (client === 'codex') {
     copySkill(source, join(projectDir, '.agents', 'skills', skillName));
     if (!authSourceHome) throw new Error('Codex authentication home is required');
-    codexHome = resolve(authSourceHome);
-    clientHome = join(root, 'client-home');
-    mkdirSync(clientHome, { recursive: true, mode: 0o700 });
+    codexHome = join(clientHome, '.codex');
+    prepareAuthDirectory(authSourceHome, codexHome, 'auth.json');
   } else {
     throw new Error(`Unsupported evaluation client: ${client}`);
   }
@@ -163,11 +167,21 @@ export function prepareVariant({
     pluginDir,
     codexHome,
     clientHome,
-    claudeConfigDir: client === 'claude' ? resolve(authSourceHome) : undefined,
+    claudeConfigDir,
     outputSchema,
     responsePath: join(root, 'last-response.json'),
     skillDigest: hashTree(source),
   };
+}
+
+function prepareAuthDirectory(sourceHome, targetHome, filename) {
+  mkdirSync(targetHome, { recursive: true, mode: 0o700 });
+  const source = resolve(sourceHome, filename);
+  // Link only authentication so installed skills and settings stay outside the probe.
+  if (existsSync(source)) {
+    if (!statSync(source).isFile()) throw new Error('Authentication source must be a file');
+    symlinkSync(source, join(targetHome, filename), 'file');
+  }
 }
 
 function isUnrelatedNonTrigger(fixture) {
@@ -228,7 +242,11 @@ export function buildInvocation(client, fixture, prepared, env = process.env) {
         ...toolArgs,
       ],
       cwd: prepared.projectDir,
-      env: { CLAUDE_CONFIG_DIR: prepared.claudeConfigDir },
+      env: {
+        CLAUDE_CONFIG_DIR: prepared.claudeConfigDir,
+        HOME: prepared.clientHome,
+        USERPROFILE: prepared.clientHome,
+      },
     };
   }
   if (client === 'codex') {
@@ -362,8 +380,10 @@ export function parseRuntimeEvidence(client, stdout, candidateSkill) {
       const normalized = String(command ?? '').replaceAll('\\', '/');
       let cwd = '/';
       for (const clause of normalized.split(/\s*(?:&&|\|\||;|\|)\s*/u)) {
-        const cd = clause.match(/(?:^|[\s"'])cd(?:\s+\/d)?\s+["']?([^\s"']+)/iu);
-        if (cd) cwd = posix.resolve(cwd, cd[1]);
+        const cd = clause.match(
+          /(?:^|[\s"'])(?:cd|chdir|sl|Set-Location)(?:\s+(?:\/d|-LiteralPath|-Path))?\s+("[^"]*"|'[^']*'|[^\s"']+)/iu,
+        );
+        if (cd) cwd = posix.resolve(cwd, cd[1].replace(/^["']|["']$/gu, ''));
         const read = clause.match(
           /\b(?:cat|sed|head|tail|less|more|bat|type|Get-Content|grep|rg|awk)\b(.*)$/iu,
         );
@@ -395,10 +415,11 @@ export function scoreResult(fixture, response, runtimeEvidence = {}) {
     const alternatives = Array.isArray(term) ? term : [term];
     return alternatives.some((alternative) => new RegExp(alternative, 'iu').test(serialized));
   });
+  const responseSkill = String(response.skill ?? '').trim().replace(/^\/+/, '').split(':').at(-1);
   const checks = {
     decision: response.decision === fixture.expect.decision,
     skill: fixture.expect.decision === 'reject'
-      ? response.skill === null || response.skill !== fixture.skill
+      ? responseSkill !== fixture.skill
       : response.skill === fixture.skill,
     branch: branchMatches,
     terms: termMatches,

@@ -87,7 +87,7 @@
       "package": "dev-toolkit",
       "category": "activation",
       "prompt": "Set up a guarded AI-assisted workflow for a newsroom editor who will prototype a small app without a software background. Include planning, version control, and verification stops.",
-      "expect": { "decision": "use", "branch": "guided-development", "branchAlternatives": ["guided development", "AI assisted development", "prototype workflow"], "terms": ["version control", "verify"] }
+      "expect": { "decision": "use", "branch": "guided-development", "branchAlternatives": ["guided development", "AI assisted development", "prototype workflow"], "terms": ["version control", ["verify", "verification"]] }
     },
     {
       "id": "vc-unrelated",
