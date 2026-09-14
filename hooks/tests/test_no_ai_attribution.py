@@ -2057,6 +2057,11 @@ def test_block_claude_session_trailer_with_crlf_message():
     assert_blocked(run(f"git commit -m {shlex.quote(message)}"))
 
 
+def test_block_claude_session_trailer_with_text_after_url():
+    message = "Fix parser\n\nClaude-Session: https://example.com/session source"
+    assert_blocked(run(f"git commit -m {shlex.quote(message)}"))
+
+
 def test_block_claude_session_trailer_in_file(tmp_path):
     message = tmp_path / "MSG"
     message.write_text("Fix parser\n\nClaude-Session: https://example.com/session\n")
