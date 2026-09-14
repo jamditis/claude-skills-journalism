@@ -27,9 +27,8 @@ Checks:
      ('/'-prefixed) link is rejected. Every link to a .md file inside the bundle
      must point at a file that exists, with the case it has on disk (a
      case-insensitive filesystem would otherwise let a wrong-case link pass on
-     macOS and dangle on Linux; see real_case_path for why a Windows author is
-     not covered); a link that escapes the bundle root or dangles is a hard
-     failure. Optional link titles and <>-wrapped destinations
+     macOS or Windows and dangle on Linux); a link that escapes the bundle root
+     or dangles is a hard failure. Optional link titles and <>-wrapped destinations
      are handled. The bundle is validated as one self-contained tree (to validate
      federated content, assemble the bundles into one tree and point --bundle at
      that root).
@@ -353,17 +352,18 @@ def real_case_path(
     The walk doubles as the existence check: a component that matches nothing,
     case or no case, means the link dangles.
 
-    This does not catch a Windows author, and a wrong-cased symlink component can
-    escape the local check on case-insensitive macOS. In both cases Path.resolve()
-    may replace the link's spelling with the on-disk target before the walk sees
-    it. The wrong-case link is still caught later by Linux CI. Fixing it needs a
-    lexically normalized path here, which is not the same as the resolved one
-    across a symlinked directory, so it is tracked separately rather than bolted on.
+    Walk the link's spelling before Path.resolve() can canonicalize its case on
+    Windows. Keep each symlink and '..' component in order: collapsing '..'
+    lexically can change the destination after a symlinked directory.
 
-    `dest` must be inside `bundle`; the caller checks that first.
+    `dest` is the uncollapsed link path starting at `bundle`. The caller keeps
+    a separately resolved path for the bundle-boundary check.
     """
     current = bundle
     for part in dest.relative_to(bundle).parts:
+        if part == "..":
+            current = current / part
+            continue
         try:
             names = set(os.listdir(current))
         except OSError:
@@ -1178,12 +1178,16 @@ def main() -> int:
             if not inside:
                 errors.append(f"{f.relative_to(bundle)}: link escapes bundle root -> {target}")
             else:
-                real = real_case_path(dest, bundle)
+                spelled = f.parent / target
+                real = real_case_path(spelled, bundle)
+                if real is not None and not real.resolve().is_relative_to(bundle):
+                    errors.append(f"{f.relative_to(bundle)}: link escapes bundle root -> {target}")
+                    continue
                 if real is not None and not real.exists():
                     real = None
                 if real is None:
                     nonconforming = real_case_path(
-                        dest, bundle, allow_nonconforming_md=True
+                        spelled, bundle, allow_nonconforming_md=True
                     )
                     if (nonconforming is not None
                             and nonconforming.exists()
@@ -1198,15 +1202,16 @@ def main() -> int:
                             f"{found} to {expected}")
                     else:
                         errors.append(f"{f.relative_to(bundle)}: dangling link -> {target}")
-                elif real != dest:
+                elif str(real) != str(spelled):
                     # Report the fix as a link, relative to the file doing the linking,
                     # so it can be pasted straight in. Bundle-relative would be the
                     # error-line convention but is not what goes between the parens.
-                    fix = os.path.relpath(real, f.parent).replace(os.sep, "/") + fragment
+                    # Do not normalize symlink/.. out of the suggested link.
+                    fix = real.relative_to(f.parent).as_posix() + fragment
                     errors.append(
                         f"{f.relative_to(bundle)}: link case does not match the file on "
                         f"disk -> {target}; write {fix}. Links are case-sensitive "
-                        f"on Linux, so this resolves on macOS and breaks in CI.")
+                        f"on Linux, so this can resolve on macOS or Windows and break in CI.")
 
     # report
     print(f"Bundle: {bundle}")

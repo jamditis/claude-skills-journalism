@@ -80,10 +80,10 @@ $taskName = "AutonomyWake"
 # documented equivalent. The action runs powershell.exe against the wrapper, so
 # the hard timeout in step 1 actually bounds every wake.
 #
-# Element order matters: the XSD fixes the trigger sequence as Enabled,
-# StartBoundary, Repetition, then ScheduleByDay, out-of-order children make
-# Register-ScheduledTask reject the whole task. The <Principal id="Author"> has
-# to match Actions Context="Author" for the same reason (an action context that
+# Use the schema-documented trigger sequence: Enabled, StartBoundary,
+# Repetition, then ScheduleByDay. This does not imply that Windows rejects
+# every alternative ordering. The <Principal id="Author"> has
+# to match Actions Context="Author" (an action context that
 # names no defined principal is a validation error, not a silent default).
 # InteractiveToken runs the task while you're logged in; to run while logged out,
 # change LogonType to Password and register with `-User <you> -Password <pw>`.

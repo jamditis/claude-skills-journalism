@@ -1,5 +1,7 @@
 # Journalism agent skills
 
+[Project: Journalism skills maintenance](https://github.com/users/jamditis/projects/6)
+
 A collection of Agent Skills for journalists, researchers, academics, media professionals, and communications practitioners. The same repository serves Claude Code and Codex while keeping Claude-only commands, agents, and hooks clearly labeled.
 
 **Docs site:** [skills.amditis.tech](https://skills.amditis.tech), interactive skill browser, setup guides, and full documentation.

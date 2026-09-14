@@ -1,5 +1,7 @@
 # Agent skills collection
 
+[Project: Journalism skills maintenance](https://github.com/users/jamditis/projects/6)
+
 ## Bug-fixing workflow
 
 When a bug is reported, don't immediately attempt to fix it. Instead:
