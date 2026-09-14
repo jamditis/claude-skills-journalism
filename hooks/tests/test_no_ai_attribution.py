@@ -2059,3 +2059,11 @@ def test_block_claude_session_trailer_in_file(tmp_path):
 
 def test_allow_claude_session_subject_matter():
     assert_allowed(run('git commit -m "Block the Claude-Session: trailer"'))
+
+
+def test_allow_claude_session_component_heading():
+    assert_allowed(run('gh pr create --title "Claude-Session: reject generated trailers" --body "Explain the hook change"'))
+
+
+def test_allow_empty_claude_session_heading():
+    assert_allowed(run('git commit -m "Claude-Session:"'))
