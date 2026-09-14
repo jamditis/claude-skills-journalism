@@ -2862,6 +2862,32 @@ def test_wrong_case_symlink_parent_does_not_false_escape(tmp_path):
     assert "link escapes bundle root" not in out
 
 
+@pytest.mark.parametrize("target", ["C:/outside.md", "\\\\outside.md"])
+def test_windows_rooted_link_is_rejected_before_case_walk(tmp_path, target):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    with (b / "index.md").open("a") as stream:
+        stream.write(f"\n[rooted]({target})\n")
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "root-relative link not allowed" in out
+
+
+def test_nonconforming_target_beyond_symlink_is_reported_as_escape(tmp_path):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (outside / "Target.MD").write_text("outside\n")
+    directory_symlink(b / "Alias", outside)
+    with (b / "index.md").open("a") as stream:
+        stream.write("\n[escape](alias/target.md)\n")
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "link escapes bundle root" in out
+    assert "rename Alias/Target.MD" not in out
+
+
 @pytest.mark.parametrize("spelling", ["alias", "Alias"])
 def test_link_symlink_escape_still_rejected(tmp_path, spelling):
     scaffold(tmp_path / "kb", "--no-validate")

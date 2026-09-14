@@ -57,7 +57,7 @@ import os
 import re
 import sys
 from collections import Counter
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 import yaml
 
@@ -333,6 +333,12 @@ def resolve_link(target: str, md_file: Path) -> Path:
     .resolve() collapses ../ so the bundle-boundary check is not fooled by a path
     like ../../outside.md."""
     return (md_file.parent / target).resolve()
+
+
+def is_rooted_link(target: str) -> bool:
+    """True for POSIX roots, Windows roots, drive paths, and UNC paths."""
+    windows_path = PureWindowsPath(target)
+    return target.startswith(("/", "\\")) or bool(windows_path.drive)
 
 
 def real_case_path(
@@ -1169,7 +1175,7 @@ def main() -> int:
             # rejected as non-conforming above, so the two checks stay in agreement.
             if ".md" not in low:
                 continue
-            if target.startswith("/"):
+            if is_rooted_link(target):
                 errors.append(f"{f.relative_to(bundle)}: root-relative link not allowed "
                               f"(use a relative path) -> {target}")
                 continue
@@ -1199,6 +1205,17 @@ def main() -> int:
                     nonconforming = real_case_path(
                         spelled, bundle, allow_nonconforming_md=True
                     )
+                    if nonconforming is not None:
+                        try:
+                            resolved_nonconforming = nonconforming.resolve()
+                        except (OSError, RuntimeError):
+                            nonconforming = None
+                        else:
+                            if not resolved_nonconforming.is_relative_to(bundle):
+                                errors.append(
+                                    f"{f.relative_to(bundle)}: link escapes bundle root -> {target}"
+                                )
+                                continue
                     if (nonconforming is not None
                             and nonconforming.exists()
                             and nonconforming.suffix.lower() == ".md"
