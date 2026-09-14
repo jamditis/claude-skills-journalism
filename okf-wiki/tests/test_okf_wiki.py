@@ -2862,3 +2862,16 @@ def test_link_symlink_escape_still_rejected(tmp_path, spelling):
     rc, out = validate(b)
     assert rc == 1, out
     assert "link escapes bundle root" in out
+
+
+@pytest.mark.parametrize("spelling", ["Loop.md", "loop.md"])
+def test_looping_symlink_link_reports_dangling(tmp_path, spelling):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    directory_symlink(b / "Loop.md", b / "Loop.md")
+    with (b / "index.md").open("a") as stream:
+        stream.write(f"\n[loop]({spelling})\n")
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert f"dangling link -> {spelling}" in out
+    assert "Traceback" not in out
