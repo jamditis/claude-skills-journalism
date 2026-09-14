@@ -129,4 +129,10 @@ test('the committed pdf-design default resolves paths portably (#235 AC3)', () =
     detectPathAssumptions(adapters[0].body).map((finding) => finding.kind),
     ['snap-confined-browser'],
   );
+  const snapBody = adapters[0].body;
+  const parentCreation = snapBody.indexOf('mkdir -p "$SNAP_WORK_ROOT" || exit 1');
+  const stagingCreation = snapBody.indexOf('mktemp -d "$SNAP_WORK_ROOT/pdf-design.XXXXXX"');
+  assert.ok(parentCreation >= 0, 'snap adapter creates its staging parent or stops');
+  assert.ok(stagingCreation > parentCreation, 'snap adapter creates its parent before mktemp');
+  assert.match(snapBody, /mktemp[^\n]+\)" \|\| exit 1/);
 });

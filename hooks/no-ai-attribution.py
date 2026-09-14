@@ -447,8 +447,8 @@ _ENV_ASSIGN_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 # the exported value the child git process will see.
 _ENV_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 # Env vars that set commit authorship: the environment twin of `git commit --author`.
-_GIT_AUTHOR_IDENTITY_ENV = {"GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL", "EMAIL"}
-_GIT_COMMITTER_IDENTITY_ENV = {"GIT_COMMITTER_NAME", "GIT_COMMITTER_EMAIL"}
+_GIT_AUTHOR_IDENTITY_ENV = {"GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL"}
+_GIT_COMMITTER_IDENTITY_ENV = {"GIT_COMMITTER_NAME", "GIT_COMMITTER_EMAIL", "EMAIL"}
 _GIT_IDENTITY_ENV = _GIT_AUTHOR_IDENTITY_ENV | _GIT_COMMITTER_IDENTITY_ENV
 # git config keys that set commit identity, settable per-command with `git -c key=value`.
 # git config keys are case-insensitive, so compare lowercased.
@@ -492,6 +492,23 @@ _GIT_MERGE_LONG_OPTS = frozenset({
     "signoff", "squash", "stat", "strategy", "strategy-option", "summary", "verbose",
     "verify-signatures",
 })
+
+# Options whose next token is data, even when it begins with `--`. Mode detection must
+# skip these operands, or a commit message such as `-m --author` becomes an author flag
+# and a merge message such as `-m --abort` becomes a recovery operation. Git's optional
+# short arguments (-S/-u for commit and -S for merge) consume only attached text, so
+# they stop a short cluster without consuming the next token.
+_GIT_COMMIT_VALUE_LONG_OPTS = frozenset({
+    "author", "cleanup", "date", "file", "fixup", "message", "pathspec-from-file",
+    "reedit-message", "reuse-message", "squash", "template", "trailer",
+})
+_GIT_COMMIT_VALUE_SHORT_OPTS = frozenset({"C", "c", "F", "m", "t"})
+_GIT_COMMIT_OPTIONAL_SHORT_OPTS = frozenset({"S", "u"})
+_GIT_MERGE_VALUE_LONG_OPTS = frozenset({
+    "cleanup", "file", "into-name", "message", "strategy", "strategy-option",
+})
+_GIT_MERGE_VALUE_SHORT_OPTS = frozenset({"F", "m", "s", "X"})
+_GIT_MERGE_OPTIONAL_SHORT_OPTS = frozenset({"S"})
 
 # Per-subcommand flag spec. 'text' -> scanned with contains_attribution; 'file' ->
 # contents read and scanned; 'field' -> scanned with value_names_tool. 'short' maps
@@ -689,6 +706,36 @@ def _resolve_git_long(name, opts):
     return matches[0] if len(matches) == 1 else None
 
 
+def _git_option_names(args, long_opts, value_long_opts, value_short_opts,
+                      optional_short_opts=frozenset()):
+    """Yield actual git option names while skipping their value operands."""
+    i = 0
+    while i < len(args):
+        token = args[i]
+        if token == "--":
+            break
+        if token.startswith("--"):
+            raw_name, separator, _ = token[2:].partition("=")
+            name = _resolve_git_long(raw_name, long_opts)
+            if name is not None:
+                yield name
+                if name in value_long_opts and not separator and i + 1 < len(args):
+                    i += 1
+            i += 1
+            continue
+        if token.startswith("-") and token != "-":
+            letters = token[1:]
+            for position, letter in enumerate(letters):
+                yield f"-{letter}"
+                if letter in value_short_opts:
+                    if position == len(letters) - 1 and i + 1 < len(args):
+                        i += 1
+                    break
+                if letter in optional_short_opts and position < len(letters) - 1:
+                    break
+        i += 1
+
+
 def _git_commit_is_dry_run(args):
     """True if a `git commit`'s options name --dry-run (or an unambiguous abbreviation).
 
@@ -696,14 +743,13 @@ def _git_commit_is_dry_run(args):
     the record: an attributed dry-run is harmless and blocking it only denies a preview.
     Stops at `--` (end of options); resolves `--dry` -> --dry-run the way git does, and does
     not match a short cluster (git commit has no short dry-run flag; -n is --no-verify)."""
-    for t in args:
-        if t == "--":
-            break
-        if t.startswith("--"):
-            name = t[2:].split("=", 1)[0]
-            if _resolve_git_long(name, _GIT_COMMIT_LONG_OPTS) == "dry-run":
-                return True
-    return False
+    return "dry-run" in _git_option_names(
+        args,
+        _GIT_COMMIT_LONG_OPTS,
+        _GIT_COMMIT_VALUE_LONG_OPTS,
+        _GIT_COMMIT_VALUE_SHORT_OPTS,
+        _GIT_COMMIT_OPTIONAL_SHORT_OPTS,
+    )
 
 
 def _git_commit_uses_environment_author(args):
@@ -713,19 +759,17 @@ def _git_commit_uses_environment_author(args):
     the existing commit's author unless --reset-author is present. The committer still
     comes from its own environment variables in every commit-writing mode.
     """
-    author = reset_author = reuse_author = amend = False
-    for t in args:
-        if t == "--":
-            break
-        if t.startswith("--"):
-            name = t[2:].split("=", 1)[0]
-            option = _resolve_git_long(name, _GIT_COMMIT_LONG_OPTS)
-            author = author or option == "author"
-            reset_author = reset_author or option == "reset-author"
-            reuse_author = reuse_author or option in {"reuse-message", "reedit-message"}
-            amend = amend or option == "amend"
-        elif t == "-C" or t.startswith("-C") or t == "-c" or t.startswith("-c"):
-            reuse_author = True
+    options = set(_git_option_names(
+        args,
+        _GIT_COMMIT_LONG_OPTS,
+        _GIT_COMMIT_VALUE_LONG_OPTS,
+        _GIT_COMMIT_VALUE_SHORT_OPTS,
+        _GIT_COMMIT_OPTIONAL_SHORT_OPTS,
+    ))
+    author = "author" in options
+    reset_author = "reset-author" in options
+    reuse_author = bool(options & {"reuse-message", "reedit-message", "-C", "-c"})
+    amend = "amend" in options
     if author:
         return False
     if reset_author:
@@ -735,14 +779,14 @@ def _git_commit_uses_environment_author(args):
 
 def _git_merge_is_recovery(args):
     """True for merge modes that recover state without creating a commit."""
-    for t in args:
-        if t == "--":
-            break
-        if t.startswith("--"):
-            name = t[2:].split("=", 1)[0]
-            if _resolve_git_long(name, _GIT_MERGE_LONG_OPTS) in {"abort", "quit"}:
-                return True
-    return False
+    options = _git_option_names(
+        args,
+        _GIT_MERGE_LONG_OPTS,
+        _GIT_MERGE_VALUE_LONG_OPTS,
+        _GIT_MERGE_VALUE_SHORT_OPTS,
+        _GIT_MERGE_OPTIONAL_SHORT_OPTS,
+    )
+    return any(option in {"abort", "quit"} for option in options)
 
 
 def _classify(spec, name):

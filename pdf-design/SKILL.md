@@ -268,7 +268,9 @@ staging and cleanup behavior inside the snap-accessible directory.
 
 <!-- pdf-design-path-adapter:snap-confined-browser:start -->
 ```bash
-WORK_DIR="$(mktemp -d "$HOME/snap/chromium/common/pdf-design.XXXXXX")"
+SNAP_WORK_ROOT="$HOME/snap/chromium/common"
+mkdir -p "$SNAP_WORK_ROOT" || exit 1
+WORK_DIR="$(mktemp -d "$SNAP_WORK_ROOT/pdf-design.XXXXXX")" || exit 1
 trap 'rm -rf -- "$WORK_DIR"' EXIT
 cp template.html "$WORK_DIR/input.html"
 chromium-browser --headless --disable-gpu \

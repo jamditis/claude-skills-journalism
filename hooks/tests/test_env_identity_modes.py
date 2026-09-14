@@ -29,3 +29,23 @@ def test_unused_ambient_identity_is_allowed(command):
 ])
 def test_effective_tool_identity_remains_blocked(command):
     assert_blocked(run(command))
+
+
+@pytest.mark.parametrize("command", [
+    "EMAIL=claude@anthropic.com git commit --author='Jane Doe <jane@example.com>' -m Fix",
+    "EMAIL=claude@anthropic.com git commit -C HEAD",
+    "EMAIL=claude@anthropic.com git commit --amend --no-edit",
+])
+def test_email_fallback_is_always_checked_for_the_committer(command):
+    assert_blocked(run(command))
+
+
+@pytest.mark.parametrize("command", [
+    "GIT_AUTHOR_NAME=Claude git commit -m --author",
+    "GIT_AUTHOR_NAME=Claude git commit -m --dry-run",
+    "GIT_AUTHOR_NAME=Claude git commit --date --author -m Fix",
+    "GIT_COMMITTER_NAME=Claude git merge --no-ff -m --abort topic",
+    "GIT_COMMITTER_NAME=Claude git merge --strategy --quit topic",
+])
+def test_option_values_are_not_treated_as_identity_modes(command):
+    assert_blocked(run(command))
