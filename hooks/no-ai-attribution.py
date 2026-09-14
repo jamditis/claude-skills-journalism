@@ -284,6 +284,7 @@ def contains_attribution(text):
     """
     if not text:
         return False
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
     # Robot-emoji byline: it leads a line (a sign-off marker position) or shares a line
     # with an attribution cue. A robot emoji embedded in prose ("fix 🤖 rendering") is
     # subject matter and does not fire.
@@ -295,6 +296,9 @@ def contains_attribution(text):
                 return True
             if _AI_INLINE_RE.search(line) or _VERB_TOOL_RE.search(line):
                 return True
+    # Session trailers identify the generating tool even without a byline verb.
+    if re.search(r"^[ \t]*Claude-Session[ \t]*:[ \t]*https?://\S+[ \t]*$", text, re.I | re.M):
+        return True
     if _AI_BYLINE_RE.search(text):
         return True
     for m in _COAUTHOR_LINE_RE.finditer(text):
