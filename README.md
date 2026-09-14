@@ -133,6 +133,20 @@ npx skills@latest add jamditis/claude-skills-journalism \
   --skill fact-check-workflow --agent codex --copy -g -y
 ```
 
+The `pdf-design` root skill also supports a project-scoped standards copy. Its
+shared instructions resolve the bundled template from the installed skill and
+use disposable browser staging. A separate adapter covers snap-confined
+Chromium:
+
+```bash
+npx skills@latest add jamditis/claude-skills-journalism \
+  --skill pdf-design --agent codex --copy -y
+```
+
+This support covers installation, bundled resource resolution, and local PDF
+rendering. It does not claim Codex plugin packaging, model activation, remote
+upload, or mixed-install behavior.
+
 Codex desktop can [import skills from another agent](https://learn.chatgpt.com/docs/import.md). Import leaves the source installation in place. Until duplicate-identity and uninstall behavior has been tested for this repository, do not import a skill and also install the same skill through `npx skills` or the package route.
 
 Codex's bundled skill installer writes to a different Codex-specific directory and is not a tested installation path for this repository. Codex does not deduplicate same-name skills across install roots, so don't combine it with the `.agents/skills` route above.
