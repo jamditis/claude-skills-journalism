@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Made `pdf-design` resolve its bundled template from the installed skill and
+  use disposable browser staging. Kept snap-confined Chromium in a guarded
+  adapter and added scoped Codex installation guidance.
+
+### Fixed
+
+- Stopped `no-ai-attribution` from applying ambient author identity to Git
+  forms that override or reuse authorship, while preserving committer checks
+  and real ambient-identity blocks.
+
 ## [2.8.0] - 2026-09-01
 
 ### Added

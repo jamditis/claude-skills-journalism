@@ -1,7 +1,7 @@
 # Codex compatibility matrix
 
-- Status: phase-two runtime pilots; journalism-core, visual-explainer, document-design, and portable okf-wiki scaffolding have scoped passes
-- Last evidence update: September 4, 2026
+- Status: phase-two runtime pilots; journalism-core, visual-explainer, document-design, pdf-design path rendering, and portable okf-wiki scaffolding have scoped passes
+- Last evidence update: September 14, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
 > **Historical runtime results stay tied to their tested snapshots.** The v2.8.0
@@ -64,8 +64,11 @@ Status labels:
 | Codex video-toolkit preflight | 0.149.1 | Scoped video-toolkit activation and dependency preflight on August 28, 2026 |
 | Codex document-design pilot | 0.153.0 | Scoped project-standards activation, non-trigger, installed-resource, output, and rendering checks on September 3, 2026 |
 | Codex security-toolkit preflight | 0.153.2 | Scoped project-copy selection and resource-read observations on September 4, 2026 |
+| Codex pdf-design path pilot | 0.154.0 | Project-standards install, installed-resource, and local rendering checks on September 14, 2026 |
 | Claude document-design regression | 2.1.239 | Candidate `--plugin-dir` argument-delivery check on September 3, 2026 |
+| Claude pdf-design path regression | 2.1.252 | Strict local marketplace validation, clean install, installed-resource, and local rendering checks on September 14, 2026 |
 | skills CLI document-design pilot | 1.5.23 | Public baseline and candidate project-copy installs on September 3, 2026 |
+| skills CLI pdf-design pilot | 1.5.26 | Local project copy of the final pdf-design 1.1.4 package on September 14, 2026 |
 | skills CLI | 1.5.19; 1.5.20 | Phase-one standards discovery, then post-merge project and user install canaries |
 | Agent Skills validator | `agentskills/agentskills@38a2ff82958afee88dadf4831509e6f7e9d8ef4e` | Shared frontmatter contract |
 | Agent Skills validator, scheduled | Default-branch head (`38a2ff82958afee88dadf4831509e6f7e9d8ef4e` on July 23, 2026) | Upstream drift signal |
@@ -473,6 +476,30 @@ package-level scan script and synthetic fixture are absent from its standalone
 skill directory. Hotpatch remains unmapped and Claude-only; no runtime pass or
 package-wide support claim follows from these observations.
 
+### Pdf-path-1: pdf-design install and path-rendering pass
+
+Environment: Codex CLI 0.154.0, Claude Code 2.1.252, skills CLI 1.5.26,
+and Chromium 152 on Linux on September 14, 2026. The tested package source was
+[`662d42f34dd81715c9c39785ae53bb3d3ea783d1`](https://github.com/jamditis/claude-skills-journalism/commit/662d42f34dd81715c9c39785ae53bb3d3ea783d1).
+
+A disposable project with an empty client home installed `pdf-design` 1.1.4
+through the standards-based Codex project-copy route. A separate empty
+`CLAUDE_CONFIG_DIR` passed strict marketplace validation and installed the same
+version through the local Claude marketplace. Both installed copies contained
+regular, source-matching `SKILL.md` and template files.
+
+Each installed template rendered as an eight-page Letter PDF from a disposable
+working directory. Chromium kept its sandbox enabled and used a disposable
+profile. The probe removed external font links from its staged copy and blocked
+background network access. The staged and client directories were removed and
+checked after each run. The local Chromium build needed a checked profile
+warm-up before printing; the output check prevented an empty success.
+
+This evidence covers installation, installed template resolution, unconfined
+browser staging, output, cleanup, and the guarded snap adapter. It does not
+cover model activation, implicit triggers, remote upload, a Codex plugin route,
+user-level Codex installation, or mixed installs.
+
 ## Package matrix
 
 | Package | Version and components | Current classification | Included and excluded scope | Evidence | Next proof |
@@ -481,7 +508,7 @@ package-wide support claim follows from these observations.
 | `dev-toolkit` | 1.1.1; 11 nested skills | Candidate with adapter review | Instruction-led skills may be shared. Exclude Claude tool vocabulary, `CLAUDE.md` updates, hook wiring, and Claude subagent syntax until tested. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Classify each skill; add explicit trigger and non-trigger fixtures for the portable subset. |
 | `journalism-core` | 1.2.0; 14 nested skills | Runtime pilot passed on the Claude package and Codex project-standards paths | Include the 14 shared skills. No commands, agents, or hooks are part of this package. The legacy-compatible Codex package and user-level standards paths remain install-only. | [J-release-1](#j-release-1-paired-journalism-core-runtime-pilot), [C-phase-1](#c-phase-1-repeatable-claude-install-canary), [K-phase-1](#k-phase-1-repeatable-codex-legacy-package-canary), [S-phase-1](#s-phase-1-full-journalism-core-standards-canary), [S-global-phase-1](#s-global-phase-1-user-level-journalism-core-standards-canary), [V-phase-1](#v-phase-1-repaired-standards-baseline) | Add a no-Claude-environment gate and scheduled runtime regression before a broader package support claim. |
 | `okf-wiki` | 0.6.1; one root skill; scripts and generated Claude settings | Pre-set portable runtime pilot passed; instruction and Claude-output adapters remain | Include the tested Okf-1 path: standards discovery, installed spec and scaffolder reads, explicit project-relative scaffolding, validation, examples, and the generated OKF bundle. Exclude the unadapted general instructions that name `AskUserQuestion` and `${CLAUDE_SKILL_DIR}`. The generated `.claude/settings.json` and hook scripts are an inert Claude Code adapter, not Codex configuration or lifecycle behavior. | [Okf-release-1](#okf-release-1-okf-wiki-no-claude-runtime-pilot), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [R-phase-1](#r-phase-1-phase-one-repository-checks) | Port and test general onboarding and skill-root resolution; add scheduled Okf-1 coverage against current Codex; test mixed-client hook trust separately before any cross-client lifecycle claim. |
-| `pdf-design` | 1.1.0; one root skill | Adapter required | Shared design guidance and assets are candidates. Hard-coded `~/.claude` and host-specific browser paths are excluded from a Codex claim. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add a no-Claude path-resolution fixture before editing paths. |
+| `pdf-design` | 1.1.4; one root skill | Install and path-rendering pass; model activation pending | Include the tested Codex project-copy and Claude marketplace paths, installed template resolution, disposable local rendering, and the guarded snap adapter. Exclude model activation, implicit triggers, remote upload, Codex plugin packaging, user-level Codex installation, and mixed installs. | [Pdf-path-1](#pdf-path-1-pdf-design-install-and-path-rendering-pass), [V-phase-1](#v-phase-1-repaired-standards-baseline) | Add paired activation and non-trigger fixtures before a broader runtime claim. |
 | `pdf-playground` | 1.3.6; one nested skill; eight commands; one hook file | Runtime pilot passed on the Codex project-standards path; Claude-only surfaces unclaimed | Include `$document-design`, its self-contained relative resources, and HTML generation through the tested project copy. Its historical project lock identity has an explicit migration. Exclude the Codex user-level and legacy-package paths, all eight Claude commands, preview lifecycle, and hook behavior. | [D-runtime-1](#d-runtime-1-document-design-codex-project-standards-pilot), [D-lock-release-1](#d-lock-release-1-document-design-standards-lock-migration), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [F-phase-1](#f-phase-1-affected-claude-package-regression) | Add a no-Claude scheduled runtime regression and test user-level installation separately before broadening the claim. |
 | `project-templates-toolkit` | 1.0.3; three nested skills | Adapter required; paired contract fixtures added | `project-retrospective` and `template-selector` remain shared candidates. `project-memory` still generates only `CLAUDE.md`; paired contract fixtures now pin Claude `CLAUDE.md` and Codex `AGENTS.md` merge, nested-scope, non-trigger, output, and cleanup behavior. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; `scripts/project-memory-fixtures.test.mjs` proves the current shared output is insufficient and guards both client contracts | Run both fixtures against installed clients, then add the smallest adapter that makes the Codex fixture pass without changing Claude output. |
 | `research-toolkit` | 1.1.0; six nested skills | Candidate | Include shared instruction-led skills. Network and external-content trust boundaries stay unchanged. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add representative activation, non-activation, network-boundary, and resource checks. |

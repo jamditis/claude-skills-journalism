@@ -153,7 +153,7 @@ test('document-design runtime evidence stays on the tested Codex path', () => {
   assert.match(record, /original runtime pilot, not\s+a claimed rerun/u);
   assert.match(record, /The eight Claude commands and the\s+SessionStart hook remain outside/u);
   assert.match(matrix, /Runtime pilot passed on the Codex project-standards path; Claude-only surfaces unclaimed/u);
-  assert.match(matrix, /Last evidence update: September 4, 2026/u);
+  assert.match(matrix, /Last evidence update: September 14, 2026/u);
   assert.doesNotMatch(record, /package-wide Codex support/iu);
 });
 
@@ -177,6 +177,29 @@ test('document-design evidence changes run compatibility checks', () => {
   ]) {
     assert.match(workflow, new RegExp(resourcePath.replaceAll('*', '\\*'), 'u'));
   }
+});
+
+test('pdf-design path evidence stays within the tested install and render scope', () => {
+  const matrix = readFileSync(
+    join(ROOT, 'plans', 'codex-compatibility-matrix.md'),
+    'utf8',
+  );
+  const readme = readFileSync(join(ROOT, 'README.md'), 'utf8');
+  const page = readFileSync(join(ROOT, 'docs', 'pdf-design', 'index.html'), 'utf8');
+
+  assert.match(matrix, /Pdf-path-1: pdf-design install and path-rendering pass/u);
+  assert.match(matrix, /662d42f34dd81715c9c39785ae53bb3d3ea783d1/u);
+  assert.match(matrix, /Codex CLI 0\.154\.0/u);
+  assert.match(matrix, /Claude Code 2\.1\.252/u);
+  assert.match(matrix, /skills CLI 1\.5\.26/u);
+  assert.match(matrix, /eight-page Letter PDF/u);
+  assert.match(matrix, /model activation, implicit triggers, remote upload/u);
+  assert.match(
+    readme,
+    /--skill pdf-design --agent codex --copy -y/u,
+  );
+  assert.match(page, /--skill pdf-design --agent codex --copy -y/u);
+  assert.match(readme, /It does not claim Codex plugin packaging, model activation/u);
 });
 
 test('okf-wiki no-Claude evidence keeps Claude adapters outside Codex behavior', () => {
@@ -302,7 +325,7 @@ test('video-toolkit evidence stays limited to the tested preflight', () => {
     matrix,
     /Observed manual Codex preflight; durable harness and media execution pending/u,
   );
-  assert.match(matrix, /Last evidence update: September 4, 2026/u);
+  assert.match(matrix, /Last evidence update: September 14, 2026/u);
   assert.match(matrix, /Codex video-toolkit preflight \| 0\.149\.1/u);
   assert.match(
     matrix,
