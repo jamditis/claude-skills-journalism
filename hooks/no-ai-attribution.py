@@ -284,6 +284,7 @@ def contains_attribution(text):
     """
     if not text:
         return False
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
     # Robot-emoji byline: it leads a line (a sign-off marker position) or shares a line
     # with an attribution cue. A robot emoji embedded in prose ("fix 🤖 rendering") is
     # subject matter and does not fire.

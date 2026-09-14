@@ -10,6 +10,7 @@ must block, which must pass, and how the hook fails open. Run:
 """
 import json
 import os
+import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -2049,6 +2050,11 @@ def test_block_popd_double_dash_ignores_a_later_position(tmp_path):
 
 def test_block_claude_session_trailer_in_message():
     assert_blocked(run('git commit -m "Fix parser\n\nClaude-Session: https://example.com/session"'))
+
+
+def test_block_claude_session_trailer_with_crlf_message():
+    message = "Fix parser\r\n\r\nClaude-Session: https://example.com/session\r\n"
+    assert_blocked(run(f"git commit -m {shlex.quote(message)}"))
 
 
 def test_block_claude_session_trailer_in_file(tmp_path):
