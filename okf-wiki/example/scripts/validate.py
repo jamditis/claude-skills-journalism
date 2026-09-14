@@ -1173,26 +1173,26 @@ def main() -> int:
                 errors.append(f"{f.relative_to(bundle)}: root-relative link not allowed "
                               f"(use a relative path) -> {target}")
                 continue
+            spelled = f.parent / target
+            real = real_case_path(spelled, bundle)
+            if real is not None:
+                try:
+                    resolved_real = real.resolve()
+                except (OSError, RuntimeError):
+                    real = None
+                else:
+                    if not resolved_real.is_relative_to(bundle):
+                        errors.append(f"{f.relative_to(bundle)}: link escapes bundle root -> {target}")
+                        continue
             try:
                 dest = resolve_link(target, f)
             except (OSError, RuntimeError):
                 errors.append(f"{f.relative_to(bundle)}: dangling link -> {target}")
                 continue
             inside = dest == bundle or bundle in dest.parents
-            if not inside:
+            if not inside and real is None:
                 errors.append(f"{f.relative_to(bundle)}: link escapes bundle root -> {target}")
             else:
-                spelled = f.parent / target
-                real = real_case_path(spelled, bundle)
-                if real is not None:
-                    try:
-                        resolved_real = real.resolve()
-                    except (OSError, RuntimeError):
-                        real = None
-                    else:
-                        if not resolved_real.is_relative_to(bundle):
-                            errors.append(f"{f.relative_to(bundle)}: link escapes bundle root -> {target}")
-                            continue
                 if real is not None and not real.exists():
                     real = None
                 if real is None:

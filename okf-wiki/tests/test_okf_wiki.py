@@ -2849,6 +2849,19 @@ def test_case_correction_preserves_symlink_parent_in_suggestion(tmp_path):
     assert "write Alias/../target.md" in out
 
 
+def test_wrong_case_symlink_parent_does_not_false_escape(tmp_path):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    (b / "deep" / "a" / "b").mkdir(parents=True)
+    directory_symlink(b / "Alias", b / "deep" / "a" / "b")
+    with (b / "index.md").open("a") as stream:
+        stream.write("\n[wrong](alias/../../../index.md)\n")
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "write Alias/../../../index.md" in out
+    assert "link escapes bundle root" not in out
+
+
 @pytest.mark.parametrize("spelling", ["alias", "Alias"])
 def test_link_symlink_escape_still_rejected(tmp_path, spelling):
     scaffold(tmp_path / "kb", "--no-validate")
