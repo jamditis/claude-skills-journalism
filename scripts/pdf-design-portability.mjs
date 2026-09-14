@@ -15,6 +15,12 @@ import { fileURLToPath } from 'node:url';
 
 export const ROOT = fileURLToPath(new URL('..', import.meta.url));
 export const SKILL_SUBDIR = 'pdf-design';
+export const APPROVED_PATH_ADAPTERS = Object.freeze([
+  'snap-confined-browser',
+]);
+
+const PATH_ADAPTER_PATTERN =
+  /<!-- pdf-design-path-adapter:([a-z0-9-]+):start -->([\s\S]*?)<!-- pdf-design-path-adapter:\1:end -->/gu;
 
 // Read every bundled text file under the skill directory. Path assumptions live
 // in SKILL.md today, but a template, reference, or helper added later can carry
@@ -48,7 +54,21 @@ export function readSkillBody(root = ROOT) {
 // so a later edit cannot slip a coupling past the guard by swapping ~ for $HOME.
 const HOME = '(?:~|\\$HOME|\\$\\{HOME\\})';
 
+export function readPathAdapters(body) {
+  return [...body.matchAll(PATH_ADAPTER_PATTERN)].map((match) => ({
+    name: match[1],
+    body: match[2],
+  }));
+}
+
+function withoutApprovedPathAdapters(body) {
+  return body.replace(PATH_ADAPTER_PATTERN, (block, name) => (
+    APPROVED_PATH_ADAPTERS.includes(name) ? '' : block
+  ));
+}
+
 export function detectPathAssumptions(body) {
+  const sharedBody = withoutApprovedPathAdapters(body);
   const findings = [];
 
   // The template ships beside SKILL.md at pdf-design/templates/, but the default
@@ -56,7 +76,7 @@ export function detectPathAssumptions(body) {
   // only exists on a Claude plugin install. A Codex or standards-based install
   // puts the skill somewhere else and has no ~/.claude at all, so the copy fails
   // before the skill does any work.
-  if (new RegExp(`${HOME}/\\.claude/(?:plugins|skills)/`, 'u').test(body)) {
+  if (new RegExp(`${HOME}/\\.claude/(?:plugins|skills)/`, 'u').test(sharedBody)) {
     findings.push({
       kind: 'claude-install-path',
       mappable: true,
@@ -69,7 +89,7 @@ export function detectPathAssumptions(body) {
   // ~/snap/chromium/common/, so the default PDF and preview steps stage files
   // there. That directory does not exist for a non-snap Chrome, on macOS, or in
   // a disposable CI working directory.
-  if (new RegExp(`${HOME}/snap/chromium/`, 'u').test(body)) {
+  if (new RegExp(`${HOME}/snap/chromium/`, 'u').test(sharedBody)) {
     findings.push({
       kind: 'snap-confined-browser',
       mappable: true,

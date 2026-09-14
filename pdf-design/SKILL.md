@@ -38,18 +38,30 @@ During a design session, use these commands:
 
 ## Quick start
 
-```bash
-# Copy template to start new report
-cp ~/.claude/plugins/pdf-design/templates/democracy-day-proposal.html ./new-report.html
+Resolve `SKILL_DIR` to the directory that contains this installed `SKILL.md`.
+Use the exact path supplied by the client when it loads the skill. Do not infer
+the path from the current directory or a user home directory. Claude Code and
+Codex can install the same shared skill in different locations, but the bundled
+template is always at `templates/democracy-day-proposal.html` relative to this
+file.
 
-# Generate PDF (must use snap-accessible path)
-mkdir -p ~/snap/chromium/common/pdf-work
-cp new-report.html ~/snap/chromium/common/pdf-work/
-chromium-browser --headless --disable-gpu \
+```bash
+# Replace the value with the exact directory that contains this SKILL.md.
+SKILL_DIR="/absolute/path/to/installed/pdf-design"
+cp "$SKILL_DIR/templates/democracy-day-proposal.html" ./new-report.html
+
+# Generate PDF in a disposable directory with an unconfined browser.
+WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/pdf-design.XXXXXX")"
+trap 'rm -rf -- "$WORK_DIR"' EXIT
+cp new-report.html "$WORK_DIR/input.html"
+BROWSER="$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)"
+test -n "$BROWSER" || { echo "Chrome or Chromium is required" >&2; exit 1; }
+"$BROWSER" --headless --disable-gpu \
   --blink-settings=scriptEnabled=false \
-  --print-to-pdf="$HOME/snap/chromium/common/pdf-work/output.pdf" \
+  --print-to-pdf="$WORK_DIR/output.pdf" \
   --no-pdf-header-footer \
-  "file://$HOME/snap/chromium/common/pdf-work/new-report.html"
+  "file://$WORK_DIR/input.html"
+cp "$WORK_DIR/output.pdf" ./output.pdf
 ```
 
 ## Document types
@@ -209,17 +221,19 @@ Content must not touch or overlap the page footer. These rules apply to **conten
 
 ## PDF generation
 
-### Chromium (snap-confined)
+### Chrome or Chromium
 ```bash
-# Must use ~/snap/chromium/common/ path
-mkdir -p ~/snap/chromium/common/pdf-work
-cp template.html ~/snap/chromium/common/pdf-work/
-chromium-browser --headless --disable-gpu \
+WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/pdf-design.XXXXXX")"
+trap 'rm -rf -- "$WORK_DIR"' EXIT
+cp template.html "$WORK_DIR/input.html"
+BROWSER="$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)"
+test -n "$BROWSER" || { echo "Chrome or Chromium is required" >&2; exit 1; }
+"$BROWSER" --headless --disable-gpu \
   --blink-settings=scriptEnabled=false \
-  --print-to-pdf="$HOME/snap/chromium/common/pdf-work/output.pdf" \
+  --print-to-pdf="$WORK_DIR/output.pdf" \
   --no-pdf-header-footer \
-  "file://$HOME/snap/chromium/common/pdf-work/template.html"
-cp ~/snap/chromium/common/pdf-work/output.pdf ./
+  "file://$WORK_DIR/input.html"
+cp "$WORK_DIR/output.pdf" ./output.pdf
 ```
 
 ### Preview pages
@@ -233,15 +247,38 @@ pdfinfo output.pdf | grep Pages
 
 ### HTML preview
 ```bash
-mkdir -p "$HOME/snap/chromium/common/pdf-work"
-cp template.html "$HOME/snap/chromium/common/pdf-work/template.html"
+WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/pdf-design.XXXXXX")"
+trap 'rm -rf -- "$WORK_DIR"' EXIT
+cp template.html "$WORK_DIR/input.html"
+BROWSER="$(command -v chromium-browser || command -v chromium || command -v google-chrome || true)"
+test -n "$BROWSER" || { echo "Chrome or Chromium is required" >&2; exit 1; }
+"$BROWSER" --headless --disable-gpu \
+  --blink-settings=scriptEnabled=false \
+  --screenshot="$WORK_DIR/preview.png" \
+  --window-size=1275,1650 \
+  "file://$WORK_DIR/input.html"
+cp "$WORK_DIR/preview.png" ./preview.png
+```
+
+### Snap-confined Chromium adapter
+
+Use this adapter only when the selected Chromium binary is installed as a snap
+and cannot read the system temporary directory. It keeps the same disposable
+staging and cleanup behavior inside the snap-accessible directory.
+
+<!-- pdf-design-path-adapter:snap-confined-browser:start -->
+```bash
+WORK_DIR="$(mktemp -d "$HOME/snap/chromium/common/pdf-design.XXXXXX")"
+trap 'rm -rf -- "$WORK_DIR"' EXIT
+cp template.html "$WORK_DIR/input.html"
 chromium-browser --headless --disable-gpu \
   --blink-settings=scriptEnabled=false \
-  --screenshot="$HOME/snap/chromium/common/pdf-work/preview.png" \
-  --window-size=1275,1650 \
-  "file://$HOME/snap/chromium/common/pdf-work/template.html"
-cp "$HOME/snap/chromium/common/pdf-work/preview.png" ./preview.png
+  --print-to-pdf="$WORK_DIR/output.pdf" \
+  --no-pdf-header-footer \
+  "file://$WORK_DIR/input.html"
+cp "$WORK_DIR/output.pdf" ./output.pdf
 ```
+<!-- pdf-design-path-adapter:snap-confined-browser:end -->
 
 ---
 
@@ -445,7 +482,7 @@ If a page feels too crowded, *reduce content*, don't expand spacing.
 ## Known issues
 
 1. **Base64 images**, Don't read HTML with large base64 using Read tool (API error). Use sed/grep/Python.
-2. **Snap confinement**, Chromium can only write to `~/snap/chromium/common/`
+2. **Snap confinement**, Use the explicit snap adapter above when Chromium cannot access the system temporary directory
 3. **Fonts**, Google Fonts via CDN; for sensitive or offline documents, use bundled local fonts
 
 ## Brand assets
@@ -456,4 +493,5 @@ If a page feels too crowded, *reduce content*, don't expand spacing.
 
 ## Template
 
-Reference: `~/.claude/plugins/pdf-design/templates/democracy-day-proposal.html`
+Reference: `templates/democracy-day-proposal.html`, resolved from the directory
+that contains this installed `SKILL.md`.

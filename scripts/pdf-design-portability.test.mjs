@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  APPROVED_PATH_ADAPTERS,
   detectPathAssumptions,
+  readPathAdapters,
   readSkillBody,
   PATH_ASSUMPTION_KINDS,
 } from './pdf-design-portability.mjs';
@@ -96,16 +98,35 @@ test('inventories a coupled skill body, not a hard-coded list (#235 AC2)', () =>
   assert.deepEqual(findings.map((f) => f.kind).sort(), [...PATH_ASSUMPTION_KINDS].sort());
 });
 
-// The portable end state (#235 AC3): once the default instructions resolve the
-// template relative to the skill and stage the browser in a disposable dir, the
-// live skill carries no path assumptions. It does today, so this is a todo --
-// it reads the real committed skill and documents the failing fixture against it
-// without reddening CI. Drop the `todo` when the SKILL.md rewrite lands, and the
-// AC2 inventory above stays green because it pins the frozen legacy body.
-test(
-  'the committed pdf-design default resolves paths portably (#235 AC3)',
-  { todo: '#235: SKILL.md default still hardcodes ~/.claude/plugins and ~/snap/chromium' },
-  () => {
-    assert.deepEqual(detectPathAssumptions(readSkillBody()), []);
-  },
-);
+test('only a marked, approved adapter can contain a host path', () => {
+  const adapter = `
+<!-- pdf-design-path-adapter:snap-confined-browser:start -->
+mkdir -p ~/snap/chromium/common/pdf-work
+<!-- pdf-design-path-adapter:snap-confined-browser:end -->`;
+  assert.deepEqual(detectPathAssumptions(adapter), []);
+  assert.deepEqual(
+    detectPathAssumptions(adapter.replace(':end', ':changed'))
+      .map((finding) => finding.kind),
+    ['snap-confined-browser'],
+  );
+  assert.deepEqual(
+    detectPathAssumptions(adapter.replace('snap-confined-browser', 'unknown-adapter'))
+      .map((finding) => finding.kind),
+    ['snap-confined-browser'],
+  );
+});
+
+test('the committed pdf-design default resolves paths portably (#235 AC3)', () => {
+  const body = readSkillBody();
+  assert.deepEqual(detectPathAssumptions(body), []);
+
+  const adapters = readPathAdapters(body);
+  assert.deepEqual(
+    adapters.map((adapter) => adapter.name),
+    [...APPROVED_PATH_ADAPTERS],
+  );
+  assert.deepEqual(
+    detectPathAssumptions(adapters[0].body).map((finding) => finding.kind),
+    ['snap-confined-browser'],
+  );
+});
