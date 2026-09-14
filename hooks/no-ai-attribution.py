@@ -295,6 +295,9 @@ def contains_attribution(text):
                 return True
             if _AI_INLINE_RE.search(line) or _VERB_TOOL_RE.search(line):
                 return True
+    # Session trailers identify the generating tool even without a byline verb.
+    if re.search(r"^[ \t]*Claude-Session[ \t]*:", text, re.I | re.M):
+        return True
     if _AI_BYLINE_RE.search(text):
         return True
     for m in _COAUTHOR_LINE_RE.finditer(text):

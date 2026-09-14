@@ -2045,3 +2045,17 @@ def test_block_popd_double_dash_ignores_a_later_position(tmp_path):
     (tmp_path / "MSG").write_text("Fix the parser\n")
     r = run(f"pushd {a} && pushd {b} && popd -- +1 && git commit -F MSG", cwd=tmp_path)
     assert_blocked(r)
+
+
+def test_block_claude_session_trailer_in_message():
+    assert_blocked(run('git commit -m "Fix parser\n\nClaude-Session: https://example.com/session"'))
+
+
+def test_block_claude_session_trailer_in_file(tmp_path):
+    message = tmp_path / "MSG"
+    message.write_text("Fix parser\n\nClaude-Session: https://example.com/session\n")
+    assert_blocked(run("git commit -F MSG", cwd=tmp_path))
+
+
+def test_allow_claude_session_subject_matter():
+    assert_allowed(run('git commit -m "Block the Claude-Session: trailer"'))
