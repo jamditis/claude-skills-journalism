@@ -2697,6 +2697,33 @@ def test_wrong_case_link_names_the_real_file(tmp_path):
     assert "dangling link -> Target.md" not in out
 
 
+@pytest.mark.parametrize("target, canonical", [
+    ("Target.md", "target.md"),
+    ("../Concepts/target.md", "../concepts/target.md"),
+    ("../ALIAS/target.md", "../Alias/target.md"),
+])
+def test_link_case_survives_windows_resolve(tmp_path, monkeypatch, capsys, target, canonical):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    write_concept(b, GOOD, name="concepts/target.md")
+    if "ALIAS" in target:
+        directory_symlink(b / "Alias", b / "concepts")
+    write_concept(b, GOOD.rstrip() + f"\nSee [x]({target}).\n", name="concepts/c.md")
+    mod = _validate_module()
+    original = Path.resolve
+
+    def windows_resolve(path, *args, **kwargs):
+        # Simulate canonicalization of file, directory, and symlink spelling.
+        if path == b / "concepts" / target:
+            path = b / "concepts" / canonical
+        return original(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "resolve", windows_resolve)
+    monkeypatch.setattr(sys, "argv", ["validate.py", "--bundle", str(b)])
+    assert mod.main() == 1
+    assert "link case does not match" in capsys.readouterr().out
+
+
 def test_wrong_case_link_fix_preserves_fragment(tmp_path):
     # The diagnostic promises a replacement that can be pasted into the link.
     # Correcting path casing must not discard the section the author targeted.
@@ -2775,3 +2802,115 @@ def test_two_case_variants_report_dangling_not_a_guess(tmp_path):
     rc, out = validate(b)
     assert rc == 1 and "dangling link -> TARGET.md" in out
     assert "link case does not match" not in out
+
+
+def directory_symlink(link, target):
+    try:
+        link.symlink_to(target, target_is_directory=True)
+    except OSError as exc:
+        pytest.skip(f"directory symlink unavailable: {exc}")
+
+
+def test_link_symlink_parent_keeps_filesystem_semantics(tmp_path):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    (b / "concepts" / "nested").mkdir()
+    directory_symlink(b / "alias", b / "concepts" / "nested")
+    write_concept(b, GOOD, name="concepts/target.md")
+    # Lexically alias/../target.md would mean bundle/target.md, which is absent.
+    with (b / "index.md").open("a") as stream:
+        stream.write("\n[valid](alias/../target.md)\n")
+    rc, out = validate(b)
+    assert rc == 0, out
+
+
+def test_wrong_case_symlink_component_is_not_lost(tmp_path):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    directory_symlink(b / "Alias", b / "concepts")
+    write_concept(b, GOOD, name="concepts/target.md")
+    with (b / "index.md").open("a") as stream:
+        stream.write("\n[wrong](alias/target.md)\n")
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "write Alias/target.md" in out
+
+
+def test_case_correction_preserves_symlink_parent_in_suggestion(tmp_path):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    (b / "concepts" / "nested").mkdir()
+    directory_symlink(b / "Alias", b / "concepts" / "nested")
+    write_concept(b, GOOD, name="concepts/target.md")
+    with (b / "index.md").open("a") as stream:
+        stream.write("\n[wrong](alias/../Target.md)\n")
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "write Alias/../target.md" in out
+
+
+def test_wrong_case_symlink_parent_does_not_false_escape(tmp_path):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    (b / "deep" / "a" / "b").mkdir(parents=True)
+    directory_symlink(b / "Alias", b / "deep" / "a" / "b")
+    with (b / "index.md").open("a") as stream:
+        stream.write("\n[wrong](alias/../../../index.md)\n")
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "write Alias/../../../index.md" in out
+    assert "link escapes bundle root" not in out
+
+
+@pytest.mark.parametrize("target", ["C:/outside.md", "\\\\outside.md"])
+def test_windows_rooted_link_is_rejected_before_case_walk(tmp_path, target):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    with (b / "index.md").open("a") as stream:
+        stream.write(f"\n[rooted]({target})\n")
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "root-relative link not allowed" in out
+
+
+def test_nonconforming_target_beyond_symlink_is_reported_as_escape(tmp_path):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (outside / "Target.MD").write_text("outside\n")
+    directory_symlink(b / "Alias", outside)
+    with (b / "index.md").open("a") as stream:
+        stream.write("\n[escape](alias/target.md)\n")
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "link escapes bundle root" in out
+    assert "rename Alias/Target.MD" not in out
+
+
+@pytest.mark.parametrize("spelling", ["alias", "Alias"])
+def test_link_symlink_escape_still_rejected(tmp_path, spelling):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (outside / "target.md").write_text(GOOD)
+    directory_symlink(b / "Alias", outside)
+    with (b / "index.md").open("a") as stream:
+        stream.write(f"\n[escape]({spelling}/target.md)\n")
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert "link escapes bundle root" in out
+
+
+@pytest.mark.parametrize("spelling", ["Loop.md", "loop.md"])
+def test_looping_symlink_link_reports_dangling(tmp_path, spelling):
+    scaffold(tmp_path / "kb", "--no-validate")
+    b = tmp_path / "kb" / "bundle"
+    directory_symlink(b / "Loop.md", b / "Loop.md")
+    with (b / "index.md").open("a") as stream:
+        stream.write(f"\n[loop]({spelling})\n")
+    rc, out = validate(b)
+    assert rc == 1, out
+    assert f"dangling link -> {spelling}" in out
+    assert "Traceback" not in out
