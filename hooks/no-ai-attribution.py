@@ -447,10 +447,9 @@ _ENV_ASSIGN_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 # the exported value the child git process will see.
 _ENV_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 # Env vars that set commit authorship: the environment twin of `git commit --author`.
-_GIT_IDENTITY_ENV = {
-    "GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL", "GIT_COMMITTER_NAME", "GIT_COMMITTER_EMAIL",
-    "EMAIL",
-}
+_GIT_AUTHOR_IDENTITY_ENV = {"GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL", "EMAIL"}
+_GIT_COMMITTER_IDENTITY_ENV = {"GIT_COMMITTER_NAME", "GIT_COMMITTER_EMAIL"}
+_GIT_IDENTITY_ENV = _GIT_AUTHOR_IDENTITY_ENV | _GIT_COMMITTER_IDENTITY_ENV
 # git config keys that set commit identity, settable per-command with `git -c key=value`.
 # git config keys are case-insensitive, so compare lowercased.
 _GIT_IDENTITY_CONFIG = {
@@ -477,7 +476,7 @@ _SHELL_C_VALUE_OPTS = {"-o", "+o", "-O", "+O", "--rcfile", "--init-file"}
 _GIT_COMMIT_LONG_OPTS = frozenset({
     "ahead-behind", "all", "allow-empty", "allow-empty-message", "amend", "author",
     "branch", "cleanup", "date", "dry-run", "edit", "file", "fixup", "gpg-sign",
-    "include", "interactive", "long", "message", "no-post-rewrite", "no-verify",
+    "include", "interactive", "long", "message", "no-edit", "no-post-rewrite", "no-verify",
     "null", "only", "patch", "pathspec-file-nul", "pathspec-from-file", "porcelain",
     "quiet", "reedit-message", "reset-author", "reuse-message", "short", "signoff",
     "squash", "status", "template", "trailer", "untracked-files", "verbose",
@@ -707,6 +706,45 @@ def _git_commit_is_dry_run(args):
     return False
 
 
+def _git_commit_uses_environment_author(args):
+    """True when git commit gets its author from the environment.
+
+    An explicit --author replaces the environment author. Reuse and amend modes keep
+    the existing commit's author unless --reset-author is present. The committer still
+    comes from its own environment variables in every commit-writing mode.
+    """
+    author = reset_author = reuse_author = amend = False
+    for t in args:
+        if t == "--":
+            break
+        if t.startswith("--"):
+            name = t[2:].split("=", 1)[0]
+            option = _resolve_git_long(name, _GIT_COMMIT_LONG_OPTS)
+            author = author or option == "author"
+            reset_author = reset_author or option == "reset-author"
+            reuse_author = reuse_author or option in {"reuse-message", "reedit-message"}
+            amend = amend or option == "amend"
+        elif t == "-C" or t.startswith("-C") or t == "-c" or t.startswith("-c"):
+            reuse_author = True
+    if author:
+        return False
+    if reset_author:
+        return True
+    return not (reuse_author or amend)
+
+
+def _git_merge_is_recovery(args):
+    """True for merge modes that recover state without creating a commit."""
+    for t in args:
+        if t == "--":
+            break
+        if t.startswith("--"):
+            name = t[2:].split("=", 1)[0]
+            if _resolve_git_long(name, _GIT_MERGE_LONG_OPTS) in {"abort", "quit"}:
+                return True
+    return False
+
+
 def _classify(spec, name):
     if name in spec["text"]:
         return "text"
@@ -885,6 +923,7 @@ def _strip_env_prefix(seg):
             # assignments after -i are still passed and still checked).
             if t in ("-i", "--ignore-environment"):
                 ignore_env = True
+                assigns.clear()
                 j += 1
                 continue
             j += 1  # any other env option takes no separate value token we track
@@ -1605,6 +1644,8 @@ def find_attribution(command, cwd, depth=0, inherited=None):
                 continue
             if spec is _GIT_COMMIT and _git_commit_is_dry_run(core[start:]):
                 continue  # a dry-run creates no commit, so nothing enters the record
+            if spec is _GIT_MERGE and _git_merge_is_recovery(core[start:]):
+                continue  # --abort and --quit recover state without creating a commit
             seg_cwd = base
             if spec is _GIT_COMMIT or spec is _GIT_MERGE:
                 # -C composes onto the base, so a relative -F file resolves correctly.
@@ -1620,8 +1661,14 @@ def find_attribution(command, cwd, depth=0, inherited=None):
                 for a in assigns:
                     name, _, val = a.partition("=")
                     effective[name] = val
+                checked_identity = set(_GIT_IDENTITY_ENV)
+                if (
+                    spec is _GIT_COMMIT
+                    and not _git_commit_uses_environment_author(core[start:])
+                ):
+                    checked_identity -= _GIT_AUTHOR_IDENTITY_ENV
                 for name, val in effective.items():
-                    if name in _GIT_IDENTITY_ENV and value_names_tool(val):
+                    if name in checked_identity and value_names_tool(val):
                         return "tool or bot named in a git identity environment variable"
                 # `git -c user.name=Claude commit ...` sets identity via config;
                 # core[start-1] is the commit/merge token, so globals are core[1:start-1].
