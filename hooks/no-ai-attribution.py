@@ -510,6 +510,11 @@ _GIT_MERGE_VALUE_LONG_OPTS = frozenset({
 _GIT_MERGE_VALUE_SHORT_OPTS = frozenset({"F", "m", "s", "X"})
 _GIT_MERGE_OPTIONAL_SHORT_OPTS = frozenset({"S"})
 
+# Boolean modes that affect whether a command writes an identity. Git accepts their
+# generated --no-* forms and applies repeated forms in command-line order.
+_GIT_COMMIT_NEGATABLE_MODE_OPTS = frozenset({"amend", "dry-run", "reset-author"})
+_GIT_MERGE_NEGATABLE_MODE_OPTS = frozenset({"abort", "quit"})
+
 # Per-subcommand flag spec. 'text' -> scanned with contains_attribution; 'file' ->
 # contents read and scanned; 'field' -> scanned with value_names_tool. 'short' maps
 # a value-taking short-option letter to its kind, for git-style clusters (-am, -F).
@@ -707,7 +712,7 @@ def _resolve_git_long(name, opts):
 
 
 def _git_option_names(args, long_opts, value_long_opts, value_short_opts,
-                      optional_short_opts=frozenset()):
+                      optional_short_opts=frozenset(), negatable_long_opts=frozenset()):
     """Yield actual git option names while skipping their value operands."""
     i = 0
     while i < len(args):
@@ -716,7 +721,13 @@ def _git_option_names(args, long_opts, value_long_opts, value_short_opts,
             break
         if token.startswith("--"):
             raw_name, separator, _ = token[2:].partition("=")
-            name = _resolve_git_long(raw_name, long_opts)
+            name = None
+            if raw_name.startswith("no-"):
+                positive = _resolve_git_long(raw_name[3:], long_opts)
+                if positive in negatable_long_opts:
+                    name = f"no-{positive}"
+            if name is None:
+                name = _resolve_git_long(raw_name, long_opts)
             if name is not None:
                 yield name
                 if name in value_long_opts and not separator and i + 1 < len(args):
@@ -736,6 +747,17 @@ def _git_option_names(args, long_opts, value_long_opts, value_short_opts,
         i += 1
 
 
+def _git_effective_option_names(options, negatable_long_opts):
+    """Return enabled options after applying supported --no-* forms in order."""
+    enabled = set()
+    for name in options:
+        if name.startswith("no-") and name[3:] in negatable_long_opts:
+            enabled.discard(name[3:])
+        else:
+            enabled.add(name)
+    return enabled
+
+
 def _git_commit_is_dry_run(args):
     """True if a `git commit`'s options name --dry-run (or an unambiguous abbreviation).
 
@@ -743,12 +765,16 @@ def _git_commit_is_dry_run(args):
     the record: an attributed dry-run is harmless and blocking it only denies a preview.
     Stops at `--` (end of options); resolves `--dry` -> --dry-run the way git does, and does
     not match a short cluster (git commit has no short dry-run flag; -n is --no-verify)."""
-    return "dry-run" in _git_option_names(
-        args,
-        _GIT_COMMIT_LONG_OPTS,
-        _GIT_COMMIT_VALUE_LONG_OPTS,
-        _GIT_COMMIT_VALUE_SHORT_OPTS,
-        _GIT_COMMIT_OPTIONAL_SHORT_OPTS,
+    return "dry-run" in _git_effective_option_names(
+        _git_option_names(
+            args,
+            _GIT_COMMIT_LONG_OPTS,
+            _GIT_COMMIT_VALUE_LONG_OPTS,
+            _GIT_COMMIT_VALUE_SHORT_OPTS,
+            _GIT_COMMIT_OPTIONAL_SHORT_OPTS,
+            _GIT_COMMIT_NEGATABLE_MODE_OPTS,
+        ),
+        _GIT_COMMIT_NEGATABLE_MODE_OPTS,
     )
 
 
@@ -759,13 +785,17 @@ def _git_commit_uses_environment_author(args):
     the existing commit's author unless --reset-author is present. The committer still
     comes from its own environment variables in every commit-writing mode.
     """
-    options = set(_git_option_names(
-        args,
-        _GIT_COMMIT_LONG_OPTS,
-        _GIT_COMMIT_VALUE_LONG_OPTS,
-        _GIT_COMMIT_VALUE_SHORT_OPTS,
-        _GIT_COMMIT_OPTIONAL_SHORT_OPTS,
-    ))
+    options = _git_effective_option_names(
+        _git_option_names(
+            args,
+            _GIT_COMMIT_LONG_OPTS,
+            _GIT_COMMIT_VALUE_LONG_OPTS,
+            _GIT_COMMIT_VALUE_SHORT_OPTS,
+            _GIT_COMMIT_OPTIONAL_SHORT_OPTS,
+            _GIT_COMMIT_NEGATABLE_MODE_OPTS,
+        ),
+        _GIT_COMMIT_NEGATABLE_MODE_OPTS,
+    )
     author = "author" in options
     reset_author = "reset-author" in options
     reuse_author = bool(options & {"reuse-message", "reedit-message", "-C", "-c"})
@@ -779,12 +809,16 @@ def _git_commit_uses_environment_author(args):
 
 def _git_merge_is_recovery(args):
     """True for merge modes that recover state without creating a commit."""
-    options = _git_option_names(
-        args,
-        _GIT_MERGE_LONG_OPTS,
-        _GIT_MERGE_VALUE_LONG_OPTS,
-        _GIT_MERGE_VALUE_SHORT_OPTS,
-        _GIT_MERGE_OPTIONAL_SHORT_OPTS,
+    options = _git_effective_option_names(
+        _git_option_names(
+            args,
+            _GIT_MERGE_LONG_OPTS,
+            _GIT_MERGE_VALUE_LONG_OPTS,
+            _GIT_MERGE_VALUE_SHORT_OPTS,
+            _GIT_MERGE_OPTIONAL_SHORT_OPTS,
+            _GIT_MERGE_NEGATABLE_MODE_OPTS,
+        ),
+        _GIT_MERGE_NEGATABLE_MODE_OPTS,
     )
     return any(option in {"abort", "quit"} for option in options)
 

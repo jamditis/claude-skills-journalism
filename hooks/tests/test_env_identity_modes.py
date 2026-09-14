@@ -49,3 +49,29 @@ def test_email_fallback_is_always_checked_for_the_committer(command):
 ])
 def test_option_values_are_not_treated_as_identity_modes(command):
     assert_blocked(run(command))
+
+
+@pytest.mark.parametrize("command", [
+    "GIT_AUTHOR_NAME=Claude git commit --amend --no-amend -m Fix",
+    "GIT_COMMITTER_NAME=Claude git merge --abort --no-abort topic",
+])
+def test_negated_identity_modes_restore_normal_identity_checks(command):
+    assert_blocked(run(command))
+
+
+@pytest.mark.parametrize("command", [
+    "GIT_AUTHOR_NAME=Claude git commit --no-amend --amend --no-edit",
+    "GIT_AUTHOR_NAME=Claude git commit -C HEAD --reset-author --no-reset-author",
+    "GIT_COMMITTER_NAME=Claude git commit --no-dry-run --dry-run -m Fix",
+    "GIT_COMMITTER_NAME=Claude git merge --no-abort --abort",
+])
+def test_final_positive_identity_mode_still_allows_recovery(command):
+    assert_allowed(run(command))
+
+
+@pytest.mark.parametrize("command", [
+    "GIT_AUTHOR_NAME=Claude git commit -C HEAD --no-reset-author --reset-author",
+    "GIT_COMMITTER_NAME=Claude git commit --dry-run --no-dry-run -m Fix",
+])
+def test_final_identity_writing_mode_remains_blocked(command):
+    assert_blocked(run(command))
