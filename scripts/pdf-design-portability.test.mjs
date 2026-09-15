@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import test from 'node:test';
 
 import {
@@ -116,6 +119,54 @@ Stage browser files in ~/snap/chromium/common/pdf-work.
     ),
     ['snap-confined-browser'],
   );
+});
+
+test('ends adapters at Markdown section headings', () => {
+  for (const heading of [
+    '   ## Default behavior',
+    'Default behavior\n================',
+    'Default behavior\n----------------',
+  ]) {
+    const body = `
+### Adapter: Claude Code resource lookup
+
+For an old install, check ~/.claude/skills/pdf-design.
+
+${heading}
+
+Default to ~/snap/chromium/common/pdf-work.
+`;
+
+    assert.deepEqual(
+      detectPathAssumptions(body).map((finding) => finding.kind),
+      ['snap-confined-browser'],
+      heading,
+    );
+  }
+});
+
+test('resets adapter state at bundled-file boundaries', () => {
+  const root = mkdtempSync(join(tmpdir(), 'pdf-design-portability-'));
+  const skill = join(root, 'pdf-design');
+
+  try {
+    mkdirSync(skill);
+    writeFileSync(
+      join(skill, '00-adapter.md'),
+      '### Adapter: Claude Code resource lookup\n\nCheck ~/.claude/skills/pdf-design.\n',
+    );
+    writeFileSync(
+      join(skill, '01-default.md'),
+      'Default to ~/snap/chromium/common/pdf-work.\n',
+    );
+
+    assert.deepEqual(
+      detectPathAssumptions(readSkillBody(root)).map((finding) => finding.kind),
+      ['snap-confined-browser'],
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('does not treat an adapter heading inside a fenced example as an adapter', () => {

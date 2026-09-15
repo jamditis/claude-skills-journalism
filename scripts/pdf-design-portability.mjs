@@ -20,7 +20,7 @@ export const SKILL_SUBDIR = 'pdf-design';
 // in SKILL.md today, but a template, reference, or helper added later can carry
 // the same coupling, so the detector reads the whole bundle rather than one
 // file. Binary files (an og-image, a font) are skipped.
-export function readSkillBody(root = ROOT) {
+function readSkillBodies(root) {
   const dir = join(root, SKILL_SUBDIR);
   const bodies = [];
   const walk = (current) => {
@@ -36,7 +36,13 @@ export function readSkillBody(root = ROOT) {
     }
   };
   walk(dir);
-  return bodies.join('\n');
+  return bodies;
+}
+
+// Filter every file on its own so an adapter at one file's end cannot exempt
+// default instructions at the start of the next file.
+export function readSkillBody(root = ROOT) {
+  return readSkillBodies(root).map(withoutExplicitAdapters).join('\n');
 }
 
 // Each assumption is a concrete, greppable pattern paired with the adapter that
@@ -52,6 +58,7 @@ function withoutExplicitAdapters(body) {
   const keptLines = [];
   let inAdapter = false;
   let openFence = null;
+  let previousLine = '';
 
   for (const line of body.split('\n')) {
     const fence = /^ {0,3}(`{3,}|~{3,})/u.exec(line)?.[1];
@@ -67,11 +74,20 @@ function withoutExplicitAdapters(body) {
       if (closingFence.test(line)) openFence = null;
     }
 
-    if (!wasInFence && !fence) {
-      const heading = /^(#{1,3})\s+/u.exec(line);
-      if (heading) inAdapter = /^### Adapter:\s+/u.test(line);
+    const outsideFence = !wasInFence && !fence;
+    if (outsideFence) {
+      const atxHeading = /^ {0,3}(#{1,3})(?:[ \t]+|$)/u.exec(line);
+      const setextHeading =
+        previousLine.trim() !== '' && /^ {0,3}(?:=+|-+)[ \t]*$/u.test(line);
+
+      if (atxHeading) {
+        inAdapter = /^ {0,3}###[ \t]+Adapter:[ \t]+/u.test(line);
+      } else if (setextHeading) {
+        inAdapter = false;
+      }
     }
     if (!inAdapter) keptLines.push(line);
+    previousLine = outsideFence ? line : '';
   }
 
   return keptLines.join('\n');
