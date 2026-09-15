@@ -36,20 +36,52 @@ During a design session, use these commands:
 
 ---
 
+## Installed resources
+
+Locate this installed `SKILL.md` and use its parent directory as
+`SKILL_DIR`. Resolve `templates/` and other bundled resources from that
+directory. Do not assume that the skill is installed below a specific client
+home directory.
+
+### Adapter: Codex resource lookup
+
+Use the absolute `SKILL.md` location from the available-skills catalog. Its
+parent directory is `SKILL_DIR`; resolve `templates/` from there.
+
+### Adapter: Claude Code resource lookup
+
+When a plugin invocation exposes `CLAUDE_PLUGIN_ROOT`, use that directory as
+`SKILL_DIR`. For a legacy single-skill install under
+`~/.claude/skills/pdf-design`, use the parent directory of the loaded
+`SKILL.md`. Do not use the legacy path as the shared default.
+
 ## Quick start
 
-```bash
-# Copy template to start new report
-cp ~/.claude/plugins/pdf-design/templates/democracy-day-proposal.html ./new-report.html
+Replace the installed-skill placeholder path before running this block. Run
+the block from the project directory and in one shell so the exit trap removes
+the disposable browser directory.
 
-# Generate PDF (must use snap-accessible path)
-mkdir -p ~/snap/chromium/common/pdf-work
-cp new-report.html ~/snap/chromium/common/pdf-work/
-chromium-browser --headless --disable-gpu \
-  --blink-settings=scriptEnabled=false \
-  --print-to-pdf="$HOME/snap/chromium/common/pdf-work/output.pdf" \
+```bash
+set -eu
+
+PROJECT_DIR="$PWD"
+SKILL_DIR="/absolute/path/to/installed/pdf-design"
+BROWSER_BIN="${BROWSER_BIN:-chromium-browser}"
+WORK_DIR="$(mktemp -d)"
+trap 'rm -rf "$WORK_DIR"' EXIT
+
+mkdir -p "$WORK_DIR/browser-profile/Default"
+printf '%s\n' '{"profile":{"default_content_setting_values":{"javascript":2}}}' \
+  > "$WORK_DIR/browser-profile/Default/Preferences"
+
+cp "$SKILL_DIR/templates/democracy-day-proposal.html" "$PROJECT_DIR/new-report.html"
+cp "$PROJECT_DIR/new-report.html" "$WORK_DIR/new-report.html"
+"$BROWSER_BIN" --headless=new --disable-gpu \
+  --user-data-dir="$WORK_DIR/browser-profile" \
+  --print-to-pdf="$WORK_DIR/output.pdf" \
   --no-pdf-header-footer \
-  "file://$HOME/snap/chromium/common/pdf-work/new-report.html"
+  "file://$WORK_DIR/new-report.html"
+cp "$WORK_DIR/output.pdf" "$PROJECT_DIR/output.pdf"
 ```
 
 ## Document types
@@ -209,18 +241,25 @@ Content must not touch or overlap the page footer. These rules apply to **conten
 
 ## PDF generation
 
-### Chromium (snap-confined)
+Use the quick-start browser workflow as the default. Keep the source HTML and
+final PDF in the project directory. Stage only the render input and temporary
+output in the disposable directory, then let the exit trap remove it.
+
+### Adapter: snap-confined Chromium
+
+Use this adapter only when a snap-packaged Chromium rejects the disposable
+directory. In the quick-start browser workflow, replace the default `WORK_DIR`
+assignment with this snap-confined path. All browser profile, input, and output
+commands will then use the same allowed directory:
+
 ```bash
-# Must use ~/snap/chromium/common/ path
-mkdir -p ~/snap/chromium/common/pdf-work
-cp template.html ~/snap/chromium/common/pdf-work/
-chromium-browser --headless --disable-gpu \
-  --blink-settings=scriptEnabled=false \
-  --print-to-pdf="$HOME/snap/chromium/common/pdf-work/output.pdf" \
-  --no-pdf-header-footer \
-  "file://$HOME/snap/chromium/common/pdf-work/template.html"
-cp ~/snap/chromium/common/pdf-work/output.pdf ./
+WORK_DIR="$(mktemp -d "$HOME/snap/chromium/common/pdf-work.XXXXXX")"
+trap 'rm -rf "$WORK_DIR"' EXIT
 ```
+
+Stage the render in `$WORK_DIR`, copy the finished PDF back to the project
+directory, and let the exit trap remove only this render's files. Keep the
+script-blocking browser profile setting from the default workflow.
 
 ### Preview pages
 ```bash
@@ -233,14 +272,24 @@ pdfinfo output.pdf | grep Pages
 
 ### HTML preview
 ```bash
-mkdir -p "$HOME/snap/chromium/common/pdf-work"
-cp template.html "$HOME/snap/chromium/common/pdf-work/template.html"
-chromium-browser --headless --disable-gpu \
-  --blink-settings=scriptEnabled=false \
-  --screenshot="$HOME/snap/chromium/common/pdf-work/preview.png" \
+set -eu
+
+PROJECT_DIR="$PWD"
+BROWSER_BIN="${BROWSER_BIN:-chromium-browser}"
+WORK_DIR="$(mktemp -d)"
+trap 'rm -rf "$WORK_DIR"' EXIT
+
+mkdir -p "$WORK_DIR/browser-profile/Default"
+printf '%s\n' '{"profile":{"default_content_setting_values":{"javascript":2}}}' \
+  > "$WORK_DIR/browser-profile/Default/Preferences"
+
+cp "$PROJECT_DIR/template.html" "$WORK_DIR/template.html"
+"$BROWSER_BIN" --headless=new --disable-gpu \
+  --user-data-dir="$WORK_DIR/browser-profile" \
+  --screenshot="$WORK_DIR/preview.png" \
   --window-size=1275,1650 \
-  "file://$HOME/snap/chromium/common/pdf-work/template.html"
-cp "$HOME/snap/chromium/common/pdf-work/preview.png" ./preview.png
+  "file://$WORK_DIR/template.html"
+cp "$WORK_DIR/preview.png" "$PROJECT_DIR/preview.png"
 ```
 
 ---
@@ -445,7 +494,7 @@ If a page feels too crowded, *reduce content*, don't expand spacing.
 ## Known issues
 
 1. **Base64 images**, Don't read HTML with large base64 using Read tool (API error). Use sed/grep/Python.
-2. **Snap confinement**, Chromium can only write to `~/snap/chromium/common/`
+2. **Browser confinement**, A snap-packaged Chromium can reject the default temporary directory. Use the explicit adapter above.
 3. **Fonts**, Google Fonts via CDN; for sensitive or offline documents, use bundled local fonts
 
 ## Brand assets
@@ -456,4 +505,4 @@ If a page feels too crowded, *reduce content*, don't expand spacing.
 
 ## Template
 
-Reference: `~/.claude/plugins/pdf-design/templates/democracy-day-proposal.html`
+Resolve `templates/democracy-day-proposal.html` from the installed skill directory.
