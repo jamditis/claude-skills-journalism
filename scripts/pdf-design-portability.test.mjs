@@ -96,15 +96,49 @@ test('inventories a coupled skill body, not a hard-coded list (#235 AC2)', () =>
   assert.deepEqual(findings.map((f) => f.kind).sort(), [...PATH_ASSUMPTION_KINDS].sort());
 });
 
-// The portable end state (#235 AC3): once the default instructions resolve the
-// template relative to the skill and stage the browser in a disposable dir, the
-// live skill carries no path assumptions. It does today, so this is a todo --
-// it reads the real committed skill and documents the failing fixture against it
-// without reddening CI. Drop the `todo` when the SKILL.md rewrite lands, and the
-// AC2 inventory above stays green because it pins the frozen legacy body.
+test('keeps client-specific paths inside explicit adapters', () => {
+  const body = `
+Use the bundled template at templates/democracy-day-proposal.html.
+
+### Adapter: Claude Code resource lookup
+
+For an old single-skill install, check ~/.claude/skills/pdf-design.
+
+### Adapter: snap-confined Chromium
+
+Stage browser files in ~/snap/chromium/common/pdf-work.
+`;
+
+  assert.deepEqual(detectPathAssumptions(body), []);
+  assert.deepEqual(
+    detectPathAssumptions(`${body}\n## Default behavior\n\nDefault to ~/snap/chromium/common/pdf-work.`).map(
+      (finding) => finding.kind,
+    ),
+    ['snap-confined-browser'],
+  );
+});
+
+test('does not treat an adapter heading inside a fenced example as an adapter', () => {
+  const body = `
+\`\`\`markdown
+### Adapter: example heading
+\`\`\`
+
+Default to ~/.claude/plugins/pdf-design/templates/example.html.
+`;
+
+  assert.deepEqual(
+    detectPathAssumptions(body).map((finding) => finding.kind),
+    ['claude-install-path'],
+  );
+});
+
+// The portable end state (#235 AC3): the default instructions resolve the
+// template relative to the skill and stage the browser in a disposable dir.
+// Client-specific paths are allowed only in explicit adapters. The AC2 inventory
+// above stays green because it pins the frozen legacy body.
 test(
   'the committed pdf-design default resolves paths portably (#235 AC3)',
-  { todo: '#235: SKILL.md default still hardcodes ~/.claude/plugins and ~/snap/chromium' },
   () => {
     assert.deepEqual(detectPathAssumptions(readSkillBody()), []);
   },

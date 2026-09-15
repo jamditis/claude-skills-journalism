@@ -1,13 +1,13 @@
 // Detect maintainer-specific path assumptions in the pdf-design skill, so the
 // portability work in #235 has a guard to fix against rather than a prose
 // inventory that drifts. The skill body is read from the repository, not
-// hard-coded, and each finding names the adapter that makes it portable --
-// mirroring the { kind, mappable, detail } signal shape that
-// dev-toolkit-portability.mjs already uses.
+// hard-coded, and each finding names the adapter that makes it portable.
+// Explicit `### Adapter:` sections may document client-specific paths without
+// turning them into shared defaults. This mirrors the
+// { kind, mappable, detail } signal shape that dev-toolkit-portability.mjs uses.
 //
-// The intent (issue #235) is to land this detector and its test BEFORE
-// rewriting the shared SKILL.md instructions, so the rewrite can be checked
-// rather than trusted.
+// This detector and its failing fixture landed before the shared SKILL.md
+// rewrite. It now guards the portable default and explicit adapter boundary.
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -48,15 +48,43 @@ export function readSkillBody(root = ROOT) {
 // so a later edit cannot slip a coupling past the guard by swapping ~ for $HOME.
 const HOME = '(?:~|\\$HOME|\\$\\{HOME\\})';
 
+function withoutExplicitAdapters(body) {
+  const keptLines = [];
+  let inAdapter = false;
+  let openFence = null;
+
+  for (const line of body.split('\n')) {
+    const fence = /^ {0,3}(`{3,}|~{3,})/u.exec(line)?.[1];
+    const wasInFence = openFence !== null;
+
+    if (!openFence && fence) {
+      openFence = { character: fence[0], length: fence.length };
+    } else if (openFence && fence?.[0] === openFence.character) {
+      const closingFence = new RegExp(
+        `^ {0,3}${openFence.character}{${openFence.length},}\\s*$`,
+        'u',
+      );
+      if (closingFence.test(line)) openFence = null;
+    }
+
+    if (!wasInFence && !fence) {
+      const heading = /^(#{1,3})\s+/u.exec(line);
+      if (heading) inAdapter = /^### Adapter:\s+/u.test(line);
+    }
+    if (!inAdapter) keptLines.push(line);
+  }
+
+  return keptLines.join('\n');
+}
+
 export function detectPathAssumptions(body) {
+  const defaultInstructions = withoutExplicitAdapters(body);
   const findings = [];
 
-  // The template ships beside SKILL.md at pdf-design/templates/, but the default
-  // copy step reads it from ~/.claude/plugins/pdf-design/templates/, a path that
-  // only exists on a Claude plugin install. A Codex or standards-based install
-  // puts the skill somewhere else and has no ~/.claude at all, so the copy fails
-  // before the skill does any work.
-  if (new RegExp(`${HOME}/\\.claude/(?:plugins|skills)/`, 'u').test(body)) {
+  // The template ships beside SKILL.md at pdf-design/templates/. A path below
+  // ~/.claude outside an explicit adapter couples the shared default to a Claude
+  // install and fails for Codex or another standards-based client.
+  if (new RegExp(`${HOME}/\\.claude/(?:plugins|skills)/`, 'u').test(defaultInstructions)) {
     findings.push({
       kind: 'claude-install-path',
       mappable: true,
@@ -65,11 +93,10 @@ export function detectPathAssumptions(body) {
     });
   }
 
-  // Chromium under snap confinement can only read and write
-  // ~/snap/chromium/common/, so the default PDF and preview steps stage files
-  // there. That directory does not exist for a non-snap Chrome, on macOS, or in
-  // a disposable CI working directory.
-  if (new RegExp(`${HOME}/snap/chromium/`, 'u').test(body)) {
+  // A snap-specific staging path outside an explicit adapter couples the shared
+  // default to one browser package. That directory does not exist for a
+  // non-snap Chrome, on macOS, or in a disposable CI working directory.
+  if (new RegExp(`${HOME}/snap/chromium/`, 'u').test(defaultInstructions)) {
     findings.push({
       kind: 'snap-confined-browser',
       mappable: true,

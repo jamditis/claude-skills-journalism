@@ -16,6 +16,10 @@ function pythonBlocks(markdown) {
   return [...markdown.matchAll(/```python\s*\n([\s\S]*?)```/g)].map((match) => match[1]);
 }
 
+function bashBlocks(markdown) {
+  return [...markdown.matchAll(/```bash\s*\n([\s\S]*?)```/g)].map((match) => match[1]);
+}
+
 function pythonIdentifierTargets(source) {
   const patterns = [
     /^\s*(?:async\s+)?(?:class|def)\s+([^\s(:]+)/gm,
@@ -44,7 +48,16 @@ test("pdf-design publishes no maintainer-specific credential or upload wiring", 
   assert.match(skill, /user-chosen destination/i);
   assert.match(skill, /connected Google Drive (tool|integration)/i);
   assert.match(skill, /Do not read or parse raw OAuth token files/i);
-  assert.match(skill, /--blink-settings=scriptEnabled=false/);
+
+  const browserBlocks = bashBlocks(skill).filter((block) =>
+    /--(?:print-to-pdf|screenshot)=/u.test(block),
+  );
+  assert.equal(browserBlocks.length, 2);
+  for (const block of browserBlocks) {
+    assert.match(block, /default_content_setting_values.*javascript.*2/u);
+    assert.match(block, /--user-data-dir="\$WORK_DIR\/browser-profile"/u);
+  }
+  assert.doesNotMatch(skill, /--disable-javascript/u);
 });
 
 test("page-monitoring examples retrieve and redact secrets safely", async () => {
