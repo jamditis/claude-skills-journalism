@@ -204,6 +204,25 @@ Default to ~/.claude/plugins/pdf-design/templates/example.html.
   );
 });
 
+test('does not treat adapter-like headings inside raw HTML as adapters', () => {
+  for (const html of [
+    '<div>\n### Adapter: example heading\n</div>',
+    '<!--\n### Adapter: example heading\n-->',
+  ]) {
+    const body = `
+${html}
+
+Default to ~/.claude/plugins/pdf-design/templates/example.html.
+`;
+
+    assert.deepEqual(
+      detectPathAssumptions(body).map((finding) => finding.kind),
+      ['claude-install-path'],
+      html,
+    );
+  }
+});
+
 // The portable end state (#235 AC3): the default instructions resolve the
 // template relative to the skill and stage the browser in a disposable dir.
 // Client-specific paths are allowed only in explicit adapters. The AC2 inventory

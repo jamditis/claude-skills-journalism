@@ -12,6 +12,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import MarkdownIt from 'markdown-it';
 
 export const ROOT = fileURLToPath(new URL('..', import.meta.url));
 export const SKILL_SUBDIR = 'pdf-design';
@@ -47,44 +48,41 @@ export function readSkillBodies(root = ROOT) {
 // variable ($HOME/x or ${HOME}/x). The detector recognizes all three spellings
 // so a later edit cannot slip a coupling past the guard by swapping ~ for $HOME.
 const HOME = '(?:~|\\$HOME|\\$\\{HOME\\})';
+const markdown = new MarkdownIt({ html: true });
 
 function withoutExplicitAdapters(body) {
-  const keptLines = [];
-  let inAdapter = false;
-  let openFence = null;
-  let previousLine = '';
+  const lines = body.split('\n');
+  const tokens = markdown.parse(body, {});
+  const headings = [];
 
-  for (const line of body.split('\n')) {
-    const fence = /^ {0,3}(`{3,}|~{3,})/u.exec(line)?.[1];
-    const wasInFence = openFence !== null;
+  for (let index = 0; index < tokens.length; index += 1) {
+    const token = tokens[index];
+    if (token.type !== 'heading_open' || token.level !== 0 || !token.map) continue;
 
-    if (!openFence && fence) {
-      openFence = { character: fence[0], length: fence.length };
-    } else if (openFence && fence?.[0] === openFence.character) {
-      const closingFence = new RegExp(
-        `^ {0,3}${openFence.character}{${openFence.length},}\\s*$`,
-        'u',
-      );
-      if (closingFence.test(line)) openFence = null;
-    }
-
-    const outsideFence = !wasInFence && !fence;
-    if (outsideFence) {
-      const atxHeading = /^ {0,3}(#{1,3})(?:[ \t]+|$)/u.exec(line);
-      const setextHeading =
-        previousLine.trim() !== '' && /^ {0,3}(?:=+|-+)[ \t]*$/u.test(line);
-
-      if (atxHeading) {
-        inAdapter = /^ {0,3}###[ \t]+Adapter:[ \t]+/u.test(line);
-      } else if (setextHeading) {
-        inAdapter = false;
-      }
-    }
-    if (!inAdapter) keptLines.push(line);
-    previousLine = outsideFence ? line : '';
+    const inline = tokens[index + 1];
+    headings.push({
+      level: Number(token.tag.slice(1)),
+      start: token.map[0],
+      text: inline?.type === 'inline' ? inline.content : '',
+    });
   }
 
-  return keptLines.join('\n');
+  const excludedLines = new Set();
+  for (let index = 0; index < headings.length; index += 1) {
+    const heading = headings[index];
+    if (heading.level !== 3 || !/^Adapter:[ \t]+/u.test(heading.text)) continue;
+
+    let end = lines.length;
+    for (let next = index + 1; next < headings.length; next += 1) {
+      if (headings[next].level <= heading.level) {
+        end = headings[next].start;
+        break;
+      }
+    }
+    for (let line = heading.start; line < end; line += 1) excludedLines.add(line);
+  }
+
+  return lines.filter((_, index) => !excludedLines.has(index)).join('\n');
 }
 
 export function detectPathAssumptions(input) {
