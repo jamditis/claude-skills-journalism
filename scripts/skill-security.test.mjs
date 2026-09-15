@@ -57,6 +57,8 @@ test("pdf-design publishes no maintainer-specific credential or upload wiring", 
     assert.match(block, /default_content_setting_values.*javascript.*2/u);
     assert.match(block, /--user-data-dir="\$WORK_DIR\/browser-profile"/u);
   }
+  assert.match(skill, /mktemp -d .*snap\/chromium\/common\/pdf-work\.XXXXXX/u);
+  assert.match(skill, /trap 'rm -rf "\$SNAP_WORK_DIR"' EXIT/u);
   assert.doesNotMatch(skill, /--disable-javascript/u);
 });
 

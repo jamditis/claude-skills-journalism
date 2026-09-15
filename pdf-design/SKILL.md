@@ -248,10 +248,17 @@ output in the disposable directory, then let the exit trap remove it.
 ### Adapter: snap-confined Chromium
 
 Use this adapter only when a snap-packaged Chromium rejects the disposable
-directory. Stage the render below `~/snap/chromium/common/pdf-work`, copy the
-finished PDF back to the project directory, and remove the staged input,
-output, and directory after verification. Keep the script-blocking browser
-profile setting from the default workflow.
+directory. Create a unique directory for each render and remove only that
+directory:
+
+```bash
+SNAP_WORK_DIR="$(mktemp -d "$HOME/snap/chromium/common/pdf-work.XXXXXX")"
+trap 'rm -rf "$SNAP_WORK_DIR"' EXIT
+```
+
+Stage the render in `$SNAP_WORK_DIR`, copy the finished PDF back to the project
+directory, and let the exit trap remove only this render's files. Keep the
+script-blocking browser profile setting from the default workflow.
 
 ### Preview pages
 ```bash

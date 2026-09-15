@@ -20,7 +20,7 @@ export const SKILL_SUBDIR = 'pdf-design';
 // in SKILL.md today, but a template, reference, or helper added later can carry
 // the same coupling, so the detector reads the whole bundle rather than one
 // file. Binary files (an og-image, a font) are skipped.
-function readSkillBodies(root) {
+export function readSkillBodies(root = ROOT) {
   const dir = join(root, SKILL_SUBDIR);
   const bodies = [];
   const walk = (current) => {
@@ -32,17 +32,11 @@ function readSkillBodies(root) {
       }
       if (!entry.isFile()) continue;
       const bytes = readFileSync(path);
-      if (!bytes.includes(0)) bodies.push(bytes.toString('utf8'));
+      if (!bytes.includes(0)) bodies.push({ path, body: bytes.toString('utf8') });
     }
   };
   walk(dir);
   return bodies;
-}
-
-// Filter every file on its own so an adapter at one file's end cannot exempt
-// default instructions at the start of the next file.
-export function readSkillBody(root = ROOT) {
-  return readSkillBodies(root).map(withoutExplicitAdapters).join('\n');
 }
 
 // Each assumption is a concrete, greppable pattern paired with the adapter that
@@ -93,8 +87,13 @@ function withoutExplicitAdapters(body) {
   return keptLines.join('\n');
 }
 
-export function detectPathAssumptions(body) {
-  const defaultInstructions = withoutExplicitAdapters(body);
+export function detectPathAssumptions(input) {
+  const bodies = typeof input === 'string' ? [{ path: null, body: input }] : input;
+  const defaultInstructions = bodies
+    .map(({ path, body }) =>
+      path === null || path.endsWith('.md') ? withoutExplicitAdapters(body) : body,
+    )
+    .join('\n');
   const findings = [];
 
   // The template ships beside SKILL.md at pdf-design/templates/. A path below

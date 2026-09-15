@@ -6,7 +6,7 @@ import test from 'node:test';
 
 import {
   detectPathAssumptions,
-  readSkillBody,
+  readSkillBodies,
   PATH_ASSUMPTION_KINDS,
 } from './pdf-design-portability.mjs';
 
@@ -161,8 +161,28 @@ test('resets adapter state at bundled-file boundaries', () => {
     );
 
     assert.deepEqual(
-      detectPathAssumptions(readSkillBody(root)).map((finding) => finding.kind),
+      detectPathAssumptions(readSkillBodies(root)).map((finding) => finding.kind),
       ['snap-confined-browser'],
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('does not exempt adapter-like text in non-Markdown files', () => {
+  const root = mkdtempSync(join(tmpdir(), 'pdf-design-portability-'));
+  const skill = join(root, 'pdf-design');
+
+  try {
+    mkdirSync(skill);
+    writeFileSync(
+      join(skill, 'template.html'),
+      '### Adapter: example text\nDefault to ~/.claude/plugins/pdf-design/template.html.\n',
+    );
+
+    assert.deepEqual(
+      detectPathAssumptions(readSkillBodies(root)).map((finding) => finding.kind),
+      ['claude-install-path'],
     );
   } finally {
     rmSync(root, { recursive: true, force: true });
@@ -191,6 +211,6 @@ Default to ~/.claude/plugins/pdf-design/templates/example.html.
 test(
   'the committed pdf-design default resolves paths portably (#235 AC3)',
   () => {
-    assert.deepEqual(detectPathAssumptions(readSkillBody()), []);
+    assert.deepEqual(detectPathAssumptions(readSkillBodies()), []);
   },
 );
