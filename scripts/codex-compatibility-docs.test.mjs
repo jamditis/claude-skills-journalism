@@ -356,6 +356,19 @@ test('video-toolkit evidence stays limited to the tested preflight', () => {
   assert.doesNotMatch(evidenceText, /\/home\/jamditis/u);
   assert.doesNotMatch(record, /one small local media item\s+through download/iu);
   assert.doesNotMatch(matrix, /video-toolkit` \|[^\n]*preflight passed/iu);
+
+  const totalElapsedMs = evidence.cases.reduce(
+    (sum, { elapsedMs }) => sum + elapsedMs,
+    0,
+  );
+  const peakRssKiB = Math.max(...evidence.cases.map(({ maxRssKiB }) => maxRssKiB));
+  assert.match(
+    record,
+    new RegExp(
+      `${(totalElapsedMs / 1000).toFixed(3)} seconds of child-process time, peaked at ${peakRssKiB.toLocaleString('en-US')} KiB RSS`,
+      'u',
+    ),
+  );
 });
 
 test('video-toolkit evidence changes run the compatibility checks', () => {

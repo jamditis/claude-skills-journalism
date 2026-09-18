@@ -22,7 +22,9 @@ import {
   parseCliArgs,
   prepareProject,
   prepareRuntimeHomes,
+  runPreflightCase,
   sanitizeText,
+  sensitiveAuthenticationValues,
   sensitiveEnvironmentValues,
   summarizeJsonl,
   validateCaseResult,
@@ -171,6 +173,8 @@ test('evidence sanitation rejects residual private paths and credentials', () =>
     '{"access_token":"secret"}',
     '{"refresh_token":"secret"}',
     '{"OPENAI_API_KEY":"secret"}',
+    'sk-proj-abcdefghijklmnopqrstuvwxyz',
+    'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature-value',
   ]) {
     assert.throws(
       () => validateEvidenceSanitization({ answer: credential }, []),
@@ -181,6 +185,138 @@ test('evidence sanitation rejects residual private paths and credentials', () =>
     () => validateEvidenceSanitization({ answer: 'redact-me' }, ['redact-me']),
     /private path or environment value/u,
   );
+});
+
+test('authentication values select only credential-bearing leaves', () => {
+  assert.deepEqual(
+    sensitiveAuthenticationValues({
+      auth_mode: 'chatgpt',
+      tokens: {
+        access_token: 'access-secret-value',
+        refresh_token: 'refresh-secret-value',
+        account_id: 'account-identifier',
+      },
+      OPENAI_API_KEY: 'api-secret-value',
+    }),
+    ['access-secret-value', 'refresh-secret-value', 'api-secret-value'],
+  );
+});
+
+test('measured preflight puts the process-group timeout outside the time wrapper', () => {
+  const runRoot = mkdtempSync(join(tmpdir(), 'video-toolkit-timeout-test-'));
+  const answerPath = join(runRoot, 'answer.txt');
+  const invocation = buildCodexInvocation('unrelated-non-trigger', {
+    projectDir: join(runRoot, 'project'),
+    codexHome: join(runRoot, 'codex-home'),
+    homeDir: join(runRoot, 'home'),
+    answerPath,
+  });
+  let captured;
+  try {
+    const result = runPreflightCase('unrelated-non-trigger', invocation, {
+      runRoot,
+      codexHome: invocation.env.CODEX_HOME,
+      callerCodexHome: join(runRoot, 'caller-codex-home'),
+      timeBinary: '/usr/bin/time',
+      timeoutBinary: '/usr/bin/timeout',
+      spawn(command, args, options) {
+        captured = { command, args, options };
+        writeFileSync(answerPath, 'Skill: none.');
+        return { status: 124, signal: null, stdout: '', stderr: '' };
+      },
+      clock: { now: () => 0 },
+    });
+    assert.equal(captured.command, '/usr/bin/timeout');
+    assert.deepEqual(captured.args.slice(0, 4), [
+      '--signal=TERM',
+      '--kill-after=5s',
+      '150s',
+      '/usr/bin/time',
+    ]);
+    assert.ok(captured.args.includes('codex'));
+    assert.ok(captured.options.timeout > PREFLIGHT_TIMEOUT_MS);
+    assert.equal(result.timedOut, true);
+  } finally {
+    rmSync(runRoot, { recursive: true, force: true });
+  }
+});
+
+test('preflight without a group timeout spawns Codex directly', () => {
+  const runRoot = mkdtempSync(join(tmpdir(), 'video-toolkit-direct-spawn-test-'));
+  const answerPath = join(runRoot, 'answer.txt');
+  const invocation = buildCodexInvocation('unrelated-non-trigger', {
+    projectDir: join(runRoot, 'project'),
+    codexHome: join(runRoot, 'codex-home'),
+    homeDir: join(runRoot, 'home'),
+    answerPath,
+  });
+  let captured;
+  try {
+    runPreflightCase('unrelated-non-trigger', invocation, {
+      runRoot,
+      codexHome: invocation.env.CODEX_HOME,
+      callerCodexHome: join(runRoot, 'caller-codex-home'),
+      timeBinary: '/usr/bin/time',
+      timeoutBinary: null,
+      spawn(command, args, options) {
+        captured = { command, args, options };
+        writeFileSync(answerPath, 'Skill: none.');
+        return { status: 0, signal: null, stdout: '', stderr: '' };
+      },
+      clock: { now: () => 0 },
+    });
+    assert.equal(captured.command, 'codex');
+    assert.equal(captured.options.timeout, PREFLIGHT_TIMEOUT_MS);
+    assert.equal(captured.args[0], 'exec');
+  } finally {
+    rmSync(runRoot, { recursive: true, force: true });
+  }
+});
+
+test('preflight evidence redacts caller authentication values', () => {
+  const runRoot = mkdtempSync(join(tmpdir(), 'video-toolkit-auth-redact-test-'));
+  const callerCodexHome = join(runRoot, 'caller-codex-home');
+  const answerPath = join(runRoot, 'answer.txt');
+  mkdirSync(callerCodexHome);
+  writeFileSync(
+    join(callerCodexHome, 'auth.json'),
+    JSON.stringify({
+      tokens: { access_token: 'access-secret-value' },
+      OPENAI_API_KEY: 'api-secret-value',
+    }),
+  );
+  const invocation = buildCodexInvocation('unrelated-non-trigger', {
+    projectDir: join(runRoot, 'project'),
+    codexHome: join(runRoot, 'codex-home'),
+    homeDir: join(runRoot, 'home'),
+    answerPath,
+  });
+  try {
+    const result = runPreflightCase('unrelated-non-trigger', invocation, {
+      runRoot,
+      codexHome: invocation.env.CODEX_HOME,
+      callerCodexHome,
+      timeBinary: null,
+      timeoutBinary: null,
+      spawn() {
+        writeFileSync(answerPath, 'Skill: none. access-secret-value api-secret-value');
+        return {
+          status: 0,
+          signal: null,
+          stdout: 'token access-secret-value\n',
+          stderr: 'key api-secret-value\n',
+        };
+      },
+      clock: { now: () => 0 },
+    });
+    assert.equal(result.finalAnswer.includes('access-secret-value'), false);
+    assert.equal(result.finalAnswer.includes('api-secret-value'), false);
+    assert.match(result.finalAnswer, /<AUTH_SECRET>/u);
+    assert.equal(result.stdout.includes('access-secret-value'), false);
+    assert.equal(result.stderr.includes('api-secret-value'), false);
+  } finally {
+    rmSync(runRoot, { recursive: true, force: true });
+  }
 });
 
 test('JSONL summary records unique event and item types and malformed lines', () => {

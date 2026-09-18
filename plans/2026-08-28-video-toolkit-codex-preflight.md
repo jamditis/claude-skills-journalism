@@ -51,7 +51,7 @@ The four explicit dependency probes could not execute a local command because
 the nested Linux sandbox failed with `bwrap: loopback: Failed RTM_NEWADDR:
 Operation not permitted`. The results therefore do not replace the Aug. 28
 manual dependency observations or prove installed-file reads. The six cases
-used 106.97 seconds of child-process time, peaked at 263,296 KiB RSS, left the
+used 119.692 seconds of child-process time, peaked at 259,052 KiB RSS, left the
 disposable project unchanged, and removed the run root.
 
 Run the fixture from a checkout with an authenticated Codex home:

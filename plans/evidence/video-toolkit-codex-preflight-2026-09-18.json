@@ -3,7 +3,7 @@
   "scope": "Repeatable video-toolkit Codex activation and preflight evidence. No media execution, browser fallback, hosted API, or parser-sandbox pass is claimed.",
   "generatedAt": "2026-09-18T15:27:50.365Z",
   "sourceCommit": "716c8754135c6093c3344580e1e5810993daf05a",
-  "runnerSha256": "ed935623b8060fa384e64083077e33df3c4c80ccddc7448dcf65c055ba235a94",
+  "runnerSha256": "683e42a3549cfaf586f97b96f6c5f134002b99457a52b7f8cb45d604588e06f9",
   "codexCliVersion": "codex-cli 0.155.0",
   "sandbox": "read-only",
   "environment": "allowlisted variables with disposable HOME and CODEX_HOME",

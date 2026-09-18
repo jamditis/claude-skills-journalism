@@ -21,8 +21,19 @@ const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const REPOSITORY_ROOT = resolve(SCRIPT_DIR, '..');
 const VIDEO_SKILLS_ROOT = join(REPOSITORY_ROOT, 'video-toolkit', 'skills');
 const SENSITIVE_ENVIRONMENT_NAME = /(?:proxy|cert_file|cert_dir)$/iu;
+const CREDENTIAL_LEAF_NAMES = new Set([
+  'access_token',
+  'refresh_token',
+  'id_token',
+  'openai_api_key',
+  'api_key',
+  'client_secret',
+  'password',
+  'authorization',
+]);
 
 export const PREFLIGHT_TIMEOUT_MS = 150_000;
+const PREFLIGHT_KILL_GRACE_MS = 5_000;
 export const VIDEO_SKILLS = Object.freeze([
   'video-dashboard',
   'video-download',
@@ -252,6 +263,35 @@ export function sensitiveEnvironmentValues(environment) {
     .map(([, value]) => value);
 }
 
+export function sensitiveAuthenticationValues(value) {
+  const secrets = [];
+
+  function visit(node) {
+    if (Array.isArray(node)) {
+      for (const item of node) visit(item);
+      return;
+    }
+    if (!node || typeof node !== 'object') return;
+    for (const [key, child] of Object.entries(node)) {
+      if (typeof child === 'string' && child && CREDENTIAL_LEAF_NAMES.has(key.toLowerCase())) {
+        secrets.push(child);
+      } else {
+        visit(child);
+      }
+    }
+  }
+
+  visit(value);
+  return secrets;
+}
+
+export function readAuthenticationSecrets(authPath) {
+  if (!authPath || !existsSync(authPath) || !lstatSync(authPath).isFile()) {
+    return [];
+  }
+  return sensitiveAuthenticationValues(JSON.parse(readFileSync(authPath, 'utf8')));
+}
+
 export function validateEvidenceSanitization(evidence, forbiddenValues) {
   const text = JSON.stringify(evidence);
   for (const value of forbiddenValues) {
@@ -266,6 +306,8 @@ export function validateEvidenceSanitization(evidence, forbiddenValues) {
     /\\?["']?(?:OPENAI_API_KEY|API_KEY|PASSWORD|AUTHORIZATION|ACCESS_TOKEN|REFRESH_TOKEN|ID_TOKEN|CLIENT_SECRET)\\?["']?\s*[:=]/iu,
     /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/u,
     /\bBearer\s+[A-Za-z0-9._~+/-]{12,}/iu,
+    /\bsk-(?:proj-|svcacct-|admin-)?[A-Za-z0-9_-]{16,}\b/u,
+    /\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/u,
   ];
   if (forbiddenPatterns.some((pattern) => pattern.test(text))) {
     throw new Error('Evidence contains a credential or private-home pattern');
@@ -351,6 +393,43 @@ function readIfPresent(path) {
   return existsSync(path) ? readFileSync(path, 'utf8') : '';
 }
 
+function timedOutResult(result) {
+  return (
+    result.error?.code === 'ETIMEDOUT'
+    || result.status === 124
+    || result.signal === 'SIGTERM'
+    || result.signal === 'SIGKILL'
+  );
+}
+
+function measuredSpawn(invocation, {
+  rssPath,
+  timeBinary = existsSync('/usr/bin/time') ? '/usr/bin/time' : null,
+  timeoutBinary = existsSync('/usr/bin/timeout') ? '/usr/bin/timeout' : null,
+} = {}) {
+  if (!timeoutBinary) {
+    return {
+      command: invocation.command,
+      args: invocation.args,
+      timeout: PREFLIGHT_TIMEOUT_MS,
+    };
+  }
+
+  const measured = timeBinary
+    ? [timeBinary, '-f', '%M', '-o', rssPath, invocation.command, ...invocation.args]
+    : [invocation.command, ...invocation.args];
+  return {
+    command: timeoutBinary,
+    args: [
+      '--signal=TERM',
+      `--kill-after=${PREFLIGHT_KILL_GRACE_MS / 1000}s`,
+      `${PREFLIGHT_TIMEOUT_MS / 1000}s`,
+      ...measured,
+    ],
+    timeout: PREFLIGHT_TIMEOUT_MS + PREFLIGHT_KILL_GRACE_MS + 5_000,
+  };
+}
+
 export function runPreflightCase(
   caseId,
   invocation,
@@ -360,24 +439,22 @@ export function runPreflightCase(
     callerCodexHome,
     spawn = spawnSync,
     clock = performance,
+    timeBinary,
+    timeoutBinary,
   } = {},
 ) {
   const resultDir = join(runRoot, 'results');
   mkdirSync(resultDir, { recursive: true });
   const rssPath = join(resultDir, `${caseId}.max-rss-kib.txt`);
-  const timeBinary = existsSync('/usr/bin/time') ? '/usr/bin/time' : null;
-  const command = timeBinary ?? invocation.command;
-  const args = timeBinary
-    ? ['-f', '%M', '-o', rssPath, invocation.command, ...invocation.args]
-    : invocation.args;
+  const measured = measuredSpawn(invocation, { rssPath, timeBinary, timeoutBinary });
   const started = clock.now();
-  const result = spawn(command, args, {
+  const result = spawn(measured.command, measured.args, {
     cwd: invocation.cwd,
     env: invocation.env,
     encoding: 'utf8',
     maxBuffer: 16 * 1024 * 1024,
     shell: false,
-    timeout: PREFLIGHT_TIMEOUT_MS,
+    timeout: measured.timeout,
     windowsHide: true,
   });
   const elapsedMs = Math.round(clock.now() - started);
@@ -391,6 +468,12 @@ export function runPreflightCase(
       value,
       label: '<SENSITIVE_ENVIRONMENT_VALUE>',
     })),
+    ...(callerCodexHome
+      ? readAuthenticationSecrets(join(resolve(callerCodexHome), 'auth.json')).map((value) => ({
+        value,
+        label: '<AUTH_SECRET>',
+      }))
+      : []),
   ];
   const stdout = sanitizeText(result.stdout, replacements);
   const stderr = sanitizeText(result.stderr, replacements);
@@ -403,7 +486,7 @@ export function runPreflightCase(
     prompt: PREFLIGHT_CASES[caseId].prompt,
     exitCode: result.status,
     signal: result.signal,
-    timedOut: result.error?.code === 'ETIMEDOUT',
+    timedOut: timedOutResult(result),
     elapsedMs,
     maxRssKiB: /^\d+$/u.test(maxRssText) ? Number(maxRssText) : null,
     finalAnswer,
@@ -477,6 +560,9 @@ function runCli() {
     );
     const prepared = prepareProject(runRoot);
     const runtimeHomes = prepareRuntimeHomes(runRoot, callerCodexHome);
+    for (const value of readAuthenticationSecrets(join(resolve(callerCodexHome), 'auth.json'))) {
+      forbiddenEvidenceValues.add(value);
+    }
     const initialManifest = prepared.manifest;
     const results = cases.map((caseId) => {
       const answerPath = join(runRoot, 'results', `${caseId}.answer.txt`);
