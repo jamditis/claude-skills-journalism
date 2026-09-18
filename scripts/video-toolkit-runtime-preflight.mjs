@@ -30,6 +30,38 @@ export const VIDEO_SKILLS = Object.freeze([
   'video-transcribe',
 ]);
 
+const REQUIRED_EVIDENCE = Object.freeze({
+  'explicit-download': [
+    /\byt-dlp\b/u,
+    /\bnetwork\b/u,
+    /\b(?:browser|sandbox)\b/u,
+    /\b(?:output|path)\b/u,
+    /\b(?:metadata\.json|youtube_urls\.txt|shell=false)\b/u,
+  ],
+  'explicit-transcribe': [
+    /\bffmpeg\b/u,
+    /\b(?:model|manifest)\b/u,
+    /\b(?:cpu|no-gpu|no gpu)\b/u,
+    /\b(?:transcript|provenance)\b/u,
+    /\b(?:whisper-artifacts\.json|transcript\.meta\.json)\b/u,
+  ],
+  'explicit-frames': [
+    /\bffmpeg\b/u,
+    /\bpillow\b/u,
+    /\b(?:cpu|no-gpu|no gpu)\b/u,
+    /\b(?:frame|grid|analysis)\b/u,
+    /\b(?:frame_%04d\.jpg|frame-grids)\b/u,
+  ],
+  'explicit-dashboard': [
+    /\bnode\b/u,
+    /\bnpm\b/u,
+    /\b(?:input|transcript|frame)\b/u,
+    /\bbrowser\b/u,
+    /\b(?:dashboard|analysis)\b/u,
+    /\b(?:8888|chart-4\.5\.1)\b/u,
+  ],
+});
+
 export const PREFLIGHT_CASES = Object.freeze({
   'explicit-download': Object.freeze({
     skill: 'video-download',
@@ -73,7 +105,14 @@ export function listFileManifest(root) {
   const files = [];
 
   function visit(directory) {
-    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const entries = readdirSync(directory, { withFileTypes: true });
+    if (directory !== root && entries.length === 0) {
+      files.push({
+        path: relative(root, directory).replaceAll('\\', '/'),
+        type: 'directory',
+      });
+    }
+    for (const entry of entries) {
       const path = join(directory, entry.name);
       if (entry.isSymbolicLink() || lstatSync(path).isSymbolicLink()) {
         throw new Error(`Preflight inputs cannot contain symlinks: ${path}`);
@@ -160,8 +199,7 @@ function promptFor(caseId) {
   }
   const fixture = PREFLIGHT_CASES[caseId];
   const activation = fixture.skill ? `$${fixture.skill}\n` : '';
-  const expectedSelection = fixture.skill ?? 'none';
-  return `${activation}${fixture.prompt}\n\n${SHARED_BOUNDARY}\nBegin your final answer with exactly: Selected skill: ${expectedSelection}.`;
+  return `${activation}${fixture.prompt}\n\n${SHARED_BOUNDARY}\nUse a short "Selected skill:" line at the start, with the value determined from the installed project skills.`;
 }
 
 export function buildCodexInvocation(
@@ -225,7 +263,7 @@ export function validateEvidenceSanitization(evidence, forbiddenValues) {
     /(?:\/home\/|\/Users\/)[^/\s"']+/u,
     /[A-Za-z]:\\Users\\[^\\\s"']+/u,
     /\b[a-z][a-z0-9+.-]*:\/\/[^/@\s"']+@/iu,
-    /\b(?:OPENAI_API_KEY|API_KEY|PASSWORD|AUTHORIZATION)\s*[:=]\s*\S+/iu,
+    /\\?["']?(?:OPENAI_API_KEY|API_KEY|PASSWORD|AUTHORIZATION|ACCESS_TOKEN|REFRESH_TOKEN|ID_TOKEN|CLIENT_SECRET)\\?["']?\s*[:=]/iu,
     /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/u,
     /\bBearer\s+[A-Za-z0-9._~+/-]{12,}/iu,
   ];
@@ -274,6 +312,12 @@ export function validateCaseSemantics(result) {
   if (fixture.skill && !answer.includes(`selected skill: ${fixture.skill}`)) {
     throw new Error(`Codex preflight case ${result.id} did not select ${fixture.skill}`);
   }
+  const missingEvidence = (REQUIRED_EVIDENCE[result.id] ?? []).filter(
+    (pattern) => !pattern.test(answer),
+  );
+  if (missingEvidence.length) {
+    throw new Error(`Codex preflight case ${result.id} did not report required runtime evidence`);
+  }
   if (result.id === 'unrelated-non-trigger') {
     if (!answer.includes('skill: none') || VIDEO_SKILLS.some((skill) => answer.includes(skill))) {
       throw new Error('Unrelated preflight case activated a video skill');
@@ -288,9 +332,12 @@ export function validateCaseSemantics(result) {
   }
 }
 
-export function validateSourceStatus(status) {
+export function validateSourceStatus(status, ignoredFiles = '') {
   if (status.trim()) {
     throw new Error('Refusing to run with changes under video-toolkit/skills');
+  }
+  if (ignoredFiles.trim()) {
+    throw new Error('Refusing to run with ignored files under video-toolkit/skills');
   }
 }
 
@@ -420,6 +467,11 @@ function runCli() {
       commandText(
         'git',
         ['status', '--porcelain=v1', '--', 'video-toolkit/skills'],
+        { cwd: REPOSITORY_ROOT },
+      ),
+      commandText(
+        'git',
+        ['ls-files', '--others', '--ignored', '--exclude-standard', '--', 'video-toolkit/skills'],
         { cwd: REPOSITORY_ROOT },
       ),
     );

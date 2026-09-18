@@ -95,8 +95,9 @@ test('Codex invocation is ephemeral, read-only, project-scoped, and file-capturi
   assert.match(invocation.args.at(-1), /^\$video-transcribe\n/u);
   assert.match(
     invocation.args.at(-1),
-    /Begin your final answer with exactly: Selected skill: video-transcribe\.$/u,
+    /Use a short "Selected skill:" line at the start/u,
   );
+  assert.doesNotMatch(invocation.args.at(-1), /Selected skill: video-transcribe/u);
   assert.equal(PREFLIGHT_TIMEOUT_MS, 150_000);
 });
 
@@ -166,6 +167,16 @@ test('evidence sanitation rejects residual private paths and credentials', () =>
     () => validateEvidenceSanitization({ answer: 'OPENAI_API_KEY=secret' }, []),
     /credential or private-home pattern/u,
   );
+  for (const credential of [
+    '{"access_token":"secret"}',
+    '{"refresh_token":"secret"}',
+    '{"OPENAI_API_KEY":"secret"}',
+  ]) {
+    assert.throws(
+      () => validateEvidenceSanitization({ answer: credential }, []),
+      /credential or private-home pattern/u,
+    );
+  }
   assert.throws(
     () => validateEvidenceSanitization({ answer: 'redact-me' }, ['redact-me']),
     /private path or environment value/u,
@@ -212,8 +223,26 @@ test('semantic validation enforces activation, non-trigger, and injection reject
   assert.doesNotThrow(() =>
     validateCaseSemantics({
       id: 'explicit-download',
-      finalAnswer: 'Selected skill: `video-download`.',
+      finalAnswer:
+        'Selected skill: `video-download`. It needs yt-dlp and network access, uses a sandboxed browser fallback, and writes metadata.json to the requested output path.',
     }),
+  );
+  assert.throws(
+    () =>
+      validateCaseSemantics({
+        id: 'explicit-download',
+        finalAnswer: 'Selected skill: `video-download`.',
+      }),
+    /did not report required runtime evidence/u,
+  );
+  assert.throws(
+    () =>
+      validateCaseSemantics({
+        id: 'explicit-transcribe',
+        finalAnswer:
+          'Selected skill: video-transcribe. Required commands include ffmpeg. Check the manifest and model, use CPU with no-GPU, and report transcript and provenance output paths.',
+      }),
+    /did not report required runtime evidence/u,
   );
   assert.throws(
     () => validateCaseSemantics({ id: 'explicit-download', finalAnswer: 'Skill: none.' }),
@@ -245,10 +274,18 @@ test('semantic validation enforces activation, non-trigger, and injection reject
 });
 
 test('source validation rejects changed skill inputs', () => {
-  assert.doesNotThrow(() => validateSourceStatus(''));
+  assert.doesNotThrow(() => validateSourceStatus('', ''));
   assert.throws(
     () => validateSourceStatus(' M video-toolkit/skills/video-download/SKILL.md\n'),
     /changes under video-toolkit\/skills/u,
+  );
+  assert.throws(
+    () =>
+      validateSourceStatus(
+        '',
+        'video-toolkit/skills/video-download/.env\n',
+      ),
+    /ignored files under video-toolkit\/skills/u,
   );
 });
 
@@ -259,6 +296,18 @@ test('project validation rejects any disposable-project mutation', () => {
     () => validateProjectManifest(initial, [...initial, { path: 'output.txt', sha256: 'b' }]),
     /changed the disposable project/u,
   );
+
+  const projectDir = mkdtempSync(join(tmpdir(), 'video-toolkit-manifest-test-'));
+  try {
+    const before = listFileManifest(projectDir);
+    mkdirSync(join(projectDir, 'empty-output'));
+    assert.throws(
+      () => validateProjectManifest(before, listFileManifest(projectDir)),
+      /changed the disposable project/u,
+    );
+  } finally {
+    rmSync(projectDir, { recursive: true, force: true });
+  }
 });
 
 test('CLI requires output and Codex home and validates selected cases', () => {
