@@ -1,13 +1,13 @@
 # Video-toolkit Codex preflight
 
-- Status: observed manual preflight; durable harness and media execution remain pending
-- Evidence date: Aug. 28, 2026
+- Status: repeatable activation fixture recorded; dependency execution and media pipeline remain pending
+- Evidence dates: Aug. 28 and Sept. 18, 2026
 - Tracking issue: [#238](https://github.com/jamditis/claude-skills-journalism/issues/238)
 - Source revision: [`bc681b79a3eaba846a494582368501e0b4d75b1b`](https://github.com/jamditis/claude-skills-journalism/commit/bc681b79a3eaba846a494582368501e0b4d75b1b)
 
 ## Scope
 
-This pass tested `video-toolkit` 1.0.6 on Codex CLI 0.149.1. Skills CLI
+The Aug. 28 pass tested `video-toolkit` 1.0.6 on Codex CLI 0.149.1. Skills CLI
 1.5.20 copied all four skills into a disposable project's `.agents/skills`
 directory. Codex ran with an empty disposable home, the existing account
 authentication file linked into that home, ignored user configuration and
@@ -25,8 +25,44 @@ runtime claim.
 These observations were transcribed from the manual probe outputs during this
 pass. The raw session outputs were not preserved as repository artifacts, so
 this record is scoped manual evidence rather than a repeatable or passed
-runtime fixture. A durable harness and sanitized result manifest remain part
-of the next proof.
+runtime fixture. The repeatable fixture below addresses that evidence gap.
+
+## Repeatable fixture
+
+The Sept. 18 fixture adds a repository runner and
+[sanitized evidence](evidence/video-toolkit-codex-preflight-2026-09-18.json).
+It copied the four current skill directories into a disposable project's
+`.agents/skills` directory from source revision
+[`dddeb94c2a0853295e18a443f2a779232ea91658`](https://github.com/jamditis/claude-skills-journalism/commit/dddeb94c2a0853295e18a443f2a779232ea91658).
+Codex CLI 0.155.0 ran six ephemeral cases with ignored user configuration and
+rules, a read-only sandbox, an environment allowlist, and disposable `HOME` and
+`CODEX_HOME` directories. The disposable Codex home linked only the caller's
+existing authentication file. The fixture did not copy credential contents
+into the project or evidence.
+
+The runner preserved sanitized JSONL, final answers, elapsed time, peak RSS,
+installed-file hashes, before-and-after project manifests, and cleanup state.
+All six Codex processes exited successfully. Each explicit prompt selected its
+named skill and reported its declared output paths and safety boundaries. The
+untrusted-transcript case rejected the embedded instruction, and the unrelated
+tip case selected no skill.
+
+The four explicit dependency probes could not execute a local command because
+the nested Linux sandbox failed with `bwrap: loopback: Failed RTM_NEWADDR:
+Operation not permitted`. The results therefore do not replace the Aug. 28
+manual dependency observations or prove installed-file reads. The six cases
+used 119.692 seconds of child-process time, peaked at 259,052 KiB RSS, left the
+disposable project unchanged, and removed the run root.
+
+Run the fixture from a checkout with an authenticated Codex home:
+
+```bash
+npm run preflight:video-toolkit:codex -- \
+  --output plans/evidence/video-toolkit-codex-preflight-YYYY-MM-DD.json \
+  --codex-home ~/.codex
+```
+
+The output path must be new. The runner refuses to overwrite evidence.
 
 ## Standards install
 
@@ -101,7 +137,8 @@ credential content was copied into the project or repository.
 
 ## Next proof
 
-Provision reviewed, pinned fixtures for the CPU Whisper binary and model,
+Run the fixture where the nested read-only sandbox can perform local checks.
+Then provision reviewed, pinned fixtures for the CPU Whisper binary and model,
 ffmpeg, Pillow, yt-dlp, and local Chart.js. Use a controlled eligible HTTPS
 social target for the download fixture. Begin the pinned local artifact at
 transcription, then run it through frame, provenance, analysis, dashboard,
