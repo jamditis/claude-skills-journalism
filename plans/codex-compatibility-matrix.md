@@ -1,7 +1,7 @@
 # Codex compatibility matrix
 
 - Status: phase-two runtime pilots; journalism-core, visual-explainer, document-design, and portable okf-wiki scaffolding have scoped passes
-- Last evidence update: September 4, 2026
+- Last evidence update: September 18, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
 > **Historical runtime results stay tied to their tested snapshots.** The v2.8.0
@@ -57,11 +57,13 @@ Status labels:
 | Repository okf-wiki pilot | [`cabb43bc2515c6c30a3d0839909f786e7afbcba8`](https://github.com/jamditis/claude-skills-journalism/commit/cabb43bc2515c6c30a3d0839909f786e7afbcba8) | July 23 `master` head installed for the Okf-1 no-Claude runtime evidence |
 | Repository Document design lock pilot | [`d49ed1022a012269a237f7749b0e47c099e7add6`](https://github.com/jamditis/claude-skills-journalism/commit/d49ed1022a012269a237f7749b0e47c099e7add6) | July 23 `master` head used for the D-lock-1 update target |
 | Repository video-toolkit preflight | [`bc681b79a3eaba846a494582368501e0b4d75b1b`](https://github.com/jamditis/claude-skills-journalism/commit/bc681b79a3eaba846a494582368501e0b4d75b1b) | August 28 source revision used for the scoped video-toolkit preflight |
+| Repository video-toolkit repeatable fixture | [`dddeb94c2a0853295e18a443f2a779232ea91658`](https://github.com/jamditis/claude-skills-journalism/commit/dddeb94c2a0853295e18a443f2a779232ea91658) | September 18 source revision used for the sanitized activation fixture |
 | Repository document-design pilot baseline | [`902cc881b5f9c8a18053d1f60dcc456851db3ee4`](https://github.com/jamditis/claude-skills-journalism/commit/902cc881b5f9c8a18053d1f60dcc456851db3ee4) | September 3 public baseline used to prove the missing-resource failure before testing the candidate adapter |
 | Repository security-toolkit preflight | [`9e8e419a916f1f26c57ebe71acc9152c95b5117d`](https://github.com/jamditis/claude-skills-journalism/commit/9e8e419a916f1f26c57ebe71acc9152c95b5117d) | September 4 source revision used for the scoped security-toolkit preflight |
 | Claude Code | 2.1.215; 2.1.218 | Phase-one marketplace validation, then the post-merge clean `journalism-core` install |
 | Codex CLI | 0.145.0 | Legacy-compatible marketplace and clean `journalism-core` install |
 | Codex video-toolkit preflight | 0.149.1 | Scoped video-toolkit activation and dependency preflight on August 28, 2026 |
+| Codex video-toolkit repeatable fixture | 0.155.0 | Sanitized activation, non-trigger, boundary, resource, and cleanup evidence on September 18, 2026 |
 | Codex document-design pilot | 0.153.0 | Scoped project-standards activation, non-trigger, installed-resource, output, and rendering checks on September 3, 2026 |
 | Codex security-toolkit preflight | 0.153.2 | Scoped project-copy selection and resource-read observations on September 4, 2026 |
 | Claude document-design regression | 2.1.239 | Candidate `--plugin-dir` argument-delivery check on September 3, 2026 |
@@ -401,6 +403,18 @@ untested. The manual session outputs were not preserved as repository
 artifacts, so this is an observed preflight rather than a repeatable or passed
 runtime fixture.
 
+The Sept. 18
+[repeatable fixture](evidence/video-toolkit-codex-preflight-2026-09-18.json)
+used Codex CLI 0.155.0 with a disposable project and home, an environment
+allowlist, ignored user configuration and rules, and a read-only sandbox. It
+preserved sanitized JSONL and final answers for four explicit activations, the
+untrusted-transcript boundary, and unrelated non-trigger behavior. It also
+recorded installed-file hashes, time, peak RSS, before-and-after project
+manifests, and cleanup. The explicit cases selected the named skills, but the
+nested Linux sandbox blocked every local dependency command before execution.
+This is repeatable activation and boundary evidence. It does not prove current
+dependency detection, media execution, browser behavior, or parser sandboxing.
+
 ### D-runtime-1: document-design Codex project-standards pilot
 
 Environment: public baseline revision
@@ -487,7 +501,7 @@ package-wide support claim follows from these observations.
 | `research-toolkit` | 1.1.0; six nested skills | Candidate | Include shared instruction-led skills. Network and external-content trust boundaries stay unchanged. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add representative activation, non-activation, network-boundary, and resource checks. |
 | `security-toolkit` | 1.2.3; four nested skills; one command | Candidate with observed preflight and a resource-packaging gap; Claude-only command | The four shared skills remain candidates. Project-copy selection does not prove resource access or security enforcement. `/security-toolkit:hotpatch` and its sandbox lifecycle remain Claude-only. | [S-tool-preflight-1](#s-tool-preflight-1-security-toolkit-project-copy-preflight), [V-phase-1](#v-phase-1-repaired-standards-baseline), [R-phase-1](#r-phase-1-phase-one-repository-checks) | Resolve standalone supply-chain resource packaging; rerun with working sandbox reads and boundary traces. Do not map `hotpatch` without a separately accepted authority, sandbox, cooldown, failure, and cleanup design. |
 | `superjawn` | 1.0.0; 14 nested skills | Not assessed | No package-wide claim. Each skill needs review for Claude tool names, namespacing, agent dispatch, and parallel-agent assumptions. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure only | Evaluate one skill at a time with client-specific tool traces. Do not bulk-port. |
-| `video-toolkit` | 1.0.6; four nested skills; external media runtimes | Observed manual Codex preflight; durable harness and media execution pending | Include explicit activation, dependency refusal, CPU and no-GPU selection, unrelated non-trigger behavior, and the tested untrusted-transcript boundary as manual observations only. Exclude a repeatable runtime claim, real media, output paths, browser fallback, hosted APIs, and media-parser sandboxing. | [V-tool-preflight-1](#v-tool-preflight-1-video-toolkit-codex-preflight), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [F-phase-1](#f-phase-1-affected-claude-package-regression) | Add a repeatable harness with sanitized raw results, then run pinned local media through transcript, frame, provenance, dashboard, browser, sandbox, resource-cap, and cleanup fixtures. |
+| `video-toolkit` | 1.0.6; four nested skills; external media runtimes | Repeatable activation fixture; dependency execution and media pipeline pending | Include repeatable explicit activation, declared output-path and safety-boundary reporting, unrelated non-trigger behavior, and untrusted-transcript rejection. Keep the Aug. 28 dependency, CPU, and no-GPU results classified as manual observations. Exclude a runtime pass, current dependency execution, real media, generated output paths, browser fallback, hosted APIs, and media-parser sandboxing. | [V-tool-preflight-1](#v-tool-preflight-1-video-toolkit-codex-preflight), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [F-phase-1](#f-phase-1-affected-claude-package-regression) | Run the fixture where nested sandbox reads work, then run pinned local media through transcript, frame, provenance, dashboard, browser, sandbox, resource-cap, and cleanup fixtures. |
 | `web-design-picker` | 1.0.0; one root skill; 16 Python scripts; optional browser and media runtimes | Not assessed for Codex | Include no Codex runtime claim. Repository structure, plugin metadata, deterministic scaffold, build, validation, and packaging are locally checked; Codex activation and runtime behavior remain untested. | [Wdp-structure-1](#wdp-structure-1-web-design-picker-repository-preflight) | Run paired activation, non-activation, installed-resource, disposable-project, and no-Claude-environment fixtures before making a Codex support claim. |
 | `visual-explainer` | 0.7.1; one root skill; eight source commands | Runtime pilot passed on the Codex project-standards path; command surfaces unclaimed | Include the root skill and its relative resources only through `.agents/skills`. The legacy route omits root-skill registration. Its three client-generated command wrappers and all eight source commands remain outside this claim. | [V-ex-release-1](#v-ex-release-1-visual-explainer-root-skill-runtime-pilot), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [Cv-base-1](#cv-base-1-codex-creator-helper-comparison) | Add a no-Claude-environment gate and scheduled runtime regression before a broader package claim; test command wrappers only in a separately scoped issue. |
 

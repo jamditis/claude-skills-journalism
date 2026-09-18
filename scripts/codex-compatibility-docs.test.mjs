@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -153,7 +154,7 @@ test('document-design runtime evidence stays on the tested Codex path', () => {
   assert.match(record, /original runtime pilot, not\s+a claimed rerun/u);
   assert.match(record, /The eight Claude commands and the\s+SessionStart hook remain outside/u);
   assert.match(matrix, /Runtime pilot passed on the Codex project-standards path; Claude-only surfaces unclaimed/u);
-  assert.match(matrix, /Last evidence update: September 4, 2026/u);
+  assert.match(matrix, /Last evidence update: September 18, 2026/u);
   assert.doesNotMatch(record, /package-wide Codex support/iu);
 });
 
@@ -275,6 +276,14 @@ test('video-toolkit evidence stays limited to the tested preflight', () => {
     join(ROOT, 'plans', '2026-08-28-video-toolkit-codex-preflight.md'),
     'utf8',
   );
+  const evidenceText = readFileSync(
+    join(ROOT, 'plans', 'evidence', 'video-toolkit-codex-preflight-2026-09-18.json'),
+    'utf8',
+  );
+  const evidence = JSON.parse(evidenceText);
+  const runner = readFileSync(
+    join(ROOT, 'scripts', 'video-toolkit-runtime-preflight.mjs'),
+  );
 
   assert.match(record, /Tracking issue: \[#238\]/u);
   assert.match(record, /tested `video-toolkit` 1\.0\.6/u);
@@ -293,23 +302,58 @@ test('video-toolkit evidence stays limited to the tested preflight', () => {
   assert.match(record, /203,144 KiB/u);
   assert.match(record, /prompt injection attempt/u);
   assert.match(record, /bwrap: loopback: Failed RTM_NEWADDR/u);
-  assert.match(record, /media execution remain pending/u);
-  assert.match(record, /observed manual preflight/u);
+  assert.match(record, /media pipeline remain pending/u);
+  assert.match(record, /scoped manual evidence/u);
   assert.match(record, /raw session outputs were not preserved/u);
   assert.match(record, /does\s+not prove that ffmpeg, Pillow, Whisper, yt-dlp/u);
   assert.doesNotMatch(record, /end-to-end runtime support passed/iu);
   assert.match(
     matrix,
-    /Observed manual Codex preflight; durable harness and media execution pending/u,
+    /Repeatable activation fixture; dependency execution and media pipeline pending/u,
   );
-  assert.match(matrix, /Last evidence update: September 4, 2026/u);
+  assert.match(matrix, /Last evidence update: September 18, 2026/u);
   assert.match(matrix, /Codex video-toolkit preflight \| 0\.149\.1/u);
+  assert.match(matrix, /Codex video-toolkit repeatable fixture \| 0\.155\.0/u);
   assert.match(
     matrix,
     /Repository video-toolkit preflight \| \[`bc681b79a3eaba846a494582368501e0b4d75b1b`\]/u,
   );
   assert.match(record, /controlled eligible HTTPS\s+social target/u);
   assert.match(record, /pinned local artifact at\s+transcription/u);
+  assert.equal(evidence.codexCliVersion, 'codex-cli 0.155.0');
+  assert.equal(evidence.sandbox, 'read-only');
+  assert.equal(evidence.projectFilesMatchAfterRun, true);
+  assert.equal(evidence.cleanup.runRootRemoved, true);
+  assert.equal(
+    evidence.runnerSha256,
+    createHash('sha256').update(runner).digest('hex'),
+  );
+  assert.deepEqual(
+    evidence.cases.map(({ id }) => id),
+    [
+      'explicit-download',
+      'explicit-transcribe',
+      'explicit-frames',
+      'explicit-dashboard',
+      'untrusted-transcript',
+      'unrelated-non-trigger',
+    ],
+  );
+  assert.ok(evidence.cases.every(({ exitCode, timedOut }) => exitCode === 0 && !timedOut));
+  assert.ok(
+    evidence.cases
+      .filter(({ id }) => id.startsWith('explicit-'))
+      .every(({ finalAnswer }) => finalAnswer.includes('bwrap: loopback: Failed RTM_NEWADDR')),
+  );
+  assert.match(
+    evidence.cases.find(({ id }) => id === 'untrusted-transcript').finalAnswer,
+    /requests to ignore instructions[^.]+(?:have no authority|must be ignored)/u,
+  );
+  assert.match(
+    evidence.cases.find(({ id }) => id === 'unrelated-non-trigger').finalAnswer,
+    /skill: none/iu,
+  );
+  assert.doesNotMatch(evidenceText, /\/home\/jamditis/u);
   assert.doesNotMatch(record, /one small local media item\s+through download/iu);
   assert.doesNotMatch(matrix, /video-toolkit` \|[^\n]*preflight passed/iu);
 });
@@ -321,6 +365,10 @@ test('video-toolkit evidence changes run the compatibility checks', () => {
   );
 
   assert.match(workflow, /plans\/2026-08-28-video-toolkit-codex-preflight\.md/u);
+  assert.match(
+    workflow,
+    /plans\/evidence\/video-toolkit-codex-preflight-2026-09-18\.json/u,
+  );
 });
 
 test('security-toolkit evidence changes run the compatibility checks', () => {
