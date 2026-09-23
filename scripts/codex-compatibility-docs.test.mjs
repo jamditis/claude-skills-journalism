@@ -154,7 +154,6 @@ test('document-design runtime evidence stays on the tested Codex path', () => {
   assert.match(record, /original runtime pilot, not\s+a claimed rerun/u);
   assert.match(record, /The eight Claude commands and the\s+SessionStart hook remain outside/u);
   assert.match(matrix, /Runtime pilot passed on the Codex project-standards path; Claude-only surfaces unclaimed/u);
-  assert.match(matrix, /Last evidence update: September 18, 2026/u);
   assert.doesNotMatch(record, /package-wide Codex support/iu);
 });
 
@@ -267,7 +266,7 @@ test('visual-explainer runtime evidence stays scoped to the tested Codex path', 
   assert.doesNotMatch(record, /repository-wide Codex support/u);
 });
 
-test('video-toolkit evidence stays limited to the tested preflight', () => {
+test('video-toolkit evidence separates preflight from the local frame check', () => {
   const matrix = readFileSync(
     join(ROOT, 'plans', 'codex-compatibility-matrix.md'),
     'utf8',
@@ -306,12 +305,15 @@ test('video-toolkit evidence stays limited to the tested preflight', () => {
   assert.match(record, /scoped manual evidence/u);
   assert.match(record, /raw session outputs were not preserved/u);
   assert.match(record, /does\s+not prove that ffmpeg, Pillow, Whisper, yt-dlp/u);
+  assert.match(record, /Synthetic frame extraction check/u);
+  assert.match(record, /`eof_action=pass` wrote four/u);
   assert.doesNotMatch(record, /end-to-end runtime support passed/iu);
   assert.match(
     matrix,
-    /Repeatable activation fixture; dependency execution and media pipeline pending/u,
+    /Repeatable activation fixture and one local synthetic frame output; Codex media pipeline pending/u,
   );
-  assert.match(matrix, /Last evidence update: September 18, 2026/u);
+  assert.match(matrix, /Last evidence update: [A-Z][a-z]+ \d{1,2}, 20\d{2}/u);
+  assert.match(matrix, /It did not run inside Codex or a media sandbox/u);
   assert.match(matrix, /Codex video-toolkit preflight \| 0\.149\.1/u);
   assert.match(matrix, /Codex video-toolkit repeatable fixture \| 0\.155\.0/u);
   assert.match(

@@ -1,7 +1,7 @@
 # Codex compatibility matrix
 
 - Status: phase-two runtime pilots; journalism-core, visual-explainer, document-design, and portable okf-wiki scaffolding have scoped passes
-- Last evidence update: September 18, 2026
+- Last evidence update: September 23, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
 > **Historical runtime results stay tied to their tested snapshots.** The v2.8.0
@@ -415,6 +415,15 @@ nested Linux sandbox blocked every local dependency command before execution.
 This is repeatable activation and boundary evidence. It does not prove current
 dependency detection, media execution, browser behavior, or parser sandboxing.
 
+### V-tool-frame-1: trusted synthetic frame extraction
+
+The September 23 [local frame check](2026-08-28-video-toolkit-codex-preflight.md#synthetic-frame-extraction-check)
+used FFmpeg 6.1.1 on a trusted synthetic video. It found that the default `fps`
+EOF rounding omitted the final output slot at 9 seconds in a 10-second video.
+The revised command kept all four slots and wrote four 320-by-180 JPEGs. This
+checks one frame output path. It did not run inside Codex or a media sandbox;
+grid, vision analysis, and the remaining pipeline outputs are still pending.
+
 ### D-runtime-1: document-design Codex project-standards pilot
 
 Environment: public baseline revision
@@ -501,7 +510,7 @@ package-wide support claim follows from these observations.
 | `research-toolkit` | 1.1.0; six nested skills | Candidate | Include shared instruction-led skills. Network and external-content trust boundaries stay unchanged. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add representative activation, non-activation, network-boundary, and resource checks. |
 | `security-toolkit` | 1.2.3; four nested skills; one command | Candidate with observed preflight and a resource-packaging gap; Claude-only command | The four shared skills remain candidates. Project-copy selection does not prove resource access or security enforcement. `/security-toolkit:hotpatch` and its sandbox lifecycle remain Claude-only. | [S-tool-preflight-1](#s-tool-preflight-1-security-toolkit-project-copy-preflight), [V-phase-1](#v-phase-1-repaired-standards-baseline), [R-phase-1](#r-phase-1-phase-one-repository-checks) | Resolve standalone supply-chain resource packaging; rerun with working sandbox reads and boundary traces. Do not map `hotpatch` without a separately accepted authority, sandbox, cooldown, failure, and cleanup design. |
 | `superjawn` | 1.0.0; 14 nested skills | Not assessed | No package-wide claim. Each skill needs review for Claude tool names, namespacing, agent dispatch, and parallel-agent assumptions. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure only | Evaluate one skill at a time with client-specific tool traces. Do not bulk-port. |
-| `video-toolkit` | 1.0.6; four nested skills; external media runtimes | Repeatable activation fixture; dependency execution and media pipeline pending | Include repeatable explicit activation, declared output-path and safety-boundary reporting, unrelated non-trigger behavior, and untrusted-transcript rejection. Keep the Aug. 28 dependency, CPU, and no-GPU results classified as manual observations. Exclude a runtime pass, current dependency execution, real media, generated output paths, browser fallback, hosted APIs, and media-parser sandboxing. | [V-tool-preflight-1](#v-tool-preflight-1-video-toolkit-codex-preflight), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [F-phase-1](#f-phase-1-affected-claude-package-regression) | Run the fixture where nested sandbox reads work, then run pinned local media through transcript, frame, provenance, dashboard, browser, sandbox, resource-cap, and cleanup fixtures. |
+| `video-toolkit` | 1.0.6; four nested skills; external media runtimes | Repeatable activation fixture and one local synthetic frame output; Codex media pipeline pending | Include repeatable explicit activation, declared output-path and safety-boundary reporting, unrelated non-trigger behavior, and untrusted-transcript rejection. Keep the Aug. 28 dependency, CPU, and no-GPU results classified as manual observations. One trusted synthetic frame extraction ran outside Codex. Exclude a Codex runtime pass, current Codex dependency execution, real external media, Codex-generated output paths, grid and analysis outputs, browser fallback, hosted APIs, and media-parser sandboxing. | [V-tool-preflight-1](#v-tool-preflight-1-video-toolkit-codex-preflight), [V-tool-frame-1](#v-tool-frame-1-trusted-synthetic-frame-extraction), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [F-phase-1](#f-phase-1-affected-claude-package-regression) | Run the fixture where nested sandbox reads work, then run pinned local media through transcript, frame, provenance, dashboard, browser, sandbox, resource-cap, and cleanup fixtures. |
 | `web-design-picker` | 1.0.0; one root skill; 16 Python scripts; optional browser and media runtimes | Not assessed for Codex | Include no Codex runtime claim. Repository structure, plugin metadata, deterministic scaffold, build, validation, and packaging are locally checked; Codex activation and runtime behavior remain untested. | [Wdp-structure-1](#wdp-structure-1-web-design-picker-repository-preflight) | Run paired activation, non-activation, installed-resource, disposable-project, and no-Claude-environment fixtures before making a Codex support claim. |
 | `visual-explainer` | 0.7.1; one root skill; eight source commands | Runtime pilot passed on the Codex project-standards path; command surfaces unclaimed | Include the root skill and its relative resources only through `.agents/skills`. The legacy route omits root-skill registration. Its three client-generated command wrappers and all eight source commands remain outside this claim. | [V-ex-release-1](#v-ex-release-1-visual-explainer-root-skill-runtime-pilot), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [Cv-base-1](#cv-base-1-codex-creator-helper-comparison) | Add a no-Claude-environment gate and scheduled runtime regression before a broader package claim; test command wrappers only in a separately scoped issue. |
 
