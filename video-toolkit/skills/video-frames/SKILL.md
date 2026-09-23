@@ -66,13 +66,19 @@ For each video in metadata.json:
 ```bash
 mkdir -p "{frames_dir}/{platform}/{video_id}"
 ffmpeg -nostdin -v error -i "{video_path}" \
-  -vf "fps=1/{interval},scale='min({max_width},iw)':-1" \
+  -vf "fps=1/{interval}:eof_action=pass,scale='min({max_width},iw)':-1" \
   -q:v 2 -start_number 0 \
   "{frames_dir}/{platform}/{video_id}/frame_%04d.jpg" \
   -y
 ```
 
-Frames are sequentially numbered: `frame_0000.jpg` = 0s, `frame_0001.jpg` = 3s, `frame_0002.jpg` = 6s, etc.
+Frames are sequentially numbered by output slot: `frame_0000.jpg` = nominal 0s,
+`frame_0001.jpg` = nominal 3s, `frame_0002.jpg` = nominal 6s, etc. The `fps`
+filter can select source content from a different timestamp. Do not cite these
+labels as exact capture times.
+The EOF setting keeps a final frame on the sampling interval when the default
+rounding would drop it. A 10-second source at a 3-second interval includes the
+9-second output slot.
 
 **Windows note:** Do not rename frames after extraction. `Path.rename()` fails on Windows when the target exists. Use sequential numbering with a documented interval mapping instead.
 

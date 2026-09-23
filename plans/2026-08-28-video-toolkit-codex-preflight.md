@@ -64,6 +64,29 @@ npm run preflight:video-toolkit:codex -- \
 
 The output path must be new. The runner refuses to overwrite evidence.
 
+## Synthetic frame extraction check
+
+On September 23, 2026, a local check on landofjawn used FFmpeg 6.1.1 and a trusted,
+10-second, 320-by-180 MPEG-4 fixture generated from `testsrc2` at one frame per
+second. Its SHA-256 was
+`1f0f1d6d8bc1c05cc287a4159d148f4099b9a1578086cad5f1bc74928786141d`.
+With a three-second interval, the skill's former `fps=1/3` filter wrote only
+three JPEGs, with output timestamps 0, 3, and 6 seconds. Adding
+`eof_action=pass` wrote four, with output timestamps 0, 3, 6, and 9 seconds.
+A second trusted fixture at 30 frames per second showed
+the same difference. The exact revised extraction command wrote four 320-by-180
+JPEGs in 0.07 seconds, with 60,844 KiB peak RSS. This checks one frame-output
+path and fixes a missed closing interval. Frame checksums mapped the source's
+selected content to 1, 4, 7, and 9 seconds for those four output slots. The
+0, 3, and 6 second slot labels differ from source capture times by one second.
+
+The probe did not run inside Codex. Bubblewrap could not configure loopback
+in a new network namespace on this host (`Failed RTM_NEWADDR: Operation not
+permitted`). Pillow was absent, so grid generation was not tested. Vision
+analysis and untrusted-media sandbox behavior also remain untested. This is
+partial local media evidence. It does not count as a Codex runtime pass for
+`video-toolkit`.
+
 ## Standards install
 
 The accepted install command ran from an empty disposable project:
