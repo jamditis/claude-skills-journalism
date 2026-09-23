@@ -61,7 +61,13 @@ Ask the user or use defaults:
 
 ### Step 2: Extract frames with ffmpeg
 
-For each video in metadata.json:
+For each video in metadata.json, extract a fresh frame set. Before running the
+command, validate the output paths as described above and clear only generated
+`frame_*.jpg` and `grid_*.jpg` files for that video. Replace its analysis JSON
+after extraction succeeds. These outputs may refer to frames from the old
+filter or an earlier interval. Do this even when frames already exist, since a
+set made before the EOF change can omit the last slot. If extraction fails, do
+not use the old grids or analysis as current results.
 
 ```bash
 mkdir -p "{frames_dir}/{platform}/{video_id}"
@@ -81,8 +87,6 @@ rounding would drop it. A 10-second source at a 3-second interval includes the
 9-second output slot.
 
 **Windows note:** Do not rename frames after extraction. `Path.rename()` fails on Windows when the target exists. Use sequential numbering with a documented interval mapping instead.
-
-Skip videos that already have frames extracted.
 
 ### Step 3: Create 3x3 grid composites
 
@@ -133,6 +137,10 @@ For each grid, note:
 
 **Output format** per video at `frame-analysis/{platform}/{video_id}.json`:
 
+Ranges in this schema use nominal output slots. They are not source capture
+times. Do not cite a nominal range as an exact source time; verify the source
+timestamp separately before making a time-specific claim.
+
 ```json
 {
   "video_id": "...",
@@ -140,7 +148,7 @@ For each grid, note:
   "frames": [
     {
       "grid": "grid_0000.jpg",
-      "timestamp_range": "0s-24s",
+      "nominal_timestamp_range": "0s-24s",
       "on_screen_text": ["text1", "text2"],
       "setting": "NYC subway station",
       "visual_elements": ["podium", "microphones"],

@@ -1,9 +1,9 @@
 # Video-toolkit Codex preflight
 
 - Status: repeatable activation fixture recorded; dependency execution and media pipeline remain pending
-- Evidence dates: Aug. 28 and Sept. 18, 2026
+- Evidence dates: Aug. 28, Sept. 18, and Sept. 23, 2026
 - Tracking issue: [#238](https://github.com/jamditis/claude-skills-journalism/issues/238)
-- Source revision: [`bc681b79a3eaba846a494582368501e0b4d75b1b`](https://github.com/jamditis/claude-skills-journalism/commit/bc681b79a3eaba846a494582368501e0b4d75b1b)
+- Aug. 28 source revision: [`bc681b79a3eaba846a494582368501e0b4d75b1b`](https://github.com/jamditis/claude-skills-journalism/commit/bc681b79a3eaba846a494582368501e0b4d75b1b)
 
 ## Scope
 
@@ -66,6 +66,11 @@ The output path must be new. The runner refuses to overwrite evidence.
 
 ## Synthetic frame extraction check
 
+The Sept. 23 frame probe used the `video-frames` extraction command in
+[`7b97732de108ae65c5aee9c45165b2f9cd392ed2`](https://github.com/jamditis/claude-skills-journalism/commit/7b97732de108ae65c5aee9c45165b2f9cd392ed2)
+(`SKILL.md` Git blob `299040d5184e2b92d960c822fb5f6302a63214af`).
+This is separate from the Aug. 28 and Sept. 18 source revisions above.
+
 On September 23, 2026, a local check on landofjawn used FFmpeg 6.1.1 and a trusted,
 10-second, 320-by-180 MPEG-4 fixture generated from `testsrc2` at one frame per
 second. Its SHA-256 was
@@ -86,6 +91,14 @@ permitted`). Pillow was absent, so grid generation was not tested. Vision
 analysis and untrusted-media sandbox behavior also remain untested. This is
 partial local media evidence. It does not count as a Codex runtime pass for
 `video-toolkit`.
+
+An independent Sept. 23 check on officejawn used FFmpeg 5.1.9 and the same
+filter strings from that skill blob. A fresh 10-second `testsrc2` MPEG-4 fixture
+at one frame per second had SHA-256
+`f24a7b38d52f98258aad8e07034a90aa475417a56303c20b599adbed846e2e3a`.
+The former filter wrote frames 0000-0002; the EOF filter wrote 0000-0003.
+This check confirms the output count on a second FFmpeg version. It did not
+test the grid, analysis, or sandbox steps.
 
 ## Standards install
 
