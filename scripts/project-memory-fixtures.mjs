@@ -540,6 +540,67 @@ export function buildProjectMemoryInvocation(
   };
 }
 
+export function verifyProjectMemoryNonTriggerTrace(client, transcript) {
+  const lines = String(transcript).trim().split(/\r?\n/u).filter(Boolean);
+  if (lines.length === 0) throw new Error(`${client} trace is empty`);
+  const events = lines.map((line) => {
+    let event;
+    try {
+      event = JSON.parse(line);
+    } catch {
+      throw new Error(`${client} trace contains invalid JSON`);
+    }
+    if (!event || typeof event !== 'object' || Array.isArray(event)) {
+      throw new Error(`${client} trace contains an invalid event`);
+    }
+    return event;
+  });
+
+  if (client === 'claude') {
+    const allowed = new Set(['system', 'assistant', 'rate_limit_event', 'result']);
+    if (events.some((event) => !allowed.has(event.type))) {
+      throw new Error('Claude trace contains an unrecognized event');
+    }
+    const results = events.filter((event) => event.type === 'result');
+    const assistants = events.filter((event) => event.type === 'assistant');
+    if (results.length !== 1 || results[0].subtype !== 'success'
+      || results[0].is_error !== false || assistants.length === 0) {
+      throw new Error('Claude trace lacks an unambiguous successful run');
+    }
+    for (const event of assistants) {
+      if (!Array.isArray(event.message?.content)) {
+        throw new Error('Claude trace lacks assistant content');
+      }
+      if (event.message.content.some((content) => !['text', 'thinking'].includes(content?.type))) {
+        throw new Error('Claude non-trigger used a tool or unknown content type');
+      }
+    }
+  } else if (client === 'codex') {
+    const allowed = new Set([
+      'thread.started', 'turn.started', 'item.started', 'item.updated',
+      'item.completed', 'turn.completed',
+    ]);
+    if (events.some((event) => !allowed.has(event.type))) {
+      throw new Error('Codex trace contains an unrecognized event');
+    }
+    if (events.filter((event) => event.type === 'thread.started').length !== 1
+      || events.filter((event) => event.type === 'turn.started').length !== 1
+      || events.filter((event) => event.type === 'turn.completed').length !== 1
+      || !events.some((event) => event.type === 'item.completed'
+        && event.item?.type === 'agent_message')) {
+      throw new Error('Codex trace lacks an unambiguous completed answer');
+    }
+    if (events.some((event) => event.type.startsWith('item.')
+      && !['agent_message', 'reasoning'].includes(event.item?.type))) {
+      throw new Error('Codex non-trigger used a tool or unknown item type');
+    }
+  } else {
+    throw new Error(`Unsupported project-memory trace client: ${client}`);
+  }
+
+  return { eventCount: events.length, noToolActivity: true };
+}
+
 export function auditCommittedProjectMemorySkill(root = ROOT) {
   const body = readFileSync(resolve(root, SKILL_PATH), 'utf8');
   const lower = body.toLowerCase();
