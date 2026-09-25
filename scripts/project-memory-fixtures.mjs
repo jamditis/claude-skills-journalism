@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SKILL_PATH = 'project-templates-toolkit/skills/project-memory/SKILL.md';
+export const PROJECT_MEMORY_SKILL_DIR = dirname(SKILL_PATH);
 
 const ROOT_REQUIRED_TEXT = Object.freeze([
   '## Project knowledge',
@@ -538,6 +539,116 @@ export function buildProjectMemoryInvocation(
     cwd,
     env: { CODEX_HOME: resolve(codexHome) },
   };
+}
+
+function nonemptyText(value) {
+  return typeof value === 'string' && value.trim() !== '';
+}
+
+export function projectMemoryAuthSourceHome(client, env = {}, fallbackHome = '') {
+  let configured;
+  if (client === 'claude') configured = env.CLAUDE_CONFIG_DIR;
+  else if (client === 'codex') configured = env.CODEX_HOME;
+  else throw new Error(`Unsupported project-memory client: ${client}`);
+  const selected = typeof configured === 'string' ? configured.trim() : '';
+  if (selected) return selected;
+  if (typeof fallbackHome !== 'string' || fallbackHome.trim() === '') {
+    throw new Error(`${client} authentication home is required`);
+  }
+  return fallbackHome;
+}
+
+export function assertProjectMemorySkillMatchesHead(statusText) {
+  const rows = String(statusText ?? '').split(/\r?\n/u).filter((row) => row.trim());
+  if (rows.length === 0) return;
+  const sample = rows.slice(0, 5).join('; ');
+  throw new Error(`Project-memory skill input differs from HEAD: ${sample}`);
+}
+
+export function requireIdenticalSkillDigests(digests) {
+  if (!Array.isArray(digests) || digests.length === 0
+    || digests.some((digest) => typeof digest !== 'string' || digest.trim() === '')) {
+    throw new Error('Project-memory skill digest is missing');
+  }
+  if (new Set(digests).size !== 1) {
+    throw new Error('Prepared project-memory skill copies differ');
+  }
+  return digests[0];
+}
+
+export function verifyProjectMemoryNonTriggerTrace(client, transcript) {
+  const lines = String(transcript).trim().split(/\r?\n/u).filter(Boolean);
+  if (lines.length === 0) throw new Error(`${client} trace is empty`);
+  const events = lines.map((line) => {
+    let event;
+    try {
+      event = JSON.parse(line);
+    } catch {
+      throw new Error(`${client} trace contains invalid JSON`);
+    }
+    if (!event || typeof event !== 'object' || Array.isArray(event)) {
+      throw new Error(`${client} trace contains an invalid event`);
+    }
+    return event;
+  });
+
+  if (client === 'claude') {
+    const allowed = new Set(['system', 'assistant', 'rate_limit_event', 'result']);
+    if (events.some((event) => !allowed.has(event.type))) {
+      throw new Error('Claude trace contains an unrecognized event');
+    }
+    const results = events.filter((event) => event.type === 'result');
+    const assistants = events.filter((event) => event.type === 'assistant');
+    if (results.length !== 1 || results[0].subtype !== 'success'
+      || results[0].is_error !== false || assistants.length === 0) {
+      throw new Error('Claude trace lacks an unambiguous successful run');
+    }
+    for (const event of assistants) {
+      if (!Array.isArray(event.message?.content)) {
+        throw new Error('Claude trace lacks assistant content');
+      }
+      if (event.message.content.some((content) => !['text', 'thinking'].includes(content?.type))) {
+        throw new Error('Claude non-trigger used a tool or unknown content type');
+      }
+    }
+    const assistantAnswer = assistants.some((event) => nonemptyText(
+      event.message.content
+        .filter((content) => content?.type === 'text' && typeof content.text === 'string')
+        .map((content) => content.text)
+        .join(''),
+    ));
+    if (!assistantAnswer && !nonemptyText(results[0].result)) {
+      throw new Error('Claude trace lacks a nonempty final answer');
+    }
+  } else if (client === 'codex') {
+    const allowed = new Set([
+      'thread.started', 'turn.started', 'item.started', 'item.updated',
+      'item.completed', 'turn.completed',
+    ]);
+    if (events.some((event) => !allowed.has(event.type))) {
+      throw new Error('Codex trace contains an unrecognized event');
+    }
+    if (events.filter((event) => event.type === 'thread.started').length !== 1
+      || events.filter((event) => event.type === 'turn.started').length !== 1
+      || events.filter((event) => event.type === 'turn.completed').length !== 1
+      || !events.some((event) => event.type === 'item.completed'
+        && event.item?.type === 'agent_message')) {
+      throw new Error('Codex trace lacks an unambiguous completed answer');
+    }
+    if (events.some((event) => event.type.startsWith('item.')
+      && !['agent_message', 'reasoning'].includes(event.item?.type))) {
+      throw new Error('Codex non-trigger used a tool or unknown item type');
+    }
+    if (!events.some((event) => event.type === 'item.completed'
+      && event.item?.type === 'agent_message'
+      && nonemptyText(event.item.text))) {
+      throw new Error('Codex trace lacks a nonempty final answer');
+    }
+  } else {
+    throw new Error(`Unsupported project-memory trace client: ${client}`);
+  }
+
+  return { eventCount: events.length, noToolActivity: true };
 }
 
 export function auditCommittedProjectMemorySkill(root = ROOT) {

@@ -21,11 +21,15 @@ import {
 
 import {
   PROJECT_MEMORY_FIXTURES,
+  assertProjectMemorySkillMatchesHead,
   auditCommittedProjectMemorySkill,
   buildProjectMemoryInvocation,
   cleanupProjectMemoryFixture,
   prepareProjectMemoryFixture,
+  projectMemoryAuthSourceHome,
+  requireIdenticalSkillDigests,
   verifyProjectMemoryNonTrigger,
+  verifyProjectMemoryNonTriggerTrace,
   verifyProjectMemoryOutput,
 } from './project-memory-fixtures.mjs';
 
@@ -826,6 +830,201 @@ test('runtime invocations isolate both clients and target their own fixture', ()
   assert.equal(codex.env.CODEX_HOME, '/tmp/project-memory/codex-home');
   assert.ok(codex.args.includes('workspace-write'));
   assert.match(codex.args.at(-1), /^\$project-memory /u);
+});
+
+test('non-trigger trace accepts a completed answer without tool activity', () => {
+  const claude = [
+    { type: 'system', subtype: 'init' },
+    { type: 'assistant', message: { content: [{ type: 'text', text: '$7.56' }] } },
+    { type: 'result', subtype: 'success', is_error: false },
+  ].map(JSON.stringify).join('\n');
+  const codex = [
+    { type: 'thread.started' },
+    { type: 'turn.started' },
+    { type: 'item.completed', item: { type: 'agent_message', text: '$7.56' } },
+    { type: 'turn.completed' },
+  ].map(JSON.stringify).join('\n');
+  assert.deepEqual(verifyProjectMemoryNonTriggerTrace('claude', claude), {
+    eventCount: 3, noToolActivity: true,
+  });
+  assert.deepEqual(verifyProjectMemoryNonTriggerTrace('codex', codex), {
+    eventCount: 4, noToolActivity: true,
+  });
+});
+
+test('non-trigger trace rejects an empty final answer', () => {
+  const claudeThinking = [
+    { type: 'assistant', message: { content: [{ type: 'thinking', thinking: '18 percent' }] } },
+    { type: 'result', subtype: 'success', is_error: false, result: '   ' },
+  ].map(JSON.stringify).join('\n');
+  assert.throws(
+    () => verifyProjectMemoryNonTriggerTrace('claude', claudeThinking),
+    /nonempty final answer/u,
+  );
+  const claudeEmpty = [
+    { type: 'assistant', message: { content: [] } },
+    { type: 'result', subtype: 'success', is_error: false },
+  ].map(JSON.stringify).join('\n');
+  assert.throws(
+    () => verifyProjectMemoryNonTriggerTrace('claude', claudeEmpty),
+    /nonempty final answer/u,
+  );
+  const claudeBlankText = [
+    { type: 'assistant', message: { content: [{ type: 'text', text: ' ' }] } },
+    { type: 'result', subtype: 'success', is_error: false, result: '' },
+  ].map(JSON.stringify).join('\n');
+  assert.throws(
+    () => verifyProjectMemoryNonTriggerTrace('claude', claudeBlankText),
+    /nonempty final answer/u,
+  );
+  const claudeResultOnly = [
+    { type: 'assistant', message: { content: [{ type: 'thinking', thinking: '18 percent' }] } },
+    { type: 'result', subtype: 'success', is_error: false, result: ' $7.56 ' },
+  ].map(JSON.stringify).join('\n');
+  assert.deepEqual(verifyProjectMemoryNonTriggerTrace('claude', claudeResultOnly), {
+    eventCount: 2, noToolActivity: true,
+  });
+
+  for (const text of ['   ', undefined]) {
+    const codex = [
+      { type: 'thread.started' },
+      { type: 'turn.started' },
+      { type: 'item.completed', item: { type: 'agent_message', text } },
+      { type: 'turn.completed' },
+    ].map(JSON.stringify).join('\n');
+    assert.throws(
+      () => verifyProjectMemoryNonTriggerTrace('codex', codex),
+      /nonempty final answer/u,
+    );
+  }
+  const codexAnswer = [
+    { type: 'thread.started' },
+    { type: 'turn.started' },
+    { type: 'item.completed', item: { type: 'agent_message', text: ' ' } },
+    { type: 'item.completed', item: { type: 'agent_message', text: '$7.56' } },
+    { type: 'turn.completed' },
+  ].map(JSON.stringify).join('\n');
+  assert.deepEqual(verifyProjectMemoryNonTriggerTrace('codex', codexAnswer), {
+    eventCount: 5, noToolActivity: true,
+  });
+});
+
+test('authentication homes follow the client environment before the default', () => {
+  assert.equal(
+    projectMemoryAuthSourceHome('claude', {
+      CLAUDE_CONFIG_DIR: '/tmp/claude-auth',
+      CODEX_HOME: '/tmp/codex-auth',
+    }, '/home/default/.claude'),
+    '/tmp/claude-auth',
+  );
+  assert.equal(
+    projectMemoryAuthSourceHome('codex', {
+      CLAUDE_CONFIG_DIR: '/tmp/claude-auth',
+      CODEX_HOME: '/tmp/codex-auth',
+    }, '/home/default/.codex'),
+    '/tmp/codex-auth',
+  );
+  assert.equal(
+    projectMemoryAuthSourceHome('claude', { CLAUDE_CONFIG_DIR: '  ' }, '/home/default/.claude'),
+    '/home/default/.claude',
+  );
+  assert.equal(
+    projectMemoryAuthSourceHome('codex', {}, '/home/default/.codex'),
+    '/home/default/.codex',
+  );
+  assert.throws(
+    () => projectMemoryAuthSourceHome('gemini', {}, '/home/default'),
+    /Unsupported project-memory client/u,
+  );
+});
+
+test('skill evidence rejects drift from HEAD and mismatched copies', () => {
+  assertProjectMemorySkillMatchesHead('');
+  assertProjectMemorySkillMatchesHead('\n');
+  assert.throws(
+    () => assertProjectMemorySkillMatchesHead(
+      ' M project-templates-toolkit/skills/project-memory/SKILL.md',
+    ),
+    /differs from HEAD/u,
+  );
+  assert.throws(
+    () => assertProjectMemorySkillMatchesHead(
+      '?? project-templates-toolkit/skills/project-memory/notes.md',
+    ),
+    /differs from HEAD/u,
+  );
+  assert.throws(
+    () => assertProjectMemorySkillMatchesHead(
+      '!! project-templates-toolkit/skills/project-memory/local.tmp',
+    ),
+    /differs from HEAD/u,
+  );
+
+  const digest = 'a'.repeat(64);
+  assert.equal(requireIdenticalSkillDigests([digest, digest]), digest);
+  assert.throws(
+    () => requireIdenticalSkillDigests([digest, 'b'.repeat(64)]),
+    /copies differ/u,
+  );
+  assert.throws(
+    () => requireIdenticalSkillDigests([digest, '']),
+    /digest is missing/u,
+  );
+});
+
+test('non-trigger trace rejects activation, missing evidence, and unknown events', () => {
+  const claudeTool = [
+    { type: 'assistant', message: { content: [{
+      type: 'tool_use', name: 'Skill', input: { skill: 'project-templates-toolkit:project-memory' },
+    }] } },
+    { type: 'result', subtype: 'success', is_error: false },
+  ].map(JSON.stringify).join('\n');
+  assert.throws(
+    () => verifyProjectMemoryNonTriggerTrace('claude', claudeTool),
+    /used a tool/u,
+  );
+  assert.throws(
+    () => verifyProjectMemoryNonTriggerTrace('claude', '{"type":"assistant"}'),
+    /lacks an unambiguous successful run/u,
+  );
+  assert.throws(
+    () => verifyProjectMemoryNonTriggerTrace('claude', '{bad json'),
+    /invalid JSON/u,
+  );
+  assert.throws(
+    () => verifyProjectMemoryNonTriggerTrace('claude', [
+      { type: 'assistant', message: { content: [{ type: 'text', text: '$7.56' }] } },
+      { type: 'result', subtype: 'error', is_error: true },
+    ].map(JSON.stringify).join('\n')),
+    /lacks an unambiguous successful run/u,
+  );
+  assert.throws(
+    () => verifyProjectMemoryNonTriggerTrace('claude', [
+      { type: 'user', message: { content: [] } },
+      { type: 'result', subtype: 'success', is_error: false },
+    ].map(JSON.stringify).join('\n')),
+    /unrecognized event/u,
+  );
+
+  const codexTool = [
+    { type: 'thread.started' },
+    { type: 'turn.started' },
+    { type: 'item.completed', item: { type: 'command_execution', command: 'cat SKILL.md' } },
+    { type: 'item.completed', item: { type: 'agent_message', text: '$7.56' } },
+    { type: 'turn.completed' },
+  ].map(JSON.stringify).join('\n');
+  assert.throws(
+    () => verifyProjectMemoryNonTriggerTrace('codex', codexTool),
+    /used a tool/u,
+  );
+  assert.throws(
+    () => verifyProjectMemoryNonTriggerTrace('codex', '{"type":"turn.completed"}'),
+    /lacks an unambiguous completed answer/u,
+  );
+  assert.throws(
+    () => verifyProjectMemoryNonTriggerTrace('codex', '{"type":"future.event"}'),
+    /unrecognized event/u,
+  );
 });
 
 test('current shared skill proves the adapter boundary before a rewrite', () => {
