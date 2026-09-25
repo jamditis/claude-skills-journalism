@@ -6,8 +6,12 @@ import { fileURLToPath } from 'node:url';
 
 import { prepareVariant } from './skill-behavior-eval.mjs';
 import {
+  PROJECT_MEMORY_SKILL_DIR,
+  assertProjectMemorySkillMatchesHead,
   buildProjectMemoryInvocation,
   prepareProjectMemoryFixture,
+  projectMemoryAuthSourceHome,
+  requireIdenticalSkillDigests,
   verifyProjectMemoryNonTrigger,
   verifyProjectMemoryNonTriggerTrace,
 } from './project-memory-fixtures.mjs';
@@ -16,7 +20,14 @@ const sourceRoot = fileURLToPath(new URL('..', import.meta.url));
 const runRoot = mkdtempSync(join(tmpdir(), 'project-memory-nontrigger-'));
 
 try {
-  const clients = [];
+  // Ignored and untracked files are copied too, so HEAD evidence must include them.
+  const skillStatus = execFileSync('git', [
+    'status', '--porcelain=v1', '--ignored', '--untracked-files=all', '--',
+    PROJECT_MEMORY_SKILL_DIR,
+  ], { cwd: sourceRoot, encoding: 'utf8', timeout: 10_000 });
+  assertProjectMemorySkillMatchesHead(skillStatus);
+
+  const preparedRuns = [];
   for (const client of ['claude', 'codex']) {
     const version = spawnSync(client, ['--version'], { encoding: 'utf8', timeout: 10_000 });
     if (version.status !== 0 || !version.stdout?.trim()) {
@@ -28,8 +39,20 @@ try {
       runRoot: join(runRoot, client),
       packageName: 'project-templates-toolkit',
       skillName: 'project-memory',
-      authSourceHome: join(homedir(), client === 'claude' ? '.claude' : '.codex'),
+      authSourceHome: projectMemoryAuthSourceHome(
+        client,
+        process.env,
+        join(homedir(), client === 'claude' ? '.claude' : '.codex'),
+      ),
     });
+    preparedRuns.push({ client, version: version.stdout.trim(), prepared });
+  }
+  const skillDigest = requireIdenticalSkillDigests(
+    preparedRuns.map((run) => run.prepared.skillDigest),
+  );
+
+  const clients = [];
+  for (const { client, version, prepared } of preparedRuns) {
     const fixture = prepareProjectMemoryFixture(prepared.projectDir, client);
     const invocation = buildProjectMemoryInvocation(client, 'nonTrigger', prepared);
     if (client === 'claude') {
@@ -59,12 +82,18 @@ try {
     }
     const trace = verifyProjectMemoryNonTriggerTrace(client, result.stdout);
     verifyProjectMemoryNonTrigger(prepared.projectDir, client, fixture.snapshot);
-    clients.push({ client, version: version.stdout.trim(), trace, projectUnchanged: true });
+    clients.push({
+      client,
+      version,
+      skillDigest: prepared.skillDigest,
+      trace,
+      projectUnchanged: true,
+    });
   }
   const sourceRevision = execFileSync('git', ['rev-parse', 'HEAD'], {
     cwd: sourceRoot, encoding: 'utf8', timeout: 10_000,
   }).trim();
-  console.log(JSON.stringify({ sourceRevision, clients }, null, 2));
+  console.log(JSON.stringify({ sourceRevision, skillDigest, clients }, null, 2));
 } finally {
   rmSync(runRoot, { recursive: true, force: true });
 }
