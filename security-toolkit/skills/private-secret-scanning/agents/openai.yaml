@@ -1,0 +1,3 @@
+interface:
+  display_name: "Private secret scanning"
+  short_description: "Local Gitleaks scans and git hooks for private repos, with redacted reports"
