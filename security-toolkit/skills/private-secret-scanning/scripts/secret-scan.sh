@@ -4,7 +4,7 @@
 # Usage:
 #   secret-scan.sh install [--dir DIR]      download the pinned Gitleaks and verify its checksum
 #   secret-scan.sh staged [--report FILE]   scan staged changes (pre-commit)
-#   secret-scan.sh push [RANGE] [--remote NAME] [--report FILE]
+#   secret-scan.sh push [RANGE] [--report FILE]
 #                                           scan commits about to be pushed; with no RANGE,
 #                                           read pre-push hook lines from stdin
 #   secret-scan.sh history [--report FILE]  scan every commit reachable from any ref
@@ -112,14 +112,43 @@ repo_root() {
 # so scans run from the repo root.
 # SECRET_SCAN_CONFIG overrides the config path; if it is set, the file must exist.
 set_config_args() {
-  local root="$1"
+  local root="$1" config=""
   CONFIG_ARGS=()
   if [[ -n "${SECRET_SCAN_CONFIG:-}" ]]; then
     [[ -f "$SECRET_SCAN_CONFIG" ]] || die "SECRET_SCAN_CONFIG does not exist: $SECRET_SCAN_CONFIG"
-    CONFIG_ARGS+=(--config "$SECRET_SCAN_CONFIG")
+    # Absolute, because the scan runs from the repo root.
+    config="$(cd "$(dirname "$SECRET_SCAN_CONFIG")" && pwd)/$(basename "$SECRET_SCAN_CONFIG")"
   elif [[ -f "$root/.gitleaks.toml" ]]; then
-    CONFIG_ARGS+=(--config "$root/.gitleaks.toml")
+    config="$root/.gitleaks.toml"
   fi
+  [[ -n "$config" ]] || return 0
+  # A custom config replaces the built-in rules unless it extends them, so an
+  # allowlist-only file would turn every detector off.
+  if ! grep -Eq '^[[:space:]]*useDefault[[:space:]]*=[[:space:]]*true' "$config" \
+      && ! grep -Eq '^[[:space:]]*\[\[rules\]\]' "$config"; then
+    die "$config has no rules and does not extend the defaults; add [extend] useDefault = true"
+  fi
+  CONFIG_ARGS+=(--config "$config")
+}
+
+# Suppression files must be committed and reviewed. An uncommitted edit to
+# .gitleaks.toml or .gitleaksignore would otherwise change what a hook lets
+# through without anyone seeing it. $1 = root, $2 = "index" (staged scans may
+# stage the edit with the commit) or "head" (pushes must use committed files).
+require_committed_suppressions() {
+  local root="$1" against="$2" f
+  for f in .gitleaks.toml .gitleaksignore; do
+    [[ -e "$root/$f" ]] || continue
+    git -C "$root" ls-files --error-unmatch -- "$f" >/dev/null 2>&1 \
+      || die "$f is not committed; commit it (and review it) or remove it before this scan"
+    if [[ "$against" == index ]]; then
+      git -C "$root" diff --quiet -- "$f" \
+        || die "$f has unstaged changes; stage them with this commit or revert them"
+    else
+      git -C "$root" diff HEAD --quiet -- "$f" \
+        || die "$f has uncommitted changes; commit or revert them before pushing"
+    fi
+  done
 }
 
 # Run Gitleaks with a private raw report, then keep only safe fields.
@@ -147,6 +176,8 @@ raw_path, out_path = sys.argv[1], sys.argv[2]
 with open(raw_path) as f:
     text = f.read().strip()
 findings = json.loads(text) if text else []
+if not isinstance(findings, list) or not all(isinstance(i, dict) for i in findings):
+    sys.exit(3)  # not a Gitleaks report; never read it as clean
 keep = ("RuleID", "File", "StartLine", "Commit", "Fingerprint")
 safe = [{k: item.get(k) for k in keep} for item in findings]
 for item in safe:
@@ -172,12 +203,12 @@ PY
 }
 
 parse_report() {
-  # Sets REPORT, REMOTE, and REST from the argument list.
-  REPORT=""; REMOTE=""; REST=()
+  # Sets REPORT and REST from the argument list.
+  REPORT=""; REST=()
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --report) REPORT="${2:?--report needs a path}"; shift 2 ;;
-      --remote) REMOTE="${2:?--remote needs a name}"; shift 2 ;;
+      --remote) shift 2 ;;  # accepted from older hooks; no longer used
       *) REST+=("$1"); shift ;;
     esac
   done
@@ -185,11 +216,14 @@ parse_report() {
 
 cmd_staged() {
   parse_report "$@"
+  require_committed_suppressions "$(repo_root)" index
   run_scan "$REPORT" --staged && echo "secret-scan: staged changes clean"
 }
 
 cmd_push() {
   parse_report "$@"
+  local root
+  root="$(repo_root)"
   local -a ranges=()
   if [[ ${#REST[@]} -gt 0 ]]; then
     ranges=("${REST[0]}")
@@ -199,21 +233,22 @@ cmd_push() {
     local lsha rsha
     while read -r _ lsha _ rsha; do
       [[ -z "${lsha:-}" || "$lsha" =~ ^0+$ ]] && continue  # branch deletion
+      # A ref can point at a blob or tree (a lightweight tag, say). The
+      # history scan would see nothing there, so refuse instead of passing.
+      git -C "$root" rev-parse -q --verify "$lsha^{commit}" >/dev/null \
+        || die "refusing to push $lsha: it is not a commit, so it cannot be scanned"
       if [[ "$rsha" =~ ^0+$ ]]; then
-        # New branch: skip only commits the destination already has. Other
-        # remotes do not count; a commit on a private remote can still leak
-        # to a public one. With no remote name, scan all of its ancestry.
-        if [[ -n "$REMOTE" ]]; then
-          ranges+=("$lsha --not --remotes=$REMOTE")
-        else
-          ranges+=("$lsha")
-        fi
+        # New ref: scan its full ancestry. Remote-tracking refs do not prove
+        # what the destination holds; a remote can be repointed to a new URL
+        # and keep its old refs.
+        ranges+=("$lsha")
       else
         ranges+=("$rsha..$lsha")
       fi
     done
   fi
   [[ ${#ranges[@]} -gt 0 ]] || { echo "secret-scan: nothing to push"; return 0; }
+  require_committed_suppressions "$root" head
   local r status=0
   for r in "${ranges[@]}"; do
     run_scan "$REPORT" --log-opts="$r" || status=$?
@@ -238,9 +273,10 @@ cmd_install_hooks() {
       die "$hooks/$hook already exists; add a call to $SCRIPT_PATH ${hook#pre-} there instead"
     fi
   done
-  printf '#!/usr/bin/env bash\n# %s\nexec "%s" staged\n' "$HOOK_MARKER" "$SCRIPT_PATH" > "$hooks/pre-commit"
-  # Git passes the destination remote's name as $1.
-  printf '#!/usr/bin/env bash\n# %s\nexec "%s" push --remote "$1"\n' "$HOOK_MARKER" "$SCRIPT_PATH" > "$hooks/pre-push"
+  local quoted
+  quoted="$(printf '%q' "$SCRIPT_PATH")"  # the path is written into shell code
+  printf '#!/usr/bin/env bash\n# %s\nexec %s staged\n' "$HOOK_MARKER" "$quoted" > "$hooks/pre-commit"
+  printf '#!/usr/bin/env bash\n# %s\nexec %s push\n' "$HOOK_MARKER" "$quoted" > "$hooks/pre-push"
   chmod 0755 "$hooks/pre-commit" "$hooks/pre-push"
   echo "installed pre-commit and pre-push hooks in $hooks"
 }
@@ -303,16 +339,20 @@ cmd_self_test() {
     "cd '$work/push' && echo 'refs/heads/new $head refs/heads/new $zero64' | '$SCRIPT_PATH' push"
   expect 0 "pre-push deletion with a 64-zero id is skipped" bash -c \
     "cd '$work/push' && echo '(delete) $zero64 refs/heads/old $head' | '$SCRIPT_PATH' push"
-  # The leak is already on a private remote. A first push to another remote
-  # must still scan it; only the destination's own commits are skipped.
+  # The leak is on origin, then origin is repointed at a new, empty URL. Its
+  # old tracking refs remain, so they must not excuse the first push.
   git init -q --bare "$work/private.git"
-  git -C "$work/push" remote add private "$work/private.git"
-  git -C "$work/push" push -q private HEAD:refs/heads/main
-  git -C "$work/push" fetch -q private
-  expect 1 "new branch to another remote still scans commits on a private remote" bash -c \
-    "cd '$work/push' && echo 'refs/heads/new $head refs/heads/new $zero' | '$SCRIPT_PATH' push --remote public"
-  expect 0 "new branch skips commits the destination already has" bash -c \
-    "cd '$work/push' && echo 'refs/heads/new $head refs/heads/new $zero' | '$SCRIPT_PATH' push --remote private"
+  git init -q --bare "$work/public.git"
+  git -C "$work/push" remote add origin "$work/private.git"
+  git -C "$work/push" push -q origin HEAD:refs/heads/main
+  git -C "$work/push" fetch -q origin
+  git -C "$work/push" remote set-url origin "$work/public.git"
+  expect 1 "new branch to a repointed remote still scans its history" bash -c \
+    "cd '$work/push' && echo 'refs/heads/main $head refs/heads/main $zero' | '$SCRIPT_PATH' push --remote origin"
+  local blob
+  blob="$(git -C "$work/push" rev-parse HEAD:config.ini)"
+  expect 2 "pushing a tag that points at a blob is refused" bash -c \
+    "cd '$work/push' && echo 'refs/tags/b $blob refs/tags/b $zero' | '$SCRIPT_PATH' push"
   expect 0 "push range before the leak passes" bash -c "cd '$work/push' && '$SCRIPT_PATH' push '$base~0..$base'"
 
   # Leak added then deleted: invisible in the tree, still in history.
@@ -341,7 +381,17 @@ cmd_self_test() {
   mkdir -p "$work/history/sub/dir"
   expect 0 ".gitleaksignore at the root applies from a subdirectory" \
     bash -c "cd '$work/history/sub/dir' && '$SCRIPT_PATH' history"
-  rm "$work/history/.gitleaksignore"
+  local hist_head
+  hist_head="$(git -C "$work/history" rev-parse HEAD)"
+  expect 2 "an uncommitted .gitleaksignore cannot excuse a push" bash -c \
+    "cd '$work/history' && echo 'refs/heads/x $hist_head refs/heads/x $zero' | '$SCRIPT_PATH' push"
+  git -C "$work/history" add .gitleaksignore
+  git -C "$work/history" commit -qm "accept rotated finding" --no-verify
+  hist_head="$(git -C "$work/history" rev-parse HEAD)"
+  expect 0 "a committed .gitleaksignore applies to a push" bash -c \
+    "cd '$work/history' && echo 'refs/heads/x $hist_head refs/heads/x $zero' | '$SCRIPT_PATH' push"
+  git -C "$work/history" rm -q .gitleaksignore
+  git -C "$work/history" commit -qm "drop baseline" --no-verify
   local out
   out="$(cd "$work/history" && "$SCRIPT_PATH" history 2>&1 || true)"
   if grep -q "leak:" <<<"$out" && ! grep -qF "$fake" <<<"$out"; then
@@ -354,6 +404,16 @@ cmd_self_test() {
     bash -c "cd '$work/clean' && GITLEAKS_BIN='$work/no-such-gitleaks' '$SCRIPT_PATH' staged"
   expect 2 "missing config fails closed" \
     bash -c "cd '$work/clean' && SECRET_SCAN_CONFIG='$work/none.toml' '$SCRIPT_PATH' staged"
+  # An allowlist-only config would replace every built-in rule.
+  printf '[allowlist]\npaths = ["fixtures/"]\n' > "$work/allow-only.toml"
+  expect 2 "config that drops the built-in rules is refused" \
+    bash -c "cd '$work/staged' && SECRET_SCAN_CONFIG='$work/allow-only.toml' '$SCRIPT_PATH' staged"
+  printf '[extend]\nuseDefault = true\n\n[allowlist]\npaths = ["fixtures/"]\n' > "$work/extends.toml"
+  expect 1 "config that extends the defaults still finds the leak" \
+    bash -c "cd '$work/staged' && SECRET_SCAN_CONFIG='$work/extends.toml' '$SCRIPT_PATH' staged"
+  mkdir -p "$work/clean/a/b"
+  expect 0 "relative config path works from a subdirectory" \
+    bash -c "cd '$work/clean/a/b' && SECRET_SCAN_CONFIG=../../../extends.toml '$SCRIPT_PATH' staged"
 
   # A scanner that reports the pinned version but writes a broken report.
   printf '#!/usr/bin/env bash\n[[ "$1" == version ]] && { echo %s; exit 0; }\nwhile [[ $# -gt 0 ]]; do [[ "$1" == --report-path ]] && echo "not json" > "$2"; shift; done\n' \
@@ -361,6 +421,22 @@ cmd_self_test() {
   chmod +x "$work/broken-gitleaks"
   expect 2 "unreadable report fails closed" \
     bash -c "cd '$work/clean' && GITLEAKS_BIN='$work/broken-gitleaks' '$SCRIPT_PATH' staged"
+  sed 's/"not json"/"{}"/' "$work/broken-gitleaks" > "$work/object-gitleaks"
+  chmod +x "$work/object-gitleaks"
+  expect 2 "report that is not a list of findings fails closed" \
+    bash -c "cd '$work/clean' && GITLEAKS_BIN='$work/object-gitleaks' '$SCRIPT_PATH' staged"
+
+  # Hooks embed the script path in shell code; a path with spaces and $
+  # must survive that.
+  local odd="$work/odd \$dir \"q\""
+  mkdir -p "$odd"
+  cp "$SCRIPT_PATH" "$odd/secret-scan.sh"
+  new_repo "$work/oddhooks"
+  (cd "$work/oddhooks" && "$odd/secret-scan.sh" install-hooks >/dev/null)
+  echo "more" >> "$work/oddhooks/README.md"
+  git -C "$work/oddhooks" add README.md
+  expect 0 "hooks work when the script path has spaces, \$ and quotes" \
+    git -C "$work/oddhooks" commit -qm "clean change"
 
   new_repo "$work/hooks"
   (cd "$work/hooks" && "$SCRIPT_PATH" install-hooks >/dev/null)
@@ -368,7 +444,7 @@ cmd_self_test() {
   git -C "$work/hooks" add config.ini
   expect 1 "installed pre-commit hook blocks the commit" git -C "$work/hooks" commit -qm "leak"
   # --no-verify skips pre-commit; pre-push must catch the commit on the way
-  # out, even though a private remote already tracks it.
+  # out, even though another remote already tracks it.
   git -C "$work/hooks" commit -qm "leak" --no-verify
   git init -q --bare "$work/hooks-private.git"
   git init -q --bare "$work/hooks-public.git"
