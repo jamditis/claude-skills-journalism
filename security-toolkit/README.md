@@ -1,12 +1,13 @@
 # security-toolkit
 
-Four defensive security skills for web applications, APIs, and toolchain hardening, pre-deployment audit, authentication patterns, API hardening, and npm/bun supply-chain hardening.
+Five defensive security skills for web applications, APIs, and toolchain hardening: pre-deployment audit, authentication patterns, API hardening, npm/bun supply-chain hardening, and local secret scanning for private repositories.
 
 ## Skills in this plugin
 
 | Skill | What it covers |
 |---|---|
 | api-hardening | Rate limiting, input validation, CORS, security headers, request throttling, defense-in-depth for Express / FastAPI / serverless |
+| private-secret-scanning | Pinned Gitleaks scans of staged changes, push ranges, and full history, with pre-commit and pre-push hooks. Reports carry fingerprints and locations, never secret values. Fails closed when the scanner or config is missing. For private repos without GitHub Secret Protection. Its script ships inside the skill directory, so copying the skill alone includes it; run `scripts/secret-scan.sh self-test` after install. |
 | secure-auth | Password hashing (argon2id, bcrypt cost), session management, JWT, OAuth 2.1, passkeys / WebAuthn, common tutorial pitfalls |
 | security-checklist | Pre-deployment audit aligned to OWASP Top 10, authentication, input validation, secrets management, database security, compliance basics |
 | supply-chain-hardening | npm/bun install-time cooldown (`min-release-age` / `minimumReleaseAge`) plus a sandboxed pre-install scan for the bypass case. Defends against Mini Shai-Hulud-class worms that ship within the cooldown window. Includes `/security-toolkit:hotpatch` slash command, a reference Bash implementation, and a synthetic test fixture mimicking the TanStack 2026-05-11 attack signatures. |
@@ -19,6 +20,10 @@ records activation observations, blocked filesystem reads, and a missing-resourc
 boundary: copying only `skills/supply-chain-hardening/` does not include the
 package-level scan script or synthetic fixture. Do not run its quick-start as
 though those resources were installed with the skill.
+
+`private-secret-scanning` was added after that preflight and has no Codex run on
+record. Its script lives inside the skill directory, so the missing-resource
+boundary above does not apply to it.
 
 `/security-toolkit:hotpatch` and its sandbox, cooldown-bypass, and install
 lifecycle are **Claude-only**. No Codex command adapter is provided or approved.

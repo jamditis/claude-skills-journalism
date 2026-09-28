@@ -161,6 +161,9 @@ skills:
   - name: security-checklist
     package: security-toolkit
     path: security-toolkit/skills/security-checklist
+  - name: private-secret-scanning
+    package: security-toolkit
+    path: security-toolkit/skills/private-secret-scanning
   - name: supply-chain-hardening
     package: security-toolkit
     path: security-toolkit/skills/supply-chain-hardening

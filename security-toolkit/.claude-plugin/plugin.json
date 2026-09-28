@@ -1,7 +1,7 @@
 {
   "name": "security-toolkit",
   "version": "1.2.3",
-  "description": "Four defensive security skills covering OWASP Top 10 and supply-chain hardening: pre-deployment audit checklists, secure authentication (hashing, sessions, JWT, OAuth, passkeys), API hardening (rate limiting, CORS, throttling), and npm/bun install-time cooldown with a sandboxed bypass scan.",
+  "description": "Five defensive security skills covering OWASP Top 10, supply-chain hardening, and secret scanning: pre-deployment audit checklists, secure authentication (hashing, sessions, JWT, OAuth, passkeys), API hardening (rate limiting, CORS, throttling), npm/bun install-time cooldown with a sandboxed bypass scan, and local Gitleaks scans for private repositories.",
   "author": {
     "name": "Joe Amditis",
     "email": "jamditis@gmail.com"

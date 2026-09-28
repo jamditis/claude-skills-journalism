@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **private-secret-scanning:** added a security-toolkit skill for private
+  repositories. It pins Gitleaks 8.30.1 by checksum, scans staged changes,
+  push ranges, and full history, installs pre-commit and pre-push hooks,
+  writes reports with fingerprints and no secret values, and fails closed.
+
 ## [2.8.0] - 2026-09-01
 
 ### Added
