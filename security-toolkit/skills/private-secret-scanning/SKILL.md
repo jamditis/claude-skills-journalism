@@ -7,7 +7,7 @@ description: Local Gitleaks scans for staged changes, push ranges, and full hist
 
 GitHub push protection and secret scanning are free on public repositories. Private repositories need a paid GitHub Secret Protection license. This skill gives private and shared repositories a deterministic local replacement: a pinned [Gitleaks](https://github.com/gitleaks/gitleaks) binary, three scan scopes, and git hooks that stop a leak before it leaves the machine.
 
-Everything runs through one script that ships with this skill: `scripts/secret-scan.sh`. It has no dependencies beyond Bash, git, curl, and python3.
+Everything runs through one script that ships with this skill: `scripts/secret-scan.sh`. It needs only Bash (3.2 or later, so the macOS default works), git, curl, and python3.
 
 ## Quick start
 
@@ -26,7 +26,7 @@ cd your-repo
 | Command | Scans | Use it |
 |---|---|---|
 | `staged` | the staged diff only | pre-commit hook; fastest |
-| `push [RANGE]` | commits in `RANGE`, or the commits a `git push` is about to send (read from pre-push stdin) | pre-push hook; catches commits made with `--no-verify` |
+| `push [RANGE] [--remote NAME]` | commits in `RANGE`, or the commits a `git push` is about to send (read from pre-push stdin). For a new branch, only commits the destination remote already has are skipped | pre-push hook; catches commits made with `--no-verify` |
 | `history` | every commit reachable from any ref, including files deleted later | first adoption, and before a private repo goes public |
 
 A secret that was committed and then deleted is still in history. Only `history` finds it, and only rotating the credential fixes it. Rewriting history does not undo a clone that already happened.
@@ -43,7 +43,8 @@ The script fails closed. It exits 2, never 0, when:
 
 - Gitleaks is missing, cannot run, or is not the pinned version.
 - `SECRET_SCAN_CONFIG` names a file that does not exist.
-- Gitleaks exits with anything other than 0 or 1.
+- Gitleaks exits with anything other than 0 or the script's own leak code. Gitleaks also exits 1 on fatal errors, such as a malformed `.gitleaks.toml`, so 1 from Gitleaks is treated as an error.
+- The Gitleaks exit code and its report disagree.
 - The report cannot be read.
 
 A hook that exits non-zero blocks the commit or push, so a broken scanner blocks work. It does not let a leak through.
@@ -74,7 +75,7 @@ The script picks up `.gitleaks.toml` and `.gitleaksignore` from the repo root au
 
 ## Hooks
 
-`install-hooks` writes `pre-commit` (runs `staged`) and `pre-push` (runs `push`) into the repository's hooks directory. It refuses to overwrite a hook it did not write; add a call to the script inside that hook instead. `git commit --no-verify` skips pre-commit, which is why pre-push scans the outgoing range again.
+`install-hooks` writes `pre-commit` (runs `staged`) and `pre-push` (runs `push --remote <destination>`) into the repository's hooks directory. It refuses to overwrite a hook it did not write; add a call to the script inside that hook instead. `git commit --no-verify` skips pre-commit, which is why pre-push scans the outgoing range again. A commit that is already on one remote is still scanned when it goes to a different remote for the first time. This matters when a branch moves from a private remote to a public one.
 
 ## Keep this public, keep your data private
 

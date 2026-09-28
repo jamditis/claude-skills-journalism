@@ -4,7 +4,7 @@
 # Usage:
 #   secret-scan.sh install [--dir DIR]      download the pinned Gitleaks and verify its checksum
 #   secret-scan.sh staged [--report FILE]   scan staged changes (pre-commit)
-#   secret-scan.sh push [RANGE] [--report FILE]
+#   secret-scan.sh push [RANGE] [--remote NAME] [--report FILE]
 #                                           scan commits about to be pushed; with no RANGE,
 #                                           read pre-push hook lines from stdin
 #   secret-scan.sh history [--report FILE]  scan every commit reachable from any ref
@@ -20,17 +20,15 @@
 set -euo pipefail
 
 GITLEAKS_VERSION="8.30.1"
-# From gitleaks_8.30.1_checksums.txt on the v8.30.1 GitHub release.
-declare -A GITLEAKS_SHA256=(
-  [linux_x64]="551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
-  [linux_arm64]="e4a487ee7ccd7d3a7f7ec08657610aa3606637dab924210b3aee62570fb4b080"
-  [darwin_x64]="dfe101a4db2255fc85120ac7f3d25e4342c3c20cf749f2c20a18081af1952709"
-  [darwin_arm64]="b40ab0ae55c505963e365f271a8d3846efbc170aa17f2607f13df610a9aeb6a5"
-)
+# Leaks exit with this code. Gitleaks exits 1 on fatal errors (a bad config,
+# for one) whatever --exit-code says, so 1 must never mean "leaks".
+LEAK_EXIT=10
 INSTALL_DIR="${SECRET_SCAN_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/private-secret-scanning}/bin"
 HOOK_MARKER="managed by private-secret-scanning"
+# Bash 3.2 (macOS) treats "${empty[@]}" as unbound under set -u, hence the
+# ${arr[@]+...} guards on arrays that can be empty.
 CLEANUP=()
-trap 'rm -rf "${CLEANUP[@]}"' EXIT
+trap 'rm -rf ${CLEANUP[@]+"${CLEANUP[@]}"}' EXIT
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 
 die() { echo "secret-scan: $*" >&2; exit 2; }
@@ -48,6 +46,16 @@ platform() {
     *) die "unsupported CPU $(uname -m); install Gitleaks $GITLEAKS_VERSION yourself and set GITLEAKS_BIN" ;;
   esac
   echo "${os}_${arch}"
+}
+
+# From gitleaks_8.30.1_checksums.txt on the v8.30.1 GitHub release.
+expected_sha256() {
+  case "$1" in
+    linux_x64) echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb" ;;
+    linux_arm64) echo "e4a487ee7ccd7d3a7f7ec08657610aa3606637dab924210b3aee62570fb4b080" ;;
+    darwin_x64) echo "dfe101a4db2255fc85120ac7f3d25e4342c3c20cf749f2c20a18081af1952709" ;;
+    darwin_arm64) echo "b40ab0ae55c505963e365f271a8d3846efbc170aa17f2607f13df610a9aeb6a5" ;;
+  esac
 }
 
 sha256_of() {
@@ -70,7 +78,7 @@ cmd_install() {
   curl -fsSL --retry 3 -o "$tmp/$tarball" "$url" || die "download failed: $url"
   local got
   got="$(sha256_of "$tmp/$tarball")"
-  [[ "$got" == "${GITLEAKS_SHA256[$plat]}" ]] \
+  [[ "$got" == "$(expected_sha256 "$plat")" ]] \
     || die "checksum mismatch for $tarball (got $got); refusing to install"
   tar -xzf "$tmp/$tarball" -C "$tmp" gitleaks
   mkdir -p "$dir"
@@ -100,7 +108,8 @@ repo_root() {
 }
 
 # Optional repository config: .gitleaks.toml (rules and allowlists). Gitleaks
-# also reads .gitleaksignore (accepted fingerprints) from the repo root.
+# reads .gitleaksignore (accepted fingerprints) from its working directory,
+# so scans run from the repo root.
 # SECRET_SCAN_CONFIG overrides the config path; if it is set, the file must exist.
 set_config_args() {
   local root="$1"
@@ -124,12 +133,12 @@ run_scan() {
   set_config_args "$root"
   raw="$(umask 077; mktemp)"
   CLEANUP+=("$raw")
-  status=0
-  "$bin" git "$root" "${CONFIG_ARGS[@]}" "$@" --redact --no-banner --log-level error \
-    --report-format json --report-path "$raw" --exit-code 1 >/dev/null || status=$?
-  # 1 means leaks; anything else non-zero is a scanner failure.
-  if [[ "$status" -ne 0 && "$status" -ne 1 ]]; then
-    die "Gitleaks exited $status"
+  local scan_status=0
+  (cd "$root" && "$bin" git . ${CONFIG_ARGS[@]+"${CONFIG_ARGS[@]}"} "$@" --redact --no-banner \
+    --log-level error --report-format json --report-path "$raw" --exit-code "$LEAK_EXIT" \
+    >/dev/null) || scan_status=$?
+  if [[ "$scan_status" -ne 0 && "$scan_status" -ne "$LEAK_EXIT" ]]; then
+    die "Gitleaks failed (exit $scan_status); fix the error above before committing"
   fi
   status=0
   python3 - "$raw" "${report_out:-}" <<'PY' || status=$?
@@ -153,19 +162,22 @@ if out_path:
 # 10, not 1: an uncaught Python error also exits 1 and must not read as leaks.
 sys.exit(10 if safe else 0)
 PY
-  case "$status" in
-    0) return 0 ;;
-    10) return 1 ;;
+  # The exit code and the report must agree; if they don't, trust neither.
+  case "$status:$scan_status" in
+    "0:0") return 0 ;;
+    "10:$LEAK_EXIT") return 1 ;;
+    0:*|10:*) die "Gitleaks exit $scan_status does not match its report" ;;
     *) die "could not read the Gitleaks report" ;;
   esac
 }
 
 parse_report() {
-  # Sets REPORT and REST from the argument list.
-  REPORT=""; REST=()
+  # Sets REPORT, REMOTE, and REST from the argument list.
+  REPORT=""; REMOTE=""; REST=()
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --report) REPORT="${2:?--report needs a path}"; shift 2 ;;
+      --remote) REMOTE="${2:?--remote needs a name}"; shift 2 ;;
       *) REST+=("$1"); shift ;;
     esac
   done
@@ -178,17 +190,24 @@ cmd_staged() {
 
 cmd_push() {
   parse_report "$@"
-  local zero="0000000000000000000000000000000000000000"
   local -a ranges=()
   if [[ ${#REST[@]} -gt 0 ]]; then
     ranges=("${REST[0]}")
   else
-    # pre-push stdin: <local ref> <local sha> <remote ref> <remote sha>
+    # pre-push stdin: <local ref> <local sha> <remote ref> <remote sha>.
+    # Git sends an all-zero id (40 or 64 digits) for a missing side.
     local lsha rsha
     while read -r _ lsha _ rsha; do
-      [[ -z "${lsha:-}" || "$lsha" == "$zero" ]] && continue  # branch deletion
-      if [[ "$rsha" == "$zero" ]]; then
-        ranges+=("$lsha --not --remotes")
+      [[ -z "${lsha:-}" || "$lsha" =~ ^0+$ ]] && continue  # branch deletion
+      if [[ "$rsha" =~ ^0+$ ]]; then
+        # New branch: skip only commits the destination already has. Other
+        # remotes do not count; a commit on a private remote can still leak
+        # to a public one. With no remote name, scan all of its ancestry.
+        if [[ -n "$REMOTE" ]]; then
+          ranges+=("$lsha --not --remotes=$REMOTE")
+        else
+          ranges+=("$lsha")
+        fi
       else
         ranges+=("$rsha..$lsha")
       fi
@@ -220,7 +239,8 @@ cmd_install_hooks() {
     fi
   done
   printf '#!/usr/bin/env bash\n# %s\nexec "%s" staged\n' "$HOOK_MARKER" "$SCRIPT_PATH" > "$hooks/pre-commit"
-  printf '#!/usr/bin/env bash\n# %s\nexec "%s" push\n' "$HOOK_MARKER" "$SCRIPT_PATH" > "$hooks/pre-push"
+  # Git passes the destination remote's name as $1.
+  printf '#!/usr/bin/env bash\n# %s\nexec "%s" push --remote "$1"\n' "$HOOK_MARKER" "$SCRIPT_PATH" > "$hooks/pre-push"
   chmod 0755 "$hooks/pre-commit" "$hooks/pre-push"
   echo "installed pre-commit and pre-push hooks in $hooks"
 }
@@ -260,6 +280,10 @@ cmd_self_test() {
   printf 'aws_access_key_id = %s\n' "$fake" > "$work/staged/config.ini"
   git -C "$work/staged" add config.ini
   expect 1 "staged leak fails" bash -c "cd '$work/staged' && '$SCRIPT_PATH' staged"
+  # Gitleaks exits 1 on a fatal config error, the old "leaks" code.
+  printf '[[rules]\nbroken\n' > "$work/staged/bad.toml"
+  expect 2 "malformed config fails closed, even with a staged leak" \
+    bash -c "cd '$work/staged' && SECRET_SCAN_CONFIG='$work/staged/bad.toml' '$SCRIPT_PATH' staged"
 
   new_repo "$work/push"
   local base
@@ -274,6 +298,21 @@ cmd_self_test() {
     "cd '$work/push' && echo 'refs/heads/main $head refs/heads/main $base' | '$SCRIPT_PATH' push"
   expect 1 "pre-push stdin for a new branch fails" bash -c \
     "cd '$work/push' && echo 'refs/heads/new $head refs/heads/new $zero' | '$SCRIPT_PATH' push"
+  local zero64="${zero}000000000000000000000000"  # SHA-256 repos use 64 zeros
+  expect 1 "pre-push new branch with a 64-zero id fails" bash -c \
+    "cd '$work/push' && echo 'refs/heads/new $head refs/heads/new $zero64' | '$SCRIPT_PATH' push"
+  expect 0 "pre-push deletion with a 64-zero id is skipped" bash -c \
+    "cd '$work/push' && echo '(delete) $zero64 refs/heads/old $head' | '$SCRIPT_PATH' push"
+  # The leak is already on a private remote. A first push to another remote
+  # must still scan it; only the destination's own commits are skipped.
+  git init -q --bare "$work/private.git"
+  git -C "$work/push" remote add private "$work/private.git"
+  git -C "$work/push" push -q private HEAD:refs/heads/main
+  git -C "$work/push" fetch -q private
+  expect 1 "new branch to another remote still scans commits on a private remote" bash -c \
+    "cd '$work/push' && echo 'refs/heads/new $head refs/heads/new $zero' | '$SCRIPT_PATH' push --remote public"
+  expect 0 "new branch skips commits the destination already has" bash -c \
+    "cd '$work/push' && echo 'refs/heads/new $head refs/heads/new $zero' | '$SCRIPT_PATH' push --remote private"
   expect 0 "push range before the leak passes" bash -c "cd '$work/push' && '$SCRIPT_PATH' push '$base~0..$base'"
 
   # Leak added then deleted: invisible in the tree, still in history.
@@ -299,6 +338,9 @@ cmd_self_test() {
     "$work/report.json" > "$work/history/.gitleaksignore"
   expect 0 "fingerprints in .gitleaksignore accept known findings" \
     bash -c "cd '$work/history' && '$SCRIPT_PATH' history"
+  mkdir -p "$work/history/sub/dir"
+  expect 0 ".gitleaksignore at the root applies from a subdirectory" \
+    bash -c "cd '$work/history/sub/dir' && '$SCRIPT_PATH' history"
   rm "$work/history/.gitleaksignore"
   local out
   out="$(cd "$work/history" && "$SCRIPT_PATH" history 2>&1 || true)"
@@ -325,6 +367,16 @@ cmd_self_test() {
   printf 'aws_access_key_id = %s\n' "$fake" > "$work/hooks/config.ini"
   git -C "$work/hooks" add config.ini
   expect 1 "installed pre-commit hook blocks the commit" git -C "$work/hooks" commit -qm "leak"
+  # --no-verify skips pre-commit; pre-push must catch the commit on the way
+  # out, even though a private remote already tracks it.
+  git -C "$work/hooks" commit -qm "leak" --no-verify
+  git init -q --bare "$work/hooks-private.git"
+  git init -q --bare "$work/hooks-public.git"
+  git -C "$work/hooks" remote add private "$work/hooks-private.git"
+  git -C "$work/hooks" remote add public "$work/hooks-public.git"
+  git -C "$work/hooks" push -q --no-verify private HEAD:refs/heads/main
+  expect 1 "installed pre-push hook blocks the first push to another remote" \
+    git -C "$work/hooks" push -q public HEAD:refs/heads/main
 
   if [[ "$fails" -eq 0 ]]; then echo "self-test passed"; return 0; fi
   echo "self-test failed: $fails check(s)"; return 1
