@@ -451,6 +451,7 @@ _GIT_IDENTITY_ENV = {
     "GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL", "GIT_COMMITTER_NAME", "GIT_COMMITTER_EMAIL",
     "EMAIL",
 }
+_GIT_AUTHOR_ENV = {"GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL"}
 # git config keys that set commit identity, settable per-command with `git -c key=value`.
 # git config keys are case-insensitive, so compare lowercased.
 _GIT_IDENTITY_CONFIG = {
@@ -493,6 +494,20 @@ _GIT_MERGE_LONG_OPTS = frozenset({
     "signoff", "squash", "stat", "strategy", "strategy-option", "summary", "verbose",
     "verify-signatures",
 })
+
+# Options whose next token is data, not another option. These sets let the identity
+# parser distinguish `-m --amend` (a message named "--amend") from a real --amend, and
+# do the same for merge recovery names used as option values. Options with optional
+# arguments (`--gpg-sign`, `--log`, `--untracked-files`) consume only attached values.
+_GIT_COMMIT_LONG_VALUE_OPTS = frozenset({
+    "author", "cleanup", "date", "file", "fixup", "message", "pathspec-from-file",
+    "reedit-message", "reuse-message", "squash", "template", "trailer",
+})
+_GIT_COMMIT_SHORT_VALUE_OPTS = frozenset("CFcmt")
+_GIT_MERGE_LONG_VALUE_OPTS = frozenset({
+    "cleanup", "file", "into-name", "message", "strategy", "strategy-option",
+})
+_GIT_MERGE_SHORT_VALUE_OPTS = frozenset("FmsX")
 
 # Per-subcommand flag spec. 'text' -> scanned with contains_attribution; 'file' ->
 # contents read and scanned; 'field' -> scanned with value_names_tool. 'short' maps
@@ -647,7 +662,7 @@ def _git_subcommand(tokens):
     return None, i
 
 
-def _git_config_identity_hit(core, stop):
+def _git_config_identity_hit(core, stop, uses_author=True):
     """True if the effective `git -c <identity-key>=<value>` before the subcommand sets an
     AI name.
 
@@ -675,7 +690,12 @@ def _git_config_identity_hit(core, stop):
         name, sep, val = cfg.partition("=")
         if sep and name.strip().lower() in _GIT_IDENTITY_CONFIG:
             identity[name.strip().lower()] = val
-    return any(value_names_tool(v) for v in identity.values())
+    for name, value in identity.items():
+        if name.startswith("author.") and not uses_author:
+            continue
+        if value_names_tool(value):
+            return True
+    return False
 
 
 def _resolve_git_long(name, opts):
@@ -688,6 +708,84 @@ def _resolve_git_long(name, opts):
         return name
     matches = [o for o in opts if o.startswith(name)]
     return matches[0] if len(matches) == 1 else None
+
+
+def _git_options(args, long_opts, long_value_opts, short_value_opts, optional_short_value_opts):
+    """Yield canonical git options while skipping each value token Git consumes.
+
+    Git accepts unambiguous long abbreviations and value-taking short options inside
+    clusters. Stop at `--`, where every later token is a pathspec or operand. The caller
+    can therefore inspect operation modes without mistaking argument text for an option.
+    Each result is (option, enabled): Git's automatic `--no-<option>` form disables the
+    same state, and later options replace earlier ones.
+    """
+    i = 0
+    while i < len(args):
+        token = args[i]
+        if token == "--":
+            return
+        if token.startswith("--"):
+            raw_name, has_equals, _ = token[2:].partition("=")
+            name = _resolve_git_long(raw_name, long_opts)
+            enabled = True
+            if name is None and raw_name.startswith("no-"):
+                name = _resolve_git_long(raw_name[3:], long_opts)
+                enabled = False
+            if name is not None:
+                yield "--" + name, enabled
+                if enabled and not has_equals and name in long_value_opts:
+                    i += 1
+            i += 1
+            continue
+        if token.startswith("-") and len(token) > 1:
+            letters = token[1:]
+            for offset, letter in enumerate(letters):
+                yield "-" + letter, True
+                if letter in optional_short_value_opts:
+                    break  # an optional value consumes the cluster remainder, never the next token
+                if letter in short_value_opts:
+                    if offset == len(letters) - 1:
+                        i += 1
+                    break
+        i += 1
+
+
+def _git_commit_uses_environment_author(args):
+    """True when commit takes its author identity from the current environment/config."""
+    has_explicit_author = False
+    reuse_modes = {"amend": False, "reuse-message": False, "reedit-message": False}
+    resets_author = False
+    for option, enabled in _git_options(
+            args,
+            _GIT_COMMIT_LONG_OPTS,
+            _GIT_COMMIT_LONG_VALUE_OPTS,
+            _GIT_COMMIT_SHORT_VALUE_OPTS,
+            "Su"):
+        if option == "--author":
+            has_explicit_author = enabled
+        elif option == "--amend":
+            reuse_modes["amend"] = enabled
+        elif option in {"-C", "--reuse-message"}:
+            reuse_modes["reuse-message"] = enabled
+        elif option in {"-c", "--reedit-message"}:
+            reuse_modes["reedit-message"] = enabled
+        elif option == "--reset-author":
+            resets_author = enabled
+    return not has_explicit_author and (not any(reuse_modes.values()) or resets_author)
+
+
+def _git_merge_writes_commit(args):
+    """False for merge recovery modes, which update state without writing a commit."""
+    recovery = {"--abort": False, "--quit": False}
+    for option, enabled in _git_options(
+            args,
+            _GIT_MERGE_LONG_OPTS,
+            _GIT_MERGE_LONG_VALUE_OPTS,
+            _GIT_MERGE_SHORT_VALUE_OPTS,
+            "S"):
+        if option in recovery:
+            recovery[option] = enabled
+    return not any(recovery.values())
 
 
 def _git_commit_is_dry_run(args):
@@ -800,18 +898,19 @@ def _strip_env_prefix(seg):
     `env -u NAME`/`--unset NAME` names are returned as unsets, so the identity check can
     drop a var an earlier `export` set and this command removes (env -u GIT_AUTHOR_NAME).
     """
-    assigns = []
+    prefix_assigns = []
+    env_assigns = []
     unsets = []
     chdir = None
     ignore_env = False  # env -i / --ignore-environment: the command starts with an empty env
     i = 0
     while i < len(seg) and _ENV_ASSIGN_RE.match(seg[i]):
-        assigns.append(seg[i])
+        prefix_assigns.append(seg[i])
         i += 1
     # Match `env` by basename, so a pathed wrapper (`/usr/bin/env NAME=val cmd`) is peeled the
     # same as a bare `env`, mirroring the basename match the git/gh detection uses.
     if i >= len(seg) or os.path.basename(seg[i]) != "env":
-        return assigns, seg[i:], chdir, unsets, ignore_env
+        return prefix_assigns, seg[i:], chdir, unsets, ignore_env
 
     rest = list(seg[i + 1:])  # tokens after `env`; mutated in place to inline `-S`
     j = 0
@@ -823,7 +922,7 @@ def _strip_env_prefix(seg):
             # collecting them before the command word.
             j += 1
             while j < len(rest) and _ENV_ASSIGN_RE.match(rest[j]):
-                assigns.append(rest[j])
+                env_assigns.append(rest[j])
                 j += 1
             break
         if t.startswith("-"):
@@ -889,11 +988,22 @@ def _strip_env_prefix(seg):
                 continue
             j += 1  # any other env option takes no separate value token we track
         elif _ENV_ASSIGN_RE.match(t):
-            assigns.append(t)
+            env_assigns.append(t)
             j += 1
         else:
             break  # the command word
-    return assigns, rest[j:], chdir, unsets, ignore_env
+    # Prefix assignments are in the environment inherited by `env`; -i clears them and
+    # -u removes the named ones. Assignment operands after the env options are applied
+    # later, so they survive both operations and override any remaining prefix value.
+    if ignore_env:
+        prefix_assigns = []
+    else:
+        unset_names = set(unsets)
+        prefix_assigns = [
+            assignment for assignment in prefix_assigns
+            if assignment.partition("=")[0] not in unset_names
+        ]
+    return prefix_assigns + env_assigns, rest[j:], chdir, unsets, ignore_env
 
 
 # Command-runner wrappers that execute the command word following them, hiding it from
@@ -1609,23 +1719,37 @@ def find_attribution(command, cwd, depth=0, inherited=None):
             if spec is _GIT_COMMIT or spec is _GIT_MERGE:
                 # -C composes onto the base, so a relative -F file resolves correctly.
                 seg_cwd = _git_effective_dir(core, start - 1, base)
+                git_args = core[start:]
+                writes_commit = (
+                    spec is _GIT_COMMIT or _git_merge_writes_commit(git_args)
+                )
+                uses_author = (
+                    spec is _GIT_MERGE or _git_commit_uses_environment_author(git_args)
+                )
                 # `GIT_AUTHOR_NAME=Claude git commit ...` sets authorship via the
                 # environment, the same as --author. Effective identity = exported vars
                 # (or none under env -i, which starts with an empty environment), minus any
                 # env -u unset, then the inline prefix overriding them (all last-wins),
-                # matching what the shell hands git. Read those vars as fields.
+                # matching what the shell hands git. Only inspect an author-specific var
+                # when this form creates a new author; committer vars and EMAIL remain
+                # relevant whenever a commit is written.
                 effective = {} if ignore_env else dict(exported_identity)
                 for u in unsets:
                     effective.pop(u, None)
                 for a in assigns:
                     name, _, val = a.partition("=")
                     effective[name] = val
-                for name, val in effective.items():
-                    if name in _GIT_IDENTITY_ENV and value_names_tool(val):
-                        return "tool or bot named in a git identity environment variable"
+                if writes_commit:
+                    for name, val in effective.items():
+                        if name in _GIT_AUTHOR_ENV and not uses_author:
+                            continue
+                        if name in _GIT_IDENTITY_ENV and value_names_tool(val):
+                            return "tool or bot named in a git identity environment variable"
                 # `git -c user.name=Claude commit ...` sets identity via config;
                 # core[start-1] is the commit/merge token, so globals are core[1:start-1].
-                if _git_config_identity_hit(core, start - 1):
+                if writes_commit and _git_config_identity_hit(
+                    core, start - 1, uses_author=uses_author
+                ):
                     return "tool or bot named in a git -c identity config value"
             # cd tracking is best-effort (a subshell `(cd x)` does not persist, a failed cd
             # does not move), so resolve a relative file against both the tracked dir and
