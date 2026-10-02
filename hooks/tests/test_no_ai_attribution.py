@@ -2073,3 +2073,155 @@ def test_allow_claude_session_component_heading():
 
 def test_allow_empty_claude_session_heading():
     assert_allowed(run('git commit -m "Claude-Session:"'))
+
+
+# Git identity applies only to fields this operation writes.
+def test_allow_author_override_with_ambient_author():
+    assert_allowed(run("git commit --author='Jane Doe <jane@example.com>' -m Fix",
+                       env={"GIT_AUTHOR_NAME": "Claude"}))
+
+
+def test_block_committer_with_author_override():
+    assert_blocked(run("git commit --author='Jane Doe <jane@example.com>' -m Fix",
+                       env={"GIT_COMMITTER_NAME": "Claude"}))
+
+
+def test_allow_inline_identity_wiped_by_env_i():
+    assert_allowed(run("GIT_AUTHOR_NAME=Claude env -i git commit -m Fix"))
+
+
+def test_allow_inline_identity_wiped_before_nested_shell():
+    assert_allowed(run("GIT_AUTHOR_NAME=Claude env -i bash -c 'git commit -m Fix'"))
+
+
+def test_block_identity_assigned_after_env_i_in_nested_shell():
+    assert_blocked(run("env -i GIT_AUTHOR_NAME=Claude bash -c 'git commit -m Fix'"))
+
+
+def test_allow_merge_recovery_with_ambient_identity():
+    for mode in ("--abort", "--quit"):
+        assert_allowed(run("git merge " + mode,
+                           env={"GIT_AUTHOR_NAME": "Claude", "GIT_COMMITTER_NAME": "Claude"}))
+
+
+def test_block_commit_writing_merge_with_ambient_identity():
+    assert_blocked(run("git merge --no-ff topic -m Merge",
+                       env={"GIT_AUTHOR_NAME": "Claude"}))
+
+
+def test_allow_reused_author_with_ambient_author():
+    for mode in ("-C HEAD", "-c HEAD", "--reuse-message=HEAD", "--reedit-message=HEAD",
+                 "--amend --no-edit", "--amend -m Fix"):
+        assert_allowed(run("git commit " + mode, env={"GIT_AUTHOR_NAME": "Claude"}))
+
+
+def test_block_committer_when_author_is_reused():
+    for mode in ("-C HEAD", "-c HEAD", "--amend --no-edit"):
+        assert_blocked(run("git commit " + mode, env={"GIT_COMMITTER_NAME": "Claude"}))
+
+
+def test_block_reset_author_uses_ambient_author():
+    for mode in ("-C HEAD", "-c HEAD", "--amend --no-edit"):
+        assert_blocked(run("git commit " + mode + " --reset-author",
+                           env={"GIT_AUTHOR_NAME": "Claude"}))
+
+
+def test_author_mode_parser_handles_abbreviations_clusters_and_terminator():
+    ambient = {"GIT_AUTHOR_NAME": "Claude"}
+    for command in (
+        "git commit --auth='Jane Doe <jane@example.com>' -m Fix",
+        "git commit -aC HEAD",
+        "git commit --reuse=HEAD",
+        "git commit --ree=HEAD",
+        "git commit --ame --no-edit",
+    ):
+        assert_allowed(run(command, env=ambient))
+
+    # These strings are data or pathspecs. They do not switch the commit into a mode that
+    # reuses its author, so the ambient author still reaches a commit and must block.
+    assert_blocked(run("git commit -m --amend", env=ambient))
+    assert_blocked(run("git commit -- --amend", env=ambient))
+
+
+def test_author_mode_negations_are_last_wins():
+    ambient = {"GIT_AUTHOR_NAME": "Claude"}
+    for command in (
+        "git commit --no-amend --amend --no-edit",
+        "git commit --no-author --author='Jane Doe <jane@example.com>' -m Fix",
+        "git commit --amend --reset-author --no-reset-author --no-edit",
+        "git commit --no-reuse-message -C HEAD",
+        "git commit --amend --no-reuse-message --no-edit",
+        "git commit -C HEAD --no-amend",
+    ):
+        assert_allowed(run(command, env=ambient))
+
+    for command in (
+        "git commit --allow-empty --amend --no-amend -m Fix",
+        "git commit --author='Jane Doe <jane@example.com>' --no-author -m Fix",
+        "git commit --amend --no-reset-author --reset-author --no-edit",
+        "git commit -C HEAD --no-reuse-message -m Fix",
+    ):
+        assert_blocked(run(command, env=ambient))
+
+
+def test_merge_recovery_parser_handles_abbreviations_values_and_terminator():
+    ambient = {"GIT_AUTHOR_NAME": "Claude", "GIT_COMMITTER_NAME": "Claude"}
+    for mode in ("--ab", "--quit"):
+        assert_allowed(run("git merge " + mode, env=ambient))
+
+    # A recovery-looking message value or branch operand does not make this a recovery
+    # operation. A commit-writing merge still must reject the ambient identity.
+    assert_blocked(run("git merge -m --abort topic", env=ambient))
+    assert_blocked(run("git merge -- --quit", env=ambient))
+
+    assert_blocked(run("git merge --abort --no-abort topic", env=ambient))
+    assert_allowed(run("git merge --no-abort --abort", env=ambient))
+    assert_blocked(run("git merge --quit --no-quit topic", env=ambient))
+    assert_allowed(run("git merge --no-quit --quit", env=ambient))
+
+
+def test_reused_author_and_merge_recovery_still_scan_message_text():
+    assert_blocked(run('git commit --amend -m "Generated with Claude Code"'))
+    assert_blocked(run('git merge --abort -m "Generated with Claude Code"'))
+
+
+def test_env_unset_removes_prefix_assignment_but_operand_restores_it():
+    assert_allowed(run(
+        "GIT_AUTHOR_NAME=Claude env -u GIT_AUTHOR_NAME git commit -m Fix"))
+    assert_blocked(run(
+        "GIT_AUTHOR_NAME=Claude env -u GIT_AUTHOR_NAME "
+        "GIT_AUTHOR_NAME=Claude git commit -m Fix"))
+
+
+def test_email_and_explicit_identity_checks_stay_active_for_reused_authors():
+    assert_blocked(run(
+        "git commit --author='Jane Doe <jane@example.com>' -m Fix",
+        env={"EMAIL": "bot@openai.com"},
+    ))
+    assert_blocked(run(
+        "git commit -C HEAD", env={"EMAIL": "bot@openai.com"}))
+    assert_blocked(run(
+        "git commit --author='Claude <c@example.com>' -m Fix",
+        env={"GIT_AUTHOR_NAME": "Jane Doe"},
+    ))
+
+
+def test_git_config_identity_follows_author_and_committer_roles():
+    assert_allowed(run(
+        "git -c author.name=Claude commit "
+        "--author='Jane Doe <jane@example.com>' -m Fix"))
+    assert_allowed(run("git -c author.name=Claude commit -C HEAD"))
+    assert_blocked(run("git -c user.name=Claude commit -C HEAD"))
+    assert_blocked(run("git -c committer.name=Claude commit -C HEAD"))
+    assert_blocked(run(
+        "git -c author.name=Claude commit -C HEAD --reset-author"))
+
+
+def test_attached_signing_key_is_not_an_author_reuse_option():
+    ambient = {"GIT_AUTHOR_NAME": "Claude"}
+    for command in ("git commit -Scafefeed -m Fix",
+                    "git commit -aScafefeed -m Fix",
+                    "git commit --gpg-sign=cafefeed -m Fix"):
+        assert_blocked(run(command, env=ambient))
+    # A bare optional-value flag does not consume the following reuse option.
+    assert_allowed(run("git commit -S -C HEAD", env=ambient))
