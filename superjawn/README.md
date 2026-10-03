@@ -10,7 +10,6 @@ Claude Code skills derived from [obra/superpowers](https://github.com/obra/super
 | `writing-plans` | Consumer | Ported (Batch 1, research stripped in v0.2.0) |
 | `executing-plans` | Freshness check | Ported (Batch 1, freshness check in v0.2.0) |
 | `systematic-debugging` | Research | Ported (Batch 2) |
-| `test-driven-development` | Consumer | Ported (Batch 2) |
 | `verification-before-completion` | Consumer | Ported (Batch 2) |
 | `receiving-code-review` | Consumer | Ported (Batch 3) |
 | `requesting-code-review` | Consumer | Ported (Batch 3, parity dropped in v1.0.0 for code-reviewer agent rewrite) |
@@ -20,6 +19,8 @@ Claude Code skills derived from [obra/superpowers](https://github.com/obra/super
 | `finishing-a-development-branch` | Consumer | Ported (Batch 5) |
 | `using-superjawn` | Consumer | Ported (Batch 5, renamed from upstream `using-superpowers`) |
 | `writing-skills` | Research | Ported (Batch 5) |
+
+`test-driven-development` was ported in Batch 2 and removed in 2.0.0. Tests now follow evidence-first bug fixing and proportional testing; see the 2.0.0 note in [CREDITS.md](CREDITS.md).
 
 ## Standalone by default
 

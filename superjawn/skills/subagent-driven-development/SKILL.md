@@ -213,7 +213,7 @@ Done!
 ## Advantages
 
 **vs. Manual execution:**
-- Subagents follow TDD naturally
+- Subagents verify each task before handing it back
 - Fresh context per task (no confusion)
 - Parallel-safe (subagents don't interfere)
 - Subagent can ask questions (before AND during work)
@@ -282,7 +282,7 @@ Done!
 - **superjawn:finishing-a-development-branch** - Complete development after all tasks
 
 **Subagents should use:**
-- **superjawn:test-driven-development** - Subagents follow TDD for each task
+- **superjawn:verification-before-completion** - Subagents prove each task works before reporting it done
 
 **Alternative workflow:**
 - **superjawn:executing-plans** - Use for parallel session instead of same-session execution

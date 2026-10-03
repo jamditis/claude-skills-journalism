@@ -1,6 +1,6 @@
 # hooks
 
-17 standalone workflow hooks under `hooks/`. Most are non-blocking warnings; `one-way-door-check`, `enforce-test-first`, and `no-ai-attribution` block intentionally. See [the hooks catalog](../systems/hooks-catalog.md) for how they install and fire.
+16 standalone workflow hooks under `hooks/`. Most are non-blocking warnings; `one-way-door-check` and `no-ai-attribution` block intentionally. See [the hooks catalog](../systems/hooks-catalog.md) for how they install and fire.
 
 ## Writing quality
 - [accessibility-check](accessibility-check.md)
@@ -24,7 +24,6 @@
 
 ## Development
 - [bug-report-detector](bug-report-detector.md)
-- [enforce-test-first](enforce-test-first.md)
 - [no-ai-attribution](no-ai-attribution.md)
 - [one-way-door-check](one-way-door-check.md)
 - [pre-commit-review](pre-commit-review.md)

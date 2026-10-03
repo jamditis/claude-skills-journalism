@@ -252,12 +252,11 @@ If skipping, write one line to `.superpowers/debug-log-<slug>.md`: `Skipped rese
 
 **Fix the root cause, not the symptom:**
 
-1. **Create Failing Test Case**
-   - Simplest possible reproduction
-   - Automated test if possible
-   - One-off test script if no framework
+1. **Reproduce the Failure**
+   - Simplest faithful reproduction: an existing test, a focused command, a log, or a new failing test
+   - Confirm it fails for the reported reason
    - MUST have before fixing
-   - Use the `superjawn:test-driven-development` skill for writing proper failing tests
+   - Keep it as a persistent regression test only when the bug is likely to recur or affects an important contract, non-obvious logic, or high-impact behavior
 
 2. **Implement Single Fix**
    - Address the root cause identified
@@ -365,7 +364,6 @@ These techniques are part of systematic debugging and available in this director
 - **`condition-based-waiting.md`** - Replace arbitrary timeouts with condition polling
 
 **Related skills:**
-- **superjawn:test-driven-development** - For creating failing test case (Phase 4, Step 1)
 - **superjawn:verification-before-completion** - Verify fix worked before claiming success
 
 ## Real-World Impact

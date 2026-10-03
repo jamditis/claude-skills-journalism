@@ -49,7 +49,6 @@
 - electron-dev
 - mobile-debugging
 - python-pipeline
-- test-first-bugs
 - web-scraping
 - zero-build-frontend
 
@@ -134,7 +133,6 @@ docs/
 ├── social-media-intelligence/index.html
 ├── story-pitch/index.html
 ├── template-selector/index.html
-├── test-first-bugs/index.html
 ├── web-archiving/index.html
 ├── web-scraping/index.html
 └── zero-build-frontend/index.html
