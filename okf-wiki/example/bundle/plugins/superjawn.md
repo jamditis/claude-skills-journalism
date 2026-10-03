@@ -9,7 +9,7 @@ tags: [plugin, productivity]
 ---
 # superjawn plugin
 
-Fourteen workflow skills (brainstorming, TDD, writing and executing plans,
+Thirteen workflow skills (brainstorming, writing and executing plans,
 code review, git worktrees, systematic debugging, and more). A standalone fork
 of obra/superpowers with no upstream dependency.
 

@@ -208,7 +208,7 @@ This skill ships inside the [pdf-playground](./pdf-playground/) plugin.
 
 ### Superjawn skills
 
-These fourteen skills ship inside the [superjawn](./superjawn/) plugin.
+These thirteen skills ship inside the [superjawn](./superjawn/) plugin.
 
 | Skill | Description | Updated |
 |-------|-------------|--------|

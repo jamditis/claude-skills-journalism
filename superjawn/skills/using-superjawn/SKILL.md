@@ -36,7 +36,7 @@ superjawn skills override default system prompt behavior, but **user instruction
 2. **superjawn skills**, override default system behavior where they conflict
 3. **Default system prompt**, lowest priority
 
-If CLAUDE.md, GEMINI.md, or AGENTS.md says "don't use TDD" and a skill says "always use TDD," follow the user's instructions. The user is in control.
+If CLAUDE.md, GEMINI.md, or AGENTS.md says "skip the research phase" and a skill says "always research first," follow the user's instructions. The user is in control.
 
 ## How to Access Skills
 
@@ -119,7 +119,7 @@ When multiple skills could apply, use this order:
 
 ## Skill Types
 
-**Rigid** (TDD, debugging): Follow exactly. Don't adapt away discipline.
+**Rigid** (debugging, verification): Follow exactly. Don't adapt away discipline.
 
 **Flexible** (patterns): Adapt principles to context.
 
