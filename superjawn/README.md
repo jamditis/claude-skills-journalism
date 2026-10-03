@@ -32,7 +32,7 @@ Superjawn has no soft dependencies on the upstream `superpowers` plugin. The v1.
 
 **Freshness check (1 stale-artifact consumer skill).** Default-skip. Fires only when a trigger indicates real drift risk: cross-session execution, external API/service touched, or working on `main`/`master`. Findings land in `.superpowers/exec-journal-<plan-slug>.md`.
 
-**Consumer (10 skills).** No phase. Pure port from upstream with attribution comment + dual-namespace cross-reference rewrites. Trusts the upstream-artifact handoff.
+**Consumer (9 skills).** No phase. Pure port from upstream with attribution comment + dual-namespace cross-reference rewrites. Trusts the upstream-artifact handoff.
 
 ## Credits
 
