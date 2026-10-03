@@ -79,11 +79,19 @@ specification or real data, not from the new code's output.
 **Files:**
 - Create: `exact/path/to/file.py`
 - Modify: `exact/path/to/existing.py:123-145`
-- Test: `tests/exact/path/to/test.py`
+- Test (only when the task keeps a new test): `tests/exact/path/to/test.py`
+
+**Check:** [The command that proves this task, and why it is the cheapest faithful evidence]
 
 - [ ] **Step 1: Run the check that shows current behavior**
 
-Use an existing test, a focused command, or a new test when the task needs one.
+Use an existing test or a focused command when it proves the behavior:
+
+Run: `python -m mypkg.cli convert sample.csv`
+Expected: exit 1 with "unsupported column type: date"
+
+When the task keeps a new test, write it first and take the expected value
+from the spec or real data:
 
 ```python
 def test_specific_behavior():
@@ -103,13 +111,13 @@ def function(input):
 
 - [ ] **Step 3: Run the same check to verify the result**
 
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: PASS
+Run: the same command as Step 1
+Expected: the behavior the spec requires (for example, exit 0, or PASS)
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add tests/path/test.py src/path/file.py
+git add src/path/file.py  # add tests/path/test.py only if the task kept a test
 git commit -m "feat: add specific feature"
 ```
 ````
