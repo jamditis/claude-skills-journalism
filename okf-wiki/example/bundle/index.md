@@ -8,7 +8,7 @@ skill that lives in it. Every concept points its `source` at the real files it
 describes, so you can diff the wiki against the code. This is the working example
 linked from the okf-wiki page.
 
-The repository is a Claude Code plugin marketplace: 12 plugins, 61 skills, and 16
+The repository is a Claude Code plugin marketplace: 12 plugins, 63 skills, and 16
 standalone hooks. Start at the [repo overview](systems/repo-overview.md), browse by
 [plugin](plugins/index.md), or jump straight to a [skill](skills/index.md).
 
