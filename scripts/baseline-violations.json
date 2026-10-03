@@ -3484,63 +3484,6 @@
     ]
   },
   {
-    "url": "http://127.0.0.1:8765/test-first-bugs/",
-    "path": "test-first-bugs/index.html",
-    "violationCount": 2,
-    "byImpact": {
-      "critical": 0,
-      "serious": 2,
-      "moderate": 0,
-      "minor": 0
-    },
-    "violations": [
-      {
-        "id": "color-contrast",
-        "impact": "serious",
-        "help": "Elements must meet minimum color contrast ratio thresholds",
-        "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
-        "nodes": [
-          {
-            "html": "<p class=\"text-clay/60 text-sm\">\n                    Built by <a href=\"https://centerforcooperativemedia.org\" target=\"_blank\" class=\"text-accent hover:text-accentDark underline underline-offset-2\">Cen...",
-            "target": [
-              ".flex-col > .text-clay\\/60"
-            ],
-            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.67 (foreground color: #7a756c, background color: #ede6d4, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
-          },
-          {
-            "html": "<a href=\"../\" class=\"text-clay/60 hover:text-ink text-sm transition-colors\">All skills</a>",
-            "target": [
-              ".text-clay\\/60.hover\\:text-ink[href=\"../\"]"
-            ],
-            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.67 (foreground color: #7a756c, background color: #ede6d4, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
-          },
-          {
-            "html": "<a href=\"https://github.com/jamditis/claude-skills-journalism\" target=\"_blank\" class=\"text-clay/60 hover:text-ink text-sm transition-colors\">GitHub</a>",
-            "target": [
-              ".text-clay\\/60.hover\\:text-ink.transition-colors:nth-child(2)"
-            ],
-            "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.67 (foreground color: #7a756c, background color: #ede6d4, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
-          }
-        ]
-      },
-      {
-        "id": "link-name",
-        "impact": "serious",
-        "help": "Links must have discernible text",
-        "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/link-name?application=playwright",
-        "nodes": [
-          {
-            "html": "<a href=\"https://github.com/jamditis/claude-skills-journalism\" target=\"_blank\" class=\"text-clay/70 hover:text-ink transition-colors\">",
-            "target": [
-              "span > .hover\\:text-ink.transition-colors[target=\"_blank\"]"
-            ],
-            "failureSummary": "Fix all of the following:\n  Element is in tab order and does not have accessible text\n\nFix any of the following:\n  Element does not have text that is visible to screen readers\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute"
-          }
-        ]
-      }
-    ]
-  },
-  {
     "url": "http://127.0.0.1:8765/vibe-coding/",
     "path": "vibe-coding/index.html",
     "violationCount": 1,

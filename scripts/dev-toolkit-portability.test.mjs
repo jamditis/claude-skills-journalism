@@ -72,13 +72,12 @@ test('instruction-file coupling: CLAUDE.md target vs AGENTS.md-aware', () => {
 test('tool coupling is the mechanic, not the noun', () => {
   const rows = Object.fromEntries(buildMatrix().map((r) => [r.name, r]));
   // Invokes the Task tool with subagent_type -> needs an adapter.
-  assert.equal(rows['test-first-bugs'].class, ADAPTER_REQUIRED);
-  assert.match(rows['test-first-bugs'].reason, /subagent_type/u);
-  // It also auto-activates through a hook it names, so the matrix must not
-  // record its auto-activation as "no".
-  assert.equal(rows['test-first-bugs'].automatic, true);
-  assert.ok(rows['test-first-bugs'].hooks.includes('bug-report-detector.md'));
-  assert.match(rows['test-first-bugs'].reason, /hook/u);
+  const taskRow = classifySkill(
+    { name: 'task-dispatch', body: 'Launch a Task with subagent_type: "general-purpose".' },
+    new Map(),
+  );
+  assert.equal(taskRow.class, ADAPTER_REQUIRED);
+  assert.match(taskRow.reason, /subagent_type/u);
   // Mentions "subagents" only as design advice -> portable.
   assert.equal(rows['context-engineering-fundamentals'].class, SHARED);
 });

@@ -58,7 +58,7 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | Plugin | Description | Commands | Updated |
 |--------|-------------|----------|--------|
 | [autocontext](./autocontext/) | Cross-session knowledge persistence with skill evolution. Lessons accumulate per-skill, and `/autocontext:evolve` folds them back into skill files | `/autocontext:setup`, `/autocontext:init`, `/autocontext:review`, `/autocontext:status`, `/autocontext:evolve` | Aug 21, 2026 |
-| [dev-toolkit](./dev-toolkit/) | Thirteen development-focused skills for journalists, researchers, and small newsroom dev teams: accessibility, context management, directed multi-agent execution, Electron, mobile debugging, Python pipelines, test-first bug fixing, ethical scraping, no-build frontends, web UI craft, and CLAUDE.md maintenance | `/dev-toolkit:director`; other skills model-selected | Aug 21, 2026 |
+| [dev-toolkit](./dev-toolkit/) | Twelve development-focused skills for journalists, researchers, and small newsroom dev teams: accessibility, context management, directed multi-agent execution, Electron, mobile debugging, Python pipelines, ethical scraping, no-build frontends, web UI craft, and CLAUDE.md maintenance | `/dev-toolkit:director`; other skills model-selected | Aug 21, 2026 |
 | [journalism-core](./journalism-core/) | Fifteen core journalism skills, including AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, Brazilian LAI requests, fact-checking, interview prep + transcription, story pitches, editorial workflow, crisis communications, newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements, and embedded photo metadata for wire distribution | n/a, skills only | Aug 21, 2026 |
 | [okf-wiki](./okf-wiki/) | Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with YAML frontmatter, directory navigation, and a validator. Generates a starter wiki that passes its own conformance and secret-leak checks, ships session-start hooks that orient Claude on the knowledge base before it works, and includes an optional GitHub-wiki bootstrap. For newsroom institutional memory, research atlases, decision logs, and infrastructure maps | n/a, skill only | Sep 14, 2026 |
 | [pdf-design](./pdf-design/) | PDF report and proposal design system with brand variables, budget tables, and reusable content blocks (stats strips, three-column, four-tile pillars, partner grids) | n/a, skill-only | Sep 15, 2026 |
@@ -66,7 +66,7 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | [project-templates-toolkit](./project-templates-toolkit/) | Three skills for setting up and closing out journalism projects: a CLAUDE.md project-memory writer (institutional knowledge), a LESSONS.md retrospective writer (failures and decisions), and a template-selector decision tree across 6 project types | n/a, skills only | Aug 24, 2026 |
 | [research-toolkit](./research-toolkit/) | Six skills for research, source preservation, and academic workflows: academic writing, legal paywall-bypass via Unpaywall and library databases, web archiving (Wayback / Archive.today / ArchiveBox), web page change monitoring, AI-enriched digital archive construction, and a curated free-API catalog with sunset currency notes (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) | n/a, skills only | Aug 21, 2026 |
 | [security-toolkit](./security-toolkit/) | Five defensive security skills covering OWASP Top 10 fundamentals, supply-chain hardening, and secret scanning: pre-deployment audit checklists (auth, input validation, secrets management), secure authentication patterns (password hashing, session management, JWT, OAuth, passkeys), API hardening (rate limiting, CORS, request throttling, defense-in-depth for Express, FastAPI, and serverless), and npm/bun supply-chain hardening with install-time cooldown plus a sandboxed pre-install scan for the bypass case (defends against Mini Shai-Hulud-class worms) | `/security-toolkit:hotpatch` | Sep 28, 2026 |
-| [superjawn](./superjawn/) | Research-augmented fork of obra/superpowers. Default-on research phase fires before brainstorming, systematic-debugging, and writing-skills. Includes all 14 skills with no soft dependencies on the upstream `superpowers` plugin | invoked indirectly via skills (e.g. `superjawn:brainstorming`, `superjawn:systematic-debugging`, `superjawn:writing-plans`) | Aug 21, 2026 |
+| [superjawn](./superjawn/) | Research-augmented fork of obra/superpowers. Default-on research phase fires before brainstorming, systematic-debugging, and writing-skills. Includes 13 skills with no soft dependencies on the upstream `superpowers` plugin | invoked indirectly via skills (e.g. `superjawn:brainstorming`, `superjawn:systematic-debugging`, `superjawn:writing-plans`) | Aug 21, 2026 |
 | [video-toolkit](./video-toolkit/) | Four composable skills for social-video accountability reporting: downloading public video from Twitter/X, TikTok, YouTube, Instagram, and Facebook; transcribing it with a provenance sidecar and a CPU path any evaluator can re-run; extracting and vision-analyzing frames; and aggregating the result into an interactive dashboard | n/a, skills only | Sep 23, 2026 |
 | [web-design-picker](./web-design-picker/) | Build two to five distinct website directions, a switchable client review site, downloadable design assets, preview images, static QA reports, and separate Cloudflare Drop and design-handoff packages | n/a, skill only | Sep 2, 2026 |
 | [visual-explainer](./visual-explainer/) | HTML diagrams, data tables, architecture views, slide decks, and KPI dashboards adapted from nicobailon/visual-explainer with journalism, newsroom, and academic design sensibilities | `/visual-explainer:project-recap` | Aug 21, 2026 |
@@ -208,7 +208,7 @@ This skill ships inside the [pdf-playground](./pdf-playground/) plugin.
 
 ### Superjawn skills
 
-These fourteen skills ship inside the [superjawn](./superjawn/) plugin.
+These thirteen skills ship inside the [superjawn](./superjawn/) plugin.
 
 | Skill | Description | Updated |
 |-------|-------------|--------|
@@ -220,7 +220,6 @@ These fourteen skills ship inside the [superjawn](./superjawn/) plugin.
 | [requesting-code-review](./superjawn/skills/requesting-code-review/) | Request focused review before integration or after a major implementation | Aug 21, 2026 |
 | [subagent-driven-development](./superjawn/skills/subagent-driven-development/) | Execute independent plan tasks with agents in the current session | Aug 21, 2026 |
 | [systematic-debugging](./superjawn/skills/systematic-debugging/) | Investigate root cause and relevant evidence before proposing a bug fix | Aug 21, 2026 |
-| [test-driven-development](./superjawn/skills/test-driven-development/) | Write a failing test before implementing a feature or bug fix | Aug 21, 2026 |
 | [using-git-worktrees](./superjawn/skills/using-git-worktrees/) | Create isolated worktrees with safe directory selection and verification | Aug 21, 2026 |
 | [using-superjawn](./superjawn/skills/using-superjawn/) | Discover and invoke the right Superjawn skill for the current task | Aug 21, 2026 |
 | [verification-before-completion](./superjawn/skills/verification-before-completion/) | Run and inspect verification evidence before claiming work is complete | Aug 21, 2026 |
@@ -239,7 +238,7 @@ These three skills ship together as the [project-templates-toolkit](./project-te
 
 ### Development skills (in `dev-toolkit` plugin)
 
-These thirteen skills ship together as the [dev-toolkit](./dev-toolkit/) plugin. Install via `/plugin install dev-toolkit@claude-skills-journalism` to get all of them at once, or copy individual skills from `dev-toolkit/skills/<name>/`.
+These twelve skills ship together as the [dev-toolkit](./dev-toolkit/) plugin. Install via `/plugin install dev-toolkit@claude-skills-journalism` to get all of them at once, or copy individual skills from `dev-toolkit/skills/<name>/`.
 
 | Skill | Description | Updated |
 |-------|-------------|--------|
@@ -251,7 +250,6 @@ These thirteen skills ship together as the [dev-toolkit](./dev-toolkit/) plugin.
 | [mobile-debugging](./dev-toolkit/skills/mobile-debugging/) | Eruda, vConsole, Chrome DevTools on Android, Safari Web Inspector for iOS, console capture | Aug 21, 2026 |
 | [one-way-door](./dev-toolkit/skills/one-way-door/) | Flag irreversible architectural decisions (data models, infra, auth, APIs) before committing | Aug 21, 2026 |
 | [python-pipeline](./dev-toolkit/skills/python-pipeline/) | Data pipelines (pandas, polars, DuckDB, asyncio) with modular architecture | Aug 21, 2026 |
-| [test-first-bugs](./dev-toolkit/skills/test-first-bugs/) | Test-driven bug fixing: write failing test first, then fix with subagents | Aug 21, 2026 |
 | [vibe-coding](./dev-toolkit/skills/vibe-coding/) | AI-assisted development workflow (Claude Code, Cursor, Aider, Continue) | Aug 21, 2026 |
 | [web-scraping](./dev-toolkit/skills/web-scraping/) | Ethical scraping patterns (Playwright, robots.txt, anti-bot defense, terms-of-service) | Aug 21, 2026 |
 | [web-ui-best-practices](./dev-toolkit/skills/web-ui-best-practices/) | Container queries, `:has()`, view transitions, scroll-driven animations, signs of taste in web UI | Aug 21, 2026 |
@@ -282,7 +280,7 @@ These four skills ship together as the [video-toolkit](./video-toolkit/) plugin 
 
 ## Hooks
 
-Hooks are automated checks that run at specific points in your workflow. Most are **non-blocking warnings**, but three block intentionally until you resolve them: `one-way-door-check`, `enforce-test-first`, and `no-ai-attribution`.
+Hooks are automated checks that run at specific points in your workflow. Most are **non-blocking warnings**, but two block intentionally until you resolve them: `one-way-door-check` and `no-ai-attribution`.
 
 ### Writing quality hooks
 
@@ -321,8 +319,7 @@ Hooks are automated checks that run at specific points in your workflow. Most ar
 | Hook | Event | Description |
 |------|-------|-------------|
 | [one-way-door-check](./hooks/one-way-door-check.md) | PreToolUse | Block creation of files representing irreversible architectural decisions |
-| [bug-report-detector](./hooks/bug-report-detector.md) | UserPromptSubmit | Detect bug reports and remind to follow test-first workflow |
-| [enforce-test-first](./hooks/enforce-test-first.md) | PreToolUse | Block source code edits until a test file has been written |
+| [bug-report-detector](./hooks/bug-report-detector.md) | UserPromptSubmit | Detect bug reports and remind the agent to establish the failure before fixing it |
 | [pre-commit-review](./hooks/pre-commit-review.md) | PreToolUse | Surface the staged diff for line-by-line review before a commit, and flag deletions of safety-critical guardrails |
 | [no-ai-attribution](./hooks/no-ai-attribution.md) | PreToolUse | Block AI authorship credit in commits, PR bodies, and comments before they land |
 

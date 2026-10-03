@@ -56,9 +56,6 @@ skills:
   - name: python-pipeline
     package: dev-toolkit
     path: dev-toolkit/skills/python-pipeline
-  - name: test-first-bugs
-    package: dev-toolkit
-    path: dev-toolkit/skills/test-first-bugs
   - name: vibe-coding
     package: dev-toolkit
     path: dev-toolkit/skills/vibe-coding
@@ -191,9 +188,6 @@ skills:
   - name: systematic-debugging
     package: superjawn
     path: superjawn/skills/systematic-debugging
-  - name: test-driven-development
-    package: superjawn
-    path: superjawn/skills/test-driven-development
   - name: using-git-worktrees
     package: superjawn
     path: superjawn/skills/using-git-worktrees

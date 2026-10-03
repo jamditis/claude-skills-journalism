@@ -20,8 +20,8 @@
     },
     {
       "name": "dev-toolkit",
-      "description": "Thirteen development skills for newsroom and research dev teams: accessibility, context management, directed multi-agent execution, Electron, mobile debugging, Python pipelines, test-first bug fixing, ethical scraping, no-build frontends, web UI craft, and CLAUDE.md maintenance.",
-      "version": "1.4.0",
+      "description": "Twelve development skills for newsroom and research dev teams: accessibility, context management, directed multi-agent execution, Electron, mobile debugging, Python pipelines, ethical scraping, no-build frontends, web UI craft, and CLAUDE.md maintenance.",
+      "version": "2.0.0",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"
@@ -108,8 +108,8 @@
     },
     {
       "name": "superjawn",
-      "description": "Research-augmented fork of obra/superpowers. Ships all 14 workflow skills (brainstorming, planning, TDD, code review, debugging, worktrees, parallel agents) standalone, with no dependency on the upstream superpowers plugin.",
-      "version": "1.1.0",
+      "description": "Research-augmented fork of obra/superpowers. Ships 13 workflow skills (brainstorming, planning, code review, debugging, verification, worktrees, parallel agents) standalone, with no dependency on the upstream superpowers plugin.",
+      "version": "2.0.0",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"

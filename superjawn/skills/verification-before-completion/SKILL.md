@@ -90,7 +90,7 @@ Skip any step = lying, not verifying
 ❌ "Should pass now" / "Looks correct"
 ```
 
-**Regression tests (TDD Red-Green):**
+**Regression tests (red-green):**
 ```
 ✅ Write → Run (pass) → Revert fix → Run (MUST FAIL) → Restore → Run (pass)
 ❌ "I've written a regression test" (without red-green verification)

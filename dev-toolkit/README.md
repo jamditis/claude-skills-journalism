@@ -1,6 +1,6 @@
 # dev-toolkit
 
-Thirteen development-focused skills for journalists, researchers, and small newsroom dev teams.
+Twelve development-focused skills for journalists, researchers, and small newsroom dev teams.
 
 ## Skills in this plugin
 
@@ -14,7 +14,6 @@ Thirteen development-focused skills for journalists, researchers, and small news
 | mobile-debugging | Eruda, vConsole, Chrome DevTools on Android, Safari Web Inspector for iOS |
 | one-way-door | Block irreversible architectural decisions during planning |
 | python-pipeline | Data pipeline patterns (pandas, polars, DuckDB, asyncio) |
-| test-first-bugs | TDD workflow for bug fixes, failing test before fix |
 | vibe-coding | AI-assisted development workflow (Claude Code, Cursor, Aider, Continue) |
 | web-scraping | Ethical scraping patterns (Playwright, robots.txt, anti-bot, terms-of-service) |
 | web-ui-best-practices | Container queries, `:has()`, view transitions, scroll-driven animations |

@@ -61,8 +61,7 @@ function frontmatterName(body) {
 // Top-level hooks/*.md files are Claude auto-activation wiring (PreToolUse,
 // PostToolUse, UserPromptSubmit). A hook belongs to a skill when the skill's
 // own SKILL.md names it, which is the skill declaring its wiring
-// (test-first-bugs names bug-report-detector; one-way-door names
-// one-way-door-check). Keying on the skill's declaration, not on the hook
+// (one-way-door names one-way-door-check). Keying on the skill's declaration, not on the hook
 // mentioning the skill, keeps a hook that only cites a skill as an example
 // (pre-commit-review) from being miscounted. Returns filename -> hook name,
 // repo-driven, no hand-kept table.

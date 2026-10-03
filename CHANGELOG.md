@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- **Test-first enforcement retired.** Removed the superjawn `test-driven-development`
+  skill, the dev-toolkit `test-first-bugs` skill, the `enforce-test-first` hook, and
+  the `test-first-bugs` page on the skills site. superjawn and dev-toolkit move to
+  2.0.0 because installed skill names are gone.
+
+### Changed
+
+- **Evidence-first bug fixing.** `bug-report-detector`, `systematic-debugging`, and
+  the repository `CLAUDE.md` now ask for the cheapest faithful reproduction (an
+  existing test, a focused command, a log, or a new failing test). They keep a
+  regression test only when the bug is likely to recur or affects an important
+  contract, non-obvious logic, or high-impact behavior.
+- `subagent-driven-development` and `writing-skills` no longer depend on the removed
+  TDD skill. Counts, catalogs, the marketplace, the skills site, `llms.txt`, the
+  sitemap, and the okf-wiki example match the new skill and hook sets.
+
 ### Added
 
 - **private-secret-scanning:** added a security-toolkit skill for private

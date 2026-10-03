@@ -15,7 +15,7 @@ See CREDITS.md.
 
 ## Overview
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
+Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. Proportional tests. Frequent commits.
 
 Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
 
@@ -44,11 +44,14 @@ This structure informs the task decomposition. Each task should produce self-con
 ## Bite-Sized Task Granularity
 
 **Each step is one action (2-5 minutes):**
-- "Write the failing test" - step
-- "Run it to make sure it fails" - step
-- "Implement the minimal code to make the test pass" - step
-- "Run the tests and make sure they pass" - step
+- "Run the check that shows the current behavior" - step
+- "Implement the minimal change" - step
+- "Run the same check and confirm the expected result" - step
 - "Commit" - step
+
+Add a new test only when it protects a likely repeat failure, a stable contract,
+non-obvious logic, or high-impact behavior. Take its expected values from the
+specification or real data, not from the new code's output.
 
 ## Plan Document Header
 
@@ -76,37 +79,45 @@ This structure informs the task decomposition. Each task should produce self-con
 **Files:**
 - Create: `exact/path/to/file.py`
 - Modify: `exact/path/to/existing.py:123-145`
-- Test: `tests/exact/path/to/test.py`
+- Test (only when the task keeps a new test): `tests/exact/path/to/test.py`
 
-- [ ] **Step 1: Write the failing test**
+**Check:** [The command that proves this task, and why it is the cheapest faithful evidence]
+
+- [ ] **Step 1: Run the check that shows current behavior**
+
+Use an existing test or a focused command when it proves the behavior:
+
+Run: `python -m mypkg.cli convert sample.csv`
+Expected: exit 1 with "unsupported column type: date"
+
+When the task keeps a new test, write it first and take the expected value
+from the spec or real data:
 
 ```python
 def test_specific_behavior():
     result = function(input)
-    assert result == expected
+    assert result == expected  # expected value from the spec or real data
 ```
-
-- [ ] **Step 2: Run test to verify it fails**
 
 Run: `pytest tests/path/test.py::test_name -v`
 Expected: FAIL with "function not defined"
 
-- [ ] **Step 3: Write minimal implementation**
+- [ ] **Step 2: Write minimal implementation**
 
 ```python
 def function(input):
     return expected
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [ ] **Step 3: Run the same check to verify the result**
 
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: PASS
+Run: the same command as Step 1
+Expected: the behavior the spec requires (for example, exit 0, or PASS)
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
-git add tests/path/test.py src/path/file.py
+git add src/path/file.py  # add tests/path/test.py only if the task kept a test
 git commit -m "feat: add specific feature"
 ```
 ````
@@ -125,7 +136,7 @@ Every step must contain the actual content an engineer needs. These are **plan f
 - Exact file paths always
 - Complete code in every step, if a step changes code, show the code
 - Exact commands with expected output
-- DRY, YAGNI, TDD, frequent commits
+- DRY, YAGNI, proportional tests, frequent commits
 
 ## Self-Review
 

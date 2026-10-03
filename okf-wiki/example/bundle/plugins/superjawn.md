@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: "superjawn plugin"
-description: "Research-augmented fork of obra/superpowers; 14 standalone skills."
+description: "Research-augmented fork of obra/superpowers; 13 standalone skills."
 source: ["superjawn/.claude-plugin/plugin.json", ".claude-plugin/marketplace.json"]
 verified: 2026-06-23
 timestamp: 2026-06-23
@@ -9,7 +9,7 @@ tags: [plugin, productivity]
 ---
 # superjawn plugin
 
-Fourteen workflow skills (brainstorming, TDD, writing and executing plans,
+Thirteen workflow skills (brainstorming, writing and executing plans,
 code review, git worktrees, systematic debugging, and more). A standalone fork
 of obra/superpowers with no upstream dependency.
 
@@ -23,7 +23,6 @@ of obra/superpowers with no upstream dependency.
 - [requesting-code-review](../skills/requesting-code-review.md)
 - [subagent-driven-development](../skills/subagent-driven-development.md)
 - [systematic-debugging](../skills/systematic-debugging.md)
-- [test-driven-development](../skills/test-driven-development.md)
 - [using-git-worktrees](../skills/using-git-worktrees.md)
 - [using-superjawn](../skills/using-superjawn.md)
 - [verification-before-completion](../skills/verification-before-completion.md)

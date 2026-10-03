@@ -38,11 +38,6 @@
         "CREATION-LOG.md": "PR #36 review: path reference + Jesse local CLAUDE.md path genericized"
       }
     },
-    "test-driven-development": {
-      "category": "consumer",
-      "skill_md_parity": false,
-      "supporting_file_overrides": {}
-    },
     "verification-before-completion": {
       "category": "consumer",
       "skill_md_parity": false,
@@ -63,7 +58,7 @@
       "skill_md_parity": false,
       "supporting_file_overrides": {
         "code-quality-reviewer-prompt.md": "v1.0.0: Task tool dispatch target rewritten from superpowers:code-reviewer to pr-review-toolkit:code-reviewer to remove the soft dependency on the upstream superpowers plugin (uninstalled at v1.0.0)",
-        "implementer-prompt.md": "Repo-wide em-dash to comma conversion"
+        "implementer-prompt.md": "superjawn 2.0.0: TDD instructions replaced with the fleet testing rules (tests where the task or project rules call for them; independent expected values; no weakened tests)"
       }
     },
     "dispatching-parallel-agents": {
@@ -95,7 +90,7 @@
       "category": "research",
       "skill_md_parity": false,
       "supporting_file_overrides": {
-        "testing-skills-with-subagents.md": "PR #48 review: REQUIRED BACKGROUND ref migrated from superpowers:test-driven-development to superjawn: for consistency with the parent SKILL.md's already-migrated cross-refs"
+        "testing-skills-with-subagents.md": "superjawn 2.0.0: REQUIRED BACKGROUND reference to the removed test-driven-development skill replaced with a self-contained description of the red-green cycle for skills"
       }
     }
   }

@@ -252,12 +252,11 @@ If skipping, write one line to `.superpowers/debug-log-<slug>.md`: `Skipped rese
 
 **Fix the root cause, not the symptom:**
 
-1. **Create Failing Test Case**
-   - Simplest possible reproduction
-   - Automated test if possible
-   - One-off test script if no framework
+1. **Reproduce the failure**
+   - Simplest faithful reproduction: an existing test, a focused command, a log, or a new failing test
+   - Confirm it fails for the reported reason
    - MUST have before fixing
-   - Use the `superjawn:test-driven-development` skill for writing proper failing tests
+   - Keep it as a persistent regression test only when the bug is likely to recur or affects an important contract, non-obvious logic, or high-impact behavior
 
 2. **Implement Single Fix**
    - Address the root cause identified
@@ -266,7 +265,7 @@ If skipping, write one line to `.superpowers/debug-log-<slug>.md`: `Skipped rese
    - No bundled refactoring
 
 3. **Verify Fix**
-   - Test passes now?
+   - The same reproduction from Step 1 now passes?
    - No other tests broken?
    - Issue actually resolved?
 
@@ -299,7 +298,7 @@ If you catch yourself thinking:
 - "Quick fix for now, investigate later"
 - "Just try changing X and see if it works"
 - "Add multiple changes, run tests"
-- "Skip the test, I'll manually verify"
+- "Skip the reproduction, I'll eyeball the fix"
 - "It's probably X, let me fix that"
 - "I don't fully understand but this might work"
 - "Pattern says X but I'll adapt it differently"
@@ -330,7 +329,7 @@ If you catch yourself thinking:
 | "Issue is simple, don't need process" | Simple issues have root causes too. Process is fast for simple bugs. |
 | "Emergency, no time for process" | Systematic debugging is FASTER than guess-and-check thrashing. |
 | "Just try this first, then investigate" | First fix sets the pattern. Do it right from the start. |
-| "I'll write test after confirming fix works" | Untested fixes don't stick. Test first proves it. |
+| "I'll reproduce it after confirming the fix works" | A fix you never saw fail proves nothing. Reproduce first, then rerun the same evidence. |
 | "Multiple fixes at once saves time" | Can't isolate what worked. Causes new bugs. |
 | "Reference too long, I'll adapt the pattern" | Partial understanding guarantees bugs. Read it completely. |
 | "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. |
@@ -343,7 +342,7 @@ If you catch yourself thinking:
 | **1. Root Cause** | Read errors, reproduce, check changes, gather evidence | Understand WHAT and WHY |
 | **2. Pattern** | Find working examples, compare | Identify differences |
 | **3. Hypothesis** | Form theory, test minimally | Confirmed or new hypothesis |
-| **4. Implementation** | Create test, fix, verify | Bug resolved, tests pass |
+| **4. Implementation** | Reproduce, fix, verify with the same evidence | Bug resolved, reproduction passes |
 
 ## When Process Reveals "No Root Cause"
 
@@ -365,7 +364,6 @@ These techniques are part of systematic debugging and available in this director
 - **`condition-based-waiting.md`** - Replace arbitrary timeouts with condition polling
 
 **Related skills:**
-- **superjawn:test-driven-development** - For creating failing test case (Phase 4, Step 1)
 - **superjawn:verification-before-completion** - Verify fix worked before claiming success
 
 ## Real-World Impact

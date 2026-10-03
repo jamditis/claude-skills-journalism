@@ -11,9 +11,9 @@ is grounded in real prior art and current best practice before TDD begins.
 Findings land at .superpowers/skill-design-<skill-slug>.md. Skip protocol
 text byte-identical to brainstorming/systematic-debugging.
 Four cross-references migrated from the upstream namespace prefix to the
-local one, three refs to test-driven-development and one to systematic-
-debugging; both targets are ported skills so the dual-namespace cross-ref
-check requires the local prefix.
+local one: three to test-driven-development and one to systematic-debugging.
+superjawn 2.0.0 removed test-driven-development, so the three TDD references
+became a self-contained description of the red-green cycle for skills.
 SKILL.md is parity:false in the manifest by design.
 See CREDITS.md.
 -->
@@ -50,7 +50,7 @@ You write test cases (pressure scenarios with subagents), watch them fail (basel
 
 **Core principle:** If you didn't watch an agent fail without the skill, you don't know if the skill teaches the right thing.
 
-**REQUIRED BACKGROUND:** You MUST understand superjawn:test-driven-development before using this skill. That skill defines the fundamental RED-GREEN-REFACTOR cycle. This skill adapts TDD to documentation.
+**The cycle:** RED: run a pressure scenario without the skill and record what the agent does. GREEN: write the smallest skill that fixes those failures and confirm that agents now comply. REFACTOR: close new loopholes and test again. This skill applies that cycle to documentation.
 
 **Official guidance:** For Anthropic's official skill authoring best practices, see anthropic-best-practices.md. This document provides additional patterns and guidelines that complement the TDD-focused approach in this skill.
 
@@ -352,10 +352,10 @@ wc -w skills/path/SKILL.md
 **When writing documentation that references other skills:**
 
 Use skill name only, with explicit requirement markers:
-- ✅ Good: `**REQUIRED SUB-SKILL:** Use superjawn:test-driven-development`
+- ✅ Good: `**REQUIRED SUB-SKILL:** Use superjawn:verification-before-completion`
 - ✅ Good: `**REQUIRED BACKGROUND:** You MUST understand superjawn:systematic-debugging`
-- ❌ Bad: `See skills/testing/test-driven-development` (unclear if required)
-- ❌ Bad: `@skills/testing/test-driven-development/SKILL.md` (force-loads, burns context)
+- ❌ Bad: `See skills/debugging/systematic-debugging` (unclear if required)
+- ❌ Bad: `@skills/debugging/systematic-debugging/SKILL.md` (force-loads, burns context)
 
 **Why no @ links:** `@` syntax force-loads files immediately, consuming 200k+ context before you need them.
 
@@ -462,7 +462,7 @@ Edit skill without testing? Same violation.
 - Don't "adapt" while running tests
 - Delete means delete
 
-**REQUIRED BACKGROUND:** The superjawn:test-driven-development skill explains why this matters. Same principles apply to documentation.
+**Why:** A skill written before you watch the baseline failure tests only what you expected agents to do, not what they actually do.
 
 ## Testing All Skill Types
 

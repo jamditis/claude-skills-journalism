@@ -6,9 +6,9 @@
 
 When a bug is reported, don't immediately attempt to fix it. Instead:
 
-1. **Write a failing test first** that reproduces the bug
-2. **Launch subagents** to work on fixing the bug
-3. **Verify the fix** by running the test, a passing test proves the bug is fixed
+1. **Establish the failure** with the cheapest faithful evidence: an existing test, a focused command, a log, or a new failing test
+2. **Fix the cause**, not the symptom
+3. **Prove the fix** with the same evidence. Keep a new regression test only when the bug is likely to recur or affects an important contract, non-obvious logic, or high-impact behavior
 
 ---
 
@@ -31,7 +31,7 @@ claude-skills-journalism/
 ├── README.md                    # User documentation
 ├── LICENSE
 │
-├── hooks/                       # Automated workflow checks (17 hooks)
+├── hooks/                       # Automated workflow checks (16 hooks)
 │   ├── ap-style-check.md        # Writing: AP Style violations
 │   ├── ai-slop-detector.md      # Writing: AI patterns
 │   ├── accessibility-check.md   # Writing: Alt text, headings
@@ -46,7 +46,6 @@ claude-skills-journalism/
 │   ├── archive-reminder.md      # Preservation: Archive URLs
 │   ├── one-way-door-check.md    # Development: Block irreversible decisions
 │   ├── bug-report-detector.md   # Development: Detect bug reports
-│   ├── enforce-test-first.md    # Development: Enforce test-first workflow
 │   ├── pre-commit-review.md     # Development: Review staged diff before commit
 │   └── no-ai-attribution.md     # Development: Block AI attribution in commits, PRs, and comments
 │
@@ -83,7 +82,7 @@ claude-skills-journalism/
 │       ├── page-monitoring/            # Change detection, availability tracking
 │       └── web-archiving/              # Wayback, Archive.today, evidence preservation
 │
-├── # Plugin: dev-toolkit (13 skills), registered in marketplace.json
+├── # Plugin: dev-toolkit (12 skills), registered in marketplace.json
 ├── dev-toolkit/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -96,7 +95,6 @@ claude-skills-journalism/
 │       ├── mobile-debugging/           # Eruda, vConsole, remote debug
 │       ├── one-way-door/               # Block irreversible decisions
 │       ├── python-pipeline/            # Data pipelines (pandas, polars, DuckDB)
-│       ├── test-first-bugs/            # TDD bug-fixing workflow
 │       ├── vibe-coding/                # AI-assisted development
 │       ├── web-scraping/               # Ethical content extraction
 │       ├── web-ui-best-practices/      # Container queries, :has(), view transitions
@@ -184,7 +182,7 @@ claude-skills-journalism/
 │   ├── templates/               # Document templates
 │   └── skills/                  # document-design/ + playground.md (user-invocable entry skill)
 │
-└── # Plugin: superjawn (14 skills, v1.1.0), registered in marketplace.json
+└── # Plugin: superjawn (13 skills, v2.0.0), registered in marketplace.json
     ├── # Research-augmented fork of obra/superpowers; standalone, no upstream dependency
     ├── .claude-plugin/plugin.json
     ├── README.md
@@ -197,7 +195,6 @@ claude-skills-journalism/
         ├── requesting-code-review/        # Verify completed work before merging
         ├── subagent-driven-development/   # Parallel task execution in one session
         ├── systematic-debugging/          # Research phase: triage before proposing fixes
-        ├── test-driven-development/        # TDD before implementation code
         ├── using-git-worktrees/           # Isolate feature work
         ├── using-superjawn/               # How to find and use skills
         ├── verification-before-completion/ # Confirm work is complete before committing
@@ -222,7 +219,7 @@ Instructions, templates, and workflows.
 
 ## Hooks
 
-Hooks run automatically at specific workflow events. Most are **non-blocking warnings**, but `one-way-door-check` (shell hook, exits 2), `enforce-test-first` (prompt-based), and `no-ai-attribution` (PreToolUse deny) block intentionally. See each hook's "Hook behavior" section for details.
+Hooks run automatically at specific workflow events. Most are **non-blocking warnings**, but `one-way-door-check` (shell hook, exits 2) and `no-ai-attribution` (PreToolUse deny) block intentionally. See each hook's "Hook behavior" section for details.
 
 ### Writing quality
 | Hook | Event | Purpose |
@@ -257,7 +254,6 @@ Hooks run automatically at specific workflow events. Most are **non-blocking war
 |------|-------|---------|
 | one-way-door-check | PreToolUse(Write) | Block irreversible architectural decisions |
 | bug-report-detector | UserPromptSubmit | Detect bug reports |
-| enforce-test-first | PreToolUse(Edit,Write) | Block source edits until test written |
 | pre-commit-review | PreToolUse(Bash) | Surface staged diff for review; flag guardrail deletions |
 | no-ai-attribution | PreToolUse(Bash) | Block AI authorship credit in commits, PR bodies, and comments |
 
