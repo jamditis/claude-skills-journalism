@@ -288,7 +288,10 @@ ios_webkit_debug_proxy -f chrome-devtools://devtools/bundled/inspector.html
 
 ### Commercial: Inspect.dev
 
-Inspect.dev provides iOS debugging from Windows/Linux with a familiar DevTools interface.
+[Inspect.dev's iOS setup guide](https://inspect.dev/guides/debug-safari-ios)
+covers debugging from Windows/Linux with a familiar DevTools interface. For a
+coding-agent workflow, see the
+[Claude mobile web debugging guide](https://inspect.dev/guides/claude-mobile-web-debugging).
 
 ```bash
 # Download from https://inspect.dev/
