@@ -84,6 +84,7 @@ All entries below verified against provider pages on 2026-05-09 unless marked **
 | [CoinGecko Demo](https://www.coingecko.com/en/api/pricing) | 10k calls/mo, 30/min, free with key | Attribution required. |
 | [Alpha Vantage](https://www.alphavantage.co/support/#api-key) | 25 requests/day | Free tier is now a demo, not a usable journalism data source. Migration target for IEX Cloud users, but expect to need a paid tier for any real workload. |
 | [Financial Modeling Prep](https://site.financialmodelingprep.com/) | Free tier exists, paid for production | IEX Cloud successor. |
+| [roic.ai](https://www.roic.ai/) | 5 requests/min, 2 years of history, no card | Company financial statements, ratios and earnings call transcripts for 68k+ companies. Good for earnings-season stories; also has an MCP server. |
 
 ### Archive / preservation
 
