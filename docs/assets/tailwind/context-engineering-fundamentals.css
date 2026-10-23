@@ -542,6 +542,9 @@ video {
 .max-w-4xl {
   max-width: 56rem;
 }
+.max-w-6xl {
+  max-width: 72rem;
+}
 .list-decimal {
   list-style-type: decimal;
 }
@@ -645,6 +648,9 @@ video {
 .pl-6 {
   padding-left: 1.5rem;
 }
+.pt-6 {
+  padding-top: 1.5rem;
+}
 .pt-8 {
   padding-top: 2rem;
 }
@@ -692,6 +698,9 @@ video {
 }
 .text-white\/90 {
   color: rgb(255 255 255 / 0.9);
+}
+.underline {
+  text-decoration-line: underline;
 }
 .outline {
   outline-style: solid;

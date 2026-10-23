@@ -152,6 +152,9 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 Generate LESSONS.md files that capture institutional knowledge, especially failures. Think like a journalist writing about your own project.
             </p>
         </div>
+            <p class="relative z-10 max-w-6xl mx-auto px-6 pt-6 text-sm text-white">
+            Works in: Uses the open Agent Skills format. <a class="underline" href="https://github.com/jamditis/claude-skills-journalism/blob/master/plans/codex-compatibility-matrix.md">Codex: adapter required; runtime fixtures pending</a>.
+        </p>
     </header>
 
     <main id="main" class="max-w-5xl mx-auto px-6 py-16 relative z-10">
@@ -164,22 +167,22 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 </p>
                 <div class="grid md:grid-cols-4 gap-6">
                     <div class="text-center p-4">
-                        <div class="text-3xl mb-3">📋</div>
+                        <div class="text-3xl mb-3">Plan</div>
                         <p class="font-semibold text-ink">Investigations</p>
                         <p class="text-sm text-clay/80">Research projects</p>
                     </div>
                     <div class="text-center p-4">
-                        <div class="text-3xl mb-3">📅</div>
+                        <div class="text-3xl mb-3">Event</div>
                         <p class="font-semibold text-ink">Events</p>
                         <p class="text-sm text-clay/80">Conferences, workshops</p>
                     </div>
                     <div class="text-center p-4">
-                        <div class="text-3xl mb-3">📰</div>
+                        <div class="text-3xl mb-3">Story</div>
                         <p class="font-semibold text-ink">Publications</p>
                         <p class="text-sm text-clay/80">Newsletters, podcasts</p>
                     </div>
                     <div class="text-center p-4">
-                        <div class="text-3xl mb-3">🛠️</div>
+                        <div class="text-3xl mb-3">Tool</div>
                         <p class="font-semibold text-ink">Tools</p>
                         <p class="text-sm text-clay/80">Newsroom software</p>
                     </div>
@@ -502,7 +505,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 <p class="text-white mb-4">/plugin install project-templates-toolkit@claude-skills-journalism</p>
                 <p class="text-white/50 mb-2"># Or copy just this skill from the plugin tree</p>
                 <p class="text-white mb-1">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
-                <p class="text-white">cp -r claude-skills-journalism/project-templates-toolkit/skills/project-retrospective ~/.claude/skills/</p>
+                <p class="text-white mb-1">cp -r claude-skills-journalism/project-templates-toolkit/skills/project-retrospective ~/.claude/skills/ <span class="text-white/50"># Claude Code</span></p>
+                <p class="text-white">cp -r claude-skills-journalism/project-templates-toolkit/skills/project-retrospective ~/.agents/skills/ <span class="text-white/50"># Codex</span></p>
             </div>
             <p class="mt-4 text-clay/70">
                 Or download just this skill from the

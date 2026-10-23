@@ -53,9 +53,9 @@ Personal site: https://jamditis.com
 - mobile-debugging, Eruda, vConsole, remote debug
 - accessibility-compliance, WCAG, alt text, a11y
 - web-ui-best-practices, signs of craft in web UI
-- claude-md-updater, propose scoped CLAUDE.md updates from a session
+- claude-md-updater, propose scoped project instruction updates from a session
 - context-engineering-fundamentals, preserve instructions, evidence, and state in long agent sessions
-- director, explicit top-tier direction through the lower-tier agents and models configured in CLAUDE.md
+- director, explicit top-tier direction through workers configured in project instructions
 
 ### Security
 - security-checklist, pre-deployment security audit
@@ -64,9 +64,9 @@ Personal site: https://jamditis.com
 - supply-chain-hardening, npm/bun install-time cooldown plus sandboxed pre-install scan; defends against Mini Shai-Hulud-class supply-chain worms (paired with /security-toolkit:hotpatch slash command)
 
 ### Project templates
-- project-memory, generate CLAUDE.md files for new projects
+- project-memory, generate project instruction files for new projects
 - project-retrospective, generate LESSONS.md files
-- template-selector, pick the right CLAUDE.md or LESSONS.md template
+- template-selector, pick the right project instruction or LESSONS.md template
 
 ### Documents and explainers
 - pdf-design, design and edit professional PDF reports and proposals

@@ -59,9 +59,9 @@ The report records the CLI versions, fixture digest, skill digest, model respons
 
 ## Run the full fixture set
 
-The full set starts 152 sessions.
+The full set starts 168 sessions.
 
-This count comes from 38 cases, two clients, and two variants.
+This count comes from 42 cases, two clients, and two variants.
 
 The runner requires an explicit case limit for this costly operation.
 
@@ -70,7 +70,7 @@ npm run eval:skills -- \
   --baseline /path/to/baseline \
   --candidate /path/to/candidate \
   --all \
-  --max-cases 38 \
+  --max-cases 42 \
   --runtime both \
   --output /path/to/private-results
 ```
