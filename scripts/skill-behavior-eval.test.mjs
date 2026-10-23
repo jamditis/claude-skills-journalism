@@ -26,7 +26,7 @@ import {
   prepareVariant,
   redactText,
   runCli,
-  runInvocation,
+  runInvocationAsync,
   scoreResult,
 } from './skill-behavior-eval.mjs';
 
@@ -610,15 +610,15 @@ test('redaction removes provider token formats without matching short lookalikes
   assert.equal(redacted.match(/\[REDACTED\]/gu)?.length, secrets.length);
 });
 
-test('runtime failures include safe process launch and timeout details', () => {
+test('runtime failures include safe process launch and timeout details', async () => {
   const invocation = {
     command: 'missing-client',
     args: [],
     cwd: '/tmp',
     env: {},
   };
-  assert.throws(
-    () => runInvocation(invocation, '/tmp/no-response', 'codex', () => ({
+  await assert.rejects(
+    () => runInvocationAsync(invocation, '/tmp/no-response', 'codex', () => ({
       status: null,
       signal: null,
       stderr: '',
@@ -627,8 +627,8 @@ test('runtime failures include safe process launch and timeout details', () => {
     })),
     /ENOENT: spawnSync missing-client ENOENT/u,
   );
-  assert.throws(
-    () => runInvocation(invocation, '/tmp/no-response', 'codex', () => ({
+  await assert.rejects(
+    () => runInvocationAsync(invocation, '/tmp/no-response', 'codex', () => ({
       status: null,
       signal: 'SIGTERM',
       stderr: '',
@@ -637,8 +637,8 @@ test('runtime failures include safe process launch and timeout details', () => {
     })),
     /signal SIGTERM; ETIMEDOUT: spawnSync missing-client ETIMEDOUT/u,
   );
-  assert.throws(
-    () => runInvocation(invocation, '/tmp/no-response', 'codex', () => ({
+  await assert.rejects(
+    () => runInvocationAsync(invocation, '/tmp/no-response', 'codex', () => ({
       status: null,
       signal: null,
       stderr: 'x'.repeat(3_000),
@@ -646,6 +646,31 @@ test('runtime failures include safe process launch and timeout details', () => {
       error: Object.assign(new Error('spawnSync missing-client ENOENT'), { code: 'ENOENT' }),
     })),
     /ENOENT: spawnSync missing-client ENOENT/u,
+  );
+});
+
+test('the async runner maps real exit codes, signals, missing binaries, and closes stdin', { timeout: 20000 }, async () => {
+  const node = (code) => ({ command: process.execPath, args: ['-e', code], cwd: tmpdir(), env: {} });
+  await assert.rejects(
+    () => runInvocationAsync(node("process.stderr.write('bad exit'); process.exit(3)"), '/tmp/no-response', 'codex'),
+    /failed with status 3: bad exit/u,
+  );
+  await assert.rejects(
+    () => runInvocationAsync(node("process.kill(process.pid, 'SIGTERM')"), '/tmp/no-response', 'codex'),
+    /failed with status unknown: .*signal SIGTERM/u,
+  );
+  await assert.rejects(
+    () => runInvocationAsync({ ...node(''), command: join(tmpdir(), 'no-such-client-binary') }, '/tmp/no-response', 'codex'),
+    /failed with status unknown: .*ENOENT/u,
+  );
+  // The child reads stdin to the end. If the runner leaves stdin open, the child gives up after five seconds.
+  await assert.rejects(
+    () => runInvocationAsync(
+      node("setTimeout(() => { process.stderr.write('stdin left open'); process.exit(9); }, 5000); process.stdin.resume(); process.stdin.on('end', () => { process.stderr.write('stdin closed'); process.exit(4); })"),
+      '/tmp/no-response',
+      'codex',
+    ),
+    /failed with status 4: stdin closed/u,
   );
 });
 
@@ -1061,6 +1086,8 @@ test('a competitive dry run reports missing competitors instead of failing', asy
     const report = JSON.parse(readFileSync(join(temp, 'output', 'skill-behavior-evaluation.json'), 'utf8'));
     assert.deepEqual(report.missingSkills, [{ package: 'gone-package', skill: 'gone-skill' }]);
     assert.equal(report.results.find((item) => item.case === 'gone-unrelated').status, 'missing-skill');
+    // Only web-scraping exists, so the report must not count the missing competitor as installed.
+    assert.equal(report.selection.installedSkills, 1);
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }

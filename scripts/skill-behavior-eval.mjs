@@ -525,40 +525,6 @@ export function scoreResult(fixture, response, runtimeEvidence = {}) {
   return { pass: failed.length === 0, score, failed, ...(advisory.length ? { advisory } : {}) };
 }
 
-export function runInvocation(invocation, responsePath, client, run = spawnSync) {
-  const result = run(invocation.command, invocation.args, {
-    // An empty input closes stdin so Codex exec does not wait for more prompt text.
-    input: '',
-    cwd: invocation.cwd,
-    env: { ...process.env, ...invocation.env },
-    shell: false,
-    encoding: 'utf8',
-    maxBuffer: 2 * 1024 * 1024,
-    timeout: EVALUATION_TIMEOUT_MS,
-    windowsHide: true,
-  });
-  if (result.status !== 0) {
-    const processDetails = [];
-    if (result.stderr) processDetails.push(result.stderr);
-    else if (result.stdout) processDetails.push(result.stdout);
-    if (result.signal) processDetails.push(`signal ${result.signal}`);
-    if (result.error) {
-      processDetails.push(
-        `${result.error.code ?? result.error.name}: ${result.error.message}`,
-      );
-    }
-    if (processDetails.length === 0) processDetails.push('no client output');
-    throw new Error(
-      `${invocation.command} failed with status ${result.status ?? 'unknown'}: `
-      + redactText(processDetails.join('; ')).slice(-2000),
-    );
-  }
-  return {
-    response: parseResponse(client, result.stdout, responsePath),
-    runtimeEvidence: parseRuntimeEvidence(client, result.stdout, invocation.candidateSkill),
-  };
-}
-
 function execFileResult(command, args, options) {
   return new Promise((resolveResult) => {
     const child = execFile(command, args, options, (error, stdout, stderr) => {
@@ -885,7 +851,7 @@ export async function runCli(
       maxCases: options.maxCases,
       candidateOnly: options.candidateOnly,
       competitive: options.competitive,
-      installedSkills: options.competitive ? extraSkills.length : 1,
+      installedSkills: options.competitive ? installableExtras.length : 1,
       concurrency: options.concurrency,
     },
     missingSkills,
