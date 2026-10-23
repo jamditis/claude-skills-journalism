@@ -333,8 +333,8 @@ test('runtime evidence detects candidate skill activation in both client transcr
     CLAUDE_ENVELOPES.legacy,
   ].map((event) => JSON.stringify(event)).join('\n');
   assert.deepEqual(
-    parseRuntimeEvidence('claude', claude, 'zero-build-frontend'),
-    { candidateSkillActivated: true },
+    parseRuntimeEvidence('claude', claude, 'zero-build-frontend').candidateSkillActivated,
+    true,
   );
 
   const codex = [
@@ -351,20 +351,20 @@ test('runtime evidence detects candidate skill activation in both client transcr
     { type: 'turn.completed', usage: { input_tokens: 1, output_tokens: 1 } },
   ].map((event) => JSON.stringify(event)).join('\n');
   assert.deepEqual(
-    parseRuntimeEvidence('codex', codex, 'zero-build-frontend'),
-    { candidateSkillActivated: true },
+    parseRuntimeEvidence('codex', codex, 'zero-build-frontend').candidateSkillActivated,
+    true,
   );
   assert.deepEqual(
-    parseRuntimeEvidence('codex', codex, 'source-verification'),
-    { candidateSkillActivated: false },
+    parseRuntimeEvidence('codex', codex, 'source-verification').candidateSkillActivated,
+    false,
   );
   const windowsArrayCommand = codex.replace(
     JSON.stringify("sed -n '1,220p' .agents/skills/zero-build-frontend/SKILL.md"),
     JSON.stringify(['cmd', '/c', 'type .agents\\skills\\zero-build-frontend\\SKILL.md']),
   );
   assert.deepEqual(
-    parseRuntimeEvidence('codex', windowsArrayCommand, 'zero-build-frontend'),
-    { candidateSkillActivated: true },
+    parseRuntimeEvidence('codex', windowsArrayCommand, 'zero-build-frontend').candidateSkillActivated,
+    true,
   );
   for (const command of [
     'cd .agents/skills/zero-build-frontend && cat SKILL.md',
@@ -379,8 +379,8 @@ test('runtime evidence detects candidate skill activation in both client transcr
       JSON.stringify(command),
     );
     assert.deepEqual(
-      parseRuntimeEvidence('codex', changedDirectoryCommand, 'zero-build-frontend'),
-      { candidateSkillActivated: true },
+      parseRuntimeEvidence('codex', changedDirectoryCommand, 'zero-build-frontend').candidateSkillActivated,
+      true,
     );
   }
   for (const command of [
@@ -392,8 +392,8 @@ test('runtime evidence detects candidate skill activation in both client transcr
       JSON.stringify(command),
     );
     assert.deepEqual(
-      parseRuntimeEvidence('codex', unrelatedRead, 'zero-build-frontend'),
-      { candidateSkillActivated: false },
+      parseRuntimeEvidence('codex', unrelatedRead, 'zero-build-frontend').candidateSkillActivated,
+      false,
     );
   }
   assert.throws(
@@ -694,6 +694,7 @@ test('CLI requires an explicit bounded selection and rejects unsafe overlap', ()
       candidateOnly: false,
       fixturesPath: DEFAULT_FIXTURES,
       concurrency: 1,
+      competitive: false,
     },
   );
 });
@@ -717,6 +718,7 @@ test('CLI parses and validates candidate-only, fixture, and concurrency options'
       candidateOnly: true,
       fixturesPath: '/fixtures.json',
       concurrency: 4,
+      competitive: false,
     },
   );
   for (const concurrency of ['0', '5', '1.5', 'no']) {
@@ -797,6 +799,8 @@ test('candidate-only dry-run uses the selected fixture and preserves result orde
       all: true,
       maxCases: 2,
       candidateOnly: true,
+      competitive: false,
+      installedSkills: 1,
       concurrency: 3,
     });
     assert.deepEqual(
@@ -875,4 +879,138 @@ test('selection scoring gates on decision, skill, and activation and keeps wordi
   assert.equal(result.pass, true);
   assert.deepEqual(result.advisory, ['branch', 'terms']);
   assert.equal(scoreResult(fixture, { ...response, decision: 'reject' }, { candidateSkillActivated: true }).pass, false);
+  assert.equal(scoreResult(fixture, { ...response, decision: 'ask' }, { candidateSkillActivated: true }).pass, true);
+  assert.equal(scoreResult(fixture, { ...response, decision: 'ask' }, { candidateSkillActivated: false }).pass, false);
+});
+
+test('competitive runs install every fixture skill, drop the hint, and skip named cases', async () => {
+  assert.throws(
+    () => parseCliArgs([
+      '--baseline', '/base', '--candidate', '/candidate', '--competitive',
+      '--all', '--output', '/results',
+    ]),
+    /--competitive requires --candidate-only/u,
+  );
+  const temp = mkdtempSync(join(tmpdir(), 'skill-eval-competitive-'));
+  try {
+    const fixturesPath = join(temp, 'fixtures.json');
+    const outputDir = join(temp, 'output');
+    const fixtureSet = {
+      schemaVersion: 1,
+      cases: [
+        {
+          id: 'ws-activation',
+          skill: 'web-scraping',
+          package: 'dev-toolkit',
+          category: 'activation',
+          prompt: 'Collect public agenda pages.',
+          expect: { decision: 'use', branch: 'scraping', terms: ['robots'] },
+        },
+        {
+          id: 'ws-implicit',
+          skill: 'web-scraping',
+          package: 'dev-toolkit',
+          category: 'implicit-activation',
+          prompt: 'Collect public agenda pages.',
+          expect: { decision: 'use', branch: 'scraping', terms: ['robots'] },
+        },
+        {
+          id: 've-unrelated',
+          skill: 'visual-explainer',
+          package: 'visual-explainer',
+          category: 'unrelated-non-trigger',
+          prompt: 'Copyedit one sentence.',
+          expect: { decision: 'reject', branch: 'copyediting', terms: ['copyedit'] },
+        },
+      ],
+    };
+    writeFileSync(fixturesPath, `${JSON.stringify(fixtureSet, null, 2)}\n`);
+    await runCli([
+      '--candidate-only', '--competitive', '--candidate', ROOT, '--fixtures', fixturesPath,
+      '--all', '--runtime', 'codex', '--max-cases', '2', '--output', outputDir, '--dry-run',
+    ]);
+    const report = JSON.parse(readFileSync(
+      join(outputDir, 'skill-behavior-evaluation.json'),
+      'utf8',
+    ));
+    assert.deepEqual(report.results.map((item) => item.case), ['ws-implicit', 've-unrelated']);
+    assert.equal(report.selection.competitive, true);
+    assert.equal(report.selection.installedSkills, 2);
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+
+  const runRoot = mkdtempSync(join(tmpdir(), 'skill-eval-competitive-prepare-'));
+  try {
+    const prepared = prepareVariant({
+      client: 'codex',
+      sourceRoot: ROOT,
+      runRoot,
+      packageName: 'dev-toolkit',
+      skillName: 'web-scraping',
+      authSourceHome: runRoot,
+      extraSkills: [
+        { package: 'dev-toolkit', skill: 'web-scraping' },
+        { package: 'visual-explainer', skill: 'visual-explainer' },
+      ],
+    });
+    assert.deepEqual(
+      readdirSync(join(prepared.projectDir, '.agents', 'skills')).sort(),
+      ['visual-explainer', 'web-scraping'],
+    );
+    const fixture = {
+      id: 'ws-implicit',
+      skill: 'web-scraping',
+      category: 'implicit-activation',
+      prompt: 'Collect public agenda pages.',
+    };
+    const prompt = buildInvocation('codex', fixture, prepared, {}, true).args.at(-1);
+    assert.doesNotMatch(prompt, /candidate|single/iu);
+    assert.doesNotMatch(prompt, /web-scraping/u);
+  } finally {
+    rmSync(runRoot, { recursive: true, force: true });
+  }
+});
+
+test('selection-scored unrelated cases gate only on leaving the candidate alone', () => {
+  const fixture = {
+    id: 've-unrelated',
+    skill: 'visual-explainer',
+    package: 'visual-explainer',
+    category: 'unrelated-non-trigger',
+    scoring: 'selection',
+    prompt: 'Copyedit one sentence.',
+    expect: { decision: 'reject', branch: 'copyediting', terms: ['copyedit'] },
+  };
+  const otherSkill = { decision: 'use', skill: 'newsroom-style', branch: 'copyediting' };
+  const evidence = { candidateSkillActivated: false, activatedSkills: ['newsroom-style'] };
+  assert.equal(scoreResult(fixture, otherSkill, evidence).pass, true);
+  assert.equal(scoreResult({ ...fixture, scoring: undefined }, otherSkill, evidence).pass, false);
+  assert.equal(
+    scoreResult(fixture, { ...otherSkill, skill: null }, { candidateSkillActivated: true }).pass,
+    false,
+  );
+  assert.equal(
+    scoreResult(fixture, { ...otherSkill, skill: 'visual-explainer' }, evidence).pass,
+    false,
+  );
+});
+
+test('runtime evidence lists every skill a Codex session read', () => {
+  const codex = [
+    {
+      type: 'item.completed',
+      item: {
+        type: 'command_execution',
+        command: 'cat .agents/skills/web-scraping/SKILL.md .agents/skills/web-archiving/SKILL.md',
+        status: 'completed',
+        exit_code: 0,
+      },
+    },
+    { type: 'turn.completed', usage: { input_tokens: 1, output_tokens: 1 } },
+  ].map((event) => JSON.stringify(event)).join('\n');
+  assert.deepEqual(
+    parseRuntimeEvidence('codex', codex, 'web-scraping').activatedSkills,
+    ['web-archiving', 'web-scraping'],
+  );
 });

@@ -25,14 +25,31 @@ Each skill has up to three cases. They prove different things:
 | Category | Prompt | A pass shows |
 |---|---|---|
 | `activation` | Names the skill (`/skill-evaluation:<skill>` in Claude Code, `$<skill>` in Codex) | The skill loads and gives a correct answer when a user asks for it by name |
-| `implicit-activation` | The same request without the skill name | The client selects the skill on its own from an ordinary request |
+| `implicit-activation` | The same request without the skill name | The client accepts the skill when it is the only one installed |
 | `unrelated-non-trigger` | An unrelated request | The client leaves the skill alone |
+
+The default run installs one candidate skill and tells the client that a
+single candidate is installed. That is easier than real use. A pass there
+does not show that the client finds the skill among many.
+
+## Competitive selection
+
+Add `--competitive` to install every skill in the fixture set for each case
+and to remove the single-candidate hint. The run skips named `activation`
+cases, because naming a skill bypasses selection. The report records each
+skill the client loaded in `runtimeEvidence.activatedSkills`.
+
+A competitive `implicit-activation` pass shows that the client picked and
+loaded the right skill from the full set. A competitive
+`unrelated-non-trigger` pass shows that the client left the candidate alone;
+another installed skill may still apply.
 
 `director` has no implicit case. It is explicit-only by design and must not
 activate unprompted.
 
 Report the categories separately. A skill that passes only `activation` is
-tested when invoked by name, not for automatic selection. A dry
+tested when invoked by name, not for automatic selection. Claim automatic
+selection only from a competitive pass. A dry
 run marks a missing skill as `missing-skill` and lists it in `missingSkills`
 instead of stopping.
 
@@ -46,6 +63,19 @@ The fixture set uses `selection` scoring. A case passes on the decision, the
 named skill, and, for implicit and unrelated cases, runtime activation
 evidence. Branch wording and expected terms are reported as `advisory`; they
 were not calibrated against real client output.
+
+Two decision rules apply under selection scoring:
+
+- When the fixture expects `use`, `ask` also passes if the response names the
+  candidate skill. Picking the right skill and then asking for missing input
+  is a correct selection.
+- An unrelated case gates only on the candidate staying unused: the response
+  must not name it, and the client must not load it. The decision word is
+  advisory, because a neighboring skill or a request for input can be the
+  right answer.
+
+A pass shows that the client selected and loaded the skill. It does not grade
+the answer itself.
 
 ## Run location
 
