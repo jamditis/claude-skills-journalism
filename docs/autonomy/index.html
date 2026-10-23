@@ -439,7 +439,7 @@
           <li><b>Every repo has a pinned ledger issue.</b> One issue per repo says what's running, what's on hold, and who's working on what. Agents read it before they touch anything and add a line while they work.</li>
           <li><b>Copilot and Gemini are out.</b> Codex and Claude cover writing and review between them.</li>
         </ul>
-        <p>The rest of this page is the May write-up with those corrections folded in. The persistent setup is in the kit as an advanced option.</p>
+        <p>The rest of this page is the May write-up of the starter loop: a fresh session for each wake, ended by a hard timeout. That is still where I would start. The persistent setup is in the kit as an advanced option, and it does not use the timeout.</p>
       </div>
       <p class="hero__note">Not a developer? <a href="#primer">Start with the plain-language key below</a> &mdash; it defines every term the page leans on. None of this is as complicated as the words make it sound.</p>
     </header>
@@ -574,8 +574,8 @@ flowchart TD
     </div>
 
     <div class="callout callout--warn">
-      <div class="callout__title">Always wrap the session in timeout --foreground</div>
-      <p>Wrap the session in <code>timeout --foreground</code>. Plain <code>timeout</code> starts a new process group and kills the Node tree before it produces output &mdash; you get zero-byte result files and silent multi-day outages that look like nothing ran. The idle-killer also watches CPU time in the process subtree, so long, quiet tool phases (a slow API call, a browser run) don't trip a false "this session is stuck."</p>
+      <div class="callout__title">In the starter loop, always wrap the session in timeout --foreground</div>
+      <p>In the fresh-session loop, wrap the session in <code>timeout --foreground</code>. (A persistent attendant has no time limit; the kit describes how it fails a wake instead.) Plain <code>timeout</code> starts a new process group and kills the Node tree before it produces output &mdash; you get zero-byte result files and silent multi-day outages that look like nothing ran. The idle-killer also watches CPU time in the process subtree, so long, quiet tool phases (a slow API call, a browser run) don't trip a false "this session is stuck."</p>
     </div>
 
     <!-- ============ S3 ============ -->
