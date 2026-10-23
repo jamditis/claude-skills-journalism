@@ -71,7 +71,7 @@ claude-skills-journalism/
 │       ├── source-verification/        # SIFT method, verification, deepfakes/C2PA
 │       └── story-pitch/                # Pitch templates
 │
-├── # Plugin: research-toolkit (6 skills, v1.1.3), registered in marketplace.json
+├── # Plugin: research-toolkit (6 skills, v1.1.4), registered in marketplace.json
 ├── research-toolkit/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -125,7 +125,7 @@ claude-skills-journalism/
 │       ├── video-frames/        # Frame extraction and vision analysis
 │       └── video-transcribe/    # Reproducible Whisper transcription
 │
-├── # Plugin: web-design-picker (1 skill, v1.0.0), registered in marketplace.json
+├── # Plugin: web-design-picker (1 skill, v1.0.1), registered in marketplace.json
 ├── web-design-picker/           # Website directions, review picker, asset handoff
 │   ├── .claude-plugin/plugin.json
 │   ├── agents/openai.yaml
@@ -173,7 +173,7 @@ claude-skills-journalism/
 │   ├── templates/              # Lesson and archive templates
 │   └── tests/
 │
-├── # Plugin: pdf-playground (8 commands, v1.3.6), registered in marketplace.json
+├── # Plugin: pdf-playground (8 commands, v1.3.7), registered in marketplace.json
 ├── pdf-playground/              # Interactive proposal/report/slide builder with live control panel
 │   ├── .claude-plugin/plugin.json
 │   ├── brands/                  # Brand presets
@@ -183,7 +183,7 @@ claude-skills-journalism/
 │   ├── templates/               # Document templates
 │   └── skills/                  # document-design/ + playground.md (user-invocable entry skill)
 │
-└── # Plugin: superjawn (13 skills, v2.0.0), registered in marketplace.json
+└── # Plugin: superjawn (13 skills, v2.0.1), registered in marketplace.json
     ├── # Research-augmented fork of obra/superpowers; standalone, no upstream dependency
     ├── .claude-plugin/plugin.json
     ├── README.md
@@ -201,6 +201,22 @@ claude-skills-journalism/
         ├── verification-before-completion/ # Confirm work is complete before committing
         ├── writing-plans/                 # Multi-step planning before touching code
         └── writing-skills/                # Research phase: creating or editing skills
+```
+
+## Validation
+
+Run these before a commit that changes skills, docs, or catalogs:
+
+```bash
+npm test
+npm run validate:catalog
+npm run validate:agent-skills
+npm run build:docs-css && npm run check:docs-css
+node scripts/updated-stamp.mjs --check
+python3 -m pytest hooks/tests -q
+python3 -m pytest okf-wiki/tests -q
+(cd okf-wiki/example && python3 ../scripts/validate.py)
+npm run a11y
 ```
 
 ## Skill format

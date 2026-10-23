@@ -78,7 +78,11 @@ test('the compatibility matrix classifies every marketplace package', () => {
     matrix,
     /`okf-wiki` \| 0\.8\.4; one root skill; scripts and generated Claude settings \| Pre-set portable runtime pilot passed; optional Claude-output adapter remains/u,
   );
-  assert.match(matrix, /client-neutral general instructions/u);
+  assert.match(
+    matrix,
+    /Exclude the general onboarding question flow and skill-root resolution; no Codex run has exercised them/u,
+  );
+  assert.match(matrix, /Port and test general onboarding and skill-root resolution/u);
   assert.match(matrix, /scripts\/okf-wiki-runtime-pilot\.mjs/u);
   assert.match(matrix, /scripts\/visual-explainer-runtime-pilot\.mjs/u);
   assert.match(matrix, /2026-07-23-document-design-lock-migration\.md/u);
