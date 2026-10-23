@@ -462,6 +462,31 @@
       }
     }
   },
+  "goal-progress-bar/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#d97706",
+          "accentDark": "#b45309",
+          "accentDeep": "#92400e"
+        }
+      }
+    }
+  },
   "index.html": {
     "theme": {
       "extend": {
@@ -797,6 +822,30 @@
       }
     }
   },
+  "ponytail-dev/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#4338ca",
+          "accentDark": "#312e81"
+        }
+      }
+    }
+  },
   "project-memory/index.html": {
     "theme": {
       "extend": {
@@ -986,6 +1035,30 @@
           "mist": "#c4bfb4",
           "accent": "#0d9488",
           "accentDark": "#0f766e"
+        }
+      }
+    }
+  },
+  "surface-completeness/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#4338ca",
+          "accentDark": "#312e81"
         }
       }
     }
