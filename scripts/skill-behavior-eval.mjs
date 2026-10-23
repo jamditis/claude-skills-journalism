@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { spawnSync } from 'node:child_process';
+import { execFile, spawnSync } from 'node:child_process';
 import {
   cpSync,
   existsSync,
@@ -24,6 +24,17 @@ export const DEFAULT_FIXTURES = resolve(
   'fixtures',
   'lean-skill-evaluations.json',
 );
+const FIXTURE_CATEGORIES = new Set([
+  'activation',
+  'near-neighbor-rejection',
+  'branch-selection',
+  'safety-invariant',
+  'incomplete-input',
+  'authority-boundary',
+  'output-artifact',
+  'unrelated-non-trigger',
+  'implicit-activation',
+]);
 
 const RESPONSE_SCHEMA = Object.freeze({
   type: 'object',
@@ -107,14 +118,29 @@ export function loadFixtureSet(path = DEFAULT_FIXTURES) {
   for (const fixture of parsed.cases) {
     if (ids.has(fixture.id)) throw new Error(`Duplicate fixture id: ${fixture.id}`);
     ids.add(fixture.id);
-    if (!['dev-toolkit', 'journalism-core'].includes(fixture.package)) {
-      throw new Error(`Unsupported fixture package: ${fixture.package}`);
+    if (!/^[a-z0-9-]+$/u.test(fixture.package)) {
+      throw new Error(`Invalid fixture package: ${fixture.package}`);
+    }
+    if (!/^[a-z0-9-]+$/u.test(fixture.skill)) {
+      throw new Error(`Invalid fixture skill: ${fixture.skill}`);
+    }
+    if (!FIXTURE_CATEGORIES.has(fixture.category)) {
+      throw new Error(`Invalid category for fixture: ${fixture.id}`);
     }
     if (!['use', 'reject', 'ask', 'stop'].includes(fixture.expect?.decision)) {
       throw new Error(`Invalid decision for fixture: ${fixture.id}`);
     }
   }
   return parsed;
+}
+
+function skillSource(sourceRoot, packageName, skillName) {
+  const packageRoot = resolve(sourceRoot, packageName);
+  assertContained(sourceRoot, packageRoot, 'Skill package');
+  const nested = join(packageRoot, 'skills', skillName);
+  if (existsSync(join(nested, 'SKILL.md'))) return nested;
+  if (packageName === skillName && existsSync(join(packageRoot, 'SKILL.md'))) return packageRoot;
+  return nested;
 }
 
 export function prepareVariant({
@@ -125,7 +151,7 @@ export function prepareVariant({
   skillName,
   authSourceHome,
 }) {
-  const source = resolve(sourceRoot, packageName, 'skills', skillName);
+  const source = skillSource(sourceRoot, packageName, skillName);
   assertContained(sourceRoot, source, 'Skill source');
   assertRegularTree(source, 'skill source');
 
@@ -188,16 +214,26 @@ function isUnrelatedNonTrigger(fixture) {
   return fixture.category === 'unrelated-non-trigger';
 }
 
+// Implicit activation sends the activation prompt without naming the skill, so a
+// pass shows the client selected the skill on its own.
+function isImplicitActivation(fixture) {
+  return fixture.category === 'implicit-activation';
+}
+
+function usesImplicitRouting(fixture) {
+  return isUnrelatedNonTrigger(fixture) || isImplicitActivation(fixture);
+}
+
 function evaluationPrompt(client, fixture) {
   const prefix = client === 'claude'
     ? `/skill-evaluation:${fixture.skill}`
     : `$${fixture.skill}`;
-  const routing = isUnrelatedNonTrigger(fixture)
+  const routing = usesImplicitRouting(fixture)
     ? 'A single candidate skill is installed. Decide whether that candidate skill applies. '
       + 'Do not activate it merely because it is installed. If you reject it, set skill to null or name '
       + 'a neighboring skill; never name the rejected candidate skill. '
     : `${prefix}\n\nEvaluate the request with the installed skill. `;
-  const toolRule = isUnrelatedNonTrigger(fixture)
+  const toolRule = usesImplicitRouting(fixture)
     ? "Use only the runtime's skill mechanism. Do not use any other tools. "
     : 'Do not use tools. ';
   return routing
@@ -216,10 +252,10 @@ export function buildInvocation(client, fixture, prepared, env = process.env) {
     const modelArgs = env.SKILL_EVAL_CLAUDE_MODEL
       ? ['--model', env.SKILL_EVAL_CLAUDE_MODEL]
       : [];
-    const outputArgs = isUnrelatedNonTrigger(fixture)
+    const outputArgs = usesImplicitRouting(fixture)
       ? ['--output-format', 'stream-json', '--verbose']
       : ['--output-format', 'json'];
-    const toolArgs = isUnrelatedNonTrigger(fixture)
+    const toolArgs = usesImplicitRouting(fixture)
       ? ['--tools', 'Skill', '--allowedTools', 'Skill']
       : ['--tools', ''];
     return {
@@ -430,6 +466,9 @@ export function scoreResult(fixture, response, runtimeEvidence = {}) {
   if (isUnrelatedNonTrigger(fixture) && runtimeEvidence.candidateSkillActivated !== false) {
     failed.push('activation');
   }
+  if (isImplicitActivation(fixture) && runtimeEvidence.candidateSkillActivated !== true) {
+    failed.push('activation');
+  }
   const score = Object.values(checks).filter(Boolean).length;
   return { pass: failed.length === 0, score, failed };
 }
@@ -466,15 +505,70 @@ export function runInvocation(invocation, responsePath, client, run = spawnSync)
   };
 }
 
+function execFileResult(command, args, options) {
+  return new Promise((resolveResult) => {
+    execFile(command, args, options, (error, stdout, stderr) => {
+      resolveResult({
+        status: error && Number.isInteger(error.code) ? error.code : (error ? null : 0),
+        signal: error?.signal ?? null,
+        error,
+        stdout,
+        stderr,
+      });
+    });
+  });
+}
+
+export async function runInvocationAsync(
+  invocation,
+  responsePath,
+  client,
+  run = execFileResult,
+) {
+  const result = await run(invocation.command, invocation.args, {
+    cwd: invocation.cwd,
+    env: { ...process.env, ...invocation.env },
+    shell: false,
+    encoding: 'utf8',
+    maxBuffer: 2 * 1024 * 1024,
+    timeout: EVALUATION_TIMEOUT_MS,
+    windowsHide: true,
+  });
+  if (result.status !== 0) {
+    const processDetails = [];
+    if (result.stderr) processDetails.push(result.stderr);
+    else if (result.stdout) processDetails.push(result.stdout);
+    if (result.signal) processDetails.push(`signal ${result.signal}`);
+    if (result.error) {
+      processDetails.push(
+        `${result.error.code ?? result.error.name}: ${result.error.message}`,
+      );
+    }
+    if (processDetails.length === 0) processDetails.push('no client output');
+    throw new Error(
+      `${invocation.command} failed with status ${result.status ?? 'unknown'}: `
+      + redactText(processDetails.join('; ')).slice(-2000),
+    );
+  }
+  return {
+    response: parseResponse(client, result.stdout, responsePath),
+    runtimeEvidence: parseRuntimeEvidence(client, result.stdout, invocation.candidateSkill),
+  };
+}
+
 function resolveCases(options, fixtureSet) {
   if (options.caseId) {
     const fixture = fixtureSet.cases.find((item) => item.id === options.caseId);
     if (!fixture) throw new Error(`Unknown evaluation case: ${options.caseId}`);
     return [fixture];
   }
-  if (fixtureSet.cases.length > options.maxCases) {
+  const boundedCount = options.candidateOnly
+    ? new Set(fixtureSet.cases.map((fixture) => fixture.skill)).size
+    : fixtureSet.cases.length;
+  if (boundedCount > options.maxCases) {
     throw new Error(
-      `The full set has ${fixtureSet.cases.length} cases. Increase --max-cases to at least that value.`,
+      `The full set has ${boundedCount} ${options.candidateOnly ? 'skills' : 'cases'}. `
+      + 'Increase --max-cases to at least that value.',
     );
   }
   return fixtureSet.cases;
@@ -490,6 +584,9 @@ export function parseCliArgs(args) {
     outputDir: undefined,
     dryRun: false,
     maxCases: 1,
+    candidateOnly: false,
+    fixturesPath: DEFAULT_FIXTURES,
+    concurrency: 1,
   };
   for (let index = 0; index < args.length; index += 1) {
     const option = args[index];
@@ -504,19 +601,28 @@ export function parseCliArgs(args) {
     else if (option === '--case') options.caseId = takeValue();
     else if (option === '--runtime') options.runtime = takeValue();
     else if (option === '--output') options.outputDir = takeValue();
-    else if (option === '--max-cases') options.maxCases = Number.parseInt(takeValue(), 10);
+    else if (option === '--fixtures') options.fixturesPath = takeValue();
+    else if (option === '--max-cases') options.maxCases = Number(takeValue());
+    else if (option === '--concurrency') options.concurrency = Number(takeValue());
     else if (option === '--all') options.all = true;
     else if (option === '--dry-run') options.dryRun = true;
+    else if (option === '--candidate-only') options.candidateOnly = true;
     else throw new Error(`Unsupported option: ${option}`);
   }
-  if (!options.baselineRoot || !options.candidateRoot || !options.outputDir) {
-    throw new Error('--baseline, --candidate, and --output are required');
+  if (!options.candidateRoot || !options.outputDir) {
+    throw new Error('--candidate and --output are required');
+  }
+  if (!options.candidateOnly && !options.baselineRoot) {
+    throw new Error('--baseline is required unless --candidate-only is used');
+  }
+  if (options.candidateOnly && options.baselineRoot) {
+    throw new Error('--baseline cannot be used with --candidate-only');
   }
   if (!options.caseId && !options.all) {
     throw new Error('Select one case with --case or explicitly use --all');
   }
   if (options.caseId && options.all) throw new Error('Use --case or --all, not both');
-  if (resolve(options.baselineRoot) === resolve(options.candidateRoot)) {
+  if (!options.candidateOnly && resolve(options.baselineRoot) === resolve(options.candidateRoot)) {
     throw new Error('Baseline and candidate roots must be different');
   }
   if (!['claude', 'codex', 'both'].includes(options.runtime)) {
@@ -524,6 +630,11 @@ export function parseCliArgs(args) {
   }
   if (!Number.isSafeInteger(options.maxCases) || options.maxCases < 1 || options.maxCases > 100) {
     throw new Error('--max-cases must be an integer from 1 through 100');
+  }
+  if (!Number.isSafeInteger(options.concurrency)
+    || options.concurrency < 1
+    || options.concurrency > 4) {
+    throw new Error('--concurrency must be an integer from 1 through 4');
   }
   return options;
 }
@@ -537,9 +648,28 @@ function commandVersion(command) {
   return result.status === 0 ? redactText(result.stdout.trim()) : 'unavailable';
 }
 
-export function runCli(args = process.argv.slice(2), { run = spawnSync } = {}) {
+async function mapConcurrent(items, concurrency, callback) {
+  const results = new Array(items.length);
+  let nextIndex = 0;
+  const worker = async () => {
+    while (nextIndex < items.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      results[index] = await callback(items[index]);
+    }
+  };
+  await Promise.all(
+    Array.from({ length: Math.min(concurrency, items.length) }, () => worker()),
+  );
+  return results;
+}
+
+export async function runCli(
+  args = process.argv.slice(2),
+  { runInvocation: invoke = runInvocationAsync } = {},
+) {
   const options = parseCliArgs(args);
-  const fixtureSet = loadFixtureSet();
+  const fixtureSet = loadFixtureSet(options.fixturesPath);
   const fixtures = resolveCases(options, fixtureSet);
   const clients = options.runtime === 'both' ? ['claude', 'codex'] : [options.runtime];
   const outputDir = resolve(options.outputDir);
@@ -555,67 +685,108 @@ export function runCli(args = process.argv.slice(2), { run = spawnSync } = {}) {
     throw new Error(`Report already exists: ${reportPath}`);
   }
 
-  const results = [];
-  for (const fixture of fixtures) {
-    for (const client of clients) {
-      for (const [variant, sourceRoot] of [
-        ['baseline', options.baselineRoot],
-        ['candidate', options.candidateRoot],
-      ]) {
-        const runRoot = mkdtempSync(join(tmpdir(), `skill-eval-${client}-${variant}-`));
-        try {
-          const prepared = prepareVariant({
-            client,
-            sourceRoot,
-            runRoot,
-            packageName: fixture.package,
-            skillName: fixture.skill,
-            authSourceHome: client === 'codex'
-              ? (process.env.CODEX_HOME ?? join(homedir(), '.codex'))
-              : (process.env.CLAUDE_CONFIG_DIR ?? join(homedir(), '.claude')),
-          });
-          const invocation = buildInvocation(client, fixture, prepared);
-          if (options.dryRun) {
-            results.push({
-              case: fixture.id,
-              client,
-              variant,
-              skillDigest: prepared.skillDigest,
-              command: invocation.command,
-              args: invocation.args.map((arg) => arg === evaluationPrompt(client, fixture) ? '[PROMPT]' : arg),
-            });
-          } else {
-            const { response, runtimeEvidence } = runInvocation(
-              invocation,
-              prepared.responsePath,
-              client,
-              run,
-            );
-            results.push({
-              case: fixture.id,
-              category: fixture.category,
-              skill: fixture.skill,
-              client,
-              variant,
-              skillDigest: prepared.skillDigest,
-              response,
-              runtimeEvidence,
-              result: scoreResult(fixture, response, runtimeEvidence),
-            });
-          }
-        } finally {
-          rmSync(runRoot, { recursive: true, force: true });
-        }
-      }
+  const variants = options.candidateOnly
+    ? [['candidate', options.candidateRoot]]
+    : [['baseline', options.baselineRoot], ['candidate', options.candidateRoot]];
+  const jobs = fixtures.flatMap((fixture) => clients.flatMap((client) => variants.map(
+    ([variant, sourceRoot]) => ({ fixture, client, variant, sourceRoot }),
+  )));
+  const missingSkillsByKey = new Map();
+  for (const job of jobs) {
+    const source = skillSource(job.sourceRoot, job.fixture.package, job.fixture.skill);
+    if (!existsSync(join(source, 'SKILL.md'))) {
+      const key = `${job.fixture.package}\0${job.fixture.skill}`;
+      missingSkillsByKey.set(key, {
+        package: job.fixture.package,
+        skill: job.fixture.skill,
+      });
     }
   }
+  const missingSkills = [...missingSkillsByKey.values()];
+  if (!options.dryRun && missingSkills.length > 0) {
+    throw new Error(
+      `Missing skill source${missingSkills.length === 1 ? '' : 's'}: `
+      + missingSkills.map((item) => `${item.package}/${item.skill}`).join(', '),
+    );
+  }
+
+  const results = await mapConcurrent(jobs, options.concurrency, async (job) => {
+    const { fixture, client, variant, sourceRoot } = job;
+    const source = skillSource(sourceRoot, fixture.package, fixture.skill);
+    if (!existsSync(join(source, 'SKILL.md'))) {
+      return {
+        case: fixture.id,
+        category: fixture.category,
+        skill: fixture.skill,
+        package: fixture.package,
+        client,
+        variant,
+        status: 'missing-skill',
+        reason: `Skill is absent from the ${variant} tree`,
+      };
+    }
+
+    const runRoot = mkdtempSync(join(tmpdir(), `skill-eval-${client}-${variant}-`));
+    try {
+      const prepared = prepareVariant({
+        client,
+        sourceRoot,
+        runRoot,
+        packageName: fixture.package,
+        skillName: fixture.skill,
+        authSourceHome: client === 'codex'
+          ? (process.env.CODEX_HOME ?? join(homedir(), '.codex'))
+          : (process.env.CLAUDE_CONFIG_DIR ?? join(homedir(), '.claude')),
+      });
+      const invocation = buildInvocation(client, fixture, prepared);
+      if (options.dryRun) {
+        return {
+          case: fixture.id,
+          client,
+          variant,
+          skillDigest: prepared.skillDigest,
+          command: invocation.command,
+          args: invocation.args.map(
+            (arg) => arg === evaluationPrompt(client, fixture) ? '[PROMPT]' : arg,
+          ),
+        };
+      }
+      const { response, runtimeEvidence } = await invoke(
+        invocation,
+        prepared.responsePath,
+        client,
+      );
+      return {
+        case: fixture.id,
+        category: fixture.category,
+        skill: fixture.skill,
+        client,
+        variant,
+        skillDigest: prepared.skillDigest,
+        response,
+        runtimeEvidence,
+        result: scoreResult(fixture, response, runtimeEvidence),
+      };
+    } finally {
+      rmSync(runRoot, { recursive: true, force: true });
+    }
+  });
 
   const report = {
     schemaVersion: 1,
     generatedAt: new Date().toISOString(),
-    fixtureDigest: createHash('sha256').update(readFileSync(DEFAULT_FIXTURES)).digest('hex'),
+    fixtureDigest: createHash('sha256')
+      .update(readFileSync(options.fixturesPath))
+      .digest('hex'),
     clients: Object.fromEntries(clients.map((client) => [client, commandVersion(client)])),
-    selection: { caseId: options.caseId ?? null, all: options.all, maxCases: options.maxCases },
+    selection: {
+      caseId: options.caseId ?? null,
+      all: options.all,
+      maxCases: options.maxCases,
+      candidateOnly: options.candidateOnly,
+      concurrency: options.concurrency,
+    },
+    missingSkills,
     results,
   };
   writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, {
@@ -628,10 +799,8 @@ export function runCli(args = process.argv.slice(2), { run = spawnSync } = {}) {
 
 const entryPoint = process.argv[1] ? pathToFileURL(resolve(process.argv[1])).href : '';
 if (entryPoint === import.meta.url) {
-  try {
-    runCli();
-  } catch (error) {
+  runCli().catch((error) => {
     console.error(redactText(error.message));
     process.exitCode = 1;
-  }
+  });
 }

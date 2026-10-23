@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import {
   existsSync,
   mkdtempSync,
@@ -12,8 +13,10 @@ import {
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import test from 'node:test';
+import { parse as parseYaml } from 'yaml';
 
 import {
+  DEFAULT_FIXTURES,
   EVALUATION_TIMEOUT_MS,
   buildInvocation,
   loadFixtureSet,
@@ -29,10 +32,13 @@ import {
 
 const ROOT = resolve(import.meta.dirname, '..');
 const FIXTURES = join(ROOT, 'scripts', 'fixtures', 'lean-skill-evaluations.json');
+const COMPAT_FIXTURES = join(ROOT, 'scripts', 'fixtures', 'compat-smoke.json');
 const CLAUDE_ENVELOPES = JSON.parse(readFileSync(
   join(ROOT, 'scripts', 'fixtures', 'claude-output-envelopes.json'),
   'utf8',
 ));
+
+const EXPLICIT_ONLY_SKILLS = new Set(['director']);
 
 test('fixture set covers every required category for each pilot skill', () => {
   const fixtureSet = loadFixtureSet(FIXTURES);
@@ -52,6 +58,76 @@ test('fixture set covers every required category for each pilot skill', () => {
     for (const category of required) {
       assert.ok(categories.has(category), `${skill} needs a ${category} fixture`);
     }
+  }
+});
+
+test('compatibility smoke fixtures cover the catalog and refresh skills exactly twice', () => {
+  const fixtureSet = loadFixtureSet(COMPAT_FIXTURES);
+  const catalog = parseYaml(readFileSync(join(ROOT, 'skills-catalog.yaml'), 'utf8'));
+  // These skills come from the refresh layers and are not present on this branch yet.
+  const refreshSkills = new Map([
+    ['ponytail-dev', 'dev-toolkit'],
+    ['surface-completeness', 'dev-toolkit'],
+    ['goal-progress-bar', 'project-templates-toolkit'],
+    ['unattended-agent-runs', 'newsroom-agent-ops'],
+    ['scheduled-briefing', 'newsroom-agent-ops'],
+    ['deadline-and-reply-tracking', 'newsroom-agent-ops'],
+    ['email-request-intake', 'newsroom-agent-ops'],
+    ['document-delivery', 'newsroom-agent-ops'],
+    ['chat-mention-triage', 'newsroom-agent-ops'],
+    ['record-reconciliation', 'newsroom-agent-ops'],
+    ['multi-agent-coordinator', 'newsroom-agent-ops'],
+    ['issue-pool-progression', 'newsroom-agent-ops'],
+    ['meeting-transcript-actions', 'journalism-core'],
+  ]);
+  const expectedPackages = new Map(catalog.skills.map((skill) => [skill.name, skill.package]));
+  for (const [skill, packageName] of refreshSkills) expectedPackages.set(skill, packageName);
+
+  const ids = new Set();
+  const casesBySkill = new Map();
+  for (const fixture of fixtureSet.cases) {
+    assert.ok(!ids.has(fixture.id), `duplicate fixture id: ${fixture.id}`);
+    ids.add(fixture.id);
+    assert.ok(
+      ['activation', 'implicit-activation', 'unrelated-non-trigger'].includes(fixture.category),
+      `${fixture.id} has an unknown category`,
+    );
+    assert.equal(fixture.package, expectedPackages.get(fixture.skill), fixture.id);
+    assert.ok(
+      fixture.expect.terms.length >= 1 && fixture.expect.terms.length <= 3,
+      `${fixture.id} needs one to three expected terms`,
+    );
+    for (const term of fixture.expect.terms) {
+      assert.equal(typeof term, 'string', `${fixture.id} terms must be strings`);
+      assert.ok(term.trim().split(/\s+/u).length <= 3, `${fixture.id} term is too long`);
+    }
+    const cases = casesBySkill.get(fixture.skill) ?? [];
+    cases.push(fixture);
+    casesBySkill.set(fixture.skill, cases);
+  }
+
+  assert.deepEqual(
+    [...casesBySkill.keys()].sort(),
+    [...expectedPackages.keys()].sort(),
+  );
+  for (const [skill, cases] of casesBySkill) {
+    // Explicit-only skills have no implicit case: they must not activate unprompted.
+    const expected = EXPLICIT_ONLY_SKILLS.has(skill)
+      ? ['activation', 'unrelated-non-trigger']
+      : ['activation', 'implicit-activation', 'unrelated-non-trigger'];
+    assert.deepEqual(cases.map((fixture) => fixture.category).sort(), expected, skill);
+    const implicit = cases.find((fixture) => fixture.category === 'implicit-activation');
+    if (implicit) {
+      const activation = cases.find((fixture) => fixture.category === 'activation');
+      assert.equal(implicit.prompt, activation.prompt, `${skill} implicit prompt must match activation`);
+      assert.equal(implicit.expect.decision, 'use');
+      assert.doesNotMatch(implicit.prompt.replaceAll('-', ' '), new RegExp(skill.replaceAll('-', ' '), 'iu'));
+    }
+    assert.equal(cases.find((fixture) => fixture.category === 'activation').expect.decision, 'use');
+    assert.equal(
+      cases.find((fixture) => fixture.category === 'unrelated-non-trigger').expect.decision,
+      'reject',
+    );
   }
 });
 
@@ -94,6 +170,37 @@ test('variant preparation copies only the selected regular skill tree', () => {
     });
     assert.equal(invocation.args.includes('--enable'), false);
     assert.equal(invocation.args.includes('skip_host_skill_discovery'), false);
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test('variant preparation supports root-level skill packages', () => {
+  const temp = mkdtempSync(join(tmpdir(), 'skill-eval-root-test-'));
+  try {
+    const source = join(temp, 'source');
+    const authHome = join(temp, 'codex-auth');
+    mkdirSync(authHome);
+    mkdirSync(join(source, 'visual-explainer'), { recursive: true });
+    writeFileSync(
+      join(source, 'visual-explainer', 'SKILL.md'),
+      '---\nname: visual-explainer\ndescription: test\n---\n',
+    );
+    const prepared = prepareVariant({
+      client: 'codex',
+      sourceRoot: source,
+      runRoot: join(temp, 'run'),
+      packageName: 'visual-explainer',
+      skillName: 'visual-explainer',
+      authSourceHome: authHome,
+    });
+    assert.equal(
+      readFileSync(
+        join(prepared.projectDir, '.agents', 'skills', 'visual-explainer', 'SKILL.md'),
+        'utf8',
+      ),
+      '---\nname: visual-explainer\ndescription: test\n---\n',
+    );
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }
@@ -584,25 +691,145 @@ test('CLI requires an explicit bounded selection and rejects unsafe overlap', ()
       outputDir: '/results',
       dryRun: true,
       maxCases: 1,
+      candidateOnly: false,
+      fixturesPath: DEFAULT_FIXTURES,
+      concurrency: 1,
     },
   );
 });
 
-test('CLI rejects an existing report before any client invocation', () => {
+test('CLI parses and validates candidate-only, fixture, and concurrency options', () => {
+  assert.deepEqual(
+    parseCliArgs([
+      '--candidate-only', '--candidate', '/candidate', '--fixtures', '/fixtures.json',
+      '--all', '--runtime', 'both', '--max-cases', '100', '--concurrency', '4',
+      '--output', '/results', '--dry-run',
+    ]),
+    {
+      baselineRoot: undefined,
+      candidateRoot: '/candidate',
+      caseId: undefined,
+      all: true,
+      runtime: 'both',
+      outputDir: '/results',
+      dryRun: true,
+      maxCases: 100,
+      candidateOnly: true,
+      fixturesPath: '/fixtures.json',
+      concurrency: 4,
+    },
+  );
+  for (const concurrency of ['0', '5', '1.5', 'no']) {
+    assert.throws(
+      () => parseCliArgs([
+        '--candidate-only', '--candidate', '/candidate', '--case', 'one',
+        '--concurrency', concurrency, '--output', '/results',
+      ]),
+      /--concurrency must be an integer from 1 through 4/u,
+    );
+  }
+  assert.throws(
+    () => parseCliArgs([
+      '--candidate-only', '--baseline', '/base', '--candidate', '/candidate',
+      '--case', 'one', '--output', '/results',
+    ]),
+    /--baseline cannot be used with --candidate-only/u,
+  );
+  assert.throws(
+    () => parseCliArgs([
+      '--candidate-only', '--candidate', '/candidate', '--fixtures',
+      '--case', 'one', '--output', '/results',
+    ]),
+    /--fixtures requires a value/u,
+  );
+});
+
+test('candidate-only dry-run uses the selected fixture and preserves result ordering', async () => {
+  const temp = mkdtempSync(join(tmpdir(), 'skill-eval-dry-run-'));
+  try {
+    const fixturesPath = join(temp, 'fixtures.json');
+    const outputDir = join(temp, 'output');
+    const fixtureSet = {
+      schemaVersion: 1,
+      cases: [
+        {
+          id: 'visual-explainer-activation',
+          skill: 'visual-explainer',
+          package: 'visual-explainer',
+          category: 'activation',
+          prompt: 'Create an HTML timeline.',
+          expect: { decision: 'use', branch: 'timeline', terms: ['HTML'] },
+        },
+        {
+          id: 'missing-skill-unrelated',
+          skill: 'missing-skill',
+          package: 'missing-package',
+          category: 'unrelated-non-trigger',
+          prompt: 'Copyedit one sentence.',
+          expect: { decision: 'reject', branch: 'copyediting', terms: ['copyedit'] },
+        },
+      ],
+    };
+    writeFileSync(fixturesPath, `${JSON.stringify(fixtureSet, null, 2)}\n`);
+    let invocations = 0;
+    await runCli([
+      '--candidate-only', '--candidate', ROOT, '--fixtures', fixturesPath,
+      '--all', '--runtime', 'both', '--max-cases', '2', '--concurrency', '3',
+      '--output', outputDir, '--dry-run',
+    ], {
+      runInvocation: async () => {
+        invocations += 1;
+        throw new Error('dry-run invoked a client');
+      },
+    });
+
+    assert.equal(invocations, 0);
+    const report = JSON.parse(readFileSync(
+      join(outputDir, 'skill-behavior-evaluation.json'),
+      'utf8',
+    ));
+    assert.equal(
+      report.fixtureDigest,
+      createHash('sha256').update(readFileSync(fixturesPath)).digest('hex'),
+    );
+    assert.deepEqual(report.selection, {
+      caseId: null,
+      all: true,
+      maxCases: 2,
+      candidateOnly: true,
+      concurrency: 3,
+    });
+    assert.deepEqual(
+      report.results.map((result) => [result.case, result.client, result.variant]),
+      [
+        ['visual-explainer-activation', 'claude', 'candidate'],
+        ['visual-explainer-activation', 'codex', 'candidate'],
+        ['missing-skill-unrelated', 'claude', 'candidate'],
+        ['missing-skill-unrelated', 'codex', 'candidate'],
+      ],
+    );
+    assert.deepEqual(report.missingSkills, [{ package: 'missing-package', skill: 'missing-skill' }]);
+    assert.ok(report.results.slice(2).every((result) => result.status === 'missing-skill'));
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test('CLI rejects an existing report before any client invocation', async () => {
   const temp = mkdtempSync(join(tmpdir(), 'skill-eval-existing-report-'));
   try {
     const reportPath = join(temp, 'skill-behavior-evaluation.json');
     writeFileSync(reportPath, '{}\n');
     let clientInvocations = 0;
-    assert.throws(
-      () => runCli([
+    await assert.rejects(
+      runCli([
         '--baseline', join(temp, 'baseline'),
         '--candidate', join(temp, 'candidate'),
         '--case', 'zbf-activation',
         '--runtime', 'codex',
         '--output', temp,
       ], {
-        run: () => {
+        runInvocation: async () => {
           clientInvocations += 1;
           return { status: 0, stderr: '', stdout: '' };
         },
@@ -614,4 +841,21 @@ test('CLI rejects an existing report before any client invocation', () => {
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }
+});
+
+test('implicit activation passes only when the client selected the skill itself', () => {
+  const fixture = {
+    id: 'x-implicit',
+    skill: 'web-scraping',
+    package: 'dev-toolkit',
+    category: 'implicit-activation',
+    prompt: 'Collect public agenda pages.',
+    expect: { decision: 'use', branch: 'public scraping', terms: ['robots'] },
+  };
+  const response = { decision: 'use', skill: 'web-scraping', branch: 'public scraping', notes: 'robots' };
+  assert.equal(scoreResult(fixture, response, { candidateSkillActivated: true }).pass, true);
+  const missing = scoreResult(fixture, response, { candidateSkillActivated: false });
+  assert.equal(missing.pass, false);
+  assert.deepEqual(missing.failed, ['activation']);
+  assert.equal(scoreResult(fixture, response, {}).pass, false);
 });
