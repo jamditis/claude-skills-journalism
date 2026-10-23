@@ -52,7 +52,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
     'visual-explainer',
   ]);
   assert.match(matrix, /`pdf-playground` \| 1\.3\.7/u);
-  assert.match(matrix, /`security-toolkit` \| 1\.2\.4;/u);
+  assert.match(matrix, /`security-toolkit` \| 1\.3\.0;/u);
   assert.match(matrix, /`video-toolkit` \| 1\.0\.6;/u);
   assert.match(matrix, /V-phase-1: repaired standards baseline/u);
   assert.match(matrix, /J-release-1: paired journalism-core runtime pilot/u);
@@ -68,7 +68,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
   assert.match(matrix, /Codex security-toolkit preflight \| 0\.153\.2/u);
   assert.match(
     matrix,
-    /`journalism-core` \| 1\.5\.0; 15 nested skills \| Runtime pilot passed on the Claude package and Codex project-standards paths/u,
+    /`journalism-core` \| 1\.6\.0; 15 nested skills \| Runtime pilot passed on the Claude package and Codex project-standards paths/u,
   );
   assert.match(
     matrix,

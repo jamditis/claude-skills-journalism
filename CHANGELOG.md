@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Fleet-practice reference files.** `ai-writing-detox` gains Simplified Technical
+  English and slop-era principles. `vibe-coding` gains complexity and readability,
+  plus invariants and proportional care. `systematic-debugging` gains a testing
+  strategy, `brainstorming` gains problem framing, `web-scraping` gains browser
+  automation by structured reference, `project-memory` gains the pinned repository
+  ledger, and `security-checklist` gains agent PR-review hardening.
+- **Private secret scanning page** on the skills site.
+
+### Changed
+
+- `requesting-code-review` requires an independent reviewer from a different model
+  provider than the author, effort scaled to risk, an exact reviewed snapshot, and a
+  verify-fixes pass. Reviewers are not swapped because of findings.
+- `receiving-code-review` covers multi-finding PRs and resolves a thread only after
+  the pushed head contains the fix. `finishing-a-development-branch` covers scoped
+  PRs, `Refs #n` versus closing keywords, stack metadata, and merge approval.
+- superjawn 2.1.0, dev-toolkit 2.1.0, journalism-core 1.6.0, security-toolkit 1.3.0,
+  and project-templates-toolkit 1.1.0.
+
+### Removed
+
+- `docs/HANDOFF.md`, a stale page-creation note.
+
 ### Removed
 
 - **Test-first enforcement retired.** Removed the superjawn `test-driven-development`

@@ -161,7 +161,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <div class="max-w-6xl mx-auto relative z-10">
             <div class="flex items-center gap-3 mb-6">
                 <div class="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide uppercase">Agent Skills package</div>
-                <div class="inline-block px-3 py-1 bg-white/10 rounded-full font-mono text-xs">v2.0.1</div>
+                <div class="inline-block px-3 py-1 bg-white/10 rounded-full font-mono text-xs">v2.1.0</div>
             </div>
             <h1 class="font-display text-5xl md:text-7xl font-black leading-[0.9] mb-6">superjawn</h1>
             <p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-10-03T09:26:01-04:00" data-updated-slug="superjawn">Updated <time datetime="2026-10-03T09:26:01-04:00">Oct 3, 2026</time></p>
@@ -458,6 +458,16 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <div class="feature-card rounded-xl p-6 mt-8">
+                    <h3 class="font-display text-2xl font-light italic mb-4">Review and branch updates</h3>
+                    <ul class="space-y-3 text-sm text-clay/80 list-disc pl-5">
+                        <li><code>requesting-code-review</code> now requires the independent reviewer to come from a different model provider than the author, with effort scaled to risk. The review covers an exact snapshot, fixes get a focused verify-fixes pass, and a reviewer is never swapped because it found problems.</li>
+                        <li><code>receiving-code-review</code> covers multi-finding PRs: read every feedback surface, fix only supported findings in one push, and resolve a thread only after the pushed head contains the fix.</li>
+                        <li><code>finishing-a-development-branch</code> keeps each PR to one concern, uses <code>Refs #n</code> when a deploy step follows merge, and treats merge as a separate decision that needs the owner's approval.</li>
+                        <li>New reference files: cross-provider review, PR feedback repair, claims and cleanup, a testing strategy for <code>systematic-debugging</code>, and problem framing for <code>brainstorming</code>.</li>
+                    </ul>
                 </div>
             </div>
         </section>

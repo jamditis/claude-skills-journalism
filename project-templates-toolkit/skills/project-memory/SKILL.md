@@ -255,6 +255,10 @@ Templates are in the `templates/` directory:
 
 Start small. Add a rule only after the project demonstrates that agents need it.
 
+## Reference files
+
+Read [Pinned repository ledger](references/repo-ledger.md) when several agents, runtimes, or people coordinate in one repository.
+
 ## Last currency sweep
 
 2026-05-09. Sources verified: https://code.claude.com/docs/en/memory and

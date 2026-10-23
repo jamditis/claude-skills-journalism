@@ -48,7 +48,7 @@ test('docs pages use committed Tailwind CSS instead of the Play CDN runtime', ()
   }
 
   assert.deepEqual(violations, []);
-  assert.equal(migrated.length, 51);
+  assert.equal(migrated.length, 52);
 });
 
 test('docs pages pin the shared Lucide runtime with integrity metadata', () => {
@@ -71,7 +71,7 @@ test('docs pages pin the shared Lucide runtime with integrity metadata', () => {
 
 test('docs Tailwind build inputs and CI freshness gate are pinned', () => {
   const manifest = JSON.parse(readFileSync(join(DOCS, 'tailwind-pages.json'), 'utf8'));
-  assert.equal(Object.keys(manifest).length, 51);
+  assert.equal(Object.keys(manifest).length, 52);
 
   const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
   assert.equal(pkg.devDependencies.tailwindcss, '3.4.19');

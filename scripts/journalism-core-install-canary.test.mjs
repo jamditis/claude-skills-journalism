@@ -3,6 +3,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
   rmSync,
   symlinkSync,
   writeFileSync,
@@ -13,6 +14,7 @@ import test from 'node:test';
 
 import {
   EXPECTED_SKILL_NAMES,
+  EXPECTED_VERSION,
   SUBPROCESS_TIMEOUT_MS,
   assertPathInside,
   buildCommandInvocation,
@@ -85,7 +87,7 @@ test('Claude and Codex canaries use isolated config homes and local source', () 
 test('Claude and Codex install records must contain the exact journalism-core skill set', (t) => {
   const root = mkdtempSync(join(tmpdir(), 'journalism-core-canary-test-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
-  const installPath = join(root, 'plugins', 'journalism-core', '1.5.0');
+  const installPath = join(root, 'plugins', 'journalism-core', '1.6.0');
 
   for (const name of EXPECTED_SKILL_NAMES) {
     const directory = join(installPath, 'skills', name);
@@ -95,14 +97,14 @@ test('Claude and Codex install records must contain the exact journalism-core sk
 
   const claude = JSON.stringify([{
     id: 'journalism-core@claude-skills-journalism',
-    version: '1.5.0',
+    version: '1.6.0',
     enabled: true,
     installPath,
   }]);
   const codex = JSON.stringify({
     installed: [{
       pluginId: 'journalism-core@claude-skills-journalism',
-      version: '1.5.0',
+      version: '1.6.0',
       installed: true,
       enabled: true,
       source: { source: 'local', path: '/repo/journalism-core' },
@@ -126,7 +128,7 @@ test('the canary rejects a partial package install', (t) => {
 
   const output = JSON.stringify([{
     id: 'journalism-core@claude-skills-journalism',
-    version: '1.5.0',
+    version: '1.6.0',
     enabled: true,
     installPath,
   }]);
@@ -256,4 +258,15 @@ test('CI runs clean install canaries against current Claude and Codex releases',
   );
   assert.equal(SUBPROCESS_TIMEOUT_MS, 180_000);
   assert.match(runner, /timeout: SUBPROCESS_TIMEOUT_MS/u);
+});
+
+test('the canary contract matches the journalism-core manifest and skill directory', () => {
+  const root = join(import.meta.dirname, '..', 'journalism-core');
+  const manifest = JSON.parse(readFileSync(join(root, '.claude-plugin', 'plugin.json'), 'utf8'));
+  assert.equal(EXPECTED_VERSION, manifest.version);
+  const skills = readdirSync(join(root, 'skills'), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+  assert.deepEqual([...EXPECTED_SKILL_NAMES].sort(), skills);
 });

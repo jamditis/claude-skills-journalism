@@ -228,3 +228,7 @@ A question about a UI topic is not automatically a visual question. "What does p
 
 If they agree to the companion, read the detailed guide before proceeding:
 `skills/brainstorming/visual-companion.md`
+
+## Reference files
+
+Read [Problem framing with natural systems](references/problem-framing.md) when an algorithm, workflow, or logistics problem needs new candidate approaches.

@@ -1019,6 +1019,30 @@
       }
     }
   },
+  "private-secret-scanning/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#ede6d4",
+          "ink": "#121212",
+          "clay": "#2d2a26",
+          "mist": "#c4bfb4",
+          "accent": "#dc2626",
+          "accentDark": "#b91c1c"
+        }
+      }
+    }
+  },
   "supply-chain-hardening/index.html": {
     "theme": {
       "extend": {

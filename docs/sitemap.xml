@@ -241,6 +241,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://skills.amditis.tech/private-secret-scanning/</loc>
+    <lastmod>2026-10-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://skills.amditis.tech/supply-chain-hardening/</loc>
     <lastmod>2026-05-12</lastmod>
     <changefreq>weekly</changefreq>
