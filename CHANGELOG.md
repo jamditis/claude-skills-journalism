@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `receiving-code-review` covers multi-finding PRs and resolves a thread only after
   the pushed head contains the fix. `finishing-a-development-branch` covers scoped
   PRs, `Refs #n` versus closing keywords, stack metadata, and merge approval.
+- The autonomy kit requires cross-provider review and documents a persistent
+  supervised attendant as an advanced option. The persistent-sessions page covers
+  Codex, systemd supervision with a reboot proof, and remote control.
 - superjawn 2.1.0, dev-toolkit 2.1.0, journalism-core 1.6.0, security-toolkit 1.3.0,
   and project-templates-toolkit 1.1.0.
 

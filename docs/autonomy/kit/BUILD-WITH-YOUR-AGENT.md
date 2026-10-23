@@ -12,8 +12,8 @@ The agent does the wiring.
 ## What you're building (for the agent)
 
 A small, self-contained software production line. On a schedule, it pulls one open
-GitHub issue from repos the owner chose, hands it to a coding agent, has a second
-model review the change, and opens a pull request for a human to approve and
+GitHub issue from repos the owner chose, hands it to a coding agent, has a model
+from a different provider review the change, and opens a pull request for a human to approve and
 merge. It never merges its own work. It only touches the surface it's been pointed
 at. And it files new issues for follow-up work it finds, so nothing is lost to
 forgetting, deletion, or a compacted context.
@@ -47,9 +47,15 @@ Non-negotiable. A build that violates one is wrong even if it runs.
    never a wider change. This is the containment ring; do not let the session
    step outside it.
 
-3. **A different model checks the work.** Before anything is committed, a second
-   model reads the diff for bugs, security holes, and swallowed errors. The model
-   that wrote the code does not get to be the only one who reviewed it.
+3. **A model from a different provider checks the work.** Before anything is
+   committed, a reviewer from a different model provider than the worker reads the
+   exact diff for bugs, security holes, and swallowed errors. A second model from
+   the same provider shares too many blind spots to count as independent. If the
+   worker is Claude Code, review with Codex; if the worker is Codex, review with
+   Claude Code. Change reviewers only when the first one is unavailable (quota,
+   rate limit, sign-in failure). Never change reviewers because of its findings,
+   malformed output, or a mismatch in what it reviewed; those are failures to
+   report, not reasons to shop for a friendlier reviewer.
 
 4. **Prove it with a receipt.** Each session carries a unique receipt token. The
    work it produces (commit message, PR body, issue comment) includes that token,
@@ -63,8 +69,10 @@ Non-negotiable. A build that violates one is wrong even if it runs.
    an irreversible action.
 
 6. **Match effort to the task.** Work runs at `model.work_effort`; review runs at
-   `model.review_effort` (low on purpose, a fast literal read, not a rewrite).
-   Don't default everything to the top tier.
+   `model.review_effort`, scaled to risk: low for a trivial change (a typo, a docs
+   line), high for anything that changes behavior, security, data, or
+   concurrency. A low-effort review is a fast literal read, not a rewrite. Don't
+   default everything to the top tier.
 
 7. **Issues are memory; protect it.** Work the session discovers but doesn't do,
    a bug it spotted, a missing test, a follow-up to its own change, will be gone
@@ -92,7 +100,7 @@ scheduler fires
           · the standing nudges (quality bar, verify-from-code, review,
             wrap-up, final reflection, issue-capture)
           · the receipt token                      (invariant 4)
-      → spawn the agent CLI on that prompt, under a hard timeout
+      → spawn the agent CLI on that prompt, under a timeout wrapper
       → the session does the work, runs its review, commits to a branch  (3, 6)
       → harness enforces scope: reject a diff outside allowed_paths, on a
         denied path, or over the breadth caps                  (invariant 2)
@@ -118,8 +126,8 @@ pick the right column. Nothing else in the build should branch on OS.
 | **Notifier** | delivers the session summary | Telegram bot (HTTPS), or stdout | same | same |
 
 **Tested status, read before you trust a column.** Only the Linux column has been
-run end-to-end; it's what this was built on, specifically a Raspberry Pi 5 (8GB)
-running Ubuntu 25.10, ARM64 (kernel 6.17), with Python 3.13, cron, tmux 3.5a, and
+run end-to-end. The kit was first built on a Raspberry Pi 5 (8GB) running Ubuntu
+25.10, ARM64 (kernel 6.17), with Python 3.13, cron, tmux 3.5a, and
 `timeout --foreground` from uutils coreutils 0.2.2. Another Linux distribution
 shares these primitives but differs in detail (init system, coreutils flavor,
 default shell), so don't assume a non-matching distro is identical either. The
@@ -187,12 +195,16 @@ Two warnings that have actually bitten people:
 5. **Spawn the session.** Run `machine.agent_cli` on the assembled prompt,
    non-interactively, under the timeout wrapper and session host for the OS.
    Stream output to a log. `reference/wake.reference.py` shows the loop and the
-   idle/hard-timeout monitoring.
+   idle/hard-timeout monitoring. The hard timeout is a cost backstop for metered
+   billing. If long, legitimate sessions keep hitting it on a subscription, read
+   "A persistent attendant" below before you raise it.
 
 6. **Wire the review pass.** Review happens *inside* the session (the prompt tells
    it to), using `review.command` at `model.review_effort`. Your job is to ensure
-   the reviewer CLI is installed and logged into a subscription (zero marginal
-   cost, see COSTS.md), and that it runs before commit.
+   the reviewer CLI comes from a different provider than `agent_cli`, is installed
+   and logged into a subscription (zero marginal cost, see COSTS.md), and runs
+   before commit against the exact uncommitted diff. Save its output with the
+   receipt token so a person can see what was reviewed.
 
 7. **Enforce scope at the harness, and open the PR there, not in the session.**
    The session commits to a new branch and stops; it does not open the PR itself,
@@ -231,7 +243,7 @@ real, and make a cautious starting point easy:
 - **Which files**, `scope.allowed_paths` / `denied_paths`. `["docs/**"]` only is
   a near-zero-blast-radius first run.
 - **How big**, `scope.max_files_changed` / `max_lines_changed`.
-- **Who checks**, `review` (a second model) + the harness scope check (step 7).
+- **Who checks**, `review` (a model from a different provider) + the harness scope check (step 7).
 - **Who approves**, `safety.auto_merge: false` (a human merges, always).
 
 A nervous owner should be able to start with one repo, one label, `docs/**`, a
@@ -274,6 +286,51 @@ When you have the answers, build the smallest thing that honors the invariants,
 dry-run it, and hand it back.
 
 ---
+
+## A persistent attendant (advanced)
+
+The starter loop spawns a fresh session for each wake and kills it at a hard
+timeout. That is simple and bounds cost, but it can cut off long, legitimate work.
+Once the starter loop is trusted, some owners move to one long-lived, supervised
+session that the scheduler feeds a prompt at each wake. Build this only when the
+owner asks for it. The rules that make it safe:
+
+- **One wake at a time.** The scheduler takes a single-flight lease before it
+  sends a wake. Only an explicit done step from the session (for example
+  `wake-done <wake-id>`) releases it. The next wake waits.
+- **Watch for real failure, not elapsed time.** The scheduler records its own
+  process ID and start time, and checks once a minute that the session process is
+  still alive. It fails a wake on session loss or a delivery error, not because
+  the work took long.
+- **Read the whole prompt.** Long prompts arrive in pages. The session records
+  each page it read, and the done step refuses to run until every page is
+  recorded.
+- **Checkpoint around side effects.** The session keeps a small checkpoint file
+  with a phase: `started`, `working`, `side-effect-pending`,
+  `side-effect-complete`, `summary-written`, or `blocked`. It updates the file
+  right before and right after each external action (a push, a comment, an
+  email), with the exact IDs. After a restart, a session that finds
+  `side-effect-pending` inspects the outside system before it retries anything.
+- **Start fresh after a restart.** A restarted session reads the checkpoint, not
+  the old terminal log, and does not carry over the last wake's assumptions.
+- **Never wait for a person.** Unattended, the session continues on a stated
+  assumption, records it in the summary, and sends a notification if a decision
+  is needed.
+- **The scheduler delivers the summary.** The session writes its summary to a
+  file; the scheduler sends it. The session does not message the owner itself.
+- **Standing holds.** Keep a short list of things the session must not touch
+  (a branch, a deploy, a repo), reread at every wake. A hold stays until a
+  person removes it.
+- **Contain resources.** Cap the session's memory at the service level (for
+  example systemd `MemoryHigh` and `MemoryMax`), keep subagent fan-out small
+  (two or three), move heavy compute to another machine, and avoid regexes such
+  as `.{0,N}(a|b).{0,N}` over minified one-line files. On a small board, one such
+  search can exhaust memory and trigger a watchdog reset.
+- **Prove it survives a reboot.** Run the supervisor and its bridge as user
+  services with lingering enabled, pin the working and state directories
+  explicitly (a hidden default directory is an easy way to have two inboxes),
+  then reboot once and confirm the session, the schedule, and the limits all
+  came back.
 
 ## Extending it later
 

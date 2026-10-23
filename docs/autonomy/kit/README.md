@@ -6,7 +6,7 @@ schedule, unattended, while you do something else. This kit is a careful
 way to try that, and "careful" is the whole point.
 
 On a schedule, it picks one open issue from the repos you choose, hands it to your
-coding agent, has a *second* model review the change, and opens a pull request for
+coding agent, has a model from a *different provider* review the change, and opens a pull request for
 you to approve and merge. It never merges its own work. It only touches the files
 you've told it it can touch. And it files new issues for follow-up work it finds,
 so tasks survive forgetting, deletion, and a compacted context.
@@ -72,7 +72,8 @@ independent dial you can keep narrow:
 - **Which files**, allow `docs/**` only, or deny `.github/workflows/**` and
   `infra/**`, or both.
 - **How big**, cap the files and lines a single change can touch.
-- **Who checks**, a second model reviews every diff before commit.
+- **Who checks**, a model from a different provider reviews every diff before
+  commit, at an effort scaled to the risk of the change.
 - **Who approves**, you do. It never merges its own pull request.
 
 Tighten all of them and the blast radius is near zero; loosen them as your
@@ -81,8 +82,9 @@ confidence grows.
 ## Before you start
 
 - **Platform:** the Linux path is what this was built and run on, so it's the
-  tested one, specifically a Raspberry Pi 5 (8GB) on Ubuntu 25.10, ARM64, with
-  Python 3.13, cron, tmux, and `timeout --foreground` from uutils coreutils.
+  tested one. It was first built on a Raspberry Pi 5 (8GB) on Ubuntu 25.10,
+  ARM64, with Python 3.13, cron, tmux, and `timeout --foreground` from uutils
+  coreutils.
   Another Linux distribution shares the same primitives but differs in detail, so
   verify on yours too. The macOS and Windows recipes follow the same five
   primitives but haven't been run end-to-end as of this version, testing them is

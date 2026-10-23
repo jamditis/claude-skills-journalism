@@ -106,20 +106,25 @@ code references are not proof.
 ```
 === REVIEW BEFORE YOU COMMIT (correctness, then quality) ===
 
-After your edits but BEFORE you commit, push, or open a PR, have a DIFFERENT model
-review the change. Two passes.
+After your edits but BEFORE you commit, push, or open a PR, have a model from a
+DIFFERENT provider review the change: correctness, then quality.
 
-CORRECTNESS, a second model, low reasoning effort on purpose:
+CORRECTNESS, a reviewer from a different provider, effort scaled to risk:
 Run your configured reviewer over the uncommitted diff (staged, unstaged, and new
-files) for bugs, logic errors, security holes, and swallowed errors. Low effort is
-deliberate: you want a fast, literal read, not a rewrite that invents problems.
+files) for bugs, logic errors, security holes, and swallowed errors. Use low
+effort for a trivial change, a fast literal read rather than a rewrite that
+invents problems. Use high effort when the change touches behavior, security,
+data, or concurrency. Review the exact diff you will commit; if you change the
+code after the review, re-check the changed part before you commit.
 
     <review.command>   2>&1 | tee /tmp/review-<TOKEN>.md
 
 Read the findings. Fix every high-severity one in place. For a medium-severity
 finding that would materially widen the change, file a follow-up issue (carrying
-the receipt token) instead of expanding scope. Re-run until clean or you hit
-`review.max_passes`.
+the receipt token) instead of expanding scope. Re-run until a pass finds nothing
+new and actionable. `review.max_passes` is a budget guard, not a pass: if you
+reach it and the latest pass still has actionable findings, do not commit, push,
+or open a PR. Mark the issue blocked, record the open findings, and stop.
 
 QUALITY, one fresh-eyes pass whose only question is quality, not bugs:
 Spawn one subagent as a skeptical senior reviewer. Have it read the diff and the
@@ -135,6 +140,11 @@ or prose, factual accuracy, stale links, and claims that contradict the code.
 Apply a suggestion if it clearly improves the change and fits your time; if you
 disagree, note why in one line rather than complying reflexively. Skip the whole
 pass only if you made no file changes at all.
+
+Do not switch to a different reviewer because you dislike its findings or its
+output is malformed. Switch only when the configured reviewer is unavailable
+(quota, rate limit, sign-in failure), and only to another provider that is not
+the author's.
 
 If the correctness reviewer can't run (timeout, error, unparseable output), fail
 closed. A second model reading the diff is a hard requirement, not a nicety, so
@@ -232,4 +242,23 @@ Read this repo and draft a short standards file for it, a CLAUDE.md, or a
 reviewer-instructions file. Two lines on the architecture, the patterns to follow
 here, and the three mistakes most likely to happen in this codebase. Keep it tight:
 every line gets read on every task, so each one has to earn its place.
+```
+
+---
+
+## 11. Standing holds (situational)
+
+Wire this in once more than one person or agent works the same repos. Keep the
+list in a file the wake reads every time, not in the prompt text, so a person can
+add or lift a hold without rebuilding anything.
+
+```
+=== STANDING HOLDS ===
+Before you pick or touch anything, read <holds file>. Each line names something
+you must not change (a branch, a repo, a deploy, a file path, a service), who set
+the hold, and why. Treat every hold as in force until a person removes the line.
+If the issue you picked needs something on hold, do not work around the hold:
+comment on the issue that it is blocked by the hold, skip it, and pick nothing
+else this wake.
+=== END STANDING HOLDS ===
 ```
