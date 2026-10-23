@@ -64,24 +64,7 @@ test('fixture set covers every required category for each pilot skill', () => {
 test('compatibility smoke fixtures cover the catalog and refresh skills exactly twice', () => {
   const fixtureSet = loadFixtureSet(COMPAT_FIXTURES);
   const catalog = parseYaml(readFileSync(join(ROOT, 'skills-catalog.yaml'), 'utf8'));
-  // These skills come from the refresh layers and are not present on this branch yet.
-  const refreshSkills = new Map([
-    ['ponytail-dev', 'dev-toolkit'],
-    ['surface-completeness', 'dev-toolkit'],
-    ['goal-progress-bar', 'project-templates-toolkit'],
-    ['unattended-agent-runs', 'newsroom-agent-ops'],
-    ['scheduled-briefing', 'newsroom-agent-ops'],
-    ['deadline-and-reply-tracking', 'newsroom-agent-ops'],
-    ['email-request-intake', 'newsroom-agent-ops'],
-    ['document-delivery', 'newsroom-agent-ops'],
-    ['chat-mention-triage', 'newsroom-agent-ops'],
-    ['record-reconciliation', 'newsroom-agent-ops'],
-    ['multi-agent-coordinator', 'newsroom-agent-ops'],
-    ['issue-pool-progression', 'newsroom-agent-ops'],
-    ['meeting-transcript-actions', 'journalism-core'],
-  ]);
   const expectedPackages = new Map(catalog.skills.map((skill) => [skill.name, skill.package]));
-  for (const [skill, packageName] of refreshSkills) expectedPackages.set(skill, packageName);
 
   const ids = new Set();
   const casesBySkill = new Map();
