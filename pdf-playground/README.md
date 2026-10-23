@@ -33,7 +33,7 @@ You need **Claude Code** installed and working on your computer. Claude Code is 
 claude --version
 ```
 
-If you see a version number, you're good. If you get an error like "command not found," you need to install Claude Code first: [Install Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)
+If you see a version number, you're good. If you get an error like "command not found," you need to install Claude Code first: [Install Claude Code](https://code.claude.com/docs/en/overview)
 
 ## Setup (one time)
 
@@ -170,7 +170,7 @@ The file goes inside a hidden folder called `.claude` in your **home directory**
 The full path for the config file is:
 
 ```
-~/.claude/pdf-playground.local.md
+./pdf-playground.local.md
 ```
 
 ### How to create the config file
@@ -181,7 +181,7 @@ The full path for the config file is:
 
 Claude will create the file in the right place.
 
-**Option B, Create it yourself:** Open a text editor (VS Code, Notepad, TextEdit, nano, any editor works) and create a new file at `~/.claude/pdf-playground.local.md` with this content:
+**Option B, Create it yourself:** Open a text editor and create `pdf-playground.local.md` in the project root with this content:
 
 ```yaml
 ---
@@ -303,7 +303,7 @@ Add any specific guidelines here, like:
 
 ### "command not found" when running `claude`
 
-Claude Code isn't installed. Follow the [installation guide](https://docs.anthropic.com/en/docs/claude-code/overview).
+Claude Code isn't installed. Follow the [installation guide](https://code.claude.com/docs/en/overview).
 
 ### Plugin install command fails
 

@@ -677,7 +677,7 @@ policy before submitting.
 
 - **LLM authorship.** ICMJE, COPE, Nature, Science, NEJM, Cell, JAMA,
   Lancet, and the major university presses all explicitly prohibit
-  listing an LLM (ChatGPT, Claude, Gemini, etc.) as a co-author. LLMs
+  listing an LLM as a co-author. LLMs
   cannot meet the accountability and approval criteria authorship
   requires. Use the acknowledgments section or a methods/disclosure
   statement instead, never the author byline.
@@ -709,8 +709,8 @@ policy before submitting.
 Most journals want a methods/acknowledgments statement that names the
 tool, version (if available), and what it was used for. Example:
 
-> During the preparation of this work the author(s) used [tool name,
-> e.g., GPT-5.6 Sol, Claude Opus 5, Gemini 3.7 Flash] in order to
+> During the preparation of this work the author(s) used [tool and version,
+> if available] in order to
 > [specific use, e.g., language polishing of the introduction; drafting
 > code for the cluster analysis in section 3.2]. After using this tool,
 > the author(s) reviewed and edited the content as needed and take(s)

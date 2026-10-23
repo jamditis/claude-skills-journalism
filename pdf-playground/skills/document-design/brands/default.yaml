@@ -1,6 +1,6 @@
 # Default brand configuration
-# Codex installs: copy this to project-root pdf-playground.local.md and customize.
-# Claude Code commands read .claude/pdf-playground.local.md.
+# Copy this to project-root pdf-playground.local.md and customize.
+# Supported clients read pdf-playground.local.md from the project root.
 
 ---
 brand:

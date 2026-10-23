@@ -43,17 +43,8 @@ Locate this installed `SKILL.md` and use its parent directory as
 directory. Do not assume that the skill is installed below a specific client
 home directory.
 
-### Adapter: Codex resource lookup
-
-Use the absolute `SKILL.md` location from the available-skills catalog. Its
-parent directory is `SKILL_DIR`; resolve `templates/` from there.
-
-### Adapter: Claude Code resource lookup
-
-When a plugin invocation exposes `CLAUDE_PLUGIN_ROOT`, use that directory as
-`SKILL_DIR`. For a legacy single-skill install under
-`~/.claude/skills/pdf-design`, use the parent directory of the loaded
-`SKILL.md`. Do not use the legacy path as the shared default.
+Use the absolute `SKILL.md` location supplied by the active client's skill
+catalog. Its parent directory is `SKILL_DIR`; resolve `templates/` from there.
 
 ## Quick start
 
@@ -96,23 +87,23 @@ cp "$WORK_DIR/output.pdf" "$PROJECT_DIR/output.pdf"
 1. **Sentence case**, Never Title Case
 2. **Left-aligned**, Never justified text
 3. **Print-ready**, 8.5" × 11" letter size
-4. **Brand consistent**, CCM red or program palettes
+4. **Brand consistent**, Use the selected brand palette
 
 ---
 
 ## Brand guidelines
 
-### CCM standard colors
+### Default colors
 ```css
 :root {
-    --ccm-red: #CA3553;
-    --ccm-black: #000000;
-    --ccm-gray: #666666;
-    --ccm-light: #e2e8f0;
+    --brand-primary: #CA3553;
+    --brand-black: #000000;
+    --brand-gray: #666666;
+    --brand-light: #e2e8f0;
 }
 ```
 
-### Program-specific (Democracy Day)
+### Alternate program palette
 ```css
 :root {
     --civic-navy: #1a2b4a;

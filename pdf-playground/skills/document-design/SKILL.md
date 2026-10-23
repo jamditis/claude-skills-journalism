@@ -10,9 +10,7 @@ Create professional, print-ready HTML documents that export to PDF with customiz
 ## Brand configuration
 
 Before creating documents, check for `pdf-playground.local.md` in the project
-root. If it is absent, check the legacy Claude Code path
-`.claude/pdf-playground.local.md`. If both exist, use only the project-root
-file. If neither exists, use sensible defaults or ask the user for their brand
+root. If it is absent, use sensible defaults or ask the user for their brand
 colors.
 
 ### Reading brand config
@@ -235,8 +233,7 @@ h1, h2, h3 {
 
 ## Document creation workflow
 
-1. **Check for brand config** at project-root `pdf-playground.local.md`, then
-   the legacy `.claude/pdf-playground.local.md` fallback
+1. **Check for brand config** at project-root `pdf-playground.local.md`
 2. **Locate this installed `SKILL.md`** and resolve bundled resources from its
    directory. Do not assume a plugin-root environment variable is available.
 3. **Load template** from the skill-relative `templates/` directory

@@ -47,7 +47,7 @@ Use this shape when passing retrieved material onward:
          │                      │                      │
 ┌────────▼────────┐  ┌──────────▼──────────┐  ┌───────▼───────┐
 │  AI Enrichment  │  │  Entity Extraction  │  │  PDF Archive  │
-│  (Gemini)       │  │  (Knowledge Graph)  │  │  (WCAG 2.1)   │
+│  (structured)   │  │  (Knowledge Graph)  │  │  (WCAG 2.1)   │
 └────────┬────────┘  └──────────┬──────────┘  └───────┬───────┘
          │                      │                      │
          └──────────────────────┼──────────────────────┘
@@ -159,9 +159,9 @@ from google.genai import types
 import json
 from typing import Optional
 
-# Use Google's current stable Flash model. Test the exact model and
-# response shape against your taxonomy prompts before deployment.
-DEFAULT_GEMINI_MODEL = 'gemini-3.7-flash'
+# Set an available model explicitly. Test the exact model and response shape
+# against your taxonomy prompts before deployment.
+MODEL_NAME = os.environ['GOOGLE_GENAI_MODEL']
 
 # Single client; reads GOOGLE_API_KEY (or pass api_key=...).
 _client = genai.Client(api_key=os.environ.get('GOOGLE_API_KEY'))
@@ -201,7 +201,7 @@ TAXONOMY = {
 }
 
 class ArchiveCategorizer:
-    def __init__(self, model: str = DEFAULT_GEMINI_MODEL, client: genai.Client = None):
+    def __init__(self, model: str = MODEL_NAME, client: genai.Client = None):
         self.model = model
         self.client = client or _client
 
@@ -236,7 +236,7 @@ IMPORTANT:
 - Pull quote must be an exact excerpt from the text
 """
 
-        # response_mime_type='application/json' makes Gemini emit raw
+        # response_mime_type='application/json' requests raw
         # JSON without ```json fences, the markdown-stripping fallback
         # in _parse_response() is kept as defense-in-depth for older
         # models that still wrap output.
@@ -261,7 +261,7 @@ IMPORTANT:
         """Extract JSON from response, tolerating ```json fences if any.
 
         With response_mime_type='application/json' set on the request,
-        Gemini emits clean JSON; this stripping logic is a fallback for
+        The provider normally emits clean JSON; this stripping logic is a fallback for
         older models or when the request config wasn't applied.
         """
         if '```json' in text:
@@ -383,7 +383,7 @@ class EntityRegistry:
 
 ```python
 class EntityExtractor:
-    def __init__(self, registry: EntityRegistry, model: str = DEFAULT_GEMINI_MODEL,
+    def __init__(self, registry: EntityRegistry, model: str = MODEL_NAME,
                  client: genai.Client = None):
         self.registry = registry
         self.model = model

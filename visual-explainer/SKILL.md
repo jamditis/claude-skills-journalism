@@ -2,11 +2,6 @@
 name: visual-explainer
 description: HTML explainers, diagrams, architecture, timelines, source maps, slide decks, comparison tables, recaps, plan and diff reviews.
 license: MIT
-compatibility: Requires a browser to view generated HTML files. Optional surf-cli for AI image generation.
-metadata:
-  author: nicobailon (upstream); journalism adaptations by jamditis
-  version: "0.7.4"
-  upstream: https://github.com/nicobailon/visual-explainer
 ---
 
 # Visual explainer
@@ -119,12 +114,9 @@ Vary the choice each time. If the last diagram was dark and technical, make the 
 
 **Mermaid CSS class collision constraint.** Never define `.node` as a page-level CSS class. Mermaid.js uses `.node` internally on SVG `<g>` elements with `transform: translate(x, y)` for positioning. Page-level `.node` styles (hover transforms, box-shadows) leak into diagrams and break layout. Use the namespaced `.ve-card` class for card components instead. The only safe way to style Mermaid's `.node` is scoped under `.mermaid` (e.g., `.mermaid .node rect`).
 
-**AI-generated illustrations (optional).** If [surf-cli](https://github.com/nicobailon/surf-cli) is available, you can generate images via Gemini and embed them in the page for creative, illustrative, explanatory, educational, or decorative purposes. Check availability with `which surf`. If available:
+**AI-generated illustrations (optional).** If the client provides an image-generation tool or a configured image CLI, you can generate images and embed them in the page for creative, illustrative, explanatory, educational, or decorative purposes. Do not require a specific provider or model. Save the result to a temporary file, then:
 
 ```bash
-# Generate to a temp file (use --aspect-ratio for control)
-surf gemini "descriptive prompt" --generate-image /tmp/ve-img.png --aspect-ratio 16:9
-
 # Base64 encode for self-containment (macOS)
 IMG=$(base64 -i /tmp/ve-img.png)
 # Linux: IMG=$(base64 -w 0 /tmp/ve-img.png)
