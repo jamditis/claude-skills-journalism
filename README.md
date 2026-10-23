@@ -40,7 +40,7 @@ Choose the section for your client. During the Codex pilot, use only one Codex i
 
 ### Claude Code
 
-**Prerequisite:** You need [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) installed. Run `claude --version` in your terminal to check.
+**Prerequisite:** You need [Claude Code](https://code.claude.com/docs/en/overview) installed. Run `claude --version` in your terminal to check.
 
 #### Plugins (recommended)
 
@@ -58,12 +58,12 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | Plugin | Description | Commands | Updated |
 |--------|-------------|----------|--------|
 | [autocontext](./autocontext/) | Cross-session knowledge persistence with skill evolution. Lessons accumulate per-skill, and `/autocontext:evolve` folds them back into skill files | `/autocontext:setup`, `/autocontext:init`, `/autocontext:review`, `/autocontext:status`, `/autocontext:evolve` | Aug 21, 2026 |
-| [dev-toolkit](./dev-toolkit/) | Twelve development-focused skills for journalists, researchers, and small newsroom dev teams: accessibility, context management, directed multi-agent execution, Electron, mobile debugging, Python pipelines, ethical scraping, no-build frontends, web UI craft, and CLAUDE.md maintenance | `/dev-toolkit:director`; other skills model-selected | Oct 4, 2026 |
+| [dev-toolkit](./dev-toolkit/) | Twelve development-focused skills for journalists, researchers, and small newsroom dev teams: accessibility, context management, directed multi-agent execution, Electron, mobile debugging, Python pipelines, ethical scraping, no-build frontends, web UI craft, and project instruction maintenance | `/dev-toolkit:director`; other skills model-selected | Oct 4, 2026 |
 | [journalism-core](./journalism-core/) | Fifteen core journalism skills, including AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, Brazilian LAI requests, fact-checking, interview prep + transcription, story pitches, editorial workflow, crisis communications, newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements, and embedded photo metadata for wire distribution | n/a, skills only | Aug 21, 2026 |
 | [okf-wiki](./okf-wiki/) | Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with YAML frontmatter, directory navigation, and a validator. Generates a starter wiki that passes its own conformance and secret-leak checks, ships session-start hooks that orient Claude on the knowledge base before it works, and includes an optional GitHub-wiki bootstrap. For newsroom institutional memory, research atlases, decision logs, and infrastructure maps | n/a, skill only | Oct 3, 2026 |
 | [pdf-design](./pdf-design/) | PDF report and proposal design system with brand variables, budget tables, and reusable content blocks (stats strips, three-column, four-tile pillars, partner grids) | n/a, skill-only | Sep 15, 2026 |
 | [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials with an interactive control panel for live design editing (colors, fonts, spacing, sections) and a guided wizard for proposals | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` | Sep 4, 2026 |
-| [project-templates-toolkit](./project-templates-toolkit/) | Three skills for setting up and closing out journalism projects: a CLAUDE.md project-memory writer (institutional knowledge), a LESSONS.md retrospective writer (failures and decisions), and a template-selector decision tree across 6 project types | n/a, skills only | Oct 3, 2026 |
+| [project-templates-toolkit](./project-templates-toolkit/) | Three skills for setting up and closing out journalism projects: a project instruction writer (institutional knowledge), a LESSONS.md retrospective writer (failures and decisions), and a template-selector decision tree across 6 project types | n/a, skills only | Oct 3, 2026 |
 | [research-toolkit](./research-toolkit/) | Six skills for research, source preservation, and academic workflows: academic writing, legal paywall-bypass via Unpaywall and library databases, web archiving (Wayback / Archive.today / ArchiveBox), web page change monitoring, AI-enriched digital archive construction, and a curated free-API catalog with sunset currency notes (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) | n/a, skills only | Aug 21, 2026 |
 | [security-toolkit](./security-toolkit/) | Five defensive security skills covering OWASP Top 10 fundamentals, supply-chain hardening, and secret scanning: pre-deployment audit checklists (auth, input validation, secrets management), secure authentication patterns (password hashing, session management, JWT, OAuth, passkeys), API hardening (rate limiting, CORS, request throttling, defense-in-depth for Express, FastAPI, and serverless), and npm/bun supply-chain hardening with install-time cooldown plus a sandboxed pre-install scan for the bypass case (defends against Mini Shai-Hulud-class worms) | `/security-toolkit:hotpatch` | Sep 28, 2026 |
 | [superjawn](./superjawn/) | Research-augmented fork of obra/superpowers. Default-on research phase fires before brainstorming, systematic-debugging, and writing-skills. Includes 13 skills with no soft dependencies on the upstream `superpowers` plugin | invoked indirectly via skills (e.g. `superjawn:brainstorming`, `superjawn:systematic-debugging`, `superjawn:writing-plans`) | Oct 3, 2026 |
@@ -232,7 +232,7 @@ These three skills ship together as the [project-templates-toolkit](./project-te
 
 | Skill | Description | Updated |
 |-------|-------------|--------|
-| [project-memory](./project-templates-toolkit/skills/project-memory/) | Generate CLAUDE.md files that capture project-specific knowledge. Includes templates for editorial tools, events, publications, research, pipelines, and archives | Oct 3, 2026 |
+| [project-memory](./project-templates-toolkit/skills/project-memory/) | Generate project instruction files that capture project-specific knowledge. Includes templates for editorial tools, events, publications, research, pipelines, and archives | Oct 3, 2026 |
 | [project-retrospective](./project-templates-toolkit/skills/project-retrospective/) | Generate LESSONS.md files that document what worked and what didn't. Templates for investigations, events, publications, and tools | Aug 21, 2026 |
 | [template-selector](./project-templates-toolkit/skills/template-selector/) | Decision tree for choosing the right project documentation template | Aug 21, 2026 |
 
@@ -243,9 +243,9 @@ These twelve skills ship together as the [dev-toolkit](./dev-toolkit/) plugin. I
 | Skill | Description | Updated |
 |-------|-------------|--------|
 | [accessibility-compliance](./dev-toolkit/skills/accessibility-compliance/) | WCAG 2.2 baseline, alt text, focus management, motion preferences, accessible charts | Aug 21, 2026 |
-| [claude-md-updater](./dev-toolkit/skills/claude-md-updater/) | Detect session lessons, new paths, infra changes, and workflows and propose scoped CLAUDE.md edits for approval | Aug 21, 2026 |
+| [claude-md-updater](./dev-toolkit/skills/claude-md-updater/) | Detect durable session lessons and propose scoped project instruction edits for approval | Aug 21, 2026 |
 | [context-engineering-fundamentals](./dev-toolkit/skills/context-engineering-fundamentals/) | Attention budget, lost-in-middle recall, context degradation patterns, and mitigations for long sessions | Aug 21, 2026 |
-| [director](./dev-toolkit/skills/director/) | Explicit top-tier direction through lower-tier agents and models configured in the applicable CLAUDE.md policy | Aug 21, 2026 |
+| [director](./dev-toolkit/skills/director/) | Explicit top-tier direction through workers configured in the applicable project instruction file | Aug 21, 2026 |
 | [electron-dev](./dev-toolkit/skills/electron-dev/) | Electron security model (contextIsolation, sandbox), IPC patterns, packaging | Aug 21, 2026 |
 | [mobile-debugging](./dev-toolkit/skills/mobile-debugging/) | Eruda, vConsole, Chrome DevTools on Android, Safari Web Inspector for iOS, console capture | Oct 4, 2026 |
 | [one-way-door](./dev-toolkit/skills/one-way-door/) | Flag irreversible architectural decisions (data models, infra, auth, APIs) before committing | Aug 21, 2026 |
@@ -395,7 +395,7 @@ When verifying claims:
 When setting up or closing projects:
 
 ```
-"Generate a CLAUDE.md for this investigation project"
+"Generate project instructions for this investigation project"
 "Write a retrospective for the conference website we just finished"
 "Which template should I use for this newsletter project?"
 ```
@@ -440,7 +440,7 @@ Quick version: fork, create your skill with a `SKILL.md` frontmatter file, run `
 ## Related resources
 
 - [Anthropic official skills](https://github.com/anthropics/skills)
-- [Claude Code documentation](https://docs.anthropic.com/claude-code)
+- [Claude Code documentation](https://code.claude.com/docs/en/overview)
 - [Codex skills documentation](https://learn.chatgpt.com/docs/build-skills)
 - [Agent Skills specification](https://agentskills.io/specification)
 - [autopunk-media-skills](https://github.com/ur-grue/autopunk-media-skills), broadcast, TV, podcast, and radio production skills; complements this repo's investigative focus. Free library, paired with a paid product ([autopunk.io](https://autopunk.io))
