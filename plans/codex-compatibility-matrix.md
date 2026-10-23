@@ -515,9 +515,10 @@ results for 62 skills come from an earlier run on the same October 23 digests.
 | All 76 skills installed, request without the name | 75/75 | 71/75 |
 | All 76 skills installed, unrelated request | 74/76 | 70/76 |
 
-A pass means the client chose and loaded the expected skill, or left it alone
-for an unrelated request, according to the client's own activation record. The
-answer is not graded. Resources, scripts, external actions, and a no-Claude
+For a named request, a pass means the client accepted the named skill; no
+activation record is checked. For the other rows, a pass means the client chose
+and loaded the expected skill, or left it alone for an unrelated request,
+according to the client's own activation record. No answer is graded. Resources, scripts, external actions, and a no-Claude
 environment are not tested. This evidence therefore does not change a package
 classification by itself.
 
