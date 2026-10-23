@@ -1,11 +1,18 @@
 ---
 name: claude-md-updater
-description: Scans the session for lessons and workflows, then proposes scoped CLAUDE.md edits. Use for save this lesson or add to context.
+description: Scans the session for durable lessons and workflows, then proposes scoped project instruction updates. Use for save this lesson or add to context.
 ---
 
-# CLAUDE.md auto-updater
+# Project instruction updater
 
-Analyze the current conversation to identify information worth persisting in CLAUDE.md for future sessions, then propose the edits for approval before writing anything.
+Analyze the current conversation to identify information worth persisting in the project's instruction file, then propose the edits for approval before writing anything.
+
+Resolve the target before drafting:
+
+1. If `AGENTS.md` exists, update it.
+2. If only `CLAUDE.md` exists, update it.
+3. If both exist and either imports the other, update the imported canonical file.
+4. If neither exists, create `AGENTS.md`. In Claude Code, also propose a one-line `CLAUDE.md` import of `@AGENTS.md`.
 
 ## What to look for
 
@@ -39,13 +46,13 @@ Analyze the current conversation to identify information worth persisting in CLA
    - "new endpoint", "new service", "new path"
    - "doesn't work", "limitation", "workaround"
 
-2. **Categorize findings.** Only durable facts belong in CLAUDE.md:
+2. **Categorize findings.** Only durable facts belong in the project instruction file:
    - Hard-won lessons go to the "Hard-won lessons" section
    - Infrastructure changes update the relevant section
    - New workflows go to the appropriate section
-   - Transient, session-specific notes do **not** go in CLAUDE.md (see "What not to persist")
+   - Transient, session-specific notes do **not** go in the project instruction file (see "What not to persist")
 
-3. **Build the exact diff.** Produce a unified diff against the current CLAUDE.md showing the precise lines and sections to be added or changed. This diff is what the user approves, not a summary of it.
+3. **Build the exact diff.** Produce a unified diff against the resolved instruction file showing the precise lines and sections to add or change. This diff is what the user approves, not a summary of it.
 
 4. **Present the diff for approval** and write nothing until the user approves.
 
@@ -54,11 +61,11 @@ Analyze the current conversation to identify information worth persisting in CLA
 Show the exact patch first, then a short summary grouped by category:
 
 ````
-## Proposed CLAUDE.md updates
+## Proposed project instruction updates
 
 ```diff
---- a/CLAUDE.md
-+++ b/CLAUDE.md
+--- a/AGENTS.md
++++ b/AGENTS.md
 @@ section being changed @@
  existing context line
 +new durable lesson, infra fact, or workflow
@@ -74,18 +81,18 @@ Apply this diff? Nothing is written until you approve.
 
 ## What not to persist
 
-CLAUDE.md is team-shared (checked into git) and advisory: it loads into every session, so it is for durable, infrequently-changing facts, not a running log. Per the project-memory skill, keep these **out** of CLAUDE.md:
+The project instruction file is team-shared, checked into git, and loaded into agent sessions. Use it for durable, infrequently changing facts, not a running log. Per the project-memory skill, keep these items out:
 
 - Transient "what we did today" session summaries
 - Anything that changes frequently
-- Things Claude learns over time through corrections
+- Personal preferences or corrections that do not belong to the project
 
-Route those to **auto memory** (`~/.claude/projects/<project>/memory/`, which Claude maintains on its own) or to a gitignored `CLAUDE.local.md` for personal notes. Putting them in CLAUDE.md bloats shared context and loads stale per-session facts into future sessions.
+Route those to the client's memory feature or a gitignored local notes file. Putting them in shared project instructions bloats context and loads stale session facts into future sessions.
 
 ## Rules
 
 1. **Never add sensitive values.** Reference where a credential is stored; never include the actual token.
-2. **Keep it concise.** CLAUDE.md should stay scannable; target under 200 lines.
+2. **Keep it concise.** The project instruction file should stay scannable; target under 200 lines.
 3. **Avoid duplication.** Check whether the information already exists before adding it.
 4. **Match the existing style.** Follow the tone and format of the current file.
-5. **Durable facts only.** Persist hard-won lessons, infrastructure facts, and workflows. Session-specific notes belong in auto memory or a gitignored `CLAUDE.local.md`, never the committed CLAUDE.md.
+5. **Durable facts only.** Persist hard-won lessons, infrastructure facts, and workflows. Session-specific notes belong in client memory or a gitignored local notes file, never the committed project instruction file.

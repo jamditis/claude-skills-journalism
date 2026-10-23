@@ -83,7 +83,7 @@ When working across multiple tools, keep the canonical guidance in `AGENTS.md` a
 
 **Run multiple tools**: There's no penalty for running Cursor for inline edits while a Claude Code or Codex CLI session works in another terminal on a separate task. Different shapes for different work.
 
-**Compare outputs**: For high-stakes decisions, generate solutions from two different model families (e.g., Claude + GPT-5) and pick the better one. They make different mistakes.
+**Compare outputs**: For high-stakes decisions, generate solutions with models from two different providers and compare them against the same requirements. Different model families make different mistakes.
 
 ## Complex feature development
 

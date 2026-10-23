@@ -7,9 +7,9 @@ Twelve development-focused skills for journalists, researchers, and small newsro
 | Skill | What it covers |
 |---|---|
 | accessibility-compliance | WCAG 2.2 baseline, alt text, focus management, motion preferences |
-| claude-md-updater | Detect session lessons, new paths, infra changes, and workflows and propose scoped CLAUDE.md edits |
+| claude-md-updater | Detect durable session lessons and propose scoped project instruction edits |
 | context-engineering-fundamentals | Attention budget, lost-in-middle recall, context degradation patterns, and mitigations for long sessions |
-| director | Explicit top-tier direction through the lower-tier agents and models configured in CLAUDE.md |
+| director | Explicit top-tier direction through the workers configured in the project instruction file |
 | electron-dev | Electron security model (contextIsolation, sandbox), IPC patterns, packaging |
 | mobile-debugging | Eruda, vConsole, Chrome DevTools on Android, Safari Web Inspector for iOS |
 | one-way-door | Block irreversible architectural decisions during planning |
