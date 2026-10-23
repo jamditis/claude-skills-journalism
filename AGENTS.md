@@ -83,7 +83,7 @@ claude-skills-journalism/
 │       ├── page-monitoring/            # Change detection, availability tracking
 │       └── web-archiving/              # Wayback, Archive.today, evidence preservation
 │
-├── # Plugin: dev-toolkit (12 skills), registered in marketplace.json
+├── # Plugin: dev-toolkit (14 skills), registered in marketplace.json
 ├── dev-toolkit/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -95,7 +95,9 @@ claude-skills-journalism/
 │       ├── electron-dev/               # Electron security model, packaging
 │       ├── mobile-debugging/           # Eruda, vConsole, remote debug
 │       ├── one-way-door/               # Block irreversible decisions
+│       ├── ponytail-dev/               # Minimal-code implementation with proportional checks
 │       ├── python-pipeline/            # Data pipelines (pandas, polars, DuckDB)
+│       ├── surface-completeness/       # UI coverage, design compliance, and docs
 │       ├── vibe-coding/                # AI-assisted development
 │       ├── web-scraping/               # Ethical content extraction
 │       ├── web-ui-best-practices/      # Container queries, :has(), view transitions
@@ -140,11 +142,12 @@ claude-skills-journalism/
 │   ├── templates/               # Architecture, flowchart, data table templates
 │   └── commands/                # Slash command templates
 │
-├── # Plugin: project-templates-toolkit (3 skills), registered in marketplace.json
+├── # Plugin: project-templates-toolkit (4 skills), registered in marketplace.json
 ├── project-templates-toolkit/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
 │   └── skills/
+│       ├── goal-progress-bar/          # Evidence-based weighted progress from a JSON tracker
 │       ├── project-memory/             # Project instruction generation, 6 project type templates
 │       ├── project-retrospective/      # LESSONS.md generation, 4 project type templates
 │       └── template-selector/          # Decision tree for picking the right template

@@ -53,9 +53,15 @@ skills:
   - name: one-way-door
     package: dev-toolkit
     path: dev-toolkit/skills/one-way-door
+  - name: ponytail-dev
+    package: dev-toolkit
+    path: dev-toolkit/skills/ponytail-dev
   - name: python-pipeline
     package: dev-toolkit
     path: dev-toolkit/skills/python-pipeline
+  - name: surface-completeness
+    package: dev-toolkit
+    path: dev-toolkit/skills/surface-completeness
   - name: vibe-coding
     package: dev-toolkit
     path: dev-toolkit/skills/vibe-coding
@@ -122,6 +128,9 @@ skills:
   - name: document-design
     package: pdf-playground
     path: pdf-playground/skills/document-design
+  - name: goal-progress-bar
+    package: project-templates-toolkit
+    path: project-templates-toolkit/skills/goal-progress-bar
   - name: project-memory
     package: project-templates-toolkit
     path: project-templates-toolkit/skills/project-memory

@@ -42,10 +42,9 @@ Match the proof to the impact, uncertainty, and recovery cost.
 Keep the handoff short. State the change, the evidence, and any known limit
 that affects the user's decision.
 
-Related skills: [vibe-coding](../vibe-coding/SKILL.md) covers broader
-AI-assisted development, and
-[verification-before-completion](../../../superjawn/skills/verification-before-completion/SKILL.md)
-covers final proof before a completion claim.
+Related skills: `vibe-coding` (dev-toolkit) covers broader AI-assisted
+development, and `verification-before-completion` (superjawn) covers final
+proof before a completion claim.
 
 Credit: Adapted from [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)
 under the MIT license.

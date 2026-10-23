@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **New workflow skills.** dev-toolkit `ponytail-dev` covers minimal-code
+  implementation with proportional checks (adapted from DietrichGebert/ponytail,
+  MIT). dev-toolkit `surface-completeness` checks UI coverage, design compliance,
+  and documentation during frontend changes. project-templates-toolkit
+  `goal-progress-bar` renders evidence-based weighted progress from a JSON tracker.
 - **Fleet-practice reference files.** `ai-writing-detox` gains Simplified Technical
   English and slop-era principles. `vibe-coding` gains complexity and readability,
   plus invariants and proportional care. `systematic-debugging` gains a testing

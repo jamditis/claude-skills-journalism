@@ -1,6 +1,6 @@
 # skills
 
-Every skill the marketplace ships, one concept per file, grouped by [plugin](../plugins/index.md). 63 skills across 12 plugins.
+Every skill the marketplace ships, one concept per file, grouped by [plugin](../plugins/index.md). 66 skills across 12 plugins.
 
 ## [journalism-core](../plugins/journalism-core.md)
 - [ai-writing-detox](ai-writing-detox.md)
@@ -35,7 +35,9 @@ Every skill the marketplace ships, one concept per file, grouped by [plugin](../
 - [electron-dev](electron-dev.md)
 - [mobile-debugging](mobile-debugging.md)
 - [one-way-door](one-way-door.md)
+- [ponytail-dev](ponytail-dev.md)
 - [python-pipeline](python-pipeline.md)
+- [surface-completeness](surface-completeness.md)
 - [vibe-coding](vibe-coding.md)
 - [web-scraping](web-scraping.md)
 - [web-ui-best-practices](web-ui-best-practices.md)
@@ -49,6 +51,7 @@ Every skill the marketplace ships, one concept per file, grouped by [plugin](../
 - [supply-chain-hardening](supply-chain-hardening.md)
 
 ## [project-templates-toolkit](../plugins/project-templates-toolkit.md)
+- [goal-progress-bar](goal-progress-bar.md)
 - [project-memory](project-memory.md)
 - [project-retrospective](project-retrospective.md)
 - [template-selector](template-selector.md)
