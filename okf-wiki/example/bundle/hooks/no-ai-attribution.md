@@ -2,7 +2,7 @@
 type: Reference
 title: "no-ai-attribution hook"
 description: "Blocks AI authorship credit in git and gh commands before they land"
-source: ["hooks/no-ai-attribution.md", "CLAUDE.md"]
+source: ["hooks/no-ai-attribution.md", "AGENTS.md"]
 verified: 2026-06-30
 timestamp: 2026-06-30
 tags: ["hook", "development"]

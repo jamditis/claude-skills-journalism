@@ -2,7 +2,7 @@
 type: Reference
 title: "accessibility-check hook"
 description: "Check for alt text, heading structure, and accessibility in content"
-source: ["hooks/accessibility-check.md", "CLAUDE.md"]
+source: ["hooks/accessibility-check.md", "AGENTS.md"]
 verified: 2026-06-26
 timestamp: 2026-06-26
 tags: ["hook", "writing-quality"]

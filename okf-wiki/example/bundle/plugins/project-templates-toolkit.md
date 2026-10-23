@@ -9,7 +9,7 @@ tags: [plugin, productivity]
 ---
 # project-templates-toolkit plugin
 
-Three skills: a CLAUDE.md project-memory writer, a LESSONS.md retrospective
+Three skills: a project instruction writer, a LESSONS.md retrospective
 writer, and a template-selector decision tree that picks the right starting
 template for the work at hand.
 

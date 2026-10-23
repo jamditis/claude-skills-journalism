@@ -2,7 +2,7 @@
 type: Reference
 title: "ai-slop-detector hook"
 description: "Warn about AI-generated writing patterns that erode reader trust"
-source: ["hooks/ai-slop-detector.md", "CLAUDE.md"]
+source: ["hooks/ai-slop-detector.md", "AGENTS.md"]
 verified: 2026-06-26
 timestamp: 2026-06-26
 tags: ["hook", "writing-quality"]

@@ -11,7 +11,7 @@ tags: [plugin, development]
 
 Twelve skills: accessibility (WCAG 2.2), context engineering, directed execution, Electron patterns, mobile/remote
 debugging, irreversible-decision discipline, Python data pipelines, AI-assisted development, ethical web scraping, no-build frontend patterns,
-web-UI taste, and CLAUDE.md context maintenance. Install with
+web-UI taste, and project instruction maintenance. Install with
 `/plugin install dev-toolkit@claude-skills-journalism`.
 
 ## Skills

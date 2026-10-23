@@ -2,7 +2,7 @@
 type: Reference
 title: "verification-reminder hook"
 description: "Prompt to verify facts before including them in journalism content"
-source: ["hooks/verification-reminder.md", "CLAUDE.md"]
+source: ["hooks/verification-reminder.md", "AGENTS.md"]
 verified: 2026-06-26
 timestamp: 2026-06-26
 tags: ["hook", "verification"]

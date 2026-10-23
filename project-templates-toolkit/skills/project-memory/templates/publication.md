@@ -1,4 +1,4 @@
-# CLAUDE.md - [Project name]
+# Project instructions - [Project name]
 
 > Template for: Publications (newsletters, blogs, magazines, news sites)
 

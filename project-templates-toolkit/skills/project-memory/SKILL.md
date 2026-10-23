@@ -1,199 +1,163 @@
 ---
 name: project-memory
-description: Generates CLAUDE.md project memory files that transfer institutional knowledge. Use when setting up projects or onboarding.
+description: Generates project instruction files that transfer institutional knowledge. Use when setting up projects or onboarding.
 ---
 
 # Project memory generator
 
-Create CLAUDE.md files that transfer institutional knowledge, not obvious information. Think like a senior journalist onboarding a competent colleague, you don't explain how journalism works, you explain YOUR project's quirks.
+Create a project instruction file that transfers institutional knowledge, not
+obvious information. Write for a capable colleague who needs this project's
+specific commands, constraints, and failure modes.
 
-## CLAUDE.md is advisory, not enforced
+## Choose the canonical instruction file
 
-Anthropic is explicit on this point: CLAUDE.md content is delivered as a user message after the system prompt. Claude reads it and tries to follow it, but there's no guarantee of strict compliance, especially with vague or conflicting instructions. Source: https://code.claude.com/docs/en/memory
+Resolve the target before writing:
 
-This affects how you write a CLAUDE.md and what you put elsewhere:
+1. If `AGENTS.md` exists, update it.
+2. If only `CLAUDE.md` exists, update it.
+3. If both exist and one imports the other, edit the imported canonical file.
+4. If neither exists, create `AGENTS.md`. In Claude Code, also create a
+   one-line `CLAUDE.md` that imports it with `@AGENTS.md`.
 
-| Mechanism | Use for | Source-of-truth |
+Do not create competing copies of the same guidance. Keep nested instruction
+files only when a subdirectory needs narrower rules than its parent.
+
+## Project instructions are advisory
+
+A project instruction file gives standing context to the active client. It does
+not enforce a rule by itself.
+
+| Mechanism | Use for | Behavior |
 |---|---|---|
-| **CLAUDE.md** | Standing facts, conventions, "always do X" rules | Advisory |
-| **Skills** | Multi-step procedures, on-demand workflows | Loaded when invoked |
-| **Hooks** | Actions that must happen every time, no exceptions | Deterministic when the hook blocks: a shell command that exits 2 (e.g. `hooks/one-way-door-check.md`) or a PreToolUse deny (e.g. `hooks/no-ai-attribution.md`). A prompt hook such as `hooks/bug-report-detector.md` only adds a reminder, so do not rely on it for a must-run rule |
+| Project instruction file | Standing facts, commands, conventions, and boundaries | Advisory context |
+| Skills | Multi-step procedures and on-demand workflows | Loaded when relevant |
+| Client enforcement | Actions that must block or run every time | Client-specific and not portable unless mapped and tested |
 
-If an instruction is "block writes to `published/`" or "run accessibility check before commit," that belongs in a hook, not CLAUDE.md. If it's "fact-check workflow" or "FOIA-letter drafting," that's a skill. CLAUDE.md is the place for things Claude must hold in every session.
+Do not use a client hook as load-bearing shared behavior. If a rule must work in
+both Claude Code and Codex, state the rule in the project instruction file and
+document any optional client enforcement separately.
 
-## What belongs in CLAUDE.md
+## What belongs in the file
 
-Anthropic publishes an explicit include/exclude table for what makes an effective CLAUDE.md. Source: https://code.claude.com/docs/en/best-practices
+Include information an agent cannot infer reliably from the repository:
 
-| ✅ Include | ❌ Exclude |
-|---|---|
-| Bash commands Claude can't guess | Anything Claude can figure out by reading code |
-| Code style rules that differ from defaults | Standard language conventions Claude already knows |
-| Testing instructions and preferred test runners | Detailed API documentation (link to docs instead) |
-| Repository etiquette (branch naming, PR conventions) | Information that changes frequently |
-| Architectural decisions specific to your project | Long explanations or tutorials |
-| Developer environment quirks (required env vars) | File-by-file descriptions of the codebase |
-| Common gotchas or non-obvious behaviors | Self-evident practices like "write clean code" |
+- Project-specific build, test, lint, and validation commands.
+- Code or editorial rules that differ from common defaults.
+- Repository etiquette, branch conventions, and approval boundaries.
+- Architecture decisions and non-obvious dependencies.
+- Environment requirements, named variables, and credential pointers without
+  secret values.
+- Common failure modes and the smallest known recovery steps.
+- Source-handling, publication, privacy, or legal constraints specific to the
+  project.
 
-For journalism projects, translate to:
+Exclude information the agent can discover cheaply:
 
-- **Include:** AP-style preferences that override defaults, "always cite source URLs," byline policy, embargo handling, source-protection invariants, CMS quirks (e.g., "story slugs must be unique across ALL desks, not just metro").
-- **Exclude:** "We verify facts before publishing" (every journalist knows this), "use AP Style" without specifics (every journalism stack does this), framework documentation, generic git commands.
+- Standard language conventions and generic advice.
+- Detailed API documentation that has a canonical source.
+- File-by-file repository descriptions.
+- Session logs, status updates, and facts that change often.
+- Long tutorials or narrative history.
+- Credentials, tokens, private values, or personal data.
 
-## The deletion test
+For journalism projects:
 
-For every line you write, ask: "Would removing this cause Claude to make mistakes?" If not, cut it.
+- Include AP-style preferences that override defaults, source-citation rules,
+  byline policy, embargo handling, source-protection invariants, and CMS quirks
+  (for example, "story slugs must be unique across all desks, not just metro").
+- Exclude "verify facts before publishing" and "use AP Style" without
+  specifics. Every newsroom already knows both.
 
-## Size guidance: target under 200 lines
+For every line, ask: Would removing this make a capable agent more likely to
+make a project-specific mistake? If not, remove it.
 
-Anthropic's explicit guidance as of 2026: target under 200 lines per CLAUDE.md file. Longer files consume more context and reduce adherence. Bloated CLAUDE.md files cause Claude to ignore the actual rules. Source: https://code.claude.com/docs/en/best-practices
+## Keep the file small and scoped
 
-Going over 200 lines is a signal to use one of these instead:
+Use short sections and direct instructions. Treat 200 lines as a review
+threshold, not a target. When the file grows:
 
-- **`.claude/rules/` with `paths:` frontmatter**, file-pattern-scoped rules that load only when Claude works with matching files. Replaces `@import` chains as the size-management mechanism. (Note: `@imports` no longer help with context size, Anthropic explicitly notes that imports load fully at launch.)
-- **Skills**, for multi-step procedures that don't need to be in every session.
-- **Hooks**, for deterministic enforcement.
+- Move multi-step procedures into skills.
+- Link to canonical reference documentation.
+- Put narrow directory rules in a nested instruction file.
+- Move transient notes into the client's memory feature or a gitignored local
+  notes file.
+- Remove duplicated and superseded rules.
 
-## Where to put CLAUDE.md files
+If both supported clients are used, keep shared guidance in `AGENTS.md` and
+let `CLAUDE.md` import it. Add client-specific guidance only when the behavior
+cannot be expressed portably, and label the client.
 
-CLAUDE.md location precedence (more specific wins). Source: https://code.claude.com/docs/en/memory
+Client-specific scoping options:
 
-| Scope | Location | Use case |
-|---|---|---|
-| **Managed policy** | Linux/WSL: `/etc/claude-code/CLAUDE.md`<br/>macOS: `/Library/Application Support/ClaudeCode/CLAUDE.md`<br/>Windows: `C:\Program Files\ClaudeCode\CLAUDE.md` | Org-wide standards (IT/DevOps managed; cannot be excluded by individual settings) |
-| **Project** | `./CLAUDE.md` OR `./.claude/CLAUDE.md` | Team-shared instructions (check into git) |
-| **User** | `~/.claude/CLAUDE.md` | Personal preferences across all projects |
-| **Local** | `./CLAUDE.local.md` | Personal project-specific notes (add to `.gitignore`) |
+- Claude Code: `.claude/rules/` files with `paths:` frontmatter load only when
+  the agent works on matching files. An `@import` loads in full at launch, so
+  it does not reduce context size.
+- Codex: a nested `AGENTS.md` applies to its directory and below.
 
-The `./.claude/CLAUDE.md` location and managed-policy tier are 2026 additions to Anthropic's documented locations. Templates that say "put this at project root" should mention `./.claude/CLAUDE.md` as an equally valid location.
+## Anti-patterns
 
-## AGENTS.md interop
+1. **Over-specified instructions.** Important rules disappear inside generic
+   advice.
+2. **Conflicting nested files.** A broad rule and a narrow rule disagree without
+   stating which scope wins.
+3. **Duplicated client files.** Two copies drift and give different guidance.
+4. **Stale operational state.** Ports, owners, or current status remain after
+   reality changes.
+5. **Secrets in instructions.** The file is checked into version control.
 
-If your repo already has `AGENTS.md` for other coding agents (Cursor, Codex, etc.), don't duplicate the content. Anthropic's recommended pattern is `@AGENTS.md` import (or symlink) with Claude-specific overrides appended:
+## Voice
 
-```markdown
-@AGENTS.md
+- Use short, direct sentences.
+- Name exact commands and paths only when the project requires them.
+- State who can authorize consequential work.
+- Remove welcome text, marketing language, and generic reminders.
+- Use sentence-case headings.
 
-## Claude Code
-- Use plan mode for changes under `src/billing/`.
-```
-
-For journalism teams using multiple agents, this matters, shared editorial standards (AP-style preferences, source-handling invariants, fact-check protocols) belong to the org, not one agent.
-
-## Anti-patterns to warn about
-
-Anthropic now names these explicitly. Source: https://code.claude.com/docs/en/best-practices and https://code.claude.com/docs/en/memory
-
-1. **The over-specified CLAUDE.md.** Bloat causes Claude to ignore real rules. If Claude keeps doing something despite a CLAUDE.md rule, the file is probably too long and the rule is getting lost.
-2. **Conflicting instructions across nested CLAUDE.md files.** Claude picks one arbitrarily. Review periodically to remove outdated rules.
-3. **Hand-coded standard conventions Claude already knows.** "Use proper indentation," "write clean code", delete.
-4. **Detailed API docs / file-by-file descriptions / info that changes frequently.** Link to the canonical source instead.
-5. **Secrets in CLAUDE.md.** It's checked into git. Use `CLAUDE.local.md` (gitignored) for sandbox URLs, test credentials, personal overrides.
-
-## Minimum-viable CLAUDE.md (~6 lines)
-
-Anthropic ships this as the canonical starter. Templates should default to something this short and grow only as needed:
-
-```markdown
-# Code style
-- Use ES modules (import/export) syntax, not CommonJS (require)
-- Destructure imports when possible
-
-# Workflow
-- Be sure to typecheck when you're done making a series of code changes
-- Prefer running single tests, and not the whole test suite, for performance
-```
-
-Each of the 6 journalism templates ships a sub-30-line "starter" variant alongside the fuller version. Adopt incrementally.
-
-## Auto memory is separate from CLAUDE.md
-
-As of Claude Code v2.1.59+, there's a second memory mechanism alongside CLAUDE.md: **auto memory**, where Claude writes notes to itself in `~/.claude/projects/<project>/memory/` based on your corrections. The first 200 lines of that directory's `MEMORY.md` are loaded into every session. Source: https://code.claude.com/docs/en/memory
-
-Practical implication for templates: don't ask the user to manually write down "things Claude learns over time", that's auto memory's job now. CLAUDE.md is for facts you write up front; auto memory is for things Claude notices.
-
-## Voice guidelines
-
-- Direct and terse
-- Like notes you'd leave for yourself
-- No marketing language
-- No "Welcome to..." introductions
-- No "This project is..." padding
-
-## Example: good vs bad
-
-**Bad (too verbose, obvious):**
-```markdown
-# CLAUDE.md
-
-## Overview
-Welcome to our newsroom's story tracking system! This is a
-web application built with React and Node.js that helps
-editors and reporters collaborate on stories.
-
-## Getting started
-First, make sure you have Node.js installed. Then:
-npm install
-npm start
-```
-
-**Good (institutional knowledge only):**
-```markdown
-# CLAUDE.md
-
-## Overview
-Story tracker for metro desk. React + Supabase.
-
-## Gotchas
-- Story slugs must be unique across ALL desks, not just metro
-- "Hold" status doesn't stop the autopublish cron, use "Kill"
-- Reporter dropdown caches for 1 hour; new hires won't appear
-
-## Commands
-npm run sync-ap  # Pull latest from AP, runs automatically at :15
-
-## Credentials
-Supabase key in 1Password "Metro Desk" vault, not .env
-```
-
-## Journalism-specific templates
+## Templates
 
 Templates are in the `templates/` directory:
 
 | Template | Use for |
-|----------|---------|
-| `editorial-tool.md` | Newsroom tools, fact-checkers, AI assistants |
-| `event-website.md` | Conferences, workshops, campaign sites |
-| `publication.md` | Newsletters, podcasts, ongoing content series |
-| `research-project.md` | Investigations, data journalism with defined scope |
-| `content-pipeline.md` | CMS workflows, publishing automation |
-| `digital-archive.md` | Historical collections, document repositories |
+|---|---|
+| `editorial-tool.md` | Newsroom tools, fact-checkers, and research assistants |
+| `event-website.md` | Conferences, workshops, and campaign sites |
+| `publication.md` | Newsletters, podcasts, and continuing publications |
+| `research-project.md` | Investigations and scoped data research |
+| `content-pipeline.md` | CMS workflows and publishing automation |
+| `digital-archive.md` | Historical collections and document repositories |
 
-### Template selection guide
+## Workflow
 
+1. Resolve the canonical instruction file with the rules above.
+2. Read the existing file and every parent or nested instruction file that
+   applies to the target scope.
+3. Select the closest template. Copy only the sections the project needs.
+4. Preserve existing guidance and ordering unless the user asks for a rewrite.
+5. Replace placeholders with verified project facts. Do not invent commands,
+   owners, paths, or service state.
+6. Keep separately scoped rules in their applicable directories.
+7. Review the final file for duplicates, conflicts, stale facts, and secrets.
+8. If this created `AGENTS.md` in Claude Code, create the one-line import file
+   described above.
+
+## Minimum starter
+
+```markdown
+# Project instructions
+
+## Commands
+
+- Test: [exact command]
+- Lint: [exact command]
+
+## Project rules
+
+- [Non-obvious rule that changes how work is done.]
+- [Approval or safety boundary.]
+
+## Known failure modes
+
+- [Symptom]: [Cause and verified recovery.]
 ```
-What are you building?
-├── Tool for the newsroom → editorial-tool.md
-├── Site for an event → event-website.md
-├── Recurring content series → publication.md
-├── One-time investigation → research-project.md
-├── Publishing automation → content-pipeline.md
-└── Archive/preservation → digital-archive.md
-```
 
-## How to use templates
-
-1. Copy the appropriate template to `./CLAUDE.md` OR `./.claude/CLAUDE.md` at your project root
-2. Fill in the bracketed placeholders with YOUR specifics
-3. Delete any sections that don't apply
-4. If your project uses other agents (Cursor, Codex), add `@AGENTS.md` at the top instead of duplicating shared content
-5. Add project-specific gotchas as you discover them, but stay under 200 lines
-6. Move multi-step procedures to skills, deterministic enforcement to hooks
-
-## Last currency sweep
-
-2026-05-09. Sources verified: code.claude.com/docs/en/memory, code.claude.com/docs/en/best-practices.
-
----
-
-*The best CLAUDE.md files are written by people who've been burned by the quirks they're documenting.*
+Start small. Add a rule only after the project demonstrates that agents need it.

@@ -1,4 +1,4 @@
-# CLAUDE.md - [Project name]
+# Project instructions - [Project name]
 
 > Template for: Editorial tools (writing aids, fact-checking, research tools)
 
@@ -71,7 +71,7 @@ project-root/
 
 ## AI/ML components
 
-- **Model(s):** [GPT-4, Claude, custom, etc.]
+- **Model role(s):** [Fast extraction, general drafting, high-reasoning review, custom]
 - **Prompts:** [Location and versioning]
 - **Confidence thresholds:** [When to flag for review]
 - **Cost management:** [API limits, caching]

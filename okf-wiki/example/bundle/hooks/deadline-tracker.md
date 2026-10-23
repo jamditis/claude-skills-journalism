@@ -2,7 +2,7 @@
 type: Reference
 title: "deadline-tracker hook"
 description: "Surface upcoming deadlines from editorial workflow at session start"
-source: ["hooks/deadline-tracker.md", "CLAUDE.md"]
+source: ["hooks/deadline-tracker.md", "AGENTS.md"]
 verified: 2026-06-26
 timestamp: 2026-06-26
 tags: ["hook", "editorial-workflow"]
