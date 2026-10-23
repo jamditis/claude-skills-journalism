@@ -61,7 +61,7 @@ test('fixture set covers every required category for each pilot skill', () => {
   }
 });
 
-test('compatibility smoke fixtures cover the catalog and refresh skills exactly twice', () => {
+test('compatibility smoke fixtures give every catalog skill its activation, implicit, and unrelated cases', () => {
   const fixtureSet = loadFixtureSet(COMPAT_FIXTURES);
   const catalog = parseYaml(readFileSync(join(ROOT, 'skills-catalog.yaml'), 'utf8'));
   const expectedPackages = new Map(catalog.skills.map((skill) => [skill.name, skill.package]));
