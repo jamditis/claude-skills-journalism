@@ -65,9 +65,10 @@ lease and keeps supervising that run until its done step.
 ## Workflow
 
 1. Receive one self-contained task with a unique run ID.
-2. Read the full prompt page by page. Record each page read. Do not substitute
+2. Create a recovery checkpoint with phase started, so a session lost during
+   the prompt read still leaves a run to recover.
+3. Read the full prompt page by page. Record each page read. Do not substitute
    a checksum, search result, parser, or prior template for this gate.
-3. Create a recovery checkpoint with phase started.
 4. Re-read the standing holds list for this run.
 5. Record the next step and move the phase to working.
 6. Before an external action, write side-effect-pending with the intended

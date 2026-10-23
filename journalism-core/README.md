@@ -40,7 +40,7 @@ A few skills in this bundle reference siblings in other bundles. The references 
 
 - **source-verification** points to `social-media-intelligence` (deeper account analysis) and `web-archiving` (full archiving workflows)
 - **interview-prep** points to `web-archiving` (recovering deleted social media content)
-- **interview-transcription** points to `meeting-transcript-actions` (notes, decisions, and owned actions)
+- **meeting-transcript-actions** points to `record-reconciliation` in newsroom-agent-ops (canonical records and privacy controls)
 - **foia-requests** points to `deadline-and-reply-tracking` (statutory clocks, responses, and appeals)
 - **brazil-records-requests** is a companion to `foia-requests` (Brazil vs. US jurisdiction) and does not depend on other bundles
 

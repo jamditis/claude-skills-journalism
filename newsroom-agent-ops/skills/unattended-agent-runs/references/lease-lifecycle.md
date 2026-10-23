@@ -29,6 +29,7 @@ done operation after the summary is complete.
             acquired_at: now()
         })
         inject(run)
+        supervise(run.id)
         return ACCEPTED
 
     function supervise(run_id):
@@ -59,7 +60,14 @@ done operation after the summary is complete.
             record_delivery_receipt(run_id)
             return CONFIRMED
         if not destination_can_be_checked():
+            # Send once, then wait for a person; never retry blind.
+            if not delivery_pending(run_id):
+                mark_delivery_pending(run_id)
+                send_summary(run_id, idempotency_key=run_id)
             alert_operator_once(run_id, "confirm summary delivery by hand")
+            if operator_confirmed_delivery(run_id):
+                record_delivery_receipt(run_id)
+                return CONFIRMED
             return PENDING
         if delivery_pending(run_id) and pending_age(run_id) < confirmation_window:
             return PENDING         # still in flight; do not resend yet
@@ -81,9 +89,10 @@ A local receipt alone cannot prevent a duplicate: the producer can stop after
 the destination accepts the summary but before anything is saved. So check the
 destination before every send, send with the run ID as an idempotency key, and
 resend only after the confirmation window passes with no copy at the
-destination. If the destination cannot be checked, alert the operator instead
-of retrying, and put the run ID in the summary so a duplicate is easy to
-recognize.
+destination. If the destination cannot be checked, send once, alert the
+operator, and hold the lease until a person confirms delivery. Put the run ID
+in the summary so a duplicate is easy to recognize. Prefer a destination you
+can read back: with a write-only notifier, every run waits for a person.
 
 Elapsed age alone is not session loss. The producer checks the real session or
 process and compares both process ID and process start marker.
@@ -91,8 +100,8 @@ process and compares both process ID and process start marker.
 ## Agent pseudocode
 
     function run_task(run):
-        read_every_prompt_page(run.id)
         checkpoint(run.id, "started")
+        read_every_prompt_page(run.id)
 
         for step in plan:
             checkpoint(run.id, "working", next=step)
