@@ -1,7 +1,8 @@
 # Lease and done lifecycle
 
-The producer owns the lease. The agent can release it only through an explicit
-done operation after the summary is complete.
+The producer owns the lease. The agent's explicit done operation records that
+the run and its summary are complete. The producer clears the lease only after
+it confirms summary delivery.
 
 ## Producer pseudocode
 
@@ -137,4 +138,5 @@ The done operation fails closed unless:
 - No side-effect-pending phase remains unresolved.
 
 Make done idempotent for the same completed run. A second call can report
-already complete, but it must not release another run's lease.
+already complete, but it must not mark another run complete. Done never clears
+the lease itself.

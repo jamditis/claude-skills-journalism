@@ -54,8 +54,8 @@ stall backstop, not proof that the task failed safely.
 
 Use one supervised session when startup cost, recurring context, or long work
 makes a fresh process impractical. The producer must hold a single-flight lease
-until the session performs an explicit done step. Do not release the lease
-because time elapsed.
+until the session performs an explicit done step and the producer confirms
+summary delivery. Do not release the lease because time elapsed.
 
 The producer identity must include the process ID and process start time. Probe
 the real session for loss. A reused process ID must not inherit an old lease.
@@ -80,7 +80,8 @@ lease and keeps supervising that run until its done step.
    limits explicit.
 10. Write the final summary to the configured summary file.
 11. Record summary-written.
-12. Run the explicit done step once. Only that step releases the lease.
+12. Run the explicit done step once. It records completion; the producer
+    clears the lease only after it confirms summary delivery.
 
 Use [references/checkpoint-schema.md](references/checkpoint-schema.md) for the
 checkpoint fields and phases. Use
