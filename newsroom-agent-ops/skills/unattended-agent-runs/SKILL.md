@@ -59,6 +59,8 @@ because time elapsed.
 
 The producer identity must include the process ID and process start time. Probe
 the real session for loss. A reused process ID must not inherit an old lease.
+A producer restart does not end the run: the new producer adopts the existing
+lease and keeps supervising that run until its done step.
 
 ## Workflow
 

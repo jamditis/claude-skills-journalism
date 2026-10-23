@@ -12,7 +12,15 @@ done operation after the summary is complete.
             return BUSY
 
         if lease exists:
+            # The old producer died, but its run may still be working or may
+            # need recovery. Adopt that run instead of starting a new one.
             preserve_for_audit(lease)
+            if not compare_and_swap_owner(lease, current_pid(), current_process_start()):
+                queue(run)
+                return BUSY        # another producer adopted it first
+            queue(run)
+            supervise(lease.run_id)
+            return BUSY
 
         write_atomic({
             run_id: run.id,
@@ -23,20 +31,34 @@ done operation after the summary is complete.
         inject(run)
         return ACCEPTED
 
-    function supervise(run):
-        while active_lease_matches(run.id):
-            if explicit_done_exists(run.id):
-                verify_summary_written(run.id)
-                archive_checkpoint(run.id)
-                clear_lease(run.id)
-                deliver_summary(run.id)
+    function supervise(run_id):
+        while active_lease_matches(run_id):
+            if explicit_done_exists(run_id):
+                if not summary_is_written(run_id):
+                    record_blocked(run_id, "done without a readable summary")
+                    alert_operator(run_id)
+                    return BLOCKED     # keep the lease
+                deliver_summary_once(run_id)   # skips if a delivery receipt exists
+                archive_checkpoint(run_id)
+                clear_lease(run_id)
                 return COMPLETE
 
             if session_is_really_lost():
                 restart_fresh_session()
-                reinject_recovery_notice(run.id)
+                reinject_recovery_notice(run_id)
 
             wait_for_event_or_probe_interval()
+
+A producer restart is not session loss. Only the done path clears a lease, so a
+restarted producer finds the old run's lease, takes ownership of the same run
+ID, and keeps supervising it. `compare_and_swap_owner` replaces the owner only
+if the lease still names the dead producer, so two restarted producers cannot
+both adopt it.
+
+Deliver the summary before clearing the lease, and record a delivery receipt
+keyed by run ID. If the producer stops between delivery and clearing, the next
+producer adopts the lease, sees the receipt, and finishes without sending the
+summary twice.
 
 Elapsed age alone is not session loss. The producer checks the real session or
 process and compares both process ID and process start marker.
