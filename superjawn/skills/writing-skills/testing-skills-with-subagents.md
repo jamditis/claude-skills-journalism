@@ -12,7 +12,7 @@ You run scenarios without the skill (RED - watch agent fail), write skill addres
 
 **The cycle:** RED: run a pressure scenario without the skill and record what the agent does. GREEN: write the skill and confirm that agents now comply. REFACTOR: close new loopholes and test again. This document provides skill-specific test formats (pressure scenarios, rationalization tables).
 
-**Complete worked example:** See examples/CLAUDE_MD_TESTING.md for a full test campaign testing CLAUDE.md documentation variants.
+**Complete worked example:** See `examples/CLAUDE_MD_TESTING.md` for a full test campaign of project instruction file variants.
 
 ## When to Use
 

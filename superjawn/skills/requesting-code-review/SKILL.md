@@ -6,13 +6,13 @@ description: Use when completing tasks, implementing major features, or before m
 Adapted from obra/superpowers requesting-code-review skill (v5.0.7),
 MIT-licensed, copyright 2025 Jesse Vincent. Modifications copyright 2026 Joe Amditis. v0.4.0 ports as a consumer category, no research
 phase per the v0.2.0 architecture, since dispatch mechanic; reviewer
-preferences live in CLAUDE.md and memory rather than a research phase.
+preferences live in the project instruction file and memory rather than a research phase.
 See CREDITS.md.
 -->
 
 # Requesting Code Review
 
-Dispatch pr-review-toolkit:code-reviewer subagent to catch issues before they cascade. The reviewer gets precisely crafted context for evaluation, never your session's history. This keeps the reviewer focused on the work product, not your thought process, and preserves your own context for continued work.
+Dispatch a code-review subagent or parallel worker, if your client supports one, to catch issues before they cascade. Give the reviewer precise context instead of the full session history. If the client has no worker capability, perform the same review in sequence in a fresh review pass.
 
 **Core principle:** Review early, review often.
 
@@ -38,7 +38,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 **2. Dispatch code-reviewer subagent:**
 
-Use Task tool with pr-review-toolkit:code-reviewer type, fill template at `code-reviewer.md`
+Use the client's worker capability and fill the template at `code-reviewer.md`.
 
 **Placeholders:**
 - `{WHAT_WAS_IMPLEMENTED}` - What you just built

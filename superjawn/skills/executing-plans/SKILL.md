@@ -94,7 +94,7 @@ If the trigger fired because you're on `main` or `master`, the freshness check A
 2. Review critically - identify any questions or concerns about the plan
 3. Run the freshness check (see "Freshness check (when artifact is stale)" above), single decision, write the result line to the execution journal
 4. If concerns or freshness FAIL: Raise them with your human partner before starting
-5. If no concerns and freshness PASS or skipped: Create TodoWrite and proceed
+5. If no concerns and freshness PASS or skipped: Create the task list with your plan tool and proceed
 
 ### Step 2: Execute Tasks
 
