@@ -27,6 +27,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   automation by structured reference, `project-memory` gains the pinned repository
   ledger, and `security-checklist` gains agent PR-review hardening.
 - **Private secret scanning page** on the skills site.
+- **Cross-client selection smoke.** `scripts/fixtures/compat-smoke.json` gives
+  each of the 76 skills a named, an unnamed, and an unrelated case, run in Claude
+  Code and Codex with one skill or all skills installed. The October 23, 2026
+  results are S-smoke-1 in the Codex compatibility matrix. A pass shows that the
+  client chose and loaded the skill; it does not grade the answer. Skill pages
+  whose skill passed every case now say so.
 
 ### Changed
 

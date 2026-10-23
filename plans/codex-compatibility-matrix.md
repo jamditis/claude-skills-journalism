@@ -1,7 +1,7 @@
 # Codex compatibility matrix
 
 - Status: phase-two runtime pilots; journalism-core, visual-explainer, document-design, and portable okf-wiki scaffolding have scoped passes
-- Last evidence update: September 23, 2026
+- Last evidence update: October 23, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
 > **Historical runtime results stay tied to their tested snapshots.** The v2.8.0
@@ -496,14 +496,58 @@ package-level scan script and synthetic fixture are absent from its standalone
 skill directory. Hotpatch remains unmapped and Claude-only; no runtime pass or
 package-wide support claim follows from these observations.
 
+### S-smoke-1: cross-client selection smoke
+
+Date: October 23, 2026, on officejawn (Linux ARM64). Clients: Claude Code
+2.1.309 with `claude-sonnet-5-5`, and Codex CLI 0.164.0 with `gpt-5.6-sol`.
+Harness: `scripts/skill-behavior-eval.mjs` with `scripts/fixtures/compat-smoke.json`
+(76 skills, 227 cases), selection scoring. Claude runs used
+`--strict-mcp-config`. Totals, every miss, and the skill digests are in
+[`compat-smoke-results-2026-10.json`](../scripts/fixtures/compat-smoke-results-2026-10.json).
+Each skill digest is the same in all four sets below. The Codex single-candidate
+results for 62 skills come from an earlier run on the same October 23 digests.
+
+| Mode | Claude Code | Codex |
+|---|---|---|
+| Named skill (`activation`) | 76/76 | 76/76 |
+| One skill installed, request without the name | 75/75 | 75/75 |
+| One skill installed, unrelated request | 76/76 | 75/76 |
+| All 76 skills installed, request without the name | 75/75 | 71/75 |
+| All 76 skills installed, unrelated request | 74/76 | 70/76 |
+
+A pass means the client chose and loaded the expected skill, or left it alone
+for an unrelated request, according to the client's own activation record. The
+answer is not graded. Resources, scripts, external actions, and a no-Claude
+environment are not tested. This evidence therefore does not change a package
+classification by itself.
+
+Misses:
+
+- Codex, all skills installed: `one-way-door`, `web-scraping`, `digital-archive`,
+  `dispatching-parallel-agents`, `web-design-picker`, and `email-request-intake`
+  were chosen for unrelated requests. `pdf-design` lost to `document-design`,
+  `writing-skills` to `skill-creator`, `web-ui-best-practices` to
+  `surface-completeness`, and `source-verification` to `fact-check-workflow`.
+  Six of these also missed in an earlier competitive run the same day:
+  `one-way-door`, `web-scraping`, `digital-archive`, `pdf-design`,
+  `writing-skills`, and `web-ui-best-practices`. They point to overlapping or
+  broad descriptions and remain open work.
+- Codex, one skill installed: the unrelated `vibe-coding` request loaded the skill.
+- Claude Code, all skills installed: for the unrelated `web-design-picker` and
+  `surface-completeness` requests, Claude loaded the skill to check it, then
+  declined it. The unrelated gate counts any load as a miss.
+
+Skill pages whose skill passed every case in all four sets say "selection smoke
+passed (October 2026)". Pages for skills with a miss keep their earlier label.
+
 ## Package matrix
 
 | Package | Version and components | Current classification | Included and excluded scope | Evidence | Next proof |
 |---|---|---|---|---|---|
 | `autocontext` | 1.1.0; no skills; five commands; one agent; six hook files | Claude-only surface | Include nothing in the Codex claim. Commands, curator agent, hook lifecycle, persisted data, and compatibility environment variables need a separate design. | [I-phase-1](#i-phase-1-package-inventory) | Define state, lifecycle, authority, and uninstall contracts in a separate accepted decision. |
 | `dev-toolkit` | 2.1.0; 14 nested skills | Candidate with adapter review | Thirteen instruction-led skills are statically shared. The optional Claude Code enforcement hook for `one-way-door` remains adapter-required and is not load-bearing shared behavior. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Run activation and non-trigger fixtures for the portable subset and test the optional enforcement adapter separately. |
-| `journalism-core` | 1.7.0; 16 nested skills | Runtime pilot passed for the earlier 15-skill snapshot; `meeting-transcript-actions` is not yet runtime-tested | Include all 16 structurally shared skills. Runtime evidence covers the earlier 15-skill snapshot, not `meeting-transcript-actions`. No commands, agents, or hooks are part of this package. The legacy-compatible Codex package and user-level standards paths remain install-only. | [J-release-1](#j-release-1-paired-journalism-core-runtime-pilot), [C-phase-1](#c-phase-1-repeatable-claude-install-canary), [K-phase-1](#k-phase-1-repeatable-codex-legacy-package-canary), [S-phase-1](#s-phase-1-full-journalism-core-standards-canary), [S-global-phase-1](#s-global-phase-1-user-level-journalism-core-standards-canary), [V-phase-1](#v-phase-1-repaired-standards-baseline) | Add activation and non-trigger evidence for `meeting-transcript-actions`, then add a no-Claude-environment gate and scheduled runtime regression before a broader package support claim. |
-| `newsroom-agent-ops` | 1.0.0; nine nested skills | Candidate, not yet runtime-tested | Include the nine structurally shared skills. No commands, agents, or hooks are part of this package. Installation and public documentation do not establish runtime support. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Run representative activation, non-activation, recovery, authority-boundary, and external-action verification fixtures before making a runtime support claim. |
+| `journalism-core` | 1.7.0; 16 nested skills | Runtime pilot passed for the earlier 15-skill snapshot; `meeting-transcript-actions` passed only the [S-smoke-1](#s-smoke-1-cross-client-selection-smoke) selection smoke | Include all 16 structurally shared skills. Runtime evidence covers the earlier 15-skill snapshot, not `meeting-transcript-actions`. No commands, agents, or hooks are part of this package. The legacy-compatible Codex package and user-level standards paths remain install-only. | [J-release-1](#j-release-1-paired-journalism-core-runtime-pilot), [S-smoke-1](#s-smoke-1-cross-client-selection-smoke), [C-phase-1](#c-phase-1-repeatable-claude-install-canary), [K-phase-1](#k-phase-1-repeatable-codex-legacy-package-canary), [S-phase-1](#s-phase-1-full-journalism-core-standards-canary), [S-global-phase-1](#s-global-phase-1-user-level-journalism-core-standards-canary), [V-phase-1](#v-phase-1-repaired-standards-baseline) | Add answer-level evidence for `meeting-transcript-actions`, then add a no-Claude-environment gate and scheduled runtime regression before a broader package support claim. |
+| `newsroom-agent-ops` | 1.0.0; nine nested skills | Candidate; eight of nine skills passed the [S-smoke-1](#s-smoke-1-cross-client-selection-smoke) selection smoke | Include the nine structurally shared skills. No commands, agents, or hooks are part of this package. Installation and public documentation do not establish runtime support. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; [S-smoke-1](#s-smoke-1-cross-client-selection-smoke) covers selection | Resolve the Codex unrelated-request miss for `email-request-intake`. Run representative recovery, authority-boundary, and external-action verification fixtures before making a runtime support claim. |
 | `okf-wiki` | 0.8.4; one root skill; scripts and generated Claude settings | Pre-set portable runtime pilot passed; optional Claude-output adapter remains | Include the tested Okf-1 path: standards discovery, installed spec and scaffolder reads, explicit project-relative scaffolding, validation, examples, and the generated OKF bundle. Exclude the general onboarding question flow and skill-root resolution; no Codex run has exercised them. The generated `.claude/settings.json` and hook scripts are an inert optional Claude Code adapter, not Codex configuration or lifecycle behavior. | [Okf-release-1](#okf-release-1-okf-wiki-no-claude-runtime-pilot), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [R-phase-1](#r-phase-1-phase-one-repository-checks) | Port and test general onboarding and skill-root resolution; add scheduled Okf-1 coverage against current Codex; test mixed-client hook trust separately before any cross-client lifecycle claim. |
 | `pdf-design` | 1.1.4; one root skill | Adapter required | Shared design guidance and assets now use skill-relative path discovery. Runtime path-resolution evidence is still pending, so no broader Codex claim is made. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add a no-Claude path-resolution fixture before changing the classification. |
 | `pdf-playground` | 1.3.7; one nested skill; eight commands; one hook file | Runtime pilot passed on the Codex project-standards path; Claude-only surfaces unclaimed | Include `$document-design`, its self-contained relative resources, and HTML generation through the tested project copy. Its historical project lock identity has an explicit migration. Exclude the Codex user-level and legacy-package paths, all eight Claude commands, preview lifecycle, and hook behavior. | [D-runtime-1](#d-runtime-1-document-design-codex-project-standards-pilot), [D-lock-release-1](#d-lock-release-1-document-design-standards-lock-migration), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [F-phase-1](#f-phase-1-affected-claude-package-regression) | Add a no-Claude scheduled runtime regression and test user-level installation separately before broadening the claim. |

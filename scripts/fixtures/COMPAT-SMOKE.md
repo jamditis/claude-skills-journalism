@@ -77,6 +77,12 @@ Two decision rules apply under selection scoring:
 A pass shows that the client selected and loaded the skill. It does not grade
 the answer itself.
 
+## Latest results
+
+The October 23, 2026 results, with every miss and what each pass does and does
+not show, are recorded as S-smoke-1 in
+[`plans/codex-compatibility-matrix.md`](../../plans/codex-compatibility-matrix.md#s-smoke-1-cross-client-selection-smoke).
+
 ## Run location
 
 Set `SKILL_EVAL_RUN_ROOT` to a directory outside the system temporary
