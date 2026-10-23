@@ -663,6 +663,10 @@ video {
 .font-semibold {
   font-weight: 600;
 }
+.text-accentDark {
+  --tw-text-opacity: 1;
+  color: rgb(180 83 9 / var(--tw-text-opacity, 1));
+}
 .text-accentDeep {
   --tw-text-opacity: 1;
   color: rgb(146 64 14 / var(--tw-text-opacity, 1));
