@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deadline and reply tracking | Newsroom agent ops</title>
+    <meta name="description" content="Track due dates, acknowledgments, reply windows, waiting states, and the next owner action.">
+    <link rel="canonical" href="https://skills.amditis.tech/deadline-and-reply-tracking/">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="stylesheet" href="../assets/tailwind/deadline-and-reply-tracking.css" data-tailwind-build="3.4.19">
+    <link rel="stylesheet" href="../updated.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta property="og:title" content="Deadline and reply tracking">
+    <meta property="og:description" content="Due dates, acknowledgments, waiting states, and next owner actions.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/deadline-and-reply-tracking/">
+    <meta property="og:image" content="https://skills.amditis.tech/deadline-and-reply-tracking/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Deadline and reply tracking">
+    <meta name="twitter:description" content="Due dates, acknowledgments, waiting states, and next owner actions.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/deadline-and-reply-tracking/og-image.png">
+    <script src="../ask-ai.js" defer></script>
+    <style>body{font-family:"Plus Jakarta Sans",sans-serif}h1,h2,h3{font-family:"Fraunces",serif}.skip-link{position:absolute;left:-9999px}.skip-link:focus{left:1rem;top:1rem;padding:.75rem;background:#17231f;color:#fff}:focus-visible{outline:3px solid #74431b;outline-offset:3px}</style>
+</head>
+<body class="bg-canvas text-ink">
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <nav class="border-b border-ink/10 bg-panel" aria-label="Primary"><div class="max-w-4xl mx-auto px-6 py-4 flex justify-between"><a class="font-semibold text-accentDark hover:underline" href="../newsroom-agent-ops/">Newsroom agent ops</a><a class="font-semibold text-accentDark hover:underline" href="https://github.com/jamditis/claude-skills-journalism/tree/master/newsroom-agent-ops/skills/deadline-and-reply-tracking">View source</a></div></nav>
+    <header class="bg-gradient-to-br from-accentDark to-ink text-white"><div class="max-w-4xl mx-auto px-6 py-16"><p class="text-sm font-semibold uppercase tracking-widest text-white/75">Operations skill</p><h1 class="text-5xl font-bold mt-4">Deadline and reply tracking</h1><p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-10-23T12:00:00-04:00" data-updated-slug="deadline-and-reply-tracking">Updated <time datetime="2026-10-23">Oct 23, 2026</time></p><p class="text-xl text-white/85 mt-6">Reconcile the source that controls a date, then name the next owner action.</p><p class="mt-5 text-sm text-white/80"><strong>Works in:</strong> Claude Code; Codex: not yet runtime-tested.</p></div></header>
+    <main id="main" class="max-w-4xl mx-auto px-6 py-12">
+        <section class="mb-12"><h2 class="text-3xl font-bold">Track separate states</h2><div class="grid md:grid-cols-3 gap-4 mt-5"><article class="rounded-xl bg-panel border border-ink/10 p-5"><h3 class="text-lg font-bold">Acknowledged</h3><p class="text-clay mt-2">A request was received. Work is not complete.</p></article><article class="rounded-xl bg-panel border border-ink/10 p-5"><h3 class="text-lg font-bold">Waiting</h3><p class="text-clay mt-2">A named person or event controls the next step.</p></article><article class="rounded-xl bg-panel border border-ink/10 p-5"><h3 class="text-lg font-bold">Complete</h3><p class="text-clay mt-2">Current source evidence proves the requested result.</p></article></div></section>
+        <section class="mb-12"><h2 class="text-3xl font-bold">Public-records clocks</h2><p class="text-clay mt-4">Record the submission, acknowledgment, extension, statutory clock, response, and appeal window separately. Check the current controlling law before calculating dates. Use <strong>foia-requests</strong> or <strong>brazil-records-requests</strong> for the jurisdiction workflow.</p></section>
+        <section class="rounded-xl bg-panel border border-ink/10 p-6"><h2 class="text-2xl font-bold">Do not infer completion</h2><p class="text-clay mt-3">Silence, an old snapshot, and a sent follow-up are not completion evidence. Keep disputed dates and source conflicts visible.</p></section>
+        <section class="rounded-xl bg-ink text-white p-6 mt-8"><h2 class="text-2xl font-bold">Authorization boundary</h2><p class="text-white/80 mt-3">Prepare a follow-up as a draft unless the written policy authorizes sending it. The project instruction file controls.</p></section>
+        <section class="mt-12"><h2 class="text-3xl font-bold">Install</h2>
+            <p class="text-clay mt-4">Claude Code, as part of the <code>newsroom-agent-ops</code> plugin:</p>
+            <pre class="mt-3 rounded-xl bg-ink text-white p-5 overflow-x-auto text-sm"><code>/plugin marketplace add jamditis/claude-skills-journalism
+/plugin install newsroom-agent-ops@claude-skills-journalism</code></pre>
+            <p class="text-clay mt-4">Codex, or any agent that reads Agent Skills from <code>.agents/skills</code>:</p>
+            <pre class="mt-3 rounded-xl bg-ink text-white p-5 overflow-x-auto text-sm"><code>npx skills@latest add jamditis/claude-skills-journalism \
+  --skill deadline-and-reply-tracking --agent codex --copy -g -y</code></pre>
+        </section>
+    </main>
+    <footer class="border-t border-ink/10"><div class="max-w-4xl mx-auto px-6 py-8 text-sm text-clay flex flex-wrap gap-4 justify-between"><span>Joe Amditis</span><span class="flex gap-6"><a class="hover:underline" href="../">All skills</a><a class="hover:underline" href="https://github.com/jamditis/claude-skills-journalism">GitHub repository</a></span></div></footer>
+    <script defer src="../updated.js"></script>
+</body>
+</html>

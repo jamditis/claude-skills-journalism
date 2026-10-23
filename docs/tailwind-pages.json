@@ -1357,5 +1357,281 @@
         }
       }
     }
+  },
+  "newsroom-agent-ops/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#f3efe3",
+          "ink": "#17231f",
+          "clay": "#3b4a43",
+          "mist": "#66756e",
+          "panel": "#fffaf0",
+          "accent": "#c67b3c",
+          "accentDark": "#74431b"
+        }
+      }
+    }
+  },
+  "unattended-agent-runs/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#f3efe3",
+          "ink": "#17231f",
+          "clay": "#3b4a43",
+          "mist": "#66756e",
+          "panel": "#fffaf0",
+          "accent": "#c67b3c",
+          "accentDark": "#74431b"
+        }
+      }
+    }
+  },
+  "scheduled-briefing/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#f3efe3",
+          "ink": "#17231f",
+          "clay": "#3b4a43",
+          "mist": "#66756e",
+          "panel": "#fffaf0",
+          "accent": "#c67b3c",
+          "accentDark": "#74431b"
+        }
+      }
+    }
+  },
+  "deadline-and-reply-tracking/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#f3efe3",
+          "ink": "#17231f",
+          "clay": "#3b4a43",
+          "mist": "#66756e",
+          "panel": "#fffaf0",
+          "accent": "#c67b3c",
+          "accentDark": "#74431b"
+        }
+      }
+    }
+  },
+  "email-request-intake/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#f3efe3",
+          "ink": "#17231f",
+          "clay": "#3b4a43",
+          "mist": "#66756e",
+          "panel": "#fffaf0",
+          "accent": "#c67b3c",
+          "accentDark": "#74431b"
+        }
+      }
+    }
+  },
+  "document-delivery/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#f3efe3",
+          "ink": "#17231f",
+          "clay": "#3b4a43",
+          "mist": "#66756e",
+          "panel": "#fffaf0",
+          "accent": "#c67b3c",
+          "accentDark": "#74431b"
+        }
+      }
+    }
+  },
+  "chat-mention-triage/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#f3efe3",
+          "ink": "#17231f",
+          "clay": "#3b4a43",
+          "mist": "#66756e",
+          "panel": "#fffaf0",
+          "accent": "#c67b3c",
+          "accentDark": "#74431b"
+        }
+      }
+    }
+  },
+  "record-reconciliation/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#f3efe3",
+          "ink": "#17231f",
+          "clay": "#3b4a43",
+          "mist": "#66756e",
+          "panel": "#fffaf0",
+          "accent": "#c67b3c",
+          "accentDark": "#74431b"
+        }
+      }
+    }
+  },
+  "multi-agent-coordinator/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#f3efe3",
+          "ink": "#17231f",
+          "clay": "#3b4a43",
+          "mist": "#66756e",
+          "panel": "#fffaf0",
+          "accent": "#c67b3c",
+          "accentDark": "#74431b"
+        }
+      }
+    }
+  },
+  "issue-pool-progression/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#f3efe3",
+          "ink": "#17231f",
+          "clay": "#3b4a43",
+          "mist": "#66756e",
+          "panel": "#fffaf0",
+          "accent": "#c67b3c",
+          "accentDark": "#74431b"
+        }
+      }
+    }
+  },
+  "meeting-transcript-actions/index.html": {
+    "theme": {
+      "extend": {
+        "fontFamily": {
+          "display": [
+            "Fraunces",
+            "serif"
+          ],
+          "body": [
+            "Plus Jakarta Sans",
+            "sans-serif"
+          ]
+        },
+        "colors": {
+          "canvas": "#f4f0fa",
+          "ink": "#24133b",
+          "clay": "#4b3b59",
+          "mist": "#6f6479",
+          "accent": "#7c3aed",
+          "accentDark": "#6d28d9",
+          "accentDeep": "#4c1d95",
+          "accentLight": "#ede9fe"
+        }
+      }
+    }
   }
 }

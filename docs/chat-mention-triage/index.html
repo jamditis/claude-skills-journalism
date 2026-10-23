@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat mention triage | Newsroom agent ops</title>
+    <meta name="description" content="Classify team-chat mentions, track distinct work, and avoid duplicating the designated live responder.">
+    <link rel="canonical" href="https://skills.amditis.tech/chat-mention-triage/">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="stylesheet" href="../assets/tailwind/chat-mention-triage.css" data-tailwind-build="3.4.19">
+    <link rel="stylesheet" href="../updated.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta property="og:title" content="Chat mention triage">
+    <meta property="og:description" content="Track distinct work without duplicating the live responder.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/chat-mention-triage/">
+    <meta property="og:image" content="https://skills.amditis.tech/chat-mention-triage/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Chat mention triage">
+    <meta name="twitter:description" content="Track distinct work without duplicating the live responder.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/chat-mention-triage/og-image.png">
+    <script src="../ask-ai.js" defer></script>
+    <style>body{font-family:"Plus Jakarta Sans",sans-serif}h1,h2,h3{font-family:"Fraunces",serif}.skip-link{position:absolute;left:-9999px}.skip-link:focus{left:1rem;top:1rem;padding:.75rem;background:#17231f;color:#fff}:focus-visible{outline:3px solid #74431b;outline-offset:3px}</style>
+</head>
+<body class="bg-canvas text-ink">
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <nav class="border-b border-ink/10 bg-panel" aria-label="Primary"><div class="max-w-4xl mx-auto px-6 py-4 flex justify-between"><a class="font-semibold text-accentDark hover:underline" href="../newsroom-agent-ops/">Newsroom agent ops</a><a class="font-semibold text-accentDark hover:underline" href="https://github.com/jamditis/claude-skills-journalism/tree/master/newsroom-agent-ops/skills/chat-mention-triage">View source</a></div></nav>
+    <header class="bg-gradient-to-br from-accentDark to-ink text-white"><div class="max-w-4xl mx-auto px-6 py-16"><p class="text-sm font-semibold uppercase tracking-widest text-white/75">Operations skill</p><h1 class="text-5xl font-bold mt-4">Chat mention triage</h1><p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-10-23T12:00:00-04:00" data-updated-slug="chat-mention-triage">Updated <time datetime="2026-10-23">Oct 23, 2026</time></p><p class="text-xl text-white/85 mt-6">One designated responder owns replies. Other agents classify, track, and hand off.</p><p class="mt-5 text-sm text-white/80"><strong>Works in:</strong> Claude Code; Codex: not yet runtime-tested.</p></div></header>
+    <main id="main" class="max-w-4xl mx-auto px-6 py-12">
+        <section class="mb-12"><h2 class="text-3xl font-bold">Five classifications</h2><div class="grid md:grid-cols-2 gap-4 mt-5 text-clay"><div class="rounded-xl bg-panel border border-ink/10 p-5">Request</div><div class="rounded-xl bg-panel border border-ink/10 p-5">Decision</div><div class="rounded-xl bg-panel border border-ink/10 p-5">Social acknowledgment</div><div class="rounded-xl bg-panel border border-ink/10 p-5">Duplicate or already processed</div><div class="rounded-xl bg-panel border border-ink/10 p-5">Work owned by the designated responder</div></div></section>
+        <section class="mb-12"><h2 class="text-3xl font-bold">Read context before tracking</h2><p class="text-clay mt-4">Read the surrounding thread and processed state. Reuse an existing task. Keep requester and assignee separate. Verify tracker writes by readback.</p></section>
+        <section class="rounded-xl bg-panel border border-ink/10 p-6"><h2 class="text-2xl font-bold">Avoid duplicate replies</h2><p class="text-clay mt-3">A tracking agent does not send a second answer because it can see the mention. Reply only when the policy assigns this agent as the live responder.</p></section>
+        <section class="rounded-xl bg-ink text-white p-6 mt-8"><h2 class="text-2xl font-bold">Authorization boundary</h2><p class="text-white/80 mt-3">The written policy names who may reply, react, or change records. The project instruction file controls.</p></section>
+        <section class="mt-12"><h2 class="text-3xl font-bold">Install</h2>
+            <p class="text-clay mt-4">Claude Code, as part of the <code>newsroom-agent-ops</code> plugin:</p>
+            <pre class="mt-3 rounded-xl bg-ink text-white p-5 overflow-x-auto text-sm"><code>/plugin marketplace add jamditis/claude-skills-journalism
+/plugin install newsroom-agent-ops@claude-skills-journalism</code></pre>
+            <p class="text-clay mt-4">Codex, or any agent that reads Agent Skills from <code>.agents/skills</code>:</p>
+            <pre class="mt-3 rounded-xl bg-ink text-white p-5 overflow-x-auto text-sm"><code>npx skills@latest add jamditis/claude-skills-journalism \
+  --skill chat-mention-triage --agent codex --copy -g -y</code></pre>
+        </section>
+    </main>
+    <footer class="border-t border-ink/10"><div class="max-w-4xl mx-auto px-6 py-8 text-sm text-clay flex flex-wrap gap-4 justify-between"><span>Joe Amditis</span><span class="flex gap-6"><a class="hover:underline" href="../">All skills</a><a class="hover:underline" href="https://github.com/jamditis/claude-skills-journalism">GitHub repository</a></span></div></footer>
+    <script defer src="../updated.js"></script>
+</body>
+</html>
