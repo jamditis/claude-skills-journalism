@@ -300,6 +300,9 @@ export function buildInvocation(client, fixture, prepared, env = process.env, co
         '--json-schema',
         JSON.stringify(RESPONSE_SCHEMA),
         '--no-session-persistence',
+        // --tools limits only built-in tools; this keeps account and user MCP
+        // servers out of the probe.
+        '--strict-mcp-config',
         '--permission-mode',
         'dontAsk',
         '--setting-sources',

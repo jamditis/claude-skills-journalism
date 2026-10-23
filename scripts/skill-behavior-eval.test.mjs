@@ -246,6 +246,7 @@ test('invocations use bounded isolated print sessions without direct APIs', () =
   assert.ok(claude.args.includes('-p'));
   assert.ok(claude.args.includes('--plugin-dir'));
   assert.ok(claude.args.includes('--no-session-persistence'));
+  assert.ok(claude.args.includes('--strict-mcp-config'));
   assert.deepEqual(claude.args.slice(-2), ['--tools', '']);
 
   const codex = buildInvocation('codex', fixture, {
