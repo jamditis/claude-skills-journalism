@@ -911,7 +911,7 @@ test('competitive runs install every fixture skill, drop the hint, and skip name
     writeFileSync(fixturesPath, `${JSON.stringify(fixtureSet, null, 2)}\n`);
     await runCli([
       '--candidate-only', '--competitive', '--candidate', ROOT, '--fixtures', fixturesPath,
-      '--all', '--runtime', 'codex', '--max-cases', '2', '--output', outputDir, '--dry-run',
+      '--all', '--runtime', 'codex', '--max-cases', '3', '--output', outputDir, '--dry-run',
     ]);
     const report = JSON.parse(readFileSync(
       join(outputDir, 'skill-behavior-evaluation.json'),
@@ -1022,7 +1022,7 @@ test('a failed client run stops new jobs and still writes the report', async () 
     let invocations = 0;
     await runCli([
       '--candidate-only', '--candidate', ROOT, '--fixtures', fixturesPath, '--all',
-      '--runtime', 'codex', '--max-cases', '1', '--concurrency', '1',
+      '--runtime', 'codex', '--max-cases', '3', '--concurrency', '1',
       '--output', join(temp, 'output'),
     ], {
       runInvocation: async () => {

@@ -618,12 +618,9 @@ function resolveCases(options, fixtureSet) {
     if (!fixture) throw new Error(`Unknown evaluation case: ${options.caseId}`);
     return [fixture];
   }
-  const boundedCount = options.candidateOnly
-    ? new Set(fixtureSet.cases.map((fixture) => fixture.skill)).size
-    : fixtureSet.cases.length;
-  if (boundedCount > options.maxCases) {
+  if (fixtureSet.cases.length > options.maxCases) {
     throw new Error(
-      `The full set has ${boundedCount} ${options.candidateOnly ? 'skills' : 'cases'}. `
+      `The full set has ${fixtureSet.cases.length} cases. `
       + 'Increase --max-cases to at least that value.',
     );
   }
@@ -689,8 +686,8 @@ export function parseCliArgs(args) {
   if (!['claude', 'codex', 'both'].includes(options.runtime)) {
     throw new Error('--runtime must be claude, codex, or both');
   }
-  if (!Number.isSafeInteger(options.maxCases) || options.maxCases < 1 || options.maxCases > 100) {
-    throw new Error('--max-cases must be an integer from 1 through 100');
+  if (!Number.isSafeInteger(options.maxCases) || options.maxCases < 1 || options.maxCases > 500) {
+    throw new Error('--max-cases must be an integer from 1 through 500');
   }
   if (!Number.isSafeInteger(options.concurrency)
     || options.concurrency < 1

@@ -10,12 +10,12 @@ node scripts/skill-behavior-eval.mjs \
   --fixtures scripts/fixtures/compat-smoke.json \
   --runtime both \
   --all \
-  --max-cases 100 \
+  --max-cases 227 \
   --concurrency 3 \
   --output /tmp/compat-smoke-<date>
 ```
 
-Candidate-only mode applies `--max-cases` to the number of distinct skills.
+`--max-cases` must be at least the number of cases in the selection.
 This fixture contains 76 skills and 227 prompt cases. Each case runs once in
 each selected client. The report keeps fixture order even when client processes
 run concurrently.
@@ -24,7 +24,7 @@ Each skill has up to three cases. They prove different things:
 
 | Category | Prompt | A pass shows |
 |---|---|---|
-| `activation` | Names the skill (`/skill-evaluation:<skill>` in Claude Code, `$<skill>` in Codex) | The skill loads and gives a correct answer when a user asks for it by name |
+| `activation` | Names the skill (`/skill-evaluation:<skill>` in Claude Code, `$<skill>` in Codex) | The client accepts the named skill. The answer itself is not graded |
 | `implicit-activation` | The same request without the skill name | The client accepts the skill when it is the only one installed |
 | `unrelated-non-trigger` | An unrelated request | The client leaves the skill alone |
 
