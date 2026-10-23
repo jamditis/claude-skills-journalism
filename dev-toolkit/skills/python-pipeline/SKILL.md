@@ -345,7 +345,8 @@ from google.genai import types
 # Client carries config (API key, project, location). Reuse across calls.
 client = genai.Client(api_key=os.environ['GEMINI_API_KEY'])
 
-# Model IDs drift. Require an explicit configured model instead of shipping a default.
+# Model IDs drift. Set GEMINI_MODEL from the current list at
+# ai.google.dev/gemini-api/docs/models instead of shipping a default.
 CONFIGURED_MODEL = os.environ['GEMINI_MODEL']
 
 class AIService:
