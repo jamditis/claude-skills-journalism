@@ -27,7 +27,7 @@ still required before the package classification can change.
 
 ## See also
 
-- [`dev-toolkit`](../dev-toolkit/README.md), 12 development skills (accessibility, Electron, scraping, frontend patterns, project instruction maintenance)
+- [`dev-toolkit`](../dev-toolkit/README.md), 14 development skills (accessibility, Electron, scraping, frontend patterns, minimal-code implementation, UI completeness, project instruction maintenance)
 - [`journalism-core`](../journalism-core/README.md), 15 skills for reporting, verification, publishing
 - [`research-toolkit`](../research-toolkit/README.md), 6 skills for research, archives, academic workflows
 - [`security-toolkit`](../security-toolkit/README.md), 3 defensive security skills for web apps and APIs

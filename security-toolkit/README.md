@@ -48,6 +48,6 @@ lifecycle are **Claude-only**. No Codex command adapter is provided or approved.
 
 ## See also
 
-- [`dev-toolkit`](../dev-toolkit/README.md), 12 development skills (accessibility, Electron, scraping, frontend patterns, project instruction maintenance)
+- [`dev-toolkit`](../dev-toolkit/README.md), 14 development skills (accessibility, Electron, scraping, frontend patterns, minimal-code implementation, UI completeness, project instruction maintenance)
 - [`journalism-core`](../journalism-core/README.md), 15 skills for reporting, verification, publishing
 - [`research-toolkit`](../research-toolkit/README.md), 6 skills for research, archives, academic workflows
