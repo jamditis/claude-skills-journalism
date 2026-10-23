@@ -299,7 +299,7 @@ test('unrelated fixtures use implicit discovery without forcing either client sy
     assert.match(prompt, /candidate skill/u);
     assert.match(prompt, /Do not activate it merely because it is installed/u);
     assert.match(prompt, /never name the rejected candidate skill/u);
-    assert.match(prompt, /Use only the runtime's skill mechanism/u);
+    assert.match(prompt, /load it through the runtime's skill mechanism/u);
     if (client === 'claude') {
       assert.ok(invocation.args.includes('--verbose'));
       assert.deepEqual(
@@ -858,4 +858,21 @@ test('implicit activation passes only when the client selected the skill itself'
   assert.equal(missing.pass, false);
   assert.deepEqual(missing.failed, ['activation']);
   assert.equal(scoreResult(fixture, response, {}).pass, false);
+});
+
+test('selection scoring gates on decision, skill, and activation and keeps wording advisory', () => {
+  const fixture = {
+    id: 'x-implicit',
+    skill: 'web-scraping',
+    package: 'dev-toolkit',
+    category: 'implicit-activation',
+    scoring: 'selection',
+    prompt: 'Collect public agenda pages.',
+    expect: { decision: 'use', branch: 'public scraping', terms: ['provenance'] },
+  };
+  const response = { decision: 'use', skill: 'skill-evaluation:web-scraping', branch: 'agenda collection' };
+  const result = scoreResult(fixture, response, { candidateSkillActivated: true });
+  assert.equal(result.pass, true);
+  assert.deepEqual(result.advisory, ['branch', 'terms']);
+  assert.equal(scoreResult(fixture, { ...response, decision: 'reject' }, { candidateSkillActivated: true }).pass, false);
 });

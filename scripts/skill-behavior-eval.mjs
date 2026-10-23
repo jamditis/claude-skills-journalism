@@ -114,6 +114,10 @@ export function loadFixtureSet(path = DEFAULT_FIXTURES) {
   if (parsed.schemaVersion !== 1 || !Array.isArray(parsed.cases)) {
     throw new Error('The fixture set must use schema version 1 and contain cases');
   }
+  const scoring = parsed.scoring ?? 'strict';
+  if (!['strict', 'selection'].includes(scoring)) {
+    throw new Error(`Invalid fixture-set scoring mode: ${scoring}`);
+  }
   const ids = new Set();
   for (const fixture of parsed.cases) {
     if (ids.has(fixture.id)) throw new Error(`Duplicate fixture id: ${fixture.id}`);
@@ -130,6 +134,7 @@ export function loadFixtureSet(path = DEFAULT_FIXTURES) {
     if (!['use', 'reject', 'ask', 'stop'].includes(fixture.expect?.decision)) {
       throw new Error(`Invalid decision for fixture: ${fixture.id}`);
     }
+    fixture.scoring = scoring;
   }
   return parsed;
 }
@@ -234,7 +239,8 @@ function evaluationPrompt(client, fixture) {
       + 'a neighboring skill; never name the rejected candidate skill. '
     : `${prefix}\n\nEvaluate the request with the installed skill. `;
   const toolRule = usesImplicitRouting(fixture)
-    ? "Use only the runtime's skill mechanism. Do not use any other tools. "
+    ? "If the candidate skill applies, load it through the runtime's skill mechanism before answering "
+      + '(in Codex, read its SKILL.md). Do not use any other tools. '
     : 'Do not use tools. ';
   return routing
     + toolRule
@@ -456,13 +462,15 @@ export function scoreResult(fixture, response, runtimeEvidence = {}) {
     decision: response.decision === fixture.expect.decision,
     skill: fixture.expect.decision === 'reject'
       ? responseSkill !== fixture.skill
-      : response.skill === fixture.skill,
+      : responseSkill === fixture.skill,
     branch: branchMatches,
     terms: termMatches,
   };
-  const failed = Object.entries(checks)
-    .filter(([, passed]) => !passed)
-    .map(([name]) => name);
+  // Selection scoring gates on decision, skill, and runtime activation evidence.
+  // Branch and term matches stay in the result as advisory quality signals.
+  const gating = fixture.scoring === 'selection' ? ['decision', 'skill'] : Object.keys(checks);
+  const failed = gating.filter((name) => !checks[name]);
+  const advisory = Object.keys(checks).filter((name) => !gating.includes(name) && !checks[name]);
   if (isUnrelatedNonTrigger(fixture) && runtimeEvidence.candidateSkillActivated !== false) {
     failed.push('activation');
   }
@@ -470,11 +478,13 @@ export function scoreResult(fixture, response, runtimeEvidence = {}) {
     failed.push('activation');
   }
   const score = Object.values(checks).filter(Boolean).length;
-  return { pass: failed.length === 0, score, failed };
+  return { pass: failed.length === 0, score, failed, ...(advisory.length ? { advisory } : {}) };
 }
 
 export function runInvocation(invocation, responsePath, client, run = spawnSync) {
   const result = run(invocation.command, invocation.args, {
+    // An empty input closes stdin so Codex exec does not wait for more prompt text.
+    input: '',
     cwd: invocation.cwd,
     env: { ...process.env, ...invocation.env },
     shell: false,
@@ -507,7 +517,7 @@ export function runInvocation(invocation, responsePath, client, run = spawnSync)
 
 function execFileResult(command, args, options) {
   return new Promise((resolveResult) => {
-    execFile(command, args, options, (error, stdout, stderr) => {
+    const child = execFile(command, args, options, (error, stdout, stderr) => {
       resolveResult({
         status: error && Number.isInteger(error.code) ? error.code : (error ? null : 0),
         signal: error?.signal ?? null,
@@ -516,6 +526,8 @@ function execFileResult(command, args, options) {
         stderr,
       });
     });
+    // Codex exec reads a non-TTY stdin as extra prompt input and waits for EOF.
+    child.stdin?.end();
   });
 }
 
@@ -726,7 +738,11 @@ export async function runCli(
       };
     }
 
-    const runRoot = mkdtempSync(join(tmpdir(), `skill-eval-${client}-${variant}-`));
+    // Codex refuses to create its sandbox helpers under the system temporary
+    // directory, so SKILL_EVAL_RUN_ROOT can place run homes elsewhere.
+    const runBase = process.env.SKILL_EVAL_RUN_ROOT || tmpdir();
+    mkdirSync(runBase, { recursive: true, mode: 0o700 });
+    const runRoot = mkdtempSync(join(runBase, `skill-eval-${client}-${variant}-`));
     try {
       const prepared = prepareVariant({
         client,

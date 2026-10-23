@@ -3,6 +3,7 @@
 Run the full fixture against one candidate tree:
 
 ```sh
+SKILL_EVAL_RUN_ROOT="$HOME/.cache/skill-eval-runs" \
 node scripts/skill-behavior-eval.mjs \
   --candidate-only \
   --candidate . \
@@ -38,3 +39,19 @@ instead of stopping.
 This result is activation evidence for the tested tree and client versions. It
 is not a package-wide support claim and does not replace resource, runtime,
 security-boundary, or clean-environment checks.
+
+## Scoring
+
+The fixture set uses `selection` scoring. A case passes on the decision, the
+named skill, and, for implicit and unrelated cases, runtime activation
+evidence. Branch wording and expected terms are reported as `advisory`; they
+were not calibrated against real client output.
+
+## Run location
+
+Set `SKILL_EVAL_RUN_ROOT` to a directory outside the system temporary
+directory. Codex refuses to create its sandbox helpers under `/tmp`, so a run
+home there blocks every shell read, including reading `SKILL.md`.
+
+Optional `SKILL_EVAL_CLAUDE_MODEL` and `SKILL_EVAL_CODEX_MODEL` pin the models.
+Record the client versions and models with any published result.
