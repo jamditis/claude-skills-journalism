@@ -38,7 +38,7 @@ done operation after the summary is complete.
                     record_blocked(run_id, "done without a readable summary")
                     alert_operator(run_id)
                     return BLOCKED     # keep the lease
-                deliver_summary_once(run_id)   # skips if a delivery receipt exists
+                deliver_summary_once(run_id)
                 archive_checkpoint(run_id)
                 clear_lease(run_id)
                 return COMPLETE
@@ -49,16 +49,32 @@ done operation after the summary is complete.
 
             wait_for_event_or_probe_interval()
 
+    function deliver_summary_once(run_id):
+        if delivery_receipt_exists(run_id):
+            return
+        if delivery_pending(run_id):
+            # A send may have reached the destination before the crash.
+            if destination_has_summary(run_id):
+                record_delivery_receipt(run_id)
+                return
+        mark_delivery_pending(run_id)
+        send_summary(run_id, idempotency_key=run_id)
+        record_delivery_receipt(run_id)
+
 A producer restart is not session loss. Only the done path clears a lease, so a
 restarted producer finds the old run's lease, takes ownership of the same run
 ID, and keeps supervising it. `compare_and_swap_owner` replaces the owner only
 if the lease still names the dead producer, so two restarted producers cannot
 both adopt it.
 
-Deliver the summary before clearing the lease, and record a delivery receipt
-keyed by run ID. If the producer stops between delivery and clearing, the next
-producer adopts the lease, sees the receipt, and finishes without sending the
-summary twice.
+Deliver the summary before clearing the lease. A local receipt alone cannot
+prevent a duplicate: the producer can stop after the destination accepts the
+summary but before the receipt is saved. Record a pending marker before the
+send, and send with the run ID as an idempotency key. After a restart, a
+pending marker with no receipt means the send is ambiguous. Check the
+destination for that run ID before sending again. If the destination supports
+neither an idempotency key nor a lookup, delivery is at least once: put the run
+ID in the summary so a duplicate is easy to recognize.
 
 Elapsed age alone is not session loss. The producer checks the real session or
 process and compares both process ID and process start marker.
