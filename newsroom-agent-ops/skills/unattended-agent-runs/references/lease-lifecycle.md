@@ -52,7 +52,7 @@ it confirms summary delivery.
                 clear_lease(run_id)
                 return COMPLETE
 
-            if session_is_really_lost():
+            if session_is_really_lost() and not operator_hold_exists(run_id):
                 restart_fresh_session()
                 reinject_recovery_notice(run_id)
             elif done_was_refused(run_id) or no_checkpoint_progress_for(run_id, stall_threshold):
@@ -93,10 +93,11 @@ both adopt it.
 
 Set `stall_threshold` above the longest run you expect. A stall alert never
 releases the lease. The operator inspects the run and decides. To end it, the
-operator first stops the session and confirms that it exited, or fences it so it
-cannot act. Then the operator reconciles any pending side effect and clears the
-lease by hand. Never clear the lease of a session that can still act: the next
-run would overlap it.
+operator first sets an operator hold for the run, so the producer does not start
+a replacement session. Then the operator stops the session and confirms that it
+exited, reconciles any pending side effect, clears the lease by hand, and
+removes the hold. Never clear the lease while any session for the run can still
+act: the next run would overlap it.
 
 Deliver the summary before clearing the lease. Record the receipt only after
 the destination shows the summary; an accepted or queued send is not proof.
@@ -151,13 +152,15 @@ The done operation fails closed unless:
 - Every prompt page is recorded as read.
 - The checkpoint phase is summary-written or blocked.
 - The summary file exists and is readable.
-- No side-effect-pending phase remains unresolved.
+- No side effect is unresolved: if `side_effect.intended_at` is set,
+  `completed_at` and `readback` are set too. Check the `side_effect` record,
+  not the phase, because a blocked checkpoint replaces the phase.
 
 When done refuses, it records which check failed in the checkpoint and returns
 that reason to the agent. The agent fixes the cause, such as reading the
 unrecorded prompt pages, and runs done again. If it cannot, it writes a blocked
-checkpoint and summary and runs done. An unresolved side-effect-pending phase
-still refuses; the producer's stall alert brings in a person.
+checkpoint and summary and runs done. An unresolved side effect still refuses,
+even in a blocked checkpoint; the producer's stall alert brings in a person.
 
 Make done idempotent for the same completed run. A second call can report
 already complete, but it must not mark another run complete. Done never clears
