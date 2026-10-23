@@ -296,12 +296,18 @@ session that the scheduler feeds a prompt at each wake. Build this only when the
 owner asks for it. The rules that make it safe:
 
 - **One wake at a time.** The scheduler takes a single-flight lease before it
-  sends a wake. Only an explicit done step from the session (for example
+  sends a wake. An explicit done step from the session (for example
   `wake-done <wake-id>`) releases it. The next wake waits.
 - **Watch for real failure, not elapsed time.** The scheduler records its own
   process ID and start time, and checks once a minute that the session process is
   still alive. It fails a wake on session loss or a delivery error, not because
   the work took long.
+- **The scheduler releases a failed wake.** A session that never got the whole
+  prompt, or that died, cannot run the done step. When the scheduler fails a
+  wake, it writes the failure and the wake ID to the checkpoint, then clears the
+  lease only if the lease still names that wake. The next session reads that
+  checkpoint first, so a `side-effect-pending` phase is still checked before
+  anything is retried.
 - **Read the whole prompt.** Long prompts arrive in pages. The session records
   each page it read, and the done step refuses to run until every page is
   recorded.
