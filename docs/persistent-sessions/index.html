@@ -697,7 +697,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <section id="supervise" class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Survive reboots: supervise the session</h2>
             <p class="text-clay/80 mb-4">tmux keeps a session alive when you disconnect, but not when the server restarts. On a Linux server with systemd, run the tmux session as a user service. systemd starts it at boot, restarts it if it crashes, and can cap its memory so one runaway tool cannot take down the machine.</p>
-            <p class="text-clay/80 mb-4">systemd watches the tmux server, not the agent. Keep this session to one window that runs only the agent. When the agent exits, its window closes, the tmux server exits, and systemd starts it again. Open logs and shells in a separate tmux session, not as extra windows here: an extra window keeps the server alive after the agent dies, and nothing restarts it.</p>
+            <p class="text-clay/80 mb-4">systemd watches the tmux server, not the agent. Keep this session to one window that runs only the agent. When the agent exits, its window closes, the tmux server exits, and systemd starts it again. Open logs and shells on a different tmux server (plain <code>tmux</code>, not <code>tmux -L agent</code>), not as extra windows or sessions here: anything else on this server keeps it alive after the agent dies, and nothing restarts it.</p>
             <div class="terminal-bar">
                 <div class="terminal-titlebar">
                     <div class="terminal-dot bg-red-400"></div>
@@ -738,16 +738,20 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     #!/bin/sh<br>
                     <span class="terminal-dim"># Resume the supervised conversation by its pinned ID; create it on first start.</span><br>
                     id_file="$HOME/.config/agent-session/id"<br>
-                    if [ -s "$id_file" ]; then<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;exec "$HOME/.local/bin/claude" --resume "$(cat "$id_file")"<br>
+                    store="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/projects"<br>
+                    if [ ! -s "$id_file" ]; then<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;mkdir -p "$(dirname "$id_file")"<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;cat /proc/sys/kernel/random/uuid &gt; "$id_file"<br>
                     fi<br>
-                    mkdir -p "$(dirname "$id_file")"<br>
-                    id="$(cat /proc/sys/kernel/random/uuid)"<br>
-                    printf '%s\n' "$id" &gt; "$id_file"<br>
+                    id="$(cat "$id_file")"<br>
+                    <span class="terminal-dim"># Resume only a conversation that was actually saved; otherwise create it with this ID.</span><br>
+                    if ls "$store"/*/"$id".jsonl &gt;/dev/null 2&gt;&amp;1; then<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;exec "$HOME/.local/bin/claude" --resume "$id"<br>
+                    fi<br>
                     exec "$HOME/.local/bin/claude" --session-id "$id"
                 </div>
             </div>
-            <p class="text-clay/80 text-sm mt-3 mb-4">Make it executable with <code>chmod +x</code>. Codex cannot choose an ID up front: start the session once by hand, write its session ID to the same file, and change the resume line to <code>exec /path/to/codex resume --no-daemon "$(cat "$id_file")"</code>. Without <code>--no-daemon</code>, Codex can run tools in a shared app-server outside this unit's limits.</p>
+            <p class="text-clay/80 text-sm mt-3 mb-4">Make it executable with <code>chmod +x</code>. If the first start fails before Claude saves the conversation, the next start creates it under the same ID instead of trying to resume a conversation that does not exist. Codex cannot choose an ID up front: start the session once by hand, write its session ID to the same file, and replace both exec lines with <code>exec /path/to/codex resume --no-daemon "$(cat "$id_file")"</code>. Without <code>--no-daemon</code>, Codex can run tools in a shared app-server outside this unit's limits.</p>
             <div class="terminal-bar mt-4">
                 <div class="terminal-titlebar">
                     <div class="terminal-dot bg-red-400"></div>
