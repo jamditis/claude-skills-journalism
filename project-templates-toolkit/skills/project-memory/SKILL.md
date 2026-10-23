@@ -1,6 +1,6 @@
 ---
 name: project-memory
-description: Generates project instruction files that transfer institutional knowledge. Use when setting up projects or onboarding.
+description: Generates project instruction files (AGENTS.md or CLAUDE.md) that transfer institutional knowledge. Use when setting up projects or onboarding. For lessons from a finished project or investigation, use project-retrospective.
 ---
 
 # Project memory generator
