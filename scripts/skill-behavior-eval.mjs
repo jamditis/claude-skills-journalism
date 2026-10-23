@@ -712,17 +712,25 @@ function commandVersion(command) {
 async function mapConcurrent(items, concurrency, callback) {
   const results = new Array(items.length);
   let nextIndex = 0;
+  let firstError;
   const worker = async () => {
-    while (nextIndex < items.length) {
+    // Each job can be a billed client run, so stop handing out jobs after the
+    // first failure. Jobs already running finish and keep their results.
+    while (nextIndex < items.length && firstError === undefined) {
       const index = nextIndex;
       nextIndex += 1;
-      results[index] = await callback(items[index]);
+      try {
+        results[index] = await callback(items[index]);
+      } catch (error) {
+        firstError ??= error;
+        results[index] = { status: 'error', reason: redactText(error.message) };
+      }
     }
   };
   await Promise.all(
     Array.from({ length: Math.min(concurrency, items.length) }, () => worker()),
   );
-  return results;
+  return { results, error: firstError };
 }
 
 export async function runCli(
@@ -734,6 +742,9 @@ export async function runCli(
   // Competitive runs skip named cases: naming a skill bypasses selection.
   const fixtures = resolveCases(options, fixtureSet)
     .filter((fixture) => !options.competitive || usesImplicitRouting(fixture));
+  if (fixtures.length === 0) {
+    throw new Error('No runnable cases: --competitive runs only unnamed implicit and unrelated cases');
+  }
   const extraSkills = options.competitive
     ? [...new Map(fixtureSet.cases.map((fixture) => [
       fixture.skill,
@@ -761,17 +772,22 @@ export async function runCli(
     ([variant, sourceRoot]) => ({ fixture, client, variant, sourceRoot }),
   )));
   const missingSkillsByKey = new Map();
-  for (const job of jobs) {
-    const source = skillSource(job.sourceRoot, job.fixture.package, job.fixture.skill);
+  const competitors = extraSkills.flatMap((extra) => variants.map(([, sourceRoot]) => ({
+    sourceRoot,
+    fixture: extra,
+  })));
+  for (const { sourceRoot, fixture } of [...jobs, ...competitors]) {
+    const source = skillSource(sourceRoot, fixture.package, fixture.skill);
     if (!existsSync(join(source, 'SKILL.md'))) {
-      const key = `${job.fixture.package}\0${job.fixture.skill}`;
-      missingSkillsByKey.set(key, {
-        package: job.fixture.package,
-        skill: job.fixture.skill,
-      });
+      const key = `${fixture.package}\0${fixture.skill}`;
+      missingSkillsByKey.set(key, { package: fixture.package, skill: fixture.skill });
     }
   }
   const missingSkills = [...missingSkillsByKey.values()];
+  // A dry run reports missing competitors instead of failing while copying them.
+  const installableExtras = extraSkills.filter(
+    (extra) => !missingSkillsByKey.has(`${extra.package}\0${extra.skill}`),
+  );
   if (!options.dryRun && missingSkills.length > 0) {
     throw new Error(
       `Missing skill source${missingSkills.length === 1 ? '' : 's'}: `
@@ -779,7 +795,7 @@ export async function runCli(
     );
   }
 
-  const results = await mapConcurrent(jobs, options.concurrency, async (job) => {
+  const { results: settled, error: runError } = await mapConcurrent(jobs, options.concurrency, async (job) => {
     const { fixture, client, variant, sourceRoot } = job;
     const source = skillSource(sourceRoot, fixture.package, fixture.skill);
     if (!existsSync(join(source, 'SKILL.md'))) {
@@ -807,7 +823,7 @@ export async function runCli(
         runRoot,
         packageName: fixture.package,
         skillName: fixture.skill,
-        extraSkills,
+        extraSkills: installableExtras,
         authSourceHome: client === 'codex'
           ? (process.env.CODEX_HOME ?? join(homedir(), '.codex'))
           : (process.env.CLAUDE_CONFIG_DIR ?? join(homedir(), '.claude')),
@@ -845,6 +861,19 @@ export async function runCli(
       rmSync(runRoot, { recursive: true, force: true });
     }
   });
+  // Keep every job in the report, so a stopped run still shows what ran.
+  const results = Array.from(settled, (item, index) => {
+    if (item && item.status !== 'error') return item;
+    const { fixture, client, variant } = jobs[index];
+    return {
+      case: fixture.id,
+      category: fixture.category,
+      skill: fixture.skill,
+      client,
+      variant,
+      ...(item ?? { status: 'not-run', reason: 'Stopped after an earlier job failed' }),
+    };
+  });
 
   const report = {
     schemaVersion: 1,
@@ -870,7 +899,10 @@ export async function runCli(
     mode: 0o600,
   });
   console.log(reportPath);
-  if (!options.dryRun && results.some((item) => !item.result.pass)) process.exitCode = 2;
+  if (runError) {
+    console.error(redactText(runError.message));
+    process.exitCode = 1;
+  } else if (!options.dryRun && results.some((item) => !item.result?.pass)) process.exitCode = 2;
 }
 
 const entryPoint = process.argv[1] ? pathToFileURL(resolve(process.argv[1])).href : '';

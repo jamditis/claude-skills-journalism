@@ -1015,3 +1015,85 @@ test('runtime evidence lists every skill a Codex session read', () => {
     ['web-archiving', 'web-scraping'],
   );
 });
+
+function writeFixtureSet(temp, cases) {
+  const fixturesPath = join(temp, 'fixtures.json');
+  writeFileSync(fixturesPath, `${JSON.stringify({ schemaVersion: 1, cases }, null, 2)}\n`);
+  return fixturesPath;
+}
+
+const WEB_SCRAPING_CASE = {
+  skill: 'web-scraping',
+  package: 'dev-toolkit',
+  prompt: 'Collect public agenda pages.',
+  expect: { decision: 'use', branch: 'scraping', terms: ['robots'] },
+};
+
+test('a failed client run stops new jobs and still writes the report', async () => {
+  const temp = mkdtempSync(join(tmpdir(), 'skill-eval-stop-'));
+  const exitCode = process.exitCode;
+  try {
+    const fixturesPath = writeFixtureSet(temp, ['one', 'two', 'three'].map((id) => ({
+      ...WEB_SCRAPING_CASE, id, category: 'activation',
+    })));
+    let invocations = 0;
+    await runCli([
+      '--candidate-only', '--candidate', ROOT, '--fixtures', fixturesPath, '--all',
+      '--runtime', 'codex', '--max-cases', '1', '--concurrency', '1',
+      '--output', join(temp, 'output'),
+    ], {
+      runInvocation: async () => {
+        invocations += 1;
+        throw new Error('client exited 1');
+      },
+    });
+    assert.equal(invocations, 1);
+    assert.equal(process.exitCode, 1);
+    const report = JSON.parse(readFileSync(join(temp, 'output', 'skill-behavior-evaluation.json'), 'utf8'));
+    assert.deepEqual(report.results.map((item) => [item.case, item.status]), [
+      ['one', 'error'], ['two', 'not-run'], ['three', 'not-run'],
+    ]);
+  } finally {
+    process.exitCode = exitCode;
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test('a competitive dry run reports missing competitors instead of failing', async () => {
+  const temp = mkdtempSync(join(tmpdir(), 'skill-eval-missing-competitor-'));
+  try {
+    const fixturesPath = writeFixtureSet(temp, [
+      { ...WEB_SCRAPING_CASE, id: 'ws-implicit', category: 'implicit-activation' },
+      {
+        id: 'gone-unrelated', skill: 'gone-skill', package: 'gone-package',
+        category: 'unrelated-non-trigger', prompt: 'Copyedit one sentence.',
+        expect: { decision: 'reject', branch: 'copyediting', terms: ['copyedit'] },
+      },
+    ]);
+    await runCli([
+      '--candidate-only', '--competitive', '--candidate', ROOT, '--fixtures', fixturesPath,
+      '--all', '--runtime', 'codex', '--max-cases', '2', '--dry-run',
+      '--output', join(temp, 'output'),
+    ]);
+    const report = JSON.parse(readFileSync(join(temp, 'output', 'skill-behavior-evaluation.json'), 'utf8'));
+    assert.deepEqual(report.missingSkills, [{ package: 'gone-package', skill: 'gone-skill' }]);
+    assert.equal(report.results.find((item) => item.case === 'gone-unrelated').status, 'missing-skill');
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test('a competitive run rejects a selection with no unnamed cases', async () => {
+  const temp = mkdtempSync(join(tmpdir(), 'skill-eval-empty-competitive-'));
+  try {
+    const fixturesPath = writeFixtureSet(temp, [
+      { ...WEB_SCRAPING_CASE, id: 'ws-activation', category: 'activation' },
+    ]);
+    await assert.rejects(runCli([
+      '--candidate-only', '--competitive', '--candidate', ROOT, '--fixtures', fixturesPath,
+      '--case', 'ws-activation', '--runtime', 'codex', '--output', join(temp, 'output'),
+    ]), /No runnable cases/u);
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
