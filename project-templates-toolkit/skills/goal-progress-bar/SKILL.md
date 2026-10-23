@@ -27,17 +27,18 @@ hand.
 
 ## Render the tracker
 
-Run the script from the skill root:
+Run the script from the task folder. Replace `<skill-root>` with the folder
+that contains this `SKILL.md`:
 
 ```bash
-python3 scripts/progress.py <tracker.json> "<Goal name>"
+python3 <skill-root>/scripts/progress.py <goal>-progress.json "<Goal name>"
 ```
 
 Add `--chat` for emoji codes suited to chat systems that render common emoji
 shortcodes:
 
 ```bash
-python3 scripts/progress.py <tracker.json> "<Goal name>" --chat
+python3 <skill-root>/scripts/progress.py <goal>-progress.json "<Goal name>" --chat
 ```
 
 The chat bar uses green squares for complete work, one yellow square for
@@ -51,7 +52,7 @@ A checkpoint is a finished step, such as a reviewed change, release, live
 check, or answer from the requester.
 
 - Back up the tracker before each edit, for example:
-  `cp goal-progress.json goal-progress.json.bak-<date>-<time>`.
+  `cp <goal>-progress.json <goal>-progress.json.bak-<date>-<time>`.
 - Set a code row to `1.0` only when its defined work is complete.
 - Set a proof row to `1.0` only with real evidence, such as a receipt, live
   read, or requester answer. Never round up to done before the proof exists.
