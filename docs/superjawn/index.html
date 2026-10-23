@@ -462,7 +462,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
                 <div class="feature-card rounded-xl p-6 mt-8">
                     <h3 class="font-display text-2xl font-light italic mb-4">Review and branch updates</h3>
-                    <ul class="space-y-3 text-sm text-clay/80 list-disc pl-5">
+                    <ul class="space-y-3 text-sm text-ink list-disc pl-5">
                         <li><code>requesting-code-review</code> now requires the independent reviewer to come from a different model provider than the author, with effort scaled to risk. The review covers an exact snapshot, fixes get a focused verify-fixes pass, and a reviewer is never swapped because it found problems.</li>
                         <li><code>receiving-code-review</code> covers multi-finding PRs: read every feedback surface, fix only supported findings in one push, and resolve a thread only after the pushed head contains the fix.</li>
                         <li><code>finishing-a-development-branch</code> keeps each PR to one concern, uses <code>Refs #n</code> when a deploy step follows merge, and treats merge as a separate decision that needs the owner's approval.</li>
