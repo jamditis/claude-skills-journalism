@@ -73,11 +73,12 @@ lease and keeps supervising that run until its done step.
    a checksum, search result, parser, or prior template for this gate.
 4. Re-read the standing holds list for this run.
 5. Record the next step and move the phase to working.
-6. Before an external action, write side-effect-pending with the intended
-   target, idempotency key, and evidence to inspect.
+6. Before an external action, write side-effect-pending with a fresh
+   side-effect record: the intended target, idempotency key, intended time, and
+   evidence to inspect.
 7. Perform the authorized action once.
-8. Read back the external state. Record its exact ID and move the checkpoint to
-   side-effect-complete.
+8. Read back the external state. Record its exact ID, the readback, and the
+   completion time, and move the checkpoint to side-effect-complete.
 9. Continue from the checkpoint. Keep assumptions, open questions, and source
    limits explicit.
 10. Write the final summary to the configured summary file.

@@ -125,19 +125,24 @@ process and compares both process ID and process start marker.
             checkpoint(run.id, "working", next=step)
 
             if step.has_external_action:
+                # Replace the whole side_effect record for each action, so an
+                # earlier action's completion cannot carry over.
                 checkpoint(
                     run.id,
                     "side-effect-pending",
-                    target=step.target,
-                    idempotency_key=step.key
+                    side_effect={kind: step.kind, target: step.target,
+                                 idempotency_key: step.key, intended_at: now(),
+                                 completed_at: null, external_id: null,
+                                 readback: null}
                 )
                 result = perform_once(step)
                 readback = inspect_external_state(result)
                 checkpoint(
                     run.id,
                     "side-effect-complete",
-                    external_id=result.id,
-                    readback=readback
+                    side_effect.external_id=result.id,
+                    side_effect.readback=readback,
+                    side_effect.completed_at=now()
                 )
 
         write_summary_file(run.id)
@@ -154,7 +159,9 @@ The done operation fails closed unless:
 - The summary file exists and is readable.
 - No side effect is unresolved: if `side_effect.intended_at` is set,
   `completed_at` and `readback` are set too. Check the `side_effect` record,
-  not the phase, because a blocked checkpoint replaces the phase.
+  not the phase, because a blocked checkpoint replaces the phase. Each action
+  writes a fresh record, so an earlier action's completion cannot satisfy this
+  check.
 
 When done refuses, it records which check failed in the checkpoint and returns
 that reason to the agent. The agent fixes the cause, such as reading the

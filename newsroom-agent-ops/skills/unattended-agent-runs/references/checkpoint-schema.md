@@ -52,6 +52,12 @@ Write the checkpoint:
 5. Immediately after readback of every external action.
 6. After the summary file is complete.
 
+Each external action replaces the whole `side_effect` record. The pending write
+sets `intended_at` and clears the other result fields. The readback write sets
+`external_id`, `readback`, and `completed_at`. A blocked checkpoint changes the
+phase but leaves the `side_effect` record as it is, so done can still see an
+unresolved action.
+
 Keep exact external IDs, but keep secret values and unnecessary personal data
 out of the checkpoint.
 
