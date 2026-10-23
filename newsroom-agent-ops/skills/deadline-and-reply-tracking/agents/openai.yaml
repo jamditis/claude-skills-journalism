@@ -1,0 +1,3 @@
+interface:
+  display_name: "Deadline and reply tracking"
+  short_description: "Track due dates, replies, waiting states, and next owner actions."
