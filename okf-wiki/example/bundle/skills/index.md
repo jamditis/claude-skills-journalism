@@ -1,6 +1,6 @@
 # skills
 
-Every skill the marketplace ships, one concept per file, grouped by [plugin](../plugins/index.md). 66 skills across 12 plugins.
+Every skill the marketplace ships, one concept per file, grouped by [plugin](../plugins/index.md). 76 skills across 13 plugins.
 
 ## [journalism-core](../plugins/journalism-core.md)
 - [ai-writing-detox](ai-writing-detox.md)
@@ -12,12 +12,24 @@ Every skill the marketplace ships, one concept per file, grouped by [plugin](../
 - [foia-requests](foia-requests.md)
 - [interview-prep](interview-prep.md)
 - [interview-transcription](interview-transcription.md)
+- [meeting-transcript-actions](meeting-transcript-actions.md)
 - [newsletter-publishing](newsletter-publishing.md)
 - [newsroom-style](newsroom-style.md)
 - [photo-metadata](photo-metadata.md)
 - [social-media-intelligence](social-media-intelligence.md)
 - [source-verification](source-verification.md)
 - [story-pitch](story-pitch.md)
+
+## [newsroom-agent-ops](../plugins/newsroom-agent-ops.md)
+- [chat-mention-triage](chat-mention-triage.md)
+- [deadline-and-reply-tracking](deadline-and-reply-tracking.md)
+- [document-delivery](document-delivery.md)
+- [email-request-intake](email-request-intake.md)
+- [issue-pool-progression](issue-pool-progression.md)
+- [multi-agent-coordinator](multi-agent-coordinator.md)
+- [record-reconciliation](record-reconciliation.md)
+- [scheduled-briefing](scheduled-briefing.md)
+- [unattended-agent-runs](unattended-agent-runs.md)
 
 ## [research-toolkit](../plugins/research-toolkit.md)
 - [academic-writing](academic-writing.md)

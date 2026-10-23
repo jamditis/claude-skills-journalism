@@ -1,6 +1,6 @@
 {
   "name": "claude-skills-journalism",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "description": "Agent skills and Claude Code plugins for journalism, research, and media organizations",
   "owner": {
     "name": "Joe Amditis",
@@ -31,7 +31,7 @@
     },
     {
       "name": "journalism-core",
-      "description": "Fifteen core journalism skills for reporting, verification, publishing, and digital investigations: AP-style writing, AI-slop detox, source verification, FOIA/OPRA and Brazilian LAI requests, fact-checking, interview prep and transcription, story pitches, editorial workflow, crisis comms, newsletter publishing, data journalism, social-media OSINT, and embedded photo metadata.",
+      "description": "Sixteen core journalism skills for reporting, verification, publishing, and digital investigations: AP-style writing, AI-slop detox, source verification, FOIA/OPRA and Brazilian LAI requests, fact-checking, interview prep, transcription and meeting actions, story pitches, editorial workflow, crisis comms, newsletter publishing, data journalism, social-media OSINT, and embedded photo metadata.",
       "version": "1.6.0",
       "author": {
         "name": "Joe Amditis",
@@ -39,6 +39,17 @@
       },
       "source": "./journalism-core",
       "category": "Journalism"
+    },
+    {
+      "name": "newsroom-agent-ops",
+      "description": "Nine skills for safe recurring newsroom agent work: unattended runs, briefings, intake, delivery, coordination, reconciliation, chat triage, deadline tracking, and issue progression.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Joe Amditis",
+        "email": "jamditis@gmail.com"
+      },
+      "source": "./newsroom-agent-ops",
+      "category": "Productivity"
     },
     {
       "name": "okf-wiki",

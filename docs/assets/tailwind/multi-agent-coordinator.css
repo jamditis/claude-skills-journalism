@@ -556,6 +556,9 @@ video {
 .overflow-x-auto {
   overflow-x: auto;
 }
+.break-words {
+  overflow-wrap: break-word;
+}
 .rounded-xl {
   border-radius: 0.75rem;
 }
@@ -631,9 +634,9 @@ video {
   font-size: 1.875rem;
   line-height: 2.25rem;
 }
-.text-5xl {
-  font-size: 3rem;
-  line-height: 1;
+.text-4xl {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
 }
 .text-sm {
   font-size: 0.875rem;
@@ -682,6 +685,13 @@ video {
 }
 .hover\:underline:hover {
   text-decoration-line: underline;
+}
+@media (min-width: 640px) {
+
+  .sm\:text-5xl {
+    font-size: 3rem;
+    line-height: 1;
+  }
 }
 @media (min-width: 768px) {
 

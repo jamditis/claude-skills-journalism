@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added the `newsroom-agent-ops` plugin with nine skills for recurring newsroom
+  operations, durable coordination, verified delivery, and bounded external actions.
+- Added `meeting-transcript-actions` to journalism-core for extracting attributed
+  notes, decisions, owned actions, and unresolved questions from verified transcripts.
+- Added public documentation pages and generated Tailwind stylesheets for the plugin
+  and all ten new skills.
 - **New workflow skills.** dev-toolkit `ponytail-dev` covers minimal-code
   implementation with proportional checks (adapted from DietrichGebert/ponytail,
   MIT). dev-toolkit `surface-completeness` checks UI coverage, design compliance,
@@ -24,6 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Increased journalism-core from 15 to 16 skills and added the new plugin and
+  skills to the catalog, marketplace, public browser, sitemap, and machine-readable
+  documentation.
 - `requesting-code-review` requires an independent reviewer from a different model
   provider than the author, effort scaled to risk, an exact reviewed snapshot, and a
   verify-fixes pass. Reviewers are not swapped because of findings.

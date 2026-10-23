@@ -10,6 +10,8 @@ packages:
     source: ./dev-toolkit
   - name: journalism-core
     source: ./journalism-core
+  - name: newsroom-agent-ops
+    source: ./newsroom-agent-ops
   - name: okf-wiki
     source: ./okf-wiki
   - name: pdf-design
@@ -101,6 +103,9 @@ skills:
   - name: interview-transcription
     package: journalism-core
     path: journalism-core/skills/interview-transcription
+  - name: meeting-transcript-actions
+    package: journalism-core
+    path: journalism-core/skills/meeting-transcript-actions
   - name: newsletter-publishing
     package: journalism-core
     path: journalism-core/skills/newsletter-publishing
@@ -119,6 +124,33 @@ skills:
   - name: story-pitch
     package: journalism-core
     path: journalism-core/skills/story-pitch
+  - name: chat-mention-triage
+    package: newsroom-agent-ops
+    path: newsroom-agent-ops/skills/chat-mention-triage
+  - name: deadline-and-reply-tracking
+    package: newsroom-agent-ops
+    path: newsroom-agent-ops/skills/deadline-and-reply-tracking
+  - name: document-delivery
+    package: newsroom-agent-ops
+    path: newsroom-agent-ops/skills/document-delivery
+  - name: email-request-intake
+    package: newsroom-agent-ops
+    path: newsroom-agent-ops/skills/email-request-intake
+  - name: issue-pool-progression
+    package: newsroom-agent-ops
+    path: newsroom-agent-ops/skills/issue-pool-progression
+  - name: multi-agent-coordinator
+    package: newsroom-agent-ops
+    path: newsroom-agent-ops/skills/multi-agent-coordinator
+  - name: record-reconciliation
+    package: newsroom-agent-ops
+    path: newsroom-agent-ops/skills/record-reconciliation
+  - name: scheduled-briefing
+    package: newsroom-agent-ops
+    path: newsroom-agent-ops/skills/scheduled-briefing
+  - name: unattended-agent-runs
+    package: newsroom-agent-ops
+    path: newsroom-agent-ops/skills/unattended-agent-runs
   - name: okf-wiki
     package: okf-wiki
     path: okf-wiki
