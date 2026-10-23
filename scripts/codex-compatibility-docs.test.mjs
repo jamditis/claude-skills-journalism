@@ -238,7 +238,7 @@ test('okf-wiki no-Claude evidence keeps Claude adapters outside Codex behavior',
   assert.match(record, /The three `.claude\/` files are Claude adapter output/u);
   assert.doesNotMatch(record, /repository-wide Codex support/u);
 
-  assert.match(skill, /The three generated adapter files are for Claude Code/u);
+  assert.match(skill, /The three generated `.claude\/` files are a Claude Code adapter/u);
   assert.match(skill, /Codex does not read them as project configuration/u);
   assert.match(
     skill,

@@ -188,13 +188,13 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">How it works</h2>
             <p class="text-clay/80 mb-6">
-                Run the scaffolder from the installed skill root. The generated project carries a validator that keeps the tree honest in CI. Optional Claude Code hooks can orient that client at session start.
+                Run the scaffolder from your project directory with an absolute path to the installed script. The generated project carries a validator that keeps the tree honest in CI. Optional Claude Code hooks can orient that client at session start.
             </p>
 
             <!-- Phase 1: scaffold once -->
             <p class="text-xs font-semibold uppercase tracking-widest text-accentDark mb-3">1 &middot; Scaffold once</p>
             <div class="flex flex-col sm:flex-row items-stretch gap-3 mb-8">
-                <div class="flex-1 bg-ink text-white rounded-xl p-4 font-mono text-sm flex items-center break-all">python3 scripts/scaffold.py ./my-kb</div>
+                <div class="flex-1 bg-ink text-white rounded-xl p-4 font-mono text-sm break-all"><span class="block">python3 ~/.claude/skills/okf-wiki/scripts/scaffold.py ./my-kb&nbsp;&nbsp;# Claude Code</span><span class="block mt-2">python3 ~/.agents/skills/okf-wiki/scripts/scaffold.py ./my-kb&nbsp;&nbsp;# Codex</span></div>
                 <div class="flex items-center justify-center text-accent text-2xl font-bold" aria-hidden="true">
                     <span class="sm:hidden">&darr;</span><span class="hidden sm:inline">&rarr;</span>
                 </div>
@@ -356,8 +356,11 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Quickstart</h2>
             <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
-                <p class="text-white/50 mb-2"># Run from the installed skill root.</p>
-                <p class="text-white mb-1">python3 scripts/scaffold.py ./my-knowledge-base \</p>
+                <p class="text-white/50 mb-2"># Run from the project directory; adjust the installed skill path if needed.</p>
+                <p class="text-white mb-1">python3 ~/.claude/skills/okf-wiki/scripts/scaffold.py ./my-knowledge-base \ <span class="text-white/50"># Claude Code</span></p>
+                <p class="text-white mb-1">&nbsp;&nbsp;--title "Team knowledge base" \</p>
+                <p class="text-white mb-4">&nbsp;&nbsp;--sections concepts,services,decisions</p>
+                <p class="text-white mb-1">python3 ~/.agents/skills/okf-wiki/scripts/scaffold.py ./my-knowledge-base \ <span class="text-white/50"># Codex</span></p>
                 <p class="text-white mb-1">&nbsp;&nbsp;--title "Team knowledge base" \</p>
                 <p class="text-white mb-4">&nbsp;&nbsp;--sections concepts,services,decisions</p>
                 <p class="text-white/50 mb-2"># the scaffolder validates at the end; re-run any time from the project root</p>
@@ -568,8 +571,10 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     a saved GitHub web session you supply.
                 </p>
                 <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto mb-3" tabindex="0" role="region" aria-label="Scrollable content">
-                    <p class="text-white">python3 scripts/gh-wiki-bootstrap.py owner/repo \</p>
-                    <p class="text-white mb-2">&nbsp;&nbsp;--state path/to/gh_state.json</p>
+                    <p class="text-white">python3 ~/.claude/skills/okf-wiki/scripts/gh-wiki-bootstrap.py owner/repo \ <span class="text-white/50"># Claude Code</span></p>
+                    <p class="text-white mb-2">&nbsp;&nbsp;--state /path/to/gh_state.json</p>
+                    <p class="text-white">python3 ~/.agents/skills/okf-wiki/scripts/gh-wiki-bootstrap.py owner/repo \ <span class="text-white/50"># Codex</span></p>
+                    <p class="text-white mb-2">&nbsp;&nbsp;--state /path/to/gh_state.json</p>
                     <p class="text-white/50"># then clone https://github.com/owner/repo.wiki.git and push the rest</p>
                 </div>
                 <p class="text-clay/70 text-sm">

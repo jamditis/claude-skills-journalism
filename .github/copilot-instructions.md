@@ -1,6 +1,6 @@
 # Copilot review instructions, claude-skills-journalism
 
-Project context, skill format, and hook conventions live in [AGENTS.md](../AGENTS.md). This file lists the rules worth named attention on every PR.
+Project context, skill format, and hook conventions live in [AGENTS.md](../AGENTS.md). Copilot code review reads both files. Keep each concise because GitHub recommends limiting each custom instruction file to about 1,000 lines. This file lists the rules worth named attention on every PR.
 
 ## Global rules to flag
 
@@ -11,7 +11,7 @@ These repository conventions are restated here because review bots may not read 
 
 ## Project-specific bug classes to flag
 
-1. **No hardcoded credentials in skill content.** API keys, tokens, OAuth secrets, or any credential value must never appear in skill markdown, templates, or example code. Documented credential pointers and environment-variable names are fine; values are not.
+1. **No hardcoded credentials in skill content.** API keys, tokens, OAuth secrets, or any credential value must never appear in skill markdown, templates, or example code. Reference paths (for example, `pass show claude/services/X`) and environment-variable names are fine; values are not.
 
 2. **Web scraping skills must respect robots.txt and rate limits.** Any skill in `web-scraping/`, `digital-archive/`, `web-archiving/`, or `page-monitoring/` that fetches third-party content must document robots.txt compliance and apply rate limiting. Flag scraping examples that don't.
 

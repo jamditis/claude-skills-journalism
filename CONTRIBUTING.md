@@ -60,9 +60,10 @@ Before submitting:
 1. Add or update `SKILL.md` and `agents/openai.yaml`.
 2. Add the skill to `skills-catalog.yaml`, the package README, and the root README.
 3. Add or update the matching `docs/<skill-name>/index.html` page.
-4. Install the skill in a temporary Claude Code profile and a temporary Codex project.
+4. Install it: `cp -r your-skill/ ~/.claude/skills/` (Claude Code) and `cp -r your-skill/ <project>/.agents/skills/` (Codex), then start a session in each.
 5. Verify expected activation, unrelated non-activation, resource access, and useful output in both clients.
-6. Run the repository validation commands documented in `AGENTS.md`.
+6. Test edge cases and different prompt phrasings.
+7. Run the repository validation commands documented in `AGENTS.md`.
 
 ## Adding a hook
 

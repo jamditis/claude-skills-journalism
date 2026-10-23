@@ -594,7 +594,7 @@ Interactive control panel and guided wizard for PDF Playground.
   - No script injection needed, the wrapper handles everything
   - Document HTML stays completely unchanged for clean PDF export
   - No re-injection after page refresh
-- **Guided proposal wizard**, structured-question setup with 4 phases
+- **Guided proposal wizard**, AskUserQuestion-driven setup with 4 phases
   - Phase 1 (Content): proposal type, sections, page count, budget items
   - Phase 2 (Design): color scheme, typography, visual style
   - Phase 3 (Review): live preview with control panel, screenshot, iterate
@@ -610,7 +610,7 @@ Interactive control panel and guided wizard for PDF Playground.
 
 ### Changed
 - Rewrote `commands/preview.md` for the wrapper approach (no more script injection)
-- Updated `commands/proposal.md` with the full structured-question wizard
+- Updated `commands/proposal.md` with the full AskUserQuestion wizard
 - Updated `skills/playground.md` with new architecture docs and preset list
 - Updated `pdf-playground/README.md` with control panel and wrapper docs
 

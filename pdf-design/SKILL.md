@@ -43,8 +43,17 @@ Locate this installed `SKILL.md` and use its parent directory as
 directory. Do not assume that the skill is installed below a specific client
 home directory.
 
-Use the absolute `SKILL.md` location supplied by the active client's skill
-catalog. Its parent directory is `SKILL_DIR`; resolve `templates/` from there.
+### Adapter: Codex resource lookup
+
+Use the absolute `SKILL.md` location from the available-skills catalog. Its
+parent directory is `SKILL_DIR`; resolve `templates/` from there.
+
+### Adapter: Claude Code resource lookup
+
+When a plugin invocation exposes `CLAUDE_PLUGIN_ROOT`, use that directory as
+`SKILL_DIR`. For a legacy single-skill install under
+`~/.claude/skills/pdf-design`, use the parent directory of the loaded
+`SKILL.md`. Do not use the legacy path as the shared default.
 
 ## Quick start
 

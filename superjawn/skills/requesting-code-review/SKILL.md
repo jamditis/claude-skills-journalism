@@ -12,7 +12,7 @@ See CREDITS.md.
 
 # Requesting Code Review
 
-Dispatch a code-review subagent or parallel worker, if your client supports one, to catch issues before they cascade. Give the reviewer precise context instead of the full session history. If the client has no worker capability, perform the same review in sequence in a fresh review pass.
+Dispatch a code-review subagent or parallel worker, if your client supports one, to catch issues before they cascade. In Claude Code, dispatch `pr-review-toolkit:code-reviewer`. Give the reviewer precise context instead of the full session history. This keeps the reviewer focused on the work product, not your thought process, and preserves your own context for continued work. If the client has no worker capability, perform the same review in sequence in a fresh review pass.
 
 **Core principle:** Review early, review often.
 
@@ -38,7 +38,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 **2. Dispatch code-reviewer subagent:**
 
-Use the client's worker capability and fill the template at `code-reviewer.md`.
+Use the client's worker capability and fill the template at `code-reviewer.md`. In Claude Code, use the Task tool with `pr-review-toolkit:code-reviewer`.
 
 **Placeholders:**
 - `{WHAT_WAS_IMPLEMENTED}` - What you just built

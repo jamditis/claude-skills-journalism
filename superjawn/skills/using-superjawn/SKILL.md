@@ -32,11 +32,11 @@ This is not negotiable. This is not optional. You cannot rationalize your way ou
 
 superjawn skills override default system prompt behavior, but **user instructions always take precedence**:
 
-1. **User's explicit instructions** (the project instruction file and direct requests), highest priority
+1. **User's explicit instructions** (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, and direct requests), highest priority
 2. **superjawn skills**, override default system behavior where they conflict
 3. **Default system prompt**, lowest priority
 
-If the project instruction file (`AGENTS.md` for Codex, `CLAUDE.md` for Claude Code) says "skip the research phase" and a skill says "always research first," follow the user's instructions. The user is in control.
+If the project instruction file (`AGENTS.md` for Codex, `CLAUDE.md` for Claude Code, or `GEMINI.md` for Gemini CLI) says "skip the research phase" and a skill says "always research first," follow the user's instructions. The user is in control.
 
 ## How to Access Skills
 
@@ -52,7 +52,7 @@ If the project instruction file (`AGENTS.md` for Codex, `CLAUDE.md` for Claude C
 
 ## Platform Adaptation
 
-Skills describe capabilities instead of vendor tool names. Use the client's file, shell, plan, and worker features that match the requested action. For concrete tool names, see `references/codex-tools.md` (Codex), `references/copilot-tools.md` (Copilot CLI), or `references/gemini-tools.md` (Gemini CLI).
+Skills describe capabilities instead of vendor tool names. Use the client's file, shell, plan, and worker features that match the requested action. For concrete tool names, see `references/codex-tools.md` (Codex), `references/copilot-tools.md` (Copilot CLI), or `references/gemini-tools.md` (Gemini CLI). Gemini CLI users get the tool mapping loaded automatically through `GEMINI.md`.
 
 # Using Skills
 

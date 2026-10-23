@@ -10,7 +10,7 @@ tags: ["hook", "development"]
 # one-way-door-check hook
 
 Blocks creation of files that represent irreversible architectural decisions until the
-user confirms. Requires the companion approval hook after the structured-question event.
+user confirms. Requires the companion approval hook at PostToolUse:AskUserQuestion.
 That hook promotes the session's pending files to approved so the retry passes. Install
 both hooks, not just this check.
 

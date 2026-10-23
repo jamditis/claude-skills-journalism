@@ -85,9 +85,12 @@ The project instruction file is team-shared, checked into git, and loaded into a
 
 - Transient "what we did today" session summaries
 - Anything that changes frequently
-- Personal preferences or corrections that do not belong to the project
+- Things the client learns over time through corrections
 
-Route those to the client's memory feature or a gitignored local notes file. Putting them in shared project instructions bloats context and loads stale session facts into future sessions.
+Route those to the client's memory feature (in Claude Code, auto memory at
+`~/.claude/projects/<project>/memory/`) or to a gitignored local notes file (in
+Claude Code, `CLAUDE.local.md`). Putting them in shared project instructions
+bloats context and loads stale session facts into future sessions.
 
 ## Rules
 

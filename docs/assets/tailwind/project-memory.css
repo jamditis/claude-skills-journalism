@@ -531,6 +531,9 @@ video {
 .z-50 {
   z-index: 50;
 }
+.\!m-0 {
+  margin: 0px !important;
+}
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -570,6 +573,9 @@ video {
 }
 .mt-5 {
   margin-top: 1.25rem;
+}
+.block {
+  display: block;
 }
 .flex {
   display: flex;
@@ -694,6 +700,9 @@ video {
 .border-mist\/30 {
   border-color: rgb(196 191 180 / 0.3);
 }
+.\!bg-transparent {
+  background-color: transparent !important;
+}
 .bg-amber-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(254 243 199 / var(--tw-bg-opacity, 1));
@@ -757,6 +766,9 @@ video {
 }
 .to-accentDark {
   --tw-gradient-to: #6d28d9 var(--tw-gradient-to-position);
+}
+.\!p-0 {
+  padding: 0px !important;
 }
 .p-5 {
   padding: 1.25rem;

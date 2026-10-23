@@ -303,7 +303,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-1 rounded">Proceed</span>
                         <div>
                             <h3 class="font-semibold">Approve, then write with confidence</h3>
-                            <p class="text-sm text-clay/70 mt-1">Proceed only after approval. Record the selected approach and its trade-offs in the project instruction file or decision record.</p>
+                            <p class="text-sm text-clay/70 mt-1">Proceed only after approval. Record the selected approach and its trade-offs in the project instruction file or decision record. Two-way door files always pass through silently, and a new session starts with a clean slate.</p>
                         </div>
                     </div>
                 </div>
@@ -388,10 +388,10 @@ fi
 
 exit 0  # Allow two-way doors</code></pre>
             </div>
-            <p class="text-clay/80 mt-5 mb-3">A second optional Claude Code hook runs after that client's structured-question event. When the user answers a structured question, it promotes every pending path to approved so the retried write passes. It never blocks. It keys on the event, not the specific question, so an unrelated question answered while a file is pending approves it too. The block-then-discuss prompt is the guardrail; the ledger stops an already-discussed file from re-blocking.</p>
+            <p class="text-clay/80 mt-5 mb-3">A second optional Claude Code hook runs on <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">PostToolUse:AskUserQuestion</code>. When the user answers a structured question, it promotes every pending path to approved so the retried write passes. It never blocks. It keys on the event, not the specific question, so an unrelated question answered while a file is pending approves it too. The block-then-discuss prompt is the guardrail; the ledger stops an already-discussed file from re-blocking.</p>
             <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                 <pre tabindex="0" class="text-white"><code>#!/bin/sh
-# one-way-door-approve.sh (after the structured-question event)
+# one-way-door-approve.sh (PostToolUse:AskUserQuestion)
 INPUT=$(cat); [ -z "$INPUT" ] && exit 0
 
 SESSION_ID=$(echo "$INPUT" | grep -oP '"session_id"\s*:\s*"[^"]*"' \
@@ -494,7 +494,7 @@ committing.</code></pre>
 
                 <div>
                     <h3 class="font-semibold mb-3">Option 3: Add optional Claude Code hooks</h3>
-                    <p class="text-sm text-clay/70 mb-3">For optional Claude Code enforcement, save both scripts and add this to that client's <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">settings.json</code>. Replace the structured-question placeholder with the current Claude Code tool name. The shared skill does not depend on these hooks.</p>
+                    <p class="text-sm text-clay/70 mb-3">For optional Claude Code enforcement, save both scripts and add this to Claude Code <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">settings.json</code>. The shared skill does not depend on these hooks.</p>
                     <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                         <pre tabindex="0" class="text-white"><code>{
   "hooks": {
@@ -506,7 +506,7 @@ committing.</code></pre>
       }]
     }],
     "PostToolUse": [{
-      "matcher": "&lt;structured-question tool name&gt;",
+      "matcher": "AskUserQuestion",
       "hooks": [{
         "type": "command",
         "command": "/path/to/one-way-door-approve.sh"
@@ -528,7 +528,7 @@ committing.</code></pre>
       }]
     }],
     "PostToolUse": [{
-      "matcher": "&lt;structured-question tool name&gt;",
+      "matcher": "AskUserQuestion",
       "hooks": [{
         "type": "command",
         "command": "powershell -ExecutionPolicy Bypass -File C:/Users/&lt;you&gt;/.claude/hooks/one-way-door-approve.ps1"

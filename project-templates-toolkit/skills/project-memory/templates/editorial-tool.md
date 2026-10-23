@@ -71,7 +71,7 @@ project-root/
 
 ## AI/ML components
 
-- **Model role(s):** [Fast extraction, general drafting, high-reasoning review, custom]
+- **Model(s) and role(s):** [Provider/model ID; fast extraction, drafting, review]
 - **Prompts:** [Location and versioning]
 - **Confidence thresholds:** [When to flag for review]
 - **Cost management:** [API limits, caching]

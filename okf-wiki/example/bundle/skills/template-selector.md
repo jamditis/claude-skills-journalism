@@ -9,7 +9,7 @@ tags: ["skill", "project-templates-toolkit"]
 ---
 # template-selector skill
 
-Choose the correct project instruction or LESSONS.md template. Use when
+Choose the correct project instruction or LESSONS.md template for journalism projects. Use when
 starting a new project, setting up documentation, or unsure which template category fits
 best. Provides decision trees and selection guidance for 6 journalism-focused template
 types.

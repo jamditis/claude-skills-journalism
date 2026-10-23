@@ -10,8 +10,8 @@ Shared skills describe capabilities instead of vendor tool names. Use the platfo
 | `Bash` (run commands) | `run_shell_command` |
 | `Grep` (search file content) | `grep_search` |
 | `Glob` (search files by name) | `glob` |
-| Task tracking | Use the native task tracker |
-| Load a skill | Use the native skill activation capability |
+| Task tracking | `write_todos` |
+| Load a skill | `activate_skill` |
 | `WebSearch` | `google_web_search` |
 | `WebFetch` | `web_fetch` |
 | Dispatch a subagent | No equivalent; do the steps in sequence |
@@ -27,7 +27,7 @@ These capabilities are client-specific and are not shared skill requirements:
 | Tool | Purpose |
 |------|---------|
 | `list_directory` | List files and subdirectories |
-| `save_memory` | Persist facts to the client's memory file across sessions |
+| `save_memory` | Persist facts to `GEMINI.md` across sessions |
 | `ask_user` | Request structured input from the user |
 | `tracker_create_task` | Rich task management (create, update, list, visualize) |
 | `enter_plan_mode` / `exit_plan_mode` | Switch to read-only research mode before making changes |

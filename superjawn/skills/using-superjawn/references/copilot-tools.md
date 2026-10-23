@@ -10,12 +10,12 @@ Shared skills describe capabilities instead of vendor tool names. Use the platfo
 | `Bash` (run commands) | `bash` |
 | `Grep` (search file content) | `grep` |
 | `Glob` (search files by name) | `glob` |
-| Load a skill | Use the native skill-loading capability |
+| Load a skill | `skill` |
 | `WebFetch` | `web_fetch` |
-| Dispatch a subagent | Use the native worker capability (see [Agent types](#agent-types)) |
-| Parallel independent work | Start multiple workers before waiting |
-| Worker status or output | Use native worker status capabilities |
-| Task tracking | Use the built-in task store |
+| Dispatch a subagent | `task` (see [Agent types](#agent-types)) |
+| Parallel independent work | Multiple `task` calls |
+| Worker status or output | `read_agent` / `list_agents` |
+| Task tracking | `sql` with the built-in `todos` table |
 | `WebSearch` | No equivalent, use `web_fetch` with a search engine URL |
 | `EnterPlanMode` / `ExitPlanMode` | No equivalent, stay in the main session |
 

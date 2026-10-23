@@ -61,7 +61,7 @@ ls -d worktrees 2>/dev/null      # Alternative
 ### 2. Check project instructions
 
 ```bash
-rg -i "worktree.*director" AGENTS.md CLAUDE.md 2>/dev/null
+grep -i "worktree.*director" AGENTS.md CLAUDE.md 2>/dev/null
 ```
 
 **If preference specified:** Use it without asking.

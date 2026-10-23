@@ -47,7 +47,7 @@ Use this shape when passing retrieved material onward:
          │                      │                      │
 ┌────────▼────────┐  ┌──────────▼──────────┐  ┌───────▼───────┐
 │  AI Enrichment  │  │  Entity Extraction  │  │  PDF Archive  │
-│  (structured)   │  │  (Knowledge Graph)  │  │  (WCAG 2.1)   │
+│  (Gemini)       │  │  (Knowledge Graph)  │  │  (WCAG 2.1)   │
 └────────┬────────┘  └──────────┬──────────┘  └───────┬───────┘
          │                      │                      │
          └──────────────────────┼──────────────────────┘
@@ -159,8 +159,9 @@ from google.genai import types
 import json
 from typing import Optional
 
-# Set an available model explicitly. Test the exact model and response shape
-# against your taxonomy prompts before deployment.
+# Set an available Gemini model explicitly. A current Flash-tier model is a
+# cost-efficient default; see https://ai.google.dev/gemini-api/docs/models.
+# Test the exact model and response shape against your taxonomy prompts.
 MODEL_NAME = os.environ['GOOGLE_GENAI_MODEL']
 
 # Single client; reads GOOGLE_API_KEY (or pass api_key=...).
@@ -236,7 +237,7 @@ IMPORTANT:
 - Pull quote must be an exact excerpt from the text
 """
 
-        # response_mime_type='application/json' requests raw
+        # response_mime_type='application/json' makes Gemini emit raw
         # JSON without ```json fences, the markdown-stripping fallback
         # in _parse_response() is kept as defense-in-depth for older
         # models that still wrap output.
@@ -261,7 +262,7 @@ IMPORTANT:
         """Extract JSON from response, tolerating ```json fences if any.
 
         With response_mime_type='application/json' set on the request,
-        The provider normally emits clean JSON; this stripping logic is a fallback for
+        Gemini normally emits clean JSON; this stripping logic is a fallback for
         older models or when the request config wasn't applied.
         """
         if '```json' in text:

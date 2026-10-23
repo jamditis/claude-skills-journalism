@@ -64,7 +64,7 @@ test('document-design resolves resources from its installed skill root', () => {
 
   assert.doesNotMatch(skill, new RegExp(['CLAUDE', 'PLUGIN', 'ROOT'].join('_'), 'u'));
   assert.match(skill, /project-root\s+`?pdf-playground\.local\.md`?/u);
-  assert.doesNotMatch(skill, /\.claude\/pdf-playground\.local\.md/u);
+  assert.match(skill, /legacy `\.claude\/pdf-playground\.local\.md` fallback/u);
   for (const resource of [
     'templates/',
     'brands/',

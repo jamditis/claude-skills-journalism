@@ -162,16 +162,13 @@ By default, PDF Playground uses generic styling. To use your organization's colo
 
 ### Where the config file goes
 
-The file goes inside a hidden folder called `.claude` in your **home directory**. Your home directory is:
+Use the path for the client you run from the project directory:
 
-- **Mac/Linux:** `/Users/yourname/` (or `~/`)
-- **Windows:** `C:\Users\yourname\`
+- **Claude Code commands:** `.claude/pdf-playground.local.md`
+- **Codex and the shared document-design skill:** `pdf-playground.local.md`
 
-The full path for the config file is:
-
-```
-./pdf-playground.local.md
-```
+If both files exist, the shared skill uses the project-root file. Claude Code
+commands continue to read the file in `.claude/`.
 
 ### How to create the config file
 
@@ -181,7 +178,7 @@ The full path for the config file is:
 
 Claude will create the file in the right place.
 
-**Option B, Create it yourself:** Open a text editor and create `pdf-playground.local.md` in the project root with this content:
+**Option B, Create it yourself:** Open a text editor (VS Code, Notepad, TextEdit, nano, any editor works) and create the file at the path for your client with this content:
 
 ```yaml
 ---

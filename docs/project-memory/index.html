@@ -262,6 +262,50 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             </div>
         </section>
 
+        <!-- Mechanism and client locations -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Choose the right mechanism</h2>
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden mb-6">
+                <table class="w-full">
+                    <thead><tr class="bg-mist/10 border-b border-mist/30"><th class="text-left px-5 py-3 font-semibold">Mechanism</th><th class="text-left px-5 py-3 font-semibold">Use for</th></tr></thead>
+                    <tbody class="divide-y divide-mist/20">
+                        <tr><td class="px-5 py-3 font-medium">Project instruction file</td><td class="px-5 py-3 text-clay/70">Standing facts, commands, conventions, and boundaries</td></tr>
+                        <tr><td class="px-5 py-3 font-medium">Skill</td><td class="px-5 py-3 text-clay/70">Fact-check workflows, FOIA-letter drafting, and other multi-step procedures</td></tr>
+                        <tr><td class="px-5 py-3 font-medium">Client enforcement</td><td class="px-5 py-3 text-clay/70">Rules that must block or run every time, such as a Claude Code hook that exits 2. Prompt hooks only remind.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <h3 class="font-semibold mb-3">Client-specific locations</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-white rounded-xl p-5 border border-mist/30 text-sm text-clay/70">
+                    <p class="font-semibold text-ink mb-2">Claude Code</p>
+                    <p><code>/etc/claude-code/CLAUDE.md</code> or the documented macOS and Windows managed-policy paths; <code>./CLAUDE.md</code> or <code>./.claude/CLAUDE.md</code>; <code>~/.claude/CLAUDE.md</code>; and gitignored <code>./CLAUDE.local.md</code>.</p>
+                </div>
+                <div class="bg-white rounded-xl p-5 border border-mist/30 text-sm text-clay/70">
+                    <p class="font-semibold text-ink mb-2">Codex</p>
+                    <p><code>~/.codex/AGENTS.md</code>, then <code>AGENTS.md</code> files from the repository root through the working directory. <code>AGENTS.override.md</code> replaces the file at the same scope.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Memory and example -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Memory and institutional knowledge</h2>
+            <p class="text-clay/80 mb-4">In Claude Code v2.1.59 and later, auto memory stores corrections under <code>~/.claude/projects/&lt;project&gt;/memory/</code>. Do not ask users to copy those notes into shared project instructions.</p>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto text-white"><pre class="!bg-transparent !p-0 !m-0"><code># Project instructions
+
+## Gotchas
+- Story slugs must be unique across all desks, not only metro.
+- "Hold" does not stop the autopublish cron. Use "Kill."
+- The reporter dropdown caches for one hour.
+
+## Commands
+npm run sync-ap  # Pull latest from AP. Runs automatically at :15.
+
+## Credentials
+The Supabase key is in the 1Password "Metro Desk" vault, not .env.</code></pre></div>
+        </section>
+
         <!-- Template selector -->
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Template selector</h2>
@@ -327,8 +371,9 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Length guideline</h2>
             <div class="bg-white rounded-xl p-5 border border-mist/30">
-                <p class="text-clay/80">A good project instruction file is <strong>50-150 lines</strong>. If it's longer, you're explaining too much. If it's shorter, you might be missing critical quirks.</p>
+                <p class="text-clay/80">Treat <strong>200 lines as a review threshold</strong>, not a target. If the file grows, move procedures to skills, narrow rules to nested instruction files, and transient notes to client memory.</p>
                 <p class="text-clay/70 text-sm mt-3 italic">The best project instruction files capture quirks that caused real mistakes.</p>
+                <p class="text-clay/70 text-sm mt-3">Sources: <a class="text-accentDark underline" href="https://code.claude.com/docs/en/memory">Claude Code memory</a>, <a class="text-accentDark underline" href="https://code.claude.com/docs/en/best-practices">Claude Code best practices</a>, and <a class="text-accentDark underline" href="https://developers.openai.com/cookbook/examples/gpt-5/codex_prompting_guide#using-agentsmd">official Codex AGENTS.md guidance</a>. Claude sources last swept May 9, 2026; Codex scoping checked Oct. 23, 2026.</p>
             </div>
         </section>
 

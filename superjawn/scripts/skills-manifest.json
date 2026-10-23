@@ -57,8 +57,9 @@
       "category": "consumer",
       "skill_md_parity": false,
       "supporting_file_overrides": {
-        "code-quality-reviewer-prompt.md": "v1.0.0: Task tool dispatch target rewritten from superpowers:code-reviewer to pr-review-toolkit:code-reviewer to remove the soft dependency on the upstream superpowers plugin (uninstalled at v1.0.0)",
-        "implementer-prompt.md": "superjawn 2.0.0: TDD instructions replaced with the fleet testing rules (tests where the task or project rules call for them; independent expected values; no weakened tests)"
+        "code-quality-reviewer-prompt.md": "v2.0.0: client-neutral dispatch guidance keeps the Claude Code pr-review-toolkit:code-reviewer target as a labeled adapter",
+        "implementer-prompt.md": "superjawn 2.0.0: TDD instructions replaced with the fleet testing rules (tests where the task or project rules call for them; independent expected values; no weakened tests)",
+        "spec-reviewer-prompt.md": "v2.0.0: Task tool wording generalized to a client worker capability and status emoji removed"
       }
     },
     "dispatching-parallel-agents": {
@@ -81,15 +82,19 @@
       "skill_md_parity": false,
       "upstream_name": "using-superpowers",
       "supporting_file_overrides": {
-        "references/codex-tools.md": "Repo-wide em-dash to comma conversion",
-        "references/copilot-tools.md": "Repo-wide em-dash to comma conversion",
-        "references/gemini-tools.md": "Repo-wide em-dash to comma conversion"
+        "agents/openai.yaml": "Codex UI metadata for the renamed using-superjawn skill",
+        "references/codex-tools.md": "v2.0.0: capability-first Codex mapping with named upstream agent examples retained",
+        "references/copilot-tools.md": "v2.0.0: capability-first Copilot CLI mapping with concrete tool names retained",
+        "references/gemini-tools.md": "v2.0.0: capability-first Gemini CLI mapping with concrete tool names and GEMINI.md retained"
       }
     },
     "writing-skills": {
       "category": "research",
       "skill_md_parity": false,
       "supporting_file_overrides": {
+        "anthropic-best-practices.md": "v2.0.0: model guidance generalized by capability tier with Claude family examples retained",
+        "examples/CLAUDE_MD_TESTING.md": "v2.0.0: exact Claude Code test variants retained with a Codex path substitution note",
+        "persuasion-principles.md": "v2.0.0: vendor task-tool references generalized to client task-list tracking while preserving the tested phrasing",
         "testing-skills-with-subagents.md": "superjawn 2.0.0: REQUIRED BACKGROUND reference to the removed test-driven-development skill replaced with a self-contained description of the red-green cycle for skills"
       }
     }

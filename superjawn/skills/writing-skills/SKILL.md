@@ -108,8 +108,8 @@ For writing-skills, the **defaults are: web (skill authoring patterns + recent d
 ### 2. Dispatch
 
 Use a subagent or parallel worker if the client supports one:
-- Use an exploration worker for codebase or prior-art questions ("does this repo or any installed package already have a skill for X?", "what naming convention do existing skills use here?")
-- Use a general worker for web or authoring patterns ("what shape do effective agent skills take?", "common pitfalls for skills in this domain?")
+- Use an exploration worker (in Claude Code: `Explore`; in Codex: `explorer`) for codebase or prior-art questions ("does this repo or any installed package already have a skill for X?", "what naming convention do existing skills use here?")
+- Use a general worker (in Claude Code: `general-purpose`; in Codex: `default`) for web or authoring patterns ("what shape do effective agent skills take?", "common pitfalls for skills in this domain?")
 - Run multiple workers in parallel when the work is independent. Otherwise, do the research in sequence.
 
 Work inline only for light research, such as one search across the client's installed skills or a memory check.
@@ -209,7 +209,7 @@ Concrete results
 ```
 
 
-## Skill discovery optimization
+## Skill discovery optimization (CSO)
 
 **Critical for discovery:** Future agent sessions need to find your skill.
 

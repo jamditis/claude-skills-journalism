@@ -16,7 +16,7 @@ See CREDITS.md.
 
 ## Overview
 
-You delegate tasks to a subagent or parallel worker if your client supports one. Give each worker isolated, focused context. If the client does not support workers, do the same tasks in sequence in the current session.
+You delegate tasks to a subagent or parallel worker if your client supports one. Give each worker isolated, focused context. They should never inherit your session's context or history, you construct exactly what they need. This also preserves your own context for coordination work. If the client does not support workers, do the same tasks in sequence in the current session.
 
 When you have multiple unrelated failures (different test files, different subsystems, different bugs), investigating them sequentially wastes time. Each investigation is independent and can happen in parallel.
 

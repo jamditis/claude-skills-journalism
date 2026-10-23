@@ -77,10 +77,10 @@ making it here, up front, where it can steer the rest of the setup.
   SPEC.md                 the OKF format contract
   README.md               how to use and validate the bundle
   scripts/validate.py     the validator
-  <client-adapter>/       optional Claude Code session-orientation hooks
-    settings.json         registers the hooks for that client
-    hooks/okf-anchor.py   loads the index into session context
-    hooks/okf-orient.py   gates the first action on orientation
+  .claude/                optional Claude Code adapter: session-orientation hooks
+    settings.json         registers the hooks (Claude Code approves them once)
+    hooks/okf-anchor.py   SessionStart: load the index into context
+    hooks/okf-orient.py   PreToolUse: gate the first action on orientation
   bundle/                 the OKF bundle (the validated tree)
     index.md              carries okf_version: "0.3" by default; "0.4" with --trust-signals
     <section>/
@@ -91,18 +91,28 @@ making it here, up front, where it can steer the rest of the setup.
 Docs and tooling sit at the project root; only `bundle/` is validated. Keep them
 separate, the validator treats every non-reserved `.md` inside the bundle as a
 concept that needs frontmatter, so a stray `SPEC.md` inside `bundle/` would fail.
-The optional client adapter sits outside `bundle/`, so it never trips the concept checks.
+The `.claude/` adapter sits outside `bundle/`, so it never trips the concept checks.
 
 ## How to run it
 
-Run the command with the working directory set to this skill's root, the directory that
-contains `SKILL.md`. The script path is relative to that root. On Windows, use `python`
+Use an explicit target outside the installed skill directory. On Windows, use `python`
 instead of `python3` (stock Windows has no `python3`). The `--title` and `--sections` come
-from the onboarding answers above, and `--no-hooks` only if the user opted out. Use an
-explicit target outside the installed skill directory. The scaffold validates automatically:
+from the onboarding answers above, and `--no-hooks` only if the user opted out. The scaffold
+validates automatically.
+
+In Claude Code, `${CLAUDE_SKILL_DIR}` expands to this skill's directory:
 
 ```bash
-python3 scripts/scaffold.py /path/to/my-knowledge-base \
+python3 "${CLAUDE_SKILL_DIR}/scripts/scaffold.py" ./my-knowledge-base \
+  --title "Team knowledge base" \
+  --sections concepts,services,decisions
+```
+
+In other clients, use the absolute `SKILL.md` location from the skill catalog and run
+the installed script from that directory:
+
+```bash
+python3 /absolute/path/to/okf-wiki/scripts/scaffold.py ./my-knowledge-base \
   --title "Team knowledge base" \
   --sections concepts,services,decisions
 ```
@@ -247,24 +257,24 @@ Windows. `scaffold.py` auto-detects the OS; `--hooks-os posix|windows` forces it
 
 Claude Code treats checked-in project hook settings as untrusted, so the first time the
 project is opened it asks the user to approve the hooks; they run automatically after that.
-To turn them off, scaffold with `--no-hooks`, remove the generated adapter directory, or set `disableAllHooks`
+To turn them off, scaffold with `--no-hooks`, delete `.claude/`, or set `disableAllHooks`
 in an existing project.
 
 ### Client boundary
 
 The portable OKF surface is `SPEC.md`, `requirements.txt`, `scripts/validate.py`, and the
 `bundle/` tree. The generated `README.md` documents both that shared surface and any enabled
-client adapter. The three generated adapter files are for Claude Code, not part of
+client adapter. The three generated `.claude/` files are a Claude Code adapter, not part of
 the OKF format and not shared Codex behavior. Codex does not read them as project configuration,
 and this skill must not claim that their `SessionStart` or `PreToolUse` lifecycle runs there.
 
-The onboarding and skill-root instructions above are client-neutral. The recorded Codex pilot
-pre-set every onboarding choice and used an explicit installed path, so that historical result
-does not add runtime evidence for the newly generalized question flow.
+The shared onboarding route is client-neutral. The labeled commands above document
+client-specific skill-root lookup. The recorded Codex pilot pre-set every onboarding choice
+and used an explicit installed path, so that historical result does not add runtime evidence for the newly generalized question flow.
 
-For a mixed Claude Code and Codex project, keep the generated adapter so Claude Code can request trust
+For a mixed Claude Code and Codex project, keep `.claude/` so Claude Code can request trust
 and use the hooks; Codex leaves it inert. For a Codex-only project, pass `--no-hooks` while
-scaffolding or remove the adapter afterward. Either choice leaves the portable bundle and
+scaffolding or delete `.claude/` afterward. Either choice leaves the portable bundle and
 validator unchanged.
 
 ## Optional: publish into a GitHub wiki
@@ -283,8 +293,17 @@ does not work, wiki pages are a web-UI-only surface):
   where you have already logged into GitHub. The script reuses that session; it does not log
   in for you. Pass its path with `--state` (default: `~/.cache/gh_state.json`).
 
+In Claude Code:
+
 ```bash
-python3 scripts/gh-wiki-bootstrap.py owner/repo --state path/to/gh_state.json
+python3 "${CLAUDE_SKILL_DIR}/scripts/gh-wiki-bootstrap.py" owner/repo --state /path/to/gh_state.json
+# then: git clone https://github.com/owner/repo.wiki.git and push your pages
+```
+
+In other clients, use the absolute installed skill path:
+
+```bash
+python3 /absolute/path/to/okf-wiki/scripts/gh-wiki-bootstrap.py owner/repo --state /path/to/gh_state.json
 # then: git clone https://github.com/owner/repo.wiki.git and push your pages
 ```
 

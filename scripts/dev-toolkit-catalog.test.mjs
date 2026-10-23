@@ -81,7 +81,8 @@ test('director has one canonical page with exact invocation guidance', () => {
   assert.match(page, /property="og:url" content="https:\/\/skills\.amditis\.tech\/director\/"/u);
   assert.match(page, /tree\/master\/dev-toolkit\/skills\/director/u);
   assert.match(page, /\/dev-toolkit:director/u);
-  assert.match(page, /Invoke the installed director skill through that client's skill mechanism/u);
+  assert.match(page, /For the literal <code>\/director<\/code> command, install the standalone skill/u);
+  assert.match(page, /# Codex: \$director/u);
   assert.equal((homepage.match(/href="director\/"/gu) ?? []).length, 1);
   assert.equal(
     (sitemap.match(/https:\/\/skills\.amditis\.tech\/director\//gu) ?? []).length,

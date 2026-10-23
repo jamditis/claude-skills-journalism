@@ -743,6 +743,9 @@ video {
 .\!p-0 {
   padding: 0px !important;
 }
+.p-4 {
+  padding: 1rem;
+}
 .p-5 {
   padding: 1.25rem;
 }

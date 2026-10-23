@@ -91,7 +91,7 @@
         <section class="mb-12">
             <h2 class="text-2xl font-semibold mb-4">Policy-driven routing</h2>
             <div class="bg-white/60 border border-mist/40 rounded-xl p-6 text-clay space-y-3">
-                <p>The skill reads the applicable project instruction file for the current user and project.</p>
+                <p>The skill reads every applicable project instruction file at user, project, and working-directory scope.</p>
                 <p>It does not contain a home-directory path or fixed model name. Each environment keeps its own routing policy.</p>
                 <p>If required delegation is unavailable, the director stops and tells the user. Activating the role does not grant new authority.</p>
             </div>
@@ -102,10 +102,12 @@
             <p class="text-clay mb-4">Claude Code plugin route:</p>
             <pre class="bg-ink text-white rounded-xl p-4 overflow-x-auto mb-4"><code>/plugin install dev-toolkit@claude-skills-journalism
 /dev-toolkit:director</code></pre>
+            <p class="text-clay mb-4">For the literal <code>/director</code> command, install the standalone skill.</p>
             <p class="text-clay mb-4">Agent Skills route for supported clients:</p>
             <pre class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>cp -r dev-toolkit/skills/director ~/.claude/skills/   # Claude Code
 cp -r dev-toolkit/skills/director ~/.agents/skills/   # Codex
-# Invoke the installed director skill through that client's skill mechanism.</code></pre>
+# Claude Code: /director
+# Codex: $director</code></pre>
         </section>
     </main>
 

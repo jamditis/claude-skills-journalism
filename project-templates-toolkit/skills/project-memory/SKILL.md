@@ -6,8 +6,8 @@ description: Generates project instruction files that transfer institutional kno
 # Project memory generator
 
 Create a project instruction file that transfers institutional knowledge, not
-obvious information. Write for a capable colleague who needs this project's
-specific commands, constraints, and failure modes.
+obvious information. Think like a senior journalist onboarding a competent
+colleague. Do not explain how journalism works; explain this project's quirks.
 
 ## Choose the canonical instruction file
 
@@ -27,15 +27,28 @@ files only when a subdirectory needs narrower rules than its parent.
 A project instruction file gives standing context to the active client. It does
 not enforce a rule by itself.
 
+In Claude Code, `CLAUDE.md` content is delivered as user context after the
+system prompt. Claude reads it and tries to follow it, but the file does not
+guarantee strict compliance with vague or conflicting instructions. Source:
+https://code.claude.com/docs/en/memory
+
 | Mechanism | Use for | Behavior |
 |---|---|---|
 | Project instruction file | Standing facts, commands, conventions, and boundaries | Advisory context |
 | Skills | Multi-step procedures and on-demand workflows | Loaded when relevant |
-| Client enforcement | Actions that must block or run every time | Client-specific and not portable unless mapped and tested |
+| Client enforcement | Actions that must block or run every time | Deterministic only when the client blocks, for example, a Claude Code hook that exits 2 or returns a PreToolUse deny. A prompt hook only adds a reminder |
 
 Do not use a client hook as load-bearing shared behavior. If a rule must work in
 both Claude Code and Codex, state the rule in the project instruction file and
 document any optional client enforcement separately.
+
+If an instruction is "block writes to `published/`" or "run an accessibility
+check before commit," use client enforcement. If it is a "fact-check workflow"
+or "FOIA-letter drafting," use a skill. Keep standing project facts and rules
+in the project instruction file.
+
+Claude Code guidance for effective instruction files includes an explicit
+include/exclude list. Source: https://code.claude.com/docs/en/best-practices
 
 ## What belongs in the file
 
@@ -94,10 +107,37 @@ Client-specific scoping options:
   it does not reduce context size.
 - Codex: a nested `AGENTS.md` applies to its directory and below.
 
+### Client-specific locations
+
+In Claude Code, more specific locations take precedence. Source:
+https://code.claude.com/docs/en/memory
+
+| Scope | Claude Code location | Use case |
+|---|---|---|
+| Managed policy | Linux/WSL: `/etc/claude-code/CLAUDE.md`<br>macOS: `/Library/Application Support/ClaudeCode/CLAUDE.md`<br>Windows: `C:\Program Files\ClaudeCode\CLAUDE.md` | Organization standards that individual settings cannot exclude |
+| Project | `./CLAUDE.md` or `./.claude/CLAUDE.md` | Team-shared instructions checked into version control |
+| User | `~/.claude/CLAUDE.md` | Personal preferences across projects |
+| Local | `./CLAUDE.local.md` | Gitignored personal project notes |
+
+In Codex, instructions load from global scope through the current working
+directory. Later directories override earlier ones. Source:
+https://developers.openai.com/cookbook/examples/gpt-5/codex_prompting_guide#using-agentsmd
+
+| Scope | Codex location | Use case |
+|---|---|---|
+| User | `~/.codex/AGENTS.md` | Personal instructions across projects |
+| Project and nested directories | `AGENTS.md` from the repository root through the current working directory | Shared rules with narrower directory scope |
+| Override | `AGENTS.override.md` | Replace `AGENTS.md` for the same directory when a temporary or stronger override is required |
+
+For journalism teams that use multiple agents, keep shared editorial standards,
+source-handling invariants, and fact-check protocols in the canonical shared
+file. Those rules belong to the organization, not one client.
+
 ## Anti-patterns
 
 1. **Over-specified instructions.** Important rules disappear inside generic
-   advice.
+   advice. In Claude Code, if Claude keeps ignoring a rule, the file is probably
+   too long and the rule is getting lost.
 2. **Conflicting nested files.** A broad rule and a narrow rule disagree without
    stating which scope wins.
 3. **Duplicated client files.** Two copies drift and give different guidance.
@@ -113,13 +153,65 @@ Client-specific scoping options:
 - Remove welcome text, marketing language, and generic reminders.
 - Use sentence-case headings.
 
+## Auto memory is separate from project instructions
+
+In Claude Code v2.1.59 and later, auto memory stores notes under
+`~/.claude/projects/<project>/memory/`. The first 200 lines of `MEMORY.md` load
+into each session. Source: https://code.claude.com/docs/en/memory
+
+Do not ask the user to write down things Claude learns through corrections.
+Auto memory handles those notes. Project instructions hold durable facts that
+the team writes and reviews.
+
+## Example: good vs. bad
+
+Bad, because it explains obvious setup and gives no institutional knowledge:
+
+```markdown
+# Project instructions
+
+## Overview
+
+Welcome to our newsroom's story tracking system. This React and Node.js app
+helps editors and reporters collaborate on stories.
+
+## Getting started
+
+npm install
+npm start
+```
+
+Good, because it records only project-specific behavior:
+
+```markdown
+# Project instructions
+
+## Overview
+
+Story tracker for the metro desk. React + Supabase.
+
+## Gotchas
+
+- Story slugs must be unique across all desks, not only metro.
+- "Hold" does not stop the autopublish cron. Use "Kill."
+- The reporter dropdown caches for one hour. New hires do not appear sooner.
+
+## Commands
+
+npm run sync-ap  # Pull latest from AP. Runs automatically at :15.
+
+## Credentials
+
+The Supabase key is in the 1Password "Metro Desk" vault, not `.env`.
+```
+
 ## Templates
 
 Templates are in the `templates/` directory:
 
 | Template | Use for |
 |---|---|
-| `editorial-tool.md` | Newsroom tools, fact-checkers, and research assistants |
+| `editorial-tool.md` | Newsroom tools, fact-checkers, and AI assistants |
 | `event-website.md` | Conferences, workshops, and campaign sites |
 | `publication.md` | Newsletters, podcasts, and continuing publications |
 | `research-project.md` | Investigations and scoped data research |
@@ -161,3 +253,9 @@ Templates are in the `templates/` directory:
 ```
 
 Start small. Add a rule only after the project demonstrates that agents need it.
+
+## Last currency sweep
+
+2026-05-09. Sources verified: https://code.claude.com/docs/en/memory and
+https://code.claude.com/docs/en/best-practices. Codex instruction scoping was
+checked against official OpenAI documentation on 2026-10-23.

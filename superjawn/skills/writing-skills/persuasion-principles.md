@@ -80,8 +80,8 @@ LLMs respond to the same persuasion principles as humans. Understanding this psy
 
 **Example:**
 ```markdown
-Good: Track every required checklist item in the client's task list or plan tool.
-Bad: Suggest tracking as an optional convenience.
+Good: Checklists without task-list tracking = steps get skipped. Every time.
+Bad: Some people find task-list tracking helpful for checklists.
 ```
 
 ### 5. Unity
