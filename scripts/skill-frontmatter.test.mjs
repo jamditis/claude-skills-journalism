@@ -127,7 +127,7 @@ test('published package versions stay aligned with the marketplace', () => {
   const expected = new Map([
     ['autocontext', '1.1.2'],
     ['dev-toolkit', '2.1.0'],
-    ['journalism-core', '1.6.0'],
+    ['journalism-core', '1.7.0'],
     ['newsroom-agent-ops', '1.0.0'],
     ['okf-wiki', '0.8.4'],
     ['pdf-design', '1.1.4'],

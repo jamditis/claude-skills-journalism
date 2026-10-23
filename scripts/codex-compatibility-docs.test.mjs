@@ -69,7 +69,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
   assert.match(matrix, /Codex security-toolkit preflight \| 0\.153\.2/u);
   assert.match(
     matrix,
-    /`journalism-core` \| 1\.6\.0; 16 nested skills \| Runtime pilot passed for the earlier 15-skill snapshot/u,
+    /`journalism-core` \| 1\.7\.0; 16 nested skills \| Runtime pilot passed for the earlier 15-skill snapshot/u,
   );
   assert.match(
     matrix,

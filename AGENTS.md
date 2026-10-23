@@ -50,7 +50,7 @@ claude-skills-journalism/
 │   ├── pre-commit-review.md     # Development: Review staged diff before commit
 │   └── no-ai-attribution.md     # Development: Block AI attribution in commits, PRs, and comments
 │
-├── # Plugin: journalism-core (16 skills, v1.6.0), registered in marketplace.json
+├── # Plugin: journalism-core (16 skills, v1.7.0), registered in marketplace.json
 ├── journalism-core/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md

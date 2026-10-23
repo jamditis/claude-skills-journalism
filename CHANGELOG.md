@@ -45,7 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The autonomy essay has an October 2026 update: cross-provider review, exact
   snapshots, no fixed pass cap, the offsite wake attendant, and pinned ledgers.
   Copilot and Gemini are no longer part of the setup.
-- superjawn 2.1.0, dev-toolkit 2.1.0, journalism-core 1.6.0, security-toolkit 1.3.0,
+- superjawn 2.1.0, dev-toolkit 2.1.0, journalism-core 1.7.0, security-toolkit 1.3.0,
   and project-templates-toolkit 1.1.0.
 
 ### Removed
