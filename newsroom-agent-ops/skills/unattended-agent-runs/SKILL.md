@@ -55,7 +55,9 @@ stall backstop, not proof that the task failed safely.
 Use one supervised session when startup cost, recurring context, or long work
 makes a fresh process impractical. The producer must hold a single-flight lease
 until the session performs an explicit done step and the producer confirms
-summary delivery. Do not release the lease because time elapsed.
+summary delivery. Do not release the lease because time elapsed. If done is
+refused, or the run makes no checkpoint progress past a stall threshold, the
+producer alerts the operator once and keeps the lease.
 
 The producer identity must include the process ID and process start time. Probe
 the real session for loss. A reused process ID must not inherit an old lease.
@@ -104,6 +106,8 @@ done pseudocode.
   assumption when possible, and record that assumption.
 - If safe progress is impossible, write a blocked checkpoint and summary, then
   complete the run without the external action.
+- If done refuses, read the reason, fix it, and run done again. If you cannot
+  fix it, write a blocked summary that names the reason.
 
 ### Messaging and delivery
 

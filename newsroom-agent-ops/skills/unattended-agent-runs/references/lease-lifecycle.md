@@ -55,6 +55,10 @@ it confirms summary delivery.
             if session_is_really_lost():
                 restart_fresh_session()
                 reinject_recovery_notice(run_id)
+            elif done_was_refused(run_id) or no_checkpoint_progress_for(run_id, stall_threshold):
+                # A refused done step or a hung tool call. Keep the lease:
+                # ending a live run can repeat or lose a side effect.
+                alert_operator_once(run_id, "run is stalled; lease held")
 
             wait_for_event_or_probe_interval()
 
@@ -86,6 +90,10 @@ restarted producer finds the old run's lease, takes ownership of the same run
 ID, and keeps supervising it. `compare_and_swap_owner` replaces the owner only
 if the lease still names the dead producer, so two restarted producers cannot
 both adopt it.
+
+Set `stall_threshold` above the longest run you expect. A stall alert never
+releases the lease. The operator inspects the run, reconciles any pending side
+effect, and then ends the run or clears the lease by hand.
 
 Deliver the summary before clearing the lease. Record the receipt only after
 the destination shows the summary; an accepted or queued send is not proof.
@@ -141,6 +149,12 @@ The done operation fails closed unless:
 - The checkpoint phase is summary-written or blocked.
 - The summary file exists and is readable.
 - No side-effect-pending phase remains unresolved.
+
+When done refuses, it records which check failed in the checkpoint and returns
+that reason to the agent. The agent fixes the cause, such as reading the
+unrecorded prompt pages, and runs done again. If it cannot, it writes a blocked
+checkpoint and summary and runs done. An unresolved side-effect-pending phase
+still refuses; the producer's stall alert brings in a person.
 
 Make done idempotent for the same completed run. A second call can report
 already complete, but it must not mark another run complete. Done never clears
