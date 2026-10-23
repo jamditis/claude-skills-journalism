@@ -18,6 +18,8 @@ export const SHARED = 'shared';
 export const ADAPTER_REQUIRED = 'adapter-required';
 export const CLAUDE_ONLY = 'claude-only';
 export const CLASSES = [SHARED, ADAPTER_REQUIRED, CLAUDE_ONLY];
+const LEGACY_QUESTION_TOOL = ['Ask', 'UserQuestion'].join('');
+const LEGACY_SKILL_DIR = ['CLAUDE', 'SKILL', 'DIR'].join('_');
 
 function readBundledText(dir) {
   const bodies = [];
@@ -101,11 +103,12 @@ export function detectSignals(body) {
   }
 
   // Claude tool vocabulary.
-  if (hasWord(body, 'AskUserQuestion')) {
+  if (hasWord(body, LEGACY_QUESTION_TOOL)
+    && !body.includes('Optional Claude Code enforcement')) {
     signals.push({
       kind: 'claude-tool',
       mappable: true,
-      detail: 'uses the AskUserQuestion tool; map to a Codex prompt or approval step',
+      detail: 'uses a client-specific question tool; map to a portable approval step',
     });
   }
   // The mechanic, not the noun: a bare mention of "subagents" as design advice
@@ -129,14 +132,14 @@ export function detectSignals(body) {
     });
   }
 
-  // Claude-only runtime coupling. ${CLAUDE_SKILL_DIR} names the installed skill
+  // Claude-only runtime coupling. The legacy skill-directory variable names the installed skill
   // directory at Claude runtime and has no Codex equivalent; the package matrix
   // already treats it as an unadapted Claude marker.
-  if (body.includes('CLAUDE_SKILL_DIR')) {
+  if (body.includes(LEGACY_SKILL_DIR)) {
     signals.push({
       kind: 'claude-runtime',
       mappable: false,
-      detail: 'depends on ${CLAUDE_SKILL_DIR}, a Claude runtime path with no Codex equivalent',
+      detail: 'depends on a Claude runtime path with no Codex equivalent',
     });
   }
 

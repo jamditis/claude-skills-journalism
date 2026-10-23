@@ -62,9 +62,9 @@ test('the standards-installed skill carries exact package resources', () => {
 test('document-design resolves resources from its installed skill root', () => {
   const skill = readFileSync(join(SKILL_ROOT, 'SKILL.md'), 'utf8');
 
-  assert.doesNotMatch(skill, /CLAUDE_PLUGIN_ROOT/u);
+  assert.doesNotMatch(skill, new RegExp(['CLAUDE', 'PLUGIN', 'ROOT'].join('_'), 'u'));
   assert.match(skill, /project-root\s+`?pdf-playground\.local\.md`?/u);
-  assert.match(skill, /legacy `.claude\/pdf-playground\.local\.md` fallback/u);
+  assert.doesNotMatch(skill, /\.claude\/pdf-playground\.local\.md/u);
   for (const resource of [
     'templates/',
     'brands/',

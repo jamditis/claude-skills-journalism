@@ -16,8 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Made shared skills and public skill pages client-neutral and model-agnostic,
+  aligned project instruction handling for Claude Code and Codex, and refreshed
+  compatibility classifications and package patch versions.
 - **Evidence-first bug fixing.** `bug-report-detector`, `systematic-debugging`, and
-  the repository `CLAUDE.md` now ask for the cheapest faithful reproduction (an
+  the repository `AGENTS.md` now ask for the cheapest faithful reproduction (an
   existing test, a focused command, a log, or a new failing test). They keep a
   regression test only when the bug is likely to recur or affects an important
   contract, non-obvious logic, or high-impact behavior.
@@ -591,7 +594,7 @@ Interactive control panel and guided wizard for PDF Playground.
   - No script injection needed, the wrapper handles everything
   - Document HTML stays completely unchanged for clean PDF export
   - No re-injection after page refresh
-- **Guided proposal wizard**, AskUserQuestion-driven setup with 4 phases
+- **Guided proposal wizard**, structured-question setup with 4 phases
   - Phase 1 (Content): proposal type, sections, page count, budget items
   - Phase 2 (Design): color scheme, typography, visual style
   - Phase 3 (Review): live preview with control panel, screenshot, iterate
@@ -607,7 +610,7 @@ Interactive control panel and guided wizard for PDF Playground.
 
 ### Changed
 - Rewrote `commands/preview.md` for the wrapper approach (no more script injection)
-- Updated `commands/proposal.md` with the full AskUserQuestion wizard
+- Updated `commands/proposal.md` with the full structured-question wizard
 - Updated `skills/playground.md` with new architecture docs and preset list
 - Updated `pdf-playground/README.md` with control panel and wrapper docs
 

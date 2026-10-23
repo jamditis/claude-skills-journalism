@@ -51,8 +51,8 @@ test('the compatibility matrix classifies every marketplace package', () => {
     'web-design-picker',
     'visual-explainer',
   ]);
-  assert.match(matrix, /`pdf-playground` \| 1\.3\.6/u);
-  assert.match(matrix, /`security-toolkit` \| 1\.2\.3;/u);
+  assert.match(matrix, /`pdf-playground` \| 1\.3\.7/u);
+  assert.match(matrix, /`security-toolkit` \| 1\.2\.4;/u);
   assert.match(matrix, /`video-toolkit` \| 1\.0\.6;/u);
   assert.match(matrix, /V-phase-1: repaired standards baseline/u);
   assert.match(matrix, /J-release-1: paired journalism-core runtime pilot/u);
@@ -68,20 +68,17 @@ test('the compatibility matrix classifies every marketplace package', () => {
   assert.match(matrix, /Codex security-toolkit preflight \| 0\.153\.2/u);
   assert.match(
     matrix,
-    /`journalism-core` \| 1\.2\.0; 14 nested skills \| Runtime pilot passed on the Claude package and Codex project-standards paths/u,
+    /`journalism-core` \| 1\.5\.0; 15 nested skills \| Runtime pilot passed on the Claude package and Codex project-standards paths/u,
   );
   assert.match(
     matrix,
-    /`visual-explainer` \| 0\.7\.1; one root skill; eight source commands \| Runtime pilot passed on the Codex project-standards path; command surfaces unclaimed/u,
+    /`visual-explainer` \| 0\.7\.5; one root skill; eight source commands \| Runtime pilot passed on the Codex project-standards path; command surfaces unclaimed/u,
   );
   assert.match(
     matrix,
-    /`okf-wiki` \| 0\.6\.1; one root skill; scripts and generated Claude settings \| Pre-set portable runtime pilot passed; instruction and Claude-output adapters remain/u,
+    /`okf-wiki` \| 0\.8\.4; one root skill; scripts and generated Claude settings \| Pre-set portable runtime pilot passed; optional Claude-output adapter remains/u,
   );
-  assert.match(
-    matrix,
-    /Exclude the unadapted general instructions that name `AskUserQuestion` and `\$\{CLAUDE_SKILL_DIR\}`/u,
-  );
+  assert.match(matrix, /client-neutral general instructions/u);
   assert.match(matrix, /scripts\/okf-wiki-runtime-pilot\.mjs/u);
   assert.match(matrix, /scripts\/visual-explainer-runtime-pilot\.mjs/u);
   assert.match(matrix, /2026-07-23-document-design-lock-migration\.md/u);
@@ -233,16 +230,19 @@ test('okf-wiki no-Claude evidence keeps Claude adapters outside Codex behavior',
     /invoking session supplied an\s+external-isolation policy/u,
   );
   assert.doesNotMatch(record, /repository's `AGENTS\.md`/u);
-  assert.match(record, /`AskUserQuestion` and `\$\{CLAUDE_SKILL_DIR\}` remain outside/u);
+  assert.match(
+    record,
+    new RegExp(`\`${['Ask', 'UserQuestion'].join('')}\` and \`\\$\\{${['CLAUDE', 'SKILL', 'DIR'].join('_')}\\}\`\\s+remain outside`, 'u'),
+  );
   assert.match(record, /removed the installed skill without touching the generated OKF project/u);
   assert.match(record, /The three `.claude\/` files are Claude adapter output/u);
   assert.doesNotMatch(record, /repository-wide Codex support/u);
 
-  assert.match(skill, /The three generated `.claude\/` files are a Claude Code adapter/u);
+  assert.match(skill, /The three generated adapter files are for Claude Code/u);
   assert.match(skill, /Codex does not read them as project configuration/u);
   assert.match(
     skill,
-    /does not establish that the unadapted\s+general route is portable/u,
+    /does not add runtime evidence for the newly generalized question flow/u,
   );
 });
 

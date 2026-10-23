@@ -18,6 +18,38 @@
       "expect": { "decision": "reject", "branch": "copyediting", "branchAlternatives": ["copyediting", "newsroom style", "editorial rewriting"], "terms": ["style"] }
     },
     {
+      "id": "cmu-activation",
+      "skill": "claude-md-updater",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Save this durable build lesson in the project's instruction file. Show me the exact patch and wait for approval before writing it.",
+      "expect": { "decision": "use", "branch": "project-instruction-update", "branchAlternatives": ["project instruction update", "durable lesson capture"], "terms": ["patch", "approval"] }
+    },
+    {
+      "id": "cmu-unrelated",
+      "skill": "claude-md-updater",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Summarize the last five commits for a stand-up update. Do not change any project files.",
+      "expect": { "decision": "reject", "branch": "status-summary", "branchAlternatives": ["status summary", "commit summary"], "terms": ["commits"] }
+    },
+    {
+      "id": "director-activation",
+      "skill": "director",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Use director to coordinate the configured workers for this repository-wide refactor, review their results, and keep final decisions in the main session.",
+      "expect": { "decision": "use", "branch": "directed-delegation", "branchAlternatives": ["directed delegation", "worker coordination"], "terms": ["coordinate", "review"] }
+    },
+    {
+      "id": "director-unrelated",
+      "skill": "director",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Rename one local variable in a five-line function and run its existing focused test.",
+      "expect": { "decision": "reject", "branch": "small-code-edit", "branchAlternatives": ["small code edit", "ordinary implementation"], "terms": ["variable"] }
+    },
+    {
       "id": "cef-activation",
       "skill": "context-engineering-fundamentals",
       "package": "dev-toolkit",

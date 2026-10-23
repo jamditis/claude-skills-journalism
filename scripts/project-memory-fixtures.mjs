@@ -654,14 +654,15 @@ export function verifyProjectMemoryNonTriggerTrace(client, transcript) {
 export function auditCommittedProjectMemorySkill(root = ROOT) {
   const body = readFileSync(resolve(root, SKILL_PATH), 'utf8');
   const lower = body.toLowerCase();
-  const claudeOutput = lower.includes('create claude.md files')
-    && lower.includes('copy the appropriate template to `./claude.md`');
-  const codexOutput = lower.includes('create agents.md files')
-    || lower.includes('copy the appropriate template to `./agents.md`');
+  const claudeOutput = lower.includes('if only `claude.md` exists, update it')
+    && lower.includes('in claude code, also create a')
+    && lower.includes('`claude.md` that imports it with `@agents.md`');
+  const codexOutput = lower.includes('if `agents.md` exists, update it')
+    && lower.includes('if neither exists, create `agents.md`');
   const preservesExistingFiles = lower.includes('preserve every existing line')
-    || lower.includes('merge into the existing instruction file');
-  const nestedCodexScope = lower.includes('nested agents.md')
-    && lower.includes('directory tree');
+    || lower.includes('preserve existing guidance and ordering');
+  const nestedCodexScope = lower.includes('nested instruction file')
+    && lower.includes('directory needs narrower rules');
 
   return {
     claudeOutput,
