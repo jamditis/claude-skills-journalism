@@ -10,7 +10,7 @@
         "scripts/server.cjs": "PR #34 review: WebSocket frame size cap",
         "scripts/start-server.sh": "PR #34 review: exec-based PID preservation",
         "scripts/stop-server.sh": "PR #34 review: SESSION_DIR validation",
-        "spec-document-reviewer-prompt.md": "Repo-wide em-dash to comma conversion",
+        "spec-document-reviewer-prompt.md": "Repo-wide em-dash to comma conversion; client-neutral sweep: Claude Code tool names replaced with generic worker wording",
         "visual-companion.md": "Repo-wide em-dash to comma conversion"
       }
     },
@@ -18,7 +18,7 @@
       "category": "consumer",
       "skill_md_parity": false,
       "supporting_file_overrides": {
-        "plan-document-reviewer-prompt.md": "Repo-wide em-dash to comma conversion"
+        "plan-document-reviewer-prompt.md": "Repo-wide em-dash to comma conversion; client-neutral sweep: Claude Code tool names replaced with generic worker wording"
       }
     },
     "executing-plans": {
@@ -58,7 +58,7 @@
       "skill_md_parity": false,
       "supporting_file_overrides": {
         "code-quality-reviewer-prompt.md": "v2.0.0: client-neutral dispatch guidance keeps the Claude Code pr-review-toolkit:code-reviewer target as a labeled adapter",
-        "implementer-prompt.md": "superjawn 2.0.0: TDD instructions replaced with the fleet testing rules (tests where the task or project rules call for them; independent expected values; no weakened tests)",
+        "implementer-prompt.md": "superjawn 2.0.0: TDD instructions replaced with the fleet testing rules (tests where the task or project rules call for them; independent expected values; no weakened tests); client-neutral sweep: Claude Code tool names replaced with generic worker wording",
         "spec-reviewer-prompt.md": "v2.0.0: Task tool wording generalized to a client worker capability and status emoji removed"
       }
     },
@@ -95,7 +95,7 @@
         "anthropic-best-practices.md": "v2.0.0: model guidance generalized by capability tier with Claude family examples retained",
         "examples/CLAUDE_MD_TESTING.md": "v2.0.0: exact Claude Code test variants retained with a Codex path substitution note",
         "persuasion-principles.md": "v2.0.0: vendor task-tool references generalized to client task-list tracking while preserving the tested phrasing",
-        "testing-skills-with-subagents.md": "superjawn 2.0.0: REQUIRED BACKGROUND reference to the removed test-driven-development skill replaced with a self-contained description of the red-green cycle for skills"
+        "testing-skills-with-subagents.md": "superjawn 2.0.0: REQUIRED BACKGROUND reference to the removed test-driven-development skill replaced with a self-contained description of the red-green cycle for skills; client-neutral sweep: Claude Code tool names replaced with generic worker wording"
       }
     }
   }

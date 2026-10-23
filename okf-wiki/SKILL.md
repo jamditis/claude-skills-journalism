@@ -108,8 +108,8 @@ python3 "${CLAUDE_SKILL_DIR}/scripts/scaffold.py" ./my-knowledge-base \
   --sections concepts,services,decisions
 ```
 
-In other clients, use the absolute `SKILL.md` location from the skill catalog and run
-the installed script from that directory:
+In other clients, take the absolute `SKILL.md` location from the skill catalog. Stay in the
+project directory and run the installed script by its absolute path:
 
 ```bash
 python3 /absolute/path/to/okf-wiki/scripts/scaffold.py ./my-knowledge-base \

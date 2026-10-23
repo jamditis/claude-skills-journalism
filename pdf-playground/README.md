@@ -162,7 +162,7 @@ By default, PDF Playground uses generic styling. To use your organization's colo
 
 ### Where the config file goes
 
-Use the path for the client you run from the project directory:
+The path depends on your client. Both paths are relative to the project directory:
 
 - **Claude Code commands:** `.claude/pdf-playground.local.md`
 - **Codex and the shared document-design skill:** `pdf-playground.local.md`
@@ -176,7 +176,7 @@ commands continue to read the file in `.claude/`.
 
 > "Create a brand config for PDF Playground. My organization is called [your org name] and our main color is [your color]."
 
-Claude will create the file in the right place.
+Claude creates the file at `.claude/pdf-playground.local.md`, the path the Claude Code commands read. If you also use Codex, copy it to `pdf-playground.local.md` at the project root, or keep only one file and use one client.
 
 **Option B, Create it yourself:** Open a text editor (VS Code, Notepad, TextEdit, nano, any editor works) and create the file at the path for your client with this content:
 

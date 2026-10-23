@@ -120,8 +120,9 @@ https://code.claude.com/docs/en/memory
 | Local | `./CLAUDE.local.md` | Gitignored personal project notes |
 
 In Codex, instructions load from global scope through the current working
-directory. Later directories override earlier ones. Source:
-https://developers.openai.com/cookbook/examples/gpt-5/codex_prompting_guide#using-agentsmd
+directory. Later directories override earlier ones, and `AGENTS.override.md`
+takes precedence over `AGENTS.md` in the same directory. Source:
+https://developers.openai.com/codex/guides/agents-md
 
 | Scope | Codex location | Use case |
 |---|---|---|
