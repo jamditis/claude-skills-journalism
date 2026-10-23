@@ -1,14 +1,15 @@
 # Codex capability mapping
 
-Shared skills describe capabilities instead of vendor tool names. In Codex, use the native equivalent:
+Shared skills describe capabilities instead of vendor tool names. In Codex, use these tools. Tool names can change between releases; check the current tool list if a call fails.
 
 | Skill action | Codex capability |
 |---|---|
-| Dispatch one worker | Use the available worker-spawn capability (see [Named worker dispatch](#named-worker-dispatch)) |
-| Dispatch independent work in parallel | Start multiple workers before waiting for results |
-| Wait for worker results | Use the available worker wait capability |
-| Track plan progress | Use the plan or task-list capability |
-| Load a skill | Use native skill discovery and loading |
+| Dispatch one worker | `spawn_agent` (see [Named worker dispatch](#named-worker-dispatch)) |
+| Dispatch independent work in parallel | Multiple `spawn_agent` calls before any `wait` |
+| Wait for worker results | `wait` |
+| Free a finished worker's slot | `close_agent` |
+| Track plan progress | `update_plan` |
+| Load a skill | Skills load natively; follow the instructions |
 | Read or edit files | Use native file tools |
 | Run commands | Use the native shell tool |
 
@@ -39,8 +40,8 @@ When a skill says to dispatch a named agent type:
 
 | Skill instruction | Codex equivalent |
 |-------------------|------------------|
-| Named code reviewer | Spawn a worker with the filled `code-reviewer.md` content |
-| General worker with an inline prompt | Spawn a worker with the same prompt |
+| Named code reviewer | `spawn_agent(agent_type="worker", message=...)` with the filled `code-reviewer.md` content |
+| General worker with an inline prompt | `spawn_agent(message=...)` with the same prompt |
 
 ### Message framing
 

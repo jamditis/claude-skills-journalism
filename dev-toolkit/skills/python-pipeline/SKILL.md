@@ -86,7 +86,7 @@ src/
 ├── services/
 │   ├── sheets_service.py   # Google Sheets integration
 │   ├── drive_service.py    # Google Drive integration
-│   └── ai_service.py       # Hosted model API wrapper
+│   └── ai_service.py       # Gemini API wrapper
 ├── utils/
 │   ├── logger.py
 │   └── rate_limiter.py
@@ -328,7 +328,7 @@ for record in records:
         tracker.log_error(record.id, str(e))
 ```
 
-## Hosted model integration
+## Gemini API integration
 
 The `google-generativeai` package was deprecated August 31, 2025 and the unified `google-genai` SDK replaced it. New code should target `google-genai`:
 
@@ -343,10 +343,10 @@ from google import genai
 from google.genai import types
 
 # Client carries config (API key, project, location). Reuse across calls.
-client = genai.Client(api_key=os.environ['GOOGLE_API_KEY'])
+client = genai.Client(api_key=os.environ['GEMINI_API_KEY'])
 
 # Model IDs drift. Require an explicit configured model instead of shipping a default.
-CONFIGURED_MODEL = os.environ['GOOGLE_GENAI_MODEL']
+CONFIGURED_MODEL = os.environ['GEMINI_MODEL']
 
 class AIService:
     def __init__(self, model: str = CONFIGURED_MODEL):
@@ -426,7 +426,7 @@ class BatchAIProcessor:
 
 `response.usage_metadata` carries the actual token counts, which is more accurate than length heuristics. Without `response_mime_type='application/json'`, the provider can return prose, often wrapped in Markdown fences, and `json.loads` fails. Every JSON-returning call needs both the config flag and a JSON-shaped prompt. For multimodal calls, pass content as a list (text plus parts), not a single string.
 
-## Image classification with a hosted vision model
+## Image classification with Gemini vision
 
 ```python
 from google import genai
@@ -436,8 +436,8 @@ from pathlib import Path
 import json
 import os
 
-client = genai.Client(api_key=os.environ['GOOGLE_API_KEY'])
-vision_model = os.environ['GOOGLE_GENAI_MODEL']
+client = genai.Client(api_key=os.environ['GEMINI_API_KEY'])
+vision_model = os.environ['GEMINI_MODEL']
 
 def classify_image(image_path: Path, categories: list[str]) -> dict:
     image = Image.open(image_path)
@@ -498,8 +498,8 @@ load_dotenv()
 
 class Config:
     # API Keys
-    GOOGLE_API_KEY = os.environ['GOOGLE_API_KEY']
-    GOOGLE_GENAI_MODEL = os.environ['GOOGLE_GENAI_MODEL']
+    GEMINI_API_KEY = os.environ['GEMINI_API_KEY']
+    GEMINI_MODEL = os.environ['GEMINI_MODEL']
     GOOGLE_SHEET_ID = os.environ['GOOGLE_SHEET_ID']
 
     # Paths

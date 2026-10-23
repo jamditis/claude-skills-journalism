@@ -44,7 +44,7 @@ Use this shape when passing retrieved material onward:
 
 **Writing skills IS Test-Driven Development applied to process documentation.**
 
-**Personal skills live in the directory configured by the active client.**
+**Personal skills live in the directory configured by the active client** (`~/.claude/skills/` for Claude Code, `~/.agents/skills/` for Codex).
 
 You write test cases (pressure scenarios with subagents), watch them fail (baseline behavior), write the skill (documentation), watch tests pass (agents comply), and refactor (close loopholes).
 

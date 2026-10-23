@@ -40,15 +40,19 @@ If the project instruction file (`AGENTS.md` for Codex, `CLAUDE.md` for Claude C
 
 ## How to Access Skills
 
-**In Claude Code:** Use the client's skill-loading mechanism. When it presents the skill content, follow that content directly.
+**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you; follow it directly. Do not use the Read tool on skill files.
 
-**In Codex:** Use the client's skill-loading mechanism. When it presents the skill content, follow that content directly.
+**In Codex:** Skills load natively from the skill catalog. Open the listed `SKILL.md` and follow it directly.
+
+**In Copilot CLI:** Use the `skill` tool. Skills are auto-discovered from installed plugins.
+
+**In Gemini CLI:** Skills activate through the `activate_skill` tool. Gemini loads skill metadata at session start and the full content on demand.
 
 **In other environments:** Check the client's documentation for skill discovery and loading.
 
 ## Platform Adaptation
 
-Skills describe capabilities instead of vendor tool names. Use the client's file, shell, plan, and worker features that match the requested action. See the client references in `references/` only when a platform-specific capability needs clarification.
+Skills describe capabilities instead of vendor tool names. Use the client's file, shell, plan, and worker features that match the requested action. For concrete tool names, see `references/codex-tools.md` (Codex), `references/copilot-tools.md` (Copilot CLI), or `references/gemini-tools.md` (Gemini CLI).
 
 # Using Skills
 

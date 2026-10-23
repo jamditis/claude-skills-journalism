@@ -87,23 +87,23 @@ cp "$WORK_DIR/output.pdf" "$PROJECT_DIR/output.pdf"
 1. **Sentence case**, Never Title Case
 2. **Left-aligned**, Never justified text
 3. **Print-ready**, 8.5" × 11" letter size
-4. **Brand consistent**, Use the selected brand palette
+4. **Brand consistent**, CCM red or the selected program palette
 
 ---
 
 ## Brand guidelines
 
-### Default colors
+### CCM standard colors
 ```css
 :root {
-    --brand-primary: #CA3553;
-    --brand-black: #000000;
-    --brand-gray: #666666;
-    --brand-light: #e2e8f0;
+    --ccm-red: #CA3553;
+    --ccm-black: #000000;
+    --ccm-gray: #666666;
+    --ccm-light: #e2e8f0;
 }
 ```
 
-### Alternate program palette
+### Program-specific (Democracy Day)
 ```css
 :root {
     --civic-navy: #1a2b4a;
