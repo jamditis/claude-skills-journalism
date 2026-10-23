@@ -53,11 +53,13 @@ first gate outside current authority.
    authorized task is planning.
 7. Run the relevant checks.
 8. Obtain the required independent review and resolve supported findings.
-9. Recheck CI, threads, holds, and the exact head.
-10. Open or update the pull request within current authority.
-11. If deployment is separate from merge, use Refs #n instead of a closing
+9. Open or update the pull request within current authority.
+10. If deployment is separate from merge, use Refs #n instead of a closing
     keyword and mark the issue as awaiting deployment.
-12. Merge only with explicit owner approval for that specific change.
+11. On the pull request, recheck CI, review threads, holds, and the exact head.
+12. Merge only with explicit owner approval for that specific change. Just
+    before the merge, confirm that the head is still the one CI and review
+    passed.
 13. Verify deployment or live behavior when the project requires it.
 14. Close the issue only after the live check passes.
 15. Release the claim and update parent or milestone tracking.

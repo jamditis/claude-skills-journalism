@@ -23,12 +23,17 @@ it confirms summary delivery.
             supervise(lease.run_id)
             return BUSY
 
-        write_atomic({
+        # Create the lease only if no lease exists, in one step: for example,
+        # write a temp file, then link() it to the lease path, which fails if
+        # the path exists. A plain rename would replace another producer's lease.
+        if not create_exclusive({
             run_id: run.id,
             pid: current_pid(),
             process_start: current_process_start(),
             acquired_at: now()
-        })
+        }):
+            queue(run)
+            return BUSY            # another producer created a lease first
         inject(run)
         supervise(run.id)
         return ACCEPTED
