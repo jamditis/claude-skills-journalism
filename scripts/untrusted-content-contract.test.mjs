@@ -22,6 +22,7 @@ const NETWORK_FACING_SKILLS = [
   'newsroom-agent-ops/skills/deadline-and-reply-tracking/SKILL.md',
   'newsroom-agent-ops/skills/email-request-intake/SKILL.md',
   'newsroom-agent-ops/skills/issue-pool-progression/SKILL.md',
+  'newsroom-agent-ops/skills/multi-agent-coordinator/SKILL.md',
   'newsroom-agent-ops/skills/record-reconciliation/SKILL.md',
   'newsroom-agent-ops/skills/scheduled-briefing/SKILL.md',
   'research-toolkit/skills/content-access/SKILL.md',

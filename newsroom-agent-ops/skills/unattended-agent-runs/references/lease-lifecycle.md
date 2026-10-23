@@ -92,8 +92,11 @@ if the lease still names the dead producer, so two restarted producers cannot
 both adopt it.
 
 Set `stall_threshold` above the longest run you expect. A stall alert never
-releases the lease. The operator inspects the run, reconciles any pending side
-effect, and then ends the run or clears the lease by hand.
+releases the lease. The operator inspects the run and decides. To end it, the
+operator first stops the session and confirms that it exited, or fences it so it
+cannot act. Then the operator reconciles any pending side effect and clears the
+lease by hand. Never clear the lease of a session that can still act: the next
+run would overlap it.
 
 Deliver the summary before clearing the lease. Record the receipt only after
 the destination shows the summary; an accepted or queued send is not proof.
