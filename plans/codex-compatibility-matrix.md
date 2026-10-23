@@ -658,7 +658,7 @@ The `dev-toolkit` row above is package-level. The per-skill breakdown lives in
 [dev-toolkit-portability-matrix.md](dev-toolkit-portability-matrix.md),
 generated from the repository by `scripts/dev-toolkit-portability.mjs` and
 guarded against drift by `scripts/dev-toolkit-portability.test.mjs`. It
-discovers 12 skills: 11 shared, 1 adapter-required (`one-way-door`), and 0
+discovers 14 skills: 13 shared, 1 adapter-required (`one-way-door`), and 0
 Claude-only. `one-way-door` stays adapter-required because its optional Claude
 Code enforcement hook has client-specific lifecycle behavior. The shared skill
 does not depend on that hook.

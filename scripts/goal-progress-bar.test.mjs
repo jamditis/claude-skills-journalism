@@ -91,3 +91,15 @@ test('does not undercount an exact decimal boundary', { skip: SKIP }, () => {
     assert.match(result.stdout, /- Task: in progress \(58%\)/u);
   });
 });
+
+test('floors row percentages so an unfinished row never shows 100%', { skip: SKIP }, () => {
+  withTracker([['Nearly', 1, 0.999], ['Barely', 1, 0.004]], (tracker) => {
+    for (const args of [[tracker, 'Row goal'], [tracker, 'Row goal', '--chat']]) {
+      const result = render(args);
+      assert.equal(result.status, 0, result.stderr);
+      assert.match(result.stdout, /Nearly.*\(99%\)/u);
+      assert.match(result.stdout, /Barely.*\(<1%\)/u);
+      assert.doesNotMatch(result.stdout, /\(100%\)/u);
+    }
+  });
+});

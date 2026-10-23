@@ -17,6 +17,12 @@ from pathlib import Path
 USAGE = 'usage: progress.py <tracker.json> ["<title>"] [--chat]'
 
 
+def row_percent(fraction):
+    # Floor like the overall value, so an unfinished row never shows 100%.
+    value = int(fraction * 100)
+    return "<1%" if value == 0 else f"{value}%"
+
+
 def status(row):
     """Return the display status for one validated tracker row."""
     fraction = row[2]
@@ -75,7 +81,7 @@ def main(argv):
         }
         for row in items:
             mark = status(row)
-            extra = f" ({round(row[2] * 100)}%)" if 0 < row[2] < 1 else ""
+            extra = f" ({row_percent(row[2])})" if 0 < row[2] < 1 else ""
             print(f"{circle[mark]} {row[0]}{extra}")
     else:
         width = 30
@@ -83,7 +89,7 @@ def main(argv):
         print(f"{title}: [{'#' * fill}{'-' * (width - fill)}] {pct}%\n")
         for row in items:
             fraction = row[2]
-            extra = f" ({round(fraction * 100)}%)" if 0 < fraction < 1 else ""
+            extra = f" ({row_percent(fraction)})" if 0 < fraction < 1 else ""
             print(f"- {row[0]}: {status(row)}{extra}")
 
     if not items:
