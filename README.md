@@ -58,19 +58,19 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | Plugin | Description | Commands | Updated |
 |--------|-------------|----------|--------|
 | [autocontext](./autocontext/) | Cross-session knowledge persistence with skill evolution. Lessons accumulate per-skill, and `/autocontext:evolve` folds them back into skill files | `/autocontext:setup`, `/autocontext:init`, `/autocontext:review`, `/autocontext:status`, `/autocontext:evolve` | Aug 21, 2026 |
-| [dev-toolkit](./dev-toolkit/) | Fourteen development-focused skills for journalists, researchers, and small newsroom dev teams: accessibility, context management, minimal-code implementation, UI completeness, directed multi-agent execution, Electron, mobile debugging, Python pipelines, ethical scraping, no-build frontends, web UI craft, and project instruction maintenance | `/dev-toolkit:director`; other skills model-selected | Oct 4, 2026 |
-| [journalism-core](./journalism-core/) | Sixteen core journalism skills, including AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, Brazilian LAI requests, fact-checking, interview prep, transcription + meeting actions, story pitches, editorial workflow, crisis communications, newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements, and embedded photo metadata for wire distribution | n/a, skills only | Aug 21, 2026 |
-| [newsroom-agent-ops](./newsroom-agent-ops/) | Nine skills for safe recurring newsroom work: unattended runs, briefings, intake, delivery, coordination, reconciliation, chat triage, deadline tracking, and issue progression | n/a, skills only | |
-| [okf-wiki](./okf-wiki/) | Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with YAML frontmatter, directory navigation, and a validator. Generates a starter wiki that passes its own conformance and secret-leak checks, ships session-start hooks that orient Claude on the knowledge base before it works, and includes an optional GitHub-wiki bootstrap. For newsroom institutional memory, research atlases, decision logs, and infrastructure maps | n/a, skill only | Oct 3, 2026 |
-| [pdf-design](./pdf-design/) | PDF report and proposal design system with brand variables, budget tables, and reusable content blocks (stats strips, three-column, four-tile pillars, partner grids) | n/a, skill-only | Sep 15, 2026 |
-| [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials with an interactive control panel for live design editing (colors, fonts, spacing, sections) and a guided wizard for proposals | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` | Sep 4, 2026 |
-| [project-templates-toolkit](./project-templates-toolkit/) | Four skills for setting up, tracking, and closing out journalism projects: a project instruction writer (institutional knowledge), a LESSONS.md retrospective writer (failures and decisions), a template-selector decision tree across 6 project types, and an evidence-based weighted progress tracker | n/a, skills only | Oct 3, 2026 |
-| [research-toolkit](./research-toolkit/) | Six skills for research, source preservation, and academic workflows: academic writing, legal paywall-bypass via Unpaywall and library databases, web archiving (Wayback / Archive.today / ArchiveBox), web page change monitoring, AI-enriched digital archive construction, and a curated free-API catalog with sunset currency notes (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) | n/a, skills only | Aug 21, 2026 |
-| [security-toolkit](./security-toolkit/) | Five defensive security skills covering OWASP Top 10 fundamentals, supply-chain hardening, and secret scanning: pre-deployment audit checklists (auth, input validation, secrets management), secure authentication patterns (password hashing, session management, JWT, OAuth, passkeys), API hardening (rate limiting, CORS, request throttling, defense-in-depth for Express, FastAPI, and serverless), and npm/bun supply-chain hardening with install-time cooldown plus a sandboxed pre-install scan for the bypass case (defends against Mini Shai-Hulud-class worms) | `/security-toolkit:hotpatch` | Sep 28, 2026 |
-| [superjawn](./superjawn/) | Research-augmented fork of obra/superpowers. Default-on research phase fires before brainstorming, systematic-debugging, and writing-skills. Includes 13 skills with no soft dependencies on the upstream `superpowers` plugin | invoked indirectly via skills (e.g. `superjawn:brainstorming`, `superjawn:systematic-debugging`, `superjawn:writing-plans`) | Oct 3, 2026 |
+| [dev-toolkit](./dev-toolkit/) | Fourteen development-focused skills for journalists, researchers, and small newsroom dev teams: accessibility, context management, minimal-code implementation, UI completeness, directed multi-agent execution, Electron, mobile debugging, Python pipelines, ethical scraping, no-build frontends, web UI craft, and project instruction maintenance | `/dev-toolkit:director`; other skills model-selected | Oct 23, 2026 |
+| [journalism-core](./journalism-core/) | Sixteen core journalism skills, including AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, Brazilian LAI requests, fact-checking, interview prep, transcription + meeting actions, story pitches, editorial workflow, crisis communications, newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements, and embedded photo metadata for wire distribution | n/a, skills only | Oct 23, 2026 |
+| [newsroom-agent-ops](./newsroom-agent-ops/) | Nine skills for safe recurring newsroom work: unattended runs, briefings, intake, delivery, coordination, reconciliation, chat triage, deadline tracking, and issue progression | n/a, skills only | Oct 23, 2026 |
+| [okf-wiki](./okf-wiki/) | Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with YAML frontmatter, directory navigation, and a validator. Generates a starter wiki that passes its own conformance and secret-leak checks, ships session-start hooks that orient Claude on the knowledge base before it works, and includes an optional GitHub-wiki bootstrap. For newsroom institutional memory, research atlases, decision logs, and infrastructure maps | n/a, skill only | Oct 23, 2026 |
+| [pdf-design](./pdf-design/) | PDF report and proposal design system with brand variables, budget tables, and reusable content blocks (stats strips, three-column, four-tile pillars, partner grids) | n/a, skill-only | Oct 23, 2026 |
+| [pdf-playground](./pdf-playground/) | Create branded proposals, reports, one-pagers, newsletters, slides, and event materials with an interactive control panel for live design editing (colors, fonts, spacing, sections) and a guided wizard for proposals | `/pdf-playground:proposal`, `/pdf-playground:report`, `/pdf-playground:onepager`, `/pdf-playground:newsletter`, `/pdf-playground:slides`, `/pdf-playground:event`, `/pdf-playground:preview` | Oct 23, 2026 |
+| [project-templates-toolkit](./project-templates-toolkit/) | Four skills for setting up, tracking, and closing out journalism projects: a project instruction writer (institutional knowledge), a LESSONS.md retrospective writer (failures and decisions), a template-selector decision tree across 6 project types, and an evidence-based weighted progress tracker | n/a, skills only | Oct 23, 2026 |
+| [research-toolkit](./research-toolkit/) | Six skills for research, source preservation, and academic workflows: academic writing, legal paywall-bypass via Unpaywall and library databases, web archiving (Wayback / Archive.today / ArchiveBox), web page change monitoring, AI-enriched digital archive construction, and a curated free-API catalog with sunset currency notes (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) | n/a, skills only | Oct 23, 2026 |
+| [security-toolkit](./security-toolkit/) | Five defensive security skills covering OWASP Top 10 fundamentals, supply-chain hardening, and secret scanning: pre-deployment audit checklists (auth, input validation, secrets management), secure authentication patterns (password hashing, session management, JWT, OAuth, passkeys), API hardening (rate limiting, CORS, request throttling, defense-in-depth for Express, FastAPI, and serverless), and npm/bun supply-chain hardening with install-time cooldown plus a sandboxed pre-install scan for the bypass case (defends against Mini Shai-Hulud-class worms) | `/security-toolkit:hotpatch` | Oct 23, 2026 |
+| [superjawn](./superjawn/) | Research-augmented fork of obra/superpowers. Default-on research phase fires before brainstorming, systematic-debugging, and writing-skills. Includes 13 skills with no soft dependencies on the upstream `superpowers` plugin | invoked indirectly via skills (e.g. `superjawn:brainstorming`, `superjawn:systematic-debugging`, `superjawn:writing-plans`) | Oct 23, 2026 |
 | [video-toolkit](./video-toolkit/) | Four composable skills for social-video accountability reporting: downloading public video from Twitter/X, TikTok, YouTube, Instagram, and Facebook; transcribing it with a provenance sidecar and a CPU path any evaluator can re-run; extracting and vision-analyzing frames; and aggregating the result into an interactive dashboard | n/a, skills only | Sep 23, 2026 |
-| [web-design-picker](./web-design-picker/) | Build two to five distinct website directions, a switchable client review site, downloadable design assets, preview images, static QA reports, and separate Cloudflare Drop and design-handoff packages | n/a, skill only | Sep 2, 2026 |
-| [visual-explainer](./visual-explainer/) | HTML diagrams, data tables, architecture views, slide decks, and KPI dashboards adapted from nicobailon/visual-explainer with journalism, newsroom, and academic design sensibilities | `/visual-explainer:project-recap` | Aug 21, 2026 |
+| [web-design-picker](./web-design-picker/) | Build two to five distinct website directions, a switchable client review site, downloadable design assets, preview images, static QA reports, and separate Cloudflare Drop and design-handoff packages | n/a, skill only | Oct 23, 2026 |
+| [visual-explainer](./visual-explainer/) | HTML diagrams, data tables, architecture views, slide decks, and KPI dashboards adapted from nicobailon/visual-explainer with journalism, newsroom, and academic design sensibilities | `/visual-explainer:project-recap` | Oct 23, 2026 |
 
 #### Skills (manual installation)
 
@@ -163,16 +163,16 @@ These sixteen skills ship together as the [journalism-core](./journalism-core/) 
 
 | Skill | Description | Updated |
 |-------|-------------|--------|
-| [ai-writing-detox](./journalism-core/skills/ai-writing-detox/) | Eliminate AI-generated patterns that erode reader trust. Banned words, phrases, and structures with alternatives | Aug 21, 2026 |
+| [ai-writing-detox](./journalism-core/skills/ai-writing-detox/) | Eliminate AI-generated patterns that erode reader trust. Banned words, phrases, and structures with alternatives | Oct 23, 2026 |
 | [brazil-records-requests](./journalism-core/skills/brazil-records-requests/) | Public records requests under Brazil's Access to Information Law (Lei 12.527/2011), portal selection across federal, state, municipal, judicial and legislative bodies; deadlines; the four-level appeal chain (first instance, agency head, CGU, CMRI); templates in Portuguese with English glosses | Aug 21, 2026 |
 | [crisis-communications](./journalism-core/skills/crisis-communications/) | Breaking news protocol, rapid verification, crisis response, misinformation countering | Aug 21, 2026 |
 | [data-journalism](./journalism-core/skills/data-journalism/) | Dataset analysis, chart and map creation, statistical reasoning, data-driven story structure | Aug 21, 2026 |
 | [editorial-workflow](./journalism-core/skills/editorial-workflow/) | Story assignment tracking, deadline management, editorial calendars, handoff protocols | Aug 21, 2026 |
 | [fact-check-workflow](./journalism-core/skills/fact-check-workflow/) | Claim extraction, evidence gathering, rating scales, correction protocols | Aug 21, 2026 |
-| [foia-requests](./journalism-core/skills/foia-requests/) | Public records request drafting (federal FOIA + NJ OPRA), tracking, appeals, current statutory citations | Aug 21, 2026 |
+| [foia-requests](./journalism-core/skills/foia-requests/) | Public records request drafting (federal FOIA + NJ OPRA), tracking, appeals, current statutory citations | Oct 23, 2026 |
 | [interview-prep](./journalism-core/skills/interview-prep/) | Pre-interview research, question frameworks, recording consent, attribution guidelines | Aug 21, 2026 |
-| [interview-transcription](./journalism-core/skills/interview-transcription/) | Whisper / WhisperX transcription pipelines, quote management, speaker diarization | Aug 21, 2026 |
-| [meeting-transcript-actions](./journalism-core/skills/meeting-transcript-actions/) | Turn verified meeting transcripts into attributed notes, owned actions, decisions, and unresolved questions | |
+| [interview-transcription](./journalism-core/skills/interview-transcription/) | Whisper / WhisperX transcription pipelines, quote management, speaker diarization | Oct 23, 2026 |
+| [meeting-transcript-actions](./journalism-core/skills/meeting-transcript-actions/) | Turn verified meeting transcripts into attributed notes, owned actions, decisions, and unresolved questions | Oct 23, 2026 |
 | [newsletter-publishing](./journalism-core/skills/newsletter-publishing/) | Email newsletter creation, subscriber management, deliverability, 2024–2026 Gmail / Yahoo / Outlook bulk-sender compliance | Aug 21, 2026 |
 | [newsroom-style](./journalism-core/skills/newsroom-style/) | AP Style enforcement, attribution rules, headline formatting, number conventions | Aug 21, 2026 |
 | [photo-metadata](./journalism-core/skills/photo-metadata/) | Embed caption, byline, credit, alt text, keywords, copyright / Creative Commons license, AI-source labeling (IPTC Digital Source Type), and Google-Images licensing into a photo's IPTC/EXIF/XMP metadata; strip GPS for source protection; read C2PA Content Credentials; batch-tag a folder for a news wire | Aug 21, 2026 |
@@ -186,15 +186,15 @@ These nine skills ship together as the [newsroom-agent-ops](./newsroom-agent-ops
 
 | Skill | Description | Updated |
 |-------|-------------|---------|
-| [unattended-agent-runs](./newsroom-agent-ops/skills/unattended-agent-runs/) | Run recurring work with leases, checkpoints, recovery, delivery checks, and resource limits | |
-| [scheduled-briefing](./newsroom-agent-ops/skills/scheduled-briefing/) | Build concise, source-backed, phone-readable newsroom briefings | |
-| [deadline-and-reply-tracking](./newsroom-agent-ops/skills/deadline-and-reply-tracking/) | Track due dates, acknowledgments, replies, waiting states, and next-owner actions | |
-| [email-request-intake](./newsroom-agent-ops/skills/email-request-intake/) | Process allowlisted email requests while treating messages and attachments as untrusted data | |
-| [document-delivery](./newsroom-agent-ops/skills/document-delivery/) | Inspect, share, send, and verify editable documents and PDFs | |
-| [chat-mention-triage](./newsroom-agent-ops/skills/chat-mention-triage/) | Classify team-chat mentions without duplicating the designated live responder | |
-| [record-reconciliation](./newsroom-agent-ops/skills/record-reconciliation/) | Reconcile task, contact, and interaction records with privacy controls and readback | |
-| [multi-agent-coordinator](./newsroom-agent-ops/skills/multi-agent-coordinator/) | Coordinate workers with durable prompts, event-driven watches, review gates, and cleanup | |
-| [issue-pool-progression](./newsroom-agent-ops/skills/issue-pool-progression/) | Advance claimed issues through review, release, deployment, and live verification | |
+| [unattended-agent-runs](./newsroom-agent-ops/skills/unattended-agent-runs/) | Run recurring work with leases, checkpoints, recovery, delivery checks, and resource limits | Oct 23, 2026 |
+| [scheduled-briefing](./newsroom-agent-ops/skills/scheduled-briefing/) | Build concise, source-backed, phone-readable newsroom briefings | Oct 23, 2026 |
+| [deadline-and-reply-tracking](./newsroom-agent-ops/skills/deadline-and-reply-tracking/) | Track due dates, acknowledgments, replies, waiting states, and next-owner actions | Oct 23, 2026 |
+| [email-request-intake](./newsroom-agent-ops/skills/email-request-intake/) | Process allowlisted email requests while treating messages and attachments as untrusted data | Oct 23, 2026 |
+| [document-delivery](./newsroom-agent-ops/skills/document-delivery/) | Inspect, share, send, and verify editable documents and PDFs | Oct 23, 2026 |
+| [chat-mention-triage](./newsroom-agent-ops/skills/chat-mention-triage/) | Classify team-chat mentions without duplicating the designated live responder | Oct 23, 2026 |
+| [record-reconciliation](./newsroom-agent-ops/skills/record-reconciliation/) | Reconcile task, contact, and interaction records with privacy controls and readback | Oct 23, 2026 |
+| [multi-agent-coordinator](./newsroom-agent-ops/skills/multi-agent-coordinator/) | Coordinate workers with durable prompts, event-driven watches, review gates, and cleanup | Oct 23, 2026 |
+| [issue-pool-progression](./newsroom-agent-ops/skills/issue-pool-progression/) | Advance claimed issues through review, release, deployment, and live verification | Oct 23, 2026 |
 
 ### Research and academic skills (in `research-toolkit` plugin)
 
@@ -202,9 +202,9 @@ These six skills ship together as the [research-toolkit](./research-toolkit/) pl
 
 | Skill | Description | Updated |
 |-------|-------------|--------|
-| [academic-writing](./research-toolkit/skills/academic-writing/) | Research design, literature reviews, IMRaD structure, peer review responses, grant proposals | Aug 21, 2026 |
+| [academic-writing](./research-toolkit/skills/academic-writing/) | Research design, literature reviews, IMRaD structure, peer review responses, grant proposals | Oct 23, 2026 |
 | [content-access](./research-toolkit/skills/content-access/) | Unpaywall, CORE, Semantic Scholar APIs, library databases, ethical access patterns | Aug 21, 2026 |
-| [digital-archive](./research-toolkit/skills/digital-archive/) | Building archives with AI enrichment, entity extraction, knowledge graphs | Aug 21, 2026 |
+| [digital-archive](./research-toolkit/skills/digital-archive/) | Building archives with AI enrichment, entity extraction, knowledge graphs | Oct 23, 2026 |
 | [free-apis-catalog](./research-toolkit/skills/free-apis-catalog/) | Curated free-API catalog organized by journalism use-case, with currency notes for major API sunsets (IEX Cloud, CrowdTangle, ProPublica Congress, X, Reddit) and an evaluation rubric | Aug 21, 2026 |
 | [page-monitoring](./research-toolkit/skills/page-monitoring/) | Change detection, RSS generation, webhook alerts, automatic archiving on changes | Aug 21, 2026 |
 | [web-archiving](./research-toolkit/skills/web-archiving/) | Wayback Machine, Archive.today, legal evidence preservation, multi-archive redundancy | Aug 21, 2026 |
@@ -213,9 +213,9 @@ These six skills ship together as the [research-toolkit](./research-toolkit/) pl
 
 | Skill | Description | Updated |
 |-------|-------------|--------|
-| [pdf-design](./pdf-design/) | Professional PDF reports and proposals with brand system, budget tables, and multi-page layouts. For the full interactive experience, use [pdf-playground](./pdf-playground/) instead | Sep 15, 2026 |
-| [web-design-picker](./web-design-picker/) | Produce distinct responsive website directions, a client review picker, downloadable design assets, preview images, static QA reports, and deployment and handoff packages | Sep 2, 2026 |
-| [visual-explainer](./visual-explainer/) | Turn complex data into styled HTML pages, architecture diagrams, data tables, flowcharts, timelines, source maps, and dashboards with dark/light theme support. Now registered as a plugin (`/plugin install visual-explainer@claude-skills-journalism`) | Aug 21, 2026 |
+| [pdf-design](./pdf-design/) | Professional PDF reports and proposals with brand system, budget tables, and multi-page layouts. For the full interactive experience, use [pdf-playground](./pdf-playground/) instead | Oct 23, 2026 |
+| [web-design-picker](./web-design-picker/) | Produce distinct responsive website directions, a client review picker, downloadable design assets, preview images, static QA reports, and deployment and handoff packages | Oct 23, 2026 |
+| [visual-explainer](./visual-explainer/) | Turn complex data into styled HTML pages, architecture diagrams, data tables, flowcharts, timelines, source maps, and dashboards with dark/light theme support. Now registered as a plugin (`/plugin install visual-explainer@claude-skills-journalism`) | Oct 23, 2026 |
 
 ### PDF Playground skill
 
@@ -223,7 +223,7 @@ This skill ships inside the [pdf-playground](./pdf-playground/) plugin.
 
 | Skill | Description | Updated |
 |-------|-------------|--------|
-| [document-design](./pdf-playground/skills/document-design/) | Create print-ready HTML proposals, reports, one-pagers, newsletters, slides, flyers, and other PDF-ready documents with reusable brand and layout patterns | Sep 4, 2026 |
+| [document-design](./pdf-playground/skills/document-design/) | Create print-ready HTML proposals, reports, one-pagers, newsletters, slides, flyers, and other PDF-ready documents with reusable brand and layout patterns | Oct 23, 2026 |
 
 ### Superjawn skills
 
@@ -231,19 +231,19 @@ These thirteen skills ship inside the [superjawn](./superjawn/) plugin.
 
 | Skill | Description | Updated |
 |-------|-------------|--------|
-| [brainstorming](./superjawn/skills/brainstorming/) | Explore intent, requirements, design, and relevant research before creative implementation work | Aug 21, 2026 |
-| [dispatching-parallel-agents](./superjawn/skills/dispatching-parallel-agents/) | Divide independent tasks among parallel agents without shared-state conflicts | Aug 21, 2026 |
-| [executing-plans](./superjawn/skills/executing-plans/) | Execute a written implementation plan with freshness and review checkpoints | Aug 21, 2026 |
-| [finishing-a-development-branch](./superjawn/skills/finishing-a-development-branch/) | Verify completed work and choose a safe integration, pull request, or cleanup path | Aug 21, 2026 |
-| [receiving-code-review](./superjawn/skills/receiving-code-review/) | Evaluate review feedback against the code before implementing it | Aug 21, 2026 |
-| [requesting-code-review](./superjawn/skills/requesting-code-review/) | Request focused review before integration or after a major implementation | Aug 21, 2026 |
-| [subagent-driven-development](./superjawn/skills/subagent-driven-development/) | Execute independent plan tasks with agents in the current session | Oct 3, 2026 |
-| [systematic-debugging](./superjawn/skills/systematic-debugging/) | Investigate root cause and relevant evidence before proposing a bug fix | Oct 3, 2026 |
-| [using-git-worktrees](./superjawn/skills/using-git-worktrees/) | Create isolated worktrees with safe directory selection and verification | Aug 21, 2026 |
-| [using-superjawn](./superjawn/skills/using-superjawn/) | Discover and invoke the right Superjawn skill for the current task | Oct 3, 2026 |
+| [brainstorming](./superjawn/skills/brainstorming/) | Explore intent, requirements, design, and relevant research before creative implementation work | Oct 23, 2026 |
+| [dispatching-parallel-agents](./superjawn/skills/dispatching-parallel-agents/) | Divide independent tasks among parallel agents without shared-state conflicts | Oct 23, 2026 |
+| [executing-plans](./superjawn/skills/executing-plans/) | Execute a written implementation plan with freshness and review checkpoints | Oct 23, 2026 |
+| [finishing-a-development-branch](./superjawn/skills/finishing-a-development-branch/) | Verify completed work and choose a safe integration, pull request, or cleanup path | Oct 23, 2026 |
+| [receiving-code-review](./superjawn/skills/receiving-code-review/) | Evaluate review feedback against the code before implementing it | Oct 23, 2026 |
+| [requesting-code-review](./superjawn/skills/requesting-code-review/) | Request focused review before integration or after a major implementation | Oct 23, 2026 |
+| [subagent-driven-development](./superjawn/skills/subagent-driven-development/) | Execute independent plan tasks with agents in the current session | Oct 23, 2026 |
+| [systematic-debugging](./superjawn/skills/systematic-debugging/) | Investigate root cause and relevant evidence before proposing a bug fix | Oct 23, 2026 |
+| [using-git-worktrees](./superjawn/skills/using-git-worktrees/) | Create isolated worktrees with safe directory selection and verification | Oct 23, 2026 |
+| [using-superjawn](./superjawn/skills/using-superjawn/) | Discover and invoke the right Superjawn skill for the current task | Oct 23, 2026 |
 | [verification-before-completion](./superjawn/skills/verification-before-completion/) | Run and inspect verification evidence before claiming work is complete | Oct 3, 2026 |
-| [writing-plans](./superjawn/skills/writing-plans/) | Turn a specification or requirements into a checked implementation plan | Oct 3, 2026 |
-| [writing-skills](./superjawn/skills/writing-skills/) | Research, create, edit, and verify reusable skills | Oct 3, 2026 |
+| [writing-plans](./superjawn/skills/writing-plans/) | Turn a specification or requirements into a checked implementation plan | Oct 23, 2026 |
+| [writing-skills](./superjawn/skills/writing-skills/) | Research, create, edit, and verify reusable skills | Oct 23, 2026 |
 
 ### Project documentation skills (in `project-templates-toolkit` plugin)
 
@@ -251,10 +251,10 @@ These four skills ship together as the [project-templates-toolkit](./project-tem
 
 | Skill | Description | Updated |
 |-------|-------------|--------|
-| [goal-progress-bar](./project-templates-toolkit/skills/goal-progress-bar/) | Render evidence-based weighted progress for multi-step work from a JSON tracker | |
-| [project-memory](./project-templates-toolkit/skills/project-memory/) | Generate project instruction files that capture project-specific knowledge. Includes templates for editorial tools, events, publications, research, pipelines, and archives | Oct 3, 2026 |
+| [goal-progress-bar](./project-templates-toolkit/skills/goal-progress-bar/) | Render evidence-based weighted progress for multi-step work from a JSON tracker | Oct 23, 2026 |
+| [project-memory](./project-templates-toolkit/skills/project-memory/) | Generate project instruction files that capture project-specific knowledge. Includes templates for editorial tools, events, publications, research, pipelines, and archives | Oct 23, 2026 |
 | [project-retrospective](./project-templates-toolkit/skills/project-retrospective/) | Generate LESSONS.md files that document what worked and what didn't. Templates for investigations, events, publications, and tools | Aug 21, 2026 |
-| [template-selector](./project-templates-toolkit/skills/template-selector/) | Decision tree for choosing the right project documentation template | Aug 21, 2026 |
+| [template-selector](./project-templates-toolkit/skills/template-selector/) | Decision tree for choosing the right project documentation template | Oct 23, 2026 |
 
 ### Development skills (in `dev-toolkit` plugin)
 
@@ -263,17 +263,17 @@ These fourteen skills ship together as the [dev-toolkit](./dev-toolkit/) plugin.
 | Skill | Description | Updated |
 |-------|-------------|--------|
 | [accessibility-compliance](./dev-toolkit/skills/accessibility-compliance/) | WCAG 2.2 baseline, alt text, focus management, motion preferences, accessible charts | Aug 21, 2026 |
-| [claude-md-updater](./dev-toolkit/skills/claude-md-updater/) | Detect durable session lessons and propose scoped project instruction edits for approval | Aug 21, 2026 |
+| [claude-md-updater](./dev-toolkit/skills/claude-md-updater/) | Detect durable session lessons and propose scoped project instruction edits for approval | Oct 23, 2026 |
 | [context-engineering-fundamentals](./dev-toolkit/skills/context-engineering-fundamentals/) | Attention budget, lost-in-middle recall, context degradation patterns, and mitigations for long sessions | Aug 21, 2026 |
-| [director](./dev-toolkit/skills/director/) | Explicit top-tier direction through workers configured in the applicable project instruction file | Aug 21, 2026 |
+| [director](./dev-toolkit/skills/director/) | Explicit top-tier direction through workers configured in the applicable project instruction file | Oct 23, 2026 |
 | [electron-dev](./dev-toolkit/skills/electron-dev/) | Electron security model (contextIsolation, sandbox), IPC patterns, packaging | Aug 21, 2026 |
 | [mobile-debugging](./dev-toolkit/skills/mobile-debugging/) | Eruda, vConsole, Chrome DevTools on Android, Safari Web Inspector for iOS, console capture | Oct 4, 2026 |
-| [one-way-door](./dev-toolkit/skills/one-way-door/) | Flag irreversible architectural decisions (data models, infra, auth, APIs) before committing | Aug 21, 2026 |
-| [ponytail-dev](./dev-toolkit/skills/ponytail-dev/) | Implement or review software with minimal code and proportional checks | |
-| [python-pipeline](./dev-toolkit/skills/python-pipeline/) | Data pipelines (pandas, polars, DuckDB, asyncio) with modular architecture | Aug 21, 2026 |
-| [surface-completeness](./dev-toolkit/skills/surface-completeness/) | Check UI coverage, design compliance, and documentation during frontend changes | |
-| [vibe-coding](./dev-toolkit/skills/vibe-coding/) | AI-assisted development workflow (Claude Code, Cursor, Aider, Continue) | Aug 21, 2026 |
-| [web-scraping](./dev-toolkit/skills/web-scraping/) | Ethical scraping patterns (Playwright, robots.txt, anti-bot defense, terms-of-service) | Aug 21, 2026 |
+| [one-way-door](./dev-toolkit/skills/one-way-door/) | Flag irreversible architectural decisions (data models, infra, auth, APIs) before committing | Oct 23, 2026 |
+| [ponytail-dev](./dev-toolkit/skills/ponytail-dev/) | Implement or review software with minimal code and proportional checks | Oct 23, 2026 |
+| [python-pipeline](./dev-toolkit/skills/python-pipeline/) | Data pipelines (pandas, polars, DuckDB, asyncio) with modular architecture | Oct 23, 2026 |
+| [surface-completeness](./dev-toolkit/skills/surface-completeness/) | Check UI coverage, design compliance, and documentation during frontend changes | Oct 23, 2026 |
+| [vibe-coding](./dev-toolkit/skills/vibe-coding/) | AI-assisted development workflow (Claude Code, Cursor, Aider, Continue) | Oct 23, 2026 |
+| [web-scraping](./dev-toolkit/skills/web-scraping/) | Ethical scraping patterns (Playwright, robots.txt, anti-bot defense, terms-of-service) | Oct 23, 2026 |
 | [web-ui-best-practices](./dev-toolkit/skills/web-ui-best-practices/) | Container queries, `:has()`, view transitions, scroll-driven animations, signs of taste in web UI | Aug 21, 2026 |
 | [zero-build-frontend](./dev-toolkit/skills/zero-build-frontend/) | ESM import maps, htmx, Alpine.js, no-build deployment | Aug 21, 2026 |
 
@@ -284,10 +284,10 @@ These five skills ship together as the [security-toolkit](./security-toolkit/) p
 | Skill | Description | Updated |
 |-------|-------------|--------|
 | [api-hardening](./security-toolkit/skills/api-hardening/) | Rate limiting, input validation, CORS, security headers, API key management, defense-in-depth for Express, FastAPI, and serverless | Aug 21, 2026 |
-| [private-secret-scanning](./security-toolkit/skills/private-secret-scanning/) | Local Gitleaks scans for staged changes, push ranges, and full history in private repositories, with pre-commit and pre-push hooks, redacted reports, and a fail-closed self-test | Sep 28, 2026 |
+| [private-secret-scanning](./security-toolkit/skills/private-secret-scanning/) | Local Gitleaks scans for staged changes, push ranges, and full history in private repositories, with pre-commit and pre-push hooks, redacted reports, and a fail-closed self-test | Oct 23, 2026 |
 | [secure-auth](./security-toolkit/skills/secure-auth/) | Production-ready authentication patterns: password hashing, session management, JWT, OAuth, passkeys / WebAuthn, MFA | Aug 21, 2026 |
-| [security-checklist](./security-toolkit/skills/security-checklist/) | Pre-deployment security audit covering OWASP Top 10 fundamentals: authentication, input validation, secrets, database security, compliance basics | Aug 21, 2026 |
-| [supply-chain-hardening](./security-toolkit/skills/supply-chain-hardening/) | npm/bun install-time cooldown plus sandboxed pre-install scan (bwrap on Linux, sandbox-exec on macOS). Defends against Mini Shai-Hulud-class worms; paired with `/security-toolkit:hotpatch` for the cooldown-bypass case | Aug 21, 2026 |
+| [security-checklist](./security-toolkit/skills/security-checklist/) | Pre-deployment security audit covering OWASP Top 10 fundamentals: authentication, input validation, secrets, database security, compliance basics | Oct 23, 2026 |
+| [supply-chain-hardening](./security-toolkit/skills/supply-chain-hardening/) | npm/bun install-time cooldown plus sandboxed pre-install scan (bwrap on Linux, sandbox-exec on macOS). Defends against Mini Shai-Hulud-class worms; paired with `/security-toolkit:hotpatch` for the cooldown-bypass case | Oct 23, 2026 |
 
 ### Video analysis skills (in `video-toolkit` plugin)
 
