@@ -12,7 +12,7 @@ Source: https://github.com/jamditis/claude-skills-journalism
 Joe Amditis, associate director of operations, Center for Cooperative Media, Montclair State University.
 Personal site: https://jamditis.com
 
-## Skills (66 total)
+## Skills (76 total)
 
 ### Journalism and verification
 - source-verification, SIFT method, verification trails, source credibility, deepfakes/C2PA
@@ -25,6 +25,7 @@ Personal site: https://jamditis.com
 ### Reporting and editorial
 - interview-prep, research, question development, background checks
 - interview-transcription, recording notes, quote handling, attribution
+- meeting-transcript-actions, turn verified meeting transcripts into attributed notes, decisions, actions, and unresolved questions
 - newsroom-style, AP Style enforcement and editorial standards
 - data-journalism, data analysis and data-driven storytelling
 - editorial-workflow, assignment tracking, story calendars
@@ -71,6 +72,17 @@ Personal site: https://jamditis.com
 - project-memory, generate project instruction files for new projects
 - project-retrospective, generate LESSONS.md files
 - template-selector, pick the right project instruction or LESSONS.md template
+
+### Newsroom agent operations
+- unattended-agent-runs, recurring work with leases, checkpoints, recovery, delivery checks, and resource limits
+- scheduled-briefing, source-backed phone-readable newsroom briefings
+- deadline-and-reply-tracking, due dates, reply windows, waiting states, and next actions
+- email-request-intake, allowlisted email intake with untrusted-content controls
+- document-delivery, editable document and PDF delivery with inspection and readback
+- chat-mention-triage, team-chat classification without duplicate replies
+- record-reconciliation, canonical task, contact, and interaction records with privacy controls
+- multi-agent-coordinator, durable worker coordination with watches, gates, and cleanup
+- issue-pool-progression, claimed issue progression through merge, deployment, and live verification
 
 ### Documents and explainers
 - pdf-design, design and edit professional PDF reports and proposals
@@ -141,7 +153,7 @@ Skills above are distributed as Claude Code plugins. Install them in Claude Code
 
 Restart your Claude Code session after installing or updating a plugin so the new skills and commands register.
 
-Codex can use the repository's legacy-compatible marketplace route for the 15 nested `journalism-core` skills:
+Codex can use the repository's legacy-compatible marketplace route for the 16 nested `journalism-core` skills:
 
 ```bash
 codex plugin marketplace add jamditis/claude-skills-journalism
@@ -150,11 +162,11 @@ codex plugin add journalism-core@claude-skills-journalism
 
 This repository does not ship native Codex manifests. The route does not convert Claude-specific commands, agents, hooks, or root-level skills into Codex components.
 
-Plugins (13): `journalism-core` (15 skills), `research-toolkit` (6), `dev-toolkit` (14), `security-toolkit` (5 skills + /hotpatch command), `project-templates-toolkit` (4), `pdf-design` (1), `pdf-playground` (1), `web-design-picker` (1), `visual-explainer` (1), `video-toolkit` (4), `okf-wiki` (1), `superjawn` (13), `autocontext` (cross-session knowledge persistence, hooks, commands, and agents rather than skills).
+Plugins (14): `journalism-core` (16 skills), `newsroom-agent-ops` (9), `research-toolkit` (6), `dev-toolkit` (14), `security-toolkit` (5 skills + /hotpatch command), `project-templates-toolkit` (4), `pdf-design` (1), `pdf-playground` (1), `web-design-picker` (1), `visual-explainer` (1), `video-toolkit` (4), `okf-wiki` (1), `superjawn` (13), `autocontext` (cross-session knowledge persistence, hooks, commands, and agents rather than skills).
 
 ## Alternate installation
 
-Install the 15 `journalism-core` skills through the Agent Skills standard for Codex:
+Install the 16 `journalism-core` skills through the Agent Skills standard for Codex:
 
 ```bash
 npx skills@latest add https://github.com/jamditis/claude-skills-journalism/tree/master/journalism-core --skill '*' --agent codex --copy -g -y

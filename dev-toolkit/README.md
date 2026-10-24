@@ -39,5 +39,5 @@ cp -r dev-toolkit/skills/director ~/.claude/skills/
 
 ## See also
 
-- [`journalism-core`](../journalism-core/README.md), 15 skills for reporting, verification, publishing
+- [`journalism-core`](../journalism-core/README.md), 16 skills for reporting, verification, publishing
 - [`research-toolkit`](../research-toolkit/README.md), 6 skills for research, archives, academic workflows

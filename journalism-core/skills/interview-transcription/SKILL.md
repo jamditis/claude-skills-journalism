@@ -400,6 +400,7 @@ For the per-state breakdown of one-party vs. all-party consent, hidden-recording
 
 ## Related skills
 
+- **meeting-transcript-actions**, Convert a verified transcript into attributed notes, decisions, and owned actions
 - **interview-prep**, Pre-interview research, question design, consent scripts, and recording-law jurisdiction
 - **source-verification**, Verify source credentials before interview
 - **fact-check-workflow**, Verify quotes against the recording before publication

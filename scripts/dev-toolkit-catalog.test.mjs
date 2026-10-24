@@ -22,7 +22,7 @@ test('the public dev-toolkit card uses the current count and scope', () => {
   const homepage = readFileSync(join(DOCS, 'index.html'), 'utf8');
 
   assert.match(homepage, /Fourteen development skills/u);
-  assert.match(homepage, /08 \/ Development[\s\S]*?<span class="section-label">15 Skills<\/span>/u);
+  assert.match(homepage, /09 \/ Development[\s\S]*?<span class="section-label">15 Skills<\/span>/u);
   assert.match(homepage, /context management/u);
   assert.match(homepage, /href="director\/"/u);
   assert.doesNotMatch(homepage, /Eleven development skills/u);

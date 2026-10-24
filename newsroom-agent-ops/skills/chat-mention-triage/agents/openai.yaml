@@ -1,0 +1,3 @@
+interface:
+  display_name: "Chat mention triage"
+  short_description: "Classify team-chat mentions without duplicating the live responder."

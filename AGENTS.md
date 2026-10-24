@@ -50,7 +50,7 @@ claude-skills-journalism/
 │   ├── pre-commit-review.md     # Development: Review staged diff before commit
 │   └── no-ai-attribution.md     # Development: Block AI attribution in commits, PRs, and comments
 │
-├── # Plugin: journalism-core (15 skills, v1.6.0), registered in marketplace.json
+├── # Plugin: journalism-core (16 skills, v1.7.0), registered in marketplace.json
 ├── journalism-core/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -63,6 +63,7 @@ claude-skills-journalism/
 │       ├── foia-requests/              # Public records requests
 │       ├── interview-prep/             # Interview preparation
 │       ├── interview-transcription/    # Recording, transcription, quotes
+│       ├── meeting-transcript-actions/ # Notes, decisions, actions, unresolved questions
 │       ├── newsletter-publishing/      # Email newsletters, subscribers
 │       ├── newsroom-style/             # AP Style enforcement
 │       ├── photo-metadata/             # Embed caption, credit, alt text, license in IPTC/EXIF/XMP
@@ -70,6 +71,21 @@ claude-skills-journalism/
 │       ├── social-media-intelligence/  # OSINT, account analysis, platform-API currency
 │       ├── source-verification/        # SIFT method, verification, deepfakes/C2PA
 │       └── story-pitch/                # Pitch templates
+│
+├── # Plugin: newsroom-agent-ops (9 skills, v1.0.0), registered in marketplace.json
+├── newsroom-agent-ops/
+│   ├── .claude-plugin/plugin.json
+│   ├── README.md
+│   └── skills/
+│       ├── chat-mention-triage/         # Team-chat classification without duplicate replies
+│       ├── deadline-and-reply-tracking/ # Due dates, reply windows, and next actions
+│       ├── document-delivery/           # Editable document and PDF delivery with readback
+│       ├── email-request-intake/        # Allowlisted email intake with untrusted-content controls
+│       ├── issue-pool-progression/      # Issue progression through release and live checks
+│       ├── multi-agent-coordinator/     # Durable coordination, watches, gates, and cleanup
+│       ├── record-reconciliation/       # Canonical records and privacy controls
+│       ├── scheduled-briefing/          # Source-backed, phone-readable briefings
+│       └── unattended-agent-runs/       # Leases, checkpoints, recovery, and resource limits
 │
 ├── # Plugin: research-toolkit (6 skills, v1.1.4), registered in marketplace.json
 ├── research-toolkit/
@@ -288,7 +304,7 @@ This repo distributes shared skills as Claude and Codex packages and as standard
 /plugin install journalism-core@claude-skills-journalism
 ```
 
-Available plugins: `autocontext`, `dev-toolkit`, `journalism-core`, `okf-wiki`, `pdf-design`, `pdf-playground`, `project-templates-toolkit`, `research-toolkit`, `security-toolkit`, `superjawn`, `video-toolkit`, `web-design-picker`, `visual-explainer`. See `.claude-plugin/marketplace.json` for the full list.
+Available plugins: `autocontext`, `dev-toolkit`, `journalism-core`, `newsroom-agent-ops`, `okf-wiki`, `pdf-design`, `pdf-playground`, `project-templates-toolkit`, `research-toolkit`, `security-toolkit`, `superjawn`, `video-toolkit`, `web-design-picker`, `visual-explainer`. See `.claude-plugin/marketplace.json` for the full list.
 
 ### Alternate: copy a single skill into `~/.claude/skills/`
 
@@ -303,6 +319,7 @@ cp -r journalism-core/skills/source-verification ~/.claude/skills/
 cp -r research-toolkit/skills/free-apis-catalog ~/.claude/skills/
 cp -r research-toolkit/skills/web-archiving ~/.claude/skills/
 cp -r dev-toolkit/skills/web-scraping ~/.claude/skills/
+cp -r newsroom-agent-ops/skills/unattended-agent-runs ~/.claude/skills/
 cp -r security-toolkit/skills/secure-auth ~/.claude/skills/
 cp -r project-templates-toolkit/skills/project-memory ~/.claude/skills/
 cp -r okf-wiki ~/.claude/skills/
