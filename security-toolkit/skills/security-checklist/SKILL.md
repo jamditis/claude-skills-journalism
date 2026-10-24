@@ -339,6 +339,7 @@ Note: "Software or Data", the OR is load-bearing. Covers CI/CD pipeline integrit
 - [ ] Deserialization gates: never deserialize untrusted input with native binary deserializers or YAML's unrestricted-load primitives. JSON-only across trust boundaries.
 - [ ] Subresource Integrity on every external `<script>` and `<link rel="stylesheet">` (Polyfill.io lesson, https://sansec.io/research/polyfill-supply-chain-attack).
 - [ ] No third-party scripts referenced from CDNs without SRI hashes pinned.
+- [ ] AI agent reviewers on pull requests treat PR files as untrusted data, take review rules from the base commit, hold only scoped short-lived tokens, and post comments only. See [references/agent-pr-review.md](references/agent-pr-review.md).
 
 ### Code pattern: deserialization (Python)
 
@@ -492,6 +493,10 @@ Minimum for any user data:
 3. Encryption in transit (HTTPS) and at rest.
 4. Access logs and audit trail.
 5. Incident response plan (even if basic).
+
+## Reference files
+
+Read [Running an AI agent as a pull request reviewer](references/agent-pr-review.md) when you build or audit a bot that reviews pull requests with a coding agent.
 
 ## Resources
 

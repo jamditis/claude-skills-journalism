@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Run pinned local Gitleaks scans for staged changes, push ranges, and full history in private repositories, with redacted reports and fail-closed hooks.">
+    <title>Private secret scanning - Agent skills for journalism</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="stylesheet" href="../assets/tailwind/private-secret-scanning.css" data-tailwind-build="3.4.19">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Fraunces', serif; }
+        .paper-overlay {
+            position: fixed;
+            inset: 0;
+            background-image:
+                url("https://www.transparenttextures.com/patterns/natural-paper.png"),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 100%);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .content-section h2 { margin-top: 2.5rem; margin-bottom: 1rem; }
+        .content-section h3 { margin-top: 2rem; margin-bottom: 0.75rem; }
+        .content-section p { margin-bottom: 1rem; }
+        .content-section ul, .content-section ol { margin-bottom: 1rem; margin-left: 1.5rem; }
+        .content-section li { margin-bottom: 0.5rem; }
+        .content-section code {
+            background: rgba(0,0,0,0.06);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+        .content-section pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        .content-section pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        .content-section table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        .content-section th, .content-section td {
+            border: 1px solid rgba(0,0,0,0.1);
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+        }
+        .content-section th {
+            background: rgba(0,0,0,0.04);
+            font-weight: 600;
+        }
+
+/* a11y-patch-v1 */
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; }
+.skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1.25rem; background: #121212; color: #ede6d4; font-weight: 700; text-decoration: none; }
+:focus-visible { outline: 2px solid #3d4b40; outline-offset: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+p a:not(.btn-primary):not(.btn-outline):not(.skill-card):not(.deckle-card):not(.feature-card),
+li a:not(.btn-primary):not(.btn-outline),
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline),
+a[class~="text-accentDeep"]:not(.btn-primary):not(.btn-outline) { color: #1e293b !important; }
+a[class~="text-accent"]:not(.btn-primary):not(.btn-outline):hover,
+a[class~="text-accentDark"]:not(.btn-primary):not(.btn-outline):hover { color: #0f172a !important; }
+strong[class~="text-accent"], em[class~="text-accent"], code[class~="text-accent"],
+strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b !important; }
+.bg-canvas [class~="text-mist"], main [class~="text-mist"], [class~="text-mist"] { color: #3a3a3a !important; }
+.bg-ink [class~="text-accent"], [class~="bg-ink"] [class~="text-accent"],
+.bg-zinc-900 [class~="text-accent"], .bg-gray-900 [class~="text-accent"],
+[class*="bg-zinc-9"] [class~="text-accent"], [class*="bg-gray-9"] [class~="text-accent"],
+[class*="text-white"] [class~="text-accent"],
+[style*="background:#1"] [class~="text-accent"], [style*="background-color:#1"] [class~="text-accent"] {
+  color: #ddd6fe !important;
+}
+.bg-ink [class~="text-mist"], [class~="bg-ink"] [class~="text-mist"],
+[class*="text-white"] [class~="text-mist"] {
+  color: #d4d4d4 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-section, .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+/* stat-on-dark-fix */
+.bg-ink .text-accent, .bg-zinc-900 .text-accent, .bg-gray-900 .text-accent,
+.bg-ink .text-accentDark, .bg-zinc-900 .text-accentDark, .bg-gray-900 .text-accentDark {
+  filter: brightness(1.6) saturate(0.85);
+}
+    </style>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Private secret scanning - Agent skills for journalism">
+    <meta property="og:description" content="Pinned local Gitleaks scans for staged changes, push ranges, and full history in private repositories, with redacted reports and fail-closed hooks.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/private-secret-scanning/">
+    <meta property="og:image" content="https://skills.amditis.tech/private-secret-scanning/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Private secret scanning - Agent skills for journalism">
+    <meta name="twitter:description" content="Pinned local Gitleaks scans for staged changes, push ranges, and full history in private repositories, with redacted reports and fail-closed hooks.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/private-secret-scanning/og-image.png">
+    <script src="../ask-ai.js" defer></script>
+<link rel="stylesheet" href="../updated.css">
+</head>
+<body class="bg-canvas text-ink">
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <div class="paper-overlay" aria-hidden="true"></div>
+
+    <!-- Navigation -->
+    <nav aria-label="Primary" class="fixed top-0 left-0 right-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-mist/30">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="../" class="text-clay/70 hover:text-ink flex items-center gap-2 text-sm font-medium transition-colors">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                All skills
+            </a>
+            <a aria-label="GitHub" href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/70 hover:text-ink transition-colors" rel="noopener noreferrer">
+                <svg aria-hidden="true" focusable="false" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+                </svg>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="bg-gradient-to-br from-accent to-accentDark text-white pt-24 pb-16">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1 text-sm mb-4">
+                <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Security skill
+            </div>
+            <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">Private secret scanning</h1>
+            <p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-09-28T09:33:00-04:00" data-updated-slug="private-secret-scanning">Updated <time datetime="2026-09-28T09:33:00-04:00">Sep 28, 2026</time></p>
+
+            <p class="text-xl text-white/90 max-w-2xl">
+                A pinned local Gitleaks workflow for private repositories. Scan staged changes, outgoing commits, or all history without placing secret values in reports.
+            </p>
+        </div>
+    </header>
+
+    <main id="main" class="max-w-4xl mx-auto px-6 py-12 relative z-10">
+        <!-- When to use -->
+        <section class="mb-12" aria-labelledby="when-heading">
+            <h2 id="when-heading" class="font-display text-2xl font-semibold mb-4">When to use</h2>
+            <ul class="space-y-2 text-clay/80">
+                <li class="flex items-start gap-3">
+                    <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Block committed secrets in a private or shared repository without paid GitHub Secret Protection.
+                </li>
+                <li class="flex items-start gap-3">
+                    <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Audit a repository before it becomes public, including secrets deleted from its current files.
+                </li>
+                <li class="flex items-start gap-3">
+                    <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Add pre-commit, pre-push, and CI checks that fail closed when the scanner cannot give a safe result.
+                </li>
+            </ul>
+        </section>
+
+        <!-- Quick start -->
+        <section class="mb-12" aria-labelledby="quick-start-heading">
+            <h2 id="quick-start-heading" class="font-display text-2xl font-semibold mb-4">Quick start</h2>
+            <p class="text-clay/80 mb-4">The skill needs Bash 3.2 or later, git, curl, and python3.</p>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Private secret scanning quick start commands">
+                <p class="text-white/50 mb-1"># Absolute, so the path still works after cd your-repo</p>
+                <p class="text-white mb-1">SCAN="$(cd path/to/private-secret-scanning/scripts &amp;&amp; pwd)/secret-scan.sh"</p>
+                <p class="text-white mb-1">"$SCAN" install</p>
+                <p class="text-white mb-1">"$SCAN" self-test</p>
+                <p class="text-white mb-1">cd your-repo</p>
+                <p class="text-white mb-1">"$SCAN" history --report /tmp/secret-report.json</p>
+                <p class="text-white">"$SCAN" install-hooks</p>
+            </div>
+        </section>
+
+        <!-- Scan scopes -->
+        <section class="mb-12" aria-labelledby="scopes-heading">
+            <h2 id="scopes-heading" class="font-display text-2xl font-semibold mb-4">Three scan scopes</h2>
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden overflow-x-auto" tabindex="0" role="region" aria-label="Secret scan scopes">
+                <table class="w-full min-w-[640px] text-sm">
+                    <thead>
+                        <tr class="bg-mist/10 border-b border-mist/30">
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">Command</th>
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">Scans</th>
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">Use it</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-mist/20">
+                        <tr>
+                            <td class="px-5 py-3"><code class="bg-black/5 px-1.5 py-0.5 rounded">staged</code></td>
+                            <td class="px-5 py-3 text-clay/80">The staged diff only</td>
+                            <td class="px-5 py-3 text-clay/80">Fast pre-commit check</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3"><code class="bg-black/5 px-1.5 py-0.5 rounded">push [RANGE]</code></td>
+                            <td class="px-5 py-3 text-clay/80">A named commit range, outgoing commits from pre-push input, or the full history of a new branch or tag</td>
+                            <td class="px-5 py-3 text-clay/80">Catch commits made with <code class="bg-black/5 px-1.5 py-0.5 rounded">--no-verify</code></td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3"><code class="bg-black/5 px-1.5 py-0.5 rounded">history</code></td>
+                            <td class="px-5 py-3 text-clay/80">Every commit reachable from any ref, including deleted files</td>
+                            <td class="px-5 py-3 text-clay/80">First adoption and checks before publication</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Failure behavior -->
+        <section class="mb-12" aria-labelledby="failure-heading">
+            <h2 id="failure-heading" class="font-display text-2xl font-semibold mb-4">Exit codes and fail-closed behavior</h2>
+            <div class="bg-white rounded-xl border border-mist/30 overflow-hidden mb-5 overflow-x-auto" tabindex="0" role="region" aria-label="Secret scanner exit codes">
+                <table class="w-full min-w-[420px] text-sm">
+                    <thead>
+                        <tr class="bg-mist/10 border-b border-mist/30">
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">Exit</th>
+                            <th scope="col" class="text-left px-5 py-3 font-semibold">Meaning</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-mist/20">
+                        <tr>
+                            <td class="px-5 py-3 font-medium">0</td>
+                            <td class="px-5 py-3 text-clay/80">No leaks found</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">1</td>
+                            <td class="px-5 py-3 text-clay/80">Leaks found. Each finding appears on stderr</td>
+                        </tr>
+                        <tr>
+                            <td class="px-5 py-3 font-medium">2</td>
+                            <td class="px-5 py-3 text-clay/80">Scanner or configuration error</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-mist/30">
+                <p class="text-clay/80 mb-3">A broken scanner blocks the commit or push. The script exits 2 when it cannot trust the result, including these cases:</p>
+                <ul class="space-y-2 text-sm text-clay/80 list-disc list-inside">
+                    <li>Gitleaks is missing, cannot run, or does not match the pinned version.</li>
+                    <li>The configuration file is missing or malformed, or a <code>.gitleaks.toml</code> neither extends the built-in rules nor defines its own.</li>
+                    <li>The scanner exit code and report disagree, or the report cannot be read as a list of findings.</li>
+                    <li>A hook finds an uncommitted suppression file or a pushed ref that is not a commit.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Reports -->
+        <section class="mb-12" aria-labelledby="reports-heading">
+            <h2 id="reports-heading" class="font-display text-2xl font-semibold mb-4">Reports contain no secret values</h2>
+            <p class="text-clay/80 mb-4">
+                Terminal output and report files contain only <code class="bg-black/5 px-1.5 py-0.5 rounded">RuleID</code>, <code class="bg-black/5 px-1.5 py-0.5 rounded">File</code>, <code class="bg-black/5 px-1.5 py-0.5 rounded">StartLine</code>, <code class="bg-black/5 px-1.5 py-0.5 rounded">Commit</code>, and <code class="bg-black/5 px-1.5 py-0.5 rounded">Fingerprint</code>. They never contain the secret, matched text, or source line.
+            </p>
+            <p class="text-clay/80">
+                Gitleaks runs with <code class="bg-black/5 px-1.5 py-0.5 rounded">--redact</code>. The raw report stays in a private temporary file and is deleted on exit. The sanitized report uses file mode <code class="bg-black/5 px-1.5 py-0.5 rounded">0600</code>.
+            </p>
+        </section>
+
+        <!-- Baselines and allowlists -->
+        <section class="mb-12" aria-labelledby="baselines-heading">
+            <h2 id="baselines-heading" class="font-display text-2xl font-semibold mb-4">Baselines and allowlists</h2>
+            <ol class="list-decimal space-y-2 text-clay/80 ml-5 mb-5">
+                <li>Rotate every live credential first. Accepting a finding does not make it safe.</li>
+                <li>Run a history report, then copy its fingerprints into <code class="bg-black/5 px-1.5 py-0.5 rounded">.gitleaksignore</code>.</li>
+                <li>Commit the ignore file so later scans report only new findings.</li>
+            </ol>
+            <p class="text-clay/80 mb-4">A custom <code class="bg-black/5 px-1.5 py-0.5 rounded">.gitleaks.toml</code> replaces the built-in rules unless it extends them. The script refuses a file with no rules at all, but it accepts one that defines its own <code class="bg-black/5 px-1.5 py-0.5 rounded">[[rules]]</code> without extending the defaults, and that file turns the built-in detectors off. Start with the default rules, then keep each exception narrow:</p>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Gitleaks allowlist configuration example">
+                <p class="text-white">[extend]</p>
+                <p class="text-white mb-4">useDefault = true</p>
+                <p class="text-white">[allowlist]</p>
+                <p class="text-white">description = "synthetic keys in test fixtures"</p>
+                <p class="text-white">paths = ['''^tests/fixtures/''']</p>
+            </div>
+            <p class="mt-4 text-clay/80 text-sm">Review an ignore or allowlist change as an access-control change. Never allowlist a whole rule because it is noisy.</p>
+        </section>
+
+        <!-- Hooks -->
+        <section class="mb-12" aria-labelledby="hooks-heading">
+            <h2 id="hooks-heading" class="font-display text-2xl font-semibold mb-4">Hooks</h2>
+            <div class="bg-white rounded-xl p-5 border border-mist/30">
+                <p class="text-clay/80 mb-3"><code class="bg-black/5 px-1.5 py-0.5 rounded">install-hooks</code> adds two repository hooks:</p>
+                <ul class="space-y-2 text-sm text-clay/80 list-disc list-inside">
+                    <li><code class="bg-black/5 px-1.5 py-0.5 rounded">pre-commit</code> runs the staged scan.</li>
+                    <li><code class="bg-black/5 px-1.5 py-0.5 rounded">pre-push</code> scans outgoing commits again.</li>
+                </ul>
+                <p class="text-sm text-clay/80">The installer refuses to overwrite a hook it did not create. Add a call to the scan script inside an existing hook.</p>
+            </div>
+        </section>
+
+        <!-- CI -->
+        <section class="mb-12" aria-labelledby="ci-heading">
+            <h2 id="ci-heading" class="font-display text-2xl font-semibold mb-4">CI</h2>
+            <p class="text-clay/80 mb-4">Run the same script in CI so local <code class="bg-black/5 px-1.5 py-0.5 rounded">--no-verify</code> cannot skip the second check.</p>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="CI configuration example">
+                <p class="text-white">- uses: actions/checkout@v6</p>
+                <p class="text-white">&nbsp;&nbsp;with:</p>
+                <p class="text-white mb-2">&nbsp;&nbsp;&nbsp;&nbsp;fetch-depth: 0</p>
+                <p class="text-white">- run: path/to/secret-scan.sh install</p>
+                <p class="text-white">- run: path/to/secret-scan.sh history</p>
+            </div>
+            <div class="mt-4 bg-red-50 rounded-xl p-5 border border-red-200">
+                <p class="text-sm text-red-950"><strong>Self-hosted runner warning:</strong> Run untrusted pull-request code only on hosted runners. A fork can rewrite the scan script and read anything a self-hosted runner can reach.</p>
+            </div>
+        </section>
+
+        <!-- Pinned version -->
+        <section class="mb-12" aria-labelledby="version-heading">
+            <h2 id="version-heading" class="font-display text-2xl font-semibold mb-4">Pinned version</h2>
+            <div class="bg-white rounded-xl p-5 border border-mist/30">
+                <p class="text-clay/80">The script pins Gitleaks 8.30.1 and checks the SHA-256 digest for each supported Linux and macOS build. An upgrade must change the version and all four hashes together, then pass <code class="bg-black/5 px-1.5 py-0.5 rounded">self-test</code>. A custom <code class="bg-black/5 px-1.5 py-0.5 rounded">GITLEAKS_BIN</code> must still report the pinned version.</p>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section class="mb-12" aria-labelledby="install-heading">
+            <h2 id="install-heading" class="font-display text-2xl font-semibold mb-4">Installation</h2>
+            <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
+                <p class="text-white/50 mb-2"># Recommended: install the security-toolkit plugin</p>
+                <p class="text-white mb-1">/plugin marketplace add jamditis/claude-skills-journalism</p>
+                <p class="text-white mb-4">/plugin install security-toolkit@claude-skills-journalism</p>
+                <p class="text-white/50 mb-2"># Or copy just this skill from the plugin tree</p>
+                <p class="text-white mb-1">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
+                <p class="text-white mb-1">mkdir -p ~/.claude/skills ~/.agents/skills</p>
+                <p class="text-white mb-1">cp -r claude-skills-journalism/security-toolkit/skills/private-secret-scanning ~/.claude/skills/ <span class="text-white/50"># Claude Code</span></p>
+                <p class="text-white">cp -r claude-skills-journalism/security-toolkit/skills/private-secret-scanning ~/.agents/skills/ <span class="text-white/50"># Codex</span></p>
+            </div>
+        </section>
+
+        <!-- Compatibility -->
+        <section class="mb-12" aria-labelledby="compatibility-heading">
+            <h2 id="compatibility-heading" class="font-display text-2xl font-semibold mb-4">Works in</h2>
+            <div class="bg-white rounded-xl p-5 border border-mist/30">
+                <p class="text-clay/80">Uses the open Agent Skills format. <a href="https://github.com/jamditis/claude-skills-journalism/blob/master/plans/codex-compatibility-matrix.md" target="_blank" class="text-accentDark hover:text-accentDark underline underline-offset-2" rel="noopener noreferrer">Codex: candidate; selection smoke passed (October 2026).</a></p>
+            </div>
+        </section>
+
+        <!-- Related skills -->
+        <section class="mb-12" aria-labelledby="related-heading">
+            <h2 id="related-heading" class="font-display text-2xl font-semibold mb-4">Related skills</h2>
+            <div class="flex flex-wrap gap-2">
+                <a href="../supply-chain-hardening/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Supply-chain hardening</a>
+                <a href="../security-checklist/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Security checklist</a>
+                <a href="../api-hardening/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">API hardening</a>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="text-center" aria-labelledby="cta-heading">
+            <div class="bg-gradient-to-br from-accent to-accentDark rounded-xl p-8 text-white">
+                <h2 id="cta-heading" class="font-display text-xl font-bold mb-3">Scan before a secret leaves the machine</h2>
+                <p class="text-white mb-6 max-w-lg mx-auto text-sm">
+                    Use one pinned script for staged changes, outgoing commits, full history, hooks, and CI.
+                </p>
+                <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/security-toolkit/skills/private-secret-scanning" target="_blank" class="inline-flex items-center gap-2 bg-white text-accentDark px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-white/95 transition-colors" rel="noopener noreferrer">
+                    View on GitHub
+                    <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-mist/30 mt-12 relative z-10">
+        <div class="max-w-4xl mx-auto px-6 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-clay/80 text-sm">
+                    Built by <a href="https://centerforcooperativemedia.org" target="_blank" class="text-accentDark hover:text-accentDark underline underline-offset-2" rel="noopener noreferrer">Center for Cooperative Media</a>
+                </p>
+                <div class="flex items-center gap-6">
+                    <a href="../" class="text-clay/80 hover:text-ink text-sm transition-colors">All skills</a>
+                    <a href="https://github.com/jamditis/claude-skills-journalism" target="_blank" class="text-clay/80 hover:text-ink text-sm transition-colors" rel="noopener noreferrer">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+<script defer src="../updated.js"></script>
+</body>
+</html>

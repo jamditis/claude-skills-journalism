@@ -12,7 +12,8 @@ Everything runs through one script that ships with this skill: `scripts/secret-s
 ## Quick start
 
 ```bash
-SCAN=path/to/private-secret-scanning/scripts/secret-scan.sh
+# Absolute, so the path still works after cd your-repo
+SCAN="$(cd path/to/private-secret-scanning/scripts && pwd)/secret-scan.sh"
 
 "$SCAN" install          # pinned Gitleaks 8.30.1, SHA-256 checked before install
 "$SCAN" self-test        # proves leaks fail and clean repos pass on this machine

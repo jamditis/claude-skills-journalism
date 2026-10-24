@@ -1,6 +1,6 @@
 {
   "name": "claude-skills-journalism",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "description": "Agent skills and Claude Code plugins for journalism, research, and media organizations",
   "owner": {
     "name": "Joe Amditis",
@@ -20,8 +20,8 @@
     },
     {
       "name": "dev-toolkit",
-      "description": "Twelve development skills for newsroom and research dev teams: accessibility, context management, directed multi-agent execution, Electron, mobile debugging, Python pipelines, ethical scraping, no-build frontends, web UI craft, and project instruction maintenance.",
-      "version": "2.0.1",
+      "description": "Fourteen development skills for newsroom and research dev teams: accessibility, context management, minimal-code implementation, UI completeness, directed multi-agent execution, Electron, mobile debugging, Python pipelines, ethical scraping, no-build frontends, web UI craft, and project instruction maintenance.",
+      "version": "2.1.0",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"
@@ -31,14 +31,25 @@
     },
     {
       "name": "journalism-core",
-      "description": "Fifteen core journalism skills for reporting, verification, publishing, and digital investigations: AP-style writing, AI-slop detox, source verification, FOIA/OPRA and Brazilian LAI requests, fact-checking, interview prep and transcription, story pitches, editorial workflow, crisis comms, newsletter publishing, data journalism, social-media OSINT, and embedded photo metadata.",
-      "version": "1.5.0",
+      "description": "Sixteen core journalism skills for reporting, verification, publishing, and digital investigations: AP-style writing, AI-slop detox, source verification, FOIA/OPRA and Brazilian LAI requests, fact-checking, interview prep, transcription and meeting actions, story pitches, editorial workflow, crisis comms, newsletter publishing, data journalism, social-media OSINT, and embedded photo metadata.",
+      "version": "1.7.0",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"
       },
       "source": "./journalism-core",
       "category": "Journalism"
+    },
+    {
+      "name": "newsroom-agent-ops",
+      "description": "Nine skills for safe recurring newsroom agent work: unattended runs, briefings, intake, delivery, coordination, reconciliation, chat triage, deadline tracking, and issue progression.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Joe Amditis",
+        "email": "jamditis@gmail.com"
+      },
+      "source": "./newsroom-agent-ops",
+      "category": "Productivity"
     },
     {
       "name": "okf-wiki",
@@ -75,8 +86,8 @@
     },
     {
       "name": "project-templates-toolkit",
-      "description": "Three skills for starting and closing out journalism projects: a project-instruction writer, a LESSONS.md retrospective writer, and a template-selector decision tree for editorial tools, events, publications, research, pipelines, and archives.",
-      "version": "1.0.5",
+      "description": "Four skills for starting, tracking, and closing out journalism projects: a project-instruction writer, a LESSONS.md retrospective writer, a template-selector decision tree for editorial tools, events, publications, research, pipelines, and archives, and an evidence-based weighted progress tracker.",
+      "version": "1.1.0",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"
@@ -98,7 +109,7 @@
     {
       "name": "security-toolkit",
       "description": "Five defensive security skills covering OWASP Top 10, supply-chain hardening, and secret scanning: pre-deployment audit checklists, secure authentication (hashing, sessions, JWT, OAuth, passkeys), API hardening (rate limiting, CORS, throttling), npm/bun install-time cooldown with a sandboxed bypass scan, and local Gitleaks scans for private repositories.",
-      "version": "1.2.4",
+      "version": "1.3.0",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"
@@ -109,7 +120,7 @@
     {
       "name": "superjawn",
       "description": "Research-augmented fork of obra/superpowers. Ships 13 workflow skills (brainstorming, planning, code review, debugging, verification, worktrees, parallel agents) standalone, with no dependency on the upstream superpowers plugin.",
-      "version": "2.0.1",
+      "version": "2.1.0",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"

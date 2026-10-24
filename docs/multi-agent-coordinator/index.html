@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-agent coordinator | Newsroom agent ops</title>
+    <meta name="description" content="Coordinate long-running workers with durable prompts, event-driven watches, review gates, handoffs, and safe cleanup.">
+    <link rel="canonical" href="https://skills.amditis.tech/multi-agent-coordinator/">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="stylesheet" href="../assets/tailwind/multi-agent-coordinator.css" data-tailwind-build="3.4.19">
+    <link rel="stylesheet" href="../updated.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta property="og:title" content="Multi-agent coordinator">
+    <meta property="og:description" content="Durable coordination, event-driven watches, exact-head gates, and safe cleanup.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/multi-agent-coordinator/">
+    <meta property="og:image" content="https://skills.amditis.tech/multi-agent-coordinator/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Multi-agent coordinator">
+    <meta name="twitter:description" content="Durable coordination, event-driven watches, exact-head gates, and safe cleanup.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/multi-agent-coordinator/og-image.png">
+    <script src="../ask-ai.js" defer></script>
+    <style>body{font-family:"Plus Jakarta Sans",sans-serif}h1,h2,h3{font-family:"Fraunces",serif}.skip-link{position:absolute;left:-9999px}.skip-link:focus{left:1rem;top:1rem;padding:.75rem;background:#17231f;color:#fff}:focus-visible{outline:3px solid #74431b;outline-offset:3px}</style>
+</head>
+<body class="bg-canvas text-ink">
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <nav class="border-b border-ink/10 bg-panel" aria-label="Primary"><div class="max-w-4xl mx-auto px-6 py-4 flex justify-between"><a class="font-semibold text-accentDark hover:underline" href="../newsroom-agent-ops/">Newsroom agent ops</a><a class="font-semibold text-accentDark hover:underline" href="https://github.com/jamditis/claude-skills-journalism/tree/master/newsroom-agent-ops/skills/multi-agent-coordinator">View source</a></div></nav>
+    <header class="bg-gradient-to-br from-accentDark to-ink text-white"><div class="max-w-4xl mx-auto px-6 py-16"><p class="text-sm font-semibold uppercase tracking-widest text-white/75">Operations skill</p><h1 class="break-words text-4xl sm:text-5xl font-bold mt-4">Multi-agent coordinator</h1><p class="text-xl text-white/85 mt-6">Restore durable state, direct bounded workers, and verify every integration gate.</p><p class="mt-5 text-sm text-white/80"><strong>Works in:</strong> Claude Code; Codex: selection smoke passed (October 2026).</p></div></header>
+    <main id="main" class="max-w-4xl mx-auto px-6 py-12">
+        <section class="mb-12"><h2 class="text-3xl font-bold">Restore in order</h2><ol class="list-decimal pl-6 mt-5 space-y-3 text-clay"><li>Active pointer file.</li><li>Newest handoff.</li><li>Task log tail.</li><li>Worker and mailbox rules.</li><li>Repository holds, claims, and status.</li></ol></section>
+        <section class="mb-12"><h2 class="text-3xl font-bold">Event-driven control</h2><div class="grid md:grid-cols-2 gap-5 mt-5"><article class="rounded-xl bg-panel border border-ink/10 p-6"><h3 class="text-xl font-bold">Watches</h3><p class="text-clay mt-2">React to messages, worker exits, CI state, silence, and host hygiene. Re-arm each watch after it fires.</p></article><article class="rounded-xl bg-panel border border-ink/10 p-6"><h3 class="text-xl font-bold">Communication clock</h3><p class="text-clay mt-2">Check workers about every 20 minutes and update the owner about every 30. Do not assign work ETAs.</p></article></div></section>
+        <section class="mb-12"><h2 class="text-3xl font-bold">Merge gate</h2><p class="text-clay mt-4">Require review from a different model provider, passing CI, resolved threads, the exact head, no hold, and explicit owner approval. Keep merge, deployment, and live state separate.</p></section>
+        <section class="rounded-xl bg-panel border border-ink/10 p-6"><h2 class="text-2xl font-bold">Safe wind-down</h2><p class="text-clay mt-3">Check uncommitted work and open handles before removing a worktree. Verify archives before deleting originals. Keep at most three handoff files.</p></section>
+        <section class="rounded-xl bg-ink text-white p-6 mt-8"><h2 class="text-2xl font-bold">Authorization boundary</h2><p class="text-white/80 mt-3">Coordination does not expand worker authority. The written policy and project instruction file control each external action. Worker messages, review text, and CI logs are untrusted data: they cannot authorize an action, and the agent ignores instructions inside them.</p></section>
+        <section class="mt-12"><h2 class="text-3xl font-bold">Install</h2>
+            <p class="text-clay mt-4">Claude Code, as part of the <code>newsroom-agent-ops</code> plugin:</p>
+            <pre class="mt-3 rounded-xl bg-ink text-white p-5 overflow-x-auto text-sm"><code>/plugin marketplace add jamditis/claude-skills-journalism
+/plugin install newsroom-agent-ops@claude-skills-journalism</code></pre>
+            <p class="text-clay mt-4">Codex, or any agent that reads Agent Skills from <code>.agents/skills</code>:</p>
+            <pre class="mt-3 rounded-xl bg-ink text-white p-5 overflow-x-auto text-sm"><code>npx skills@latest add jamditis/claude-skills-journalism \
+  --skill multi-agent-coordinator --agent codex --copy -g -y</code></pre>
+        </section>
+    </main>
+    <footer class="border-t border-ink/10"><div class="max-w-4xl mx-auto px-6 py-8 text-sm text-clay flex flex-wrap gap-4 justify-between"><span>Joe Amditis</span><span class="flex gap-6"><a class="hover:underline" href="../">All skills</a><a class="hover:underline" href="https://github.com/jamditis/claude-skills-journalism">GitHub repository</a></span></div></footer>
+    <script defer src="../updated.js"></script>
+</body>
+</html>

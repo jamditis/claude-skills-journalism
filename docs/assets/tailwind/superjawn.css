@@ -652,6 +652,9 @@ video {
 .transform {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
+.list-disc {
+  list-style-type: disc;
+}
 .grid-cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
@@ -872,6 +875,9 @@ video {
 .pb-24 {
   padding-bottom: 6rem;
 }
+.pl-5 {
+  padding-left: 1.25rem;
+}
 .pt-32 {
   padding-top: 8rem;
 }
@@ -895,6 +901,10 @@ video {
 }
 .font-sans {
   font-family: Plus Jakarta Sans, sans-serif;
+}
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
 }
 .text-3xl {
   font-size: 1.875rem;

@@ -280,6 +280,8 @@
     .callout { padding: 18px 20px; border: 1px solid var(--border); background: var(--surface); margin: 24px 0; }
     .callout__title { font-family: var(--font-body); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 9px; color: var(--callt, var(--text-bright)); }
     .callout p { font-size: 14px; }
+    .callout ul { font-size: 14px; padding-left: 1.2em; margin: 8px 0; }
+    .callout li { margin: 6px 0; }
     .callout--warn { background: var(--accent-dim); border-color: var(--accent); --callt: var(--accent-strong); }
     .callout--ok   { --callt: var(--text-bright); }
     .callout--info { --callt: var(--accent); }
@@ -417,16 +419,28 @@
     <header class="hero">
       <h1>How I run dev work with Claude, on autopilot and at the keyboard</h1>
       <div class="hero__byline"><span class="by">By</span> <a href="https://jamditis.com" rel="author">Joe Amditis</a></div>
-      <p class="lead">A few of you asked how my setup works, so here it is end to end. It runs in <strong>two modes that share one quality bar</strong>. On autopilot, a cron scheduler wakes a Claude Code session every hour to pull a GitHub issue and work it in an isolated git worktree. Before any pull request reaches me, it's been read by a second model and a separate coach agent whose only job is to ask whether the work is good. Hands-on, I'm at the keyboard and we run heavier multi-agent reviews together on bigger changes. Either way, the Codex cloud connector reviews the PR, I have the final say, and I get a Telegram message when something's done.</p>
+      <p class="lead">A few of you asked how my setup works, so here it is end to end. It runs in <strong>two modes that share one quality bar</strong>. On autopilot, a cron scheduler wakes an agent session every hour to pull a GitHub issue and work it in an isolated git worktree. Before any pull request reaches me, it's been read by a model from a different provider and a separate coach agent whose only job is to ask whether the work is good. Hands-on, I'm at the keyboard and we run heavier multi-agent reviews together on bigger changes. Either way, the Codex cloud connector reviews the PR, I have the final say, and I get a Telegram message when something's done.</p>
       <p class="lead">Quality comes from <strong>stacking independent checks</strong>. No single model has to be brilliant; enough of them have to disagree. Stack a few and a single miss gets caught in review, before it can become a bad merge.</p>
 
       <div class="stats">
         <div class="stat"><div class="stat__val">2</div><div class="stat__label">modes: autopilot + hands-on</div></div>
-        <div class="stat"><div class="stat__val">4</div><div class="stat__label">models, 0 direct API calls</div></div>
+        <div class="stat"><div class="stat__val">2+</div><div class="stat__label">model providers on every change, 0 direct API calls</div></div>
         <div class="stat"><div class="stat__val">hourly</div><div class="stat__label">scheduled wakes, 7 a.m. to 9 p.m.</div></div>
         <div class="stat"><div class="stat__val">1</div><div class="stat__label">human merge gate (me)</div></div>
       </div>
-      <p class="hero__meta">Working notes &middot; Center for Cooperative Media &middot; updated May 2026</p>
+      <p class="hero__meta">Working notes &middot; Center for Cooperative Media &middot; updated October 2026</p>
+      <div class="callout callout--ok">
+        <div class="callout__title">October 2026: what changed since May</div>
+        <ul>
+          <li><b>Codex does most of the writing now.</b> It became my primary coding agent, so the roles flipped. When Codex writes a change, Claude reviews it; when Claude writes one, Codex or another provider reviews it. The rule underneath got stricter: the reviewer has to come from a different provider than the author, not just a different model.</li>
+          <li><b>Reviews are tied to the exact change.</b> A small review runner records which diff the reviewer saw. If the code changes after the review, the changed part gets a focused re-check before it ships. A reviewer never gets swapped out because I didn't like its findings, only because it was unavailable.</li>
+          <li><b>No fixed pass cap.</b> Review runs until a round turns up nothing new and actionable. If rounds keep finding new real problems, that's a design problem, so I stop and rethink instead of reviewing harder.</li>
+          <li><b>The wake attendant moved off the Pis.</b> It runs on a small x86 mini-PC offsite, as one long-lived supervised session instead of a fresh one per wake. A wake can't start until the last one says it's done, and nothing kills a session for taking too long, only for actually dying. I can drive it from my phone through remote control.</li>
+          <li><b>Every repo has a pinned ledger issue.</b> One issue per repo says what's running, what's on hold, and who's working on what. Agents read it before they touch anything and add a line while they work.</li>
+          <li><b>Copilot and Gemini are out.</b> Codex and Claude cover writing and review between them.</li>
+        </ul>
+        <p>The rest of this page is the May write-up of the starter loop: a fresh session for each wake, ended by a hard timeout. That is still where I would start. The persistent setup is in the kit as an advanced option, and it does not use the timeout.</p>
+      </div>
       <p class="hero__note">Not a developer? <a href="#primer">Start with the plain-language key below</a> &mdash; it defines every term the page leans on. None of this is as complicated as the words make it sound.</p>
     </header>
 
@@ -439,7 +453,7 @@
         <div class="primer__row"><dt>pull request</dt><dd>A finished change, bundled up and held for review. Nothing in it goes live until it's approved. Usually shortened to PR.</dd></div>
         <div class="primer__row"><dt>worktree</dt><dd>A separate, private copy of the project's files. Each session gets its own, so two can run at the same time without overwriting each other.</dd></div>
         <div class="primer__row"><dt>session</dt><dd>One run of Claude Code working on a task, from start to handoff.</dd></div>
-        <div class="primer__row"><dt>model</dt><dd>An AI system. This setup uses four: Claude writes the code, Codex reviews it, Copilot breaks ties, and Gemini sorts email.</dd></div>
+        <div class="primer__row"><dt>model</dt><dd>An AI system. This setup uses two model families: Codex and Claude write code and review each other's work.</dd></div>
         <div class="primer__row"><dt>commit / merge</dt><dd>To commit is to save a set of changes as one step. To merge is to accept those changes into the live version of the code.</dd></div>
         <div class="primer__row"><dt>cron</dt><dd>A built-in timer that runs a job automatically at set times, with no one watching. The thing that wakes a session every hour.</dd></div>
         <div class="primer__row"><dt>CLI</dt><dd>A command-line tool: you run it by typing a command, instead of clicking through an app or website.</dd></div>
@@ -560,8 +574,8 @@ flowchart TD
     </div>
 
     <div class="callout callout--warn">
-      <div class="callout__title">Always wrap the session in timeout --foreground</div>
-      <p>Wrap the session in <code>timeout --foreground</code>. Plain <code>timeout</code> starts a new process group and kills the Node tree before it produces output &mdash; you get zero-byte result files and silent multi-day outages that look like nothing ran. The idle-killer also watches CPU time in the process subtree, so long, quiet tool phases (a slow API call, a browser run) don't trip a false "this session is stuck."</p>
+      <div class="callout__title">In the starter loop, always wrap the session in timeout --foreground</div>
+      <p>In the fresh-session loop, wrap the session in <code>timeout --foreground</code>. (A persistent attendant has no time limit; the kit describes how it fails a wake instead.) Plain <code>timeout</code> starts a new process group and kills the Node tree before it produces output &mdash; you get zero-byte result files and silent multi-day outages that look like nothing ran. The idle-killer also watches CPU time in the process subtree, so long, quiet tool phases (a slow API call, a browser run) don't trip a false "this session is stuck."</p>
     </div>
 
     <!-- ============ S3 ============ -->
@@ -582,8 +596,8 @@ flowchart TD
       <p>Not everything runs on a timer. When I'm at the keyboard the same machinery is there, but I'm in the loop in real time &mdash; so we can take on bigger, riskier changes than an unattended wake should, and I can steer mid-flight.</p>
       <ul>
         <li><b>superjawn for anything non-trivial.</b> I run it through superjawn &mdash; my fork of superpowers (a workflow add-on for Claude Code) that forces a research phase before any brainstorming or planning, so the work starts from evidence. It writes the spec before touching code and I approve it; ambiguous specs produce ambiguous code, so the spec is where the time goes.</li>
-        <li><b>Fan out.</b> Instead of one session grinding through a problem, I have it spawn several subagents in parallel (extra AI helpers the main session launches, each on one piece of the problem) &mdash; one exploring the codebase, one running a codex review, one acting as the coach, one driving the Copilot CLI &mdash; then synthesize what they bring back. More compute on the same problem, and independent passes that catch each other's misses.</li>
-        <li><b>Reviews on demand.</b> The codex and coach passes from the autonomous flow are available here too, and I can fire a Copilot CLI review on a single fix without spending one of the once-per-PR cloud reviews.</li>
+        <li><b>Fan out.</b> Instead of one session grinding through a problem, I have it spawn several subagents in parallel (extra AI helpers the main session launches, each on one piece of the problem) &mdash; one exploring the codebase, one running a cross-provider review, one acting as the coach &mdash; then synthesize what they bring back. More compute on the same problem, and independent passes that catch each other's misses.</li>
+        <li><b>Reviews on demand.</b> The cross-provider review and coach passes from the autonomous flow are available here too, so I can check a single fix without spending one of the once-per-PR cloud reviews.</li>
         <li><b>Verify before "done."</b> Nothing gets called finished on a claim. The session has to prove it &mdash; run the test and show the output, diff the behavior against main, demonstrate the fix fires. "It should work now" is not done.</li>
         <li><b>I'm the gate at every step</b> &mdash; the plan, the fan-out, the diff, the merge &mdash; which is what makes the bigger changes safe to attempt.</li>
       </ul>
@@ -604,9 +618,8 @@ flowchart TD
     me["Me, at the keyboard"]
     plan["Main session&lt;br/&gt;superjawn: research first"]
     sub1["subagent:&lt;br/&gt;explore / research"]
-    sub2["subagent:&lt;br/&gt;codex review"]
+    sub2["subagent:&lt;br/&gt;cross-provider review"]
     sub3["subagent:&lt;br/&gt;coach (quality)"]
-    sub4["subagent:&lt;br/&gt;Copilot CLI"]
     synth["Main session&lt;br/&gt;synthesizes findings"]
     decide{"I decide&lt;br/&gt;in real time"}
 
@@ -614,11 +627,9 @@ flowchart TD
     plan -->|spawn in parallel| sub1
     plan -->|spawn in parallel| sub2
     plan -->|spawn in parallel| sub3
-    plan -->|spawn in parallel| sub4
     sub1 --> synth
     sub2 --> synth
     sub3 --> synth
-    sub4 --> synth
     synth --> decide
     decide -->|looks good| plan
     decide -->|push back| plan
@@ -649,19 +660,19 @@ flowchart TD
     <!-- ============ S5 ============ -->
     <div id="s5" class="sec-head"><span class="sec-head__num">05</span><h2>Three reviewers check one change</h2><span class="sec-head__mode">both modes</span></div>
     <div class="sec-intro">
-      <p>The review stack is the core of the setup, and it runs in both modes. Work gets done with Claude Opus at high reasoning. Before anything is committed, a <b>different</b> model reads the change.</p>
-      <p>First, <b>Codex reviews the uncommitted diff</b> &mdash; the exact lines the change adds or removes, before they're saved &mdash; for bugs, security, swallowed errors, and style, in at most two passes: one to surface findings, at most one more to confirm the fixes. The effort is matched to the risk &mdash; low for a trivial, well-tested diff; high for a non-trivial or security-touching one. High-severity findings get fixed in place; anything that would balloon the scope becomes its own issue instead.</p>
+      <p>The review stack is the core of the setup, and it runs in both modes. The writing model runs at high reasoning (Claude Opus when I first wrote this up; mostly Codex now, with Claude reviewing). Before anything is committed, a model from a <b>different</b> provider reads the change. The walkthrough below uses the May setup, where Claude wrote and Codex reviewed.</p>
+      <p>First, <b>Codex reviews the uncommitted diff</b> &mdash; the exact lines the change adds or removes, before they're saved &mdash; for bugs, security, swallowed errors, and style. In May that was capped at two passes: one to surface findings, at most one more to confirm the fixes. Now review runs until a pass finds nothing new and actionable. In the unattended kit, <code>review.max_passes</code> is only a budget guard: reaching it with findings still open blocks the change instead of shipping it. The effort is matched to the risk &mdash; low for a trivial, well-tested diff; high for a non-trivial or security-touching one. High-severity findings get fixed in place; anything that would balloon the scope becomes its own issue instead.</p>
       <p>Then an independent <b>coach</b>: a separate Claude subagent at high reasoning that judges quality. Codex already covered correctness, so the coach reads the diff and answers two questions &mdash; would this impress a sharp reviewer or land as competent but forgettable, and what single change would raise it most? It runs even when Codex is down, and skips itself when there's no code to review.</p>
       <p>Only then does the change get committed and the PR opened, where the <b>Codex cloud connector</b> reviews it again, independently, on GitHub &mdash; reasoning about the live repo, not just the diff. The last gate is me.</p>
     </div>
 
     <div class="pullquote">
-      <p>A second model reviews the high-reasoning model's work before I open the PR &mdash; then a coach asks the question neither bug-checker does: is this good?</p>
+      <p>A model from a different provider reviews the high-reasoning model's work before I open the PR &mdash; then a coach asks the question neither bug-checker does: is this good?</p>
     </div>
 
     <div class="callout callout--warn">
       <div class="callout__title">Match the reviewer's effort to the risk</div>
-      <p>Codex reviews at an effort set by the change, not a fixed default. A trivial, well-tested diff gets a low-reasoning pass: it's far lighter on tokens, and it keeps the reviewer from overthinking &mdash; turn a code reviewer up too high on a simple change and it starts inventing problems, rewriting things that were already fine, and burying the two findings that matter under a pile of speculation. A non-trivial or security-touching change gets a high-reasoning pass instead, where the stronger judgment is worth the cost and is usually right in one shot. Either way it's capped at two passes, not run to convergence. The model writing the code and the coach judging it always run at high reasoning.</p>
+      <p>Codex reviews at an effort set by the change, not a fixed default. A trivial, well-tested diff gets a low-reasoning pass: it's far lighter on tokens, and it keeps the reviewer from overthinking &mdash; turn a code reviewer up too high on a simple change and it starts inventing problems, rewriting things that were already fine, and burying the two findings that matter under a pile of speculation. A non-trivial or security-touching change gets a high-reasoning pass instead, where the stronger judgment is worth the cost and is usually right in one shot. There's no fixed pass cap: the review runs until a round turns up nothing new and actionable. The model writing the code and the coach judging it always run at high reasoning.</p>
     </div>
 
     <div class="diagram-shell">
@@ -688,7 +699,8 @@ flowchart TD
 
     work --> codex --> decide
     decide -->|yes, fix in place| work
-    decide -->|clean or 2 passes| coach --> commit --> pr --> connector --> gate
+    decide -->|clean| coach --> commit --> pr --> connector --> gate
+    decide -->|cap reached, findings open| blocked["blocked: hand to me"]
     gate -->|approve| merge
     gate -->|needs changes| work
 
@@ -815,26 +827,22 @@ flowchart TD
     <!-- ============ S8 ============ -->
     <div id="s8" class="sec-head"><span class="sec-head__num">08</span><h2>Who does what</h2><span class="sec-head__mode">both modes</span></div>
     <div class="sec-intro">
-      <p>Four models, each on a job that fits it, and a hard rule underneath: <b>no direct API calls</b> &mdash; the pay-as-you-go way of calling a model, billed by the word. Everything runs through a CLI on a subscription I already pay for, so adding a model to the pipeline doesn't add a metered bill.</p>
+      <p>Two model families that check each other, and a hard rule underneath: <b>no direct API calls</b> &mdash; the pay-as-you-go way of calling a model, billed by the word. Everything runs through a CLI on a subscription I already pay for, so adding a model to the pipeline doesn't add a metered bill.</p>
     </div>
 
     <p class="fig-cap"><span class="fig">Fig. 7</span> &mdash; who does what</p>
     <div class="card-grid">
       <div class="ve-card">
         <div class="ve-card__label">writer</div>
-        <p><b>Claude Opus</b> runs the sessions and the coach subagent &mdash; the model doing the work, and a separate instance judging it.</p>
+        <p><b>Codex</b> writes most changes now and <b>Claude</b> writes the rest. A separate coach instance judges the work.</p>
       </div>
       <div class="ve-card">
         <div class="ve-card__label">correctness</div>
-        <p><b>Codex</b> reviews the uncommitted diff before commit, at an effort set by the change &mdash; low for a simple diff, high for a risky one. Runs on my ChatGPT subscription.</p>
+        <p>The <b>other provider</b> reviews the diff before it ships: Claude when Codex wrote it, Codex when Claude did. Effort is set by the change &mdash; low for a simple diff, high for a risky one.</p>
       </div>
       <div class="ve-card">
         <div class="ve-card__label">independent</div>
         <p>The <b>Codex cloud connector</b> reviews the PR on GitHub once it opens, reasoning about the live repo state, not just the diff &mdash; a second look from a different surface than the pre-PR pass.</p>
-      </div>
-      <div class="ve-card">
-        <div class="ve-card__label">support</div>
-        <p><b>Gemini</b> handles the cheap, high-volume jobs: triaging email and returning structured output (answers in a fixed, machine-readable format) from the CLI.</p>
       </div>
     </div>
 
@@ -845,10 +853,9 @@ flowchart TD
             <tr><th>Model</th><th>Role</th><th>Invoked via</th><th>Marginal cost</th></tr>
           </thead>
           <tbody>
-            <tr><td><b>Claude Opus</b></td><td>Sessions + coach review</td><td><code>claude</code> CLI</td><td><span class="tag">subscription</span></td></tr>
-            <tr><td><b>Codex</b></td><td>Pre-PR review, effort by risk</td><td><code>codex exec</code> CLI</td><td><span class="tag">none (OAuth)</span></td></tr>
+            <tr><td><b>Codex</b></td><td>Most sessions; pre-PR review of Claude's changes</td><td><code>codex exec</code> CLI</td><td><span class="tag">subscription</span></td></tr>
+            <tr><td><b>Claude</b></td><td>Some sessions; pre-PR review of Codex's changes</td><td><code>claude</code> CLI</td><td><span class="tag">subscription</span></td></tr>
             <tr><td><b>Codex (cloud connector)</b></td><td>Independent PR review</td><td><code>chatgpt-codex-connector</code> bot</td><td><span class="tag">subscription (weekly allowance)</span></td></tr>
-            <tr><td><b>Gemini</b></td><td>Email triage, structured output</td><td><code>gemini</code> CLI</td><td><span class="tag">subscription</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -856,10 +863,10 @@ flowchart TD
 
     <div class="callout callout--info">
       <div class="callout__title">Each repo teaches its own reviewers</div>
-      <p>The reviews are grounded in each repo. Every repo carries a per-repo <code>CLAUDE.md</code> that spells out the project's architecture, the patterns to enforce, and the specific mistakes to watch for &mdash; concrete, repo-specific bugs like a missing query limit, a NaN write, a wrong dependency arrow, or a factual error in the docs. The Claude sessions read it on every wake, and the cloud connector reasons about the live repo on GitHub rather than the diff alone &mdash; so the review comes back shaped by that repo's context. The project carries its own standards, and every model that works in it inherits them.</p>
+      <p>The reviews are grounded in each repo. Every repo carries a per-repo instruction file (<code>AGENTS.md</code> or <code>CLAUDE.md</code>) that spells out the project's architecture, the patterns to enforce, and the specific mistakes to watch for &mdash; concrete, repo-specific bugs like a missing query limit, a NaN write, a wrong dependency arrow, or a factual error in the docs. The agent sessions read it on every wake, and the cloud connector reasons about the live repo on GitHub rather than the diff alone &mdash; so the review comes back shaped by that repo's context. The project carries its own standards, and every model that works in it inherits them.</p>
     </div>
 
-    <p class="sec-intro" style="margin-top:18px">The cloud connector fires once when the PR opens and reasons about live repo state. It's subscription-billed &mdash; no metered minutes &mdash; but it still spends the ChatGPT plan's finite weekly and 5-hour allowance, so I treat it as a once-per-PR resource: I address what it raises in one fix round and don't re-trigger it. The local passes &mdash; the Codex CLI review and the coach &mdash; do the iterating before the PR ever opens.</p>
+    <p class="sec-intro" style="margin-top:18px">The cloud connector fires once when the PR opens and reasons about live repo state. It's subscription-billed &mdash; no metered minutes &mdash; but it still spends the ChatGPT plan's finite weekly and 5-hour allowance, so I treat it as a once-per-PR resource: I address what it raises in one fix round and don't re-trigger it. The local passes &mdash; the cross-provider CLI review and the coach &mdash; do the iterating before the PR ever opens.</p>
 
     <!-- ============ S9 ============ -->
     <div id="s9" class="sec-head"><span class="sec-head__num">09</span><h2>Context and pre-compaction prep</h2><span class="sec-head__mode">both modes</span></div>
@@ -898,8 +905,8 @@ flowchart TD
         <li><b>Make a queue you trust.</b> Issues work because they're already where the work lives. The scheduler just pulls from them one at a time.</li>
         <li><b>Pull one item per session.</b> Small, bounded work produces small, reviewable PRs.</li>
         <li><b>Isolate every session.</b> Worktrees mean concurrency never corrupts your main checkout.</li>
-        <li><b>Put at least one independent reviewer between the writer and main.</b> Use a different model than the one that wrote the code; a different vendor is better still. Stack a couple and the cost of a miss drops to a comment.</li>
-        <li><b>Match the reasoning level to the task.</b> High for writing and judgment; low for a fast, literal code review that won't overthink.</li>
+        <li><b>Put at least one independent reviewer between the writer and main.</b> Use a model from a different provider than the one that wrote the code; a second model from the same vendor shares too many of its blind spots. Stack a couple and the cost of a miss drops to a comment.</li>
+        <li><b>Match the reasoning level to the task.</b> High for writing and judgment. For review, low on a trivial diff so it stays a fast, literal read; high when the change touches behavior, security, or data.</li>
         <li><b>Prove "done," don't claim it.</b> A passing test, pasted output, a before/after beats "this should work now." Make verification a step the session has to run.</li>
         <li><b>Respect the context window.</b> Compact before the dumb zone, and write a handoff to disk before you do.</li>
         <li><b>Keep one human gate.</b> Everything is built to make that gate a quick yes &mdash; from my phone when I'm away, or step by step when I'm there.</li>
@@ -924,7 +931,7 @@ flowchart TD
 
     <div class="prompt-card">
       <div class="prompt-card__head"><span class="prompt-card__label"><b>02</b> &nbsp;an independent review before commit</span><button type="button" class="prompt-card__copy">copy</button></div>
-      <div class="prompt-card__body">When you finish a change, don't commit yet. First have a different model read the diff for bugs, security holes, and swallowed errors. Match its effort to the risk, low reasoning for a simple, well-tested diff so it stays a fast, literal read instead of a rewrite that invents problems; higher for a complex or security-touching one. Fix anything serious in place; turn anything that would balloon the scope into a separate ticket. Then commit.</div>
+      <div class="prompt-card__body">When you finish a change, don't commit yet. First have a model from a different provider read the diff for bugs, security holes, and swallowed errors. Match its effort to the risk, low reasoning for a simple, well-tested diff so it stays a fast, literal read instead of a rewrite that invents problems; higher for a complex or security-touching one. Fix anything serious in place; turn anything that would balloon the scope into a separate ticket. Then commit.</div>
     </div>
 
     <div class="prompt-card">
@@ -951,14 +958,14 @@ flowchart TD
     <div id="s12" class="sec-head"><span class="sec-head__num">12</span><h2>Get the kit</h2></div>
     <div class="sec-intro">
       <p>Most people I show this to didn't know it was a thing you could do &mdash; point an agent at your own GitHub issues and let it work them on a schedule, with the review and approval steps built in. So I packaged the autopilot half as a drop-in kit. You don't have to write the code or know Python: you hand two files to your own agent, answer its questions, and it builds the loop for your machine, whether that's a Mac, a Windows box, or Linux.</p>
-      <p>It's the careful version on purpose. What keeps autonomous work from turning into unreviewed output that quietly breaks something is bounded scope, a second model on every diff, and a person at the merge. The kit is built around those three, and it's the part most people ask about first.</p>
+      <p>It's the careful version on purpose. What keeps autonomous work from turning into unreviewed output that quietly breaks something is bounded scope, a different provider's model on every diff, and a person at the merge. The kit is built around those three, and it's the part most people ask about first.</p>
       <p>You aim it as tightly as you want, then widen one ring at a time:</p>
       <ul>
         <li><b>Which repos</b> &mdash; and which one is the focus right now.</li>
         <li><b>Which issues</b> &mdash; a label like <code>agent-ready</code> you apply by hand is the tightest gate.</li>
         <li><b>Which files</b> &mdash; allow <code>docs/**</code> only, deny <code>.github/workflows/</code>, or both.</li>
         <li><b>How big</b> &mdash; cap the files and lines a single change can touch.</li>
-        <li><b>Who checks and who approves</b> &mdash; a second model reviews every diff; you merge. It never merges its own work.</li>
+        <li><b>Who checks and who approves</b> &mdash; a model from a different provider reviews every diff; you merge. It never merges its own work.</li>
       </ul>
     </div>
 
@@ -969,11 +976,11 @@ flowchart TD
 
     <div class="callout callout--warn">
       <div class="callout__title">Tested on Linux only, so far</div>
-      <p>I've run this end to end on one setup: a Raspberry Pi 5 (8GB) on Ubuntu 25.10, ARM64, with Python 3.13, cron, tmux, and <code>timeout --foreground</code> from uutils coreutils. The macOS and Windows recipes follow the same design but haven't been run end to end as of this version &mdash; testing them is planned. And &ldquo;Linux&rdquo; has roughly 58 million permutations once you count distros, kernels, and coreutils flavors, so even a different Linux box can differ in the details. Unless you're on that exact setup, have your agent treat the matching template with some skepticism: verify each piece on a throwaway issue before you trust an unattended schedule.</p>
+      <p>I first ran this end to end on a Raspberry Pi 5 (8GB) on Ubuntu 25.10, ARM64, with Python 3.13, cron, tmux, and <code>timeout --foreground</code> from uutils coreutils. The same primitives now run my long-lived attendant on an x86 mini-PC with Ubuntu 24.04 under systemd user services, and it came back cleanly after a real reboot. The macOS and Windows recipes follow the same design but haven't been run end to end as of this version &mdash; testing them is planned. And &ldquo;Linux&rdquo; has roughly 58 million permutations once you count distros, kernels, and coreutils flavors, so even a different Linux box can differ in the details. Unless you're on that exact setup, have your agent treat the matching template with some skepticism: verify each piece on a throwaway issue before you trust an unattended schedule.</p>
     </div>
 
     <div class="foot">
-      <p>That's the whole thing. Built on a couple of Raspberry Pis, a cron file, and the rule that no model gets to be the only one who checked its own work. Questions or "I built one too" notes welcome.</p>
+      <p>That's the whole thing. Built on a couple of Raspberry Pis (and now a mini-PC), a cron file, and the rule that no model gets to be the only one who checked its own work. Questions or "I built one too" notes welcome.</p>
     </div>
 
   </main>

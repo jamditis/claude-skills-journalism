@@ -1052,7 +1052,7 @@ test('matrix and package wording keep the untested clients explicit', () => {
   );
   assert.match(
     matrix,
-    /All three skills are statically client-neutral/u,
+    /All four skills are statically client-neutral/u,
   );
   assert.match(
     packageReadme,

@@ -506,3 +506,7 @@ If a page feels too crowded, *reduce content*, don't expand spacing.
 ## Template
 
 Resolve `templates/democracy-day-proposal.html` from the installed skill directory.
+
+## Related
+
+Use **document-delivery** to inspect, share, send, and verify the final PDF or editable document.

@@ -4,7 +4,7 @@
 
 import { spawn } from 'node:child_process';
 import { createServer, connect } from 'node:net';
-import { readdirSync, statSync, writeFileSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
@@ -38,7 +38,8 @@ function findIndexes(dir, out = []) {
     let st;
     try { st = statSync(full); } catch { continue; }
     if (st.isDirectory()) findIndexes(full, out);
-    else if (ent === 'index.html') out.push(full);
+    // A meta-refresh redirect stub navigates away mid-scan and has no content to audit.
+    else if (ent === 'index.html' && !/http-equiv="refresh"/iu.test(readFileSync(full, 'utf8'))) out.push(full);
   }
   return out;
 }

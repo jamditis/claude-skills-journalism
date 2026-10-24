@@ -1,6 +1,6 @@
 ---
 name: project-memory
-description: Generates project instruction files that transfer institutional knowledge. Use when setting up projects or onboarding.
+description: Generates project instruction files (AGENTS.md or CLAUDE.md) that transfer institutional knowledge. Use when setting up projects or onboarding. For lessons from a finished project or investigation, use project-retrospective.
 ---
 
 # Project memory generator
@@ -13,11 +13,14 @@ colleague. Do not explain how journalism works; explain this project's quirks.
 
 Resolve the target before writing:
 
-1. If `AGENTS.md` exists, update it.
+1. If `AGENTS.md` exists, update it. If no `CLAUDE.md` exists, then
+   in Claude Code, also create a one-line
+   `CLAUDE.md` that imports it with `@AGENTS.md`. Claude Code loads
+   `CLAUDE.md`, not `AGENTS.md`.
 2. If only `CLAUDE.md` exists, update it.
 3. If both exist and one imports the other, edit the imported canonical file.
-4. If neither exists, create `AGENTS.md`. In Claude Code, also create a
-   one-line `CLAUDE.md` that imports it with `@AGENTS.md`.
+4. If neither exists, create `AGENTS.md`. In Claude Code, also create the
+   same one-line `CLAUDE.md` import.
 
 Do not create competing copies of the same guidance. Keep nested instruction
 files only when a subdirectory needs narrower rules than its parent.
@@ -254,6 +257,10 @@ Templates are in the `templates/` directory:
 ```
 
 Start small. Add a rule only after the project demonstrates that agents need it.
+
+## Reference files
+
+Read [Pinned repository ledger](references/repo-ledger.md) when several agents, runtimes, or people coordinate in one repository.
 
 ## Last currency sweep
 

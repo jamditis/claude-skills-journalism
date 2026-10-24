@@ -40,9 +40,9 @@ test('homepage lists video toolkit once, before visual explainer, with accurate 
   const index = readFileSync(join(DOCS, 'index.html'), 'utf8');
   const skillCount = findSkillFiles().length;
 
-  assert.match(index, new RegExp(`>${skillCount} Skills // 13 Plugins // 16 Hooks`, 'u'));
-  assert.match(index, new RegExp(`id="finder-count">${skillCount} skills, 13 plugins`, 'u'));
-  assert.match(index, />13 Plugins<\/span>/u);
+  assert.match(index, new RegExp(`>${skillCount} Skills // 14 Plugins // 16 Hooks`, 'u'));
+  assert.match(index, new RegExp(`id="finder-count">${skillCount} skills, 14 plugins`, 'u'));
+  assert.match(index, />14 Plugins<\/span>/u);
   assert.equal((index.match(/href="video-toolkit\/"/gu) || []).length, 1);
 
   const pluginsStart = index.indexOf('<!-- Plugins -->');

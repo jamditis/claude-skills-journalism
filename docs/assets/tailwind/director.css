@@ -685,6 +685,9 @@ video {
 .underline {
   text-decoration-line: underline;
 }
+.underline-offset-2 {
+  text-underline-offset: 2px;
+}
 .outline {
   outline-style: solid;
 }

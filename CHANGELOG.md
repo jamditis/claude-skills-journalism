@@ -7,6 +7,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added the `newsroom-agent-ops` plugin with nine skills for recurring newsroom
+  operations, durable coordination, verified delivery, and bounded external actions.
+- Added `meeting-transcript-actions` to journalism-core for extracting attributed
+  notes, decisions, owned actions, and unresolved questions from verified transcripts.
+- Added public documentation pages and generated Tailwind stylesheets for the plugin
+  and all ten new skills.
+- **New workflow skills.** dev-toolkit `ponytail-dev` covers minimal-code
+  implementation with proportional checks (adapted from DietrichGebert/ponytail,
+  MIT). dev-toolkit `surface-completeness` checks UI coverage, design compliance,
+  and documentation during frontend changes. project-templates-toolkit
+  `goal-progress-bar` renders evidence-based weighted progress from a JSON tracker.
+- **Fleet-practice reference files.** `ai-writing-detox` gains Simplified Technical
+  English and slop-era principles. `vibe-coding` gains complexity and readability,
+  plus invariants and proportional care. `systematic-debugging` gains a testing
+  strategy, `brainstorming` gains problem framing, `web-scraping` gains browser
+  automation by structured reference, `project-memory` gains the pinned repository
+  ledger, and `security-checklist` gains agent PR-review hardening.
+- **Private secret scanning page** on the skills site.
+- **Cross-client selection smoke.** `scripts/fixtures/compat-smoke.json` gives
+  each of the 76 skills a named, an unnamed, and an unrelated case, run in Claude
+  Code and Codex with one skill or all skills installed. The October 23, 2026
+  results are S-smoke-1 in the Codex compatibility matrix. A named pass shows that
+  the client accepted the skill. Other passes are checked against the client's
+  activation record. No pass grades the answer. Skill pages
+  whose skill passed every case now say so.
+
+### Changed
+
+- Increased journalism-core from 15 to 16 skills and added the new plugin and
+  skills to the catalog, marketplace, public browser, sitemap, and machine-readable
+  documentation.
+- `requesting-code-review` requires an independent reviewer from a different model
+  provider than the author, effort scaled to risk, an exact reviewed snapshot, and a
+  verify-fixes pass. Reviewers are not swapped because of findings.
+- `receiving-code-review` covers multi-finding PRs and resolves a thread only after
+  the pushed head contains the fix. `finishing-a-development-branch` covers scoped
+  PRs, `Refs #n` versus closing keywords, stack metadata, and merge approval.
+- The autonomy kit requires cross-provider review and documents a persistent
+  supervised attendant as an advanced option. The persistent-sessions page covers
+  Codex, systemd supervision with a reboot proof, and remote control.
+- The autonomy essay has an October 2026 update: cross-provider review, exact
+  snapshots, no fixed pass cap, the offsite wake attendant, and pinned ledgers.
+  Copilot and Gemini are no longer part of the setup.
+- superjawn 2.1.0, dev-toolkit 2.1.0, journalism-core 1.7.0, security-toolkit 1.3.0,
+  and project-templates-toolkit 1.1.0.
+
+### Removed
+
+- `docs/HANDOFF.md`, a stale page-creation note.
+
 ### Removed
 
 - **Test-first enforcement retired.** Removed the superjawn `test-driven-development`

@@ -480,6 +480,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             <h3 class="font-display text-xl font-bold">Or copy just this skill from the plugin tree</h3>
                         </div>
                         <pre tabindex="0"><code>git clone https://github.com/jamditis/claude-skills-journalism.git
+mkdir -p ~/.claude/skills ~/.agents/skills
 cp -r claude-skills-journalism/dev-toolkit/skills/vibe-coding ~/.claude/skills/   # Claude Code
 cp -r claude-skills-journalism/dev-toolkit/skills/vibe-coding ~/.agents/skills/   # Codex</code></pre>
                     </div>
@@ -517,6 +518,18 @@ cp -r claude-skills-journalism/dev-toolkit/skills/vibe-coding ~/.agents/skills/ 
                         <i data-lucide="bug" class="w-8 h-8 mb-4 text-accent"></i>
                         <h3 class="font-display text-xl font-bold mb-2">Debugging</h3>
                         <p class="text-white/70 text-sm">Error analysis, strategic logging, model switching.</p>
+                    </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <i data-lucide="layers" class="w-8 h-8 mb-4 text-accent"></i>
+                        <h3 class="font-display text-xl font-bold mb-2">Complexity and readability</h3>
+                        <p class="text-white/70 text-sm">A reference for complexity passes: flatten control flow, name facts and policies, and prefer deletion over abstraction.</p>
+                    </div>
+
+                    <div class="p-6 bg-white/5 rounded-xl">
+                        <i data-lucide="shield-check" class="w-8 h-8 mb-4 text-accent"></i>
+                        <h3 class="font-display text-xl font-bold mb-2">Invariants and proportional care</h3>
+                        <p class="text-white/70 text-sm">A reference for changes that touch stored state, trust boundaries, or error recovery. Scale review and tests to the cost of being wrong.</p>
                     </div>
                 </div>
 

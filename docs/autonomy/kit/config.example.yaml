@@ -5,11 +5,11 @@
 # references).
 #
 # What this sets up: on a schedule, the kit picks one open GitHub issue from the
-# repos you choose, hands it to your coding agent to work, has a second model
-# review the change, opens a pull request (and never merges it), then reports
-# back. It also files NEW issues for follow-up work it finds, so nothing is lost
-# to forgetting, deletion, or a compacted context. Issues in, pull requests out,
-# and a durable to-do list that grows itself.
+# repos you choose, hands it to your coding agent to work, has a model from a
+# different provider review the change, opens a pull request (and never merges
+# it), then reports back. It also files NEW issues for follow-up work it finds,
+# so nothing is lost to forgetting, deletion, or a compacted context. Issues in,
+# pull requests out, and a durable to-do list that grows itself.
 
 machine:
   # linux | macos | windows. Your agent uses this to pick the right scheduler,
@@ -35,14 +35,17 @@ schedule:
     timezone: America/New_York
   timeouts:
     idle_minutes: 20    # kill a session that stops producing output (likely stuck)
-    hard_minutes: 90    # absolute ceiling per session
+    hard_minutes: 90    # absolute ceiling per session; a cost backstop for metered
+                        # billing. See "A persistent attendant" in
+                        # BUILD-WITH-YOUR-AGENT.md before you raise it.
 
 model:
   # Effort for doing the work. Higher costs more and is slower; don't default
   # everything to the top tier. See COSTS.md.       low|medium|high|xhigh|max
   work_effort: high
-  # Effort for the review pass. Low on purpose, a fast literal read for bugs,
-  # not a rewrite that invents problems.
+  # Effort for the review pass, scaled to risk. Low suits a trivial change (a
+  # typo, a docs line): a fast literal read for bugs, not a rewrite. Use high
+  # when the change touches behavior, security, data, or concurrency.
   review_effort: low
 
 # --- WHERE the work comes from, and which repo gets the focus --------------
@@ -98,11 +101,13 @@ nudges:
 
 review:
   enabled: true
-  # The reviewer command, run at model.review_effort. Use a CLI logged into a
+  # The reviewer command, run at model.review_effort. Pick a reviewer from a
+  # DIFFERENT model provider than machine.agent_cli (Claude Code work, Codex
+  # review; Codex work, Claude Code review). Use a CLI logged into a
   # subscription, not an API key, to keep cost at zero per run (see COSTS.md).
   # `{repo}` is filled in at runtime.
   command: "codex -C {repo} exec review --uncommitted --skip-git-repo-check"
-  max_passes: 3               # cap review iterations so a session can't loop forever
+  max_passes: 3               # budget guard; reaching it with findings open blocks the change
 
 notify:
   # Where session summaries go. `stdout` needs no setup and is the right default

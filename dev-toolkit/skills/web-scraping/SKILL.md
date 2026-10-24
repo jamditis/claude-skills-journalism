@@ -761,3 +761,7 @@ Scraping is technically simple, ethically nuanced, and legally a moving target. 
 - Stop if you receive a cease-and-desist or explicit blocking signal, escalating past one is the move that turns a civil dispute into a CFAA case.
 
 **Notes on specific platforms.** Instagram's `instaloader` and TikTok extraction via `yt-dlp` change frequently as platforms update access controls. Do not use credentialed sessions without explicit user approval and documented authorization. For journalism, prefer the official Meta Content Library and TikTok Research API when eligible.
+
+## Reference files
+
+Read [Browser automation by structured reference](references/browser-automation.md) before navigating or interacting with a live page.

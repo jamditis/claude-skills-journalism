@@ -40,6 +40,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
     'autocontext',
     'dev-toolkit',
     'journalism-core',
+    'newsroom-agent-ops',
     'okf-wiki',
     'pdf-design',
     'pdf-playground',
@@ -52,7 +53,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
     'visual-explainer',
   ]);
   assert.match(matrix, /`pdf-playground` \| 1\.3\.7/u);
-  assert.match(matrix, /`security-toolkit` \| 1\.2\.4;/u);
+  assert.match(matrix, /`security-toolkit` \| 1\.3\.0;/u);
   assert.match(matrix, /`video-toolkit` \| 1\.0\.6;/u);
   assert.match(matrix, /V-phase-1: repaired standards baseline/u);
   assert.match(matrix, /J-release-1: paired journalism-core runtime pilot/u);
@@ -68,7 +69,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
   assert.match(matrix, /Codex security-toolkit preflight \| 0\.153\.2/u);
   assert.match(
     matrix,
-    /`journalism-core` \| 1\.5\.0; 15 nested skills \| Runtime pilot passed on the Claude package and Codex project-standards paths/u,
+    /`journalism-core` \| 1\.7\.0; 16 nested skills \| Runtime pilot passed for the earlier 15-skill snapshot/u,
   );
   assert.match(
     matrix,
@@ -99,7 +100,7 @@ test('the compatibility matrix classifies every marketplace package', () => {
     .split('\n')
     .filter((line) => /^\| `[^`]+` \|/u.test(line))
     .map((line) => line.split('|')[5].trim());
-  assert.equal(evidenceCells.length, 13);
+  assert.equal(evidenceCells.length, 14);
   for (const evidence of evidenceCells) {
     assert.match(evidence, /\[[^\]]+\]\(#[^)]+\)/u);
   }
@@ -425,7 +426,7 @@ test('the README routes Codex users without implying mixed-install support', () 
   assert.match(homepage, /codex plugin marketplace add jamditis\/claude-skills-journalism/u);
   assert.match(homepage, /codex plugin add journalism-core@claude-skills-journalism/u);
   assert.match(homepage, /verified legacy-compatible route/u);
-  assert.match(homepage, /15 nested journalism-core skills/u);
+  assert.match(homepage, /16 nested journalism-core skills/u);
   assert.doesNotMatch(homepage, /A curated collection of Claude Code skills/u);
 });
 
