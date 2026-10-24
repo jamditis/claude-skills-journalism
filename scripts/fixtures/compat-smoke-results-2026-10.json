@@ -1,0 +1,278 @@
+{
+  "schemaVersion": 1,
+  "evidence": "S-smoke-1",
+  "date": "2026-10-23",
+  "fixture": "scripts/fixtures/compat-smoke.json",
+  "fixtureDigest": "2a46cac16769d7f7cc86180c7787904d7a02735b9067d96d28ab44934e1f29d6",
+  "clients": {
+    "claude": {
+      "version": "2.1.309 (Claude Code)",
+      "model": "claude-sonnet-5-5"
+    },
+    "codex": {
+      "version": "codex-cli 0.164.0",
+      "model": "gpt-5.6-sol"
+    }
+  },
+  "scoring": "selection",
+  "note": "Every case not listed under misses passed. Each skill digest is the same in all four client and mode sets.",
+  "totals": {
+    "claude/single/activation": "76/76",
+    "claude/single/implicit-activation": "75/75",
+    "claude/single/unrelated-non-trigger": "76/76",
+    "claude/competitive/implicit-activation": "75/75",
+    "claude/competitive/unrelated-non-trigger": "74/76",
+    "codex/single/activation": "76/76",
+    "codex/single/implicit-activation": "75/75",
+    "codex/single/unrelated-non-trigger": "75/76",
+    "codex/competitive/implicit-activation": "71/75",
+    "codex/competitive/unrelated-non-trigger": "70/76"
+  },
+  "misses": [
+    {
+      "case": "web-design-picker-unrelated",
+      "client": "claude",
+      "mode": "competitive",
+      "failed": [
+        "activation"
+      ],
+      "chosenSkill": null,
+      "activatedSkills": [
+        "web-design-picker"
+      ]
+    },
+    {
+      "case": "surface-completeness-unrelated",
+      "client": "claude",
+      "mode": "competitive",
+      "failed": [
+        "activation"
+      ],
+      "chosenSkill": "ponytail-dev",
+      "activatedSkills": [
+        "ponytail-dev",
+        "surface-completeness"
+      ]
+    },
+    {
+      "case": "vibe-coding-unrelated",
+      "client": "codex",
+      "mode": "single",
+      "failed": [
+        "activation"
+      ],
+      "chosenSkill": "ponytail-dev",
+      "activatedSkills": [
+        "vibe-coding"
+      ]
+    },
+    {
+      "case": "one-way-door-unrelated",
+      "client": "codex",
+      "mode": "competitive",
+      "failed": [
+        "skill",
+        "activation"
+      ],
+      "chosenSkill": "one-way-door",
+      "activatedSkills": [
+        "one-way-door"
+      ]
+    },
+    {
+      "case": "web-scraping-unrelated",
+      "client": "codex",
+      "mode": "competitive",
+      "failed": [
+        "skill",
+        "activation"
+      ],
+      "chosenSkill": "web-scraping",
+      "activatedSkills": [
+        "web-scraping"
+      ]
+    },
+    {
+      "case": "web-ui-best-practices-implicit",
+      "client": "codex",
+      "mode": "competitive",
+      "failed": [
+        "skill",
+        "activation"
+      ],
+      "chosenSkill": "surface-completeness",
+      "activatedSkills": [
+        "surface-completeness"
+      ]
+    },
+    {
+      "case": "source-verification-implicit",
+      "client": "codex",
+      "mode": "competitive",
+      "failed": [
+        "skill",
+        "activation"
+      ],
+      "chosenSkill": "fact-check-workflow",
+      "activatedSkills": [
+        "fact-check-workflow"
+      ]
+    },
+    {
+      "case": "pdf-design-implicit",
+      "client": "codex",
+      "mode": "competitive",
+      "failed": [
+        "skill",
+        "activation"
+      ],
+      "chosenSkill": "document-design",
+      "activatedSkills": [
+        "document-delivery",
+        "document-design"
+      ]
+    },
+    {
+      "case": "digital-archive-unrelated",
+      "client": "codex",
+      "mode": "competitive",
+      "failed": [
+        "skill",
+        "activation"
+      ],
+      "chosenSkill": "digital-archive",
+      "activatedSkills": [
+        "digital-archive",
+        "using-superjawn"
+      ]
+    },
+    {
+      "case": "dispatching-parallel-agents-unrelated",
+      "client": "codex",
+      "mode": "competitive",
+      "failed": [
+        "skill",
+        "activation"
+      ],
+      "chosenSkill": "dispatching-parallel-agents",
+      "activatedSkills": [
+        "dispatching-parallel-agents"
+      ]
+    },
+    {
+      "case": "writing-skills-implicit",
+      "client": "codex",
+      "mode": "competitive",
+      "failed": [
+        "skill",
+        "activation"
+      ],
+      "chosenSkill": "skill-creator",
+      "activatedSkills": []
+    },
+    {
+      "case": "web-design-picker-unrelated",
+      "client": "codex",
+      "mode": "competitive",
+      "failed": [
+        "skill",
+        "activation"
+      ],
+      "chosenSkill": "web-design-picker",
+      "activatedSkills": [
+        "web-design-picker"
+      ]
+    },
+    {
+      "case": "email-request-intake-unrelated",
+      "client": "codex",
+      "mode": "competitive",
+      "failed": [
+        "skill",
+        "activation"
+      ],
+      "chosenSkill": "email-request-intake",
+      "activatedSkills": [
+        "email-request-intake"
+      ]
+    }
+  ],
+  "skillDigests": {
+    "academic-writing": "d25b5358c043db2d39abbffab41769865f9edbaf5250d88600b27d1d7cf3a4cf",
+    "accessibility-compliance": "d86b7f3d3e0c8fdd6082b0b542e7eb8b2600f02eba6ef371b4e31c99090f9a9c",
+    "ai-writing-detox": "7d1aea764857943971427dc386010443e8abd9a4f8977657c32a132f705b7475",
+    "api-hardening": "b484ff6138bf1df2f19c73aad0572a0ef4ab72f755bc9428e8694c50a824f01e",
+    "brainstorming": "4e38a17033880690f6e5301efec9283415e845757e855cce7aebe30088dc17d0",
+    "brazil-records-requests": "9ae538452092d301d2b0d10aa080b81dc52c92bfe2da7e1f1a2a8d5f6e0b4dde",
+    "chat-mention-triage": "a52433bf89e0c640c6ea38d1bf5293e1274b1772172546a0d953a91d40ec9f62",
+    "claude-md-updater": "de83b1da8eb668d014cce018b1aebae5f62f50a451ef7284f63946bc59ea1dfe",
+    "content-access": "6430de675926a693a617049d3d6df8abc0315ee345389b0dddddfc20ec4070f5",
+    "context-engineering-fundamentals": "08545c68948aa71b655ed0080bdf6e16b4c0bafca92277bff63ed210984dfd3f",
+    "crisis-communications": "f5102b22ca0f3a1a6087fe05b8c97e1d235e85576455288eccf97eee57a27a74",
+    "data-journalism": "82b90d6fac527a9002262a4b8c2114d22de53d764d13006fe810dc1cef2d7f8c",
+    "deadline-and-reply-tracking": "3d2e15a3872bacd8ab589228fa2e48132172b10a23dd003609c5ce9040973d0f",
+    "digital-archive": "c37d6006f830817d90d809df0dc24ac8490975c6e879f6c0571a62378c25d9c8",
+    "director": "350e58b36e572ec8c852a1ceed7ecf54c538019620ae6ebbcf24e3d12f39d4a3",
+    "dispatching-parallel-agents": "cff0fd7babb4f9fddee540bde9ab1f6e6405b109f4b5403a15be65adcb4c4a70",
+    "document-delivery": "c2108b95d9c9d728c0905268f73d911566bc433f825cf7b50f2f4c48b2747004",
+    "document-design": "d2c3ca355b5519c77624176153cbce07eff69fba74226a987a9220d457f35159",
+    "editorial-workflow": "43c45f153bc09b75a1f3d210eb7ab0a853e8832e2b1878faedf3613cfd79eda7",
+    "electron-dev": "60c9002926aaec6f1a74fd247aab4d4bec9b83fd3dc2e2be8c23324c6106d6d9",
+    "email-request-intake": "e443a16ca8f020f9548cb6ba12bdf6aadb34faccfeabea30d8179cac3afea6be",
+    "executing-plans": "6b41c11793dad12cdc56b1ea204138eadd4c7ca7c96dc101bd89a172d0d73b6b",
+    "fact-check-workflow": "0fc2ba119db0eace0f4baddd2de63e3c0a7c1cba7f5bbe005866db269cb46c93",
+    "finishing-a-development-branch": "807f8587f9bff9dcbfe65f682c177b6c6b64aaa477c808145aa573d6f81e4aee",
+    "foia-requests": "0f43f3b4e1dfdb87b91cc82b50bd832064b550fc16256490a43950bc209c019d",
+    "free-apis-catalog": "4cc36d4a3c49835600bbfe7a3a14aa2b77a941cacd26f555849c0c9c30769e5c",
+    "goal-progress-bar": "dc6148ae593f340d3bb4e32c5e648aa349ceaa221d5ec170504404d3dd610cfa",
+    "interview-prep": "5b13ccde00046449e2e8b13a89b4a4610404fb2ea8d41cb2ca7db23dbb841b90",
+    "interview-transcription": "2dee5febeef07b56ceadd53fc5e23351f623d273c3ea4a7ae5877b8f03787f92",
+    "issue-pool-progression": "6d445ce376c89b5df1e2b25030947b0b12660c176c9f638380733993a71b1859",
+    "meeting-transcript-actions": "5ab7dc25891e0d6ac5052b8d3029ff268929b2de7720070e502316590a68bc22",
+    "mobile-debugging": "d5253ef2b05026afac475096a5b1297e4251bffed5e6cc6e055ec8dc822de7f4",
+    "multi-agent-coordinator": "ccc7019a901d3904f18bbadb111d59ebac8da4f2cc0b2c03a991fd90bbace223",
+    "newsletter-publishing": "dcbf226b0917d51eef57878e4949a0f731074399b98f51adeb9b670405f0d0dc",
+    "newsroom-style": "406eb6d4c5c378602715f12ba59372987b7772f136b8e5fb52d32c6640358709",
+    "okf-wiki": "aadfa3e8713a3c320e640454ec4456bc99735eee8c7a130fd5ff199496795808",
+    "one-way-door": "5f68c57bf4424a71889f63f0c2e42ed1df02f9749cca35428403b919abb6c1ed",
+    "page-monitoring": "38fb598c2f5e6d835f51c19c7a3c2650e6d699720c13bc1cf10496098a98d266",
+    "pdf-design": "d48766ff5a69ec937633e4aca8a81b4625e69d79f1845029f23ede1f2d9ce6f6",
+    "photo-metadata": "99c70c4255e61d428c6f628795c1dd658d3887a156e5007fae91e641f06bc15f",
+    "ponytail-dev": "e702bf59873da68a2ee1a5fcd559ff880c7bedaf8d1cf5b6525ff2dd88cb7f30",
+    "private-secret-scanning": "56aa5a10bcf8458f4f9a53609d7fe4b5c0c4697fe14450f4e5b6f26fefa283bf",
+    "project-memory": "bf948373cd989958c11a35277c1c8b64b95762a12151880dd8e505d65b137d9a",
+    "project-retrospective": "f860ce4d2b40046f73d1f2769ab878175117924600fa093577f4a0078cc88fbe",
+    "python-pipeline": "51858ac4859c8346566a4a1bd38ba0b8615b883be50f6ffd43e12bb05a6ac8a0",
+    "receiving-code-review": "297c4f58c7a52c4bf97cc41f7f2b91fffb3960b4b2dc04d7dcf37b8bb319afbb",
+    "record-reconciliation": "04ff484882b5bc4304166368cde8fc799d4a5176e7d04738121af7ee0fdb9a3c",
+    "requesting-code-review": "1d6a87683be4cf3341f8cd057c95fa9165ecb81ebbee2348fd8342c3279f508d",
+    "scheduled-briefing": "03ccafd3592320509f2239fcf4709798146f12f72253ba146715fa3f5ce06055",
+    "secure-auth": "04f5d3299b80a0ea59c9be5601e0b0630f7fef4bfaf38a852b285ab59813c67c",
+    "security-checklist": "5e7a8032d1238e2a5aa662cebe6780741c06accc13087ddbabbbe375c5287490",
+    "social-media-intelligence": "064cb0009c32c14a49722d2eeb67294d815d450d1aeda16aef566559aae7fe09",
+    "source-verification": "5df9b8298c35e2eef67eb1640ce94574f5da59616e5d85c4c0aab03e70cbbc5a",
+    "story-pitch": "4fe92a306ed4d9c74225c14370e896efafe5269bec42cbbe0d06907c288ed771",
+    "subagent-driven-development": "7adec060c846a6576e7e3e5e6d3bd6c845e5e32f0c5cccad533ef9d323a1c547",
+    "supply-chain-hardening": "085291c283a9201578547aca29f5117c6d70f0ae568eebcaeee40defae470418",
+    "surface-completeness": "f29687b92680bf1a29c622de5c1492be1f6cdbf414b1e54324adb0e08aed1b25",
+    "systematic-debugging": "092692a97c387e70be772b45cdf7118cd9cf0e549d82865cec395d0531527879",
+    "template-selector": "ff8d40be9cfd2f510342103f219dd96ef0a9b7c1d08021f9adbb9e4ac329e6d1",
+    "unattended-agent-runs": "ae6e8514c5ca25df3d3436778cc32b43946ad055aa9afc15cb3963c39dd88044",
+    "using-git-worktrees": "3cc11fd192934dd79c5a62dfbfae3df42ac68524e1cee28bc6036726c1ccd988",
+    "using-superjawn": "55f571bee5d19f2603bc95b38401453b31d4b8053b76c131009ab28d77041bb2",
+    "verification-before-completion": "ba0b4dbf9a346d1e217fdadcc41911778fda9524cc047ec44a6c9acedfd7b14b",
+    "vibe-coding": "c226ab78fbdec3abad8519c4dc72174d7f5345227a56ba3facfb0ffa07e78d11",
+    "video-dashboard": "3e7520a727634d436992acecd2549821236bdeb6dd2f444ee3265e31c1cee714",
+    "video-download": "ea3d123a0222e472bd5105fb0151ffa6b37d35cdb1fbafa261f4432bab098892",
+    "video-frames": "61fb75e25949f622f7f1b174fde058bdcfb3f9a0e6c8dbf6eaacfb29df329e64",
+    "video-transcribe": "d26e2768acebb584338e02f48604321c6b75eece4c0ce0e5ffc1947d133bc9c8",
+    "visual-explainer": "cb0e6bd1cfe6f392e5db4cd43744fda764201345abfe4812a624d5eca0ae7d01",
+    "web-archiving": "c07d8ee804a0ae08f5334119ba4c2e6d47505b9aaf14bdb52b207034c5c23571",
+    "web-design-picker": "2666a7e8fa1883041c97480607f9810f831fb4a5cbe2fd211ab4dea6e679bb18",
+    "web-scraping": "90c6ae9f1332ad22eb2d418bde8479e7a56965d3fb424c0e23777b3c591a0211",
+    "web-ui-best-practices": "c3c169fe1b3f7aa15c6543c3d53973fe69f665173df92a6d6f1a20d57744742f",
+    "writing-plans": "4a80117efdf0428242a78945cfc39387d04b927139a8a1524d7180c67f919b00",
+    "writing-skills": "ccac42904cb467151ecd7c14a314b3467be3e439bce1c8dbfa17855f8bcf00de",
+    "zero-build-frontend": "c5c69919ec421a988a96546f061db32c66b52f0b8368b929d40e815cf01e38de"
+  }
+}

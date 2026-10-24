@@ -8,7 +8,7 @@ Classes: **shared** runs as written; **adapter-required** needs a documented
 Codex mapping (instruction file, tool vocabulary, or hook); **Claude-only**
 depends on a Claude runtime mechanic with no Codex equivalent.
 
-Inventory: 12 skills discovered from `dev-toolkit/skills` (11 shared, 1 adapter-required, 0 Claude-only).
+Inventory: 14 skills discovered from `dev-toolkit/skills` (13 shared, 1 adapter-required, 0 Claude-only).
 
 | Skill | Class | Auto-activation | Reason |
 | --- | --- | --- | --- |
@@ -19,7 +19,9 @@ Inventory: 12 skills discovered from `dev-toolkit/skills` (11 shared, 1 adapter-
 | `electron-dev` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
 | `mobile-debugging` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
 | `one-way-door` | adapter-required | yes (one-way-door-check.md) | Wires Claude PreToolUse/PostToolUse hooks; reproduce the failure and approval semantics before mapping, do not drop them. |
+| `ponytail-dev` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
 | `python-pipeline` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
+| `surface-completeness` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
 | `vibe-coding` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
 | `web-scraping` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
 | `web-ui-best-practices` | shared | no | No Claude-specific mechanic; runs under Codex as written. |

@@ -1,7 +1,7 @@
 # Codex compatibility matrix
 
 - Status: phase-two runtime pilots; journalism-core, visual-explainer, document-design, and portable okf-wiki scaffolding have scoped passes
-- Last evidence update: September 23, 2026
+- Last evidence update: October 23, 2026
 - Architecture: [Codex compatibility architecture decision](2026-07-21-codex-compatibility-architecture.md)
 
 > **Historical runtime results stay tied to their tested snapshots.** The v2.8.0
@@ -18,8 +18,8 @@
 
 ## September 2026 structure refresh
 
-- Marketplace 2.8.0 contains 13 Claude packages and 63 shared skills.
-- Codex can install the 15 nested journalism-core skills through the verified legacy-compatible package route.
+- Marketplace 2.9.0 contains 14 Claude packages and 76 shared skills.
+- Codex can install the 16 nested journalism-core skills through the verified legacy-compatible package route.
 - The Agent Skills route supports root and nested skill layouts without converting Claude commands, agents, or hooks.
 - No native `.agents/plugins/marketplace.json` or `.codex-plugin/plugin.json` manifests are published.
 
@@ -50,7 +50,7 @@ Status labels:
 | Tool | Version or revision | Role |
 |---|---|---|
 | Codex structure refresh | 0.147.0 | Legacy package and Agent Skills route verification on August 15, 2026 |
-| Claude marketplace, current structure | 2.8.0 | Current catalog and version alignment; historical runtime results below remain snapshot-specific |
+| Claude marketplace, current structure | 2.9.0 | Current catalog and version alignment; historical runtime results below remain snapshot-specific |
 | Repository | `b0617649515d24ebfcd51f15bceb1d76b03db668` | Architecture commit used as the phase-one worktree base |
 | Repository release verification | [`9eef57629edbaa19bf47ec35296acebdd7b4ab1f`](https://github.com/jamditis/claude-skills-journalism/commit/9eef57629edbaa19bf47ec35296acebdd7b4ab1f) | July 23 post-merge `master` head used for the phase-one release evidence |
 | Repository visual-explainer pilot | [`f6a4b84dd2e9feafc6c2bf067f873e9301a083c2`](https://github.com/jamditis/claude-skills-journalism/commit/f6a4b84dd2e9feafc6c2bf067f873e9301a083c2) | July 23 `master` head installed for the V-ex-1 runtime evidence |
@@ -496,17 +496,63 @@ package-level scan script and synthetic fixture are absent from its standalone
 skill directory. Hotpatch remains unmapped and Claude-only; no runtime pass or
 package-wide support claim follows from these observations.
 
+### S-smoke-1: cross-client selection smoke
+
+Date: October 23, 2026, on officejawn (Linux ARM64). Clients: Claude Code
+2.1.309 with `claude-sonnet-5-5`, and Codex CLI 0.164.0 with `gpt-5.6-sol`.
+Harness: `scripts/skill-behavior-eval.mjs` with `scripts/fixtures/compat-smoke.json`
+(76 skills, 227 cases), selection scoring. Claude runs used
+`--strict-mcp-config`. Totals, every miss, and the skill digests are in
+[`compat-smoke-results-2026-10.json`](../scripts/fixtures/compat-smoke-results-2026-10.json).
+Each skill digest is the same in all four sets below. The Codex single-candidate
+results for 62 skills come from an earlier run on the same October 23 digests.
+
+| Mode | Claude Code | Codex |
+|---|---|---|
+| Named skill (`activation`) | 76/76 | 76/76 |
+| One skill installed, request without the name | 75/75 | 75/75 |
+| One skill installed, unrelated request | 76/76 | 75/76 |
+| All 76 skills installed, request without the name | 75/75 | 71/75 |
+| All 76 skills installed, unrelated request | 74/76 | 70/76 |
+
+For a named request, a pass means the client accepted the named skill; no
+activation record is checked. For the other rows, a pass means the client chose
+and loaded the expected skill, or left it alone for an unrelated request,
+according to the client's own activation record. No answer is graded. Resources, scripts, external actions, and a no-Claude
+environment are not tested. This evidence therefore does not change a package
+classification by itself.
+
+Misses:
+
+- Codex, all skills installed: `one-way-door`, `web-scraping`, `digital-archive`,
+  `dispatching-parallel-agents`, `web-design-picker`, and `email-request-intake`
+  were chosen for unrelated requests. `pdf-design` lost to `document-design`,
+  `writing-skills` to `skill-creator`, `web-ui-best-practices` to
+  `surface-completeness`, and `source-verification` to `fact-check-workflow`.
+  Six of these also missed in an earlier competitive run the same day:
+  `one-way-door`, `web-scraping`, `digital-archive`, `pdf-design`,
+  `writing-skills`, and `web-ui-best-practices`. They point to overlapping or
+  broad descriptions and remain open work.
+- Codex, one skill installed: the unrelated `vibe-coding` request loaded the skill.
+- Claude Code, all skills installed: for the unrelated `web-design-picker` and
+  `surface-completeness` requests, Claude loaded the skill to check it, then
+  declined it. The unrelated gate counts any load as a miss.
+
+Skill pages whose skill passed every case in all four sets say "selection smoke
+passed (October 2026)". Pages for skills with a miss keep their earlier label.
+
 ## Package matrix
 
 | Package | Version and components | Current classification | Included and excluded scope | Evidence | Next proof |
 |---|---|---|---|---|---|
 | `autocontext` | 1.1.0; no skills; five commands; one agent; six hook files | Claude-only surface | Include nothing in the Codex claim. Commands, curator agent, hook lifecycle, persisted data, and compatibility environment variables need a separate design. | [I-phase-1](#i-phase-1-package-inventory) | Define state, lifecycle, authority, and uninstall contracts in a separate accepted decision. |
-| `dev-toolkit` | 2.1.0; 12 nested skills | Candidate with adapter review | Eleven instruction-led skills are statically shared. The optional Claude Code enforcement hook for `one-way-door` remains adapter-required and is not load-bearing shared behavior. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Run activation and non-trigger fixtures for the portable subset and test the optional enforcement adapter separately. |
-| `journalism-core` | 1.6.0; 15 nested skills | Runtime pilot passed on the Claude package and Codex project-standards paths | Include the 15 shared skills. No commands, agents, or hooks are part of this package. The legacy-compatible Codex package and user-level standards paths remain install-only. | [J-release-1](#j-release-1-paired-journalism-core-runtime-pilot), [C-phase-1](#c-phase-1-repeatable-claude-install-canary), [K-phase-1](#k-phase-1-repeatable-codex-legacy-package-canary), [S-phase-1](#s-phase-1-full-journalism-core-standards-canary), [S-global-phase-1](#s-global-phase-1-user-level-journalism-core-standards-canary), [V-phase-1](#v-phase-1-repaired-standards-baseline) | Add a no-Claude-environment gate and scheduled runtime regression before a broader package support claim. |
+| `dev-toolkit` | 2.1.0; 14 nested skills | Candidate with adapter review | Thirteen instruction-led skills are statically shared. The optional Claude Code enforcement hook for `one-way-door` remains adapter-required and is not load-bearing shared behavior. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Run activation and non-trigger fixtures for the portable subset and test the optional enforcement adapter separately. |
+| `journalism-core` | 1.7.0; 16 nested skills | Runtime pilot passed for the earlier 15-skill snapshot; `meeting-transcript-actions` passed only the [S-smoke-1](#s-smoke-1-cross-client-selection-smoke) selection smoke | Include all 16 structurally shared skills. Runtime evidence covers the earlier 15-skill snapshot, not `meeting-transcript-actions`. No commands, agents, or hooks are part of this package. The legacy-compatible Codex package and user-level standards paths remain install-only. | [J-release-1](#j-release-1-paired-journalism-core-runtime-pilot), [S-smoke-1](#s-smoke-1-cross-client-selection-smoke), [C-phase-1](#c-phase-1-repeatable-claude-install-canary), [K-phase-1](#k-phase-1-repeatable-codex-legacy-package-canary), [S-phase-1](#s-phase-1-full-journalism-core-standards-canary), [S-global-phase-1](#s-global-phase-1-user-level-journalism-core-standards-canary), [V-phase-1](#v-phase-1-repaired-standards-baseline) | Add answer-level evidence for `meeting-transcript-actions`, then add a no-Claude-environment gate and scheduled runtime regression before a broader package support claim. |
+| `newsroom-agent-ops` | 1.0.0; nine nested skills | Candidate; eight of nine skills passed the [S-smoke-1](#s-smoke-1-cross-client-selection-smoke) selection smoke | Include the nine structurally shared skills. No commands, agents, or hooks are part of this package. Installation and public documentation do not establish runtime support. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; [S-smoke-1](#s-smoke-1-cross-client-selection-smoke) covers selection | Resolve the Codex unrelated-request miss for `email-request-intake`. Run representative recovery, authority-boundary, and external-action verification fixtures before making a runtime support claim. |
 | `okf-wiki` | 0.8.4; one root skill; scripts and generated Claude settings | Pre-set portable runtime pilot passed; optional Claude-output adapter remains | Include the tested Okf-1 path: standards discovery, installed spec and scaffolder reads, explicit project-relative scaffolding, validation, examples, and the generated OKF bundle. Exclude the general onboarding question flow and skill-root resolution; no Codex run has exercised them. The generated `.claude/settings.json` and hook scripts are an inert optional Claude Code adapter, not Codex configuration or lifecycle behavior. | [Okf-release-1](#okf-release-1-okf-wiki-no-claude-runtime-pilot), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [R-phase-1](#r-phase-1-phase-one-repository-checks) | Port and test general onboarding and skill-root resolution; add scheduled Okf-1 coverage against current Codex; test mixed-client hook trust separately before any cross-client lifecycle claim. |
 | `pdf-design` | 1.1.4; one root skill | Adapter required | Shared design guidance and assets now use skill-relative path discovery. Runtime path-resolution evidence is still pending, so no broader Codex claim is made. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add a no-Claude path-resolution fixture before changing the classification. |
 | `pdf-playground` | 1.3.7; one nested skill; eight commands; one hook file | Runtime pilot passed on the Codex project-standards path; Claude-only surfaces unclaimed | Include `$document-design`, its self-contained relative resources, and HTML generation through the tested project copy. Its historical project lock identity has an explicit migration. Exclude the Codex user-level and legacy-package paths, all eight Claude commands, preview lifecycle, and hook behavior. | [D-runtime-1](#d-runtime-1-document-design-codex-project-standards-pilot), [D-lock-release-1](#d-lock-release-1-document-design-standards-lock-migration), [V-phase-1](#v-phase-1-repaired-standards-baseline), and [F-phase-1](#f-phase-1-affected-claude-package-regression) | Add a no-Claude scheduled runtime regression and test user-level installation separately before broadening the claim. |
-| `project-templates-toolkit` | 1.1.0; three nested skills | Adapter required; paired contract fixtures added | All three skills are statically client-neutral. `project-memory` resolves the canonical instruction file; paired contract fixtures pin Claude `CLAUDE.md` and Codex `AGENTS.md` merge, nested-scope, non-trigger, output, and cleanup behavior. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; `scripts/project-memory-fixtures.test.mjs` guards both client contracts | Run both fixtures against installed clients before changing the package classification. |
+| `project-templates-toolkit` | 1.1.0; four nested skills | Adapter required; paired contract fixtures added | All four skills are statically client-neutral. `project-memory` resolves the canonical instruction file; paired contract fixtures pin Claude `CLAUDE.md` and Codex `AGENTS.md` merge, nested-scope, non-trigger, output, and cleanup behavior. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure; `scripts/project-memory-fixtures.test.mjs` guards both client contracts | Run both fixtures against installed clients before changing the package classification. |
 | `research-toolkit` | 1.1.4; six nested skills | Candidate | Include shared instruction-led skills. Network and external-content trust boundaries stay unchanged. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure | Add representative activation, non-activation, network-boundary, and resource checks. |
 | `security-toolkit` | 1.3.0; five nested skills; one command | Candidate with observed preflight and a resource-packaging gap; Claude-only command | The five shared skills remain candidates. Project-copy selection does not prove resource access or security enforcement. `/security-toolkit:hotpatch` and its sandbox lifecycle remain Claude-only. | [S-tool-preflight-1](#s-tool-preflight-1-security-toolkit-project-copy-preflight), [V-phase-1](#v-phase-1-repaired-standards-baseline), [R-phase-1](#r-phase-1-phase-one-repository-checks) | Resolve standalone supply-chain resource packaging; rerun with working sandbox reads and boundary traces. Do not map `hotpatch` without a separately accepted authority, sandbox, cooldown, failure, and cleanup design. |
 | `superjawn` | 2.1.0; 13 nested skills | Not assessed | No package-wide claim. Shared instructions now use generic task tracking, instruction files, and optional worker dispatch, but runtime evidence is pending. | [V-phase-1](#v-phase-1-repaired-standards-baseline) covers structure only | Evaluate one skill at a time with client-specific tool traces. |
@@ -658,7 +704,7 @@ The `dev-toolkit` row above is package-level. The per-skill breakdown lives in
 [dev-toolkit-portability-matrix.md](dev-toolkit-portability-matrix.md),
 generated from the repository by `scripts/dev-toolkit-portability.mjs` and
 guarded against drift by `scripts/dev-toolkit-portability.test.mjs`. It
-discovers 12 skills: 11 shared, 1 adapter-required (`one-way-door`), and 0
+discovers 14 skills: 13 shared, 1 adapter-required (`one-way-door`), and 0
 Claude-only. `one-way-door` stays adapter-required because its optional Claude
 Code enforcement hook has client-specific lifecycle behavior. The shared skill
 does not depend on that hook.

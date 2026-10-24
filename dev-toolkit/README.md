@@ -1,6 +1,6 @@
 # dev-toolkit
 
-Twelve development-focused skills for journalists, researchers, and small newsroom dev teams.
+Fourteen development-focused skills for journalists, researchers, and small newsroom dev teams.
 
 ## Skills in this plugin
 
@@ -13,7 +13,9 @@ Twelve development-focused skills for journalists, researchers, and small newsro
 | electron-dev | Electron security model (contextIsolation, sandbox), IPC patterns, packaging |
 | mobile-debugging | Eruda, vConsole, Chrome DevTools on Android, Safari Web Inspector for iOS |
 | one-way-door | Block irreversible architectural decisions during planning |
+| ponytail-dev | Minimal-code implementation and review with proportional checks |
 | python-pipeline | Data pipeline patterns (pandas, polars, DuckDB, asyncio) |
+| surface-completeness | UI coverage, design-system compliance, and current documentation for frontend changes |
 | vibe-coding | AI-assisted development workflow (Claude Code, Cursor, Aider, Continue) |
 | web-scraping | Ethical scraping patterns (Playwright, robots.txt, anti-bot, terms-of-service) |
 | web-ui-best-practices | Container queries, `:has()`, view transitions, scroll-driven animations |
@@ -37,5 +39,5 @@ cp -r dev-toolkit/skills/director ~/.claude/skills/
 
 ## See also
 
-- [`journalism-core`](../journalism-core/README.md), 15 skills for reporting, verification, publishing
+- [`journalism-core`](../journalism-core/README.md), 16 skills for reporting, verification, publishing
 - [`research-toolkit`](../research-toolkit/README.md), 6 skills for research, archives, academic workflows

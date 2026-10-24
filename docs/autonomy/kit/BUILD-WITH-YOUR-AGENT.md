@@ -289,6 +289,9 @@ dry-run it, and hand it back.
 
 ## A persistent attendant (advanced)
 
+For this pattern as a reusable skill, see
+[unattended-agent-runs](https://skills.amditis.tech/unattended-agent-runs/).
+
 The starter loop spawns a fresh session for each wake and kills it at a hard
 timeout. That is simple and bounds cost, but it can cut off long, legitimate work.
 Once the starter loop is trusted, some owners move to one long-lived, supervised

@@ -1,6 +1,6 @@
 # journalism-core
 
-Fifteen core journalism skills for Claude Code, covering reporting, verification, and publishing workflows for working journalists.
+Sixteen core journalism skills for Claude Code and Codex, covering reporting, verification, and publishing workflows for working journalists.
 
 ## What's in this plugin
 
@@ -15,6 +15,7 @@ Fifteen core journalism skills for Claude Code, covering reporting, verification
 | **foia-requests** | Federal FOIA and state OPRA request templates with current statutory citations (FOIA Improvement Act 2016, NJ OPRA reform 2024) |
 | **interview-prep** | Pre-interview research, question frameworks, and consent scripts |
 | **interview-transcription** | Whisper / WhisperX transcription pipelines with speaker diarization |
+| **meeting-transcript-actions** | Verified meeting notes, decisions, owned actions, and unresolved questions |
 | **newsletter-publishing** | Email newsletter workflows including 2024-2026 Gmail / Yahoo / Outlook bulk-sender compliance |
 | **newsroom-style** | AP Style enforcement for journalism writing |
 | **photo-metadata** | Embed caption, byline, credit, alt text, keywords, copyright or Creative Commons license, AI-source labeling (IPTC Digital Source Type), and Google-Images licensing into a photo's IPTC/EXIF/XMP metadata; strip GPS for source protection and read C2PA Content Credentials, for wire and archive use |
@@ -39,7 +40,8 @@ A few skills in this bundle reference siblings in other bundles. The references 
 
 - **source-verification** points to `social-media-intelligence` (deeper account analysis) and `web-archiving` (full archiving workflows)
 - **interview-prep** points to `web-archiving` (recovering deleted social media content)
-- **foia-requests** does not depend on other bundles
+- **meeting-transcript-actions** points to `record-reconciliation` in newsroom-agent-ops (canonical records and privacy controls)
+- **foia-requests** points to `deadline-and-reply-tracking` (statutory clocks, responses, and appeals)
 - **brazil-records-requests** is a companion to `foia-requests` (Brazil vs. US jurisdiction) and does not depend on other bundles
 
 ## Maintenance

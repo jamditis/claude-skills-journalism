@@ -855,6 +855,10 @@ video {
   --tw-text-opacity: 1;
   color: rgb(30 64 175 / var(--tw-text-opacity, 1));
 }
+.text-clay {
+  --tw-text-opacity: 1;
+  color: rgb(45 42 38 / var(--tw-text-opacity, 1));
+}
 .text-clay\/70 {
   color: rgb(45 42 38 / 0.7);
 }
@@ -926,6 +930,9 @@ video {
 .hover\:text-ink:hover {
   --tw-text-opacity: 1;
   color: rgb(18 18 18 / var(--tw-text-opacity, 1));
+}
+.hover\:underline:hover {
+  text-decoration-line: underline;
 }
 @media (min-width: 768px) {
 

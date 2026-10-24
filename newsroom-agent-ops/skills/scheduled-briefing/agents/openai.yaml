@@ -1,0 +1,3 @@
+interface:
+  display_name: "Scheduled briefing"
+  short_description: "Build a concise briefing from current newsroom sources."
