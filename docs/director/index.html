@@ -109,7 +109,8 @@
 /dev-toolkit:director</code></pre>
             <p class="text-clay mb-4">For the literal <code>/director</code> command, install the standalone skill.</p>
             <p class="text-clay mb-4">Agent Skills route for supported clients:</p>
-            <pre class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>cp -r dev-toolkit/skills/director ~/.claude/skills/   # Claude Code
+            <pre class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>mkdir -p ~/.claude/skills ~/.agents/skills
+cp -r dev-toolkit/skills/director ~/.claude/skills/   # Claude Code
 cp -r dev-toolkit/skills/director ~/.agents/skills/   # Codex
 # Claude Code: /director
 # Codex: $director</code></pre>

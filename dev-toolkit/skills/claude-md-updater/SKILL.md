@@ -9,10 +9,10 @@ Analyze the current conversation to identify information worth persisting in the
 
 Resolve the target before drafting:
 
-1. If `AGENTS.md` exists, update it.
+1. If `AGENTS.md` exists, update it. In Claude Code, if there is no `CLAUDE.md`, also propose a one-line `CLAUDE.md` import of `@AGENTS.md`. Claude Code loads `CLAUDE.md`, not `AGENTS.md`.
 2. If only `CLAUDE.md` exists, update it.
 3. If both exist and either imports the other, update the imported canonical file.
-4. If neither exists, create `AGENTS.md`. In Claude Code, also propose a one-line `CLAUDE.md` import of `@AGENTS.md`.
+4. If neither exists, create `AGENTS.md`. In Claude Code, also propose the one-line `CLAUDE.md` import.
 
 ## What to look for
 

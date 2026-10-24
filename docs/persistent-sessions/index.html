@@ -736,6 +736,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 </div>
                 <div class="terminal-body text-xs leading-relaxed">
                     #!/bin/sh<br>
+                    <span class="terminal-dim"># Job control puts each command in its own foreground group, so tmux reports claude, not sh.</span><br>
+                    set -m<br>
                     <span class="terminal-dim"># Resume the supervised conversation by its pinned ID; create it on first start.</span><br>
                     id_file="$HOME/.config/agent-session/id"<br>
                     if [ ! -s "$id_file" ]; then<br>
@@ -747,7 +749,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     "$HOME/.local/bin/claude" --resume "$id" || exec "$HOME/.local/bin/claude" --session-id "$id"
                 </div>
             </div>
-            <p class="text-clay/80 text-sm mt-3 mb-4">Make it executable with <code>chmod +x</code>. The launcher relies only on two Claude Code errors, not on where Claude stores conversations: <code>--resume</code> exits at once with "No conversation found" for an ID it has not saved, and <code>--session-id</code> exits at once with "already in use" for one it has. So a failed first start is created again under the same ID, and a resumed session that crashes ends the launcher, and systemd starts it again. Before you enable the service, run <code>claude</code> once by hand in the project folder and accept the folder-trust prompt; otherwise the service waits at that prompt. Codex cannot choose an ID up front: start the session once by hand, write its session ID to the same file, and replace the last line with <code>exec /path/to/codex resume --no-daemon "$(cat "$id_file")"</code>. Without <code>--no-daemon</code>, Codex can run tools in a shared app-server outside this unit's limits.</p>
+            <p class="text-clay/80 text-sm mt-3 mb-4">Make it executable with <code>chmod +x</code>. The launcher relies only on two Claude Code errors, not on where Claude stores conversations: <code>--resume</code> exits at once with "No conversation found" for an ID it has not saved, and <code>--session-id</code> exits at once with "already in use" for one it has. So a failed first start is created again under the same ID, and a resumed session that crashes ends the launcher, and systemd starts it again. Keep <code>set -m</code>: without it, the resumed <code>claude</code> runs as a child of the launcher shell, and <code>pane_current_command</code> reports <code>sh</code>. The scheduler check above and the reboot check below would then miss the running agent. Before you enable the service, run <code>claude</code> once by hand in the project folder and accept the folder-trust prompt; otherwise the service waits at that prompt. Codex cannot choose an ID up front: start the session once by hand, write its session ID to the same file, and replace the last line with <code>exec /path/to/codex resume --no-daemon "$(cat "$id_file")"</code>. Without <code>--no-daemon</code>, Codex can run tools in a shared app-server outside this unit's limits.</p>
             <div class="terminal-bar mt-4">
                 <div class="terminal-titlebar">
                     <div class="terminal-dot bg-red-400"></div>
