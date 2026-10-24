@@ -1,0 +1,4243 @@
+{
+  "schemaVersion": 1,
+  "scoring": "selection",
+  "cases": [
+    {
+      "id": "accessibility-compliance-activation",
+      "skill": "accessibility-compliance",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Audit a local-news article page for WCAG 2.2 AA, including image alternatives, keyboard focus, captions, and an interactive chart.",
+      "expect": {
+        "decision": "use",
+        "branch": "accessibility audit",
+        "branchAlternatives": [
+          "accessibility audit",
+          "WCAG review"
+        ],
+        "terms": [
+          "WCAG",
+          "keyboard"
+        ]
+      }
+    },
+    {
+      "id": "accessibility-compliance-implicit",
+      "skill": "accessibility-compliance",
+      "package": "dev-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Audit a local-news article page for WCAG 2.2 AA, including image alternatives, keyboard focus, captions, and an interactive chart.",
+      "expect": {
+        "decision": "use",
+        "branch": "accessibility audit",
+        "branchAlternatives": [
+          "accessibility audit",
+          "WCAG review"
+        ],
+        "terms": [
+          "WCAG",
+          "keyboard"
+        ]
+      }
+    },
+    {
+      "id": "accessibility-compliance-unrelated",
+      "skill": "accessibility-compliance",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Copyedit a verified city council story for AP style and active voice. The page layout is out of scope.",
+      "expect": {
+        "decision": "reject",
+        "branch": "copyediting",
+        "branchAlternatives": [
+          "copyediting",
+          "newsroom style"
+        ],
+        "terms": [
+          "style"
+        ]
+      }
+    },
+    {
+      "id": "claude-md-updater-activation",
+      "skill": "claude-md-updater",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Review this completed session and propose one scoped update to the project instruction file for the reusable release lesson we learned.",
+      "expect": {
+        "decision": "use",
+        "branch": "instruction update",
+        "branchAlternatives": [
+          "instruction update",
+          "project memory"
+        ],
+        "terms": [
+          "instruction",
+          "lesson"
+        ]
+      }
+    },
+    {
+      "id": "claude-md-updater-implicit",
+      "skill": "claude-md-updater",
+      "package": "dev-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Review this completed session and propose one scoped update to the project instruction file for the reusable release lesson we learned.",
+      "expect": {
+        "decision": "use",
+        "branch": "instruction update",
+        "branchAlternatives": [
+          "instruction update",
+          "project memory"
+        ],
+        "terms": [
+          "instruction",
+          "lesson"
+        ]
+      }
+    },
+    {
+      "id": "claude-md-updater-unrelated",
+      "skill": "claude-md-updater",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Fix a one-line spelling error in an application error message. Do not change project instructions.",
+      "expect": {
+        "decision": "reject",
+        "branch": "code edit",
+        "branchAlternatives": [
+          "code edit",
+          "ordinary implementation"
+        ],
+        "terms": [
+          "spelling"
+        ]
+      }
+    },
+    {
+      "id": "context-engineering-fundamentals-activation",
+      "skill": "context-engineering-fundamentals",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "A long investigation keeps dropping early constraints and contradicting prior evidence. Design bounded checkpoints and an evidence-loading strategy.",
+      "expect": {
+        "decision": "use",
+        "branch": "context management",
+        "branchAlternatives": [
+          "context management",
+          "context recovery"
+        ],
+        "terms": [
+          "checkpoint",
+          "evidence"
+        ]
+      }
+    },
+    {
+      "id": "context-engineering-fundamentals-implicit",
+      "skill": "context-engineering-fundamentals",
+      "package": "dev-toolkit",
+      "category": "implicit-activation",
+      "prompt": "A long investigation keeps dropping early constraints and contradicting prior evidence. Design bounded checkpoints and an evidence-loading strategy.",
+      "expect": {
+        "decision": "use",
+        "branch": "context management",
+        "branchAlternatives": [
+          "context management",
+          "context recovery"
+        ],
+        "terms": [
+          "checkpoint",
+          "evidence"
+        ]
+      }
+    },
+    {
+      "id": "context-engineering-fundamentals-unrelated",
+      "skill": "context-engineering-fundamentals",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Fix an isolated off-by-one error in a five-line parser. The failing input and expected output are supplied.",
+      "expect": {
+        "decision": "reject",
+        "branch": "debugging",
+        "branchAlternatives": [
+          "debugging",
+          "bug fix"
+        ],
+        "terms": [
+          "parser"
+        ]
+      }
+    },
+    {
+      "id": "director-activation",
+      "skill": "director",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Use the director skill explicitly to divide this approved migration into research, implementation, and verification work for configured workers.",
+      "expect": {
+        "decision": "use",
+        "branch": "direction",
+        "branchAlternatives": [
+          "direction",
+          "delegation"
+        ],
+        "terms": [
+          "workers",
+          "verification"
+        ]
+      }
+    },
+    {
+      "id": "director-unrelated",
+      "skill": "director",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Calculate the percentage increase from 80 to 92 and show the arithmetic.",
+      "expect": {
+        "decision": "reject",
+        "branch": "calculation",
+        "branchAlternatives": [
+          "calculation",
+          "arithmetic"
+        ],
+        "terms": [
+          "percent"
+        ]
+      }
+    },
+    {
+      "id": "electron-dev-activation",
+      "skill": "electron-dev",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Build a packaged desktop app with a React renderer, a narrow preload bridge, validated IPC, a tray window, and signed releases.",
+      "expect": {
+        "decision": "use",
+        "branch": "electron development",
+        "branchAlternatives": [
+          "electron development",
+          "desktop application"
+        ],
+        "terms": [
+          "preload",
+          "IPC"
+        ]
+      }
+    },
+    {
+      "id": "electron-dev-implicit",
+      "skill": "electron-dev",
+      "package": "dev-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Build a packaged desktop app with a React renderer, a narrow preload bridge, validated IPC, a tray window, and signed releases.",
+      "expect": {
+        "decision": "use",
+        "branch": "electron development",
+        "branchAlternatives": [
+          "electron development",
+          "desktop application"
+        ],
+        "terms": [
+          "preload",
+          "IPC"
+        ]
+      }
+    },
+    {
+      "id": "electron-dev-unrelated",
+      "skill": "electron-dev",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Build a responsive browser-only dashboard for an existing web server. It will never run as a desktop application.",
+      "expect": {
+        "decision": "reject",
+        "branch": "web interface",
+        "branchAlternatives": [
+          "web interface",
+          "frontend development"
+        ],
+        "terms": [
+          "browser"
+        ]
+      }
+    },
+    {
+      "id": "mobile-debugging-activation",
+      "skill": "mobile-debugging",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "A layout failure occurs only in Safari on a physical phone. Set up remote inspection and capture console, network, and viewport evidence.",
+      "expect": {
+        "decision": "use",
+        "branch": "mobile debugging",
+        "branchAlternatives": [
+          "mobile debugging",
+          "remote inspection"
+        ],
+        "terms": [
+          "Safari",
+          "console"
+        ]
+      }
+    },
+    {
+      "id": "mobile-debugging-implicit",
+      "skill": "mobile-debugging",
+      "package": "dev-toolkit",
+      "category": "implicit-activation",
+      "prompt": "A layout failure occurs only in Safari on a physical phone. Set up remote inspection and capture console, network, and viewport evidence.",
+      "expect": {
+        "decision": "use",
+        "branch": "mobile debugging",
+        "branchAlternatives": [
+          "mobile debugging",
+          "remote inspection"
+        ],
+        "terms": [
+          "Safari",
+          "console"
+        ]
+      }
+    },
+    {
+      "id": "mobile-debugging-unrelated",
+      "skill": "mobile-debugging",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Diagnose a server process that returns HTTP 500 by using its logs and focused unit test.",
+      "expect": {
+        "decision": "reject",
+        "branch": "server debugging",
+        "branchAlternatives": [
+          "server debugging",
+          "backend debugging"
+        ],
+        "terms": [
+          "server"
+        ]
+      }
+    },
+    {
+      "id": "one-way-door-activation",
+      "skill": "one-way-door",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Review a proposed authentication boundary and irreversible event schema before the team commits to either design.",
+      "expect": {
+        "decision": "use",
+        "branch": "one way decision",
+        "branchAlternatives": [
+          "one way decision",
+          "irreversible decision"
+        ],
+        "terms": [
+          "reversible",
+          "boundary"
+        ]
+      }
+    },
+    {
+      "id": "one-way-door-implicit",
+      "skill": "one-way-door",
+      "package": "dev-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Review a proposed authentication boundary and irreversible event schema before the team commits to either design.",
+      "expect": {
+        "decision": "use",
+        "branch": "one way decision",
+        "branchAlternatives": [
+          "one way decision",
+          "irreversible decision"
+        ],
+        "terms": [
+          "reversible",
+          "boundary"
+        ]
+      }
+    },
+    {
+      "id": "one-way-door-unrelated",
+      "skill": "one-way-door",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Change the color of a local development status label. The change is easy to revert and has no external effect.",
+      "expect": {
+        "decision": "reject",
+        "branch": "interface edit",
+        "branchAlternatives": [
+          "interface edit",
+          "small change"
+        ],
+        "terms": [
+          "color"
+        ]
+      }
+    },
+    {
+      "id": "python-pipeline-activation",
+      "skill": "python-pipeline",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Build a reproducible Python batch pipeline that validates CSV schemas, joins large tables, writes Parquet, and records rejected rows.",
+      "expect": {
+        "decision": "use",
+        "branch": "data pipeline",
+        "branchAlternatives": [
+          "data pipeline",
+          "Python pipeline"
+        ],
+        "terms": [
+          "schema",
+          "Parquet"
+        ]
+      }
+    },
+    {
+      "id": "python-pipeline-implicit",
+      "skill": "python-pipeline",
+      "package": "dev-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Build a reproducible Python batch pipeline that validates CSV schemas, joins large tables, writes Parquet, and records rejected rows.",
+      "expect": {
+        "decision": "use",
+        "branch": "data pipeline",
+        "branchAlternatives": [
+          "data pipeline",
+          "Python pipeline"
+        ],
+        "terms": [
+          "schema",
+          "Parquet"
+        ]
+      }
+    },
+    {
+      "id": "python-pipeline-unrelated",
+      "skill": "python-pipeline",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Add one pure function that formats an ISO timestamp in an existing command-line application.",
+      "expect": {
+        "decision": "reject",
+        "branch": "software development",
+        "branchAlternatives": [
+          "software development",
+          "ordinary implementation"
+        ],
+        "terms": [
+          "timestamp"
+        ]
+      }
+    },
+    {
+      "id": "vibe-coding-activation",
+      "skill": "vibe-coding",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Set up a guarded AI-assisted coding workflow for a reporter who will prototype an app without a software background.",
+      "expect": {
+        "decision": "use",
+        "branch": "assisted development",
+        "branchAlternatives": [
+          "assisted development",
+          "guided coding"
+        ],
+        "terms": [
+          "version control",
+          "verification"
+        ]
+      }
+    },
+    {
+      "id": "vibe-coding-implicit",
+      "skill": "vibe-coding",
+      "package": "dev-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Set up a guarded AI-assisted coding workflow for a reporter who will prototype an app without a software background.",
+      "expect": {
+        "decision": "use",
+        "branch": "assisted development",
+        "branchAlternatives": [
+          "assisted development",
+          "guided coding"
+        ],
+        "terms": [
+          "version control",
+          "verification"
+        ]
+      }
+    },
+    {
+      "id": "vibe-coding-unrelated",
+      "skill": "vibe-coding",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Review a completed patch for a SQL injection flaw and report whether parameter binding is safe.",
+      "expect": {
+        "decision": "reject",
+        "branch": "security review",
+        "branchAlternatives": [
+          "security review",
+          "code review"
+        ],
+        "terms": [
+          "SQL injection"
+        ]
+      }
+    },
+    {
+      "id": "web-scraping-activation",
+      "skill": "web-scraping",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Collect public meeting agenda pages into a sourced dataset. Honor robots rules, bound request rates, and handle access failures.",
+      "expect": {
+        "decision": "use",
+        "branch": "web scraping",
+        "branchAlternatives": [
+          "web scraping",
+          "content extraction"
+        ],
+        "terms": [
+          "robots",
+          "rate limits"
+        ]
+      }
+    },
+    {
+      "id": "web-scraping-implicit",
+      "skill": "web-scraping",
+      "package": "dev-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Collect public meeting agenda pages into a sourced dataset. Honor robots rules, bound request rates, and handle access failures.",
+      "expect": {
+        "decision": "use",
+        "branch": "web scraping",
+        "branchAlternatives": [
+          "web scraping",
+          "content extraction"
+        ],
+        "terms": [
+          "robots",
+          "rate limits"
+        ]
+      }
+    },
+    {
+      "id": "web-scraping-unrelated",
+      "skill": "web-scraping",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Use a vendor's documented SDK to query the authenticated JSON API for records in our own account.",
+      "expect": {
+        "decision": "reject",
+        "branch": "API integration",
+        "branchAlternatives": [
+          "API integration",
+          "SDK integration"
+        ],
+        "terms": [
+          "SDK"
+        ]
+      }
+    },
+    {
+      "id": "web-ui-best-practices-activation",
+      "skill": "web-ui-best-practices",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Review a dashboard for interaction latency, keyboard operation, responsive layout, loading states, empty states, and useful error copy.",
+      "expect": {
+        "decision": "use",
+        "branch": "interface review",
+        "branchAlternatives": [
+          "interface review",
+          "web UI review"
+        ],
+        "terms": [
+          "keyboard",
+          "loading"
+        ]
+      }
+    },
+    {
+      "id": "web-ui-best-practices-implicit",
+      "skill": "web-ui-best-practices",
+      "package": "dev-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Review a dashboard for interaction latency, keyboard operation, responsive layout, loading states, empty states, and useful error copy.",
+      "expect": {
+        "decision": "use",
+        "branch": "interface review",
+        "branchAlternatives": [
+          "interface review",
+          "web UI review"
+        ],
+        "terms": [
+          "keyboard",
+          "loading"
+        ]
+      }
+    },
+    {
+      "id": "web-ui-best-practices-unrelated",
+      "skill": "web-ui-best-practices",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Optimize a database query plan in a backend service without changing any screen or user interaction.",
+      "expect": {
+        "decision": "reject",
+        "branch": "database performance",
+        "branchAlternatives": [
+          "database performance",
+          "query optimization"
+        ],
+        "terms": [
+          "database"
+        ]
+      }
+    },
+    {
+      "id": "zero-build-frontend-activation",
+      "skill": "zero-build-frontend",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Build a small interactive map as static files for a host that cannot run a build step or server-side code.",
+      "expect": {
+        "decision": "use",
+        "branch": "zero build",
+        "branchAlternatives": [
+          "zero build",
+          "static frontend"
+        ],
+        "terms": [
+          "static",
+          "browser"
+        ]
+      }
+    },
+    {
+      "id": "zero-build-frontend-implicit",
+      "skill": "zero-build-frontend",
+      "package": "dev-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Build a small interactive map as static files for a host that cannot run a build step or server-side code.",
+      "expect": {
+        "decision": "use",
+        "branch": "zero build",
+        "branchAlternatives": [
+          "zero build",
+          "static frontend"
+        ],
+        "terms": [
+          "static",
+          "browser"
+        ]
+      }
+    },
+    {
+      "id": "zero-build-frontend-unrelated",
+      "skill": "zero-build-frontend",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Tune a database connection pool for a background worker with no browser-facing output.",
+      "expect": {
+        "decision": "reject",
+        "branch": "backend performance",
+        "branchAlternatives": [
+          "backend performance",
+          "database tuning"
+        ],
+        "terms": [
+          "database"
+        ]
+      }
+    },
+    {
+      "id": "ai-writing-detox-activation",
+      "skill": "ai-writing-detox",
+      "package": "journalism-core",
+      "category": "activation",
+      "prompt": "Rewrite this press release draft to remove canned transitions, vague claims, inflated language, and repetitive sentence patterns.",
+      "expect": {
+        "decision": "use",
+        "branch": "writing detox",
+        "branchAlternatives": [
+          "writing detox",
+          "prose revision"
+        ],
+        "terms": [
+          "specific",
+          "language"
+        ]
+      }
+    },
+    {
+      "id": "ai-writing-detox-implicit",
+      "skill": "ai-writing-detox",
+      "package": "journalism-core",
+      "category": "implicit-activation",
+      "prompt": "Rewrite this press release draft to remove canned transitions, vague claims, inflated language, and repetitive sentence patterns.",
+      "expect": {
+        "decision": "use",
+        "branch": "writing detox",
+        "branchAlternatives": [
+          "writing detox",
+          "prose revision"
+        ],
+        "terms": [
+          "specific",
+          "language"
+        ]
+      }
+    },
+    {
+      "id": "ai-writing-detox-unrelated",
+      "skill": "ai-writing-detox",
+      "package": "journalism-core",
+      "category": "unrelated-non-trigger",
+      "prompt": "Verify whether a quoted unemployment statistic matches the original government table. Do not rewrite the story.",
+      "expect": {
+        "decision": "reject",
+        "branch": "fact checking",
+        "branchAlternatives": [
+          "fact checking",
+          "data verification"
+        ],
+        "terms": [
+          "source"
+        ]
+      }
+    },
+    {
+      "id": "brazil-records-requests-activation",
+      "skill": "brazil-records-requests",
+      "package": "journalism-core",
+      "category": "activation",
+      "prompt": "Draft a public records request to a Brazilian federal agency through Fala.BR and outline the CGU appeal path.",
+      "expect": {
+        "decision": "use",
+        "branch": "Brazil records",
+        "branchAlternatives": [
+          "Brazil records",
+          "LAI request"
+        ],
+        "terms": [
+          "Fala.BR",
+          "appeal"
+        ]
+      }
+    },
+    {
+      "id": "brazil-records-requests-implicit",
+      "skill": "brazil-records-requests",
+      "package": "journalism-core",
+      "category": "implicit-activation",
+      "prompt": "Draft a public records request to a Brazilian federal agency through Fala.BR and outline the CGU appeal path.",
+      "expect": {
+        "decision": "use",
+        "branch": "Brazil records",
+        "branchAlternatives": [
+          "Brazil records",
+          "LAI request"
+        ],
+        "terms": [
+          "Fala.BR",
+          "appeal"
+        ]
+      }
+    },
+    {
+      "id": "brazil-records-requests-unrelated",
+      "skill": "brazil-records-requests",
+      "package": "journalism-core",
+      "category": "unrelated-non-trigger",
+      "prompt": "Draft a federal public records request to a United States agency under its disclosure statute.",
+      "expect": {
+        "decision": "reject",
+        "branch": "FOIA request",
+        "branchAlternatives": [
+          "FOIA request",
+          "public records"
+        ],
+        "terms": [
+          "federal"
+        ]
+      }
+    },
+    {
+      "id": "crisis-communications-activation",
+      "skill": "crisis-communications",
+      "package": "journalism-core",
+      "category": "activation",
+      "prompt": "A fast-moving chemical spill is closing schools. Set a rapid verification, update, correction, and stakeholder communication workflow.",
+      "expect": {
+        "decision": "use",
+        "branch": "crisis response",
+        "branchAlternatives": [
+          "crisis response",
+          "breaking news"
+        ],
+        "terms": [
+          "verification",
+          "updates"
+        ]
+      }
+    },
+    {
+      "id": "crisis-communications-implicit",
+      "skill": "crisis-communications",
+      "package": "journalism-core",
+      "category": "implicit-activation",
+      "prompt": "A fast-moving chemical spill is closing schools. Set a rapid verification, update, correction, and stakeholder communication workflow.",
+      "expect": {
+        "decision": "use",
+        "branch": "crisis response",
+        "branchAlternatives": [
+          "crisis response",
+          "breaking news"
+        ],
+        "terms": [
+          "verification",
+          "updates"
+        ]
+      }
+    },
+    {
+      "id": "crisis-communications-unrelated",
+      "skill": "crisis-communications",
+      "package": "journalism-core",
+      "category": "unrelated-non-trigger",
+      "prompt": "Plan a monthly evergreen gardening newsletter with no breaking event or urgent deadline.",
+      "expect": {
+        "decision": "reject",
+        "branch": "newsletter planning",
+        "branchAlternatives": [
+          "newsletter planning",
+          "editorial planning"
+        ],
+        "terms": [
+          "newsletter"
+        ]
+      }
+    },
+    {
+      "id": "data-journalism-activation",
+      "skill": "data-journalism",
+      "package": "journalism-core",
+      "category": "activation",
+      "prompt": "Clean a city contracts CSV, analyze spending changes, visualize the result, and document a reproducible reporting method.",
+      "expect": {
+        "decision": "use",
+        "branch": "data journalism",
+        "branchAlternatives": [
+          "data journalism",
+          "data analysis"
+        ],
+        "terms": [
+          "methodology",
+          "reproducible"
+        ]
+      }
+    },
+    {
+      "id": "data-journalism-implicit",
+      "skill": "data-journalism",
+      "package": "journalism-core",
+      "category": "implicit-activation",
+      "prompt": "Clean a city contracts CSV, analyze spending changes, visualize the result, and document a reproducible reporting method.",
+      "expect": {
+        "decision": "use",
+        "branch": "data journalism",
+        "branchAlternatives": [
+          "data journalism",
+          "data analysis"
+        ],
+        "terms": [
+          "methodology",
+          "reproducible"
+        ]
+      }
+    },
+    {
+      "id": "data-journalism-unrelated",
+      "skill": "data-journalism",
+      "package": "journalism-core",
+      "category": "unrelated-non-trigger",
+      "prompt": "Copyedit a narrative feature for clarity and AP style. It contains no dataset, calculation, map, or chart.",
+      "expect": {
+        "decision": "reject",
+        "branch": "copyediting",
+        "branchAlternatives": [
+          "copyediting",
+          "newsroom style"
+        ],
+        "terms": [
+          "style"
+        ]
+      }
+    },
+    {
+      "id": "editorial-workflow-activation",
+      "skill": "editorial-workflow",
+      "package": "journalism-core",
+      "category": "activation",
+      "prompt": "Set up an assignment board with owners, deadlines, editing stages, publication dates, and a weekly editorial calendar.",
+      "expect": {
+        "decision": "use",
+        "branch": "editorial workflow",
+        "branchAlternatives": [
+          "editorial workflow",
+          "assignment tracking"
+        ],
+        "terms": [
+          "owners",
+          "deadlines"
+        ]
+      }
+    },
+    {
+      "id": "editorial-workflow-implicit",
+      "skill": "editorial-workflow",
+      "package": "journalism-core",
+      "category": "implicit-activation",
+      "prompt": "Set up an assignment board with owners, deadlines, editing stages, publication dates, and a weekly editorial calendar.",
+      "expect": {
+        "decision": "use",
+        "branch": "editorial workflow",
+        "branchAlternatives": [
+          "editorial workflow",
+          "assignment tracking"
+        ],
+        "terms": [
+          "owners",
+          "deadlines"
+        ]
+      }
+    },
+    {
+      "id": "editorial-workflow-unrelated",
+      "skill": "editorial-workflow",
+      "package": "journalism-core",
+      "category": "unrelated-non-trigger",
+      "prompt": "Calculate a confidence interval for one survey estimate and explain the formula. Do not manage assignments.",
+      "expect": {
+        "decision": "reject",
+        "branch": "statistical analysis",
+        "branchAlternatives": [
+          "statistical analysis",
+          "data analysis"
+        ],
+        "terms": [
+          "confidence interval"
+        ]
+      }
+    },
+    {
+      "id": "fact-check-workflow-activation",
+      "skill": "fact-check-workflow",
+      "package": "journalism-core",
+      "category": "activation",
+      "prompt": "Verify a candidate's claim about school funding, document primary sources, rate the claim, and set pre-publication checks.",
+      "expect": {
+        "decision": "use",
+        "branch": "fact checking",
+        "branchAlternatives": [
+          "fact checking",
+          "claim review"
+        ],
+        "terms": [
+          "sources",
+          "rating"
+        ]
+      }
+    },
+    {
+      "id": "fact-check-workflow-implicit",
+      "skill": "fact-check-workflow",
+      "package": "journalism-core",
+      "category": "implicit-activation",
+      "prompt": "Verify a candidate's claim about school funding, document primary sources, rate the claim, and set pre-publication checks.",
+      "expect": {
+        "decision": "use",
+        "branch": "fact checking",
+        "branchAlternatives": [
+          "fact checking",
+          "claim review"
+        ],
+        "terms": [
+          "sources",
+          "rating"
+        ]
+      }
+    },
+    {
+      "id": "fact-check-workflow-unrelated",
+      "skill": "fact-check-workflow",
+      "package": "journalism-core",
+      "category": "unrelated-non-trigger",
+      "prompt": "Tighten the wording of a fully verified 200-word brief and write a concise headline.",
+      "expect": {
+        "decision": "reject",
+        "branch": "newsroom style",
+        "branchAlternatives": [
+          "newsroom style",
+          "copyediting"
+        ],
+        "terms": [
+          "headline"
+        ]
+      }
+    },
+    {
+      "id": "foia-requests-activation",
+      "skill": "foia-requests",
+      "package": "journalism-core",
+      "category": "activation",
+      "prompt": "Draft a federal records request for inspection reports, create a tracking log, and prepare for exemptions and an appeal.",
+      "expect": {
+        "decision": "use",
+        "branch": "FOIA request",
+        "branchAlternatives": [
+          "FOIA request",
+          "records request"
+        ],
+        "terms": [
+          "exemptions",
+          "appeal"
+        ]
+      }
+    },
+    {
+      "id": "foia-requests-implicit",
+      "skill": "foia-requests",
+      "package": "journalism-core",
+      "category": "implicit-activation",
+      "prompt": "Draft a federal records request for inspection reports, create a tracking log, and prepare for exemptions and an appeal.",
+      "expect": {
+        "decision": "use",
+        "branch": "FOIA request",
+        "branchAlternatives": [
+          "FOIA request",
+          "records request"
+        ],
+        "terms": [
+          "exemptions",
+          "appeal"
+        ]
+      }
+    },
+    {
+      "id": "foia-requests-unrelated",
+      "skill": "foia-requests",
+      "package": "journalism-core",
+      "category": "unrelated-non-trigger",
+      "prompt": "Prepare questions for an on-record interview with the agency director. No records request is needed.",
+      "expect": {
+        "decision": "reject",
+        "branch": "interview preparation",
+        "branchAlternatives": [
+          "interview preparation",
+          "source interview"
+        ],
+        "terms": [
+          "questions"
+        ]
+      }
+    },
+    {
+      "id": "interview-prep-activation",
+      "skill": "interview-prep",
+      "package": "journalism-core",
+      "category": "activation",
+      "prompt": "Research a housing expert, build a question ladder, plan follow-ups, and check recording-consent rules before the interview.",
+      "expect": {
+        "decision": "use",
+        "branch": "interview preparation",
+        "branchAlternatives": [
+          "interview preparation",
+          "question planning"
+        ],
+        "terms": [
+          "questions",
+          "consent"
+        ]
+      }
+    },
+    {
+      "id": "interview-prep-implicit",
+      "skill": "interview-prep",
+      "package": "journalism-core",
+      "category": "implicit-activation",
+      "prompt": "Research a housing expert, build a question ladder, plan follow-ups, and check recording-consent rules before the interview.",
+      "expect": {
+        "decision": "use",
+        "branch": "interview preparation",
+        "branchAlternatives": [
+          "interview preparation",
+          "question planning"
+        ],
+        "terms": [
+          "questions",
+          "consent"
+        ]
+      }
+    },
+    {
+      "id": "interview-prep-unrelated",
+      "skill": "interview-prep",
+      "package": "journalism-core",
+      "category": "unrelated-non-trigger",
+      "prompt": "Transcribe an interview that already happened and extract timestamped quotes from the recording.",
+      "expect": {
+        "decision": "reject",
+        "branch": "transcription",
+        "branchAlternatives": [
+          "transcription",
+          "quote extraction"
+        ],
+        "terms": [
+          "timestamps"
+        ]
+      }
+    },
+    {
+      "id": "interview-transcription-activation",
+      "skill": "interview-transcription",
+      "package": "journalism-core",
+      "category": "activation",
+      "prompt": "Process a recorded interview into a timestamped transcript, mark uncertain words, and extract verified quotes.",
+      "expect": {
+        "decision": "use",
+        "branch": "interview transcription",
+        "branchAlternatives": [
+          "interview transcription",
+          "transcription"
+        ],
+        "terms": [
+          "timestamps",
+          "quotes"
+        ]
+      }
+    },
+    {
+      "id": "interview-transcription-implicit",
+      "skill": "interview-transcription",
+      "package": "journalism-core",
+      "category": "implicit-activation",
+      "prompt": "Process a recorded interview into a timestamped transcript, mark uncertain words, and extract verified quotes.",
+      "expect": {
+        "decision": "use",
+        "branch": "interview transcription",
+        "branchAlternatives": [
+          "interview transcription",
+          "transcription"
+        ],
+        "terms": [
+          "timestamps",
+          "quotes"
+        ]
+      }
+    },
+    {
+      "id": "interview-transcription-unrelated",
+      "skill": "interview-transcription",
+      "package": "journalism-core",
+      "category": "unrelated-non-trigger",
+      "prompt": "Prepare background research and questions for an interview that has not happened yet.",
+      "expect": {
+        "decision": "reject",
+        "branch": "interview preparation",
+        "branchAlternatives": [
+          "interview preparation",
+          "question planning"
+        ],
+        "terms": [
+          "questions"
+        ]
+      }
+    },
+    {
+      "id": "newsletter-publishing-activation",
+      "skill": "newsletter-publishing",
+      "package": "journalism-core",
+      "category": "activation",
+      "prompt": "Plan a weekly email newsletter, segment subscribers, design the template, test delivery, and define engagement metrics.",
+      "expect": {
+        "decision": "use",
+        "branch": "newsletter publishing",
+        "branchAlternatives": [
+          "newsletter publishing",
+          "email newsletter"
+        ],
+        "terms": [
+          "subscribers",
+          "engagement"
+        ]
+      }
+    },
+    {
+      "id": "newsletter-publishing-implicit",
+      "skill": "newsletter-publishing",
+      "package": "journalism-core",
+      "category": "implicit-activation",
+      "prompt": "Plan a weekly email newsletter, segment subscribers, design the template, test delivery, and define engagement metrics.",
+      "expect": {
+        "decision": "use",
+        "branch": "newsletter publishing",
+        "branchAlternatives": [
+          "newsletter publishing",
+          "email newsletter"
+        ],
+        "terms": [
+          "subscribers",
+          "engagement"
+        ]
+      }
+    },
+    {
+      "id": "newsletter-publishing-unrelated",
+      "skill": "newsletter-publishing",
+      "package": "journalism-core",
+      "category": "unrelated-non-trigger",
+      "prompt": "Write one short social post announcing a published article. No email list or newsletter is involved.",
+      "expect": {
+        "decision": "reject",
+        "branch": "social publishing",
+        "branchAlternatives": [
+          "social publishing",
+          "social media"
+        ],
+        "terms": [
+          "social"
+        ]
+      }
+    },
+    {
+      "id": "newsroom-style-activation",
+      "skill": "newsroom-style",
+      "package": "journalism-core",
+      "category": "activation",
+      "prompt": "Edit this verified breaking-news draft for AP style, concise sentences, attribution, headline clarity, and newsroom conventions.",
+      "expect": {
+        "decision": "use",
+        "branch": "newsroom style",
+        "branchAlternatives": [
+          "newsroom style",
+          "copyediting"
+        ],
+        "terms": [
+          "AP style",
+          "headline"
+        ]
+      }
+    },
+    {
+      "id": "newsroom-style-implicit",
+      "skill": "newsroom-style",
+      "package": "journalism-core",
+      "category": "implicit-activation",
+      "prompt": "Edit this verified breaking-news draft for AP style, concise sentences, attribution, headline clarity, and newsroom conventions.",
+      "expect": {
+        "decision": "use",
+        "branch": "newsroom style",
+        "branchAlternatives": [
+          "newsroom style",
+          "copyediting"
+        ],
+        "terms": [
+          "AP style",
+          "headline"
+        ]
+      }
+    },
+    {
+      "id": "newsroom-style-unrelated",
+      "skill": "newsroom-style",
+      "package": "journalism-core",
+      "category": "unrelated-non-trigger",
+      "prompt": "Determine whether an unsigned video is authentic before anyone relies on it. Do not edit article copy.",
+      "expect": {
+        "decision": "reject",
+        "branch": "source verification",
+        "branchAlternatives": [
+          "source verification",
+          "video verification"
+        ],
+        "terms": [
+          "authenticity"
+        ]
+      }
+    },
+    {
+      "id": "photo-metadata-activation",
+      "skill": "photo-metadata",
+      "package": "journalism-core",
+      "category": "activation",
+      "prompt": "Embed a caption, credit, alt text, license, and source label in a publication photo, then strip precise GPS data.",
+      "expect": {
+        "decision": "use",
+        "branch": "photo metadata",
+        "branchAlternatives": [
+          "photo metadata",
+          "IPTC metadata"
+        ],
+        "terms": [
+          "caption",
+          "GPS"
+        ]
+      }
+    },
+    {
+      "id": "photo-metadata-implicit",
+      "skill": "photo-metadata",
+      "package": "journalism-core",
+      "category": "implicit-activation",
+      "prompt": "Embed a caption, credit, alt text, license, and source label in a publication photo, then strip precise GPS data.",
+      "expect": {
+        "decision": "use",
+        "branch": "photo metadata",
+        "branchAlternatives": [
+          "photo metadata",
+          "IPTC metadata"
+        ],
+        "terms": [
+          "caption",
+          "GPS"
+        ]
+      }
+    },
+    {
+      "id": "photo-metadata-unrelated",
+      "skill": "photo-metadata",
+      "package": "journalism-core",
+      "category": "unrelated-non-trigger",
+      "prompt": "Crop a photo and correct its exposure for a homepage thumbnail. Do not edit embedded metadata.",
+      "expect": {
+        "decision": "reject",
+        "branch": "photo editing",
+        "branchAlternatives": [
+          "photo editing",
+          "image editing"
+        ],
+        "terms": [
+          "crop"
+        ]
+      }
+    },
+    {
+      "id": "social-media-intelligence-activation",
+      "skill": "social-media-intelligence",
+      "package": "journalism-core",
+      "category": "activation",
+      "prompt": "Track how a false rumor spreads across public accounts, identify amplification patterns, and vet the leading account network.",
+      "expect": {
+        "decision": "use",
+        "branch": "social intelligence",
+        "branchAlternatives": [
+          "social intelligence",
+          "narrative tracking"
+        ],
+        "terms": [
+          "spread",
+          "accounts"
+        ]
+      }
+    },
+    {
+      "id": "social-media-intelligence-implicit",
+      "skill": "social-media-intelligence",
+      "package": "journalism-core",
+      "category": "implicit-activation",
+      "prompt": "Track how a false rumor spreads across public accounts, identify amplification patterns, and vet the leading account network.",
+      "expect": {
+        "decision": "use",
+        "branch": "social intelligence",
+        "branchAlternatives": [
+          "social intelligence",
+          "narrative tracking"
+        ],
+        "terms": [
+          "spread",
+          "accounts"
+        ]
+      }
+    },
+    {
+      "id": "social-media-intelligence-unrelated",
+      "skill": "social-media-intelligence",
+      "package": "journalism-core",
+      "category": "unrelated-non-trigger",
+      "prompt": "Measure open and click rates for our subscriber email newsletter. Do not analyze public social accounts.",
+      "expect": {
+        "decision": "reject",
+        "branch": "newsletter analytics",
+        "branchAlternatives": [
+          "newsletter analytics",
+          "email engagement"
+        ],
+        "terms": [
+          "open rates"
+        ]
+      }
+    },
+    {
+      "id": "source-verification-activation",
+      "skill": "source-verification",
+      "package": "journalism-core",
+      "category": "activation",
+      "prompt": "An unsigned screenshot claims a city doubled its police budget. Create a verification plan and durable evidence trail before publication.",
+      "expect": {
+        "decision": "use",
+        "branch": "source verification",
+        "branchAlternatives": [
+          "source verification",
+          "claim verification"
+        ],
+        "terms": [
+          "original",
+          "provenance"
+        ]
+      }
+    },
+    {
+      "id": "source-verification-implicit",
+      "skill": "source-verification",
+      "package": "journalism-core",
+      "category": "implicit-activation",
+      "prompt": "An unsigned screenshot claims a city doubled its police budget. Create a verification plan and durable evidence trail before publication.",
+      "expect": {
+        "decision": "use",
+        "branch": "source verification",
+        "branchAlternatives": [
+          "source verification",
+          "claim verification"
+        ],
+        "terms": [
+          "original",
+          "provenance"
+        ]
+      }
+    },
+    {
+      "id": "source-verification-unrelated",
+      "skill": "source-verification",
+      "package": "journalism-core",
+      "category": "unrelated-non-trigger",
+      "prompt": "Copyedit a verified city council paragraph for AP style. Do not investigate its claims.",
+      "expect": {
+        "decision": "reject",
+        "branch": "copyediting",
+        "branchAlternatives": [
+          "copyediting",
+          "newsroom style"
+        ],
+        "terms": [
+          "style"
+        ]
+      }
+    },
+    {
+      "id": "story-pitch-activation",
+      "skill": "story-pitch",
+      "package": "journalism-core",
+      "category": "activation",
+      "prompt": "Shape a reported feature idea into a concise editor pitch with angle, audience, timeliness, access, and expected reporting.",
+      "expect": {
+        "decision": "use",
+        "branch": "story pitch",
+        "branchAlternatives": [
+          "story pitch",
+          "editor pitch"
+        ],
+        "terms": [
+          "angle",
+          "audience"
+        ]
+      }
+    },
+    {
+      "id": "story-pitch-implicit",
+      "skill": "story-pitch",
+      "package": "journalism-core",
+      "category": "implicit-activation",
+      "prompt": "Shape a reported feature idea into a concise editor pitch with angle, audience, timeliness, access, and expected reporting.",
+      "expect": {
+        "decision": "use",
+        "branch": "story pitch",
+        "branchAlternatives": [
+          "story pitch",
+          "editor pitch"
+        ],
+        "terms": [
+          "angle",
+          "audience"
+        ]
+      }
+    },
+    {
+      "id": "story-pitch-unrelated",
+      "skill": "story-pitch",
+      "package": "journalism-core",
+      "category": "unrelated-non-trigger",
+      "prompt": "Copyedit a completed and assigned feature before publication. The editor already approved its angle.",
+      "expect": {
+        "decision": "reject",
+        "branch": "copyediting",
+        "branchAlternatives": [
+          "copyediting",
+          "newsroom style"
+        ],
+        "terms": [
+          "edit"
+        ]
+      }
+    },
+    {
+      "id": "okf-wiki-activation",
+      "skill": "okf-wiki",
+      "package": "okf-wiki",
+      "category": "activation",
+      "prompt": "Turn an existing repository and its notes into an Open Knowledge Format knowledge base with a validated index and linked records.",
+      "expect": {
+        "decision": "use",
+        "branch": "OKF wiki",
+        "branchAlternatives": [
+          "OKF wiki",
+          "knowledge base"
+        ],
+        "terms": [
+          "OKF",
+          "validate"
+        ]
+      }
+    },
+    {
+      "id": "okf-wiki-implicit",
+      "skill": "okf-wiki",
+      "package": "okf-wiki",
+      "category": "implicit-activation",
+      "prompt": "Turn an existing repository and its notes into an Open Knowledge Format knowledge base with a validated index and linked records.",
+      "expect": {
+        "decision": "use",
+        "branch": "OKF wiki",
+        "branchAlternatives": [
+          "OKF wiki",
+          "knowledge base"
+        ],
+        "terms": [
+          "OKF",
+          "validate"
+        ]
+      }
+    },
+    {
+      "id": "okf-wiki-unrelated",
+      "skill": "okf-wiki",
+      "package": "okf-wiki",
+      "category": "unrelated-non-trigger",
+      "prompt": "Write a short README summary for one script. Do not create a wiki, index, or knowledge bundle.",
+      "expect": {
+        "decision": "reject",
+        "branch": "documentation",
+        "branchAlternatives": [
+          "documentation",
+          "README writing"
+        ],
+        "terms": [
+          "README"
+        ]
+      }
+    },
+    {
+      "id": "pdf-design-activation",
+      "skill": "pdf-design",
+      "package": "pdf-design",
+      "category": "activation",
+      "prompt": "Design a branded annual report in HTML, preview the pages, export a print-ready PDF, and prepare a secure delivery copy.",
+      "expect": {
+        "decision": "use",
+        "branch": "PDF design",
+        "branchAlternatives": [
+          "PDF design",
+          "report design"
+        ],
+        "terms": [
+          "PDF",
+          "branding"
+        ]
+      }
+    },
+    {
+      "id": "pdf-design-implicit",
+      "skill": "pdf-design",
+      "package": "pdf-design",
+      "category": "implicit-activation",
+      "prompt": "Design a branded annual report in HTML, preview the pages, export a print-ready PDF, and prepare a secure delivery copy.",
+      "expect": {
+        "decision": "use",
+        "branch": "PDF design",
+        "branchAlternatives": [
+          "PDF design",
+          "report design"
+        ],
+        "terms": [
+          "PDF",
+          "branding"
+        ]
+      }
+    },
+    {
+      "id": "pdf-design-unrelated",
+      "skill": "pdf-design",
+      "package": "pdf-design",
+      "category": "unrelated-non-trigger",
+      "prompt": "Build a responsive application dashboard that will only be used in a browser and never exported to PDF.",
+      "expect": {
+        "decision": "reject",
+        "branch": "web interface",
+        "branchAlternatives": [
+          "web interface",
+          "dashboard design"
+        ],
+        "terms": [
+          "browser"
+        ]
+      }
+    },
+    {
+      "id": "document-design-activation",
+      "skill": "document-design",
+      "package": "pdf-playground",
+      "category": "activation",
+      "prompt": "Create a print-ready two-page proposal in HTML with a cover, cost table, page breaks, and PDF export settings.",
+      "expect": {
+        "decision": "use",
+        "branch": "document design",
+        "branchAlternatives": [
+          "document design",
+          "proposal design"
+        ],
+        "terms": [
+          "print ready",
+          "PDF"
+        ]
+      }
+    },
+    {
+      "id": "document-design-implicit",
+      "skill": "document-design",
+      "package": "pdf-playground",
+      "category": "implicit-activation",
+      "prompt": "Create a print-ready two-page proposal in HTML with a cover, cost table, page breaks, and PDF export settings.",
+      "expect": {
+        "decision": "use",
+        "branch": "document design",
+        "branchAlternatives": [
+          "document design",
+          "proposal design"
+        ],
+        "terms": [
+          "print ready",
+          "PDF"
+        ]
+      }
+    },
+    {
+      "id": "document-design-unrelated",
+      "skill": "document-design",
+      "package": "pdf-playground",
+      "category": "unrelated-non-trigger",
+      "prompt": "Implement a searchable data table inside an existing web application. It is not a printable document.",
+      "expect": {
+        "decision": "reject",
+        "branch": "web development",
+        "branchAlternatives": [
+          "web development",
+          "interface development"
+        ],
+        "terms": [
+          "data table"
+        ]
+      }
+    },
+    {
+      "id": "project-memory-activation",
+      "skill": "project-memory",
+      "package": "project-templates-toolkit",
+      "category": "activation",
+      "prompt": "Set up a new project instruction file that preserves architecture, commands, constraints, and operating knowledge for future sessions.",
+      "expect": {
+        "decision": "use",
+        "branch": "project memory",
+        "branchAlternatives": [
+          "project memory",
+          "instruction setup"
+        ],
+        "terms": [
+          "commands",
+          "constraints"
+        ]
+      }
+    },
+    {
+      "id": "project-memory-implicit",
+      "skill": "project-memory",
+      "package": "project-templates-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Set up a new project instruction file that preserves architecture, commands, constraints, and operating knowledge for future sessions.",
+      "expect": {
+        "decision": "use",
+        "branch": "project memory",
+        "branchAlternatives": [
+          "project memory",
+          "instruction setup"
+        ],
+        "terms": [
+          "commands",
+          "constraints"
+        ]
+      }
+    },
+    {
+      "id": "project-memory-unrelated",
+      "skill": "project-memory",
+      "package": "project-templates-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Summarize what went wrong after a completed investigation and record lessons for the next project.",
+      "expect": {
+        "decision": "reject",
+        "branch": "retrospective",
+        "branchAlternatives": [
+          "retrospective",
+          "lessons learned"
+        ],
+        "terms": [
+          "lessons"
+        ]
+      }
+    },
+    {
+      "id": "project-retrospective-activation",
+      "skill": "project-retrospective",
+      "package": "project-templates-toolkit",
+      "category": "activation",
+      "prompt": "Close out a completed investigation with a LESSONS record covering failures, decisions, repeatable methods, and future safeguards.",
+      "expect": {
+        "decision": "use",
+        "branch": "project retrospective",
+        "branchAlternatives": [
+          "project retrospective",
+          "lessons learned"
+        ],
+        "terms": [
+          "failures",
+          "lessons"
+        ]
+      }
+    },
+    {
+      "id": "project-retrospective-implicit",
+      "skill": "project-retrospective",
+      "package": "project-templates-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Close out a completed investigation with a LESSONS record covering failures, decisions, repeatable methods, and future safeguards.",
+      "expect": {
+        "decision": "use",
+        "branch": "project retrospective",
+        "branchAlternatives": [
+          "project retrospective",
+          "lessons learned"
+        ],
+        "terms": [
+          "failures",
+          "lessons"
+        ]
+      }
+    },
+    {
+      "id": "project-retrospective-unrelated",
+      "skill": "project-retrospective",
+      "package": "project-templates-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Create a live status update for work that is still in progress. Do not close out or analyze the project.",
+      "expect": {
+        "decision": "reject",
+        "branch": "status reporting",
+        "branchAlternatives": [
+          "status reporting",
+          "progress update"
+        ],
+        "terms": [
+          "status"
+        ]
+      }
+    },
+    {
+      "id": "template-selector-activation",
+      "skill": "template-selector",
+      "package": "project-templates-toolkit",
+      "category": "activation",
+      "prompt": "Choose the correct project memory or retrospective template for a new data investigation with scripts, sources, and publication steps.",
+      "expect": {
+        "decision": "use",
+        "branch": "template selection",
+        "branchAlternatives": [
+          "template selection",
+          "template decision"
+        ],
+        "terms": [
+          "template",
+          "project"
+        ]
+      }
+    },
+    {
+      "id": "template-selector-implicit",
+      "skill": "template-selector",
+      "package": "project-templates-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Choose the correct project memory or retrospective template for a new data investigation with scripts, sources, and publication steps.",
+      "expect": {
+        "decision": "use",
+        "branch": "template selection",
+        "branchAlternatives": [
+          "template selection",
+          "template decision"
+        ],
+        "terms": [
+          "template",
+          "project"
+        ]
+      }
+    },
+    {
+      "id": "template-selector-unrelated",
+      "skill": "template-selector",
+      "package": "project-templates-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Correct one outdated command in an existing project instruction file. The template is already selected.",
+      "expect": {
+        "decision": "reject",
+        "branch": "instruction update",
+        "branchAlternatives": [
+          "instruction update",
+          "documentation edit"
+        ],
+        "terms": [
+          "command"
+        ]
+      }
+    },
+    {
+      "id": "academic-writing-activation",
+      "skill": "academic-writing",
+      "package": "research-toolkit",
+      "category": "activation",
+      "prompt": "Prepare a journal manuscript plan with CRediT roles, preregistration, open-access compliance, ORCID records, and tool-use disclosure.",
+      "expect": {
+        "decision": "use",
+        "branch": "academic writing",
+        "branchAlternatives": [
+          "academic writing",
+          "research compliance"
+        ],
+        "terms": [
+          "CRediT",
+          "preregistration"
+        ]
+      }
+    },
+    {
+      "id": "academic-writing-implicit",
+      "skill": "academic-writing",
+      "package": "research-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Prepare a journal manuscript plan with CRediT roles, preregistration, open-access compliance, ORCID records, and tool-use disclosure.",
+      "expect": {
+        "decision": "use",
+        "branch": "academic writing",
+        "branchAlternatives": [
+          "academic writing",
+          "research compliance"
+        ],
+        "terms": [
+          "CRediT",
+          "preregistration"
+        ]
+      }
+    },
+    {
+      "id": "academic-writing-unrelated",
+      "skill": "academic-writing",
+      "package": "research-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Write a 500-word breaking-news article for a general audience using verified interviews and AP style.",
+      "expect": {
+        "decision": "reject",
+        "branch": "news writing",
+        "branchAlternatives": [
+          "news writing",
+          "newsroom style"
+        ],
+        "terms": [
+          "AP style"
+        ]
+      }
+    },
+    {
+      "id": "content-access-activation",
+      "skill": "content-access",
+      "package": "research-toolkit",
+      "category": "activation",
+      "prompt": "Find a legal open-access copy of a paywalled paper through DOI lookup, Unpaywall, repositories, and library access.",
+      "expect": {
+        "decision": "use",
+        "branch": "content access",
+        "branchAlternatives": [
+          "content access",
+          "open access"
+        ],
+        "terms": [
+          "Unpaywall",
+          "repository"
+        ]
+      }
+    },
+    {
+      "id": "content-access-implicit",
+      "skill": "content-access",
+      "package": "research-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Find a legal open-access copy of a paywalled paper through DOI lookup, Unpaywall, repositories, and library access.",
+      "expect": {
+        "decision": "use",
+        "branch": "content access",
+        "branchAlternatives": [
+          "content access",
+          "open access"
+        ],
+        "terms": [
+          "Unpaywall",
+          "repository"
+        ]
+      }
+    },
+    {
+      "id": "content-access-unrelated",
+      "skill": "content-access",
+      "package": "research-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Extract headings from an unrestricted public HTML page that is already accessible without a login or paywall.",
+      "expect": {
+        "decision": "reject",
+        "branch": "web extraction",
+        "branchAlternatives": [
+          "web extraction",
+          "web scraping"
+        ],
+        "terms": [
+          "HTML"
+        ]
+      }
+    },
+    {
+      "id": "digital-archive-activation",
+      "skill": "digital-archive",
+      "package": "research-toolkit",
+      "category": "activation",
+      "prompt": "Build a searchable archive from thousands of documents, extract entities, link related records, and preserve source provenance.",
+      "expect": {
+        "decision": "use",
+        "branch": "digital archive",
+        "branchAlternatives": [
+          "digital archive",
+          "knowledge graph"
+        ],
+        "terms": [
+          "entities",
+          "provenance"
+        ]
+      }
+    },
+    {
+      "id": "digital-archive-implicit",
+      "skill": "digital-archive",
+      "package": "research-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Build a searchable archive from thousands of documents, extract entities, link related records, and preserve source provenance.",
+      "expect": {
+        "decision": "use",
+        "branch": "digital archive",
+        "branchAlternatives": [
+          "digital archive",
+          "knowledge graph"
+        ],
+        "terms": [
+          "entities",
+          "provenance"
+        ]
+      }
+    },
+    {
+      "id": "digital-archive-unrelated",
+      "skill": "digital-archive",
+      "package": "research-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Copy one folder to encrypted backup storage without indexing, enrichment, entity extraction, or public access.",
+      "expect": {
+        "decision": "reject",
+        "branch": "file backup",
+        "branchAlternatives": [
+          "file backup",
+          "storage backup"
+        ],
+        "terms": [
+          "backup"
+        ]
+      }
+    },
+    {
+      "id": "free-apis-catalog-activation",
+      "skill": "free-apis-catalog",
+      "package": "research-toolkit",
+      "category": "activation",
+      "prompt": "Find a current free weather API for a student project and compare authentication, request limits, and licensing.",
+      "expect": {
+        "decision": "use",
+        "branch": "API selection",
+        "branchAlternatives": [
+          "API selection",
+          "free API"
+        ],
+        "terms": [
+          "free tier",
+          "limits"
+        ]
+      }
+    },
+    {
+      "id": "free-apis-catalog-implicit",
+      "skill": "free-apis-catalog",
+      "package": "research-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Find a current free weather API for a student project and compare authentication, request limits, and licensing.",
+      "expect": {
+        "decision": "use",
+        "branch": "API selection",
+        "branchAlternatives": [
+          "API selection",
+          "free API"
+        ],
+        "terms": [
+          "free tier",
+          "limits"
+        ]
+      }
+    },
+    {
+      "id": "free-apis-catalog-unrelated",
+      "skill": "free-apis-catalog",
+      "package": "research-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Implement a client for a paid vendor API that the project has already selected and documented.",
+      "expect": {
+        "decision": "reject",
+        "branch": "API integration",
+        "branchAlternatives": [
+          "API integration",
+          "client implementation"
+        ],
+        "terms": [
+          "vendor"
+        ]
+      }
+    },
+    {
+      "id": "page-monitoring-activation",
+      "skill": "page-monitoring",
+      "package": "research-toolkit",
+      "category": "activation",
+      "prompt": "Monitor a public policy page for text changes and downtime, retain diffs, and expose updates through an RSS feed.",
+      "expect": {
+        "decision": "use",
+        "branch": "page monitoring",
+        "branchAlternatives": [
+          "page monitoring",
+          "change detection"
+        ],
+        "terms": [
+          "diffs",
+          "RSS"
+        ]
+      }
+    },
+    {
+      "id": "page-monitoring-implicit",
+      "skill": "page-monitoring",
+      "package": "research-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Monitor a public policy page for text changes and downtime, retain diffs, and expose updates through an RSS feed.",
+      "expect": {
+        "decision": "use",
+        "branch": "page monitoring",
+        "branchAlternatives": [
+          "page monitoring",
+          "change detection"
+        ],
+        "terms": [
+          "diffs",
+          "RSS"
+        ]
+      }
+    },
+    {
+      "id": "page-monitoring-unrelated",
+      "skill": "page-monitoring",
+      "package": "research-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Download one public page now for a single analysis. No future checks, alerts, or feeds are needed.",
+      "expect": {
+        "decision": "reject",
+        "branch": "web extraction",
+        "branchAlternatives": [
+          "web extraction",
+          "one time scrape"
+        ],
+        "terms": [
+          "download"
+        ]
+      }
+    },
+    {
+      "id": "web-archiving-activation",
+      "skill": "web-archiving",
+      "package": "research-toolkit",
+      "category": "activation",
+      "prompt": "Preserve a vulnerable public webpage in two independent web archives and record capture URLs for an evidence log.",
+      "expect": {
+        "decision": "use",
+        "branch": "web archiving",
+        "branchAlternatives": [
+          "web archiving",
+          "evidence preservation"
+        ],
+        "terms": [
+          "capture",
+          "archive"
+        ]
+      }
+    },
+    {
+      "id": "web-archiving-implicit",
+      "skill": "web-archiving",
+      "package": "research-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Preserve a vulnerable public webpage in two independent web archives and record capture URLs for an evidence log.",
+      "expect": {
+        "decision": "use",
+        "branch": "web archiving",
+        "branchAlternatives": [
+          "web archiving",
+          "evidence preservation"
+        ],
+        "terms": [
+          "capture",
+          "archive"
+        ]
+      }
+    },
+    {
+      "id": "web-archiving-unrelated",
+      "skill": "web-archiving",
+      "package": "research-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Watch a live status page every five minutes and alert when its current text changes. Historical capture is not needed.",
+      "expect": {
+        "decision": "reject",
+        "branch": "page monitoring",
+        "branchAlternatives": [
+          "page monitoring",
+          "change detection"
+        ],
+        "terms": [
+          "alert"
+        ]
+      }
+    },
+    {
+      "id": "api-hardening-activation",
+      "skill": "api-hardening",
+      "package": "security-toolkit",
+      "category": "activation",
+      "prompt": "Harden a public JSON API with rate limits, strict CORS, schema validation, key handling, and OWASP API controls.",
+      "expect": {
+        "decision": "use",
+        "branch": "API hardening",
+        "branchAlternatives": [
+          "API hardening",
+          "API security"
+        ],
+        "terms": [
+          "rate limits",
+          "CORS"
+        ]
+      }
+    },
+    {
+      "id": "api-hardening-implicit",
+      "skill": "api-hardening",
+      "package": "security-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Harden a public JSON API with rate limits, strict CORS, schema validation, key handling, and OWASP API controls.",
+      "expect": {
+        "decision": "use",
+        "branch": "API hardening",
+        "branchAlternatives": [
+          "API hardening",
+          "API security"
+        ],
+        "terms": [
+          "rate limits",
+          "CORS"
+        ]
+      }
+    },
+    {
+      "id": "api-hardening-unrelated",
+      "skill": "api-hardening",
+      "package": "security-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Improve spacing and typography on a static landing page without changing any server or API behavior.",
+      "expect": {
+        "decision": "reject",
+        "branch": "interface design",
+        "branchAlternatives": [
+          "interface design",
+          "visual styling"
+        ],
+        "terms": [
+          "typography"
+        ]
+      }
+    },
+    {
+      "id": "secure-auth-activation",
+      "skill": "secure-auth",
+      "package": "security-toolkit",
+      "category": "activation",
+      "prompt": "Design login, password reset, session rotation, passkey enrollment, and MFA recovery using current security guidance.",
+      "expect": {
+        "decision": "use",
+        "branch": "secure authentication",
+        "branchAlternatives": [
+          "secure authentication",
+          "auth design"
+        ],
+        "terms": [
+          "sessions",
+          "MFA"
+        ]
+      }
+    },
+    {
+      "id": "secure-auth-implicit",
+      "skill": "secure-auth",
+      "package": "security-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Design login, password reset, session rotation, passkey enrollment, and MFA recovery using current security guidance.",
+      "expect": {
+        "decision": "use",
+        "branch": "secure authentication",
+        "branchAlternatives": [
+          "secure authentication",
+          "auth design"
+        ],
+        "terms": [
+          "sessions",
+          "MFA"
+        ]
+      }
+    },
+    {
+      "id": "secure-auth-unrelated",
+      "skill": "secure-auth",
+      "package": "security-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Add request throttling to an unauthenticated public API endpoint. No login, session, or identity flow changes.",
+      "expect": {
+        "decision": "reject",
+        "branch": "API hardening",
+        "branchAlternatives": [
+          "API hardening",
+          "rate limiting"
+        ],
+        "terms": [
+          "throttling"
+        ]
+      }
+    },
+    {
+      "id": "security-checklist-activation",
+      "skill": "security-checklist",
+      "package": "security-toolkit",
+      "category": "activation",
+      "prompt": "Run a pre-deployment security audit of this web service across the OWASP Top 10 and report blocking findings.",
+      "expect": {
+        "decision": "use",
+        "branch": "security audit",
+        "branchAlternatives": [
+          "security audit",
+          "predeployment review"
+        ],
+        "terms": [
+          "OWASP",
+          "findings"
+        ]
+      }
+    },
+    {
+      "id": "security-checklist-implicit",
+      "skill": "security-checklist",
+      "package": "security-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Run a pre-deployment security audit of this web service across the OWASP Top 10 and report blocking findings.",
+      "expect": {
+        "decision": "use",
+        "branch": "security audit",
+        "branchAlternatives": [
+          "security audit",
+          "predeployment review"
+        ],
+        "terms": [
+          "OWASP",
+          "findings"
+        ]
+      }
+    },
+    {
+      "id": "security-checklist-unrelated",
+      "skill": "security-checklist",
+      "package": "security-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Implement a known password-reset bug fix from a focused failing test. A broad release audit is out of scope.",
+      "expect": {
+        "decision": "reject",
+        "branch": "auth repair",
+        "branchAlternatives": [
+          "auth repair",
+          "bug fix"
+        ],
+        "terms": [
+          "password reset"
+        ]
+      }
+    },
+    {
+      "id": "private-secret-scanning-activation",
+      "skill": "private-secret-scanning",
+      "package": "security-toolkit",
+      "category": "activation",
+      "prompt": "Scan staged changes and the outgoing push range in a private repository for secrets, using pinned local rules and redacted results.",
+      "expect": {
+        "decision": "use",
+        "branch": "secret scanning",
+        "branchAlternatives": [
+          "secret scanning",
+          "Gitleaks scan"
+        ],
+        "terms": [
+          "Gitleaks",
+          "redacted"
+        ]
+      }
+    },
+    {
+      "id": "private-secret-scanning-implicit",
+      "skill": "private-secret-scanning",
+      "package": "security-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Scan staged changes and the outgoing push range in a private repository for secrets, using pinned local rules and redacted results.",
+      "expect": {
+        "decision": "use",
+        "branch": "secret scanning",
+        "branchAlternatives": [
+          "secret scanning",
+          "Gitleaks scan"
+        ],
+        "terms": [
+          "Gitleaks",
+          "redacted"
+        ]
+      }
+    },
+    {
+      "id": "private-secret-scanning-unrelated",
+      "skill": "private-secret-scanning",
+      "package": "security-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Review a public library for injection flaws and insecure authorization. There is no request to scan git history for secrets.",
+      "expect": {
+        "decision": "reject",
+        "branch": "security review",
+        "branchAlternatives": [
+          "security review",
+          "code audit"
+        ],
+        "terms": [
+          "injection"
+        ]
+      }
+    },
+    {
+      "id": "supply-chain-hardening-activation",
+      "skill": "supply-chain-hardening",
+      "package": "security-toolkit",
+      "category": "activation",
+      "prompt": "Protect dependency installation with a package-release cooldown and a sandboxed pre-install scan for an approved bypass.",
+      "expect": {
+        "decision": "use",
+        "branch": "supply chain",
+        "branchAlternatives": [
+          "supply chain",
+          "dependency security"
+        ],
+        "terms": [
+          "cooldown",
+          "sandbox"
+        ]
+      }
+    },
+    {
+      "id": "supply-chain-hardening-implicit",
+      "skill": "supply-chain-hardening",
+      "package": "security-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Protect dependency installation with a package-release cooldown and a sandboxed pre-install scan for an approved bypass.",
+      "expect": {
+        "decision": "use",
+        "branch": "supply chain",
+        "branchAlternatives": [
+          "supply chain",
+          "dependency security"
+        ],
+        "terms": [
+          "cooldown",
+          "sandbox"
+        ]
+      }
+    },
+    {
+      "id": "supply-chain-hardening-unrelated",
+      "skill": "supply-chain-hardening",
+      "package": "security-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Add runtime input validation to an existing API route. Do not install or update any dependencies.",
+      "expect": {
+        "decision": "reject",
+        "branch": "API hardening",
+        "branchAlternatives": [
+          "API hardening",
+          "input validation"
+        ],
+        "terms": [
+          "validation"
+        ]
+      }
+    },
+    {
+      "id": "brainstorming-activation",
+      "skill": "brainstorming",
+      "package": "superjawn",
+      "category": "activation",
+      "prompt": "Explore the goals, constraints, user flow, and design choices for a new source-tracking feature before implementation starts.",
+      "expect": {
+        "decision": "use",
+        "branch": "brainstorming",
+        "branchAlternatives": [
+          "brainstorming",
+          "design exploration"
+        ],
+        "terms": [
+          "constraints",
+          "design"
+        ]
+      }
+    },
+    {
+      "id": "brainstorming-implicit",
+      "skill": "brainstorming",
+      "package": "superjawn",
+      "category": "implicit-activation",
+      "prompt": "Explore the goals, constraints, user flow, and design choices for a new source-tracking feature before implementation starts.",
+      "expect": {
+        "decision": "use",
+        "branch": "brainstorming",
+        "branchAlternatives": [
+          "brainstorming",
+          "design exploration"
+        ],
+        "terms": [
+          "constraints",
+          "design"
+        ]
+      }
+    },
+    {
+      "id": "brainstorming-unrelated",
+      "skill": "brainstorming",
+      "package": "superjawn",
+      "category": "unrelated-non-trigger",
+      "prompt": "Correct a confirmed spelling error in one existing label. The desired text and file are already specified.",
+      "expect": {
+        "decision": "reject",
+        "branch": "small edit",
+        "branchAlternatives": [
+          "small edit",
+          "implementation"
+        ],
+        "terms": [
+          "spelling"
+        ]
+      }
+    },
+    {
+      "id": "dispatching-parallel-agents-activation",
+      "skill": "dispatching-parallel-agents",
+      "package": "superjawn",
+      "category": "activation",
+      "prompt": "Investigate three independent test failures in separate modules that share no files or state, and combine the findings afterward.",
+      "expect": {
+        "decision": "use",
+        "branch": "parallel dispatch",
+        "branchAlternatives": [
+          "parallel dispatch",
+          "parallel agents"
+        ],
+        "terms": [
+          "independent",
+          "parallel"
+        ]
+      }
+    },
+    {
+      "id": "dispatching-parallel-agents-implicit",
+      "skill": "dispatching-parallel-agents",
+      "package": "superjawn",
+      "category": "implicit-activation",
+      "prompt": "Investigate three independent test failures in separate modules that share no files or state, and combine the findings afterward.",
+      "expect": {
+        "decision": "use",
+        "branch": "parallel dispatch",
+        "branchAlternatives": [
+          "parallel dispatch",
+          "parallel agents"
+        ],
+        "terms": [
+          "independent",
+          "parallel"
+        ]
+      }
+    },
+    {
+      "id": "dispatching-parallel-agents-unrelated",
+      "skill": "dispatching-parallel-agents",
+      "package": "superjawn",
+      "category": "unrelated-non-trigger",
+      "prompt": "Run a database migration, then update code against the migrated schema. The second step depends on the first.",
+      "expect": {
+        "decision": "reject",
+        "branch": "sequential work",
+        "branchAlternatives": [
+          "sequential work",
+          "dependent tasks"
+        ],
+        "terms": [
+          "dependency"
+        ]
+      }
+    },
+    {
+      "id": "executing-plans-activation",
+      "skill": "executing-plans",
+      "package": "superjawn",
+      "category": "activation",
+      "prompt": "Execute the approved implementation plan in this separate session, stopping at its stated review checkpoints.",
+      "expect": {
+        "decision": "use",
+        "branch": "plan execution",
+        "branchAlternatives": [
+          "plan execution",
+          "executing plan"
+        ],
+        "terms": [
+          "checkpoints",
+          "plan"
+        ]
+      }
+    },
+    {
+      "id": "executing-plans-implicit",
+      "skill": "executing-plans",
+      "package": "superjawn",
+      "category": "implicit-activation",
+      "prompt": "Execute the approved implementation plan in this separate session, stopping at its stated review checkpoints.",
+      "expect": {
+        "decision": "use",
+        "branch": "plan execution",
+        "branchAlternatives": [
+          "plan execution",
+          "executing plan"
+        ],
+        "terms": [
+          "checkpoints",
+          "plan"
+        ]
+      }
+    },
+    {
+      "id": "executing-plans-unrelated",
+      "skill": "executing-plans",
+      "package": "superjawn",
+      "category": "unrelated-non-trigger",
+      "prompt": "Turn these loose requirements into a new implementation plan. No approved plan exists yet.",
+      "expect": {
+        "decision": "reject",
+        "branch": "plan writing",
+        "branchAlternatives": [
+          "plan writing",
+          "planning"
+        ],
+        "terms": [
+          "requirements"
+        ]
+      }
+    },
+    {
+      "id": "finishing-a-development-branch-activation",
+      "skill": "finishing-a-development-branch",
+      "package": "superjawn",
+      "category": "activation",
+      "prompt": "The implementation is complete and tests pass. Present safe options to merge, open a review, keep the branch, or clean it up.",
+      "expect": {
+        "decision": "use",
+        "branch": "branch completion",
+        "branchAlternatives": [
+          "branch completion",
+          "integration options"
+        ],
+        "terms": [
+          "merge",
+          "cleanup"
+        ]
+      }
+    },
+    {
+      "id": "finishing-a-development-branch-implicit",
+      "skill": "finishing-a-development-branch",
+      "package": "superjawn",
+      "category": "implicit-activation",
+      "prompt": "The implementation is complete and tests pass. Present safe options to merge, open a review, keep the branch, or clean it up.",
+      "expect": {
+        "decision": "use",
+        "branch": "branch completion",
+        "branchAlternatives": [
+          "branch completion",
+          "integration options"
+        ],
+        "terms": [
+          "merge",
+          "cleanup"
+        ]
+      }
+    },
+    {
+      "id": "finishing-a-development-branch-unrelated",
+      "skill": "finishing-a-development-branch",
+      "package": "superjawn",
+      "category": "unrelated-non-trigger",
+      "prompt": "Continue implementing the remaining parser functions. Tests are still failing and the branch is not ready to integrate.",
+      "expect": {
+        "decision": "reject",
+        "branch": "implementation",
+        "branchAlternatives": [
+          "implementation",
+          "continued development"
+        ],
+        "terms": [
+          "tests"
+        ]
+      }
+    },
+    {
+      "id": "receiving-code-review-activation",
+      "skill": "receiving-code-review",
+      "package": "superjawn",
+      "category": "activation",
+      "prompt": "A reviewer says the cache change causes stale reads. Verify the claim against the code and decide whether and how to fix it.",
+      "expect": {
+        "decision": "use",
+        "branch": "review feedback",
+        "branchAlternatives": [
+          "review feedback",
+          "feedback verification"
+        ],
+        "terms": [
+          "verify",
+          "finding"
+        ]
+      }
+    },
+    {
+      "id": "receiving-code-review-implicit",
+      "skill": "receiving-code-review",
+      "package": "superjawn",
+      "category": "implicit-activation",
+      "prompt": "A reviewer says the cache change causes stale reads. Verify the claim against the code and decide whether and how to fix it.",
+      "expect": {
+        "decision": "use",
+        "branch": "review feedback",
+        "branchAlternatives": [
+          "review feedback",
+          "feedback verification"
+        ],
+        "terms": [
+          "verify",
+          "finding"
+        ]
+      }
+    },
+    {
+      "id": "receiving-code-review-unrelated",
+      "skill": "receiving-code-review",
+      "package": "superjawn",
+      "category": "unrelated-non-trigger",
+      "prompt": "The feature is complete. Ask an independent reviewer to check the current patch before it is merged.",
+      "expect": {
+        "decision": "reject",
+        "branch": "request review",
+        "branchAlternatives": [
+          "request review",
+          "code review request"
+        ],
+        "terms": [
+          "reviewer"
+        ]
+      }
+    },
+    {
+      "id": "requesting-code-review-activation",
+      "skill": "requesting-code-review",
+      "package": "superjawn",
+      "category": "activation",
+      "prompt": "The feature and tests are complete. Prepare a bounded independent code review against the requirements before merge.",
+      "expect": {
+        "decision": "use",
+        "branch": "request review",
+        "branchAlternatives": [
+          "request review",
+          "code review"
+        ],
+        "terms": [
+          "requirements",
+          "reviewer"
+        ]
+      }
+    },
+    {
+      "id": "requesting-code-review-implicit",
+      "skill": "requesting-code-review",
+      "package": "superjawn",
+      "category": "implicit-activation",
+      "prompt": "The feature and tests are complete. Prepare a bounded independent code review against the requirements before merge.",
+      "expect": {
+        "decision": "use",
+        "branch": "request review",
+        "branchAlternatives": [
+          "request review",
+          "code review"
+        ],
+        "terms": [
+          "requirements",
+          "reviewer"
+        ]
+      }
+    },
+    {
+      "id": "requesting-code-review-unrelated",
+      "skill": "requesting-code-review",
+      "package": "superjawn",
+      "category": "unrelated-non-trigger",
+      "prompt": "Assess review feedback that has already arrived and verify whether its reported race condition is real.",
+      "expect": {
+        "decision": "reject",
+        "branch": "review feedback",
+        "branchAlternatives": [
+          "review feedback",
+          "feedback verification"
+        ],
+        "terms": [
+          "feedback"
+        ]
+      }
+    },
+    {
+      "id": "subagent-driven-development-activation",
+      "skill": "subagent-driven-development",
+      "package": "superjawn",
+      "category": "activation",
+      "prompt": "Execute an implementation plan with three independent modules in this session, using bounded workers and integrating each checked result.",
+      "expect": {
+        "decision": "use",
+        "branch": "worker development",
+        "branchAlternatives": [
+          "worker development",
+          "parallel implementation"
+        ],
+        "terms": [
+          "workers",
+          "independent"
+        ]
+      }
+    },
+    {
+      "id": "subagent-driven-development-implicit",
+      "skill": "subagent-driven-development",
+      "package": "superjawn",
+      "category": "implicit-activation",
+      "prompt": "Execute an implementation plan with three independent modules in this session, using bounded workers and integrating each checked result.",
+      "expect": {
+        "decision": "use",
+        "branch": "worker development",
+        "branchAlternatives": [
+          "worker development",
+          "parallel implementation"
+        ],
+        "terms": [
+          "workers",
+          "independent"
+        ]
+      }
+    },
+    {
+      "id": "subagent-driven-development-unrelated",
+      "skill": "subagent-driven-development",
+      "package": "superjawn",
+      "category": "unrelated-non-trigger",
+      "prompt": "Refactor one tightly coupled function where every edit depends on the result of the previous edit.",
+      "expect": {
+        "decision": "reject",
+        "branch": "sequential implementation",
+        "branchAlternatives": [
+          "sequential implementation",
+          "single task"
+        ],
+        "terms": [
+          "sequential"
+        ]
+      }
+    },
+    {
+      "id": "systematic-debugging-activation",
+      "skill": "systematic-debugging",
+      "package": "superjawn",
+      "category": "activation",
+      "prompt": "A previously passing parser now fails on one input. Reproduce the failure, test likely causes, and identify the root cause before fixing it.",
+      "expect": {
+        "decision": "use",
+        "branch": "systematic debugging",
+        "branchAlternatives": [
+          "systematic debugging",
+          "root cause"
+        ],
+        "terms": [
+          "reproduce",
+          "root cause"
+        ]
+      }
+    },
+    {
+      "id": "systematic-debugging-implicit",
+      "skill": "systematic-debugging",
+      "package": "superjawn",
+      "category": "implicit-activation",
+      "prompt": "A previously passing parser now fails on one input. Reproduce the failure, test likely causes, and identify the root cause before fixing it.",
+      "expect": {
+        "decision": "use",
+        "branch": "systematic debugging",
+        "branchAlternatives": [
+          "systematic debugging",
+          "root cause"
+        ],
+        "terms": [
+          "reproduce",
+          "root cause"
+        ]
+      }
+    },
+    {
+      "id": "systematic-debugging-unrelated",
+      "skill": "systematic-debugging",
+      "package": "superjawn",
+      "category": "unrelated-non-trigger",
+      "prompt": "Add a new formatter from an approved specification. There is no failure or unexpected behavior to diagnose.",
+      "expect": {
+        "decision": "reject",
+        "branch": "implementation",
+        "branchAlternatives": [
+          "implementation",
+          "feature development"
+        ],
+        "terms": [
+          "specification"
+        ]
+      }
+    },
+    {
+      "id": "using-git-worktrees-activation",
+      "skill": "using-git-worktrees",
+      "package": "superjawn",
+      "category": "activation",
+      "prompt": "Create an isolated git worktree for a risky feature branch, select a safe directory, and verify it cannot overwrite current work.",
+      "expect": {
+        "decision": "use",
+        "branch": "git worktree",
+        "branchAlternatives": [
+          "git worktree",
+          "worktree setup"
+        ],
+        "terms": [
+          "isolated",
+          "branch"
+        ]
+      }
+    },
+    {
+      "id": "using-git-worktrees-implicit",
+      "skill": "using-git-worktrees",
+      "package": "superjawn",
+      "category": "implicit-activation",
+      "prompt": "Create an isolated git worktree for a risky feature branch, select a safe directory, and verify it cannot overwrite current work.",
+      "expect": {
+        "decision": "use",
+        "branch": "git worktree",
+        "branchAlternatives": [
+          "git worktree",
+          "worktree setup"
+        ],
+        "terms": [
+          "isolated",
+          "branch"
+        ]
+      }
+    },
+    {
+      "id": "using-git-worktrees-unrelated",
+      "skill": "using-git-worktrees",
+      "package": "superjawn",
+      "category": "unrelated-non-trigger",
+      "prompt": "Review the completed current branch and decide whether it is ready for a pull request. Do not create another worktree.",
+      "expect": {
+        "decision": "reject",
+        "branch": "branch completion",
+        "branchAlternatives": [
+          "branch completion",
+          "review readiness"
+        ],
+        "terms": [
+          "branch"
+        ]
+      }
+    },
+    {
+      "id": "using-superjawn-activation",
+      "skill": "using-superjawn",
+      "package": "superjawn",
+      "category": "activation",
+      "prompt": "Before answering this new request, determine which available workflow skills apply and invoke the relevant guidance first.",
+      "expect": {
+        "decision": "use",
+        "branch": "skill selection",
+        "branchAlternatives": [
+          "skill selection",
+          "skill discovery"
+        ],
+        "terms": [
+          "skills",
+          "invoke"
+        ]
+      }
+    },
+    {
+      "id": "using-superjawn-implicit",
+      "skill": "using-superjawn",
+      "package": "superjawn",
+      "category": "implicit-activation",
+      "prompt": "Before answering this new request, determine which available workflow skills apply and invoke the relevant guidance first.",
+      "expect": {
+        "decision": "use",
+        "branch": "skill selection",
+        "branchAlternatives": [
+          "skill selection",
+          "skill discovery"
+        ],
+        "terms": [
+          "skills",
+          "invoke"
+        ]
+      }
+    },
+    {
+      "id": "using-superjawn-unrelated",
+      "skill": "using-superjawn",
+      "package": "superjawn",
+      "category": "unrelated-non-trigger",
+      "prompt": "Report the current git branch name from already supplied text. No workflow selection or skill discovery is needed.",
+      "expect": {
+        "decision": "reject",
+        "branch": "direct answer",
+        "branchAlternatives": [
+          "direct answer",
+          "git status"
+        ],
+        "terms": [
+          "branch"
+        ]
+      }
+    },
+    {
+      "id": "verification-before-completion-activation",
+      "skill": "verification-before-completion",
+      "package": "superjawn",
+      "category": "activation",
+      "prompt": "Before claiming this change is complete, run the relevant checks, inspect their output, and tie each success claim to fresh evidence.",
+      "expect": {
+        "decision": "use",
+        "branch": "completion verification",
+        "branchAlternatives": [
+          "completion verification",
+          "verification"
+        ],
+        "terms": [
+          "evidence",
+          "checks"
+        ]
+      }
+    },
+    {
+      "id": "verification-before-completion-implicit",
+      "skill": "verification-before-completion",
+      "package": "superjawn",
+      "category": "implicit-activation",
+      "prompt": "Before claiming this change is complete, run the relevant checks, inspect their output, and tie each success claim to fresh evidence.",
+      "expect": {
+        "decision": "use",
+        "branch": "completion verification",
+        "branchAlternatives": [
+          "completion verification",
+          "verification"
+        ],
+        "terms": [
+          "evidence",
+          "checks"
+        ]
+      }
+    },
+    {
+      "id": "verification-before-completion-unrelated",
+      "skill": "verification-before-completion",
+      "package": "superjawn",
+      "category": "unrelated-non-trigger",
+      "prompt": "Draft a plan for work that has not started. No completion claim or finished change exists to verify.",
+      "expect": {
+        "decision": "reject",
+        "branch": "planning",
+        "branchAlternatives": [
+          "planning",
+          "plan writing"
+        ],
+        "terms": [
+          "plan"
+        ]
+      }
+    },
+    {
+      "id": "writing-plans-activation",
+      "skill": "writing-plans",
+      "package": "superjawn",
+      "category": "activation",
+      "prompt": "Turn this detailed specification into a sequenced implementation plan with file targets, dependencies, checks, and review points.",
+      "expect": {
+        "decision": "use",
+        "branch": "plan writing",
+        "branchAlternatives": [
+          "plan writing",
+          "implementation planning"
+        ],
+        "terms": [
+          "dependencies",
+          "checks"
+        ]
+      }
+    },
+    {
+      "id": "writing-plans-implicit",
+      "skill": "writing-plans",
+      "package": "superjawn",
+      "category": "implicit-activation",
+      "prompt": "Turn this detailed specification into a sequenced implementation plan with file targets, dependencies, checks, and review points.",
+      "expect": {
+        "decision": "use",
+        "branch": "plan writing",
+        "branchAlternatives": [
+          "plan writing",
+          "implementation planning"
+        ],
+        "terms": [
+          "dependencies",
+          "checks"
+        ]
+      }
+    },
+    {
+      "id": "writing-plans-unrelated",
+      "skill": "writing-plans",
+      "package": "superjawn",
+      "category": "unrelated-non-trigger",
+      "prompt": "Execute the already approved plan from step one and stop at its defined review checkpoint.",
+      "expect": {
+        "decision": "reject",
+        "branch": "plan execution",
+        "branchAlternatives": [
+          "plan execution",
+          "executing plan"
+        ],
+        "terms": [
+          "checkpoint"
+        ]
+      }
+    },
+    {
+      "id": "writing-skills-activation",
+      "skill": "writing-skills",
+      "package": "superjawn",
+      "category": "activation",
+      "prompt": "Create a new portable skill with a precise trigger description, progressive instructions, fixtures, and verification before release.",
+      "expect": {
+        "decision": "use",
+        "branch": "skill writing",
+        "branchAlternatives": [
+          "skill writing",
+          "skill development"
+        ],
+        "terms": [
+          "description",
+          "verification"
+        ]
+      }
+    },
+    {
+      "id": "writing-skills-implicit",
+      "skill": "writing-skills",
+      "package": "superjawn",
+      "category": "implicit-activation",
+      "prompt": "Create a new portable skill with a precise trigger description, progressive instructions, fixtures, and verification before release.",
+      "expect": {
+        "decision": "use",
+        "branch": "skill writing",
+        "branchAlternatives": [
+          "skill writing",
+          "skill development"
+        ],
+        "terms": [
+          "description",
+          "verification"
+        ]
+      }
+    },
+    {
+      "id": "writing-skills-unrelated",
+      "skill": "writing-skills",
+      "package": "superjawn",
+      "category": "unrelated-non-trigger",
+      "prompt": "Use an existing source-verification skill to assess one screenshot. Do not create or edit any skill instructions.",
+      "expect": {
+        "decision": "reject",
+        "branch": "source verification",
+        "branchAlternatives": [
+          "source verification",
+          "claim verification"
+        ],
+        "terms": [
+          "screenshot"
+        ]
+      }
+    },
+    {
+      "id": "video-dashboard-activation",
+      "skill": "video-dashboard",
+      "package": "video-toolkit",
+      "category": "activation",
+      "prompt": "Combine transcripts, frame findings, topics, and sentiment into an interactive dashboard for reviewing a video collection.",
+      "expect": {
+        "decision": "use",
+        "branch": "video dashboard",
+        "branchAlternatives": [
+          "video dashboard",
+          "video analysis"
+        ],
+        "terms": [
+          "transcripts",
+          "frames"
+        ]
+      }
+    },
+    {
+      "id": "video-dashboard-implicit",
+      "skill": "video-dashboard",
+      "package": "video-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Combine transcripts, frame findings, topics, and sentiment into an interactive dashboard for reviewing a video collection.",
+      "expect": {
+        "decision": "use",
+        "branch": "video dashboard",
+        "branchAlternatives": [
+          "video dashboard",
+          "video analysis"
+        ],
+        "terms": [
+          "transcripts",
+          "frames"
+        ]
+      }
+    },
+    {
+      "id": "video-dashboard-unrelated",
+      "skill": "video-dashboard",
+      "package": "video-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Transcribe one audio interview into timestamped text. No dashboard, frames, or collection analysis is needed.",
+      "expect": {
+        "decision": "reject",
+        "branch": "transcription",
+        "branchAlternatives": [
+          "transcription",
+          "audio transcription"
+        ],
+        "terms": [
+          "timestamped"
+        ]
+      }
+    },
+    {
+      "id": "video-download-activation",
+      "skill": "video-download",
+      "package": "video-toolkit",
+      "category": "activation",
+      "prompt": "Collect public videos from a specified social account, preserve source URLs, and record download provenance.",
+      "expect": {
+        "decision": "use",
+        "branch": "video collection",
+        "branchAlternatives": [
+          "video collection",
+          "video download"
+        ],
+        "terms": [
+          "source URLs",
+          "provenance"
+        ]
+      }
+    },
+    {
+      "id": "video-download-implicit",
+      "skill": "video-download",
+      "package": "video-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Collect public videos from a specified social account, preserve source URLs, and record download provenance.",
+      "expect": {
+        "decision": "use",
+        "branch": "video collection",
+        "branchAlternatives": [
+          "video collection",
+          "video download"
+        ],
+        "terms": [
+          "source URLs",
+          "provenance"
+        ]
+      }
+    },
+    {
+      "id": "video-download-unrelated",
+      "skill": "video-download",
+      "package": "video-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Extract representative frames from a video file that is already stored locally. Do not access a social platform.",
+      "expect": {
+        "decision": "reject",
+        "branch": "frame extraction",
+        "branchAlternatives": [
+          "frame extraction",
+          "video frames"
+        ],
+        "terms": [
+          "frames"
+        ]
+      }
+    },
+    {
+      "id": "video-frames-activation",
+      "skill": "video-frames",
+      "package": "video-toolkit",
+      "category": "activation",
+      "prompt": "Extract frames at fixed intervals from a local video, build a contact sheet, and identify visible text and scene changes.",
+      "expect": {
+        "decision": "use",
+        "branch": "frame analysis",
+        "branchAlternatives": [
+          "frame analysis",
+          "frame extraction"
+        ],
+        "terms": [
+          "contact sheet",
+          "visible text"
+        ]
+      }
+    },
+    {
+      "id": "video-frames-implicit",
+      "skill": "video-frames",
+      "package": "video-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Extract frames at fixed intervals from a local video, build a contact sheet, and identify visible text and scene changes.",
+      "expect": {
+        "decision": "use",
+        "branch": "frame analysis",
+        "branchAlternatives": [
+          "frame analysis",
+          "frame extraction"
+        ],
+        "terms": [
+          "contact sheet",
+          "visible text"
+        ]
+      }
+    },
+    {
+      "id": "video-frames-unrelated",
+      "skill": "video-frames",
+      "package": "video-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Download a public video from a supplied social post URL. No visual frame analysis is requested.",
+      "expect": {
+        "decision": "reject",
+        "branch": "video download",
+        "branchAlternatives": [
+          "video download",
+          "video collection"
+        ],
+        "terms": [
+          "download"
+        ]
+      }
+    },
+    {
+      "id": "video-transcribe-activation",
+      "skill": "video-transcribe",
+      "package": "video-toolkit",
+      "category": "activation",
+      "prompt": "Batch transcribe several podcast recordings with timestamps, language settings, input hashes, and a rerunnable provenance record.",
+      "expect": {
+        "decision": "use",
+        "branch": "media transcription",
+        "branchAlternatives": [
+          "media transcription",
+          "batch transcription"
+        ],
+        "terms": [
+          "timestamps",
+          "provenance"
+        ]
+      }
+    },
+    {
+      "id": "video-transcribe-implicit",
+      "skill": "video-transcribe",
+      "package": "video-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Batch transcribe several podcast recordings with timestamps, language settings, input hashes, and a rerunnable provenance record.",
+      "expect": {
+        "decision": "use",
+        "branch": "media transcription",
+        "branchAlternatives": [
+          "media transcription",
+          "batch transcription"
+        ],
+        "terms": [
+          "timestamps",
+          "provenance"
+        ]
+      }
+    },
+    {
+      "id": "video-transcribe-unrelated",
+      "skill": "video-transcribe",
+      "package": "video-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Build an interactive dashboard from transcripts that already exist. Do not process any audio or video files.",
+      "expect": {
+        "decision": "reject",
+        "branch": "video dashboard",
+        "branchAlternatives": [
+          "video dashboard",
+          "dashboard development"
+        ],
+        "terms": [
+          "dashboard"
+        ]
+      }
+    },
+    {
+      "id": "web-design-picker-activation",
+      "skill": "web-design-picker",
+      "package": "web-design-picker",
+      "category": "activation",
+      "prompt": "Create three distinct website directions, a client review picker, an asset catalog, responsive previews, and a deployment-ready handoff.",
+      "expect": {
+        "decision": "use",
+        "branch": "design picker",
+        "branchAlternatives": [
+          "design picker",
+          "website directions"
+        ],
+        "terms": [
+          "directions",
+          "handoff"
+        ]
+      }
+    },
+    {
+      "id": "web-design-picker-implicit",
+      "skill": "web-design-picker",
+      "package": "web-design-picker",
+      "category": "implicit-activation",
+      "prompt": "Create three distinct website directions, a client review picker, an asset catalog, responsive previews, and a deployment-ready handoff.",
+      "expect": {
+        "decision": "use",
+        "branch": "design picker",
+        "branchAlternatives": [
+          "design picker",
+          "website directions"
+        ],
+        "terms": [
+          "directions",
+          "handoff"
+        ]
+      }
+    },
+    {
+      "id": "web-design-picker-unrelated",
+      "skill": "web-design-picker",
+      "package": "web-design-picker",
+      "category": "unrelated-non-trigger",
+      "prompt": "Fix a known broken link in an approved website design. Do not create alternative visual directions or a review picker.",
+      "expect": {
+        "decision": "reject",
+        "branch": "website repair",
+        "branchAlternatives": [
+          "website repair",
+          "content fix"
+        ],
+        "terms": [
+          "link"
+        ]
+      }
+    },
+    {
+      "id": "visual-explainer-activation",
+      "skill": "visual-explainer",
+      "package": "visual-explainer",
+      "category": "activation",
+      "prompt": "Turn a four-stage reporting workflow into a standalone HTML flow diagram with a legend, clear labels, and responsive layout.",
+      "expect": {
+        "decision": "use",
+        "branch": "visual explainer",
+        "branchAlternatives": [
+          "visual explainer",
+          "HTML diagram"
+        ],
+        "terms": [
+          "diagram",
+          "responsive"
+        ]
+      }
+    },
+    {
+      "id": "visual-explainer-implicit",
+      "skill": "visual-explainer",
+      "package": "visual-explainer",
+      "category": "implicit-activation",
+      "prompt": "Turn a four-stage reporting workflow into a standalone HTML flow diagram with a legend, clear labels, and responsive layout.",
+      "expect": {
+        "decision": "use",
+        "branch": "visual explainer",
+        "branchAlternatives": [
+          "visual explainer",
+          "HTML diagram"
+        ],
+        "terms": [
+          "diagram",
+          "responsive"
+        ]
+      }
+    },
+    {
+      "id": "visual-explainer-unrelated",
+      "skill": "visual-explainer",
+      "package": "visual-explainer",
+      "category": "unrelated-non-trigger",
+      "prompt": "Write a plain-text three-sentence summary of a meeting. No diagram, table, slide, or web page is requested.",
+      "expect": {
+        "decision": "reject",
+        "branch": "text summary",
+        "branchAlternatives": [
+          "text summary",
+          "prose summary"
+        ],
+        "terms": [
+          "summary"
+        ]
+      }
+    },
+    {
+      "id": "ponytail-dev-activation",
+      "skill": "ponytail-dev",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Implement a small parser change with the least code that meets the contract, then run a focused proportional check.",
+      "expect": {
+        "decision": "use",
+        "branch": "software implementation",
+        "branchAlternatives": [
+          "software implementation",
+          "minimal development"
+        ],
+        "terms": [
+          "minimal",
+          "verification"
+        ]
+      }
+    },
+    {
+      "id": "ponytail-dev-implicit",
+      "skill": "ponytail-dev",
+      "package": "dev-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Implement a small parser change with the least code that meets the contract, then run a focused proportional check.",
+      "expect": {
+        "decision": "use",
+        "branch": "software implementation",
+        "branchAlternatives": [
+          "software implementation",
+          "minimal development"
+        ],
+        "terms": [
+          "minimal",
+          "verification"
+        ]
+      }
+    },
+    {
+      "id": "ponytail-dev-unrelated",
+      "skill": "ponytail-dev",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Choose a new visual identity, type system, color palette, and interaction style for a public website.",
+      "expect": {
+        "decision": "reject",
+        "branch": "visual design",
+        "branchAlternatives": [
+          "visual design",
+          "brand design"
+        ],
+        "terms": [
+          "design"
+        ]
+      }
+    },
+    {
+      "id": "surface-completeness-activation",
+      "skill": "surface-completeness",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "A frontend workflow changed. Check every affected screen, state, responsive layout, design rule, and user-facing document before completion.",
+      "expect": {
+        "decision": "use",
+        "branch": "surface completeness",
+        "branchAlternatives": [
+          "surface completeness",
+          "UI coverage"
+        ],
+        "terms": [
+          "states",
+          "documentation"
+        ]
+      }
+    },
+    {
+      "id": "surface-completeness-implicit",
+      "skill": "surface-completeness",
+      "package": "dev-toolkit",
+      "category": "implicit-activation",
+      "prompt": "A frontend workflow changed. Check every affected screen, state, responsive layout, design rule, and user-facing document before completion.",
+      "expect": {
+        "decision": "use",
+        "branch": "surface completeness",
+        "branchAlternatives": [
+          "surface completeness",
+          "UI coverage"
+        ],
+        "terms": [
+          "states",
+          "documentation"
+        ]
+      }
+    },
+    {
+      "id": "surface-completeness-unrelated",
+      "skill": "surface-completeness",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Optimize a background database query with no interface, design, interaction, or documentation change.",
+      "expect": {
+        "decision": "reject",
+        "branch": "backend optimization",
+        "branchAlternatives": [
+          "backend optimization",
+          "database performance"
+        ],
+        "terms": [
+          "database"
+        ]
+      }
+    },
+    {
+      "id": "goal-progress-bar-activation",
+      "skill": "goal-progress-bar",
+      "package": "project-templates-toolkit",
+      "category": "activation",
+      "prompt": "Track a six-step migration with weighted checkpoints and update one progress bar only when recorded evidence proves each milestone.",
+      "expect": {
+        "decision": "use",
+        "branch": "progress tracking",
+        "branchAlternatives": [
+          "progress tracking",
+          "goal progress"
+        ],
+        "terms": [
+          "weighted",
+          "evidence"
+        ]
+      }
+    },
+    {
+      "id": "goal-progress-bar-implicit",
+      "skill": "goal-progress-bar",
+      "package": "project-templates-toolkit",
+      "category": "implicit-activation",
+      "prompt": "Track a six-step migration with weighted checkpoints and update one progress bar only when recorded evidence proves each milestone.",
+      "expect": {
+        "decision": "use",
+        "branch": "progress tracking",
+        "branchAlternatives": [
+          "progress tracking",
+          "goal progress"
+        ],
+        "terms": [
+          "weighted",
+          "evidence"
+        ]
+      }
+    },
+    {
+      "id": "goal-progress-bar-unrelated",
+      "skill": "goal-progress-bar",
+      "package": "project-templates-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Correct one typo and report that the single edit is complete. There are no milestones or multi-step goal.",
+      "expect": {
+        "decision": "reject",
+        "branch": "small edit",
+        "branchAlternatives": [
+          "small edit",
+          "direct task"
+        ],
+        "terms": [
+          "typo"
+        ]
+      }
+    },
+    {
+      "id": "unattended-agent-runs-activation",
+      "skill": "unattended-agent-runs",
+      "package": "newsroom-agent-ops",
+      "category": "activation",
+      "prompt": "Design a recurring overnight newsroom check that runs without a person watching, records receipts, handles failure, and has a safe supervisor.",
+      "expect": {
+        "decision": "use",
+        "branch": "unattended runs",
+        "branchAlternatives": [
+          "unattended runs",
+          "recurring automation"
+        ],
+        "terms": [
+          "supervision",
+          "receipts"
+        ]
+      }
+    },
+    {
+      "id": "unattended-agent-runs-implicit",
+      "skill": "unattended-agent-runs",
+      "package": "newsroom-agent-ops",
+      "category": "implicit-activation",
+      "prompt": "Design a recurring overnight newsroom check that runs without a person watching, records receipts, handles failure, and has a safe supervisor.",
+      "expect": {
+        "decision": "use",
+        "branch": "unattended runs",
+        "branchAlternatives": [
+          "unattended runs",
+          "recurring automation"
+        ],
+        "terms": [
+          "supervision",
+          "receipts"
+        ]
+      }
+    },
+    {
+      "id": "unattended-agent-runs-unrelated",
+      "skill": "unattended-agent-runs",
+      "package": "newsroom-agent-ops",
+      "category": "unrelated-non-trigger",
+      "prompt": "Guide an editor through one interactive research task while they remain present and approve each step.",
+      "expect": {
+        "decision": "reject",
+        "branch": "interactive workflow",
+        "branchAlternatives": [
+          "interactive workflow",
+          "supervised task"
+        ],
+        "terms": [
+          "interactive"
+        ]
+      }
+    },
+    {
+      "id": "scheduled-briefing-activation",
+      "skill": "scheduled-briefing",
+      "package": "newsroom-agent-ops",
+      "category": "activation",
+      "prompt": "Create a concise weekday morning briefing from the assignment calendar, upcoming deadlines, inbox requests, and current verified status.",
+      "expect": {
+        "decision": "use",
+        "branch": "scheduled briefing",
+        "branchAlternatives": [
+          "scheduled briefing",
+          "morning briefing"
+        ],
+        "terms": [
+          "deadlines",
+          "status"
+        ]
+      }
+    },
+    {
+      "id": "scheduled-briefing-implicit",
+      "skill": "scheduled-briefing",
+      "package": "newsroom-agent-ops",
+      "category": "implicit-activation",
+      "prompt": "Create a concise weekday morning briefing from the assignment calendar, upcoming deadlines, inbox requests, and current verified status.",
+      "expect": {
+        "decision": "use",
+        "branch": "scheduled briefing",
+        "branchAlternatives": [
+          "scheduled briefing",
+          "morning briefing"
+        ],
+        "terms": [
+          "deadlines",
+          "status"
+        ]
+      }
+    },
+    {
+      "id": "scheduled-briefing-unrelated",
+      "skill": "scheduled-briefing",
+      "package": "newsroom-agent-ops",
+      "category": "unrelated-non-trigger",
+      "prompt": "Send an immediate breaking-news alert about a newly confirmed evacuation. Do not wait for a scheduled briefing.",
+      "expect": {
+        "decision": "reject",
+        "branch": "breaking alert",
+        "branchAlternatives": [
+          "breaking alert",
+          "crisis communication"
+        ],
+        "terms": [
+          "alert"
+        ]
+      }
+    },
+    {
+      "id": "deadline-and-reply-tracking-activation",
+      "skill": "deadline-and-reply-tracking",
+      "package": "newsroom-agent-ops",
+      "category": "activation",
+      "prompt": "Track a records deadline, the agency acknowledgment, its reply window, the current owner, and the next follow-up action.",
+      "expect": {
+        "decision": "use",
+        "branch": "deadline tracking",
+        "branchAlternatives": [
+          "deadline tracking",
+          "reply tracking"
+        ],
+        "terms": [
+          "owner",
+          "follow-up"
+        ]
+      }
+    },
+    {
+      "id": "deadline-and-reply-tracking-implicit",
+      "skill": "deadline-and-reply-tracking",
+      "package": "newsroom-agent-ops",
+      "category": "implicit-activation",
+      "prompt": "Track a records deadline, the agency acknowledgment, its reply window, the current owner, and the next follow-up action.",
+      "expect": {
+        "decision": "use",
+        "branch": "deadline tracking",
+        "branchAlternatives": [
+          "deadline tracking",
+          "reply tracking"
+        ],
+        "terms": [
+          "owner",
+          "follow-up"
+        ]
+      }
+    },
+    {
+      "id": "deadline-and-reply-tracking-unrelated",
+      "skill": "deadline-and-reply-tracking",
+      "package": "newsroom-agent-ops",
+      "category": "unrelated-non-trigger",
+      "prompt": "Analyze five years of archived response times for a published data story. No active deadline or reply is pending.",
+      "expect": {
+        "decision": "reject",
+        "branch": "data analysis",
+        "branchAlternatives": [
+          "data analysis",
+          "historical analysis"
+        ],
+        "terms": [
+          "archived"
+        ]
+      }
+    },
+    {
+      "id": "email-request-intake-activation",
+      "skill": "email-request-intake",
+      "package": "newsroom-agent-ops",
+      "category": "activation",
+      "prompt": "Process a concrete request from an approved email intake route, preserve the thread context, confirm authority, and record delivery evidence.",
+      "expect": {
+        "decision": "use",
+        "branch": "email intake",
+        "branchAlternatives": [
+          "email intake",
+          "request intake"
+        ],
+        "terms": [
+          "thread",
+          "authority"
+        ]
+      }
+    },
+    {
+      "id": "email-request-intake-implicit",
+      "skill": "email-request-intake",
+      "package": "newsroom-agent-ops",
+      "category": "implicit-activation",
+      "prompt": "Process a concrete request from an approved email intake route, preserve the thread context, confirm authority, and record delivery evidence.",
+      "expect": {
+        "decision": "use",
+        "branch": "email intake",
+        "branchAlternatives": [
+          "email intake",
+          "request intake"
+        ],
+        "terms": [
+          "thread",
+          "authority"
+        ]
+      }
+    },
+    {
+      "id": "email-request-intake-unrelated",
+      "skill": "email-request-intake",
+      "package": "newsroom-agent-ops",
+      "category": "unrelated-non-trigger",
+      "prompt": "Draft a general marketing email from a blank page. It did not arrive through an approved request intake route.",
+      "expect": {
+        "decision": "reject",
+        "branch": "email drafting",
+        "branchAlternatives": [
+          "email drafting",
+          "marketing copy"
+        ],
+        "terms": [
+          "draft"
+        ]
+      }
+    },
+    {
+      "id": "document-delivery-activation",
+      "skill": "document-delivery",
+      "package": "newsroom-agent-ops",
+      "category": "activation",
+      "prompt": "Prepare an editable report and PDF from verified source material, inspect both outputs, share them with the approved recipient, and retain delivery proof.",
+      "expect": {
+        "decision": "use",
+        "branch": "document delivery",
+        "branchAlternatives": [
+          "document delivery",
+          "file delivery"
+        ],
+        "terms": [
+          "editable",
+          "delivery"
+        ]
+      }
+    },
+    {
+      "id": "document-delivery-implicit",
+      "skill": "document-delivery",
+      "package": "newsroom-agent-ops",
+      "category": "implicit-activation",
+      "prompt": "Prepare an editable report and PDF from verified source material, inspect both outputs, share them with the approved recipient, and retain delivery proof.",
+      "expect": {
+        "decision": "use",
+        "branch": "document delivery",
+        "branchAlternatives": [
+          "document delivery",
+          "file delivery"
+        ],
+        "terms": [
+          "editable",
+          "delivery"
+        ]
+      }
+    },
+    {
+      "id": "document-delivery-unrelated",
+      "skill": "document-delivery",
+      "package": "newsroom-agent-ops",
+      "category": "unrelated-non-trigger",
+      "prompt": "Answer a short factual question in chat. No editable file, PDF, sharing step, or delivery receipt is needed.",
+      "expect": {
+        "decision": "reject",
+        "branch": "source answer",
+        "branchAlternatives": [
+          "source answer",
+          "chat response"
+        ],
+        "terms": [
+          "answer"
+        ]
+      }
+    },
+    {
+      "id": "chat-mention-triage-activation",
+      "skill": "chat-mention-triage",
+      "package": "newsroom-agent-ops",
+      "category": "activation",
+      "prompt": "Triage a team-chat mention, decide whether it creates distinct work, identify the live responder, and avoid a duplicate reply.",
+      "expect": {
+        "decision": "use",
+        "branch": "mention triage",
+        "branchAlternatives": [
+          "mention triage",
+          "chat triage"
+        ],
+        "terms": [
+          "responder",
+          "duplicate"
+        ]
+      }
+    },
+    {
+      "id": "chat-mention-triage-implicit",
+      "skill": "chat-mention-triage",
+      "package": "newsroom-agent-ops",
+      "category": "implicit-activation",
+      "prompt": "Triage a team-chat mention, decide whether it creates distinct work, identify the live responder, and avoid a duplicate reply.",
+      "expect": {
+        "decision": "use",
+        "branch": "mention triage",
+        "branchAlternatives": [
+          "mention triage",
+          "chat triage"
+        ],
+        "terms": [
+          "responder",
+          "duplicate"
+        ]
+      }
+    },
+    {
+      "id": "chat-mention-triage-unrelated",
+      "skill": "chat-mention-triage",
+      "package": "newsroom-agent-ops",
+      "category": "unrelated-non-trigger",
+      "prompt": "Process a request that arrived through the approved email intake route. There is no team-chat mention.",
+      "expect": {
+        "decision": "reject",
+        "branch": "email intake",
+        "branchAlternatives": [
+          "email intake",
+          "request intake"
+        ],
+        "terms": [
+          "email"
+        ]
+      }
+    },
+    {
+      "id": "record-reconciliation-activation",
+      "skill": "record-reconciliation",
+      "package": "newsroom-agent-ops",
+      "category": "activation",
+      "prompt": "A new request names a source and changes an assignment status. Reconcile the task, contact, and interaction records without duplicating the person.",
+      "expect": {
+        "decision": "use",
+        "branch": "record reconciliation",
+        "branchAlternatives": [
+          "record reconciliation",
+          "record update"
+        ],
+        "terms": [
+          "records",
+          "duplicate"
+        ]
+      }
+    },
+    {
+      "id": "record-reconciliation-implicit",
+      "skill": "record-reconciliation",
+      "package": "newsroom-agent-ops",
+      "category": "implicit-activation",
+      "prompt": "A new request names a source and changes an assignment status. Reconcile the task, contact, and interaction records without duplicating the person.",
+      "expect": {
+        "decision": "use",
+        "branch": "record reconciliation",
+        "branchAlternatives": [
+          "record reconciliation",
+          "record update"
+        ],
+        "terms": [
+          "records",
+          "duplicate"
+        ]
+      }
+    },
+    {
+      "id": "record-reconciliation-unrelated",
+      "skill": "record-reconciliation",
+      "package": "newsroom-agent-ops",
+      "category": "unrelated-non-trigger",
+      "prompt": "Draft a feature story from an already verified source packet. No task, contact, or interaction record changed.",
+      "expect": {
+        "decision": "reject",
+        "branch": "story writing",
+        "branchAlternatives": [
+          "story writing",
+          "drafting"
+        ],
+        "terms": [
+          "story"
+        ]
+      }
+    },
+    {
+      "id": "multi-agent-coordinator-activation",
+      "skill": "multi-agent-coordinator",
+      "package": "newsroom-agent-ops",
+      "category": "activation",
+      "prompt": "Coordinate four long-running workers with durable prompts, event-driven status watches, review gates, owner updates, and safe cleanup.",
+      "expect": {
+        "decision": "use",
+        "branch": "multi agent coordination",
+        "branchAlternatives": [
+          "multi agent coordination",
+          "worker coordination"
+        ],
+        "terms": [
+          "review gates",
+          "cleanup"
+        ]
+      }
+    },
+    {
+      "id": "multi-agent-coordinator-implicit",
+      "skill": "multi-agent-coordinator",
+      "package": "newsroom-agent-ops",
+      "category": "implicit-activation",
+      "prompt": "Coordinate four long-running workers with durable prompts, event-driven status watches, review gates, owner updates, and safe cleanup.",
+      "expect": {
+        "decision": "use",
+        "branch": "multi agent coordination",
+        "branchAlternatives": [
+          "multi agent coordination",
+          "worker coordination"
+        ],
+        "terms": [
+          "review gates",
+          "cleanup"
+        ]
+      }
+    },
+    {
+      "id": "multi-agent-coordinator-unrelated",
+      "skill": "multi-agent-coordinator",
+      "package": "newsroom-agent-ops",
+      "category": "unrelated-non-trigger",
+      "prompt": "Run one focused local test in this session. No other worker, status watch, or coordination layer is involved.",
+      "expect": {
+        "decision": "reject",
+        "branch": "direct execution",
+        "branchAlternatives": [
+          "direct execution",
+          "single task"
+        ],
+        "terms": [
+          "test"
+        ]
+      }
+    },
+    {
+      "id": "issue-pool-progression-activation",
+      "skill": "issue-pool-progression",
+      "package": "newsroom-agent-ops",
+      "category": "activation",
+      "prompt": "Select one eligible issue from an authorized pool, claim it, advance it through review and release, then verify the live result.",
+      "expect": {
+        "decision": "use",
+        "branch": "issue progression",
+        "branchAlternatives": [
+          "issue progression",
+          "issue pool"
+        ],
+        "terms": [
+          "eligible",
+          "claim"
+        ]
+      }
+    },
+    {
+      "id": "issue-pool-progression-implicit",
+      "skill": "issue-pool-progression",
+      "package": "newsroom-agent-ops",
+      "category": "implicit-activation",
+      "prompt": "Select one eligible issue from an authorized pool, claim it, advance it through review and release, then verify the live result.",
+      "expect": {
+        "decision": "use",
+        "branch": "issue progression",
+        "branchAlternatives": [
+          "issue progression",
+          "issue pool"
+        ],
+        "terms": [
+          "eligible",
+          "claim"
+        ]
+      }
+    },
+    {
+      "id": "issue-pool-progression-unrelated",
+      "skill": "issue-pool-progression",
+      "package": "newsroom-agent-ops",
+      "category": "unrelated-non-trigger",
+      "prompt": "Implement the one specific issue already assigned in this request. Do not select from or manage an issue pool.",
+      "expect": {
+        "decision": "reject",
+        "branch": "issue implementation",
+        "branchAlternatives": [
+          "issue implementation",
+          "software implementation"
+        ],
+        "terms": [
+          "assigned"
+        ]
+      }
+    },
+    {
+      "id": "meeting-transcript-actions-activation",
+      "skill": "meeting-transcript-actions",
+      "package": "journalism-core",
+      "category": "activation",
+      "prompt": "Turn a meeting transcript into verified notes, decisions, commitments, and separate owner actions with due dates and uncertainty marked.",
+      "expect": {
+        "decision": "use",
+        "branch": "transcript actions",
+        "branchAlternatives": [
+          "transcript actions",
+          "meeting actions"
+        ],
+        "terms": [
+          "owners",
+          "decisions"
+        ]
+      }
+    },
+    {
+      "id": "meeting-transcript-actions-implicit",
+      "skill": "meeting-transcript-actions",
+      "package": "journalism-core",
+      "category": "implicit-activation",
+      "prompt": "Turn a meeting transcript into verified notes, decisions, commitments, and separate owner actions with due dates and uncertainty marked.",
+      "expect": {
+        "decision": "use",
+        "branch": "transcript actions",
+        "branchAlternatives": [
+          "transcript actions",
+          "meeting actions"
+        ],
+        "terms": [
+          "owners",
+          "decisions"
+        ]
+      }
+    },
+    {
+      "id": "meeting-transcript-actions-unrelated",
+      "skill": "meeting-transcript-actions",
+      "package": "journalism-core",
+      "category": "unrelated-non-trigger",
+      "prompt": "Create a raw timestamped transcript from a meeting recording. Do not extract decisions, commitments, or owner actions.",
+      "expect": {
+        "decision": "reject",
+        "branch": "transcription",
+        "branchAlternatives": [
+          "transcription",
+          "meeting transcription"
+        ],
+        "terms": [
+          "timestamps"
+        ]
+      }
+    }
+  ]
+}
