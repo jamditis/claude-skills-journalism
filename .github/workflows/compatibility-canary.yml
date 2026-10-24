@@ -15,6 +15,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   journalism-core-install:
     name: ${{ matrix.client }} clean install
@@ -59,5 +63,6 @@ jobs:
         with:
           node-version: 22.20.0
       - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+      - run: npm ci
       - name: Validate with the current upstream revision
         run: npm run validate:agent-skills:upstream
