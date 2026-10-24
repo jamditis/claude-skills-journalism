@@ -2,16 +2,17 @@
 name: visual-explainer
 description: HTML explainers, diagrams, architecture, timelines, source maps, slide decks, comparison tables, recaps, plan and diff reviews.
 license: MIT
-compatibility: Requires a browser to view generated HTML files. Optional surf-cli for AI image generation.
 metadata:
   author: nicobailon (upstream); journalism adaptations by jamditis
-  version: "0.7.4"
+  version: "0.7.5"
   upstream: https://github.com/nicobailon/visual-explainer
 ---
 
 # Visual explainer
 
 Generate self-contained HTML files for technical diagrams, editorial visualizations, and data tables. Always open the result in the browser. Never fall back to ASCII art when this skill is loaded.
+
+**Requirements:** A browser is required to view generated HTML files. surf-cli is optional for AI image generation.
 
 **Proactive table rendering.** When you're about to present tabular data as an ASCII box-drawing table in the terminal (comparisons, audits, feature matrices, status reports, source verification grids, any structured rows/columns), generate an HTML page instead. The threshold: if the table has 4+ rows or 3+ columns, it belongs in the browser. Don't wait for the user to ask, render it as HTML automatically and tell them the file path. You can still include a brief text summary in the chat, but the table itself should be the HTML page.
 
@@ -119,7 +120,7 @@ Vary the choice each time. If the last diagram was dark and technical, make the 
 
 **Mermaid CSS class collision constraint.** Never define `.node` as a page-level CSS class. Mermaid.js uses `.node` internally on SVG `<g>` elements with `transform: translate(x, y)` for positioning. Page-level `.node` styles (hover transforms, box-shadows) leak into diagrams and break layout. Use the namespaced `.ve-card` class for card components instead. The only safe way to style Mermaid's `.node` is scoped under `.mermaid` (e.g., `.mermaid .node rect`).
 
-**AI-generated illustrations (optional).** If [surf-cli](https://github.com/nicobailon/surf-cli) is available, you can generate images via Gemini and embed them in the page for creative, illustrative, explanatory, educational, or decorative purposes. Check availability with `which surf`. If available:
+**AI-generated illustrations (optional).** If the client provides an image-generation tool or a configured image CLI, you can generate images and embed them in the page for creative, illustrative, explanatory, educational, or decorative purposes. Do not require a specific provider or model. For example, if [surf-cli](https://github.com/nicobailon/surf-cli) is available, check with `which surf` and run:
 
 ```bash
 # Generate to a temp file (use --aspect-ratio for control)

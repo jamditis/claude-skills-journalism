@@ -2,7 +2,7 @@
 type: Reference
 title: "legal-review-flag hook"
 description: "Flag potentially defamatory or legally risky content for review"
-source: ["hooks/legal-review-flag.md", "CLAUDE.md"]
+source: ["hooks/legal-review-flag.md", "AGENTS.md"]
 verified: 2026-06-26
 timestamp: 2026-06-26
 tags: ["hook", "editorial-workflow"]

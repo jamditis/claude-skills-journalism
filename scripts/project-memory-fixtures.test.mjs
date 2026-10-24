@@ -1027,13 +1027,13 @@ test('non-trigger trace rejects activation, missing evidence, and unknown events
   );
 });
 
-test('current shared skill proves the adapter boundary before a rewrite', () => {
+test('current shared skill defines both client outputs and scope rules', () => {
   assert.deepEqual(auditCommittedProjectMemorySkill(), {
     claudeOutput: true,
-    codexOutput: false,
-    preservesExistingFiles: false,
-    nestedCodexScope: false,
-    classification: 'adapter-required',
+    codexOutput: true,
+    preservesExistingFiles: true,
+    nestedCodexScope: true,
+    classification: 'shared',
   });
 });
 
@@ -1048,14 +1048,14 @@ test('matrix and package wording keep the untested clients explicit', () => {
   );
   assert.match(
     matrix,
-    /paired contract fixtures now pin Claude `CLAUDE\.md` and Codex `AGENTS\.md`/u,
+    /paired contract fixtures pin Claude `CLAUDE\.md` and Codex `AGENTS\.md`/u,
   );
   assert.match(
     matrix,
-    /`project-retrospective` and `template-selector` remain shared candidates/u,
+    /All four skills are statically client-neutral/u,
   );
   assert.match(
     packageReadme,
-    /Codex `AGENTS\.md` output is not supported yet/u,
+    /Runtime evidence is\s+still required before the package classification can change/u,
   );
 });

@@ -1,6 +1,8 @@
-# Testing CLAUDE.md Skills Documentation
+# Testing project instruction file guidance
 
 Testing different documentation variants to find what actually makes agents discover and use skills under pressure.
+
+Variants as tested in Claude Code. For Codex, substitute `~/.agents/skills/`.
 
 ## Test Scenarios
 

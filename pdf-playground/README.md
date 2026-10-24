@@ -33,7 +33,7 @@ You need **Claude Code** installed and working on your computer. Claude Code is 
 claude --version
 ```
 
-If you see a version number, you're good. If you get an error like "command not found," you need to install Claude Code first: [Install Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)
+If you see a version number, you're good. If you get an error like "command not found," you need to install Claude Code first: [Install Claude Code](https://code.claude.com/docs/en/overview)
 
 ## Setup (one time)
 
@@ -162,16 +162,13 @@ By default, PDF Playground uses generic styling. To use your organization's colo
 
 ### Where the config file goes
 
-The file goes inside a hidden folder called `.claude` in your **home directory**. Your home directory is:
+The path depends on your client. Both paths are relative to the project directory:
 
-- **Mac/Linux:** `/Users/yourname/` (or `~/`)
-- **Windows:** `C:\Users\yourname\`
+- **Claude Code commands:** `.claude/pdf-playground.local.md`
+- **Codex and the shared document-design skill:** `pdf-playground.local.md`
 
-The full path for the config file is:
-
-```
-~/.claude/pdf-playground.local.md
-```
+If both files exist, the shared skill uses the project-root file. Claude Code
+commands continue to read the file in `.claude/`.
 
 ### How to create the config file
 
@@ -179,9 +176,9 @@ The full path for the config file is:
 
 > "Create a brand config for PDF Playground. My organization is called [your org name] and our main color is [your color]."
 
-Claude will create the file in the right place.
+Claude creates the file at `.claude/pdf-playground.local.md`, the path the Claude Code commands read. If you also use Codex, copy it to `pdf-playground.local.md` at the project root, or keep only one file and use one client.
 
-**Option B, Create it yourself:** Open a text editor (VS Code, Notepad, TextEdit, nano, any editor works) and create a new file at `~/.claude/pdf-playground.local.md` with this content:
+**Option B, Create it yourself:** Open a text editor (VS Code, Notepad, TextEdit, nano, any editor works) and create the file at the path for your client with this content:
 
 ```yaml
 ---
@@ -303,7 +300,7 @@ Add any specific guidelines here, like:
 
 ### "command not found" when running `claude`
 
-Claude Code isn't installed. Follow the [installation guide](https://docs.anthropic.com/en/docs/claude-code/overview).
+Claude Code isn't installed. Follow the [installation guide](https://code.claude.com/docs/en/overview).
 
 ### Plugin install command fails
 

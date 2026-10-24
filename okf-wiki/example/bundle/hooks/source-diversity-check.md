@@ -2,7 +2,7 @@
 type: Reference
 title: "source-diversity-check hook"
 description: "Note when sources in an article may lack diversity of perspective"
-source: ["hooks/source-diversity-check.md", "CLAUDE.md"]
+source: ["hooks/source-diversity-check.md", "AGENTS.md"]
 verified: 2026-06-26
 timestamp: 2026-06-26
 tags: ["hook", "editorial-workflow"]

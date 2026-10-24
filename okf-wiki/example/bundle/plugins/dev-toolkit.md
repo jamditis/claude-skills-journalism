@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: "dev-toolkit plugin"
-description: "Twelve development skills for small newsroom dev teams."
+description: "Fourteen development skills for small newsroom dev teams."
 source: ["dev-toolkit/.claude-plugin/plugin.json", ".claude-plugin/marketplace.json"]
 verified: 2026-08-21
 timestamp: 2026-08-21
@@ -9,9 +9,9 @@ tags: [plugin, development]
 ---
 # dev-toolkit plugin
 
-Twelve skills: accessibility (WCAG 2.2), context engineering, directed execution, Electron patterns, mobile/remote
+Fourteen skills: accessibility (WCAG 2.2), context engineering, minimal-code implementation, UI completeness, directed execution, Electron patterns, mobile/remote
 debugging, irreversible-decision discipline, Python data pipelines, AI-assisted development, ethical web scraping, no-build frontend patterns,
-web-UI taste, and CLAUDE.md context maintenance. Install with
+web-UI taste, and project instruction maintenance. Install with
 `/plugin install dev-toolkit@claude-skills-journalism`.
 
 ## Skills
@@ -23,7 +23,9 @@ web-UI taste, and CLAUDE.md context maintenance. Install with
 - [electron-dev](../skills/electron-dev.md)
 - [mobile-debugging](../skills/mobile-debugging.md)
 - [one-way-door](../skills/one-way-door.md)
+- [ponytail-dev](../skills/ponytail-dev.md)
 - [python-pipeline](../skills/python-pipeline.md)
+- [surface-completeness](../skills/surface-completeness.md)
 - [vibe-coding](../skills/vibe-coding.md)
 - [web-scraping](../skills/web-scraping.md)
 - [web-ui-best-practices](../skills/web-ui-best-practices.md)

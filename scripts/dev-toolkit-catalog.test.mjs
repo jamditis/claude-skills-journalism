@@ -21,8 +21,8 @@ test('every dev-toolkit skill has a public docs page', () => {
 test('the public dev-toolkit card uses the current count and scope', () => {
   const homepage = readFileSync(join(DOCS, 'index.html'), 'utf8');
 
-  assert.match(homepage, /Twelve development skills/u);
-  assert.match(homepage, /08 \/ Development[\s\S]*?<span class="section-label">13 Skills<\/span>/u);
+  assert.match(homepage, /Fourteen development skills/u);
+  assert.match(homepage, /09 \/ Development[\s\S]*?<span class="section-label">15 Skills<\/span>/u);
   assert.match(homepage, /context management/u);
   assert.match(homepage, /href="director\/"/u);
   assert.doesNotMatch(homepage, /Eleven development skills/u);
@@ -65,7 +65,10 @@ test('director is explicit-only and uses environment policy', () => {
   const metadata = parse(frontmatter[1]);
   assert.equal(metadata.name, 'director');
   assert.equal(metadata['disable-model-invocation'], true);
-  assert.match(skill, /`CLAUDE\.md` policy that is applicable/u);
+  assert.match(
+    skill,
+    /project instruction file \(`AGENTS\.md` for Codex, `CLAUDE\.md` for Claude Code\)/u,
+  );
   assert.match(skill, /Delegate research, code writing, file changes, tests, and command execution/u);
   assert.doesNotMatch(skill, /\/home\/|gpt-\d|claude-(?:opus|sonnet|haiku)/iu);
 });
@@ -78,7 +81,8 @@ test('director has one canonical page with exact invocation guidance', () => {
   assert.match(page, /property="og:url" content="https:\/\/skills\.amditis\.tech\/director\/"/u);
   assert.match(page, /tree\/master\/dev-toolkit\/skills\/director/u);
   assert.match(page, /\/dev-toolkit:director/u);
-  assert.match(page, /literal <code>\/director<\/code>/u);
+  assert.match(page, /For the literal <code>\/director<\/code> command, install the standalone skill/u);
+  assert.match(page, /# Codex: \$director/u);
   assert.equal((homepage.match(/href="director\/"/gu) ?? []).length, 1);
   assert.equal(
     (sitemap.match(/https:\/\/skills\.amditis\.tech\/director\//gu) ?? []).length,

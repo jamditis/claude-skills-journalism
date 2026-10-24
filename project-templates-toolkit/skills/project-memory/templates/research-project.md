@@ -1,4 +1,4 @@
-# CLAUDE.md - [Project name]
+# Project instructions - [Project name]
 
 > Template for: Research projects (investigations, data journalism, academic)
 

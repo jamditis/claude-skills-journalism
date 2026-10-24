@@ -91,7 +91,7 @@ Be honest about the limits with whoever you're configuring this for:
 1. Verify npm >= 11: `npm --version`. If older, upgrade (`sudo npm i -g npm@latest` or tarball-swap if self-upgrade races).
 2. Write `~/.npmrc` and `~/.bunfig.toml` with the config above.
 3. Verify: `npm config get min-release-age` returns `7`. `cat ~/.bunfig.toml` shows the `[install]` block.
-4. Copy `scripts/hotpatch.example.sh` to `~/.claude/hotpatch.sh` (or wherever fits). Make executable. Run `./hotpatch.sh --self-test` against the synthetic Mini Shai-Hulud fixture (also shipped) to confirm the heuristics fire.
+4. Copy `scripts/hotpatch.example.sh` to a user-owned tools directory. Make it executable. Run `./hotpatch.sh --self-test` against the shipped synthetic Mini Shai-Hulud fixture to confirm the heuristics fire.
 5. Document the bypass workflow somewhere your team will find it. The whole skill assumes the bypass is *rare* and *reviewed*, not the default.
 
 ## Threat model: what this defends and what it doesn't

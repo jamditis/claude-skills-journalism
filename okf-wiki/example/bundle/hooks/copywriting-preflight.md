@@ -2,7 +2,7 @@
 type: Reference
 title: "copywriting-preflight hook"
 description: "Detects writing and revision requests and prompts an intent interview before drafting"
-source: ["hooks/copywriting-preflight.md", "CLAUDE.md"]
+source: ["hooks/copywriting-preflight.md", "AGENTS.md"]
 verified: 2026-06-26
 timestamp: 2026-06-26
 tags: ["hook", "writing-quality"]

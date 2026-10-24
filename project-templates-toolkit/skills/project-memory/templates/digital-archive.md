@@ -1,4 +1,4 @@
-# CLAUDE.md - [Project name]
+# Project instructions - [Project name]
 
 > Template for: Digital archives (preservation, collections, research databases)
 

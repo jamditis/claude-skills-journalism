@@ -160,6 +160,9 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 Eliminate AI-generated writing patterns that erode reader trust. Essential for journalists using AI assistance who need human-sounding output.
             </p>
         </div>
+            <p class="relative z-10 max-w-6xl mx-auto px-6 pt-6 text-sm text-white">
+            Works in: Uses the open Agent Skills format. <a class="underline" href="https://github.com/jamditis/claude-skills-journalism/blob/master/plans/codex-compatibility-matrix.md">Codex: runtime pilot passed</a>.
+        </p>
     </header>
 
     <main id="main" class="max-w-5xl mx-auto px-6 py-16 relative z-10">
@@ -327,7 +330,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     </div>
                     <div class="p-6">
                         <p class="text-clay/70 italic">
-                            "In the rich tapestry of American journalism, few stories are as compelling as the one about to unfold. This isn't just a profile—it's a journey into the heart of what makes local news truly matter."
+                            "In the rich tapestry of American journalism, few stories are as compelling as the one about to unfold. This isn't just a profile, it's a journey into the heart of what makes local news truly matter."
                         </p>
                     </div>
                     <div class="bg-green-50 px-6 py-3 border-t border-green-100">
@@ -485,6 +488,21 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             </div>
         </section>
 
+        <!-- Reference files -->
+        <section class="mb-20">
+            <h2 class="font-display text-2xl font-semibold mb-6">Reference files</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="feature-card rounded-2xl p-6">
+                    <h3 class="font-semibold mb-2">Simplified Technical English</h3>
+                    <p class="text-sm text-clay/70">Clarity methods adapted from ASD-STE100 for procedures, corrections, explainers, and technical reports. Short sentences and consistent terms; not a claim of formal compliance.</p>
+                </div>
+                <div class="feature-card rounded-2xl p-6">
+                    <h3 class="font-semibold mb-2">Slop-era principles</h3>
+                    <p class="text-sm text-clay/70">Polished text is cheap now. Recover the intent, treat polished form as untrusted, report observations before diagnoses, and limit output to what a person can review.</p>
+                </div>
+            </div>
+        </section>
+
         <!-- Headline case -->
         <section class="mb-20">
             <h2 class="font-display text-2xl font-semibold mb-6">Case sensitivity</h2>
@@ -520,7 +538,9 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 <p class="text-white mb-4">/plugin install journalism-core@claude-skills-journalism</p>
                 <p class="text-white/50 mb-2"># Or copy just this skill from the plugin tree</p>
                 <p class="text-white mb-1">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
-                <p class="text-white">cp -r claude-skills-journalism/journalism-core/skills/ai-writing-detox ~/.claude/skills/</p>
+                <p class="text-white mb-1">mkdir -p ~/.claude/skills ~/.agents/skills</p>
+                <p class="text-white mb-1">cp -r claude-skills-journalism/journalism-core/skills/ai-writing-detox ~/.claude/skills/ <span class="text-white/50"># Claude Code</span></p>
+                <p class="text-white">cp -r claude-skills-journalism/journalism-core/skills/ai-writing-detox ~/.agents/skills/ <span class="text-white/50"># Codex</span></p>
             </div>
             <p class="mt-4 text-clay/70">
                 Or download just this skill from the

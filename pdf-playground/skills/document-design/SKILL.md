@@ -290,3 +290,7 @@ For detailed CSS patterns, use the installed skill's
 Reusable preview assets are in the installed skill's `controls/` directory.
 These files are resources for document generation; they do not turn the
 Claude-only preview command or plugin hook into Codex features.
+
+## Related
+
+Use **document-delivery** to inspect, share, send, and verify the final PDF or editable document.

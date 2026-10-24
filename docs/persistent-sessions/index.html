@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Persistent Claude sessions - Agent skills for journalism</title>
+    <title>Persistent agent sessions - Agent skills for journalism</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
-    <meta name="description" content="Keep Claude Code running while you switch devices, close your laptop, or step away. Set up persistent tmux sessions on a headless server."><link rel="stylesheet" href="../assets/tailwind/persistent-sessions.css" data-tailwind-build="3.4.19">
+    <meta name="description" content="Keep Claude Code or Codex running while you switch devices, close your laptop, or step away. Set up persistent tmux sessions on a headless server, supervise them so they survive reboots, and check in from your phone."><link rel="stylesheet" href="../assets/tailwind/persistent-sessions.css" data-tailwind-build="3.4.19">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -158,8 +158,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 </style>
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Persistent Claude sessions - Agent skills for journalism">
-    <meta property="og:description" content="Keep Claude Code running while you switch devices, close your laptop, or step away. Set up persistent tmux sessions on a headless server.">
+    <meta property="og:title" content="Persistent agent sessions - Agent skills for journalism">
+    <meta property="og:description" content="Keep Claude Code or Codex running while you switch devices, close your laptop, or step away. Set up persistent tmux sessions on a headless server, supervise them so they survive reboots, and check in from your phone.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://skills.amditis.tech/persistent-sessions/">
     <meta property="og:image" content="https://skills.amditis.tech/persistent-sessions/og-image.png">
@@ -168,8 +168,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Persistent Claude sessions - Agent skills for journalism">
-    <meta name="twitter:description" content="Keep Claude Code running while you switch devices, close your laptop, or step away. Set up persistent tmux sessions on a headless server.">
+    <meta name="twitter:title" content="Persistent agent sessions - Agent skills for journalism">
+    <meta name="twitter:description" content="Keep Claude Code or Codex running while you switch devices, close your laptop, or step away. Set up persistent tmux sessions on a headless server, supervise them so they survive reboots, and check in from your phone.">
     <meta name="twitter:image" content="https://skills.amditis.tech/persistent-sessions/og-image.png">
 <script src="../ask-ai.js" defer></script>
     <!-- a11y-patch-v1 -->
@@ -204,9 +204,9 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 </svg>
                 Infrastructure skill
             </div>
-            <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">Persistent Claude sessions</h1>
+            <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">Persistent agent sessions</h1>
             <p class="text-xl text-white/90 max-w-2xl">
-                Keep Claude running while you switch devices, close your laptop, or step away. Start a session from your desktop, check in from your phone, and pick up right where you left off.
+                Keep Claude Code or Codex running while you switch devices, close your laptop, or step away. Start a session from your desktop, check in from your phone, and pick up right where you left off.
             </p>
         </div>
     </header>
@@ -216,7 +216,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <!-- The problem -->
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">The problem</h2>
-            <p class="text-clay/80 mb-6">If you run Claude Code in a browser-based terminal (like Cockpit), your session lives inside a WebSocket connection. When that connection drops, browser tab closed, laptop lid shut, phone screen locked, network hiccup, everything dies. Claude stops mid-task. Your context is gone. You start over.</p>
+            <p class="text-clay/80 mb-6">If you run Claude Code or Codex in a browser-based terminal (like Cockpit), your session lives inside a WebSocket connection. When that connection drops, browser tab closed, laptop lid shut, phone screen locked, network hiccup, everything dies. The agent stops mid-task. Your context is gone. You start over.</p>
 
             <div class="terminal-bar mb-6">
                 <div class="terminal-titlebar">
@@ -233,14 +233,14 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 </div>
             </div>
 
-            <p class="text-clay/80">Cockpit compounds this with a 15-minute idle session timeout. If Claude is thinking quietly, running tools, processing files, and you're not clicking around in the Cockpit UI, your session gets terminated automatically, taking Claude with it.</p>
+            <p class="text-clay/80">Cockpit compounds this with a 15-minute idle session timeout. If the agent is thinking quietly, running tools, processing files, and you're not clicking around in the Cockpit UI, your session gets terminated automatically, taking the agent with it.</p>
         </section>
 
         <!-- The solution -->
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">The solution</h2>
             <p class="text-clay/80 mb-6">
-                <strong>tmux</strong> is a terminal multiplexer that runs on the server, not in your browser. Your Claude session runs inside tmux. The browser terminal just shows you a view of it, like a window into a room that exists independently of whether you're looking.
+                <strong>tmux</strong> is a terminal multiplexer that runs on the server, not in your browser. Your agent session runs inside tmux. The browser terminal just shows you a view of it, like a window into a room that exists independently of whether you're looking.
             </p>
 
             <div class="grid md:grid-cols-2 gap-4 mb-6">
@@ -251,7 +251,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </svg>
                     </div>
                     <h3 class="font-semibold mb-1">Without tmux</h3>
-                    <p class="text-sm text-clay/70">Claude process is a child of the browser terminal. Close the tab → kill the process. One device, one session, no recovery.</p>
+                    <p class="text-sm text-clay/70">The agent process is a child of the browser terminal. Close the tab → kill the process. One device, one session, no recovery.</p>
                 </div>
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <div class="text-accent mb-2">
@@ -260,7 +260,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </svg>
                     </div>
                     <h3 class="font-semibold mb-1">With tmux</h3>
-                    <p class="text-sm text-clay/70">Claude runs inside a server-side tmux session. Close the tab, switch devices, lose network, tmux keeps running. Reconnect and attach.</p>
+                    <p class="text-sm text-clay/70">The agent runs inside a server-side tmux session. Close the tab, switch devices, lose network, tmux keeps running. Reconnect and attach.</p>
                 </div>
             </div>
 
@@ -273,10 +273,10 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 </div>
                 <div class="terminal-body">
                     <span class="terminal-green">$</span> claude<br>
-                    <span class="terminal-dim"># Claude is mid-task. Close the tab.</span><br><br>
+                    <span class="terminal-dim"># The agent is mid-task. Close the tab.</span><br><br>
                     <span class="terminal-dim"># Later, on your phone...</span><br>
                     <span class="terminal-green">$</span> <span class="terminal-dim"># .bashrc auto-attaches to the same tmux session</span><br>
-                    <span class="terminal-dim"># Claude is still running. Exactly where you left it.</span>
+                    <span class="terminal-dim"># The agent is still running. Exactly where you left it.</span>
                 </div>
                 <div class="terminal-status">
                     <span class="terminal-green" style="color:#3fb950">[main]  0:claude*  1:logs  2:bash</span>
@@ -289,7 +289,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-6">Setup</h2>
 
-            <p class="text-clay/80 mb-6">tmux runs on the <strong>server</strong>, the always-on machine where Claude Code lives. Your laptop, phone, or tablet is just the client connecting to it. Everything in this Setup section is configured on the server. See <a href="#install-tmux" class="text-accentDark underline underline-offset-2">Installing tmux</a> if you don't have it yet, and <a href="#clients" class="text-accentDark underline underline-offset-2">Connecting from different devices</a> for the client side.</p>
+            <p class="text-clay/80 mb-6">tmux runs on the <strong>server</strong>, the always-on machine where your agent CLI lives. Your laptop, phone, or tablet is just the client connecting to it. Everything in this Setup section is configured on the server. See <a href="#install-tmux" class="text-accentDark underline underline-offset-2">Installing tmux</a> if you don't have it yet, and <a href="#clients" class="text-accentDark underline underline-offset-2">Connecting from different devices</a> for the client side.</p>
 
             <!-- Step 1 -->
             <div class="flex gap-4 mb-8">
@@ -369,7 +369,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 <div class="step-number mt-1">3</div>
                 <div class="flex-1">
                     <h3 class="font-semibold text-lg mb-3">Fix the Cockpit idle timeout <span class="text-clay/70 font-normal text-sm">(Cockpit only)</span></h3>
-                    <p class="text-clay/80 mb-3">Skip this step if you connect over SSH. By default, Cockpit terminates idle web sessions after 15 minutes, exactly long enough to time out while Claude is working quietly. Disable it:</p>
+                    <p class="text-clay/80 mb-3">Skip this step if you connect over SSH. By default, Cockpit terminates idle web sessions after 15 minutes, exactly long enough to time out while the agent is working quietly. Disable it:</p>
                     <div class="terminal-bar">
                         <div class="terminal-titlebar">
                             <div class="terminal-dot bg-red-400"></div>
@@ -444,7 +444,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             </div>
 
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-4">
-                <p class="text-sm text-amber-800"><strong>Native Windows has no tmux.</strong> tmux is POSIX-only. On a Windows server, run Claude Code and tmux inside <a href="https://learn.microsoft.com/windows/wsl/install" class="underline underline-offset-2" target="_blank" rel="noopener noreferrer">WSL2</a>, or use a separate Linux/macOS box as your always-on host. PowerShell and CMD can be SSH <em>clients</em>, but they can't host the tmux session.</p>
+                <p class="text-sm text-amber-800"><strong>Native Windows has no tmux.</strong> tmux is POSIX-only. On a Windows server, run your agent CLI and tmux inside <a href="https://learn.microsoft.com/windows/wsl/install" class="underline underline-offset-2" target="_blank" rel="noopener noreferrer">WSL2</a>, or use a separate Linux/macOS box as your always-on host. PowerShell and CMD can be SSH <em>clients</em>, but they can't host the tmux session.</p>
             </div>
 
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-3">
@@ -600,7 +600,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         </div>
                     </div>
                     <h3 class="font-semibold mb-1">1: claude</h3>
-                    <p class="text-sm text-clay/70">Your active Claude Code session. This is where you work.</p>
+                    <p class="text-sm text-clay/70">Your active agent session (Claude Code, Codex, or another CLI). This is where you work.</p>
                 </div>
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <div class="terminal-bar mb-3" style="font-size:0.7rem">
@@ -625,36 +625,42 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
         <!-- Bonus: scheduler coexistence -->
         <section class="mb-12">
-            <h2 class="font-display text-2xl font-semibold mb-4">Coexisting with scheduled Claude sessions</h2>
-            <p class="text-clay/80 mb-4">If you run automated Claude sessions (cron-based check-ins, email processing, transcript analysis), they can conflict with your interactive session, competing for CPU and trying to process the same data at the same time.</p>
+            <h2 class="font-display text-2xl font-semibold mb-4">Coexisting with scheduled agent sessions</h2>
+            <p class="text-clay/80 mb-4">If you run automated agent sessions (cron-based check-ins, email processing, transcript analysis), they can conflict with your interactive session, competing for CPU and trying to process the same data at the same time.</p>
             <p class="text-clay/80 mb-4">Add this function to your scheduler to detect an active interactive session and skip the automated wake:</p>
             <div class="terminal-bar">
                 <div class="terminal-titlebar">
                     <div class="terminal-dot bg-red-400"></div>
                     <div class="terminal-dot bg-yellow-400"></div>
                     <div class="terminal-dot bg-green-400"></div>
-                    <span class="text-white/70 text-xs ml-2">claude-scheduler.py</span>
+                    <span class="text-white/70 text-xs ml-2">agent-scheduler.py</span>
                 </div>
                 <div class="terminal-body text-xs leading-relaxed">
+                    <span class="terminal-dim"># (tmux socket, session) pairs to check. None is the default socket.</span><br>
+                    <span class="terminal-dim"># Match these to your setup: 'main' from auto-attach, 'agent' from the service below.</span><br>
+                    SESSIONS = [(None, 'main'), ('agent', 'agent')]<br><br>
                     def is_interactive_session_active():<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="terminal-dim">"""Check if there's an active interactive Claude session in 'main' tmux."""</span><br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;result = subprocess.run(<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;['tmux', 'has-session', '-t', 'main'], capture_output=True<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;)<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;if result.returncode != 0:<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return False<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;result = subprocess.run(<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;['tmux', 'list-panes', '-t', 'main', '-F', '#{pane_current_command}'],<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;capture_output=True, text=True<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;)<br>
-                    &nbsp;&nbsp;&nbsp;&nbsp;return 'claude' in result.stdout.lower()<br><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="terminal-dim">"""Check each tmux session for a running agent CLI."""</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;for socket, session in SESSIONS:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tmux = ['tmux'] + (['-L', socket] if socket else [])<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result = subprocess.run(<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tmux + ['list-panes', '-t', session, '-F', '#{pane_current_command}'],<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;capture_output=True, text=True<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if result.returncode != 0:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;continue  <span class="terminal-dim"># no such session</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;running = result.stdout.lower().split()<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if any(cmd in running for cmd in ('claude', 'codex')):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return True<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;return False<br><br>
                     <span class="terminal-dim"># In your run_task() function, before spawning:</span><br>
                     if is_interactive_session_active():<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;print("Skipping: interactive session active")<br>
                     &nbsp;&nbsp;&nbsp;&nbsp;return False
                 </div>
             </div>
-            <p class="text-clay/80 text-sm mt-2">The <code>pane_current_command</code> tmux format string returns the name of the running process, no need to parse <code>ps aux</code>.</p>
+            <p class="text-clay/80 text-sm mt-2">The <code>pane_current_command</code> tmux format string returns the name of the running process, no need to parse <code>ps aux</code>. Add the command name of any other agent CLI you run. A tmux socket is a separate server, so a session started with <code>-L agent</code> is invisible to plain <code>tmux</code> commands; list every socket you use in <code>SESSIONS</code>.</p>
+            <p class="text-clay/80 mb-4 mt-4">If your scheduler sends work into one long-lived session instead of starting a new one, skipping is not enough. Use a single-flight lease: the scheduler holds a lock while a wake runs, and only an explicit done step from the session releases it. The <a href="https://github.com/jamditis/claude-skills-journalism/blob/master/docs/autonomy/kit/BUILD-WITH-YOUR-AGENT.md#a-persistent-attendant-advanced" class="text-accentDark underline underline-offset-2">persistent attendant section of the autonomy kit</a> covers the full pattern.</p>
         </section>
 
         <!-- Activity notifications -->
@@ -683,8 +689,109 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             </div>
             <p class="text-clay/80 text-sm mt-3 mb-4">The <code>monitor-silence 20</code> value is seconds. Bump it up if it fires too often during normal processing pauses.</p>
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                <p class="text-sm text-amber-800"><strong>Why silence, not activity?</strong> <code>monitor-activity</code> fires on every byte of output, too noisy for Claude sessions that stream continuously. <code>monitor-silence</code> fires only when output <em>stops</em>, which is a much better proxy for "waiting for you." While a session is running it outputs constantly; when it hits a prompt or finishes, it goes quiet.</p>
+                <p class="text-sm text-amber-800"><strong>Why silence, not activity?</strong> <code>monitor-activity</code> fires on every byte of output, too noisy for agent sessions that stream continuously. <code>monitor-silence</code> fires only when output <em>stops</em>, which is a much better proxy for "waiting for you." While a session is running it outputs constantly; when it hits a prompt or finishes, it goes quiet.</p>
             </div>
+        </section>
+
+        <!-- Supervised sessions -->
+        <section id="supervise" class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Survive reboots: supervise the session</h2>
+            <p class="text-clay/80 mb-4">tmux keeps a session alive when you disconnect, but not when the server restarts. On a Linux server with systemd, run the tmux session as a user service. systemd starts it at boot, restarts it if it crashes, and can cap its memory so one runaway tool cannot take down the machine.</p>
+            <p class="text-clay/80 mb-4">systemd watches the tmux server, not the agent. Keep this session to one window that runs only the agent. When the agent exits, its window closes, the tmux server exits, and systemd starts it again. Open logs and shells on a different tmux server (plain <code>tmux</code>, not <code>tmux -L agent</code>), not as extra windows or sessions here: anything else on this server keeps it alive after the agent dies, and nothing restarts it.</p>
+            <div class="terminal-bar">
+                <div class="terminal-titlebar">
+                    <div class="terminal-dot bg-red-400"></div>
+                    <div class="terminal-dot bg-yellow-400"></div>
+                    <div class="terminal-dot bg-green-400"></div>
+                    <span class="text-white/70 text-xs ml-2">~/.config/systemd/user/agent-session.service</span>
+                </div>
+                <div class="terminal-body text-xs leading-relaxed">
+                    [Unit]<br>
+                    Description=Persistent coding-agent session in tmux<br><br>
+                    [Service]<br>
+                    Type=forking<br>
+                    <span class="terminal-dim"># A dedicated tmux socket (-L agent) keeps this tmux server, and every tool it starts, inside this service</span><br>
+                    <span class="terminal-dim"># systemd does not read ~/.bashrc, so use full paths (find them with: command -v claude)</span><br>
+                    Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin<br>
+                    <span class="terminal-dim"># The launcher below resumes one pinned conversation</span><br>
+                    ExecStart=/usr/bin/tmux -L agent new-session -d -s agent -c %h/projects/my-project %h/.local/bin/agent-session-start<br>
+                    ExecStop=/usr/bin/tmux -L agent kill-server<br>
+                    <span class="terminal-dim"># tmux exits cleanly when its last window closes, so on-failure would never restart it</span><br>
+                    Restart=always<br>
+                    RestartSec=10<br>
+                    MemoryHigh=1536M<br>
+                    MemoryMax=2G<br>
+                    MemorySwapMax=512M<br><br>
+                    [Install]<br>
+                    WantedBy=default.target
+                </div>
+            </div>
+            <p class="text-clay/80 mb-4">Pin the conversation. <code>claude --continue</code> and <code>codex resume --last</code> pick the most recent conversation in the directory, so after a crash the service could resume a different session you opened there. This launcher keeps one conversation ID and always resumes it:</p>
+            <div class="terminal-bar">
+                <div class="terminal-titlebar">
+                    <div class="terminal-dot bg-red-400"></div>
+                    <div class="terminal-dot bg-yellow-400"></div>
+                    <div class="terminal-dot bg-green-400"></div>
+                    <span class="text-white/70 text-xs ml-2">~/.local/bin/agent-session-start</span>
+                </div>
+                <div class="terminal-body text-xs leading-relaxed">
+                    #!/bin/sh<br>
+                    <span class="terminal-dim"># Job control puts each command in its own foreground group, so tmux reports claude, not sh.</span><br>
+                    set -m<br>
+                    <span class="terminal-dim"># Resume the supervised conversation by its pinned ID; create it on first start.</span><br>
+                    id_file="$HOME/.config/agent-session/id"<br>
+                    if [ ! -s "$id_file" ]; then<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;mkdir -p "$(dirname "$id_file")"<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;cat /proc/sys/kernel/random/uuid &gt; "$id_file"<br>
+                    fi<br>
+                    id="$(cat "$id_file")"<br>
+                    <span class="terminal-dim"># --resume exits at once if nothing was saved under this ID yet; then create it with that ID.</span><br>
+                    "$HOME/.local/bin/claude" --resume "$id" || exec "$HOME/.local/bin/claude" --session-id "$id"
+                </div>
+            </div>
+            <p class="text-clay/80 text-sm mt-3 mb-4">Make it executable with <code>chmod +x</code>. The launcher relies only on two Claude Code errors, not on where Claude stores conversations: <code>--resume</code> exits at once with "No conversation found" for an ID it has not saved, and <code>--session-id</code> exits at once with "already in use" for one it has. So a failed first start is created again under the same ID, and a resumed session that crashes ends the launcher, and systemd starts it again. Keep <code>set -m</code>: without it, the resumed <code>claude</code> runs as a child of the launcher shell, and <code>pane_current_command</code> reports <code>sh</code>. The scheduler check above and the reboot check below would then miss the running agent. Before you enable the service, run <code>claude</code> once by hand in the project folder and accept the folder-trust prompt; otherwise the service waits at that prompt. Codex cannot choose an ID up front: start the session once by hand, write its session ID to the same file, and replace the last line with <code>exec /path/to/codex resume --no-daemon "$(cat "$id_file")"</code>. Without <code>--no-daemon</code>, Codex can run tools in a shared app-server outside this unit's limits.</p>
+            <div class="terminal-bar mt-4">
+                <div class="terminal-titlebar">
+                    <div class="terminal-dot bg-red-400"></div>
+                    <div class="terminal-dot bg-yellow-400"></div>
+                    <div class="terminal-dot bg-green-400"></div>
+                    <span class="text-white/70 text-xs ml-2">enable it</span>
+                </div>
+                <div class="terminal-body text-xs leading-relaxed">
+                    $ systemctl --user daemon-reload<br>
+                    $ systemctl --user enable --now agent-session.service<br>
+                    <span class="terminal-dim"># Keep user services running when you are logged out, and start them at boot</span><br>
+                    $ sudo loginctl enable-linger "$USER"<br>
+                    <span class="terminal-dim"># Attach from any SSH session</span><br>
+                    $ tmux -L agent attach -t agent
+                </div>
+            </div>
+            <p class="text-clay/80 text-sm mt-3 mb-4">If you use the auto-attach snippet above, point it at this session, and attach without <code>exec</code>: <code>tmux -L agent attach -t agent || echo "agent session is not running: systemctl --user status agent-session"</code>. If the service is down or waiting to restart, the attach fails and you keep a normal login shell to repair it. When you detach, you return to that shell. Do not let a login shell create the session with <code>new-session -A</code>; systemd owns it, and a session created by a shell runs outside the service and its memory limits.</p>
+            <p class="text-clay/80 text-sm mb-4">Size the memory limits to your machine. <code>MemoryHigh</code> slows the session down before <code>MemoryMax</code> stops it. On a small server, keep subagent fan-out small (two or three) and move heavy compute to another machine.</p>
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <p class="text-sm text-amber-800"><strong>Prove it with a real reboot.</strong> A unit that starts by hand can still fail at boot. Reboot once, then confirm that the boot ID changed (<code>cat /proc/sys/kernel/random/boot_id</code>), the service is active, the agent itself is running (<code>tmux -L agent list-panes -t agent -F '#{pane_current_command}'</code> shows <code>claude</code> or <code>codex</code>), the memory limit applies (<code>systemctl --user show agent-session -p MemoryMax</code>), and the agent's tool processes run inside the unit (<code>systemd-cgls --user-unit agent-session.service</code>). On macOS, use a launchd agent with <code>KeepAlive</code>. On Windows, run the session inside WSL2 and start the distribution at logon.</p>
+            </div>
+        </section>
+
+        <!-- Remote control -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Check in from your phone without SSH</h2>
+            <p class="text-clay/80 mb-4">Claude Code and Codex can both expose a running session to their own apps, so you can read and answer it from a phone without a terminal. Use this on top of tmux, not instead of it: tmux and the service still keep the process alive.</p>
+            <div class="terminal-bar">
+                <div class="terminal-titlebar">
+                    <div class="terminal-dot bg-red-400"></div>
+                    <div class="terminal-dot bg-yellow-400"></div>
+                    <div class="terminal-dot bg-green-400"></div>
+                    <span class="text-white/70 text-xs ml-2">remote control</span>
+                </div>
+                <div class="terminal-body text-xs leading-relaxed">
+                    <span class="terminal-dim"># Claude Code: start an interactive session with Remote Control, optionally named</span><br>
+                    $ claude --remote-control my-server<br><br>
+                    <span class="terminal-dim"># Codex: remote control runs through its app-server daemon (experimental)</span><br>
+                    $ codex remote-control --help
+                </div>
+            </div>
+            <p class="text-clay/80 text-sm mt-3">Codex remote control runs tools in its app-server daemon, not in the <code>--no-daemon</code> session above. If you use it, run the daemon as its own supervised service with its own memory limits. Both features change quickly. Check <code>--help</code> on your installed version before you build on them. Anyone who can reach the remote session can run commands on your server, so protect the account that controls it.</p>
         </section>
 
         <!-- Pitfalls -->
@@ -723,7 +830,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-1 rounded mt-0.5">Best practice</span>
                         <div>
                             <h3 class="font-semibold">tmux survives, but the server has to stay on</h3>
-                            <p class="text-sm text-clay/70 mt-1">Sessions persist across browser disconnects, not server reboots. A Pi or always-on server works perfectly for this; a laptop that gets shut down does not.</p>
+                            <p class="text-sm text-clay/70 mt-1">Sessions persist across browser disconnects, not server reboots. A Pi or always-on server works for this; a laptop that gets shut down does not. To survive reboots, <a href="#supervise" class="text-accentDark underline underline-offset-2">supervise the session</a>.</p>
                         </div>
                     </div>
                 </div>
@@ -743,7 +850,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <!-- CTA -->
         <section class="text-center">
             <div class="bg-gradient-to-br from-accent to-accentDark rounded-xl p-8 text-white">
-                <h2 class="font-display text-xl font-bold mb-3">Claude that keeps working after you close the tab</h2>
+                <h2 class="font-display text-xl font-bold mb-3">An agent that keeps working after you close the tab</h2>
                 <p class="text-white/80 mb-6 max-w-lg mx-auto text-sm">
                     A few config changes. Runs on any headless Linux, macOS, or BSD server with tmux. Connect from a Mac, Windows, Linux, ChromeOS, iOS, or Android client.
                 </p>

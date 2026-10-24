@@ -1,17 +1,17 @@
-# Codex Tool Mapping
+# Codex capability mapping
 
-Skills use Claude Code tool names. When you encounter these in a skill, use your platform equivalent:
+Shared skills describe capabilities instead of vendor tool names. In Codex, use these tools. Tool names can change between releases; check the current tool list if a call fails.
 
-| Skill references | Codex equivalent |
-|-----------------|------------------|
-| `Task` tool (dispatch subagent) | `spawn_agent` (see [Named agent dispatch](#named-agent-dispatch)) |
-| Multiple `Task` calls (parallel) | Multiple `spawn_agent` calls |
-| Task returns result | `wait` |
-| Task completes automatically | `close_agent` to free slot |
-| `TodoWrite` (task tracking) | `update_plan` |
-| `Skill` tool (invoke a skill) | Skills load natively, just follow the instructions |
-| `Read`, `Write`, `Edit` (files) | Use your native file tools |
-| `Bash` (run commands) | Use your native shell tools |
+| Skill action | Codex capability |
+|---|---|
+| Dispatch one worker | `spawn_agent` (see [Named worker dispatch](#named-worker-dispatch)) |
+| Dispatch independent work in parallel | Multiple `spawn_agent` calls before any `wait` |
+| Wait for worker results | `wait` |
+| Free a finished worker's slot | `close_agent` |
+| Track plan progress | `update_plan` |
+| Load a skill | Skills load natively; follow the instructions |
+| Read or edit files | Use native file tools |
+| Run commands | Use the native shell tool |
 
 ## Subagent dispatch requires multi-agent support
 
@@ -24,10 +24,10 @@ multi_agent = true
 
 This enables `spawn_agent`, `wait`, and `close_agent` for skills like `dispatching-parallel-agents` and `subagent-driven-development`.
 
-## Named agent dispatch
+## Named worker dispatch
 
-Claude Code skills reference named agent types like `superpowers:code-reviewer`.
-Codex does not have a named agent registry, `spawn_agent` creates generic agents
+Claude Code skills can reference named agent types such as `superpowers:code-reviewer`.
+Codex does not have a named agent registry. Its worker capability creates generic agents
 from built-in roles (`default`, `explorer`, `worker`).
 
 When a skill says to dispatch a named agent type:
@@ -40,8 +40,8 @@ When a skill says to dispatch a named agent type:
 
 | Skill instruction | Codex equivalent |
 |-------------------|------------------|
-| `Task tool (superpowers:code-reviewer)` | `spawn_agent(agent_type="worker", message=...)` with `code-reviewer.md` content |
-| `Task tool (general-purpose)` with inline prompt | `spawn_agent(message=...)` with the same prompt |
+| `Task` tool (`superpowers:code-reviewer`) | `spawn_agent(agent_type="worker", message=...)` with the filled `code-reviewer.md` content |
+| `Task` tool (`general-purpose`) with inline prompt | `spawn_agent(message=...)` with the same prompt |
 
 ### Message framing
 

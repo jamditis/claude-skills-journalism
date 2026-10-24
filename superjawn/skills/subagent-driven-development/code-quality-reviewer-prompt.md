@@ -7,7 +7,7 @@ Use this template when dispatching a code quality reviewer subagent.
 **Only dispatch after spec compliance review passes.**
 
 ```
-Task tool (pr-review-toolkit:code-reviewer):
+Dispatch with the client's code-review worker capability. In Claude Code, use the Task tool with `pr-review-toolkit:code-reviewer`:
   Use template at requesting-code-review/code-reviewer.md
 
   WHAT_WAS_IMPLEMENTED: [from implementer's report]

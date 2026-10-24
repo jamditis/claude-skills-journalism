@@ -4,7 +4,7 @@ description: Builds an Open Knowledge Format (OKF) knowledge base from existing 
 license: MIT
 metadata:
   author: jamditis
-  version: "0.8.3"
+  version: "0.8.4"
   okf_spec: v1
 ---
 
@@ -28,9 +28,10 @@ in `spec/SPEC.md` (in this skill's directory), read it before changing structure
 ## Start here: scope the wiki with the user
 
 Before you scaffold anything, settle four things with the user. They shape what gets created and
-how it is published, and they are awkward to retrofit once concepts exist. Ask with `AskUserQuestion`
-rather than in prose, in two steps: the first three questions in one call, then the publish question
-as a follow-up call only if the audience came back public or both (it does not apply to an
+how it is published, and they are awkward to retrofit once concepts exist. Ask the user and wait
+for an explicit answer. Use the client's structured question tool when it has one. Ask in two
+steps: the first three questions together, then the publish question only if the audience is public
+or both (it does not apply to an
 internal-only wiki, and its relevant options depend on that answer, so it cannot share the first
 batch). Infer the title from the repo or project and confirm it. Skip any question the user already
 answered in their request, do not re-ask what they have told you.
@@ -53,7 +54,7 @@ answered in their request, do not re-ask what they have told you.
 3. **Populate now or later**, author concepts now from existing material (a repo, docs, notes, or a
    URL: gather it and enter the authoring loop after scaffolding), or scaffold an empty tree the user
    fills in later.
-4. **Publish target**, a follow-up `AskUserQuestion` call, made only after the audience comes back
+4. **Publish target**, a follow-up question made only after the audience comes back
    public or both (skip it entirely for an internal-only wiki):
    - **In-repo bundle only (default):** the validator and relative links work directly, with no
      extra surface to maintain. Right for most wikis.
@@ -76,7 +77,7 @@ making it here, up front, where it can steer the rest of the setup.
   SPEC.md                 the OKF format contract
   README.md               how to use and validate the bundle
   scripts/validate.py     the validator
-  .claude/                Claude Code adapter: session-orientation hooks
+  .claude/                optional Claude Code adapter: session-orientation hooks
     settings.json         registers the hooks (Claude Code approves them once)
     hooks/okf-anchor.py   SessionStart: load the index into context
     hooks/okf-orient.py   PreToolUse: gate the first action on orientation
@@ -90,19 +91,28 @@ making it here, up front, where it can steer the rest of the setup.
 Docs and tooling sit at the project root; only `bundle/` is validated. Keep them
 separate, the validator treats every non-reserved `.md` inside the bundle as a
 concept that needs frontmatter, so a stray `SPEC.md` inside `bundle/` would fail.
-The `.claude/` hooks sit outside `bundle/`, so they never trip the concept checks.
+The `.claude/` adapter sits outside `bundle/`, so it never trips the concept checks.
 
 ## How to run it
 
-`${CLAUDE_SKILL_DIR}` below is this skill's own directory (the folder holding this
-`SKILL.md`). Claude Code substitutes it with the real absolute path before you run the
-command, so it works regardless of the current directory. On Windows, use `python` instead
-of `python3` (stock Windows has no `python3`). The `--title` and `--sections` come from the
-onboarding answers above, and `--no-hooks` only if the user opted out. Scaffold into a new
-directory; it validates automatically at the end:
+Use an explicit target outside the installed skill directory. On Windows, use `python`
+instead of `python3` (stock Windows has no `python3`). The `--title` and `--sections` come
+from the onboarding answers above, and `--no-hooks` only if the user opted out. The scaffold
+validates automatically.
+
+In Claude Code, `${CLAUDE_SKILL_DIR}` expands to this skill's directory:
 
 ```bash
 python3 "${CLAUDE_SKILL_DIR}/scripts/scaffold.py" ./my-knowledge-base \
+  --title "Team knowledge base" \
+  --sections concepts,services,decisions
+```
+
+In other clients, take the absolute `SKILL.md` location from the skill catalog. Stay in the
+project directory and run the installed script by its absolute path:
+
+```bash
+python3 /absolute/path/to/okf-wiki/scripts/scaffold.py ./my-knowledge-base \
   --title "Team knowledge base" \
   --sections concepts,services,decisions
 ```
@@ -124,7 +134,7 @@ Scaffolding leaves an empty tree with one placeholder concept. The usual next re
 "here are my docs / plans / notes / repo, build the wiki", has no importer script, and
 can't have one: deciding what counts as a single concept, writing its one-line description,
 choosing its `type`, and pointing `source` at real provenance is judgment work, not a
-mechanical transform. So you (Claude) author the concepts directly, in this loop:
+mechanical transform. Author the concepts directly in this loop:
 
 1. **Gather the source.** Read what the user pointed you at, a file, a folder, a repo, or a
    URL (fetch a URL first). Skim the whole thing before writing anything, so you can see the
@@ -233,8 +243,8 @@ unchanged from before this vocabulary existed.
 
 ## Session hooks
 
-A scaffolded project ships a `.claude/` with two hooks so any Claude session opened in it
-starts from the bundle, not from memory:
+A scaffolded project can include an optional Claude Code adapter with two hooks so a Claude
+Code session starts from the bundle instead of memory:
 
 - **`okf-anchor.py`** (SessionStart) prints the bundle's root index into the session context.
 - **`okf-orient.py`** (PreToolUse, no matcher) blocks the first action of the session once,
@@ -242,12 +252,12 @@ starts from the bundle, not from memory:
   inert outside an OKF bundle and fails open on any error, so it never wedges a session.
 
 Both are one cross-platform python3 script. The scripts are identical on every OS; only the
-interpreter in `.claude/settings.json` changes: `python3` on macOS/Linux, `python` on
+interpreter in the generated adapter settings changes: `python3` on macOS/Linux, `python` on
 Windows. `scaffold.py` auto-detects the OS; `--hooks-os posix|windows` forces it.
 
-Claude Code treats a checked-in `.claude/settings.json` as untrusted, so the first time the
+Claude Code treats checked-in project hook settings as untrusted, so the first time the
 project is opened it asks the user to approve the hooks; they run automatically after that.
-To turn them off, scaffold with `--no-hooks`, or delete `.claude/` (or set `disableAllHooks`)
+To turn them off, scaffold with `--no-hooks`, delete `.claude/`, or set `disableAllHooks`
 in an existing project.
 
 ### Client boundary
@@ -258,10 +268,9 @@ client adapter. The three generated `.claude/` files are a Claude Code adapter, 
 the OKF format and not shared Codex behavior. Codex does not read them as project configuration,
 and this skill must not claim that their `SessionStart` or `PreToolUse` lifecycle runs there.
 
-The general onboarding route above still names Claude Code's `AskUserQuestion` and
-`${CLAUDE_SKILL_DIR}` surfaces. The recorded Codex pilot pre-set every onboarding choice and
-used an explicit project-relative installed path; it does not establish that the unadapted
-general route is portable.
+The shared onboarding route is client-neutral. The labeled commands above document
+client-specific skill-root lookup. The recorded Codex pilot pre-set every onboarding choice
+and used an explicit installed path, so that historical result does not add runtime evidence for the newly generalized question flow.
 
 For a mixed Claude Code and Codex project, keep `.claude/` so Claude Code can request trust
 and use the hooks; Codex leaves it inert. For a Codex-only project, pass `--no-hooks` while
@@ -284,8 +293,17 @@ does not work, wiki pages are a web-UI-only surface):
   where you have already logged into GitHub. The script reuses that session; it does not log
   in for you. Pass its path with `--state` (default: `~/.cache/gh_state.json`).
 
+In Claude Code:
+
 ```bash
-python3 "${CLAUDE_SKILL_DIR}/scripts/gh-wiki-bootstrap.py" owner/repo --state path/to/gh_state.json
+python3 "${CLAUDE_SKILL_DIR}/scripts/gh-wiki-bootstrap.py" owner/repo --state /path/to/gh_state.json
+# then: git clone https://github.com/owner/repo.wiki.git and push your pages
+```
+
+In other clients, use the absolute installed skill path:
+
+```bash
+python3 /absolute/path/to/okf-wiki/scripts/gh-wiki-bootstrap.py owner/repo --state /path/to/gh_state.json
 # then: git clone https://github.com/owner/repo.wiki.git and push your pages
 ```
 

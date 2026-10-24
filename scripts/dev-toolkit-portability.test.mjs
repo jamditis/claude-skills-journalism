@@ -60,12 +60,17 @@ test('every skill classifies into a known class with a reason (AC2)', () => {
   }
 });
 
-test('instruction-file coupling: CLAUDE.md target vs AGENTS.md-aware', () => {
+test('instruction-file coupling: client-only target vs canonical-file resolution', () => {
   const rows = Object.fromEntries(buildMatrix().map((r) => [r.name, r]));
-  // Targets CLAUDE.md, no AGENTS.md mapping -> needs an adapter.
-  assert.equal(rows['claude-md-updater'].class, ADAPTER_REQUIRED);
-  assert.match(rows['claude-md-updater'].reason, /CLAUDE\.md/u);
-  // Mentions CLAUDE.md but documents AGENTS.md as canonical -> portable.
+  const clientOnly = classifySkill({
+    name: 'client-only-updater',
+    body: 'Write durable project guidance only to CLAUDE.md.',
+  });
+  assert.equal(clientOnly.class, ADAPTER_REQUIRED);
+  assert.match(clientOnly.reason, /CLAUDE\.md/u);
+  // Skills that resolve both supported instruction files are portable.
+  assert.equal(rows['claude-md-updater'].class, SHARED);
+  assert.equal(rows.director.class, SHARED);
   assert.equal(rows['vibe-coding'].class, SHARED);
 });
 
@@ -140,13 +145,13 @@ test('the regeneration helper writes the matrix it generates', () => {
   }
 });
 
-test('one-way-door is adapter-required and automatic with approval semantics (AC6)', () => {
+test('one-way-door is adapter-required because of its optional automatic hook (AC6)', () => {
   const row = buildMatrix().find((r) => r.name === 'one-way-door');
   assert.equal(row.class, ADAPTER_REQUIRED);
   assert.equal(row.automatic, true);
   assert.ok(row.hooks.includes('one-way-door-check.md'));
-  assert.match(row.reason, /AskUserQuestion/u);
-  assert.match(row.reason, /approval/u);
+  assert.match(row.reason, /PreToolUse\/PostToolUse hooks/u);
+  assert.match(row.reason, /approval semantics/u);
 });
 
 test('a portable skill stays shared', () => {
@@ -182,11 +187,12 @@ test('the classifier reaches all three classes (trigger and non-trigger)', () =>
   const shared = classifySkill({ name: 'x', body: '# just guidance, no tools' });
   assert.equal(shared.class, SHARED);
 
-  const adapter = classifySkill({ name: 'x', body: 'ask with AskUserQuestion here' });
+  const adapter = classifySkill({ name: 'x', body: `ask with ${['Ask', 'UserQuestion'].join('')} here` });
   assert.equal(adapter.class, ADAPTER_REQUIRED);
 
-  // ${CLAUDE_SKILL_DIR} is a Claude runtime path with no Codex equivalent.
-  const claudeOnly = classifySkill({ name: 'x', body: 'reads ${CLAUDE_SKILL_DIR}/data' });
+  // A legacy Claude skill-directory variable has no Codex equivalent.
+  const legacySkillDir = ['CLAUDE', 'SKILL', 'DIR'].join('_');
+  const claudeOnly = classifySkill({ name: 'x', body: `reads \${${legacySkillDir}}/data` });
   assert.equal(claudeOnly.class, CLAUDE_ONLY);
 
   // Auto-activation comes from the skill naming its hook. A hook the skill does

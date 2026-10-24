@@ -2,7 +2,7 @@
 type: Reference
 title: "data-methodology-check hook"
 description: "Ensure data journalism content includes methodology documentation"
-source: ["hooks/data-methodology-check.md", "CLAUDE.md"]
+source: ["hooks/data-methodology-check.md", "AGENTS.md"]
 verified: 2026-06-26
 timestamp: 2026-06-26
 tags: ["hook", "verification"]

@@ -58,17 +58,17 @@ ls -d worktrees 2>/dev/null      # Alternative
 
 **If found:** Use that directory. If both exist, `.worktrees` wins.
 
-### 2. Check CLAUDE.md
+### 2. Check project instructions
 
 ```bash
-grep -i "worktree.*director" CLAUDE.md 2>/dev/null
+grep -i "worktree.*director" AGENTS.md CLAUDE.md 2>/dev/null
 ```
 
 **If preference specified:** Use it without asking.
 
 ### 3. Ask User
 
-If no directory exists and no CLAUDE.md preference:
+If no directory exists and no applicable project instruction sets a preference:
 
 ```
 No worktree directory found. Where should I create worktrees?
@@ -179,7 +179,7 @@ Ready to implement <feature-name>
 | `.worktrees/` exists | Use it (verify ignored) |
 | `worktrees/` exists | Use it (verify ignored) |
 | Both exist | Use `.worktrees/` |
-| Neither exists | Check CLAUDE.md → Ask user |
+| Neither exists | Check the project instruction file, then ask the user |
 | Directory not ignored | Add to .gitignore + commit |
 | Tests fail during baseline | Report failures + ask |
 | No package.json/Cargo.toml | Skip dependency install |
@@ -194,7 +194,7 @@ Ready to implement <feature-name>
 ### Assuming directory location
 
 - **Problem:** Creates inconsistency, violates project conventions
-- **Fix:** Follow priority: existing > CLAUDE.md > ask
+- **Fix:** Follow priority: existing directory, project instructions, then ask
 
 ### Proceeding with failing tests
 
@@ -217,7 +217,7 @@ You: I'm using the using-git-worktrees skill to set up an isolated workspace.
 [Run npm install]
 [Run npm test - 47 passing]
 
-Worktree ready at /Users/jesse/myproject/.worktrees/auth
+Worktree ready at /Users/example/myproject/.worktrees/auth
 Tests passing (47 tests, 0 failures)
 Ready to implement auth feature
 ```
@@ -229,10 +229,10 @@ Ready to implement auth feature
 - Skip baseline test verification
 - Proceed with failing tests without asking
 - Assume directory location when ambiguous
-- Skip CLAUDE.md check
+- Skip the project instruction file check
 
 **Always:**
-- Follow directory priority: existing > CLAUDE.md > ask
+- Follow directory priority: existing directory, project instructions, then ask
 - Verify directory is ignored for project-local
 - Auto-detect and run project setup
 - Verify clean test baseline

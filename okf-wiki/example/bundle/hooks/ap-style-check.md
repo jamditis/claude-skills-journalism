@@ -2,7 +2,7 @@
 type: Reference
 title: "ap-style-check hook"
 description: "Flag common AP Style violations in written content"
-source: ["hooks/ap-style-check.md", "CLAUDE.md"]
+source: ["hooks/ap-style-check.md", "AGENTS.md"]
 verified: 2026-06-26
 timestamp: 2026-06-26
 tags: ["hook", "writing-quality"]

@@ -1,6 +1,6 @@
 ---
 name: template-selector
-description: Selects the correct CLAUDE.md or LESSONS.md template via decision trees. Use when starting a project or unsure which fits.
+description: Selects the correct project instruction or LESSONS.md template via decision trees. Use when starting a project or unsure which fits.
 ---
 
 # Template selector
@@ -126,7 +126,7 @@ If you're still unsure, ask:
 
 ## Using templates
 
-### For project memory (CLAUDE.md)
+### For project instructions
 1. Identify project category using decision tree above
 2. Copy appropriate template from `project-memory/templates/`
 3. Fill in bracketed placeholders with your specifics

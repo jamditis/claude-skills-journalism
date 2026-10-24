@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import {
   existsSync,
   mkdtempSync,
@@ -12,8 +13,10 @@ import {
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import test from 'node:test';
+import { parse as parseYaml } from 'yaml';
 
 import {
+  DEFAULT_FIXTURES,
   EVALUATION_TIMEOUT_MS,
   buildInvocation,
   loadFixtureSet,
@@ -23,16 +26,19 @@ import {
   prepareVariant,
   redactText,
   runCli,
-  runInvocation,
+  runInvocationAsync,
   scoreResult,
 } from './skill-behavior-eval.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const FIXTURES = join(ROOT, 'scripts', 'fixtures', 'lean-skill-evaluations.json');
+const COMPAT_FIXTURES = join(ROOT, 'scripts', 'fixtures', 'compat-smoke.json');
 const CLAUDE_ENVELOPES = JSON.parse(readFileSync(
   join(ROOT, 'scripts', 'fixtures', 'claude-output-envelopes.json'),
   'utf8',
 ));
+
+const EXPLICIT_ONLY_SKILLS = new Set(['director']);
 
 test('fixture set covers every required category for each pilot skill', () => {
   const fixtureSet = loadFixtureSet(FIXTURES);
@@ -52,6 +58,59 @@ test('fixture set covers every required category for each pilot skill', () => {
     for (const category of required) {
       assert.ok(categories.has(category), `${skill} needs a ${category} fixture`);
     }
+  }
+});
+
+test('compatibility smoke fixtures give every catalog skill its activation, implicit, and unrelated cases', () => {
+  const fixtureSet = loadFixtureSet(COMPAT_FIXTURES);
+  const catalog = parseYaml(readFileSync(join(ROOT, 'skills-catalog.yaml'), 'utf8'));
+  const expectedPackages = new Map(catalog.skills.map((skill) => [skill.name, skill.package]));
+
+  const ids = new Set();
+  const casesBySkill = new Map();
+  for (const fixture of fixtureSet.cases) {
+    assert.ok(!ids.has(fixture.id), `duplicate fixture id: ${fixture.id}`);
+    ids.add(fixture.id);
+    assert.ok(
+      ['activation', 'implicit-activation', 'unrelated-non-trigger'].includes(fixture.category),
+      `${fixture.id} has an unknown category`,
+    );
+    assert.equal(fixture.package, expectedPackages.get(fixture.skill), fixture.id);
+    assert.ok(
+      fixture.expect.terms.length >= 1 && fixture.expect.terms.length <= 3,
+      `${fixture.id} needs one to three expected terms`,
+    );
+    for (const term of fixture.expect.terms) {
+      assert.equal(typeof term, 'string', `${fixture.id} terms must be strings`);
+      assert.ok(term.trim().split(/\s+/u).length <= 3, `${fixture.id} term is too long`);
+    }
+    const cases = casesBySkill.get(fixture.skill) ?? [];
+    cases.push(fixture);
+    casesBySkill.set(fixture.skill, cases);
+  }
+
+  assert.deepEqual(
+    [...casesBySkill.keys()].sort(),
+    [...expectedPackages.keys()].sort(),
+  );
+  for (const [skill, cases] of casesBySkill) {
+    // Explicit-only skills have no implicit case: they must not activate unprompted.
+    const expected = EXPLICIT_ONLY_SKILLS.has(skill)
+      ? ['activation', 'unrelated-non-trigger']
+      : ['activation', 'implicit-activation', 'unrelated-non-trigger'];
+    assert.deepEqual(cases.map((fixture) => fixture.category).sort(), expected, skill);
+    const implicit = cases.find((fixture) => fixture.category === 'implicit-activation');
+    if (implicit) {
+      const activation = cases.find((fixture) => fixture.category === 'activation');
+      assert.equal(implicit.prompt, activation.prompt, `${skill} implicit prompt must match activation`);
+      assert.equal(implicit.expect.decision, 'use');
+      assert.doesNotMatch(implicit.prompt.replaceAll('-', ' '), new RegExp(skill.replaceAll('-', ' '), 'iu'));
+    }
+    assert.equal(cases.find((fixture) => fixture.category === 'activation').expect.decision, 'use');
+    assert.equal(
+      cases.find((fixture) => fixture.category === 'unrelated-non-trigger').expect.decision,
+      'reject',
+    );
   }
 });
 
@@ -99,6 +158,37 @@ test('variant preparation copies only the selected regular skill tree', () => {
   }
 });
 
+test('variant preparation supports root-level skill packages', () => {
+  const temp = mkdtempSync(join(tmpdir(), 'skill-eval-root-test-'));
+  try {
+    const source = join(temp, 'source');
+    const authHome = join(temp, 'codex-auth');
+    mkdirSync(authHome);
+    mkdirSync(join(source, 'visual-explainer'), { recursive: true });
+    writeFileSync(
+      join(source, 'visual-explainer', 'SKILL.md'),
+      '---\nname: visual-explainer\ndescription: test\n---\n',
+    );
+    const prepared = prepareVariant({
+      client: 'codex',
+      sourceRoot: source,
+      runRoot: join(temp, 'run'),
+      packageName: 'visual-explainer',
+      skillName: 'visual-explainer',
+      authSourceHome: authHome,
+    });
+    assert.equal(
+      readFileSync(
+        join(prepared.projectDir, '.agents', 'skills', 'visual-explainer', 'SKILL.md'),
+        'utf8',
+      ),
+      '---\nname: visual-explainer\ndescription: test\n---\n',
+    );
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
+
 test('client discovery homes expose only linked authentication files', () => {
   const temp = mkdtempSync(join(tmpdir(), 'skill-eval-auth-test-'));
   try {
@@ -139,6 +229,7 @@ test('invocations use bounded isolated print sessions without direct APIs', () =
   assert.ok(claude.args.includes('-p'));
   assert.ok(claude.args.includes('--plugin-dir'));
   assert.ok(claude.args.includes('--no-session-persistence'));
+  assert.ok(claude.args.includes('--strict-mcp-config'));
   assert.deepEqual(claude.args.slice(-2), ['--tools', '']);
 
   const codex = buildInvocation('codex', fixture, {
@@ -192,7 +283,7 @@ test('unrelated fixtures use implicit discovery without forcing either client sy
     assert.match(prompt, /candidate skill/u);
     assert.match(prompt, /Do not activate it merely because it is installed/u);
     assert.match(prompt, /never name the rejected candidate skill/u);
-    assert.match(prompt, /Use only the runtime's skill mechanism/u);
+    assert.match(prompt, /load it through the runtime's skill mechanism/u);
     if (client === 'claude') {
       assert.ok(invocation.args.includes('--verbose'));
       assert.deepEqual(
@@ -226,8 +317,8 @@ test('runtime evidence detects candidate skill activation in both client transcr
     CLAUDE_ENVELOPES.legacy,
   ].map((event) => JSON.stringify(event)).join('\n');
   assert.deepEqual(
-    parseRuntimeEvidence('claude', claude, 'zero-build-frontend'),
-    { candidateSkillActivated: true },
+    parseRuntimeEvidence('claude', claude, 'zero-build-frontend').candidateSkillActivated,
+    true,
   );
 
   const codex = [
@@ -244,20 +335,20 @@ test('runtime evidence detects candidate skill activation in both client transcr
     { type: 'turn.completed', usage: { input_tokens: 1, output_tokens: 1 } },
   ].map((event) => JSON.stringify(event)).join('\n');
   assert.deepEqual(
-    parseRuntimeEvidence('codex', codex, 'zero-build-frontend'),
-    { candidateSkillActivated: true },
+    parseRuntimeEvidence('codex', codex, 'zero-build-frontend').candidateSkillActivated,
+    true,
   );
   assert.deepEqual(
-    parseRuntimeEvidence('codex', codex, 'source-verification'),
-    { candidateSkillActivated: false },
+    parseRuntimeEvidence('codex', codex, 'source-verification').candidateSkillActivated,
+    false,
   );
   const windowsArrayCommand = codex.replace(
     JSON.stringify("sed -n '1,220p' .agents/skills/zero-build-frontend/SKILL.md"),
     JSON.stringify(['cmd', '/c', 'type .agents\\skills\\zero-build-frontend\\SKILL.md']),
   );
   assert.deepEqual(
-    parseRuntimeEvidence('codex', windowsArrayCommand, 'zero-build-frontend'),
-    { candidateSkillActivated: true },
+    parseRuntimeEvidence('codex', windowsArrayCommand, 'zero-build-frontend').candidateSkillActivated,
+    true,
   );
   for (const command of [
     'cd .agents/skills/zero-build-frontend && cat SKILL.md',
@@ -272,8 +363,8 @@ test('runtime evidence detects candidate skill activation in both client transcr
       JSON.stringify(command),
     );
     assert.deepEqual(
-      parseRuntimeEvidence('codex', changedDirectoryCommand, 'zero-build-frontend'),
-      { candidateSkillActivated: true },
+      parseRuntimeEvidence('codex', changedDirectoryCommand, 'zero-build-frontend').candidateSkillActivated,
+      true,
     );
   }
   for (const command of [
@@ -285,8 +376,8 @@ test('runtime evidence detects candidate skill activation in both client transcr
       JSON.stringify(command),
     );
     assert.deepEqual(
-      parseRuntimeEvidence('codex', unrelatedRead, 'zero-build-frontend'),
-      { candidateSkillActivated: false },
+      parseRuntimeEvidence('codex', unrelatedRead, 'zero-build-frontend').candidateSkillActivated,
+      false,
     );
   }
   assert.throws(
@@ -519,15 +610,15 @@ test('redaction removes provider token formats without matching short lookalikes
   assert.equal(redacted.match(/\[REDACTED\]/gu)?.length, secrets.length);
 });
 
-test('runtime failures include safe process launch and timeout details', () => {
+test('runtime failures include safe process launch and timeout details', async () => {
   const invocation = {
     command: 'missing-client',
     args: [],
     cwd: '/tmp',
     env: {},
   };
-  assert.throws(
-    () => runInvocation(invocation, '/tmp/no-response', 'codex', () => ({
+  await assert.rejects(
+    () => runInvocationAsync(invocation, '/tmp/no-response', 'codex', () => ({
       status: null,
       signal: null,
       stderr: '',
@@ -536,8 +627,8 @@ test('runtime failures include safe process launch and timeout details', () => {
     })),
     /ENOENT: spawnSync missing-client ENOENT/u,
   );
-  assert.throws(
-    () => runInvocation(invocation, '/tmp/no-response', 'codex', () => ({
+  await assert.rejects(
+    () => runInvocationAsync(invocation, '/tmp/no-response', 'codex', () => ({
       status: null,
       signal: 'SIGTERM',
       stderr: '',
@@ -546,8 +637,8 @@ test('runtime failures include safe process launch and timeout details', () => {
     })),
     /signal SIGTERM; ETIMEDOUT: spawnSync missing-client ETIMEDOUT/u,
   );
-  assert.throws(
-    () => runInvocation(invocation, '/tmp/no-response', 'codex', () => ({
+  await assert.rejects(
+    () => runInvocationAsync(invocation, '/tmp/no-response', 'codex', () => ({
       status: null,
       signal: null,
       stderr: 'x'.repeat(3_000),
@@ -555,6 +646,31 @@ test('runtime failures include safe process launch and timeout details', () => {
       error: Object.assign(new Error('spawnSync missing-client ENOENT'), { code: 'ENOENT' }),
     })),
     /ENOENT: spawnSync missing-client ENOENT/u,
+  );
+});
+
+test('the async runner maps real exit codes, signals, missing binaries, and closes stdin', { timeout: 20000 }, async () => {
+  const node = (code) => ({ command: process.execPath, args: ['-e', code], cwd: tmpdir(), env: {} });
+  await assert.rejects(
+    () => runInvocationAsync(node("process.stderr.write('bad exit'); process.exit(3)"), '/tmp/no-response', 'codex'),
+    /failed with status 3: bad exit/u,
+  );
+  await assert.rejects(
+    () => runInvocationAsync(node("process.kill(process.pid, 'SIGTERM')"), '/tmp/no-response', 'codex'),
+    /failed with status unknown: .*signal SIGTERM/u,
+  );
+  await assert.rejects(
+    () => runInvocationAsync({ ...node(''), command: join(tmpdir(), 'no-such-client-binary') }, '/tmp/no-response', 'codex'),
+    /failed with status unknown: .*ENOENT/u,
+  );
+  // The child reads stdin to the end. If the runner leaves stdin open, the child gives up after five seconds.
+  await assert.rejects(
+    () => runInvocationAsync(
+      node("setTimeout(() => { process.stderr.write('stdin left open'); process.exit(9); }, 5000); process.stdin.resume(); process.stdin.on('end', () => { process.stderr.write('stdin closed'); process.exit(4); })"),
+      '/tmp/no-response',
+      'codex',
+    ),
+    /failed with status 4: stdin closed/u,
   );
 });
 
@@ -584,25 +700,149 @@ test('CLI requires an explicit bounded selection and rejects unsafe overlap', ()
       outputDir: '/results',
       dryRun: true,
       maxCases: 1,
+      candidateOnly: false,
+      fixturesPath: DEFAULT_FIXTURES,
+      concurrency: 1,
+      competitive: false,
     },
   );
 });
 
-test('CLI rejects an existing report before any client invocation', () => {
+test('CLI parses and validates candidate-only, fixture, and concurrency options', () => {
+  assert.deepEqual(
+    parseCliArgs([
+      '--candidate-only', '--candidate', '/candidate', '--fixtures', '/fixtures.json',
+      '--all', '--runtime', 'both', '--max-cases', '100', '--concurrency', '4',
+      '--output', '/results', '--dry-run',
+    ]),
+    {
+      baselineRoot: undefined,
+      candidateRoot: '/candidate',
+      caseId: undefined,
+      all: true,
+      runtime: 'both',
+      outputDir: '/results',
+      dryRun: true,
+      maxCases: 100,
+      candidateOnly: true,
+      fixturesPath: '/fixtures.json',
+      concurrency: 4,
+      competitive: false,
+    },
+  );
+  for (const concurrency of ['0', '5', '1.5', 'no']) {
+    assert.throws(
+      () => parseCliArgs([
+        '--candidate-only', '--candidate', '/candidate', '--case', 'one',
+        '--concurrency', concurrency, '--output', '/results',
+      ]),
+      /--concurrency must be an integer from 1 through 4/u,
+    );
+  }
+  assert.throws(
+    () => parseCliArgs([
+      '--candidate-only', '--baseline', '/base', '--candidate', '/candidate',
+      '--case', 'one', '--output', '/results',
+    ]),
+    /--baseline cannot be used with --candidate-only/u,
+  );
+  assert.throws(
+    () => parseCliArgs([
+      '--candidate-only', '--candidate', '/candidate', '--fixtures',
+      '--case', 'one', '--output', '/results',
+    ]),
+    /--fixtures requires a value/u,
+  );
+});
+
+test('candidate-only dry-run uses the selected fixture and preserves result ordering', async () => {
+  const temp = mkdtempSync(join(tmpdir(), 'skill-eval-dry-run-'));
+  try {
+    const fixturesPath = join(temp, 'fixtures.json');
+    const outputDir = join(temp, 'output');
+    const fixtureSet = {
+      schemaVersion: 1,
+      cases: [
+        {
+          id: 'visual-explainer-activation',
+          skill: 'visual-explainer',
+          package: 'visual-explainer',
+          category: 'activation',
+          prompt: 'Create an HTML timeline.',
+          expect: { decision: 'use', branch: 'timeline', terms: ['HTML'] },
+        },
+        {
+          id: 'missing-skill-unrelated',
+          skill: 'missing-skill',
+          package: 'missing-package',
+          category: 'unrelated-non-trigger',
+          prompt: 'Copyedit one sentence.',
+          expect: { decision: 'reject', branch: 'copyediting', terms: ['copyedit'] },
+        },
+      ],
+    };
+    writeFileSync(fixturesPath, `${JSON.stringify(fixtureSet, null, 2)}\n`);
+    let invocations = 0;
+    await runCli([
+      '--candidate-only', '--candidate', ROOT, '--fixtures', fixturesPath,
+      '--all', '--runtime', 'both', '--max-cases', '2', '--concurrency', '3',
+      '--output', outputDir, '--dry-run',
+    ], {
+      runInvocation: async () => {
+        invocations += 1;
+        throw new Error('dry-run invoked a client');
+      },
+    });
+
+    assert.equal(invocations, 0);
+    const report = JSON.parse(readFileSync(
+      join(outputDir, 'skill-behavior-evaluation.json'),
+      'utf8',
+    ));
+    assert.equal(
+      report.fixtureDigest,
+      createHash('sha256').update(readFileSync(fixturesPath)).digest('hex'),
+    );
+    assert.deepEqual(report.selection, {
+      caseId: null,
+      all: true,
+      maxCases: 2,
+      candidateOnly: true,
+      competitive: false,
+      installedSkills: 1,
+      concurrency: 3,
+    });
+    assert.deepEqual(
+      report.results.map((result) => [result.case, result.client, result.variant]),
+      [
+        ['visual-explainer-activation', 'claude', 'candidate'],
+        ['visual-explainer-activation', 'codex', 'candidate'],
+        ['missing-skill-unrelated', 'claude', 'candidate'],
+        ['missing-skill-unrelated', 'codex', 'candidate'],
+      ],
+    );
+    assert.deepEqual(report.missingSkills, [{ package: 'missing-package', skill: 'missing-skill' }]);
+    assert.ok(report.results.slice(2).every((result) => result.status === 'missing-skill'));
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test('CLI rejects an existing report before any client invocation', async () => {
   const temp = mkdtempSync(join(tmpdir(), 'skill-eval-existing-report-'));
   try {
     const reportPath = join(temp, 'skill-behavior-evaluation.json');
     writeFileSync(reportPath, '{}\n');
     let clientInvocations = 0;
-    assert.throws(
-      () => runCli([
+    await assert.rejects(
+      runCli([
         '--baseline', join(temp, 'baseline'),
         '--candidate', join(temp, 'candidate'),
         '--case', 'zbf-activation',
         '--runtime', 'codex',
         '--output', temp,
       ], {
-        run: () => {
+        runInvocation: async () => {
           clientInvocations += 1;
           return { status: 0, stderr: '', stdout: '' };
         },
@@ -611,6 +851,258 @@ test('CLI rejects an existing report before any client invocation', () => {
     );
     assert.equal(clientInvocations, 0);
     assert.equal(readFileSync(reportPath, 'utf8'), '{}\n');
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test('implicit activation passes only when the client selected the skill itself', () => {
+  const fixture = {
+    id: 'x-implicit',
+    skill: 'web-scraping',
+    package: 'dev-toolkit',
+    category: 'implicit-activation',
+    prompt: 'Collect public agenda pages.',
+    expect: { decision: 'use', branch: 'public scraping', terms: ['robots'] },
+  };
+  const response = { decision: 'use', skill: 'web-scraping', branch: 'public scraping', notes: 'robots' };
+  assert.equal(scoreResult(fixture, response, { candidateSkillActivated: true }).pass, true);
+  const missing = scoreResult(fixture, response, { candidateSkillActivated: false });
+  assert.equal(missing.pass, false);
+  assert.deepEqual(missing.failed, ['activation']);
+  assert.equal(scoreResult(fixture, response, {}).pass, false);
+});
+
+test('selection scoring gates on decision, skill, and activation and keeps wording advisory', () => {
+  const fixture = {
+    id: 'x-implicit',
+    skill: 'web-scraping',
+    package: 'dev-toolkit',
+    category: 'implicit-activation',
+    scoring: 'selection',
+    prompt: 'Collect public agenda pages.',
+    expect: { decision: 'use', branch: 'public scraping', terms: ['provenance'] },
+  };
+  const response = { decision: 'use', skill: 'skill-evaluation:web-scraping', branch: 'agenda collection' };
+  const result = scoreResult(fixture, response, { candidateSkillActivated: true });
+  assert.equal(result.pass, true);
+  assert.deepEqual(result.advisory, ['branch', 'terms']);
+  assert.equal(scoreResult(fixture, { ...response, decision: 'reject' }, { candidateSkillActivated: true }).pass, false);
+  assert.equal(scoreResult(fixture, { ...response, decision: 'ask' }, { candidateSkillActivated: true }).pass, true);
+  assert.equal(scoreResult(fixture, { ...response, decision: 'ask' }, { candidateSkillActivated: false }).pass, false);
+});
+
+test('competitive runs install every fixture skill, drop the hint, and skip named cases', async () => {
+  assert.throws(
+    () => parseCliArgs([
+      '--baseline', '/base', '--candidate', '/candidate', '--competitive',
+      '--all', '--output', '/results',
+    ]),
+    /--competitive requires --candidate-only/u,
+  );
+  const temp = mkdtempSync(join(tmpdir(), 'skill-eval-competitive-'));
+  try {
+    const fixturesPath = join(temp, 'fixtures.json');
+    const outputDir = join(temp, 'output');
+    const fixtureSet = {
+      schemaVersion: 1,
+      cases: [
+        {
+          id: 'ws-activation',
+          skill: 'web-scraping',
+          package: 'dev-toolkit',
+          category: 'activation',
+          prompt: 'Collect public agenda pages.',
+          expect: { decision: 'use', branch: 'scraping', terms: ['robots'] },
+        },
+        {
+          id: 'ws-implicit',
+          skill: 'web-scraping',
+          package: 'dev-toolkit',
+          category: 'implicit-activation',
+          prompt: 'Collect public agenda pages.',
+          expect: { decision: 'use', branch: 'scraping', terms: ['robots'] },
+        },
+        {
+          id: 've-unrelated',
+          skill: 'visual-explainer',
+          package: 'visual-explainer',
+          category: 'unrelated-non-trigger',
+          prompt: 'Copyedit one sentence.',
+          expect: { decision: 'reject', branch: 'copyediting', terms: ['copyedit'] },
+        },
+      ],
+    };
+    writeFileSync(fixturesPath, `${JSON.stringify(fixtureSet, null, 2)}\n`);
+    await runCli([
+      '--candidate-only', '--competitive', '--candidate', ROOT, '--fixtures', fixturesPath,
+      '--all', '--runtime', 'codex', '--max-cases', '3', '--output', outputDir, '--dry-run',
+    ]);
+    const report = JSON.parse(readFileSync(
+      join(outputDir, 'skill-behavior-evaluation.json'),
+      'utf8',
+    ));
+    assert.deepEqual(report.results.map((item) => item.case), ['ws-implicit', 've-unrelated']);
+    assert.equal(report.selection.competitive, true);
+    assert.equal(report.selection.installedSkills, 2);
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+
+  const runRoot = mkdtempSync(join(tmpdir(), 'skill-eval-competitive-prepare-'));
+  try {
+    const prepared = prepareVariant({
+      client: 'codex',
+      sourceRoot: ROOT,
+      runRoot,
+      packageName: 'dev-toolkit',
+      skillName: 'web-scraping',
+      authSourceHome: runRoot,
+      extraSkills: [
+        { package: 'dev-toolkit', skill: 'web-scraping' },
+        { package: 'visual-explainer', skill: 'visual-explainer' },
+      ],
+    });
+    assert.deepEqual(
+      readdirSync(join(prepared.projectDir, '.agents', 'skills')).sort(),
+      ['visual-explainer', 'web-scraping'],
+    );
+    const fixture = {
+      id: 'ws-implicit',
+      skill: 'web-scraping',
+      category: 'implicit-activation',
+      prompt: 'Collect public agenda pages.',
+    };
+    const prompt = buildInvocation('codex', fixture, prepared, {}, true).args.at(-1);
+    assert.doesNotMatch(prompt, /candidate|single/iu);
+    assert.doesNotMatch(prompt, /web-scraping/u);
+  } finally {
+    rmSync(runRoot, { recursive: true, force: true });
+  }
+});
+
+test('selection-scored unrelated cases gate only on leaving the candidate alone', () => {
+  const fixture = {
+    id: 've-unrelated',
+    skill: 'visual-explainer',
+    package: 'visual-explainer',
+    category: 'unrelated-non-trigger',
+    scoring: 'selection',
+    prompt: 'Copyedit one sentence.',
+    expect: { decision: 'reject', branch: 'copyediting', terms: ['copyedit'] },
+  };
+  const otherSkill = { decision: 'use', skill: 'newsroom-style', branch: 'copyediting' };
+  const evidence = { candidateSkillActivated: false, activatedSkills: ['newsroom-style'] };
+  assert.equal(scoreResult(fixture, otherSkill, evidence).pass, true);
+  assert.equal(scoreResult({ ...fixture, scoring: undefined }, otherSkill, evidence).pass, false);
+  assert.equal(
+    scoreResult(fixture, { ...otherSkill, skill: null }, { candidateSkillActivated: true }).pass,
+    false,
+  );
+  assert.equal(
+    scoreResult(fixture, { ...otherSkill, skill: 'visual-explainer' }, evidence).pass,
+    false,
+  );
+});
+
+test('runtime evidence lists every skill a Codex session read', () => {
+  const codex = [
+    {
+      type: 'item.completed',
+      item: {
+        type: 'command_execution',
+        command: 'cat .agents/skills/web-scraping/SKILL.md .agents/skills/web-archiving/SKILL.md',
+        status: 'completed',
+        exit_code: 0,
+      },
+    },
+    { type: 'turn.completed', usage: { input_tokens: 1, output_tokens: 1 } },
+  ].map((event) => JSON.stringify(event)).join('\n');
+  assert.deepEqual(
+    parseRuntimeEvidence('codex', codex, 'web-scraping').activatedSkills,
+    ['web-archiving', 'web-scraping'],
+  );
+});
+
+function writeFixtureSet(temp, cases) {
+  const fixturesPath = join(temp, 'fixtures.json');
+  writeFileSync(fixturesPath, `${JSON.stringify({ schemaVersion: 1, cases }, null, 2)}\n`);
+  return fixturesPath;
+}
+
+const WEB_SCRAPING_CASE = {
+  skill: 'web-scraping',
+  package: 'dev-toolkit',
+  prompt: 'Collect public agenda pages.',
+  expect: { decision: 'use', branch: 'scraping', terms: ['robots'] },
+};
+
+test('a failed client run stops new jobs and still writes the report', async () => {
+  const temp = mkdtempSync(join(tmpdir(), 'skill-eval-stop-'));
+  const exitCode = process.exitCode;
+  try {
+    const fixturesPath = writeFixtureSet(temp, ['one', 'two', 'three'].map((id) => ({
+      ...WEB_SCRAPING_CASE, id, category: 'activation',
+    })));
+    let invocations = 0;
+    await runCli([
+      '--candidate-only', '--candidate', ROOT, '--fixtures', fixturesPath, '--all',
+      '--runtime', 'codex', '--max-cases', '3', '--concurrency', '1',
+      '--output', join(temp, 'output'),
+    ], {
+      runInvocation: async () => {
+        invocations += 1;
+        throw new Error('client exited 1');
+      },
+    });
+    assert.equal(invocations, 1);
+    assert.equal(process.exitCode, 1);
+    const report = JSON.parse(readFileSync(join(temp, 'output', 'skill-behavior-evaluation.json'), 'utf8'));
+    assert.deepEqual(report.results.map((item) => [item.case, item.status]), [
+      ['one', 'error'], ['two', 'not-run'], ['three', 'not-run'],
+    ]);
+  } finally {
+    process.exitCode = exitCode;
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test('a competitive dry run reports missing competitors instead of failing', async () => {
+  const temp = mkdtempSync(join(tmpdir(), 'skill-eval-missing-competitor-'));
+  try {
+    const fixturesPath = writeFixtureSet(temp, [
+      { ...WEB_SCRAPING_CASE, id: 'ws-implicit', category: 'implicit-activation' },
+      {
+        id: 'gone-unrelated', skill: 'gone-skill', package: 'gone-package',
+        category: 'unrelated-non-trigger', prompt: 'Copyedit one sentence.',
+        expect: { decision: 'reject', branch: 'copyediting', terms: ['copyedit'] },
+      },
+    ]);
+    await runCli([
+      '--candidate-only', '--competitive', '--candidate', ROOT, '--fixtures', fixturesPath,
+      '--all', '--runtime', 'codex', '--max-cases', '2', '--dry-run',
+      '--output', join(temp, 'output'),
+    ]);
+    const report = JSON.parse(readFileSync(join(temp, 'output', 'skill-behavior-evaluation.json'), 'utf8'));
+    assert.deepEqual(report.missingSkills, [{ package: 'gone-package', skill: 'gone-skill' }]);
+    assert.equal(report.results.find((item) => item.case === 'gone-unrelated').status, 'missing-skill');
+    // Only web-scraping exists, so the report must not count the missing competitor as installed.
+    assert.equal(report.selection.installedSkills, 1);
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test('a competitive run rejects a selection with no unnamed cases', async () => {
+  const temp = mkdtempSync(join(tmpdir(), 'skill-eval-empty-competitive-'));
+  try {
+    const fixturesPath = writeFixtureSet(temp, [
+      { ...WEB_SCRAPING_CASE, id: 'ws-activation', category: 'activation' },
+    ]);
+    await assert.rejects(runCli([
+      '--candidate-only', '--competitive', '--candidate', ROOT, '--fixtures', fixturesPath,
+      '--case', 'ws-activation', '--runtime', 'codex', '--output', join(temp, 'output'),
+    ]), /No runnable cases/u);
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }

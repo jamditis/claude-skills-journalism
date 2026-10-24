@@ -1,4 +1,4 @@
-# CLAUDE.md - [Project name]
+# Project instructions - [Project name]
 
 > Template for: Content pipelines (publishing workflows, content automation)
 

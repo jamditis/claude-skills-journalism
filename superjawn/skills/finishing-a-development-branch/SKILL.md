@@ -97,6 +97,12 @@ Then: Cleanup worktree (Step 5)
 
 #### Option 2: Push and Create PR
 
+Before you push:
+
+- Keep the PR to one concern. Split unrelated changes into separate PRs, or stack them.
+- Get the independent cross-provider review on the exact head (see **requesting-code-review**).
+- Run the checks locally first. Push once when the branch is ready, so hosted CI runs once.
+
 ```bash
 # Push branch
 git push -u origin <feature-branch>
@@ -108,9 +114,15 @@ gh pr create --title "<title>" --body "$(cat <<'EOF'
 
 ## Test Plan
 - [ ] <verification steps>
+
+Refs #<issue>
 EOF
 )"
 ```
+
+Use `Refs #n` when the repository deploys after merge, and close the issue only after a live check. Use a closing keyword only when merge itself makes the change live. For a stacked PR, state its parent PR, base branch, and position in the stack.
+
+Merging is a separate decision. Do not merge a PR without the owner's explicit approval for that PR.
 
 Then: Cleanup worktree (Step 5)
 
@@ -192,6 +204,7 @@ git worktree remove <worktree-path>
 - Merge without verifying tests on result
 - Delete work without confirmation
 - Force-push without explicit request
+- Treat "merged" as "live" when a deploy step remains
 
 **Always:**
 - Verify tests before offering options
@@ -207,3 +220,7 @@ git worktree remove <worktree-path>
 
 **Pairs with:**
 - **using-git-worktrees** - Cleans up worktree created by that skill
+
+## Reference files
+
+Read [Claims and cleanup](references/claims-and-cleanup.md) when releasing claims, handling stacked pull requests, or cleaning up after merge.

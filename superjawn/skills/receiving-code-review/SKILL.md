@@ -35,7 +35,7 @@ WHEN receiving code review feedback:
 ## Forbidden Responses
 
 **NEVER:**
-- "You're absolutely right!" (explicit CLAUDE.md violation)
+- "You're absolutely right!" (violates the project instruction file)
 - "Great point!" / "Excellent feedback!" (performative)
 - "Let me implement that now" (before verification)
 
@@ -212,6 +212,14 @@ You understand 1,2,3,6. Unclear on 4,5.
 
 When replying to inline review comments on GitHub, reply in the comment thread (`gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`), not as a top-level PR comment.
 
+For a PR with several findings:
+
+1. Start from the PR's current head. Read every surface: review threads, top-level comments, and failing checks.
+2. Classify each finding as actionable, already fixed, not reproducible, or out of scope. Reproduce it when practical.
+3. Fix only the supported findings. Put all fixes in one push, so hosted CI runs once.
+4. Resolve a thread only after the fix is pushed and the pushed head contains it. A local fix does not resolve a thread.
+5. Report each finding's state accurately: fixed in a named commit, declined with a reason, or still open.
+
 ## The Bottom Line
 
 **External feedback = suggestions to evaluate, not orders to follow.**
@@ -219,3 +227,7 @@ When replying to inline review comments on GitHub, reply in the comment thread (
 Verify. Question. Then implement.
 
 No performative agreement. Technical rigor always.
+
+## Reference files
+
+Read [Pull request feedback repair](references/pr-feedback-repair.md) when review feedback may require code changes or thread resolution.

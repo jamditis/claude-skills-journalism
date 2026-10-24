@@ -165,6 +165,9 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 Generate self-contained HTML pages that visually explain systems, data stories, investigations, editorial workflows, and code changes. Adapted from nicobailon/visual-explainer with journalism design sensibilities.
             </p>
         </div>
+            <p class="relative z-10 max-w-6xl mx-auto px-6 pt-6 text-sm text-white">
+            Works in: Uses the open Agent Skills format. <a class="underline" href="https://github.com/jamditis/claude-skills-journalism/blob/master/plans/codex-compatibility-matrix.md">Codex: runtime pilot passed; command surfaces unclaimed</a>.
+        </p>
     </header>
 
     <main id="main" class="max-w-4xl mx-auto px-6 py-12 relative z-10">
@@ -360,6 +363,13 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             </div>
         </section>
 
+        <!-- Requirements -->
+        <section class="mb-12">
+            <h2 class="font-display text-2xl font-semibold mb-4">Requirements and optional imagery</h2>
+            <p class="text-clay/80 mb-4">A browser is required to view generated HTML files. Image generation is optional. If <a href="https://github.com/nicobailon/surf-cli" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">surf-cli</a> is available, check it with <code>which surf</code> and generate an image with:</p>
+            <pre class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>surf gemini "descriptive prompt" --generate-image /tmp/ve-img.png --aspect-ratio 16:9</code></pre>
+        </section>
+
         <!-- Installation -->
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Installation</h2>
@@ -369,7 +379,9 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 <p class="text-white mb-4">/plugin install visual-explainer@claude-skills-journalism</p>
                 <p class="text-white/50 mb-2"># Or copy just this skill from the plugin tree</p>
                 <p class="text-white mb-1">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
-                <p class="text-white">cp -r claude-skills-journalism/visual-explainer ~/.claude/skills/</p>
+                <p class="text-white mb-1">mkdir -p ~/.claude/skills ~/.agents/skills</p>
+                <p class="text-white mb-1">cp -r claude-skills-journalism/visual-explainer ~/.claude/skills/ <span class="text-white/50"># Claude Code</span></p>
+                <p class="text-white">cp -r claude-skills-journalism/visual-explainer ~/.agents/skills/ <span class="text-white/50"># Codex</span></p>
             </div>
             <p class="mt-4 text-clay/70 text-sm">
                 Or browse this skill in the
@@ -381,7 +393,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Credits</h2>
             <p class="text-clay/70 text-sm">
-                Adapted from <a href="https://github.com/nicobailon/visual-explainer" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">nicobailon/visual-explainer</a> (MIT)
+                Version 0.7.5, adapted from <a href="https://github.com/nicobailon/visual-explainer" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">nicobailon/visual-explainer</a> by nicobailon (MIT), with journalism adaptations by jamditis
                 with design principles from <a href="https://github.com/anthropics/skills" class="text-accentDark hover:text-accentDark underline underline-offset-2" target="_blank" rel="noopener noreferrer">Anthropic's frontend-design skill</a>.
                 Tailored for journalism, media, and academic workflows.
             </p>

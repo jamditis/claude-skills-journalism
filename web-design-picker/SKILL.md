@@ -2,16 +2,18 @@
 name: web-design-picker
 description: Use when creating distinct website directions, a client review picker, asset catalog, previews, and Cloudflare-ready handoffs.
 license: MIT
-compatibility: Python 3.10+. Build, validation, and packaging use the standard library. Scaffolding and favicon exports require Pillow and resvg-cli; screenshots require Playwright plus Chromium; video exports require ffmpeg. Generated sites are framework-free static files.
-metadata:
-  author: Joe Amditis
-  version: "1.0.0"
-  category: web-design
 ---
 
 # Web design picker
 
 Build a complete website-concept review package rather than isolated mockups. The default deliverable is three materially different, responsive website directions; a review shell that switches among them without losing the presentation context; a full-screen presentation mode; a searchable asset catalog with per-format, per-family, and download-all controls; two primary release archives; and supporting review, source, and full-handoff archives.
+
+## Requirements
+
+Use Python 3.10 or newer. Build, validation, and packaging use the standard
+library. Scaffolding and favicon exports require Pillow and resvg-cli.
+Screenshots require Playwright and Chromium. Video exports require ffmpeg.
+Generated sites are framework-free static files.
 
 When invoked for an actual website project, perform the work. Do not stop at a strategy document unless the user asks only for strategy.
 

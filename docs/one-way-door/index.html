@@ -139,6 +139,9 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 Flag irreversible architectural decisions before you commit to them. The most expensive mistakes aren't bugs, they're decisions that can't be undone.
             </p>
         </div>
+            <p class="relative z-10 max-w-6xl mx-auto px-6 pt-6 text-sm text-white">
+            Works in: Uses the open Agent Skills format. <a class="underline" href="https://github.com/jamditis/claude-skills-journalism/blob/master/plans/codex-compatibility-matrix.md">Codex: candidate, adapter review pending</a>.
+        </p>
     </header>
 
     <main id="main" class="max-w-4xl mx-auto px-6 py-12 relative z-10">
@@ -266,14 +269,14 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
         <!-- How it works -->
         <section class="mb-16">
-            <h2 class="font-display text-2xl font-semibold mb-6">How it works</h2>
+            <h2 class="font-display text-2xl font-semibold mb-6">Shared decision workflow</h2>
             <div class="space-y-4">
                 <div class="bg-white rounded-xl p-5 border border-mist/30">
                     <div class="flex items-start gap-4">
                         <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded">Detect</span>
                         <div>
-                            <h3 class="font-semibold">Hook intercepts file creation</h3>
-                            <p class="text-sm text-clay/70 mt-1">The PreToolUse hook fires on every <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">Write</code> call. It extracts the file path and checks it against known one-way-door filename patterns.</p>
+                            <h3 class="font-semibold">Identify the decision</h3>
+                            <p class="text-sm text-clay/70 mt-1">Check whether a proposed file or change defines a decision that is costly to reverse.</p>
                         </div>
                     </div>
                 </div>
@@ -282,7 +285,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-1 rounded">Block</span>
                         <div>
                             <h3 class="font-semibold">One-way door detected</h3>
-                            <p class="text-sm text-clay/70 mt-1">If the file matches a one-way-door pattern and isn't already approved this session, the hook records it as pending, exits with code 2 (block), and sends a message to stderr explaining what was caught and why.</p>
+                            <p class="text-sm text-clay/70 mt-1">Pause before making the change. Explain what is difficult to reverse and list viable alternatives.</p>
                         </div>
                     </div>
                 </div>
@@ -290,8 +293,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                     <div class="flex items-start gap-4">
                         <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded">Ask</span>
                         <div>
-                            <h3 class="font-semibold">Claude discusses trade-offs</h3>
-                            <p class="text-sm text-clay/70 mt-1">Claude uses <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">AskUserQuestion</code> to present the architectural decision: what it does, alternative approaches, and trade-offs. The user decides how to proceed.</p>
+                            <h3 class="font-semibold">Ask for an explicit decision</h3>
+                            <p class="text-sm text-clay/70 mt-1">Ask the user and wait for an explicit answer. Use the client's structured question tool when it has one.</p>
                         </div>
                     </div>
                 </div>
@@ -300,7 +303,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-1 rounded">Proceed</span>
                         <div>
                             <h3 class="font-semibold">Approve, then write with confidence</h3>
-                            <p class="text-sm text-clay/70 mt-1">When the user answers, a companion hook (PostToolUse:AskUserQuestion) promotes the file to approved for the session, so Claude's retried write passes instead of re-blocking. Two-way door files always pass through silently, and a new session starts with a clean slate.</p>
+                            <p class="text-sm text-clay/70 mt-1">Proceed only after approval. Record the selected approach and its trade-offs in the project instruction file or decision record. Two-way door files always pass through silently, and a new session starts with a clean slate.</p>
                         </div>
                     </div>
                 </div>
@@ -309,7 +312,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
         <!-- Hook script -->
         <section class="mb-16">
-            <h2 class="font-display text-2xl font-semibold mb-4">The hook scripts</h2>
+            <h2 class="font-display text-2xl font-semibold mb-4">Optional Claude Code enforcement</h2>
             <p class="text-clay/80 mb-4">Two shell scripts that share a session-scoped approval ledger. The check runs on every <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">Write</code>: it pattern-matches the filename and blocks with exit code 2 if the file is a one-way door it hasn't already seen approved this session.</p>
             <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                 <pre tabindex="0" class="text-white"><code>#!/bin/sh
@@ -379,13 +382,13 @@ if [ "$ONE_WAY" = "1" ]; then
     grep -Fxq "$FILE_PATH" "$PENDING_FILE" 2>/dev/null \
       || printf '%s\n' "$FILE_PATH" >> "$PENDING_FILE"  # record as pending
     echo "ONE_WAY_DOOR: $FILENAME ($REASON)" >&2
-    echo "Blocked. Use AskUserQuestion, then retry." >&2
+    echo "Blocked. Ask the user for an explicit decision, then retry." >&2
     exit 2  # Block the write
 fi
 
 exit 0  # Allow two-way doors</code></pre>
             </div>
-            <p class="text-clay/80 mt-5 mb-3">A second hook runs on <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">PostToolUse:AskUserQuestion</code>. When the user answers any <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">AskUserQuestion</code>, it promotes every pending path to approved so the retried write passes. It never blocks. It keys on the event, not the specific question, so an unrelated question answered while a file is pending approves it too. The block-then-discuss prompt is the guardrail; the ledger just stops an already-discussed file from re-blocking.</p>
+            <p class="text-clay/80 mt-5 mb-3">A second optional Claude Code hook runs on <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">PostToolUse:AskUserQuestion</code>. When the user answers a structured question, it promotes every pending path to approved so the retried write passes. It never blocks. It keys on the event, not the specific question, so an unrelated question answered while a file is pending approves it too. The block-then-discuss prompt is the guardrail; the ledger stops an already-discussed file from re-blocking.</p>
             <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                 <pre tabindex="0" class="text-white"><code>#!/bin/sh
 # one-way-door-approve.sh (PostToolUse:AskUserQuestion)
@@ -469,13 +472,15 @@ exit 0</code></pre>
                         <p class="text-white mb-4">/plugin install dev-toolkit@claude-skills-journalism</p>
                         <p class="text-white/50 mb-2"># Or copy just this skill from the plugin tree</p>
                         <p class="text-white mb-1">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
-                        <p class="text-white">cp -r claude-skills-journalism/dev-toolkit/skills/one-way-door ~/.claude/skills/</p>
+                        <p class="text-white mb-1">mkdir -p ~/.claude/skills ~/.agents/skills</p>
+                        <p class="text-white mb-1">cp -r claude-skills-journalism/dev-toolkit/skills/one-way-door ~/.claude/skills/ <span class="text-white/50"># Claude Code</span></p>
+                <p class="text-white">cp -r claude-skills-journalism/dev-toolkit/skills/one-way-door ~/.agents/skills/ <span class="text-white/50"># Codex</span></p>
                     </div>
                 </div>
 
                 <div>
-                    <h3 class="font-semibold mb-3">Option 2: Add the CLAUDE.md rule</h3>
-                    <p class="text-sm text-clay/70 mb-3">Add this paragraph to your project's CLAUDE.md for prompt-based enforcement (no hook needed):</p>
+                    <h3 class="font-semibold mb-3">Option 2: Add the project instruction rule</h3>
+                    <p class="text-sm text-clay/70 mb-3">Add this paragraph to the canonical project instruction file for prompt-based enforcement:</p>
                     <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                         <pre tabindex="0" class="text-white"><code>### One-way door check
 Before creating new files that represent architectural
@@ -489,8 +494,8 @@ committing.</code></pre>
                 </div>
 
                 <div>
-                    <h3 class="font-semibold mb-3">Option 3: Add the automated hooks</h3>
-                    <p class="text-sm text-clay/70 mb-3">For automated enforcement, save both scripts and add this to your <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">settings.json</code>. The approval hook is required, without it, the check re-blocks an approved file on every retry:</p>
+                    <h3 class="font-semibold mb-3">Option 3: Add optional Claude Code hooks</h3>
+                    <p class="text-sm text-clay/70 mb-3">For optional Claude Code enforcement, save both scripts and add this to Claude Code <code class="bg-ink/5 px-1.5 py-0.5 rounded text-xs">settings.json</code>. The shared skill does not depend on these hooks.</p>
                     <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
                         <pre tabindex="0" class="text-white"><code>{
   "hooks": {

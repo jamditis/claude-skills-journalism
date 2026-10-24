@@ -2,7 +2,7 @@
 type: Reference
 title: "source-attribution-check hook"
 description: "Flag unattributed quotes, claims, and statistics in journalism content"
-source: ["hooks/source-attribution-check.md", "CLAUDE.md"]
+source: ["hooks/source-attribution-check.md", "AGENTS.md"]
 verified: 2026-06-26
 timestamp: 2026-06-26
 tags: ["hook", "verification"]

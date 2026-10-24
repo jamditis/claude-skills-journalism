@@ -8,18 +8,20 @@ Thanks for your interest in contributing to this skill collection. Whether you'r
 2. Clone your fork: `git clone https://github.com/YOUR-USERNAME/claude-skills-journalism.git`
 3. Create a branch: `git checkout -b my-skill-or-fix`
 4. Make your changes
-5. Test with Claude Code locally
+5. Test with Claude Code and Codex locally
 6. Submit a pull request
 
 ## Adding a new skill
 
 ### Directory structure
 
-Each skill lives in its own directory at the repo root:
+Each skill lives in its own directory. Most skills are nested under a package:
 
 ```
-skill-name/
+package/skills/skill-name/
 ├── SKILL.md          # Main instructions (required)
+├── agents/
+│   └── openai.yaml      # Codex interface metadata (required)
 ├── templates/        # Reusable templates (optional)
 ├── examples/         # Example inputs/outputs (optional)
 └── scripts/          # Helper scripts (optional)
@@ -37,10 +39,10 @@ description: When to use this skill and what it does
 
 # Skill title
 
-Instructions, workflows, and knowledge for Claude to use.
+Instructions, workflows, and knowledge for supported coding agents to use.
 ```
 
-The `description` field is what Claude uses to decide when to activate the skill, so make it specific about trigger conditions.
+The `description` field helps supported clients decide when to activate the skill, so make it specific about trigger conditions.
 
 ### Skill guidelines
 
@@ -55,11 +57,13 @@ The `description` field is what Claude uses to decide when to activate the skill
 
 Before submitting:
 
-1. Install the skill locally: `cp -r your-skill/ ~/.claude/skills/`
-2. Start a Claude Code session
-3. Give it a prompt that should trigger the skill
-4. Verify it activates and produces useful output
-5. Test edge cases and different prompt phrasings
+1. Add or update `SKILL.md` and `agents/openai.yaml`.
+2. Add the skill to `skills-catalog.yaml`, the package README, and the root README.
+3. Add or update the matching `docs/<skill-name>/index.html` page.
+4. Install it: `mkdir -p ~/.claude/skills <project>/.agents/skills`, then `cp -r your-skill/ ~/.claude/skills/` (Claude Code) and `cp -r your-skill/ <project>/.agents/skills/` (Codex). Start a session in each.
+5. Verify expected activation, unrelated non-activation, resource access, and useful output in both clients.
+6. Test edge cases and different prompt phrasings.
+7. Run the repository validation commands documented in `AGENTS.md`.
 
 ## Adding a hook
 
@@ -76,7 +80,7 @@ tools: [Write, Edit]  # for Pre/PostToolUse hooks
 Hook instructions here.
 ```
 
-All hooks should be **non-blocking warnings**, they provide guidance but don't prevent actions.
+Most hooks are **non-blocking warnings**. `one-way-door-check` and `no-ai-attribution` block intentionally. Each hook documents its behavior.
 
 ## Improving existing skills
 

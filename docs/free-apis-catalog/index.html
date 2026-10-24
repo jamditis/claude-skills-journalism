@@ -154,6 +154,9 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 </a>
             </div>
         </div>
+            <p class="relative z-10 max-w-6xl mx-auto px-6 pt-6 text-sm text-white">
+            Works in: Uses the open Agent Skills format. <a class="underline" href="https://github.com/jamditis/claude-skills-journalism/blob/master/plans/codex-compatibility-matrix.md">Codex: candidate; selection smoke passed (October 2026)</a>.
+        </p>
     </header>
 
     <main id="main" class="relative z-10">
@@ -389,7 +392,9 @@ Slack message."
                             Or copy just this skill into your Claude skills directory
                         </h3>
                         <pre tabindex="0"><code>git clone https://github.com/jamditis/claude-skills-journalism.git
-cp -r claude-skills-journalism/research-toolkit/skills/free-apis-catalog ~/.claude/skills/</code></pre>
+mkdir -p ~/.claude/skills ~/.agents/skills
+cp -r claude-skills-journalism/research-toolkit/skills/free-apis-catalog ~/.claude/skills/   # Claude Code
+cp -r claude-skills-journalism/research-toolkit/skills/free-apis-catalog ~/.agents/skills/   # Codex</code></pre>
                     </div>
 
                     <div class="bg-white/5 p-6 rounded-xl">

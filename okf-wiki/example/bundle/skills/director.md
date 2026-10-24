@@ -10,7 +10,7 @@ tags: ["skill", "dev-toolkit"]
 # director skill
 
 Activate an explicit top-tier director role for one request. The director reads
-the applicable `CLAUDE.md` policy, delegates execution to the lower-tier agents
-configured there, reviews their results, and stays within the user's authority.
+the applicable project instruction file, delegates execution to configured workers,
+reviews their results, and stays within the user's authority.
 
 Part of the [dev-toolkit plugin](../plugins/dev-toolkit.md). Source: `dev-toolkit/skills/director/SKILL.md`.

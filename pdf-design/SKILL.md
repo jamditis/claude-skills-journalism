@@ -96,7 +96,7 @@ cp "$WORK_DIR/output.pdf" "$PROJECT_DIR/output.pdf"
 1. **Sentence case**, Never Title Case
 2. **Left-aligned**, Never justified text
 3. **Print-ready**, 8.5" × 11" letter size
-4. **Brand consistent**, CCM red or program palettes
+4. **Brand consistent**, CCM red or the selected program palette
 
 ---
 
@@ -506,3 +506,7 @@ If a page feels too crowded, *reduce content*, don't expand spacing.
 ## Template
 
 Resolve `templates/democracy-day-proposal.html` from the installed skill directory.
+
+## Related
+
+Use **document-delivery** to inspect, share, send, and verify the final PDF or editable document.

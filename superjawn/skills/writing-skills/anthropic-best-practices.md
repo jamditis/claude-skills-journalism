@@ -135,11 +135,11 @@ Skills act as additions to models, so effectiveness depends on the underlying mo
 
 **Testing considerations by model**:
 
-* **Claude Haiku** (fast, economical): Does the Skill provide enough guidance?
-* **Claude Sonnet** (balanced): Is the Skill clear and efficient?
-* **Claude Opus** (powerful reasoning): Does the Skill avoid over-explaining?
+* **Fast, economical model (for example, Claude Haiku):** Does the skill provide enough guidance?
+* **Balanced general model (for example, Claude Sonnet):** Is the skill clear and efficient?
+* **Most capable reasoning model (for example, Claude Opus):** Does the skill avoid over-explaining?
 
-What works perfectly for Opus might need more detail for Haiku. If you plan to use your Skill across multiple models, aim for instructions that work well with all of them.
+What works for a capable reasoning model might need more detail for a faster model. If you plan to use your skill across multiple capability tiers, write instructions that work well with all of them.
 
 ## Skill structure
 

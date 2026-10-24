@@ -601,6 +601,9 @@ video {
 .max-w-4xl {
   max-width: 56rem;
 }
+.max-w-6xl {
+  max-width: 72rem;
+}
 .max-w-lg {
   max-width: 32rem;
 }
@@ -780,6 +783,9 @@ video {
 }
 .pt-24 {
   padding-top: 6rem;
+}
+.pt-6 {
+  padding-top: 1.5rem;
 }
 .text-left {
   text-align: left;

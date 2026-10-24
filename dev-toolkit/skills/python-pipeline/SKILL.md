@@ -328,7 +328,7 @@ for record in records:
         tracker.log_error(record.id, str(e))
 ```
 
-## Gemini AI integration
+## Gemini API integration
 
 The `google-generativeai` package was deprecated August 31, 2025 and the unified `google-genai` SDK replaced it. New code should target `google-genai`:
 
@@ -345,12 +345,12 @@ from google.genai import types
 # Client carries config (API key, project, location). Reuse across calls.
 client = genai.Client(api_key=os.environ['GEMINI_API_KEY'])
 
-# Pick a current model. Names drift; check ai.google.dev/gemini-api/docs/models
-# for the active list. gemini-2.5-flash is a reasonable cost-efficient default.
-DEFAULT_MODEL = 'gemini-2.5-flash'
+# Model IDs drift. Set GEMINI_MODEL from the current list at
+# ai.google.dev/gemini-api/docs/models instead of shipping a default.
+CONFIGURED_MODEL = os.environ['GEMINI_MODEL']
 
 class AIService:
-    def __init__(self, model: str = DEFAULT_MODEL):
+    def __init__(self, model: str = CONFIGURED_MODEL):
         self.model = model
 
     def categorize(self, text: str, taxonomy: dict) -> dict:
@@ -425,17 +425,20 @@ class BatchAIProcessor:
         return results
 ```
 
-`response.usage_metadata` carries the actual token counts, which is more accurate than length heuristics. Without `response_mime_type='application/json'`, Gemini returns prose (often wrapped in markdown fences) and `json.loads` fails, every JSON-returning call needs both the config flag and a JSON-shaped prompt. For multimodal calls, pass content as a list (text + parts), not a single string.
+`response.usage_metadata` carries the actual token counts, which is more accurate than length heuristics. Without `response_mime_type='application/json'`, the provider can return prose, often wrapped in Markdown fences, and `json.loads` fails. Every JSON-returning call needs both the config flag and a JSON-shaped prompt. For multimodal calls, pass content as a list (text plus parts), not a single string.
 
-## Image classification with Gemini Vision
+## Image classification with Gemini vision
 
 ```python
 from google import genai
 from google.genai import types
 from PIL import Image
 from pathlib import Path
+import json
+import os
 
 client = genai.Client(api_key=os.environ['GEMINI_API_KEY'])
+vision_model = os.environ['GEMINI_MODEL']
 
 def classify_image(image_path: Path, categories: list[str]) -> dict:
     image = Image.open(image_path)
@@ -453,7 +456,7 @@ Respond with JSON:
 }}
 """
     response = client.models.generate_content(
-        model='gemini-2.5-flash',
+        model=vision_model,
         contents=[prompt, image],
         config=types.GenerateContentConfig(response_mime_type='application/json'),
     )
@@ -497,6 +500,7 @@ load_dotenv()
 class Config:
     # API Keys
     GEMINI_API_KEY = os.environ['GEMINI_API_KEY']
+    GEMINI_MODEL = os.environ['GEMINI_MODEL']
     GOOGLE_SHEET_ID = os.environ['GOOGLE_SHEET_ID']
 
     # Paths

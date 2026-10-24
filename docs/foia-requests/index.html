@@ -202,6 +202,9 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 </a>
             </div>
         </div>
+            <p class="relative z-10 max-w-6xl mx-auto px-6 pt-6 text-sm text-white">
+            Works in: Uses the open Agent Skills format. <a class="underline" href="https://github.com/jamditis/claude-skills-journalism/blob/master/plans/codex-compatibility-matrix.md">Codex: runtime pilot passed</a>.
+        </p>
     </header>
 
     <main id="main" class="relative z-10">
@@ -527,7 +530,9 @@ format as they become available.</code></pre>
                             <h3 class="font-display text-xl font-bold">Or copy just this skill from the plugin tree</h3>
                         </div>
                         <pre tabindex="0"><code>git clone https://github.com/jamditis/claude-skills-journalism.git
-cp -r claude-skills-journalism/journalism-core/skills/foia-requests ~/.claude/skills/</code></pre>
+mkdir -p ~/.claude/skills ~/.agents/skills
+cp -r claude-skills-journalism/journalism-core/skills/foia-requests ~/.claude/skills/   # Claude Code
+cp -r claude-skills-journalism/journalism-core/skills/foia-requests ~/.agents/skills/   # Codex</code></pre>
                     </div>
 
                     <div class="feature-card p-8 rounded-xl">
@@ -601,6 +606,14 @@ cp -r claude-skills-journalism/journalism-core/skills/foia-requests ~/.claude/sk
                         <p class="text-mist text-sm">Federal agency portals, online submission, tracking numbers.</p>
                     </a>
                 </div>
+            </div>
+        </section>
+
+        <!-- Related skill -->
+        <section class="py-12 px-6 border-t border-ink/10">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="font-display text-3xl font-light italic mb-4">Related skill</h2>
+                <p class="text-mist">Use <a href="../deadline-and-reply-tracking/" class="text-accentDark hover:underline">deadline-and-reply-tracking</a> to track statutory clocks, acknowledgments, response windows, and appeal deadlines.</p>
             </div>
         </section>
 

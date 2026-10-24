@@ -2,7 +2,7 @@
 type: Process
 title: "contributing a skill"
 description: "How to add a skill, hook, or plugin: directory layout, SKILL.md frontmatter, and the house style."
-source: ["CONTRIBUTING.md", "CLAUDE.md"]
+source: ["CONTRIBUTING.md", "AGENTS.md"]
 verified: 2026-06-26
 timestamp: 2026-06-26
 tags: [contributing, authoring]

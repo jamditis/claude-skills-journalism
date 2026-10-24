@@ -123,21 +123,22 @@ test('published package versions stay aligned with the marketplace', () => {
   const marketplace = JSON.parse(
     readFileSync(join(ROOT, '.claude-plugin', 'marketplace.json'), 'utf8'),
   );
-  assert.equal(marketplace.version, '2.8.0', 'marketplace version');
+  assert.equal(marketplace.version, '2.9.0', 'marketplace version');
   const expected = new Map([
     ['autocontext', '1.1.2'],
-    ['dev-toolkit', '2.0.0'],
-    ['journalism-core', '1.5.0'],
-    ['okf-wiki', '0.8.3'],
-    ['pdf-design', '1.1.3'],
-    ['pdf-playground', '1.3.6'],
-    ['project-templates-toolkit', '1.0.4'],
-    ['research-toolkit', '1.1.3'],
-    ['security-toolkit', '1.2.3'],
-    ['superjawn', '2.0.0'],
+    ['dev-toolkit', '2.1.0'],
+    ['journalism-core', '1.7.0'],
+    ['newsroom-agent-ops', '1.0.0'],
+    ['okf-wiki', '0.8.4'],
+    ['pdf-design', '1.1.4'],
+    ['pdf-playground', '1.3.7'],
+    ['project-templates-toolkit', '1.1.0'],
+    ['research-toolkit', '1.1.4'],
+    ['security-toolkit', '1.3.0'],
+    ['superjawn', '2.1.0'],
     ['video-toolkit', '1.0.6'],
-    ['web-design-picker', '1.0.0'],
-    ['visual-explainer', '0.7.4'],
+    ['web-design-picker', '1.0.1'],
+    ['visual-explainer', '0.7.5'],
   ]);
 
   for (const [name, version] of expected) {

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Use this skill when the user asks to update CLAUDE.md, save a lesson, or persist something from the current session: phrases like &quot;update claude.md&quot;, &quot;what should we remember&quot;, &quot;save this lesson&quot;, or &quot;add to context&quot;. Proposes scoped CLAUDE.md edits as a diff for approval before writing.">
-    <title>CLAUDE.md updater - Agent skills for journalism</title>
+    <meta name="description" content="Use this skill when the user asks to update project instructions, save a lesson, or persist durable context. It resolves AGENTS.md or CLAUDE.md, then proposes a scoped diff for approval before writing.">
+    <title>Project instruction updater - Agent skills for journalism</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <link rel="stylesheet" href="../assets/tailwind/claude-md-updater.css" data-tailwind-build="3.4.19">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -111,8 +111,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 </style>
 
     <!-- Open Graph -->
-    <meta property="og:title" content="CLAUDE.md updater - Agent skills for journalism">
-    <meta property="og:description" content="Propose scoped CLAUDE.md edits as a diff for approval before writing: durable lessons, infrastructure facts, and workflows, never transient session notes.">
+    <meta property="og:title" content="Project instruction updater - Agent skills for journalism">
+    <meta property="og:description" content="Propose scoped project instruction edits as a diff for approval before writing: durable lessons, infrastructure facts, and workflows, never transient session notes.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://skills.amditis.tech/claude-md-updater/">
     <meta property="og:image" content="https://skills.amditis.tech/claude-md-updater/og-image.png">
@@ -121,8 +121,8 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="CLAUDE.md updater - Agent skills for journalism">
-    <meta name="twitter:description" content="Propose scoped CLAUDE.md edits as a diff for approval before writing: durable lessons, infrastructure facts, and workflows, never transient session notes.">
+    <meta name="twitter:title" content="Project instruction updater - Agent skills for journalism">
+    <meta name="twitter:description" content="Propose scoped project instruction edits as a diff for approval before writing: durable lessons, infrastructure facts, and workflows, never transient session notes.">
     <meta name="twitter:image" content="https://skills.amditis.tech/claude-md-updater/og-image.png">
 <script src="../ask-ai.js" defer></script>
     <!-- a11y-patch-v1 -->
@@ -158,13 +158,16 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 </svg>
                 Development skill
             </div>
-            <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">CLAUDE.md updater</h1>
+            <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">Project instruction updater</h1>
             <p class="updated-tape updated-tape-hero mt-5" data-updated-at="2026-08-21T14:21:06-04:00" data-updated-slug="claude-md-updater">Updated <time datetime="2026-08-21T14:21:06-04:00">Aug 21, 2026</time></p>
 
             <p class="text-xl text-white/90 max-w-2xl">
-                Turn the lessons of a working session into a scoped CLAUDE.md edit, shown as a diff you approve before anything is written.
+                Turn the lessons of a working session into a scoped project instruction edit, shown as a diff you approve before anything is written.
             </p>
         </div>
+            <p class="relative z-10 max-w-6xl mx-auto px-6 pt-6 text-sm text-white">
+            Works in: Uses the open Agent Skills format. <a class="underline" href="https://github.com/jamditis/claude-skills-journalism/blob/master/plans/codex-compatibility-matrix.md">Codex: candidate, adapter review pending</a>.
+        </p>
     </header>
 
     <main id="main" class="max-w-4xl mx-auto px-6 py-12 relative z-10">
@@ -217,7 +220,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded">Step 2</span>
                         <div>
                             <h3 class="font-semibold">Categorize: durable facts only</h3>
-                            <p class="text-sm text-clay/70 mt-2">Route hard-won lessons, infrastructure changes, and new workflows to the right CLAUDE.md sections. Transient session notes do not go in CLAUDE.md.</p>
+                            <p class="text-sm text-clay/70 mt-2">Resolve the canonical AGENTS.md or CLAUDE.md file, then route durable lessons, infrastructure changes, and workflows to the right sections. Transient session notes stay out.</p>
                         </div>
                     </div>
                 </div>
@@ -226,7 +229,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                         <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-1 rounded">Step 3</span>
                         <div>
                             <h3 class="font-semibold">Build the exact diff</h3>
-                            <p class="text-sm text-clay/70 mt-2">Produce a unified diff against the current CLAUDE.md showing the precise lines and sections to change. The diff is what gets approved, not a summary of it.</p>
+                            <p class="text-sm text-clay/70 mt-2">Produce a unified diff against the canonical project instruction file showing the precise lines and sections to change. The diff is what gets approved, not a summary of it.</p>
                         </div>
                     </div>
                 </div>
@@ -270,11 +273,11 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <h2 class="font-display text-2xl font-semibold mb-4">You approve a diff, not a summary</h2>
             <p class="text-clay/80 mb-4">The approval gate shows the exact patch first, so you can see every line before it lands:</p>
             <div class="bg-ink rounded-xl p-5 font-mono text-sm overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable content">
-                <pre tabindex="0" class="text-white"><code>## Proposed CLAUDE.md updates
+                <pre tabindex="0" class="text-white"><code>## Proposed project instruction updates
 
 ```diff
---- a/CLAUDE.md
-+++ b/CLAUDE.md
+--- a/AGENTS.md
++++ b/AGENTS.md
 @@ Hard-won lessons @@
  ### Hard-won lessons
 +- Plain `timeout` kills the Node tree; use `timeout --foreground` in tmux.
@@ -289,8 +292,8 @@ Apply this diff? Nothing is written until you approve.</code></pre>
 
         <!-- What stays out -->
         <section class="mb-12">
-            <h2 class="font-display text-2xl font-semibold mb-4">What stays out of CLAUDE.md</h2>
-            <p class="text-clay/80 mb-4">CLAUDE.md is checked into git and loads into every session, so it is for durable, infrequently-changing facts, not a running log. The skill keeps these out:</p>
+            <h2 class="font-display text-2xl font-semibold mb-4">What stays out of project instructions</h2>
+            <p class="text-clay/80 mb-4">A project instruction file is checked into git and loads as standing context, so it is for durable, infrequently-changing facts, not a running log. The skill keeps these out:</p>
             <ul class="space-y-2 text-clay/80">
                 <li class="flex items-start gap-3">
                     <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -308,10 +311,10 @@ Apply this diff? Nothing is written until you approve.</code></pre>
                     <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-accent mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
-                    Things Claude learns over time through corrections
+                    Things the client learns over time through corrections
                 </li>
             </ul>
-            <p class="text-clay/80 mt-4">Those belong in <strong>auto memory</strong> (<code>~/.claude/projects/&lt;project&gt;/memory/</code>, which Claude maintains on its own) or a gitignored <code>CLAUDE.local.md</code>. This mirrors the <a href="../project-memory/" class="text-accentDark hover:text-accentDark underline underline-offset-2">project-memory</a> skill's guidance.</p>
+            <p class="text-clay/80 mt-4">Those belong in the client's memory feature (in Claude Code, auto memory at <code>~/.claude/projects/&lt;project&gt;/memory/</code>) or a gitignored local notes file (in Claude Code, <code>CLAUDE.local.md</code>). This mirrors the <a href="../project-memory/" class="text-accentDark hover:text-accentDark underline underline-offset-2">project-memory</a> skill's guidance.</p>
         </section>
 
         <!-- Installation -->
@@ -323,7 +326,9 @@ Apply this diff? Nothing is written until you approve.</code></pre>
                 <p class="text-white mb-4">/plugin install dev-toolkit@claude-skills-journalism</p>
                 <p class="text-white/50 mb-2"># Or copy just this skill from the plugin tree</p>
                 <p class="text-white mb-1">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
-                <p class="text-white">cp -r claude-skills-journalism/dev-toolkit/skills/claude-md-updater ~/.claude/skills/</p>
+                <p class="text-white mb-1">mkdir -p ~/.claude/skills ~/.agents/skills</p>
+                <p class="text-white mb-1">cp -r claude-skills-journalism/dev-toolkit/skills/claude-md-updater ~/.claude/skills/ <span class="text-white/50"># Claude Code</span></p>
+                <p class="text-white">cp -r claude-skills-journalism/dev-toolkit/skills/claude-md-updater ~/.agents/skills/ <span class="text-white/50"># Codex</span></p>
             </div>
             <p class="mt-4 text-clay/70 text-sm">
                 Or browse this skill in the

@@ -159,9 +159,10 @@ from google.genai import types
 import json
 from typing import Optional
 
-# Use Google's current stable Flash model. Test the exact model and
-# response shape against your taxonomy prompts before deployment.
-DEFAULT_GEMINI_MODEL = 'gemini-3.7-flash'
+# Set an available Gemini model explicitly. A current Flash-tier model is a
+# cost-efficient default; see https://ai.google.dev/gemini-api/docs/models.
+# Test the exact model and response shape against your taxonomy prompts.
+MODEL_NAME = os.environ['GOOGLE_GENAI_MODEL']
 
 # Single client; reads GOOGLE_API_KEY (or pass api_key=...).
 _client = genai.Client(api_key=os.environ.get('GOOGLE_API_KEY'))
@@ -201,7 +202,7 @@ TAXONOMY = {
 }
 
 class ArchiveCategorizer:
-    def __init__(self, model: str = DEFAULT_GEMINI_MODEL, client: genai.Client = None):
+    def __init__(self, model: str = MODEL_NAME, client: genai.Client = None):
         self.model = model
         self.client = client or _client
 
@@ -261,7 +262,7 @@ IMPORTANT:
         """Extract JSON from response, tolerating ```json fences if any.
 
         With response_mime_type='application/json' set on the request,
-        Gemini emits clean JSON; this stripping logic is a fallback for
+        Gemini normally emits clean JSON; this stripping logic is a fallback for
         older models or when the request config wasn't applied.
         """
         if '```json' in text:
@@ -383,7 +384,7 @@ class EntityRegistry:
 
 ```python
 class EntityExtractor:
-    def __init__(self, registry: EntityRegistry, model: str = DEFAULT_GEMINI_MODEL,
+    def __init__(self, registry: EntityRegistry, model: str = MODEL_NAME,
                  client: genai.Client = None):
         self.registry = registry
         self.model = model

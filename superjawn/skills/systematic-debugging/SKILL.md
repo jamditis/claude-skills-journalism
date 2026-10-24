@@ -373,3 +373,7 @@ From debugging sessions:
 - Random fixes approach: 2-3 hours of thrashing
 - First-time fix rate: 95% vs 40%
 - New bugs introduced: Near zero vs common
+
+## Reference files
+
+Read [Testing strategy](references/testing-strategy.md) before choosing, writing, changing, removing, or quarantining tests.

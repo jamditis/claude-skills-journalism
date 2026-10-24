@@ -1,6 +1,6 @@
-# Gemini CLI Tool Mapping
+# Gemini CLI capability mapping
 
-Skills use Claude Code tool names. When you encounter these in a skill, use your platform equivalent:
+Shared skills describe capabilities instead of vendor tool names. Use the platform equivalent:
 
 | Skill references | Gemini CLI equivalent |
 |-----------------|----------------------|
@@ -10,24 +10,24 @@ Skills use Claude Code tool names. When you encounter these in a skill, use your
 | `Bash` (run commands) | `run_shell_command` |
 | `Grep` (search file content) | `grep_search` |
 | `Glob` (search files by name) | `glob` |
-| `TodoWrite` (task tracking) | `write_todos` |
-| `Skill` tool (invoke a skill) | `activate_skill` |
+| Task tracking | `write_todos` |
+| Load a skill | `activate_skill` |
 | `WebSearch` | `google_web_search` |
 | `WebFetch` | `web_fetch` |
-| `Task` tool (dispatch subagent) | No equivalent, Gemini CLI does not support subagents |
+| Dispatch a subagent | No equivalent; do the steps in sequence |
 
 ## No subagent support
 
-Gemini CLI has no equivalent to Claude Code's `Task` tool. Skills that rely on subagent dispatch (`subagent-driven-development`, `dispatching-parallel-agents`) will fall back to single-session execution via `executing-plans`.
+When no worker capability is available, skills that delegate work (`subagent-driven-development`, `dispatching-parallel-agents`) fall back to single-session execution through `executing-plans`.
 
 ## Additional Gemini CLI tools
 
-These tools are available in Gemini CLI but have no Claude Code equivalent:
+These capabilities are client-specific and are not shared skill requirements:
 
 | Tool | Purpose |
 |------|---------|
 | `list_directory` | List files and subdirectories |
-| `save_memory` | Persist facts to GEMINI.md across sessions |
+| `save_memory` | Persist facts to `GEMINI.md` across sessions |
 | `ask_user` | Request structured input from the user |
 | `tracker_create_task` | Rich task management (create, update, list, visualize) |
 | `enter_plan_mode` / `exit_plan_mode` | Switch to read-only research mode before making changes |

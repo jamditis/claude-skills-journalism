@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Direct one request through the lower-tier agents and models configured in the applicable Claude Code policy.">
+    <meta name="description" content="Direct one request through the lower-tier agents and models configured in the applicable project instructions.">
     <title>Director - Agent skills for journalism</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <link rel="stylesheet" href="../assets/tailwind/director.css" data-tailwind-build="3.4.19">
@@ -59,6 +59,9 @@
 
             <p class="text-xl text-white/90 max-w-2xl mt-5">Direct, decide, delegate, and review without taking over implementation work.</p>
         </div>
+            <p class="relative z-10 max-w-6xl mx-auto px-6 pt-6 text-sm text-white">
+            Works in: Uses the open Agent Skills format. <a class="underline" href="https://github.com/jamditis/claude-skills-journalism/blob/master/plans/codex-compatibility-matrix.md">Codex: candidate, adapter review pending</a>.
+        </p>
     </header>
 
     <main id="main" class="relative z-10 max-w-4xl mx-auto px-6 py-12">
@@ -88,21 +91,29 @@
         <section class="mb-12">
             <h2 class="text-2xl font-semibold mb-4">Policy-driven routing</h2>
             <div class="bg-white/60 border border-mist/40 rounded-xl p-6 text-clay space-y-3">
-                <p>The skill reads the applicable <code>CLAUDE.md</code> policy for the current user and project.</p>
+                <p>The skill reads every applicable project instruction file at user, project, and working-directory scope.</p>
                 <p>It does not contain a home-directory path or fixed model name. Each environment keeps its own routing policy.</p>
                 <p>If required delegation is unavailable, the director stops and tells the user. Activating the role does not grant new authority.</p>
             </div>
         </section>
 
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">Related skill</h2>
+            <p class="text-clay">Use <a href="../multi-agent-coordinator/" class="text-accent underline underline-offset-2">multi-agent-coordinator</a> when delegated work needs durable state, event-driven watches, review gates, and restart-safe handoffs.</p>
+        </section>
+
         <section class="border-t border-mist/40 pt-8">
             <h2 class="text-2xl font-semibold mb-4">Install and invoke</h2>
-            <p class="text-clay mb-4">The plugin form is namespaced:</p>
+            <p class="text-clay mb-4">Claude Code plugin route:</p>
             <pre class="bg-ink text-white rounded-xl p-4 overflow-x-auto mb-4"><code>/plugin install dev-toolkit@claude-skills-journalism
 /dev-toolkit:director</code></pre>
-            <p class="text-clay mb-4">For the literal <code>/director</code> command, install the standalone skill:</p>
-            <pre class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>mkdir -p ~/.claude/skills
-cp -r dev-toolkit/skills/director ~/.claude/skills/
-/director</code></pre>
+            <p class="text-clay mb-4">For the literal <code>/director</code> command, install the standalone skill.</p>
+            <p class="text-clay mb-4">Agent Skills route for supported clients:</p>
+            <pre class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>mkdir -p ~/.claude/skills ~/.agents/skills
+cp -r dev-toolkit/skills/director ~/.claude/skills/   # Claude Code
+cp -r dev-toolkit/skills/director ~/.agents/skills/   # Codex
+# Claude Code: /director
+# Codex: $director</code></pre>
         </section>
     </main>
 

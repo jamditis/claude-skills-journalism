@@ -263,3 +263,9 @@ If readers think "AI wrote this," you've already lost their trust.
 *Good writing is invisible. If readers notice the writing, it's getting in the way of the content.*
 
 *See also: hooks/ai-slop-detector.md for the automated companion to this skill.*
+
+## Reference files
+
+Read [Simplified technical English for newsroom and technical prose](references/simplified-technical-english.md) when clarity, controlled terms, or procedural register matters.
+
+Read [Slop-era principles](references/slop-era-principles.md) when polished output may hide weak intent, evidence, or review.

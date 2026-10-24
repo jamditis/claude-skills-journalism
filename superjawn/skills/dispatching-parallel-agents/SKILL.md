@@ -16,7 +16,7 @@ See CREDITS.md.
 
 ## Overview
 
-You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history, you construct exactly what they need. This also preserves your own context for coordination work.
+You delegate tasks to a subagent or parallel worker if your client supports one. Give each worker isolated, focused context. They should never inherit your session's context or history, you construct exactly what they need. This also preserves your own context for coordination work. If the client does not support workers, do the same tasks in sequence in the current session.
 
 When you have multiple unrelated failures (different test files, different subsystems, different bugs), investigating them sequentially wastes time. Each investigation is independent and can happen in parallel.
 
@@ -74,12 +74,12 @@ Each agent gets:
 
 ### 3. Dispatch in Parallel
 
-```typescript
-// In Claude Code / AI environment
-Task("Fix agent-tool-abort.test.ts failures")
-Task("Fix batch-completion-behavior.test.ts failures")
-Task("Fix tool-approval-race-conditions.test.ts failures")
-// All three run concurrently
+```text
+Worker A: Fix agent-tool-abort.test.ts failures.
+Worker B: Fix batch-completion-behavior.test.ts failures.
+Worker C: Fix tool-approval-race-conditions.test.ts failures.
+
+Start all three with the client's parallel worker capability.
 ```
 
 ### 4. Review and Integrate

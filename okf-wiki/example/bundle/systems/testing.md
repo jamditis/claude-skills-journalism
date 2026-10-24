@@ -24,6 +24,6 @@ Three GitHub Actions workflows gate pull requests by path:
   scanner against synthetic malicious fixtures.
 
 The repository also follows an evidence-first bug-fixing rule documented in
-`CLAUDE.md`: establish the failure with the cheapest faithful evidence before
+`AGENTS.md`: establish the failure with the cheapest faithful evidence before
 fixing it, and keep a regression test only when it protects against a likely
 repeat failure or an important contract.

@@ -37,10 +37,13 @@ For reference, not as a recommendation:
 - Both CLIs (worker and reviewer) on subscriptions, so the marginal cost of a wake
   is effectively zero.
 - An hourly wake during work hours only, about 13 sessions a day, not 100.
-- Work at a real reasoning effort; review at low effort, because a fast literal
-  read is what catches bugs.
-- One issue per session, with a 90-minute hard timeout, so no single run can spend
-  much before a human sees the result.
+- Work at a real reasoning effort; review at an effort scaled to risk, low for
+  trivial changes (a fast literal read is what catches typos and slips) and high
+  for behavior, security, or data changes.
+- A reviewer from a different provider than the worker, both on subscriptions.
+- One issue per session. On metered billing, a hard timeout (90 minutes is a
+  reasonable start) keeps any single run from spending much before a human sees
+  the result.
 - Review runs locally in the session rather than as a CI job, which keeps it off
   metered Actions minutes on private repos.
 
@@ -58,7 +61,11 @@ to taste:
   per run and take longer.
 - **One issue per session** (built in), bounds how much any single wake can do.
 - **Hard timeout** (`schedule.timeouts.hard_minutes`), the backstop on a runaway
-  session.
+  session. It is a cost control, not a quality control: it can also cut off long,
+  legitimate work. On a flat subscription, a single-flight lease with a check for
+  real session loss (see "A persistent attendant" in `BUILD-WITH-YOUR-AGENT.md`)
+  bounds concurrency without killing a run that is still making progress. On
+  metered billing, keep the hard timeout.
 
 If you're on metered billing and want a firm ceiling, the practical budget is
 cadence × effort × timeout: fewer runs, lower effort, and a shorter cap each

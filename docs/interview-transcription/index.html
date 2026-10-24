@@ -165,6 +165,9 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 Interview management, transcription workflows, and source note-taking from preparation through publication.
             </p>
         </div>
+            <p class="relative z-10 max-w-6xl mx-auto px-6 pt-6 text-sm text-white">
+            Works in: Uses the open Agent Skills format. <a class="underline" href="https://github.com/jamditis/claude-skills-journalism/blob/master/plans/codex-compatibility-matrix.md">Codex: runtime pilot passed</a>.
+        </p>
     </header>
 
     <main id="main" class="max-w-4xl mx-auto px-6 py-12 relative z-10">
@@ -323,7 +326,9 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 <p class="text-white mb-4">/plugin install journalism-core@claude-skills-journalism</p>
                 <p class="text-white/50 mb-2"># Or copy just this skill from the plugin tree</p>
                 <p class="text-white mb-1">git clone https://github.com/jamditis/claude-skills-journalism.git</p>
-                <p class="text-white">cp -r claude-skills-journalism/journalism-core/skills/interview-transcription ~/.claude/skills/</p>
+                <p class="text-white mb-1">mkdir -p ~/.claude/skills ~/.agents/skills</p>
+                <p class="text-white mb-1">cp -r claude-skills-journalism/journalism-core/skills/interview-transcription ~/.claude/skills/ <span class="text-white/50"># Claude Code</span></p>
+                <p class="text-white">cp -r claude-skills-journalism/journalism-core/skills/interview-transcription ~/.agents/skills/ <span class="text-white/50"># Codex</span></p>
             </div>
             <p class="mt-4 text-clay/70 text-sm">
                 Or browse this skill in the
@@ -334,6 +339,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
         <!-- Related skills -->
         <section class="mb-12">
             <h2 class="font-display text-2xl font-semibold mb-4">Related skills</h2>
+            <p class="text-clay mb-4">Use <a href="../meeting-transcript-actions/" class="text-accentDark hover:underline">meeting-transcript-actions</a> to convert a verified transcript into attributed notes, decisions, and owned actions.</p>
             <div class="flex flex-wrap gap-2">
                 <a href="../interview-prep/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Interview prep</a>
                 <a href="../source-verification/" class="bg-white rounded-full px-4 py-2 text-sm border border-mist/30 hover:border-accent/50 transition-colors">Source verification</a>

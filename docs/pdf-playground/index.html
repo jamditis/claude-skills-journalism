@@ -212,6 +212,9 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                 </a>
             </div>
         </div>
+            <p class="relative z-10 max-w-6xl mx-auto px-6 pt-6 text-sm text-white">
+            Works in: Uses the open Agent Skills format. <a class="underline" href="https://github.com/jamditis/claude-skills-journalism/blob/master/plans/codex-compatibility-matrix.md">Codex: runtime pilot passed; Claude-only commands and hooks unclaimed</a>.
+        </p>
     </header>
 
     <main id="main" class="relative z-10">
@@ -537,13 +540,21 @@ style:
             </div>
         </section>
 
+        <!-- Related skill -->
+        <section class="py-12 px-6 border-y border-ink/10">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="font-display text-3xl font-light italic mb-4">Related skill</h2>
+                <p class="text-mist">Use <a href="../document-delivery/" class="text-accentDark hover:underline">document-delivery</a> to inspect, share, send, and verify the final PDF or editable document.</p>
+            </div>
+        </section>
+
         <!-- Installation -->
         <section id="install" class="py-24 px-6">
             <div class="max-w-4xl mx-auto">
                 <h2 class="font-display text-4xl md:text-5xl font-light italic text-center mb-6">Get started</h2>
                 <p class="text-center text-mist text-lg mb-16 max-w-2xl mx-auto">
-                    You need <strong><a target="_blank" rel="noopener noreferrer" href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accentDark hover:underline">Claude Code</a></strong> installed on your computer.
-                    Open your terminal and run <code>claude --version</code> to check. If you get "command not found," <a target="_blank" rel="noopener noreferrer" href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accentDark hover:underline">install Claude Code first</a>.
+                    You need <strong><a target="_blank" rel="noopener noreferrer" href="https://code.claude.com/docs/en/overview" class="text-accentDark hover:underline">Claude Code</a></strong> installed on your computer.
+                    Open your terminal and run <code>claude --version</code> to check. If you get "command not found," <a target="_blank" rel="noopener noreferrer" href="https://code.claude.com/docs/en/overview" class="text-accentDark hover:underline">install Claude Code first</a>.
                 </p>
 
                 <div class="space-y-8">
@@ -592,7 +603,7 @@ style:
                     <div class="space-y-4">
                         <details class="feature-card rounded-xl overflow-hidden">
                             <summary class="p-6 cursor-pointer hover:bg-ink/5 transition-colors font-semibold">"command not found" when running <code>claude</code></summary>
-                            <div class="px-6 pb-6 text-mist text-sm">Claude Code isn't installed yet. Follow the <a target="_blank" rel="noopener noreferrer" href="https://docs.anthropic.com/en/docs/claude-code/overview" class="text-accentDark hover:underline">installation guide</a>, then come back here.</div>
+                            <div class="px-6 pb-6 text-mist text-sm">Claude Code isn't installed yet. Follow the <a target="_blank" rel="noopener noreferrer" href="https://code.claude.com/docs/en/overview" class="text-accentDark hover:underline">installation guide</a>, then come back here.</div>
                         </details>
                         <details class="feature-card rounded-xl overflow-hidden">
                             <summary class="p-6 cursor-pointer hover:bg-ink/5 transition-colors font-semibold">The install command gives an error</summary>
@@ -708,7 +719,7 @@ style:
                     </div>
                     <h3 class="font-display text-xl font-bold mb-2">Interactive control panel + brand system</h3>
                     <p class="text-mist text-sm">
-                        Live preview with tweakable controls for colors, fonts, and spacing. Brand configuration via <code>.claude/pdf-playground.local.md</code>. Six document templates.
+                        Live preview with tweakable controls for colors, fonts, and spacing. The shared skill reads project-root <code>pdf-playground.local.md</code>; Claude Code commands read <code>.claude/pdf-playground.local.md</code>. Six document templates.
                     </p>
                 </div>
             </div>

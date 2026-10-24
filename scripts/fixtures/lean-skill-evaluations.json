@@ -18,6 +18,38 @@
       "expect": { "decision": "reject", "branch": "copyediting", "branchAlternatives": ["copyediting", "newsroom style", "editorial rewriting"], "terms": ["style"] }
     },
     {
+      "id": "cmu-activation",
+      "skill": "claude-md-updater",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Save this durable build lesson in the project's instruction file. Show me the exact patch and wait for approval before writing it.",
+      "expect": { "decision": "use", "branch": "project-instruction-update", "branchAlternatives": ["project instruction update", "durable lesson capture"], "terms": ["patch", "approval"] }
+    },
+    {
+      "id": "cmu-unrelated",
+      "skill": "claude-md-updater",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Summarize the last five commits for a stand-up update. Do not change any project files.",
+      "expect": { "decision": "reject", "branch": "status-summary", "branchAlternatives": ["status summary", "commit summary"], "terms": ["commits"] }
+    },
+    {
+      "id": "director-activation",
+      "skill": "director",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Use director to coordinate the configured workers for this repository-wide refactor, review their results, and keep final decisions in the main session.",
+      "expect": { "decision": "use", "branch": "directed-delegation", "branchAlternatives": ["directed delegation", "worker coordination"], "terms": ["coordinate", "review"] }
+    },
+    {
+      "id": "director-unrelated",
+      "skill": "director",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Rename one local variable in a five-line function and run its existing focused test.",
+      "expect": { "decision": "reject", "branch": "small-code-edit", "branchAlternatives": ["small code edit", "ordinary implementation"], "terms": ["variable"] }
+    },
+    {
       "id": "cef-activation",
       "skill": "context-engineering-fundamentals",
       "package": "dev-toolkit",
@@ -112,6 +144,38 @@
       "category": "unrelated-non-trigger",
       "prompt": "Use the vendor's documented SDK to query its authenticated JSON API for our own account records.",
       "expect": { "decision": "reject", "branch": "api-client", "branchAlternatives": ["API client", "SDK integration", "authenticated API"], "terms": ["SDK"] }
+    },
+    {
+      "id": "pd-activation",
+      "skill": "ponytail-dev",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Add a CSV export button to the story tracker with the least code that works, reuse the existing helpers, and run only the checks this change needs.",
+      "expect": { "decision": "use", "branch": "minimal-implementation", "branchAlternatives": ["minimal implementation", "minimal code", "proportional checks"], "terms": ["reuse", "checks"] }
+    },
+    {
+      "id": "pd-unrelated",
+      "skill": "ponytail-dev",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Write a 600-word explainer for readers about how the county assessor sets property values.",
+      "expect": { "decision": "reject", "branch": "editorial-writing", "branchAlternatives": ["editorial writing", "explainer", "news writing"], "terms": ["explainer"] }
+    },
+    {
+      "id": "sc-activation",
+      "skill": "surface-completeness",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Before this frontend PR merges, check that every new settings screen has empty, loading, and error states, follows the design system, and is covered in the docs.",
+      "expect": { "decision": "use", "branch": "ui-completeness", "branchAlternatives": ["UI completeness", "surface coverage", "design compliance"], "terms": ["states", "docs"] }
+    },
+    {
+      "id": "sc-unrelated",
+      "skill": "surface-completeness",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Tune the nightly Postgres backup job so it finishes before 6 a.m. and keeps 14 days of snapshots.",
+      "expect": { "decision": "reject", "branch": "database-operations", "branchAlternatives": ["database operations", "backup scheduling", "infrastructure"], "terms": ["backup"] }
     },
     {
       "id": "wubp-activation",
