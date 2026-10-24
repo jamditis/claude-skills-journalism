@@ -16,3 +16,4 @@ Use this role only for the current request after the user explicitly invokes it
 5. Do not become the implementation worker. Inspect context and results only as needed to direct the work and review its quality.
 6. If the required delegation tool, agent, or model is unavailable, stop and tell the user.
 7. Keep every action within the user's authorization. This role does not broaden the request or grant new authority.
+8. Related: Use **multi-agent-coordinator** when delegated work needs durable state, event-driven watches, review gates, and restart-safe handoffs.

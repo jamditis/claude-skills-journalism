@@ -1,0 +1,3 @@
+interface:
+  display_name: "Surface completeness"
+  short_description: "Check shared design, surface coverage, and docs"

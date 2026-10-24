@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: "journalism-core plugin"
-description: "Fifteen core journalism skills for reporting, verification, and publishing."
+description: "Sixteen core journalism skills for reporting, verification, and publishing."
 source: ["journalism-core/.claude-plugin/plugin.json", ".claude-plugin/marketplace.json"]
 verified: 2026-08-21
 timestamp: 2026-08-21
@@ -9,10 +9,11 @@ tags: [plugin, journalism]
 ---
 # journalism-core plugin
 
-Fifteen skills: AP-style writing, AI-slop detox, source verification (deepfake/
-C2PA), US and Brazilian records requests, fact-checking, interview prep and transcription,
-story pitches, editorial workflow, crisis communications, newsletter publishing,
-data journalism, social-media OSINT, and embedded photo metadata.
+Sixteen skills: AP-style writing, AI-slop detox, source verification (deepfake/
+C2PA), US and Brazilian records requests, fact-checking, interview prep,
+transcription and meeting actions, story pitches, editorial workflow, crisis
+communications, newsletter publishing, data journalism, social-media OSINT, and
+embedded photo metadata.
 
 ## Skills
 
@@ -25,6 +26,7 @@ data journalism, social-media OSINT, and embedded photo metadata.
 - [foia-requests](../skills/foia-requests.md)
 - [interview-prep](../skills/interview-prep.md)
 - [interview-transcription](../skills/interview-transcription.md)
+- [meeting-transcript-actions](../skills/meeting-transcript-actions.md)
 - [newsletter-publishing](../skills/newsletter-publishing.md)
 - [newsroom-style](../skills/newsroom-style.md)
 - [photo-metadata](../skills/photo-metadata.md)

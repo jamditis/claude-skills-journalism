@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Check shared UI changes for design compliance, complete surface coverage, accessibility, and current documentation.">
+    <title>Surface completeness - Agent skills for journalism</title>
+    <link rel="canonical" href="https://skills.amditis.tech/surface-completeness/">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="stylesheet" href="../assets/tailwind/surface-completeness.css" data-tailwind-build="3.4.19">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Fraunces', serif; }
+        .paper-overlay { position: fixed; inset: 0; background-image: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.45), transparent 60%); pointer-events: none; }
+        .skip-link { position: absolute; left: -9999px; top: 0; z-index: 100; }
+        .skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1rem; background: #121212; color: #fff; }
+        :focus-visible { outline: 2px solid #4338ca; outline-offset: 4px; }
+        p a, li a { text-decoration: underline; text-underline-offset: 0.15em; }
+    </style>
+    <meta property="og:title" content="Surface completeness">
+    <meta property="og:description" content="Trace shared UI changes across consumers, states, evidence, and documentation.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/surface-completeness/">
+    <meta property="og:image" content="https://skills.amditis.tech/surface-completeness/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Surface completeness">
+    <meta name="twitter:description" content="Trace shared UI changes across consumers, states, evidence, and documentation.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/surface-completeness/og-image.png">
+    <link rel="stylesheet" href="../updated.css">
+    <script src="../ask-ai.js" defer></script>
+</head>
+<body class="bg-canvas text-ink">
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <div class="paper-overlay" aria-hidden="true"></div>
+
+    <nav aria-label="Primary" class="relative z-10 border-b border-mist/40">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="../" class="text-sm font-semibold text-accent hover:underline">All skills</a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/dev-toolkit/skills/surface-completeness" class="text-sm font-semibold text-accent hover:underline">View source</a>
+        </div>
+    </nav>
+
+    <header class="relative z-10 bg-gradient-to-br from-accent to-accentDark text-white">
+        <div class="max-w-4xl mx-auto px-6 py-16">
+            <p class="text-sm font-semibold mb-4">Development skill</p>
+            <h1 class="text-4xl md:text-5xl font-bold">Surface completeness</h1>
+            <p class="text-xl text-white/90 max-w-2xl mt-5">Check that a shared interface change reaches every intended consumer, state, and guide.</p>
+        </div>
+    </header>
+
+    <main id="main" class="relative z-10 max-w-4xl mx-auto px-6 py-12">
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">Use this skill when</h2>
+            <ul class="space-y-3 list-disc pl-6 text-clay">
+                <li>A cosmetic or shared component change affects more than one surface.</li>
+                <li>You must preserve an accepted design baseline while changing presentation.</li>
+                <li>Code, browser evidence, screenshots, and guidance must describe the same result.</li>
+            </ul>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">Coverage workflow</h2>
+            <div class="space-y-4">
+                <article class="bg-white/60 border border-mist/40 rounded-xl p-5">
+                    <h3 class="text-lg font-semibold">Record the baseline</h3>
+                    <p class="text-clay mt-2">Keep the accepted result, intended change, affected surfaces, and recent work in your task list or plan tool.</p>
+                </article>
+                <article class="bg-white/60 border border-mist/40 rounded-xl p-5">
+                    <h3 class="text-lg font-semibold">Change the shared owner</h3>
+                    <p class="text-clay mt-2">Update the semantic token, component, or style rule once. Trace aliases, variants, generated output, and local overrides.</p>
+                </article>
+                <article class="bg-white/60 border border-mist/40 rounded-xl p-5">
+                    <h3 class="text-lg font-semibold">Keep one reviewer</h3>
+                    <p class="text-clay mt-2">Use one dedicated reviewer when supported. Check design rules, consumer coverage, relevant states, and documentation after each cosmetic change.</p>
+                </article>
+                <article class="bg-white/60 border border-mist/40 rounded-xl p-5">
+                    <h3 class="text-lg font-semibold">Reconcile evidence</h3>
+                    <p class="text-clay mt-2">Use static inspection for propagation and browser evidence for layout and interaction. Keep source, tests, deployment, persisted content, and public visibility separate.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="mb-12 bg-white/60 border border-mist/40 rounded-xl p-6">
+            <h2 class="text-2xl font-semibold mb-3">Standards boundary</h2>
+            <p class="text-clay">WCAG 2.2 success criteria are normative. Button hierarchy from USWDS, GOV.UK Design System, and Material Design 3 is design guidance. The <a href="https://github.com/jamditis/claude-skills-journalism/blob/master/dev-toolkit/skills/surface-completeness/references/standards.md">standards reference</a> keeps those roles separate.</p>
+        </section>
+
+        <section class="mb-12 bg-white/60 border border-mist/40 rounded-xl p-6">
+            <h2 class="text-2xl font-semibold mb-3">Works in</h2>
+            <p class="text-clay"><strong>Claude Code:</strong> Marketplace skill. <strong>Codex:</strong> candidate, not yet runtime-tested.</p>
+        </section>
+
+        <section class="border-t border-mist/40 pt-8">
+            <h2 class="text-2xl font-semibold mb-4">Install</h2>
+            <pre tabindex="0" aria-label="Install command" class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>npx skills add jamditis/claude-skills-journalism --skill surface-completeness</code></pre>
+        </section>
+    </main>
+
+    <footer class="relative z-10 border-t border-mist/40 mt-8">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-sm text-clay flex flex-wrap gap-4 justify-between">
+            <span>Joe Amditis</span>
+            <a href="https://github.com/jamditis/claude-skills-journalism" class="text-accent hover:underline">GitHub repository</a>
+        </div>
+    </footer>
+    <script defer src="../updated.js"></script>
+</body>
+</html>

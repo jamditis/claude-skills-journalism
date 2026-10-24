@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: "project-templates-toolkit plugin"
-description: "Three skills for starting and closing out projects."
+description: "Four skills for starting, tracking, and closing out projects."
 source: ["project-templates-toolkit/.claude-plugin/plugin.json", ".claude-plugin/marketplace.json"]
 verified: 2026-06-23
 timestamp: 2026-06-23
@@ -9,12 +9,13 @@ tags: [plugin, productivity]
 ---
 # project-templates-toolkit plugin
 
-Three skills: a project instruction writer, a LESSONS.md retrospective
-writer, and a template-selector decision tree that picks the right starting
-template for the work at hand.
+Four skills: a project instruction writer, a LESSONS.md retrospective
+writer, a template-selector decision tree that picks the right starting
+template for the work at hand, and an evidence-based weighted progress tracker.
 
 ## Skills
 
+- [goal-progress-bar](../skills/goal-progress-bar.md)
 - [project-memory](../skills/project-memory.md)
 - [project-retrospective](../skills/project-retrospective.md)
 - [template-selector](../skills/template-selector.md)

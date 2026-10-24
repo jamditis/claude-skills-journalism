@@ -1,0 +1,3 @@
+interface:
+  display_name: "Meeting transcript actions"
+  short_description: "Turn verified meeting transcripts into notes and owned actions."

@@ -21,6 +21,9 @@ This is the runnable companion to the essay
 ["How I run dev work with Claude"](../). The essay explains the why; this folder
 is how you set up the part most people ask about first.
 
+For a reusable skill version of the persistent attendant, see
+[unattended-agent-runs](https://skills.amditis.tech/unattended-agent-runs/).
+
 ## Who this is for
 
 You work with a coding agent (Claude Code, Codex, or similar). You don't have to

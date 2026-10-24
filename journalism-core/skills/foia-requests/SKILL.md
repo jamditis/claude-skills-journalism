@@ -642,4 +642,8 @@ For each document, track:
 - Follow-up needed?
 ```
 
+## Related
+
+Use **deadline-and-reply-tracking** to track statutory clocks, acknowledgments, response windows, and appeal deadlines.
+
 

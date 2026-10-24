@@ -1,0 +1,3 @@
+interface:
+  display_name: "Email request intake"
+  short_description: "Process allowlisted email requests without trusting message content."
