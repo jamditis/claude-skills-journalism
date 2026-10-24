@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document delivery | Newsroom agent ops</title>
+    <meta name="description" content="Inspect, share, send, and verify editable documents and PDFs without turning drafts into publication.">
+    <link rel="canonical" href="https://skills.amditis.tech/document-delivery/">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="stylesheet" href="../assets/tailwind/document-delivery.css" data-tailwind-build="3.4.19">
+    <link rel="stylesheet" href="../updated.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta property="og:title" content="Document delivery">
+    <meta property="og:description" content="Inspect, share, send, and verify editable documents and PDFs.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/document-delivery/">
+    <meta property="og:image" content="https://skills.amditis.tech/document-delivery/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Document delivery">
+    <meta name="twitter:description" content="Inspect, share, send, and verify editable documents and PDFs.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/document-delivery/og-image.png">
+    <script src="../ask-ai.js" defer></script>
+    <style>body{font-family:"Plus Jakarta Sans",sans-serif}h1,h2,h3{font-family:"Fraunces",serif}.skip-link{position:absolute;left:-9999px}.skip-link:focus{left:1rem;top:1rem;padding:.75rem;background:#17231f;color:#fff}:focus-visible{outline:3px solid #74431b;outline-offset:3px}</style>
+</head>
+<body class="bg-canvas text-ink">
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <nav class="border-b border-ink/10 bg-panel" aria-label="Primary"><div class="max-w-4xl mx-auto px-6 py-4 flex justify-between"><a class="font-semibold text-accentDark hover:underline" href="../newsroom-agent-ops/">Newsroom agent ops</a><a class="font-semibold text-accentDark hover:underline" href="https://github.com/jamditis/claude-skills-journalism/tree/master/newsroom-agent-ops/skills/document-delivery">View source</a></div></nav>
+    <header class="bg-gradient-to-br from-accentDark to-ink text-white"><div class="max-w-4xl mx-auto px-6 py-16"><p class="text-sm font-semibold uppercase tracking-widest text-white/75">Operations skill</p><h1 class="text-5xl font-bold mt-4">Document delivery</h1><p class="text-xl text-white/85 mt-6">Keep document creation, sharing, sending, and publication as separate states.</p><p class="mt-5 text-sm text-white/80"><strong>Works in:</strong> Claude Code; Codex: selection smoke passed (October 2026).</p></div></header>
+    <main id="main" class="max-w-4xl mx-auto px-6 py-12">
+        <section class="mb-12"><h2 class="text-3xl font-bold">Inspect the final artifact</h2><div class="grid md:grid-cols-2 gap-5 mt-5"><article class="rounded-xl bg-panel border border-ink/10 p-6"><h3 class="text-xl font-bold">Editable source</h3><p class="text-clay mt-2">Use native headings, lists, tables, links, alt text, and page structure.</p></article><article class="rounded-xl bg-panel border border-ink/10 p-6"><h3 class="text-xl font-bold">Export</h3><p class="text-clay mt-2">Check every page for clipping, fonts, links, contrast, blank pages, and pagination.</p></article></div></section>
+        <section class="mb-12"><h2 class="text-3xl font-bold">Verify access and delivery</h2><ol class="list-decimal pl-6 mt-5 space-y-3 text-clay"><li>Confirm sharing scope and named-recipient access.</li><li>Confirm the exact final attachment and recipient.</li><li>Send once through the authorized capability.</li><li>Read back the send record and recipient-visible copy.</li><li>Update tracking with the exact delivered version.</li></ol></section>
+        <section class="rounded-xl bg-panel border border-ink/10 p-6"><h2 class="text-2xl font-bold">Related document skills</h2><p class="text-clay mt-3">Use <strong>pdf-design</strong> for report and proposal design. Use <strong>document-design</strong> for print-ready HTML and PDF output.</p></section>
+        <section class="rounded-xl bg-ink text-white p-6 mt-8"><h2 class="text-2xl font-bold">Authorization boundary</h2><p class="text-white/80 mt-3">Draft authority does not grant sharing, sending, or publication authority. The written policy and project instruction file control.</p></section>
+        <section class="mt-12"><h2 class="text-3xl font-bold">Install</h2>
+            <p class="text-clay mt-4">Claude Code, as part of the <code>newsroom-agent-ops</code> plugin:</p>
+            <pre class="mt-3 rounded-xl bg-ink text-white p-5 overflow-x-auto text-sm"><code>/plugin marketplace add jamditis/claude-skills-journalism
+/plugin install newsroom-agent-ops@claude-skills-journalism</code></pre>
+            <p class="text-clay mt-4">Codex, or any agent that reads Agent Skills from <code>.agents/skills</code>:</p>
+            <pre class="mt-3 rounded-xl bg-ink text-white p-5 overflow-x-auto text-sm"><code>npx skills@latest add jamditis/claude-skills-journalism \
+  --skill document-delivery --agent codex --copy -g -y</code></pre>
+        </section>
+    </main>
+    <footer class="border-t border-ink/10"><div class="max-w-4xl mx-auto px-6 py-8 text-sm text-clay flex flex-wrap gap-4 justify-between"><span>Joe Amditis</span><span class="flex gap-6"><a class="hover:underline" href="../">All skills</a><a class="hover:underline" href="https://github.com/jamditis/claude-skills-journalism">GitHub repository</a></span></div></footer>
+    <script defer src="../updated.js"></script>
+</body>
+</html>

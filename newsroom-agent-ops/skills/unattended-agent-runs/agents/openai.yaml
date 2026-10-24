@@ -1,0 +1,3 @@
+interface:
+  display_name: "Unattended agent runs"
+  short_description: "Run unattended work with leases, checkpoints, recovery, and safe sends."

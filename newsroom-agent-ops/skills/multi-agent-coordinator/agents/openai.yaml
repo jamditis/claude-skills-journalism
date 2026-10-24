@@ -1,0 +1,3 @@
+interface:
+  display_name: "Multi-agent coordinator"
+  short_description: "Coordinate workers with durable prompts, watches, gates, and cleanup."

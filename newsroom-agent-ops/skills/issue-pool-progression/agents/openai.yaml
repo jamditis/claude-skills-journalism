@@ -1,0 +1,3 @@
+interface:
+  display_name: "Issue pool progression"
+  short_description: "Advance claimed issues through review, release, and live verification."

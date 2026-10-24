@@ -24,6 +24,7 @@ export const EXPECTED_SKILL_NAMES = [
   'foia-requests',
   'interview-prep',
   'interview-transcription',
+  'meeting-transcript-actions',
   'newsletter-publishing',
   'newsroom-style',
   'photo-metadata',
@@ -33,7 +34,7 @@ export const EXPECTED_SKILL_NAMES = [
 ];
 
 const PLUGIN_ID = 'journalism-core@claude-skills-journalism';
-export const EXPECTED_VERSION = '1.6.0';
+export const EXPECTED_VERSION = '1.7.0';
 export const SUBPROCESS_TIMEOUT_MS = 180_000;
 
 export function buildCommandPlan(client, repoRoot, tempRoot) {

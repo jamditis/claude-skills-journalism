@@ -1,0 +1,3 @@
+interface:
+  display_name: "Goal progress bar"
+  short_description: "Render honest weighted progress from a JSON tracker"

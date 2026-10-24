@@ -1,0 +1,9 @@
+{
+  "name": "newsroom-agent-ops",
+  "version": "1.0.0",
+  "description": "Nine skills for safe recurring newsroom agent work: unattended runs, briefings, intake, delivery, coordination, reconciliation, chat triage, deadline tracking, and issue progression.",
+  "author": {
+    "name": "Joe Amditis",
+    "email": "jamditis@gmail.com"
+  }
+}

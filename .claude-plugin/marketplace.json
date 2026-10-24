@@ -1,6 +1,6 @@
 {
   "name": "claude-skills-journalism",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "description": "Agent skills and Claude Code plugins for journalism, research, and media organizations",
   "owner": {
     "name": "Joe Amditis",
@@ -20,7 +20,7 @@
     },
     {
       "name": "dev-toolkit",
-      "description": "Twelve development skills for newsroom and research dev teams: accessibility, context management, directed multi-agent execution, Electron, mobile debugging, Python pipelines, ethical scraping, no-build frontends, web UI craft, and project instruction maintenance.",
+      "description": "Fourteen development skills for newsroom and research dev teams: accessibility, context management, minimal-code implementation, UI completeness, directed multi-agent execution, Electron, mobile debugging, Python pipelines, ethical scraping, no-build frontends, web UI craft, and project instruction maintenance.",
       "version": "2.1.0",
       "author": {
         "name": "Joe Amditis",
@@ -31,14 +31,25 @@
     },
     {
       "name": "journalism-core",
-      "description": "Fifteen core journalism skills for reporting, verification, publishing, and digital investigations: AP-style writing, AI-slop detox, source verification, FOIA/OPRA and Brazilian LAI requests, fact-checking, interview prep and transcription, story pitches, editorial workflow, crisis comms, newsletter publishing, data journalism, social-media OSINT, and embedded photo metadata.",
-      "version": "1.6.0",
+      "description": "Sixteen core journalism skills for reporting, verification, publishing, and digital investigations: AP-style writing, AI-slop detox, source verification, FOIA/OPRA and Brazilian LAI requests, fact-checking, interview prep, transcription and meeting actions, story pitches, editorial workflow, crisis comms, newsletter publishing, data journalism, social-media OSINT, and embedded photo metadata.",
+      "version": "1.7.0",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"
       },
       "source": "./journalism-core",
       "category": "Journalism"
+    },
+    {
+      "name": "newsroom-agent-ops",
+      "description": "Nine skills for safe recurring newsroom agent work: unattended runs, briefings, intake, delivery, coordination, reconciliation, chat triage, deadline tracking, and issue progression.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Joe Amditis",
+        "email": "jamditis@gmail.com"
+      },
+      "source": "./newsroom-agent-ops",
+      "category": "Productivity"
     },
     {
       "name": "okf-wiki",
@@ -75,7 +86,7 @@
     },
     {
       "name": "project-templates-toolkit",
-      "description": "Three skills for starting and closing out journalism projects: a project-instruction writer, a LESSONS.md retrospective writer, and a template-selector decision tree for editorial tools, events, publications, research, pipelines, and archives.",
+      "description": "Four skills for starting, tracking, and closing out journalism projects: a project-instruction writer, a LESSONS.md retrospective writer, a template-selector decision tree for editorial tools, events, publications, research, pipelines, and archives, and an evidence-based weighted progress tracker.",
       "version": "1.1.0",
       "author": {
         "name": "Joe Amditis",

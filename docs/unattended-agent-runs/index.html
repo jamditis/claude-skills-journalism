@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unattended agent runs | Newsroom agent ops</title>
+    <meta name="description" content="Run recurring newsroom agent work with leases, checkpoints, safe recovery, delivery checks, and resource limits.">
+    <link rel="canonical" href="https://skills.amditis.tech/unattended-agent-runs/">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="stylesheet" href="../assets/tailwind/unattended-agent-runs.css" data-tailwind-build="3.4.19">
+    <link rel="stylesheet" href="../updated.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta property="og:title" content="Unattended agent runs">
+    <meta property="og:description" content="Leases, checkpoints, safe recovery, delivery checks, and resource limits.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/unattended-agent-runs/">
+    <meta property="og:image" content="https://skills.amditis.tech/unattended-agent-runs/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Unattended agent runs">
+    <meta name="twitter:description" content="Leases, checkpoints, safe recovery, delivery checks, and resource limits.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/unattended-agent-runs/og-image.png">
+    <script src="../ask-ai.js" defer></script>
+    <style>body{font-family:"Plus Jakarta Sans",sans-serif}h1,h2,h3{font-family:"Fraunces",serif}.skip-link{position:absolute;left:-9999px}.skip-link:focus{left:1rem;top:1rem;padding:.75rem;background:#17231f;color:#fff}:focus-visible{outline:3px solid #74431b;outline-offset:3px}</style>
+</head>
+<body class="bg-canvas text-ink">
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <nav class="border-b border-ink/10 bg-panel" aria-label="Primary"><div class="max-w-4xl mx-auto px-6 py-4 flex justify-between"><a class="font-semibold text-accentDark hover:underline" href="../newsroom-agent-ops/">Newsroom agent ops</a><a class="font-semibold text-accentDark hover:underline" href="https://github.com/jamditis/claude-skills-journalism/tree/master/newsroom-agent-ops/skills/unattended-agent-runs">View source</a></div></nav>
+    <header class="bg-gradient-to-br from-accentDark to-ink text-white"><div class="max-w-4xl mx-auto px-6 py-16"><p class="text-sm font-semibold uppercase tracking-widest text-white/75">Operations skill</p><h1 class="text-5xl font-bold mt-4">Unattended agent runs</h1><p class="text-xl text-white/85 mt-6 max-w-3xl">Recover recurring work without repeating external actions or killing valid long runs.</p><p class="mt-5 text-sm text-white/80"><strong>Works in:</strong> Claude Code; Codex: selection smoke passed (October 2026).</p></div></header>
+    <main id="main" class="max-w-4xl mx-auto px-6 py-12">
+        <section class="mb-12"><h2 class="text-3xl font-bold">Two run tiers</h2><div class="grid md:grid-cols-2 gap-5 mt-5"><article class="rounded-xl border border-ink/10 bg-panel p-6"><h3 class="text-xl font-bold">Fresh process</h3><p class="text-clay mt-2">One bounded process per event. Use the <a class="underline" href="../autonomy/#s12">autonomy kit</a> as the starter path.</p></article><article class="rounded-xl border border-ink/10 bg-panel p-6"><h3 class="text-xl font-bold">Persistent session</h3><p class="text-clay mt-2">Use a single-flight lease, explicit done step, full-prompt gate, durable checkpoints, real session-loss probes, and a stall alert that keeps the lease.</p></article></div></section>
+        <section class="mb-12"><h2 class="text-3xl font-bold">Recovery contract</h2><ol class="list-decimal pl-6 mt-5 space-y-3 text-clay"><li>Read every prompt page and record the gate.</li><li>Checkpoint before and after each external action with exact IDs.</li><li>After restart, use a fresh session and the bounded checkpoint.</li><li>Inspect side-effect-pending state before any retry.</li><li>Write the summary file, then run the explicit done step once.</li></ol></section>
+        <section class="mb-12"><h2 class="text-3xl font-bold">Delivery and resource safety</h2><div class="rounded-xl bg-panel border border-ink/10 p-6 text-clay space-y-3"><p>An accepted send is not delivery. Verify a received copy and inspect an ambiguous result before retrying.</p><p>Cap memory, swap, and CPU at the session scope. Keep worker fan-out small and offload heavy compute.</p><p>Pin working and state directories, then prove persistence with a real reboot.</p></div></section>
+        <section class="rounded-xl bg-ink text-white p-6"><h2 class="text-2xl font-bold">Authorization boundary</h2><p class="text-white/80 mt-3">External actions require a written policy that states who may send or change what, to whom, and when. The project instruction file controls.</p></section>
+        <section class="mt-12"><h2 class="text-3xl font-bold">Install</h2>
+            <p class="text-clay mt-4">Claude Code, as part of the <code>newsroom-agent-ops</code> plugin:</p>
+            <pre class="mt-3 rounded-xl bg-ink text-white p-5 overflow-x-auto text-sm"><code>/plugin marketplace add jamditis/claude-skills-journalism
+/plugin install newsroom-agent-ops@claude-skills-journalism</code></pre>
+            <p class="text-clay mt-4">Codex, or any agent that reads Agent Skills from <code>.agents/skills</code>:</p>
+            <pre class="mt-3 rounded-xl bg-ink text-white p-5 overflow-x-auto text-sm"><code>npx skills@latest add jamditis/claude-skills-journalism \
+  --skill unattended-agent-runs --agent codex --copy -g -y</code></pre>
+        </section>
+    </main>
+    <footer class="border-t border-ink/10"><div class="max-w-4xl mx-auto px-6 py-8 text-sm text-clay flex flex-wrap gap-4 justify-between"><span>Joe Amditis</span><span class="flex gap-6"><a class="hover:underline" href="../">All skills</a><a class="hover:underline" href="https://github.com/jamditis/claude-skills-journalism">GitHub repository</a></span></div></footer>
+    <script defer src="../updated.js"></script>
+</body>
+</html>

@@ -656,7 +656,8 @@ export function auditCommittedProjectMemorySkill(root = ROOT) {
   const lower = body.toLowerCase();
   const claudeOutput = lower.includes('if only `claude.md` exists, update it')
     && lower.includes('in claude code, also create a')
-    && lower.includes('`claude.md` that imports it with `@agents.md`');
+    && lower.includes('`claude.md` that imports it with `@agents.md`')
+    && lower.includes('if `agents.md` exists, update it. if no `claude.md` exists');
   const codexOutput = lower.includes('if `agents.md` exists, update it')
     && lower.includes('if neither exists, create `agents.md`');
   const preservesExistingFiles = lower.includes('preserve every existing line')
