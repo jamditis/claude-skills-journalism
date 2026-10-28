@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A Claude Code Stop hook that catches possible prose questions and nudges Claude to use AskUserQuestion. Includes Python source, setup, examples, and limits.">
+    <title>Prose question guard - Agent skills for journalism</title>
+    <link rel="canonical" href="https://skills.amditis.tech/prose-question-guard/">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="stylesheet" href="../assets/tailwind/prose-question-guard.css" data-tailwind-build="3.4.19">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Fraunces', serif; }
+        .paper-overlay { position: fixed; inset: 0; background-image: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.45), transparent 60%); pointer-events: none; }
+        .skip-link { position: absolute; left: -9999px; top: 0; z-index: 100; }
+        .skip-link:focus { left: 1rem; top: 1rem; padding: 0.75rem 1rem; background: #121212; color: #fff; }
+        :focus-visible { outline: 2px solid #4338ca; outline-offset: 4px; }
+        p a, li a { text-decoration: underline; text-underline-offset: 0.15em; }
+        pre { max-width: 100%; }
+    </style>
+    <meta property="og:title" content="Prose question guard">
+    <meta property="og:description" content="Catch prose questions at the end of a Claude Code turn and move them into AskUserQuestion.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/prose-question-guard/">
+    <meta property="og:image" content="https://skills.amditis.tech/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Prose question guard">
+    <meta name="twitter:description" content="A Stop hook that nudges Claude to use AskUserQuestion instead of leaving questions in prose.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/og-image.png">
+</head>
+<body class="bg-canvas text-ink">
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <div class="paper-overlay" aria-hidden="true"></div>
+
+    <nav aria-label="Primary" class="relative z-10 border-b border-mist/40">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
+            <a href="../#hooks" class="text-sm font-semibold text-accent hover:underline">All hooks</a>
+            <a href="https://github.com/jamditis/claude-skills-journalism/blob/master/hooks/prose-question-guard.py" class="text-sm font-semibold text-accent hover:underline">Python source</a>
+        </div>
+    </nav>
+
+    <header class="relative z-10 bg-gradient-to-br from-accent to-accentDark text-white">
+        <div class="max-w-4xl mx-auto px-6 py-16">
+            <h1 class="text-4xl md:text-5xl font-bold">Prose question guard</h1>
+            <p class="text-xl text-white/90 max-w-2xl mt-5">Put questions where the user can answer them. Catch a possible question in Claude's final reply and prompt it to use AskUserQuestion.</p>
+        </div>
+    </header>
+
+    <main id="main" class="relative z-10 max-w-4xl mx-auto px-6 py-12">
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">How it works</h2>
+            <p class="text-clay mb-4">The hook runs at Claude Code's <code>Stop</code> event. It checks the final reply for question marks and phrases such as “would you like,” “let me know,” and “needs your approval.” If it finds a match, it blocks that stop and asks Claude to use <code>AskUserQuestion</code>.</p>
+            <p class="text-clay mb-4">If <code>stop_hook_active</code> is already true, the hook allows the stop. This prevents a loop. A false positive can pass on the next stop without changing the reply.</p>
+            <p class="text-clay">It runs locally with Python 3 and uses no external packages, model calls, or network access. It does not send phone notifications. Delivery to a phone depends on your client and notification setup.</p>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">Install in Claude Code</h2>
+            <p class="text-clay mb-4">From a clone of <a href="https://github.com/jamditis/claude-skills-journalism">this repository</a>, copy the hook:</p>
+            <pre tabindex="0" aria-label="Copy the hook" class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>mkdir -p ~/.claude/hooks
+cp hooks/prose-question-guard.py ~/.claude/hooks/</code></pre>
+            <p class="text-clay mt-5 mb-4">Merge the entry below into the existing <code>hooks.Stop</code> array in <code>~/.claude/settings.json</code>. Keep your other settings and hooks. Replace the example path with the absolute path on your machine.</p>
+            <pre tabindex="0" aria-label="Stop hook settings" class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /absolute/path/to/.claude/hooks/prose-question-guard.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+            <p class="text-clay mt-5">On Windows, use your Python 3 command and an absolute path with forward slashes. Quote paths containing spaces inside the JSON command. The <a href="https://github.com/jamditis/claude-skills-journalism/blob/master/hooks/prose-question-guard.md">installation reference</a> includes an example.</p>
+            <p class="text-clay mt-4">This is a manual hook install. Installing a marketplace skill package does not enable it. It uses Claude Code's Stop event and question tool; it is not a Codex hook.</p>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">What it catches</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-clay">
+                    <caption class="text-left mb-4">Examples of final replies and hook decisions</caption>
+                    <thead><tr class="border-b border-mist/40"><th scope="col" class="p-3">Reply or state</th><th scope="col" class="p-3">Result</th></tr></thead>
+                    <tbody>
+                        <tr class="border-b border-mist/40"><td class="p-3">Should I publish this?</td><td class="p-3">Blocks once; prompts AskUserQuestion</td></tr>
+                        <tr class="border-b border-mist/40"><td class="p-3">Let me know which draft you prefer.</td><td class="p-3">Blocks once, even without a question mark</td></tr>
+                        <tr class="border-b border-mist/40"><td class="p-3">The build passed.</td><td class="p-3">Allows</td></tr>
+                        <tr class="border-b border-mist/40"><td class="p-3">A question inside fenced code, inline code, a URL, a double-quoted phrase, or a Markdown blockquote</td><td class="p-3">Allows</td></tr>
+                        <tr class="border-b border-mist/40"><td class="p-3">AskUserQuestion was the last tool call in this turn</td><td class="p-3">Allows</td></tr>
+                        <tr><td class="p-3">stop_hook_active is true</td><td class="p-3">Allows</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">Limits and unattended runs</h2>
+            <ul class="space-y-3 list-disc pl-6 text-clay">
+                <li>This is a wording heuristic. Rhetorical questions can trigger it. Questions inside quotes can escape it.</li>
+                <li>SDK entrypoints are skipped when <code>CLAUDE_CODE_ENTRYPOINT</code> starts with <code>sdk</code>. Omit this hook from other unattended entrypoints.</li>
+                <li>The hook uses <code>last_assistant_message</code> when supplied. The local transcript identifies the current turn and last tool call. Older clients fall back to transcript text after the last tool call.</li>
+                <li>A question-tool call earlier in the turn does not exempt text after a later tool call.</li>
+                <li>Malformed JSON records are skipped. Invalid payloads and missing transcripts allow the stop unless a usable final message is supplied directly.</li>
+                <li>A question-tool call does not prove that the user answered or approved an action. The hook does not grant permission to act.</li>
+            </ul>
+        </section>
+
+        <section class="border-t border-mist/40 pt-8">
+            <h2 class="text-2xl font-semibold mb-4">Check your installation</h2>
+            <pre tabindex="0" aria-label="Run behavior tests" class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>python3 -m pytest hooks/tests/test_prose_question_guard.py -q</code></pre>
+            <p class="text-clay mt-5">In a fresh interactive Claude Code session with the hook loaded, ask for a final reply containing a plain-text question. Confirm that Claude receives the hook reason and uses AskUserQuestion. If the match is not a question for you, the next stop can pass.</p>
+            <p class="text-clay mt-4">Read the <a href="https://github.com/jamditis/claude-skills-journalism/blob/master/hooks/prose-question-guard.md">full hook reference</a> or Claude Code's <a href="https://code.claude.com/docs/en/hooks#stop">Stop hook contract</a>.</p>
+        </section>
+    </main>
+
+    <footer class="relative z-10 border-t border-mist/40 mt-8">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-sm text-clay flex flex-wrap gap-4 justify-between">
+            <span>Joe Amditis</span>
+            <a href="https://github.com/jamditis/claude-skills-journalism" class="text-accent hover:underline">GitHub repository</a>
+        </div>
+    </footer>
+</body>
+</html>

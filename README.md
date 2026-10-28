@@ -302,7 +302,7 @@ These four skills ship together as the [video-toolkit](./video-toolkit/) plugin 
 
 ## Hooks
 
-Hooks are automated checks that run at specific points in your workflow. Most are **non-blocking warnings**, but two block intentionally until you resolve them: `one-way-door-check` and `no-ai-attribution`.
+Hooks are automated checks that run at specific points in your workflow. Most are **non-blocking warnings**. `one-way-door-check` and `no-ai-attribution` block until you resolve them. `prose-question-guard` blocks a stop once to move a question into `AskUserQuestion`.
 
 ### Writing quality hooks
 
@@ -335,6 +335,12 @@ Hooks are automated checks that run at specific points in your workflow. Most ar
 | Hook | Event | Description |
 |------|-------|-------------|
 | [archive-reminder](./hooks/archive-reminder.md) | PostToolUse | Remind to archive URLs when citing sources |
+
+### Interaction hooks
+
+| Hook | Event | Purpose |
+|------|-------|---------|
+| [prose-question-guard](./hooks/prose-question-guard.md) | Stop | Nudge prose questions into `AskUserQuestion`; [installation and guide](https://skills.amditis.tech/prose-question-guard/) |
 
 ### Development hooks
 
