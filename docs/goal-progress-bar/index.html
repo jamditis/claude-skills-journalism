@@ -86,10 +86,31 @@
             </div>
         </section>
 
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">Define the evidence behind the bar</h2>
+            <p class="text-clay mb-4">Agree the deliverables and acceptance evidence before choosing weights. The percentage describes completion of that scope. It does not estimate elapsed time, confidence, or a release date.</p>
+            <ul class="space-y-3 list-disc pl-6 text-clay">
+                <li>Keep acceptance conditions, current evidence, owners, and next actions in a task record beside the numeric tracker.</li>
+                <li>When scope grows, add the work and explain any lower percentage. Preserve the previous baseline if the requester explicitly removes work.</li>
+                <li>Keep earned progress on blocked work. Reopen proof when its build, artifact, or external state changes.</li>
+                <li>Require current acceptance evidence before setting every row to 1. The renderer checks the numbers; it cannot verify the evidence or grant release authority.</li>
+            </ul>
+            <p class="text-clay mt-4">The <a href="https://github.com/jamditis/claude-skills-journalism/blob/master/project-templates-toolkit/skills/goal-progress-bar/references/evidence-and-scope.md">evidence and scope reference</a> includes a compact record and examples for review, publication, and live verification.</p>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">Input and completion safeguards</h2>
+            <p class="text-clay mb-4">The script rejects malformed trackers, nonfinite numbers, empty or multiline names, unsupported row fields, and rows that are both complete and blocked. Invalid or missing input exits with code 2 and prints no progress.</p>
+            <p class="text-clay">An empty tracker stays at 0%. Numeric rounding cannot show an unfinished row or tracker as 100%. The same Python 3 script accepts UTF-8 files with or without a byte-order mark, including Windows-written trackers.</p>
+        </section>
+
         <section class="mb-12 bg-white/60 border border-mist/40 rounded-xl p-6">
             <h2 class="text-2xl font-semibold mb-3">Run the script</h2>
             <pre tabindex="0" aria-label="Progress commands" class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>python3 &lt;skill-root&gt;/scripts/progress.py my-goal-progress.json "Goal name"
-python3 &lt;skill-root&gt;/scripts/progress.py my-goal-progress.json "Goal name" --chat</code></pre>
+python3 &lt;skill-root&gt;/scripts/progress.py my-goal-progress.json "Goal name" --chat
+
+# Windows PowerShell
+py -3 "&lt;skill-root&gt;/scripts/progress.py" my-goal-progress.json "Goal name"</code></pre>
             <p class="text-clay mt-4">Run it from the task folder that holds the tracker. <code>&lt;skill-root&gt;</code> is the installed skill folder. The plain mode uses an ASCII bar. The optional chat mode uses common emoji shortcodes. An empty tracker reports 0% without an error.</p>
         </section>
 

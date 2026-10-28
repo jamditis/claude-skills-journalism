@@ -126,13 +126,13 @@ test('published package versions stay aligned with the marketplace', () => {
   assert.equal(marketplace.version, '2.9.0', 'marketplace version');
   const expected = new Map([
     ['autocontext', '1.1.2'],
-    ['dev-toolkit', '2.1.0'],
+    ['dev-toolkit', '2.1.1'],
     ['journalism-core', '1.7.0'],
     ['newsroom-agent-ops', '1.0.0'],
     ['okf-wiki', '0.8.4'],
     ['pdf-design', '1.1.4'],
     ['pdf-playground', '1.3.7'],
-    ['project-templates-toolkit', '1.1.0'],
+    ['project-templates-toolkit', '1.1.1'],
     ['research-toolkit', '1.1.4'],
     ['security-toolkit', '1.3.0'],
     ['superjawn', '2.1.0'],

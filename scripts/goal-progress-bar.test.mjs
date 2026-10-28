@@ -103,3 +103,60 @@ test('floors row percentages so an unfinished row never shows 100%', { skip: SKI
     }
   });
 });
+
+test('rejects invalid trackers without printing progress or a traceback', { skip: SKIP }, () => {
+  const cases = [
+    '{}', 'null', 'not json',
+    '[["Release proof",1,1,"blocked"]]',
+    '[["Build",1,0.5,null]]',
+    '[["",1,0.5]]',
+    '[["Fake\\ncompletion",1,0.5]]',
+    '[["Draft\\n",1,0.5]]',
+    '[["Draft\\r",1,0.5]]',
+    '[["Draft\\u2028",1,0.5]]',
+    '[["Build",NaN,0.5]]',
+    '[["Build",1,Infinity]]',
+  ];
+  withTracker([], (tracker) => {
+    for (const source of cases) {
+      writeFileSync(tracker, source);
+      const result = render([tracker, 'Invalid goal']);
+      assert.equal(result.status, 2, source);
+      assert.equal(result.stdout, '', source);
+      assert.ok(result.stderr.trim(), source);
+      assert.doesNotMatch(result.stderr, /Traceback/u, source);
+    }
+  });
+});
+
+test('a missing tracker reports an input error without progress', { skip: SKIP }, () => {
+  withTracker([], (tracker) => {
+    const result = render([tracker + '.missing', 'Missing goal']);
+    assert.equal(result.status, 2);
+    assert.equal(result.stdout, '');
+    assert.match(result.stderr, /cannot read tracker/u);
+    assert.doesNotMatch(result.stderr, /Traceback/u);
+  });
+});
+
+test('rounding cannot complete a tracker with an unfinished row', { skip: SKIP }, () => {
+  withTracker([], (tracker) => {
+    writeFileSync(tracker, '[["Release proof",1,0.99999999999999999999999999999]]');
+    for (const args of [[tracker, 'Near completion'], [tracker, 'Near completion', '--chat']]) {
+      const result = render(args);
+      assert.equal(result.status, 0, result.stderr);
+      assert.match(result.stdout, /99%/u);
+      assert.doesNotMatch(result.stdout, /100%|:large_green_circle:/u);
+      assert.doesNotMatch(result.stdout, /\[#{30}\]/u);
+    }
+  });
+});
+
+test('accepts a UTF-8 BOM from a Windows-written tracker', { skip: SKIP }, () => {
+  withTracker([], (tracker) => {
+    writeFileSync(tracker, '\uFEFF[["Build",1,0.5]]');
+    const result = render([tracker, 'Windows tracker']);
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /^Windows tracker: \[#{15}-{15}\] 50%/u);
+  });
+});

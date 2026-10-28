@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Check shared UI changes for design compliance, complete surface coverage, accessibility, and current documentation.">
+    <meta name="description" content="Verify interface coverage, accessibility, browser support, performance evidence, and current documentation with task-specific checks.">
     <title>Surface completeness - Agent skills for journalism</title>
     <link rel="canonical" href="https://skills.amditis.tech/surface-completeness/">
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
@@ -84,6 +84,45 @@
                     <p class="text-clay mt-2">Use static inspection for propagation and browser evidence for layout and interaction. Keep source, tests, deployment, persisted content, and public visibility separate.</p>
                 </article>
             </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">Choose the relevant quality signals</h2>
+            <p class="text-clay mb-4">Match the checks to the user task and the change. A copy edit does not need every audit. Record passed, not tested, and not applicable separately, with the build, browser, method, and evidence.</p>
+            <ul class="space-y-3 list-disc pl-6 text-clay">
+                <li><strong>Accessibility:</strong> Combine automated scans with keyboard completion, focus and announcements, zoom, reflow, and relevant assistive-technology checks. A scan alone cannot establish conformance.</li>
+                <li><strong>Browser support:</strong> Check the project's supported environments and feature-specific compatibility. Use a usable fallback for newer features. An emulated viewport is not a real-device test.</li>
+                <li><strong>User preferences and lifecycle:</strong> Check affected reduced-motion, forced-colors, theme, long-content, loading, empty, error, retry, offline, and permission states.</li>
+                <li><strong>Performance:</strong> Compare affected assets, fonts, layout shifts, and interaction work against the baseline. Keep field results separate from lab diagnostics.</li>
+            </ul>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">Current performance indicators</h2>
+            <p class="text-clay mb-4">Google's good Core Web Vitals targets use the 75th percentile of field measurements, segmented by mobile and desktop. They are experience guidance, separate from WCAG conformance.</p>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-clay">
+                    <caption class="text-left mb-3">Good Core Web Vitals field results</caption>
+                    <thead><tr class="border-b border-mist/40"><th scope="col" class="p-3">Signal</th><th scope="col" class="p-3">Good result</th><th scope="col" class="p-3">What it measures</th></tr></thead>
+                    <tbody>
+                        <tr class="border-b border-mist/40"><td class="p-3">LCP</td><td class="p-3">At most 2.5 seconds</td><td class="p-3">Loading</td></tr>
+                        <tr class="border-b border-mist/40"><td class="p-3">INP</td><td class="p-3">At most 200 milliseconds</td><td class="p-3">Interaction responsiveness</td></tr>
+                        <tr><td class="p-3">CLS</td><td class="p-3">At most 0.1</td><td class="p-3">Layout stability</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-clay mt-4">A Lighthouse score does not prove field performance. If real-user data is unavailable, record that limit and use lab runs to diagnose the affected experience.</p>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">Standards and current resources</h2>
+            <ul class="space-y-3 list-disc pl-6 text-clay">
+                <li><a href="https://www.w3.org/TR/WCAG22/">WCAG 2.2</a> defines the normative accessibility criteria. Use the project's required level and the criteria's scope and exceptions.</li>
+                <li><a href="https://www.w3.org/WAI/test-evaluate/">WAI evaluation guidance</a> and <a href="https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/">APG keyboard guidance</a> support manual checks and custom-widget behavior.</li>
+                <li><a href="https://developer.mozilla.org/en-US/docs/Glossary/Baseline/Compatibility">MDN Baseline</a> describes browser support. It does not certify accessibility, usability, or performance.</li>
+                <li><a href="https://web.dev/articles/vitals">Core Web Vitals</a> and <a href="https://web.dev/articles/lab-and-field-data-differences">lab versus field data</a> explain the performance measures and their limits.</li>
+            </ul>
+            <p class="text-clay mt-4">The <a href="https://github.com/jamditis/claude-skills-journalism/blob/master/dev-toolkit/skills/surface-completeness/references/quality-signals.md">quality-signals reference</a> maps changes to checks, source links, thresholds, and an evidence record. Sources checked October 28, 2026; recheck precise requirements before using them for a new decision.</p>
         </section>
 
         <section class="mb-12 bg-white/60 border border-mist/40 rounded-xl p-6">

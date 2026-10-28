@@ -21,7 +21,7 @@
     {
       "name": "dev-toolkit",
       "description": "Fourteen development skills for newsroom and research dev teams: accessibility, context management, minimal-code implementation, UI completeness, directed multi-agent execution, Electron, mobile debugging, Python pipelines, ethical scraping, no-build frontends, web UI craft, and project instruction maintenance.",
-      "version": "2.1.0",
+      "version": "2.1.1",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"
@@ -87,7 +87,7 @@
     {
       "name": "project-templates-toolkit",
       "description": "Four skills for starting, tracking, and closing out journalism projects: a project-instruction writer, a LESSONS.md retrospective writer, a template-selector decision tree for editorial tools, events, publications, research, pipelines, and archives, and an evidence-based weighted progress tracker.",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"

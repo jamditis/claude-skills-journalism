@@ -1,6 +1,6 @@
 ---
 name: surface-completeness
-description: Use to check UI coverage, design compliance, and docs during frontend changes.
+description: Use to verify interface changes across affected surfaces, user states, quality signals, and documentation.
 ---
 
 # Surface completeness
@@ -89,6 +89,25 @@ Inspect intended changes before accepting visual baselines. Confirm screenshot
 provenance, deterministic fixtures, responsive layout, and actual user behavior.
 A green snapshot alone does not establish usability or complete coverage.
 
+## Choose relevant quality signals
+
+When a change affects interaction, layout, assets, fonts, or browser features,
+read [quality signals](references/quality-signals.md). Select the checks that
+can expose a failure in the affected user task. A copy edit does not require a
+full performance or device audit.
+
+Record each relevant check's expected result, method, build or commit, browser
+and version, viewport or device, result, and evidence. Keep "passed", "not
+tested", and "not applicable" distinct. Explain exclusions. An automated
+accessibility scan cannot establish conformance, and a lab performance score
+cannot establish real-user performance.
+
+Check browser support and a usable fallback before adopting a modern platform
+feature. Choose relevant keyboard and assistive-technology checks, zoom and
+reflow, user preferences, loading and failure states, and performance measures.
+Use the project's supported environments rather than a universal device list.
+Separate normative accessibility criteria from design and performance guidance.
+
 ## Maintain documentation with the result
 
 Map the change to code contracts, runbooks, staff guides, public design-system
@@ -109,7 +128,9 @@ your task list or plan tool, and verify delivery of generated documentation.
 
 Replace images that misrepresent the finished interface. Add screenshots when
 they explain a new feature, service, state, or meaningful step. Capture the final
-verified view with suitable test data. Retain no secrets or private content.
+verified view with authorized content or suitable test data. Retain no secrets
+or unapproved private content. Preserve the useful context in approved
+publication assets. Label crops and illustrative recreations accurately.
 Check image paths, useful captions or alternative text, links, and rendered
 pages. Clearly label preview or undeployed behavior and keep public and staff
 boundaries.

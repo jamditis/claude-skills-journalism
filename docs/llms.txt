@@ -45,7 +45,7 @@ Personal site: https://jamditis.com
 - newsletter-publishing, email newsletters and subscriber workflows
 
 ### Development
-- surface-completeness, shared UI coverage, design compliance, and current documentation
+- surface-completeness, UI coverage, accessibility, browser support, performance evidence, and current documentation
 - vibe-coding, AI-assisted development for non-engineers
 - one-way-door, flag irreversible architectural decisions
 - electron-dev, Electron app patterns
@@ -68,7 +68,7 @@ Personal site: https://jamditis.com
 - supply-chain-hardening, npm/bun install-time cooldown plus sandboxed pre-install scan; defends against Mini Shai-Hulud-class supply-chain worms (paired with /security-toolkit:hotpatch slash command)
 
 ### Project templates
-- goal-progress-bar, evidence-based weighted progress from a JSON tracker
+- goal-progress-bar, weighted progress with evidence and scope guidance, input safeguards, and protection against false 100%
 - project-memory, generate project instruction files for new projects
 - project-retrospective, generate LESSONS.md files
 - template-selector, pick the right project instruction or LESSONS.md template
@@ -115,6 +115,8 @@ Personal site: https://jamditis.com
 ## Hooks (17 workflow hooks)
 
 Hooks run automatically at specific workflow events. Most are non-blocking warnings. `one-way-door-check` exits 2 to prevent irreversible architectural decisions. `no-ai-attribution` denies a commit, PR, or comment that carries AI authorship credit. `prose-question-guard` blocks a stop once to move a prose question into `AskUserQuestion`.
+
+The standalone top-level hooks require manual setup from their reference files. Installing a skill package does not enable them. prose-question-guard runs with Python 3 on Windows, macOS, and Linux.
 
 ### Writing quality
 - ap-style-check, flags AP Style violations on write/edit

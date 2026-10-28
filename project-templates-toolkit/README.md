@@ -6,7 +6,7 @@ Four skills for setting up, tracking, and closing out journalism projects, the i
 
 | Skill | What it covers |
 |---|---|
-| goal-progress-bar | Script-rendered weighted progress for multi-step work, updated from recorded evidence. Nobody types or adjusts the percentage by hand. |
+| goal-progress-bar | Script-rendered weighted progress with evidence and scope guidance, input validation, blocked-state checks, and protection against false 100%. |
 | project-memory | Project instruction generation that captures institutional knowledge, the things obvious to current team members but invisible to a new collaborator. Templates cover editorial tools, event websites, publications, research projects, content pipelines, and digital archives. |
 | project-retrospective | LESSONS.md generation that names specific failures and the decisions that caused them. Templates for research projects, event post-mortems, editorial tools, and publications. |
 | template-selector | Decision tree that picks the right starting template across project-memory and project-retrospective. Use when starting a new project or unsure which template category fits. |

@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added the cross-platform `prose-question-guard` Stop hook, manual setup,
+  behavior tests, and a public guide with a terminal example.
+- Added conditional quality-signal guidance and current W3C, MDN, and web.dev
+  resources to `surface-completeness`, plus evidence and scope guidance for
+  `goal-progress-bar`.
 - Added the `newsroom-agent-ops` plugin with nine skills for recurring newsroom
   operations, durable coordination, verified delivery, and bounded external actions.
 - Added `meeting-transcript-actions` to journalism-core for extracting attributed
@@ -37,6 +42,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Replaced the superjawn homepage announcement with recent additions, led by
+  `surface-completeness` and `goal-progress-bar`. Kept the Codex review field guide.
+- `goal-progress-bar` accepts Windows-written UTF-8 BOM files and prevents
+  Decimal rounding from showing unfinished work as 100%. Missing or invalid
+  trackers exit 2 without progress output. Names must be nonempty single-line
+  text; a fourth field must be `"blocked"` on an unfinished row. To update an
+  older tracker, remove a `null` fourth field, remove `"blocked"` from completed
+  rows, and replace multiline or empty names with useful one-line labels.
+- Published dev-toolkit 2.1.1 and project-templates-toolkit 1.1.1 with these updates.
 - Increased journalism-core from 15 to 16 skills and added the new plugin and
   skills to the catalog, marketplace, public browser, sitemap, and machine-readable
   documentation.
@@ -52,8 +66,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The autonomy essay has an October 2026 update: cross-provider review, exact
   snapshots, no fixed pass cap, the offsite wake attendant, and pinned ledgers.
   Copilot and Gemini are no longer part of the setup.
-- superjawn 2.1.0, dev-toolkit 2.1.0, journalism-core 1.7.0, security-toolkit 1.3.0,
-  and project-templates-toolkit 1.1.0.
+- superjawn 2.1.0, dev-toolkit 2.1.1, journalism-core 1.7.0, security-toolkit 1.3.0,
+  and project-templates-toolkit 1.1.1.
 
 ### Removed
 

@@ -115,8 +115,8 @@ that a user approved an action. It does not grant permission to act.
 The [public guide](https://skills.amditis.tech/prose-question-guard/) includes a
 cropped original terminal screenshot of the hook flagging a question intended
 for someone else.
-Claude explains the false positive and ends the turn. The screenshot shows Joe's
-local wording; the reusable hook uses neutral wording.
+Claude explains the false positive and ends the turn. The screenshot shows local
+configuration wording; the reusable hook uses neutral wording.
 
 ## Verify
 

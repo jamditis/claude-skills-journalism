@@ -61,13 +61,19 @@
 
         <section class="mb-12">
             <h2 class="text-2xl font-semibold mb-4">The hook in use</h2>
-            <p class="text-clay mb-4">The terminal shows the guard catching a possible prose question. Claude then explains that it was summarizing questions sent to someone else. This is a false positive: the loop guard allows the next stop, so Claude can finish without asking the user again.</p>
-            <figure>
-                <a href="images/stop-hook-example-cropped.png" aria-label="Open the full-size Stop hook screenshot">
-                    <img src="images/stop-hook-example-cropped.png" alt="Terminal output from prose-question-guard.py blocks a possible question. Claude explains that the questions were for someone else and the user does not need to answer." width="1306" height="1426" loading="lazy" class="w-full max-w-sm rounded-xl">
-                </a>
-                <figcaption class="text-sm text-clay mt-4">Joe's original screenshot, cropped to the terminal. The text and Claude Code status lines are unchanged. Shared with his approval. The reusable hook uses neutral wording. Select the image to read it at full size.</figcaption>
-            </figure>
+            <div class="grid md:grid-cols-2 gap-8 items-start">
+                <div class="space-y-4 text-clay">
+                    <p>The terminal shows the guard catching a possible prose question. Claude then explains that it was summarizing questions sent to someone else.</p>
+                    <p>This is a false positive: the loop guard allows the next stop, so Claude can finish without asking the user again.</p>
+                    <p>The status lines show the model, context use, active goal, and background work from my session.</p>
+                    <p>The reusable hook uses neutral wording. Phone delivery depends on your client and notification setup.</p>
+                </div>
+                <figure class="w-full">
+                    <a href="images/stop-hook-example-cropped.png" aria-label="Open the full-size Stop hook screenshot">
+                        <img src="images/stop-hook-example-cropped.png" alt="Claude Code terminal showing the prose-question-guard Stop hook, a false-positive explanation, and status lines for the model, context use, active goal, and background shells." width="1306" height="1426" loading="lazy" class="w-full rounded-xl">
+                    </a>
+                </figure>
+            </div>
         </section>
 
         <section class="mb-12">
