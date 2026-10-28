@@ -12,6 +12,7 @@ Setup and workflow guides, separate from the skills themselves:
 
 | Guide | Description |
 |-------|-------------|
+| [The Codex review setup I run](https://codex.amditis.tech/) | Code-review setup, everyday workflow, and model-routing notes |
 | [Autonomous and hands-on dev work](https://skills.amditis.tech/autonomy/) | A first-person account of running dev work with Claude in two modes, autonomous sessions that pull tasks off GitHub issues, and hands-on multi-agent reviews at the keyboard, held to one quality bar, with copy-able prompts to adapt the approach to your own agent |
 | [Multi-agent workflows](https://skills.amditis.tech/workflows/) | Plain-language guide to running many AI agents on one job, fan-out, pipeline, and adversarial-verify patterns, with real examples from ICIJ, The Markup, Full Fact, and Elicit, plus honest cautions |
 | [Persistent sessions](https://skills.amditis.tech/persistent-sessions/) | Keep Claude Code sessions alive through disconnects using tmux, setup, key bindings, activity notifications, and scheduler coexistence |
@@ -44,7 +45,7 @@ Choose the section for your client. During the Codex pilot, use only one Codex i
 
 #### Plugins (recommended)
 
-Plugins give you slash commands you can run directly inside Claude Code. Run these two commands inside a Claude Code session:
+Plugins bundle skills and, where provided, commands, agents, or hooks. The table below lists each package’s commands. Run these two commands inside a Claude Code session:
 
 ```
 /plugin marketplace add jamditis/claude-skills-journalism
@@ -251,7 +252,7 @@ These four skills ship together as the [project-templates-toolkit](./project-tem
 
 | Skill | Description | Updated |
 |-------|-------------|--------|
-| [goal-progress-bar](./project-templates-toolkit/skills/goal-progress-bar/) | Render evidence-based weighted progress for multi-step work from a JSON tracker | Oct 23, 2026 |
+| [goal-progress-bar](./project-templates-toolkit/skills/goal-progress-bar/) | Render weighted progress with current evidence, scope changes, blocked-state checks, and protection against false 100% | Oct 23, 2026 |
 | [project-memory](./project-templates-toolkit/skills/project-memory/) | Generate project instruction files that capture project-specific knowledge. Includes templates for editorial tools, events, publications, research, pipelines, and archives | Oct 23, 2026 |
 | [project-retrospective](./project-templates-toolkit/skills/project-retrospective/) | Generate LESSONS.md files that document what worked and what didn't. Templates for investigations, events, publications, and tools | Aug 21, 2026 |
 | [template-selector](./project-templates-toolkit/skills/template-selector/) | Decision tree for choosing the right project documentation template | Oct 23, 2026 |
@@ -271,7 +272,7 @@ These fourteen skills ship together as the [dev-toolkit](./dev-toolkit/) plugin.
 | [one-way-door](./dev-toolkit/skills/one-way-door/) | Flag irreversible architectural decisions (data models, infra, auth, APIs) before committing | Oct 23, 2026 |
 | [ponytail-dev](./dev-toolkit/skills/ponytail-dev/) | Implement or review software with minimal code and proportional checks | Oct 23, 2026 |
 | [python-pipeline](./dev-toolkit/skills/python-pipeline/) | Data pipelines (pandas, polars, DuckDB, asyncio) with modular architecture | Oct 23, 2026 |
-| [surface-completeness](./dev-toolkit/skills/surface-completeness/) | Check UI coverage, design compliance, and documentation during frontend changes | Oct 23, 2026 |
+| [surface-completeness](./dev-toolkit/skills/surface-completeness/) | Verify UI coverage, accessibility, browser support, performance evidence, and current documentation | Oct 23, 2026 |
 | [vibe-coding](./dev-toolkit/skills/vibe-coding/) | AI-assisted development workflow (Claude Code, Cursor, Aider, Continue) | Oct 23, 2026 |
 | [web-scraping](./dev-toolkit/skills/web-scraping/) | Ethical scraping patterns (Playwright, robots.txt, anti-bot defense, terms-of-service) | Oct 23, 2026 |
 | [web-ui-best-practices](./dev-toolkit/skills/web-ui-best-practices/) | Container queries, `:has()`, view transitions, scroll-driven animations, signs of taste in web UI | Aug 21, 2026 |
@@ -303,6 +304,8 @@ These four skills ship together as the [video-toolkit](./video-toolkit/) plugin 
 ## Hooks
 
 Hooks are automated checks that run at specific points in your workflow. Most are **non-blocking warnings**. `one-way-door-check` and `no-ai-attribution` block until you resolve them. `prose-question-guard` blocks a stop once to move a question into `AskUserQuestion`.
+
+The 17 standalone hooks in [`hooks/`](./hooks/) are optional and installed manually from their reference files. Installing a skill package does not enable these top-level hooks. The [prose question guard](./hooks/prose-question-guard.md) uses Python 3 on Windows, macOS, and Linux; its [public guide](https://skills.amditis.tech/prose-question-guard/) includes platform-specific setup and an example from my Claude Code session.
 
 ### Writing quality hooks
 

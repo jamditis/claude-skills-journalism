@@ -20,6 +20,8 @@ USAGE = 'usage: progress.py <tracker.json> ["<title>"] [--chat]'
 def row_percent(fraction):
     # Floor like the overall value, so an unfinished row never shows 100%.
     value = int(fraction * 100)
+    if fraction < 1:
+        value = min(99, value)
     return "<1%" if value == 0 else f"{value}%"
 
 
@@ -43,32 +45,63 @@ def main(argv):
 
     path = Path(args[0])
     title = args[1] if len(args) == 2 else path.stem
-    items = json.loads(path.read_text(encoding="utf-8"), parse_float=Decimal)
+    try:
+        items = json.loads(
+            path.read_text(encoding="utf-8-sig"),
+            parse_float=Decimal,
+            parse_constant=Decimal,
+        )
+    except (OSError, ValueError) as error:
+        print(f"cannot read tracker: {error}", file=sys.stderr)
+        return 2
+    if not isinstance(items, list):
+        print("tracker must be a JSON list of rows", file=sys.stderr)
+        return 2
 
     for row in items:
         if not isinstance(row, list) or len(row) not in (3, 4):
-            raise SystemExit(f"bad row: {row!r}")
+            print(f"bad row: {row!r}", file=sys.stderr)
+            return 2
         name, weight, fraction = row[:3]
         flag = row[3] if len(row) == 4 else None
         if not (
             isinstance(name, str)
+            and name.strip()
+            and name.splitlines() == [name]
+            and "\t" not in name
             and isinstance(weight, (int, Decimal))
             and not isinstance(weight, bool)
+            and (not isinstance(weight, Decimal) or weight.is_finite())
             and weight > 0
             and isinstance(fraction, (int, Decimal))
             and not isinstance(fraction, bool)
+            and (not isinstance(fraction, Decimal) or fraction.is_finite())
             and 0 <= fraction <= 1
-            and flag in (None, "blocked")
+            and (len(row) == 3 or flag == "blocked")
+            and not (flag == "blocked" and fraction == 1)
         ):
-            raise SystemExit(f"bad row: {row!r}")
+            print(f"bad row: {row!r}", file=sys.stderr)
+            return 2
 
     total = sum(row[1] for row in items)
     done = sum(row[1] * row[2] for row in items)
-    pct = 0 if total == 0 else (100 if done >= total else int(100 * done // total))
+    complete = bool(items) and all(row[2] == 1 for row in items)
+    if total == 0:
+        pct = 0
+    elif complete:
+        pct = 100
+    else:
+        pct = min(99, int(100 * done // total))
+
+    width = 10 if chat else 30
+    if total == 0:
+        fill = 0
+    elif complete:
+        fill = width
+    else:
+        fill = min(width - 1, int(width * done // total))
 
     if chat:
-        width = 10
-        fill = 0 if total == 0 else (width if pct == 100 else int(width * done // total))
         partial = 0 if total == 0 else int(fill < width and done * width > fill * total)
         bar = ":large_green_square:" * fill + ":large_yellow_square:" * partial
         bar += ":white_large_square:" * (width - fill - partial)
@@ -84,8 +117,6 @@ def main(argv):
             extra = f" ({row_percent(row[2])})" if 0 < row[2] < 1 else ""
             print(f"{circle[mark]} {row[0]}{extra}")
     else:
-        width = 30
-        fill = 0 if total == 0 else int(width * done // total)
         print(f"{title}: [{'#' * fill}{'-' * (width - fill)}] {pct}%\n")
         for row in items:
             fraction = row[2]

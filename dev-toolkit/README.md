@@ -15,7 +15,7 @@ Fourteen development-focused skills for journalists, researchers, and small news
 | one-way-door | Block irreversible architectural decisions during planning |
 | ponytail-dev | Minimal-code implementation and review with proportional checks |
 | python-pipeline | Data pipeline patterns (pandas, polars, DuckDB, asyncio) |
-| surface-completeness | UI coverage, design-system compliance, and current documentation for frontend changes |
+| surface-completeness | UI coverage, design compliance, accessibility, browser support, performance signals, and current documentation |
 | vibe-coding | AI-assisted development workflow (Claude Code, Cursor, Aider, Continue) |
 | web-scraping | Ethical scraping patterns (Playwright, robots.txt, anti-bot, terms-of-service) |
 | web-ui-best-practices | Container queries, `:has()`, view transitions, scroll-driven animations |

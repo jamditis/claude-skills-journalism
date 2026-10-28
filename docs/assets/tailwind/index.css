@@ -525,9 +525,6 @@ video {
 .relative {
   position: relative;
 }
-.inset-0 {
-  inset: 0px;
-}
 .left-4 {
   left: 1rem;
 }
@@ -601,6 +598,9 @@ video {
 }
 .mt-5 {
   margin-top: 1.25rem;
+}
+.mt-auto {
+  margin-top: auto;
 }
 .block {
   display: block;
@@ -850,16 +850,6 @@ video {
 }
 .bg-ink\/5 {
   background-color: rgb(18 18 18 / 0.05);
-}
-.bg-white {
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
-}
-.bg-white\/10 {
-  background-color: rgb(255 255 255 / 0.1);
-}
-.bg-white\/15 {
-  background-color: rgb(255 255 255 / 0.15);
 }
 .bg-white\/20 {
   background-color: rgb(255 255 255 / 0.2);
@@ -1136,6 +1126,9 @@ video {
   --tw-text-opacity: 1;
   color: rgb(18 18 18 / var(--tw-text-opacity, 1));
 }
+.text-ink\/70 {
+  color: rgb(18 18 18 / 0.7);
+}
 .text-ink\/80 {
   color: rgb(18 18 18 / 0.8);
 }
@@ -1147,12 +1140,6 @@ video {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
-.text-white\/75 {
-  color: rgb(255 255 255 / 0.75);
-}
-.text-white\/90 {
-  color: rgb(255 255 255 / 0.9);
-}
 .underline {
   text-decoration-line: underline;
 }
@@ -1163,14 +1150,8 @@ video {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-.opacity-10 {
-  opacity: 0.1;
-}
 .opacity-30 {
   opacity: 0.3;
-}
-.opacity-50 {
-  opacity: 0.5;
 }
 .outline {
   outline-style: solid;
@@ -1257,9 +1238,6 @@ video {
   --tw-translate-x: 0.25rem;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
-.group:hover .group-hover\:bg-white\/90 {
-  background-color: rgb(255 255 255 / 0.9);
-}
 .group:hover .group-hover\:text-\[\#059669\] {
   --tw-text-opacity: 1;
   color: rgb(5 150 105 / var(--tw-text-opacity, 1));
@@ -1331,6 +1309,9 @@ video {
 .group:hover .group-hover\:text-accent {
   --tw-text-opacity: 1;
   color: rgb(61 75 64 / var(--tw-text-opacity, 1));
+}
+.group:hover .group-hover\:underline {
+  text-decoration-line: underline;
 }
 @media (min-width: 768px) {
 
@@ -1456,5 +1437,11 @@ video {
 
   .lg\:flex-row {
     flex-direction: row;
+  }
+}
+@media (min-width: 1280px) {
+
+  .xl\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }

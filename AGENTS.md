@@ -258,6 +258,8 @@ Instructions, templates, and workflows.
 
 Hooks run automatically at specific workflow events. Most are **non-blocking warnings**, but `one-way-door-check` (shell hook, exits 2) and `no-ai-attribution` (PreToolUse deny) block intentionally. `prose-question-guard` blocks a stop once to move prose questions into `AskUserQuestion`. See each hook's "Hook behavior" section for details.
 
+The top-level hooks are optional manual installs. Follow each hook's reference file; installing a skill package does not enable them. `prose-question-guard` uses the same Python 3 file on Windows, macOS, and Linux, with platform-specific commands in its reference and public guide.
+
 ### Writing quality
 | Hook | Event | Purpose |
 |------|-------|---------|
