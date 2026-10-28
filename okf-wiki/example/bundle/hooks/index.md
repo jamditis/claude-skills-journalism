@@ -1,6 +1,6 @@
 # hooks
 
-16 standalone workflow hooks under `hooks/`. Most are non-blocking warnings; `one-way-door-check` and `no-ai-attribution` block intentionally. See [the hooks catalog](../systems/hooks-catalog.md) for how they install and fire.
+17 standalone workflow hooks under `hooks/`. Most are non-blocking warnings; `one-way-door-check` and `no-ai-attribution` block until resolved. `prose-question-guard` blocks a stop once to move a prose question into `AskUserQuestion`. See [the hooks catalog](../systems/hooks-catalog.md) for how they install and fire.
 
 ## Writing quality
 - [accessibility-check](accessibility-check.md)
@@ -21,6 +21,9 @@
 
 ## Preservation
 - [archive-reminder](archive-reminder.md)
+
+## Interaction
+- [prose-question-guard](prose-question-guard.md)
 
 ## Development
 - [bug-report-detector](bug-report-detector.md)

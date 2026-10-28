@@ -60,10 +60,25 @@
         </section>
 
         <section class="mb-12">
+            <h2 class="text-2xl font-semibold mb-4">The hook in use</h2>
+            <p class="text-clay mb-4">The terminal shows the guard catching a possible prose question. Claude then explains that it was summarizing questions sent to someone else. This is a false positive: the loop guard allows the next stop, so Claude can finish without asking the user again.</p>
+            <figure>
+                <a href="images/stop-hook-example-redacted.png" aria-label="Open the full-size Stop hook screenshot">
+                    <img src="images/stop-hook-example-redacted.png" alt="Terminal output from prose-question-guard.py blocks a possible question. Claude explains that the questions were for someone else and the user does not need to answer." width="1619" height="972" loading="lazy" class="w-full max-w-sm rounded-xl">
+                </a>
+                <figcaption class="text-sm text-clay mt-4">Cropped and redacted: The guard and its false-positive recovery in Joe's local setup. The screenshot uses his personal wording; the reusable hook uses neutral wording. Select the image to read it at full size.</figcaption>
+            </figure>
+        </section>
+
+        <section class="mb-12">
             <h2 class="text-2xl font-semibold mb-4">Install in Claude Code</h2>
-            <p class="text-clay mb-4">From a clone of <a href="https://github.com/jamditis/claude-skills-journalism">this repository</a>, copy the hook:</p>
-            <pre tabindex="0" aria-label="Copy the hook" class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>mkdir -p ~/.claude/hooks
+            <p class="text-clay mb-4">The same Python 3 file works on Windows, macOS, and Linux. It reads UTF-8 hook input and transcripts, uses native file paths, and runs no shell commands. From a clone of <a href="https://github.com/jamditis/claude-skills-journalism">this repository</a>, copy the hook:</p>
+            <h3 class="text-lg font-semibold mb-3">macOS and Linux</h3>
+            <pre tabindex="0" aria-label="Copy the hook on macOS or Linux" class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>mkdir -p ~/.claude/hooks
 cp hooks/prose-question-guard.py ~/.claude/hooks/</code></pre>
+            <h3 class="text-lg font-semibold mt-5 mb-3">Windows PowerShell</h3>
+            <pre tabindex="0" aria-label="Copy the hook on Windows" class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>New-Item -ItemType Directory -Force "$env:USERPROFILE/.claude/hooks"
+Copy-Item ./hooks/prose-question-guard.py "$env:USERPROFILE/.claude/hooks/"</code></pre>
             <p class="text-clay mt-5 mb-4">Merge the entry below into the existing <code>hooks.Stop</code> array in <code>~/.claude/settings.json</code>. Keep your other settings and hooks. Replace the example path with the absolute path on your machine.</p>
             <pre tabindex="0" aria-label="Stop hook settings" class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>{
   "hooks": {
@@ -80,7 +95,9 @@ cp hooks/prose-question-guard.py ~/.claude/hooks/</code></pre>
     ]
   }
 }</code></pre>
-            <p class="text-clay mt-5">On Windows, use your Python 3 command and an absolute path with forward slashes. Quote paths containing spaces inside the JSON command. The <a href="https://github.com/jamditis/claude-skills-journalism/blob/master/hooks/prose-question-guard.md">installation reference</a> includes an example.</p>
+            <p class="text-clay mt-5">On Windows, edit <code>%USERPROFILE%/.claude/settings.json</code>. Use <code>py -3</code> or your installed Python 3 command with an absolute path. Quote paths containing spaces inside the JSON command:</p>
+            <pre tabindex="0" aria-label="Windows hook command example" class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>"command": "py -3 \"C:/Users/Your Name/.claude/hooks/prose-question-guard.py\""</code></pre>
+            <p class="text-clay mt-5">On macOS and Linux, use <code>python3</code>. Quote paths containing spaces there too. The <a href="https://github.com/jamditis/claude-skills-journalism/blob/master/hooks/prose-question-guard.md">installation reference</a> includes all three platforms.</p>
             <p class="text-clay mt-4">This is a manual hook install. Installing a marketplace skill package does not enable it. It uses Claude Code's Stop event and question tool; it is not a Codex hook.</p>
         </section>
 
@@ -116,7 +133,11 @@ cp hooks/prose-question-guard.py ~/.claude/hooks/</code></pre>
 
         <section class="border-t border-mist/40 pt-8">
             <h2 class="text-2xl font-semibold mb-4">Check your installation</h2>
-            <pre tabindex="0" aria-label="Run behavior tests" class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code>python3 -m pytest hooks/tests/test_prose_question_guard.py -q</code></pre>
+            <pre tabindex="0" aria-label="Run behavior tests on each platform" class="bg-ink text-white rounded-xl p-4 overflow-x-auto"><code># macOS and Linux
+python3 -m pytest hooks/tests/test_prose_question_guard.py -q
+
+# Windows PowerShell
+py -3 -m pytest hooks/tests/test_prose_question_guard.py -q</code></pre>
             <p class="text-clay mt-5">In a fresh interactive Claude Code session with the hook loaded, ask for a final reply containing a plain-text question. Confirm that Claude receives the hook reason and uses AskUserQuestion. If the match is not a question for you, the next stop can pass.</p>
             <p class="text-clay mt-4">Read the <a href="https://github.com/jamditis/claude-skills-journalism/blob/master/hooks/prose-question-guard.md">full hook reference</a> or Claude Code's <a href="https://code.claude.com/docs/en/hooks#stop">Stop hook contract</a>.</p>
         </section>

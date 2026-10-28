@@ -80,7 +80,7 @@ def find_question(text):
 
 def main():
     try:
-        data = json.load(sys.stdin)
+        data = json.load(sys.stdin.buffer)
     except Exception:
         return
     if not isinstance(data, dict):

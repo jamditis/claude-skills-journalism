@@ -17,7 +17,8 @@ client and notification setup.
 ## Hook behavior
 
 - **Event:** `Stop`, for the main agent.
-- **Runtime:** Python 3, standard library only. No model calls or network access.
+- **Runtime:** Python 3 on Windows, macOS, and Linux, standard library only.
+  The same file runs on all three. No shell commands, model calls, or network access.
 - **Decision:** Prints `{"decision": "block", "reason": "..."}` on stdout and
   exits zero when it finds a possible question. Otherwise it exits zero silently.
 - **Loop guard:** Always allows a stop with `stop_hook_active: true`. A false
@@ -42,15 +43,23 @@ payloads allow the stop unless a usable final message is supplied directly.
 
 ## Install
 
-From a clone of this repository, copy the executable:
+From a clone of this repository, copy the executable. On macOS and Linux:
 
 ```sh
 mkdir -p ~/.claude/hooks
 cp hooks/prose-question-guard.py ~/.claude/hooks/
 ```
 
+On Windows, use PowerShell:
+
+```powershell
+New-Item -ItemType Directory -Force "$env:USERPROFILE/.claude/hooks"
+Copy-Item ./hooks/prose-question-guard.py "$env:USERPROFILE/.claude/hooks/"
+```
+
 Merge this entry into the existing `hooks.Stop` array in
-`~/.claude/settings.json`. Keep any existing hooks and settings. Replace the
+`~/.claude/settings.json` (macOS/Linux) or
+`%USERPROFILE%/.claude/settings.json` (Windows). Keep any existing hooks and settings. Replace the
 example path with the absolute path to the copied file on your machine:
 
 ```json
@@ -71,9 +80,17 @@ example path with the absolute path to the copied file on your machine:
 }
 ```
 
-On Windows, use `python` if that is your Python 3 command. Use forward slashes in
-the absolute path. Quote the script path inside the JSON command if it contains
-spaces: `"command": "python \"C:/Users/Your Name/.claude/hooks/prose-question-guard.py\""`.
+On Windows, use `py -3` or your installed Python 3 command. Use forward slashes in
+the absolute path. Quote script paths containing spaces on every platform. For example:
+
+```json
+"command": "py -3 \"C:/Users/Your Name/.claude/hooks/prose-question-guard.py\""
+```
+
+On macOS and Linux, use `python3` with the actual absolute path, such as
+`"command": "python3 \"/Users/Your Name/.claude/hooks/prose-question-guard.py\""`.
+The hook reads stdin as UTF-8 JSON bytes and transcript text as UTF-8, so Windows
+console encoding does not change question detection or Unicode file paths.
 
 These top-level hooks are installed manually. Installing a marketplace skill
 package does not enable this hook. It uses Claude Code's Stop event and
@@ -95,6 +112,12 @@ This is a wording heuristic. Rhetorical questions can trigger it, and questions
 inside quotes can escape it. It does not prove that a question was answered or
 that a user approved an action. It does not grant permission to act.
 
+The [public guide](https://skills.amditis.tech/prose-question-guard/) includes a
+cropped, redacted terminal screenshot of the hook flagging a question intended
+for someone else.
+Claude explains the false positive and ends the turn. The screenshot shows Joe's
+local wording; the reusable hook uses neutral wording.
+
 ## Verify
 
 Run the behavior tests from the repository root:
@@ -102,6 +125,8 @@ Run the behavior tests from the repository root:
 ```sh
 python3 -m pytest hooks/tests/test_prose_question_guard.py -q
 ```
+
+On Windows, use `py -3 -m pytest hooks/tests/test_prose_question_guard.py -q`.
 
 In a fresh interactive Claude Code session with the hook loaded, ask for a reply
 that ends with a plain-text question. Confirm that Claude receives the hook reason

@@ -131,3 +131,21 @@ def test_malformed_transcript_records_are_skipped(tmp_path):
     transcript = tmp_path / "malformed.jsonl"
     transcript.write_text('broken\nnull\n' + json.dumps(assistant(text("Should I publish?"))))
     assert run_hook(tmp_path, payload={"transcript_path": str(transcript)})["decision"] == "block"
+
+
+def test_utf8_input_preserves_unicode_paths_with_a_windows_console_encoding(tmp_path):
+    directory = tmp_path / "Renée drafts"
+    directory.mkdir()
+    transcript = directory / "session.jsonl"
+    transcript.write_text(json.dumps(assistant(tool("AskUserQuestion"))), encoding="utf-8")
+    payload = {"transcript_path": str(transcript), "last_assistant_message": "Your call."}
+    result = subprocess.run(
+        [sys.executable, str(HOOK)],
+        input=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        capture_output=True,
+        timeout=5,
+        env={**os.environ, "CLAUDE_CODE_ENTRYPOINT": "cli", "PYTHONIOENCODING": "cp1252"},
+    )
+    assert result.returncode == 0, result.stderr
+    assert result.stdout == b""
+    assert result.stderr == b""
