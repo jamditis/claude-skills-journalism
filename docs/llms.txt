@@ -112,9 +112,9 @@ Personal site: https://jamditis.com
 - finishing-a-development-branch, decide how to land completed work
 - using-git-worktrees, isolate feature work from current workspace
 
-## Hooks (16 workflow hooks)
+## Hooks (17 workflow hooks)
 
-Hooks run automatically at specific workflow events. Most are non-blocking warnings; two block intentionally: `one-way-door-check` exits 2 to prevent irreversible architectural decisions, and `no-ai-attribution` denies a commit, PR, or comment that carries AI authorship credit.
+Hooks run automatically at specific workflow events. Most are non-blocking warnings. `one-way-door-check` exits 2 to prevent irreversible architectural decisions. `no-ai-attribution` denies a commit, PR, or comment that carries AI authorship credit. `prose-question-guard` blocks a stop once to move a prose question into `AskUserQuestion`.
 
 ### Writing quality
 - ap-style-check, flags AP Style violations on write/edit
@@ -135,6 +135,9 @@ Hooks run automatically at specific workflow events. Most are non-blocking warni
 
 ### Preservation
 - archive-reminder, reminds to archive URLs
+
+### Interaction
+- [prose-question-guard](https://skills.amditis.tech/prose-question-guard/), Stop hook that blocks once to move prose questions into AskUserQuestion; manual Python 3 install, Claude Code only
 
 ### Development
 - one-way-door-check, blocks irreversible architectural decisions

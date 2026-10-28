@@ -56,3 +56,6 @@ nul
 # OG social share images (keep these)
 !docs/og-image.png
 !docs/**/og-image.png
+
+# User-facing documentation example
+!docs/prose-question-guard/images/stop-hook-example-cropped.png

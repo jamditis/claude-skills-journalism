@@ -13,7 +13,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agent skills for journalism | Joe Amditis</title>
-    <meta name="description" content="76 agent skills, 14 plugins, and 16 hooks for journalists, researchers, academics, and media professionals. Supports Claude Code and Codex.">
+    <meta name="description" content="76 agent skills, 14 plugins, and 17 hooks for journalists, researchers, academics, and media professionals. Supports Claude Code and Codex.">
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -227,7 +227,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
 
     <!-- Open Graph -->
     <meta property="og:title" content="Agent skills for journalism">
-    <meta property="og:description" content="76 skills, 14 plugins, and 16 hooks for journalists, researchers, academics, and media professionals. Supports Claude Code and Codex.">
+    <meta property="og:description" content="76 skills, 14 plugins, and 17 hooks for journalists, researchers, academics, and media professionals. Supports Claude Code and Codex.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://skills.amditis.tech/">
     <meta property="og:image" content="https://skills.amditis.tech/og-image.png">
@@ -237,7 +237,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Agent skills for journalism">
-    <meta name="twitter:description" content="76 skills, 14 plugins, and 16 hooks for journalists, researchers, academics, and media professionals. Supports Claude Code and Codex.">
+    <meta name="twitter:description" content="76 skills, 14 plugins, and 17 hooks for journalists, researchers, academics, and media professionals. Supports Claude Code and Codex.">
     <meta name="twitter:image" content="https://skills.amditis.tech/og-image.png">
 <script src="ask-ai.js" defer></script>
 
@@ -247,7 +247,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
   "@context": "https://schema.org",
   "@type": "SoftwareSourceCode",
   "name": "Agent skills for journalism",
-  "description": "76 agent skills, 14 plugins, and 16 workflow hooks for verification, FOIA, data journalism, academic writing, and more. Built for journalists, researchers, and media professionals.",
+  "description": "76 agent skills, 14 plugins, and 17 workflow hooks for verification, FOIA, data journalism, academic writing, and more. Built for journalists, researchers, and media professionals.",
   "url": "https://skills.amditis.tech",
   "codeRepository": "https://github.com/jamditis/claude-skills-journalism",
   "programmingLanguage": "Markdown",
@@ -303,7 +303,7 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <!-- Hero -->
             <header class="mb-32 md:mb-44 animate-page-in">
                 <div class="inline-block px-4 py-1 border border-ink/10 mb-6">
-                    <span class="text-[9px] font-bold tracking-[0.4em] uppercase opacity-50">76 Skills // 14 Plugins // 16 Hooks</span>
+                    <span class="text-[9px] font-bold tracking-[0.4em] uppercase opacity-50">76 Skills // 14 Plugins // 17 Hooks</span>
                 </div>
                 <h1 class="font-display fluid-title text-[11vw] md:text-[8.5vw] font-light leading-[0.85] tracking-tight mb-12 text-ink">
                     Skills for <br> <span class="italic font-black">journalism.</span>
@@ -1261,10 +1261,10 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
             <section id="hooks" class="reveal-section mb-32">
                 <div class="section-header flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <h2 class="font-display text-4xl font-light italic">12 / Hooks</h2>
-                    <span class="section-label">16 Automated Checks</span>
+                    <span class="section-label">17 automated checks</span>
                 </div>
 
-                <p class="text-mist mb-8 max-w-3xl">Hooks run automatically at specific workflow events. Most are <strong>non-blocking warnings</strong>, but two block intentionally: one-way-door-check stops until you resolve it, and no-ai-attribution denies a commit, PR, or comment that carries AI authorship credit.</p>
+                <p class="text-mist mb-8 max-w-3xl">Hooks run automatically at specific workflow events. Most are <strong>non-blocking warnings</strong>. The one-way-door-check hook stops until you resolve it, and no-ai-attribution denies a commit, PR, or comment that carries AI authorship credit. The prose-question-guard hook blocks a stop once to move a question into AskUserQuestion.</p>
 
                 <div class="deckle-card-solid p-8">
                     <!-- Writing Quality Hooks -->
@@ -1368,6 +1368,18 @@ strong[class~="text-accentDark"], em[class~="text-accentDark"] { color: #1e293b 
                             </div>
                             <h4 class="font-display font-bold mb-1">archive-reminder</h4>
                             <p class="text-xs text-mist">Remind to archive URLs when citing sources.</p>
+                        </div>
+                    </div>
+
+                    <!-- Interaction hooks -->
+                    <h3 class="text-[11px] font-bold uppercase tracking-widest text-mist mb-4">Interaction</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        <div class="border border-ink/10 p-4 bg-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="hook-badge bg-clay text-ink font-bold">Stop</span>
+                            </div>
+                            <h4 class="font-display font-bold mb-1"><a href="prose-question-guard/" class="underline underline-offset-2">prose-question-guard</a></h4>
+                            <p class="text-xs text-mist">Move prose questions into AskUserQuestion. Blocks a stop once, with a loop guard.</p>
                         </div>
                     </div>
 

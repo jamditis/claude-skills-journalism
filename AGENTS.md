@@ -32,7 +32,7 @@ claude-skills-journalism/
 ├── README.md                    # User documentation
 ├── LICENSE
 │
-├── hooks/                       # Automated workflow checks (16 hooks)
+├── hooks/                       # Automated workflow checks (17 hooks)
 │   ├── ap-style-check.md        # Writing: AP Style violations
 │   ├── ai-slop-detector.md      # Writing: AI patterns
 │   ├── accessibility-check.md   # Writing: Alt text, headings
@@ -44,6 +44,7 @@ claude-skills-journalism/
 │   ├── legal-review-flag.md     # Editorial: Defamation risk
 │   ├── pre-publish-checklist.md # Editorial: Pre-publish reminder
 │   ├── deadline-tracker.md      # Editorial: Deadline surfacing
+│   ├── prose-question-guard.md  # Interaction: Move prose questions into AskUserQuestion
 │   ├── archive-reminder.md      # Preservation: Archive URLs
 │   ├── one-way-door-check.md    # Development: Block irreversible decisions
 │   ├── bug-report-detector.md   # Development: Detect bug reports
@@ -255,7 +256,7 @@ Instructions, templates, and workflows.
 
 ## Hooks
 
-Hooks run automatically at specific workflow events. Most are **non-blocking warnings**, but `one-way-door-check` (shell hook, exits 2) and `no-ai-attribution` (PreToolUse deny) block intentionally. See each hook's "Hook behavior" section for details.
+Hooks run automatically at specific workflow events. Most are **non-blocking warnings**, but `one-way-door-check` (shell hook, exits 2) and `no-ai-attribution` (PreToolUse deny) block intentionally. `prose-question-guard` blocks a stop once to move prose questions into `AskUserQuestion`. See each hook's "Hook behavior" section for details.
 
 ### Writing quality
 | Hook | Event | Purpose |
@@ -284,6 +285,11 @@ Hooks run automatically at specific workflow events. Most are **non-blocking war
 | Hook | Event | Purpose |
 |------|-------|---------|
 | archive-reminder | PostToolUse(Write,Edit) | Remind to archive URLs |
+
+### Interaction
+| Hook | Event | Purpose |
+|------|-------|---------|
+| prose-question-guard | Stop | Nudge prose questions into AskUserQuestion; allow the next stop |
 
 ### Development
 | Hook | Event | Purpose |
