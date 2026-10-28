@@ -114,7 +114,7 @@ claude-skills-journalism/
 │       ├── one-way-door/               # Block irreversible decisions
 │       ├── ponytail-dev/               # Minimal-code implementation with proportional checks
 │       ├── python-pipeline/            # Data pipelines (pandas, polars, DuckDB)
-│       ├── surface-completeness/       # UI coverage, design compliance, and docs
+│       ├── surface-completeness/       # UI coverage, quality signals, and docs
 │       ├── vibe-coding/                # AI-assisted development
 │       ├── web-scraping/               # Ethical content extraction
 │       ├── web-ui-best-practices/      # Container queries, :has(), view transitions
@@ -164,7 +164,7 @@ claude-skills-journalism/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
 │   └── skills/
-│       ├── goal-progress-bar/          # Evidence-based weighted progress from a JSON tracker
+│       ├── goal-progress-bar/          # Weighted progress, evidence, and completion safeguards
 │       ├── project-memory/             # Project instruction generation, 6 project type templates
 │       ├── project-retrospective/      # LESSONS.md generation, 4 project type templates
 │       └── template-selector/          # Decision tree for picking the right template
