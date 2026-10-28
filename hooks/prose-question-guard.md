@@ -113,7 +113,7 @@ inside quotes can escape it. It does not prove that a question was answered or
 that a user approved an action. It does not grant permission to act.
 
 The [public guide](https://skills.amditis.tech/prose-question-guard/) includes a
-cropped, redacted terminal screenshot of the hook flagging a question intended
+cropped original terminal screenshot of the hook flagging a question intended
 for someone else.
 Claude explains the false positive and ends the turn. The screenshot shows Joe's
 local wording; the reusable hook uses neutral wording.
