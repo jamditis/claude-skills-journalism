@@ -9,7 +9,7 @@ const output = process.argv[2] ? path.resolve(process.argv[2]) : fs.mkdtempSync(
 fs.mkdirSync(output, { recursive: true });
 const css = fs.readFileSync(path.join(root, 'style.css'), 'utf8');
 const js = fs.readFileSync(path.join(root, 'workshop.js'), 'utf8');
-const slugs = ['', 'status-cards', 'incident-updates', 'visual-audits', 'source-evidence', 'rough-edges'];
+const slugs = ['', 'status-cards', 'incident-updates', 'visual-audits', 'source-evidence', 'rough-edges', 'field-report'];
 const browser = await chromium.launch({ headless: true, ...(process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE } : {}) });
 const errors = [];
 async function load(page, slug = '') {
@@ -48,7 +48,7 @@ try {
     for (const slug of slugs) {
       await load(page, slug);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${slug || 'home'} overflows at ${width}px`);
-      if ((width === 390 && ['', 'status-cards', 'rough-edges'].includes(slug)) || (width === 1440 && slug === 'rough-edges')) {
+      if ((width === 390 && ['', 'status-cards', 'rough-edges'].includes(slug)) || (width === 1440 && ['rough-edges', 'field-report'].includes(slug)) || (width === 390 && slug === 'field-report')) {
         await page.waitForTimeout(1400);
         await page.screenshot({ path: path.join(output, `${slug || 'home'}-${width}.png`), fullPage: true });
       }
@@ -84,8 +84,25 @@ try {
   assert.equal(await staticPage.locator('textarea').isVisible(), true);
   assert.equal(await staticPage.locator('[data-copy]').isVisible(), false);
   assert.equal(await staticPage.locator('[data-percent]').innerText(), '25%');
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await load(page, 'field-report');
+  for (let click = 0; click < 4; click += 1) {
+    await page.locator('[data-approval-loop] button').nth(click % 3).click();
+    assert.match(await page.locator('[data-approval-prompt]').innerText(), /Allow again\?$/);
+  }
+  await page.locator('[data-approval-loop] button').first().focus();
+  await page.keyboard.press('Enter');
+  assert.equal(await page.locator('[data-approval-prompt]').innerText(), 'Approved. For now.');
+  assert.equal(await page.evaluate(() => document.activeElement.hasAttribute('data-approval-prompt')), true);
+  assert.equal(await page.locator('[data-approval-loop] button').first().isDisabled(), true);
+  assert.equal(await page.locator('[data-sleepy-dot]').evaluate(el => el.classList.contains('is-awake')), true);
+  await page.screenshot({ path: path.join(output, 'field-report-easter-egg.png') });
+  const staticReport = await noJS.newPage();
+  await load(staticReport, 'field-report');
+  assert.equal(await staticReport.locator('[data-approval-loop] button').first().isVisible(), false);
+  assert.equal(await staticReport.locator('video').isVisible(), true);
   assert.deepEqual(errors, []);
-  console.log('Passed: 24 page/viewport combinations, scenario transitions, two clocks, failed retrieval, reset, reduced motion, manual pause, clipboard success/failure, keyboard skip link, and no-JavaScript content.');
+  console.log('Passed: 28 page/viewport combinations, the field report approval loop, scenario transitions, two clocks, failed retrieval, reset, reduced motion, manual pause, clipboard success/failure, keyboard skip link, and no-JavaScript content.');
   console.log(`Offline screenshots: ${output}`);
   console.log('External requests blocked. Font fallbacks rendered. This does not test deployment, dot imports, live Slack delivery, or VM recovery.');
 } finally {

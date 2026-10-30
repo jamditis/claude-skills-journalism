@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added "A month with two ChatGPT dots," a first-person field report in the dot
+  workshop, with Blender renders, a 720p web interstitial, pixel sprites of the
+  two dots, and an approval-loop easter egg. Added share cards to every dot page,
+  blinking helpers, and a rewritten homepage callout.
 - Added the cross-platform `prose-question-guard` Stop hook, manual setup,
   behavior tests, and a public guide with a terminal example.
 - Added conditional quality-signal guidance and current W3C, MDN, and web.dev

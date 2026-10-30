@@ -15,6 +15,8 @@ Setup and workflow guides, separate from the skills themselves:
 | [The Codex review setup I run](https://codex.amditis.tech/) | Code-review setup, everyday workflow, and model-routing notes |
 | [Autonomous and hands-on dev work](https://skills.amditis.tech/autonomy/) | A first-person account of running dev work with Claude in two modes, autonomous sessions that pull tasks off GitHub issues, and hands-on multi-agent reviews at the keyboard, held to one quality bar, with copy-able prompts to adapt the approach to your own agent |
 | [Multi-agent workflows](https://skills.amditis.tech/workflows/) | Plain-language guide to running many AI agents on one job, fan-out, pipeline, and adversarial-verify patterns, with real examples from ICIJ, The Markup, Full Fact, and Elicit, plus honest cautions |
+| [Dot skills](https://skills.amditis.tech/dot-skills/) | An unofficial workshop for ChatGPT dots, OpenAI's always-on agents: Markdown playbooks for status cards, incident updates, visual audits, and source evidence, a small progress-tracker lab, and honest field notes. There is no dot marketplace yet, so these are shared here |
+| [A month with two ChatGPT dots](https://skills.amditis.tech/dot-skills/field-report/) | A first-person field report on running two dots in newsroom Slack workspaces: repeated approvals, daily computer crashes, a message sent from the wrong account, the Blender work that surprised me, and the skills that kept them usable |
 | [Persistent sessions](https://skills.amditis.tech/persistent-sessions/) | Keep Claude Code sessions alive through disconnects using tmux, setup, key bindings, activity notifications, and scheduler coexistence |
 
 ## What are agent skills?

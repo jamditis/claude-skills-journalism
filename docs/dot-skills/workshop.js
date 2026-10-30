@@ -147,5 +147,33 @@
       feedback.textContent = 'Automatic copy was unavailable. The text is selected; use your device’s copy command.';
     }
   }));
+  // Helpers blink at their own pace. The nudge helper is skipped because its pupils follow the pointer.
+  document.querySelectorAll('.mascot').forEach((dot, index) => {
+    if (dot.closest('#helper')) return;
+    dot.classList.add('blinky');
+    dot.style.setProperty('--blink-delay', `${(index * 1.7) % 6}s`);
+  });
+
+  // Field report easter egg: an approval card that keeps asking until you give up.
+  const approval = document.querySelector('[data-approval-loop]');
+  if (approval) {
+    const prompt = approval.querySelector('[data-approval-prompt]');
+    const sleeper = document.querySelector('[data-sleepy-dot]');
+    const sleeperTag = document.querySelector('[data-sleepy-tag]');
+    const asks = ['Allow this again?', 'Approval expired. Allow again?', 'Are you sure? Allow again?', 'Couldn’t confirm this request’s status. Allow again?', 'Saved rule rejected (reason: null). Allow again?'];
+    let approvals = 0;
+    approval.querySelectorAll('button').forEach(button => button.addEventListener('click', () => {
+      approvals += 1;
+      animateOnce(approval, 'is-nagging');
+      if (approvals < asks.length) { prompt.textContent = asks[approvals]; return; }
+      prompt.textContent = 'Approved. For now.';
+      approval.querySelectorAll('button').forEach(item => { item.disabled = true; });
+      prompt.focus(); // The focused button was just disabled; keep keyboard users on the card.
+      sleeper?.classList.add('is-awake');
+      if (sleeperTag) sleeperTag.textContent = 'Syl · back online (for now)';
+      animateOnce(approval, 'is-done');
+    }));
+  }
+
   document.querySelectorAll('[data-js-only]').forEach(element => { element.hidden = false; });
 }());

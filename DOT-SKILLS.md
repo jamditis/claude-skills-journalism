@@ -1,6 +1,6 @@
 # Dot skills: the workshop and the field notebook
 
-[Browse the workshop](https://skills.amditis.tech/dot-skills/) · [Read the field notes](https://skills.amditis.tech/dot-skills/rough-edges/)
+[Browse the workshop](https://skills.amditis.tech/dot-skills/) · [Read the field notes](https://skills.amditis.tech/dot-skills/rough-edges/) · [Read the field report](https://skills.amditis.tech/dot-skills/field-report/)
 
 This part of the repository has three jobs: share useful workflows for ChatGPT dots, make a small start on a community skill exchange, and document the friction encountered while trying to use them. It is independent community work by Joe Amditis, not an official OpenAI marketplace.
 
@@ -72,6 +72,7 @@ Contribute a redacted failure report by explaining the expected result, observed
 - `docs/dot-skills/index.html`: skill shelf, local tracker lab, and the purpose of the experiment.
 - The four workflow subdirectories: examples, method, starter prompt, and download links.
 - `docs/dot-skills/rough-edges/index.html`: first-person field notebook with source links.
+- `docs/dot-skills/field-report/`: the long first-person essay ("A month with two ChatGPT dots"), with the Blender renders, a 720p web copy of one interstitial, and its share image. The page is static HTML; keep media small (the video is under 5 MB) and give every image real alt text.
 - `docs/dot-skills/playbooks/`: downloadable workflow instructions and their manifest.
 - `docs/dot-skills/style.css` and `workshop.js`: this section's isolated visual and interaction system.
 - `docs/dot-skills/AGENTS.md`: the design and editorial boundaries for future edits.
@@ -93,4 +94,7 @@ Run the full repository validation in `AGENTS.md` before landing changes. The fo
 
 For a visual pass, open all six pages at desktop, intermediate, and narrow mobile widths. Exercise every scenario, repeated checks, failure and reset, keyboard use, copy success/failure, manual pause, OS reduced motion, blocked storage, and no JavaScript. Check the whole rendered frame. External fonts may be unavailable in an offline runner; record that limit rather than calling it a production rendering check.
 
-The demo uses fictional project data, six equal milestone weights, and sample clock times. It makes no network request, posts no message, and schedules nothing. Its celebration belongs only to the verified-complete example.
+The field report has one easter egg: an approval card whose Allow buttons keep asking again, until the fifth click "approves" and wakes the sleepy helper. It is a real button group, so it works with a keyboard, and it is hidden without JavaScript. Every other helper blinks on its own timer; the nudge helper on the home page is skipped because its pupils follow the pointer.
+
+- `docs/dot-skills/rough-edges/index.html`: first-person field notebook with source links.
+- `docs/dot-skills/field-report/`: the long first-person essay ("A month with two ChatGPT dots"), with the Blender renders, a 720p web copy of one interstitial, and its share image. The page is static HTML; keep media small (the video is under 5 MB) and give every image real alt text., six equal milestone weights, and sample clock times. It makes no network request, posts no message, and schedules nothing. Its celebration belongs only to the verified-complete example.
