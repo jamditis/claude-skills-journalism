@@ -97,12 +97,25 @@ try {
   assert.equal(await page.locator('[data-approval-loop] button').first().isDisabled(), true);
   assert.equal(await page.locator('[data-sleepy-dot]').evaluate(el => el.classList.contains('is-awake')), true);
   await page.screenshot({ path: path.join(output, 'field-report-easter-egg.png') });
+  await page.locator('[data-poke="wyndle"]').click({ force: true });
+  assert.match(await page.locator('[data-poke-bubble]').innerText(), /^Wyndle: /);
+  for (let poke = 0; poke < 9; poke += 1) await page.locator('[data-poke="wyndle"]').click({ force: true });
+  await page.waitForTimeout(2700);
+  assert.equal(await page.locator('[data-poke="syl"] svg').evaluate(el => el.classList.contains('is-dazed')), true);
+  await page.screenshot({ path: path.join(output, 'field-report-fight.png') });
+  await page.keyboard.type('allow');
+  assert.ok(await page.locator('.approval-rain').count() > 0);
+  await page.keyboard.type('devil');
+  assert.equal(await page.locator('.jersey-devil').count(), 1);
+  await page.getByRole('button', { name: 'Pause animations', exact: true }).click();
+  await page.waitForTimeout(150);
+  assert.equal(await page.locator('.jersey-devil, .approval-rain, .projectile').count(), 0, 'paused motion must stop running egg animations');
   const staticReport = await noJS.newPage();
   await load(staticReport, 'field-report');
   assert.equal(await staticReport.locator('[data-approval-loop] button').first().isVisible(), false);
   assert.equal(await staticReport.locator('video').isVisible(), true);
   assert.deepEqual(errors, []);
-  console.log('Passed: 28 page/viewport combinations, the field report approval loop, scenario transitions, two clocks, failed retrieval, reset, reduced motion, manual pause, clipboard success/failure, keyboard skip link, and no-JavaScript content.');
+  console.log('Passed: 28 page/viewport combinations, the field report approval loop, pokes, the fight, typed eggs, scenario transitions, two clocks, failed retrieval, reset, reduced motion, manual pause, clipboard success/failure, keyboard skip link, and no-JavaScript content.');
   console.log(`Offline screenshots: ${output}`);
   console.log('External requests blocked. Font fallbacks rendered. This does not test deployment, dot imports, live Slack delivery, or VM recovery.');
 } finally {

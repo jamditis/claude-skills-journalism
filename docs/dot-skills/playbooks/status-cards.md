@@ -2,7 +2,7 @@
 
 Version: 0.2.0 · Community workflow preview · MIT
 
-Keep one readable progress update for a shared task. The card should answer what changed, what is actually done, and what still needs a person—not merely show that the assistant woke up.
+Keep one readable progress update for a shared task. The card should answer what changed, what is actually done, and what still needs a person. Showing that the assistant woke up is not enough.
 
 ## Use it for
 

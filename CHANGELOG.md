@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Rewrote the dot field report in the author's voice with links to every dot
+  workflow and related skills, and added easter eggs: pokeable dots with real
+  quotes, a fight after ten fast pokes, typed "allow" and "devil", and more.
+- Removed AI-template design habits from the dot pages (eyebrow labels, numbered
+  kickers, offset shadows, colored card tabs and edges, the card grid, tiny text)
+  and switched dot headlines to Pixelify Sans.
 - Added "A month with two ChatGPT dots," a first-person field report in the dot
   workshop, with Blender renders, a 720p web interstitial, pixel sprites of the
   two dots, and an approval-loop easter egg. Added share cards to every dot page,
