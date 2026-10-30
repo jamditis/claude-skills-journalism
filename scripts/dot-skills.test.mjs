@@ -184,3 +184,10 @@ test('helpers blink without fighting the pointer-tracking helper', () => {
   assert.match(js, /if \(dot\.closest\('#helper'\)\) return;/);
   assert.match(fs.readFileSync(path.join(root, 'style.css'), 'utf8'), /\.mascot\.blinky \.pupils\{[^}]*animation:blink/);
 });
+
+test('workshop animations stay finite', () => {
+  // docs/dot-skills/AGENTS.md asks for expressive but finite motion.
+  assert.doesNotMatch(fs.readFileSync(path.join(root, 'style.css'), 'utf8'), /\binfinite\b/);
+  const feature = fs.readFileSync('docs/index.html', 'utf8').match(/<style>\.dot-feature[\s\S]*?<\/style>/)[0];
+  assert.doesNotMatch(feature, /\binfinite\b/);
+});

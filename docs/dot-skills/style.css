@@ -10,7 +10,7 @@ a{color:inherit;text-underline-offset:4px}a:hover{text-decoration-thickness:2px}
 @media(max-width:700px){.wrap{width:calc(100% - 36px)}.brand span{display:none}.site-nav{gap:12px;padding-block:17px}.nav-links{gap:13px;font-size:12px}.nav-links .desktop-link{display:none}.nav-links button{font-size:11px;padding:7px 9px}.hero{grid-template-columns:1fr;padding-block:37px 35px;gap:0}.hero h1{font-size:clamp(53px,11vw,76px)}.intro{font-size:17px}.workshop-scene{width:min(410px,100%);height:355px;margin:20px auto 0}.pinboard{width:260px;right:8px;top:5px}.helper-button{left:0;width:120px}.helper-button .mascot{width:115px}.scene-note{right:10px;max-width:190px}.doodle{font-size:35px}.purpose-strip{grid-template-columns:1fr;gap:18px;padding-bottom:25px}.purpose-strip p{padding-left:27px}.section{padding-block:42px}.section-heading{display:block;margin-bottom:25px}.skill-grid,.two-col,.sample-grid{grid-template-columns:1fr;gap:24px}.skill-card{padding:25px}.skill-card h3{font-size:32px}.demo-shell{padding:16px;box-shadow:4px 5px 0 #d8cfb4}.tracker{padding:19px}.milestones{grid-template-columns:repeat(2,1fr)}.milestones li,.milestones li span{font-size:12px}.demo-heading{align-items:start}.scenario-buttons{gap:6px}.scenario-buttons button{font-size:11px;padding:8px 10px}.article-header{padding-block:32px 20px}.article-layout{display:block}.toc{position:static;display:flex;flex-wrap:wrap;gap:4px 18px;padding-bottom:18px;margin-bottom:10px}.toc strong{width:100%;margin:0}.toc a{font-size:12px}.article-content section{padding-top:28px;margin-top:25px}.article-content h2{font-size:31px}.article-content .demo-shell{margin-inline:0}.article-content .steps{padding-right:0}.prompt{padding:17px}.prompt textarea{min-height:270px}.field-teaser{padding:26px}.site-footer{display:block}.site-footer a{display:inline-block;margin-top:16px}.reading-table{font-size:12px}th,td{padding:11px 8px}.quote{font-size:24px}}
 @media print{body{background:white}.site-nav,.toc,.demo-controls,.scenario-buttons,.copy-button,.helper-button,.site-footer{display:none!important}.wrap{width:100%}.article-layout{display:block}.article-content{max-width:none}*{animation:none!important;box-shadow:none!important}.article-content section{break-inside:avoid}}
 /* Blinking helpers (all pages) and the field report. */
-.mascot.blinky .pupils{transform-box:fill-box;transform-origin:center;animation:blink 6s var(--blink-delay,0s) infinite}
+.mascot.blinky .pupils{transform-box:fill-box;transform-origin:center;animation:blink 6s var(--blink-delay,0s) 4}
 @keyframes blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.12)}}
 .report-header{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:40px;align-items:center;max-width:none}
 .report-scene{position:relative;height:330px;isolation:isolate}
@@ -31,8 +31,8 @@ a{color:inherit;text-underline-offset:4px}a:hover{text-decoration-thickness:2px}
 @keyframes settle{0%{transform:rotate(2.5deg) scale(1)}40%{transform:rotate(-1deg) scale(1.06)}100%{transform:rotate(0) scale(1)}}
 .report-dot{position:absolute;bottom:0;display:flex;flex-direction:column;align-items:center;gap:6px;font:600 11px monospace;letter-spacing:.12em;text-transform:uppercase}
 .report-dot-a{left:4%}.report-dot-b{left:34%}
-.report-dot-a .helper-body{animation:idle 2.8s ease-in-out infinite}
-.sleepy .eyes-open{display:none}.sleepy .helper-body{transform-origin:50% 90%;animation:doze 3.6s ease-in-out infinite}
+.report-dot-a .helper-body{animation:idle 2.8s ease-in-out 4}
+.sleepy .eyes-open{display:none}.sleepy .helper-body{transform-origin:50% 90%;animation:doze 3.6s ease-in-out 4}
 .sleepy.is-awake .eyes-open{display:inline}.sleepy.is-awake .eyes-x{display:none}.sleepy.is-awake .helper-body{animation:hop .8s var(--spring)}
 @keyframes idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 @keyframes doze{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(4deg)}}
