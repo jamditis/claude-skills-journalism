@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "format": "markdown-workflow-preview",
+  "version": "0.2.0",
+  "license": "MIT",
+  "installation": "Read and adapt the instructions. No native dot import or automatic installation is claimed.",
+  "validation_scope": "Document structure and local website/demo tests only; no live dot, Slack, browser-session recovery, or scheduled-run certification.",
+  "workflows": [
+    {
+      "name": "status-cards",
+      "file": "status-cards.md",
+      "title": "Status cards",
+      "bytes": 6118,
+      "sha256": "e0c8d0fd2063be07a145ebc133920688168a8f6dd2085b210b3b4f74bc86e9de"
+    },
+    {
+      "name": "incident-updates",
+      "file": "incident-updates.md",
+      "title": "Incident updates",
+      "bytes": 4515,
+      "sha256": "73340e464e9204082613851d930f852c853261b54839085a041767157e463372"
+    },
+    {
+      "name": "visual-audits",
+      "file": "visual-audits.md",
+      "title": "Visual audits",
+      "bytes": 4334,
+      "sha256": "b5b05a1b0319fcd181aa28f77eaf4824adffc33f5eaf9eda46f36d699434a9c7"
+    },
+    {
+      "name": "source-evidence",
+      "file": "source-evidence.md",
+      "title": "Source evidence",
+      "bytes": 4363,
+      "sha256": "53a28c7cb79f8dbcae49a3a689aad858e6dcb3145bcbd7921a10a8f69735eb2e"
+    }
+  ]
+}
