@@ -716,6 +716,9 @@ video {
 .bg-mist\/10 {
   background-color: rgb(196 191 180 / 0.1);
 }
+.bg-mist\/20 {
+  background-color: rgb(196 191 180 / 0.2);
+}
 .bg-red-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(254 226 226 / var(--tw-bg-opacity, 1));
@@ -857,6 +860,10 @@ video {
 .text-accentDark {
   --tw-text-opacity: 1;
   color: rgb(67 56 202 / var(--tw-text-opacity, 1));
+}
+.text-clay {
+  --tw-text-opacity: 1;
+  color: rgb(45 42 38 / var(--tw-text-opacity, 1));
 }
 .text-clay\/70 {
   color: rgb(45 42 38 / 0.7);

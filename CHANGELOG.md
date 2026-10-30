@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added an optional `FirecrawlScraper` step to the `web-scraping` cascade for
+  public, authorized pages that need JavaScript when no local browser is
+  available. Playwright stays the local default, and hosted renderers follow the
+  same access rules. Updated the web-scraping docs page to match.
 - Rewrote the dot field report in the author's voice with links to every dot
   workflow and related skills, and added easter eggs: pokeable dots with real
   quotes, a fight after ten fast pokes, typed "allow" and "devil", and more.
