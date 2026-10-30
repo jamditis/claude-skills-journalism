@@ -138,7 +138,7 @@ test('demos disclose their boundary and do not perform network actions', () => {
   assert.doesNotMatch(js, /\b(?:fetch|XMLHttpRequest|WebSocket|setInterval)\s*\(/);
   for (const slug of ['', 'status-cards']) {
     const html = fs.readFileSync(path.join(root, slug, 'index.html'), 'utf8');
-    assert.match(html, /Fictional project · local demo/);
+    assert.match(html, /All numbers, events, and times here are examples./);
     assert.match(html, /does not connect to Slack/);
     assert.match(html, /aria-valuenow="25"/);
   }

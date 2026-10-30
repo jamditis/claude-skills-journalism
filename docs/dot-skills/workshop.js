@@ -83,6 +83,7 @@
   const reminders = ['Nice bar. Where is the evidence?', 'A merge is not a launch.', 'Same post. Fewer pings.', 'Little bounce. No extra permissions.'];
   let nudge = 0;
   helper?.addEventListener('click', () => {
+    if (helper.classList.contains('is-lying-down')) return;
     aside.textContent = reminders[nudge++ % reminders.length];
     animateOnce(helper, 'is-bouncing');
     animateOnce(aside, 'is-changing');
@@ -173,6 +174,157 @@
       if (sleeperTag) sleeperTag.textContent = 'Syl · back online (for now)';
       animateOnce(approval, 'is-done');
     }));
+  }
+
+  // Field report: poke the dots. Their lines are things they actually said.
+  const pokeLines = {
+    wyndle: ['Sent and verified.', 'The checks kept running. The graphic just hadn’t earned a new version.', 'An unchanged timestamp makes it look that way.', 'I’m staying stopped.'],
+    syl: ['I overstated the concern.', 'Please hold off on a public PR for now.', 'I used “rights review” too broadly.', 'Hi Syl. (That was OpenAI support, not me.)'],
+    sleeping: ['Zzz. Rebooting.', 'Still rebooting.', 'Couldn’t confirm this request’s status.']
+  };
+  const bubble = document.querySelector('[data-poke-bubble]');
+  const dotTag = document.querySelector('[data-sleepy-tag]');
+  const pokes = { wyndle: 0, syl: 0 };
+  const recent = [];
+  let fighting = false;
+  function say(text) {
+    if (!bubble) return;
+    bubble.textContent = text;
+    animateOnce(bubble, 'is-popping');
+  }
+  function sprite(name) { return document.querySelector(`[data-poke="${name}"] svg`); }
+  function throwAt(fromName, toName, kind, count) {
+    const scene = document.querySelector('.report-scene');
+    const from = sprite(fromName).getBoundingClientRect();
+    const to = sprite(toName).getBoundingClientRect();
+    const box = scene.getBoundingClientRect();
+    for (let i = 0; i < count; i += 1) {
+      const bit = document.createElement('span');
+      bit.className = `projectile ${kind}`;
+      bit.setAttribute('aria-hidden', 'true');
+      bit.style.left = `${from.left - box.left + from.width / 2}px`;
+      bit.style.top = `${from.top - box.top + from.height / 3}px`;
+      scene.append(bit);
+      const dx = to.left - from.left + (Math.random() * 20 - 10);
+      const lift = 40 + Math.random() * 50;
+      bit.animate([
+        { transform: 'translate(0, 0) rotate(0deg)' },
+        { transform: `translate(${dx / 2}px, ${-lift}px) rotate(180deg)` },
+        { transform: `translate(${dx}px, ${Math.random() * 16}px) rotate(360deg)` }
+      ], { duration: 650, delay: i * 170, easing: 'ease-in-out', fill: 'forwards' }).finished.then(() => bit.remove());
+    }
+  }
+  function fight() {
+    fighting = true;
+    const wyndle = sprite('wyndle');
+    const syl = sprite('syl');
+    syl.classList.add('is-awake');
+    if (dotTag) dotTag.textContent = 'Syl · wide awake';
+    say('Wyndle and Syl are settling this the old-fashioned way.');
+    const finish = () => {
+      wyndle.classList.add('is-dazed');
+      syl.classList.add('is-dazed');
+      say('Both dots need fresh approval to keep fighting.');
+      setTimeout(() => {
+        wyndle.classList.remove('is-dazed');
+        syl.classList.remove('is-dazed');
+        if (dotTag) dotTag.textContent = 'Syl · back online (for now)';
+        fighting = false;
+      }, 3200);
+    };
+    if (paused) { finish(); return; }
+    wyndle.classList.add('is-fighting');
+    syl.classList.add('is-fighting');
+    throwAt('wyndle', 'syl', 'rock', 6);
+    setTimeout(() => throwAt('syl', 'wyndle', 'drop', 6), 500);
+    setTimeout(() => { wyndle.classList.remove('is-fighting'); syl.classList.remove('is-fighting'); finish(); }, 2400);
+  }
+  document.querySelectorAll('[data-poke]').forEach(button => button.addEventListener('click', () => {
+    if (fighting) return;
+    const name = button.dataset.poke;
+    const now = Date.now();
+    recent.push(now);
+    while (recent.length && now - recent[0] > 4000) recent.shift();
+    if (recent.length >= 10) { recent.length = 0; fight(); return; }
+    const asleep = name === 'syl' && !sprite('syl').classList.contains('is-awake');
+    const lines = asleep ? pokeLines.sleeping : pokeLines[name];
+    say(`${asleep ? 'Syl' : name === 'syl' ? 'Syl' : 'Wyndle'}: ${lines[pokes[name]++ % lines.length]}`);
+    animateOnce(button.querySelector('svg'), 'is-poked');
+  }));
+
+  // Click a null and it tries out other reasons.
+  const nulls = ['null', 'undefined', 'see above', '¯\\_(ツ)_/¯', 'ask again tomorrow', 'NaN', 'null (but louder)'];
+  document.querySelectorAll('.article-content code').forEach(code => {
+    // Quoted evidence stays as quoted; only the author's own nulls play along.
+    if (!/\bnull\b/.test(code.textContent) || /“[^”]*$/.test(code.parentElement.innerHTML.split(code.outerHTML)[0])) return;
+    const original = code.textContent;
+    let turn = 0;
+    code.classList.add('null-egg');
+    code.addEventListener('click', () => {
+      turn = (turn + 1) % nulls.length;
+      code.textContent = original.replace(/null.*$/, nulls[turn]);
+    });
+  });
+
+  // Type a word anywhere on a dot page. "allow" and "devil" do something.
+  const devilRows = ['....X..........X....', '....XX........XX....', 'X....XX..XX..XX....X', 'XX....XXXXXXXX....XX', 'XXX...XRXXXXRX...XXX', '.XXXX.XXXXXXXX.XXXX.', '..XXXXXXXXXXXXXXXX..', '...XXXXXXXXXXXXXX...', '......XXXXXXXX......', '.......XXXXXX.......', '......XX....XX......', '.....XX......XX..X..', '....XX........XXXX..'];
+  const devilSvg = `<svg viewBox="0 0 20 13" width="120" height="78" shape-rendering="crispEdges">${devilRows.map((row, y) => [...row].map((cell, x) => cell === '.' ? '' : `<rect x="${x}" y="${y}" width="1" height="1" fill="${cell === 'R' ? '#e4572e' : '#2b2620'}"/>`).join('')).join('')}</svg>`;
+  let typed = '';
+  let approvals = 0;
+  function rainApprovals() {
+    const count = paused ? 1 : 9;
+    for (let i = 0; i < count; i += 1) {
+      approvals += 1;
+      const card = document.createElement('div');
+      card.className = 'approval-rain';
+      card.setAttribute('aria-hidden', 'true');
+      card.textContent = `Approval request #${approvals}: Allow this again?`;
+      card.style.left = paused ? '50%' : `${5 + Math.random() * 75}vw`;
+      if (paused) card.style.transform = 'translateX(-50%)';
+      document.body.append(card);
+      if (paused) { setTimeout(() => card.remove(), 2500); continue; }
+      card.animate([
+        { transform: `translateY(-120px) rotate(${Math.random() * 30 - 15}deg)` },
+        { transform: `translateY(110vh) rotate(${Math.random() * 60 - 30}deg)` }
+      ], { duration: 2600 + Math.random() * 1400, delay: i * 140, easing: 'ease-in', fill: 'backwards' }).finished.then(() => card.remove());
+    }
+  }
+  function walkDevil() {
+    const devil = document.createElement('div');
+    devil.className = 'jersey-devil';
+    devil.setAttribute('aria-hidden', 'true');
+    devil.innerHTML = devilSvg;
+    document.body.append(devil);
+    if (paused) { setTimeout(() => devil.remove(), 2500); return; }
+    devil.animate([
+      { transform: 'translateX(-140px)' },
+      { transform: `translateX(${window.innerWidth + 20}px)` }
+    ], { duration: 7000, easing: 'linear' }).finished.then(() => devil.remove());
+  }
+  document.addEventListener?.('keydown', event => {
+    if (event.isComposing || event.metaKey || event.ctrlKey || event.altKey || event.key.length !== 1) return;
+    if (event.target.isContentEditable || event.target.closest?.('input, textarea, select')) return;
+    typed = (typed + event.key.toLowerCase()).slice(-5);
+    if (typed === 'allow') { typed = ''; rainApprovals(); }
+    if (typed === 'devil') { typed = ''; walkDevil(); }
+  });
+
+  // The home page helper: nudge it ten times in a row and it lies down.
+  if (helper) {
+    const helperClicks = [];
+    let standUp;
+    helper.addEventListener('click', () => {
+      if (helper.classList.contains('is-lying-down')) { aside.textContent = 'Lying down. Will get up after the next approval.'; return; }
+      const now = Date.now();
+      helperClicks.push(now);
+      while (helperClicks.length && now - helperClicks[0] > 4000) helperClicks.shift();
+      if (helperClicks.length < 10) return;
+      helperClicks.length = 0;
+      helper.classList.add('is-lying-down');
+      aside.textContent = 'Lying down. Will get up after the next approval.';
+      clearTimeout(standUp);
+      standUp = setTimeout(() => { helper.classList.remove('is-lying-down'); aside.textContent = ''; }, 4500);
+    });
   }
 
   document.querySelectorAll('[data-js-only]').forEach(element => { element.hidden = false; });

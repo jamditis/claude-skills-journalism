@@ -27,3 +27,11 @@ Run `node --test scripts/dot-skills.test.mjs`, then the applicable repository ch
 ## The field report
 
 `field-report/` is the long version of the field notebook: the full story from an interview with the author, including the support cases, the agent the author built before dots existed, and the Blender work. Keep it first person and specific. Quote dots and support replies only with colleague names, channel IDs, and private identifiers removed. Do not add claims the author did not make or the sources do not support.
+
+## Avoid the vibe-coded look
+
+The dot pages use Pixelify Sans for headlines and Plus Jakarta Sans for text, not the Fraunces-and-italics look the main site keeps on purpose. Do not bring back: eyebrow labels above headlines, numbered labels like "01 /", offset "box behind a box" shadows, colored left edges or colored tabs on cards, bento card grids, an italic or underlined word inside a headline, gradient blobs, pills above a call to action, pulsing dots, scroll-triggered reveals, text under 13px, or lines that explain the page to itself ("Playful instructions. Visible limits."). Prose follows the owner's writing rules: no em dashes, capitalize after a colon, no wind-ups or mic-drop closers.
+
+## Easter eggs
+
+They should be found by people clicking around absentmindedly, and they must never hide information. Current eggs: the field report's approval card (five presses), poking Wyndle or Syl for real quotes, ten fast pokes to start a fight, clicking a `null` in the report, typing "allow" or "devil" on any dot page, and ten fast nudges of the home page helper. Every egg honors Pause motion and reduced motion by skipping the movement and keeping the joke.
