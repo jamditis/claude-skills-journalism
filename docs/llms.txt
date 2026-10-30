@@ -187,3 +187,7 @@ ln -sfn ~/projects/claude-skills-journalism/research-toolkit/skills/free-apis-ca
 ## License
 
 MIT. Use, adapt, and share freely.
+
+## Dot skills workshop
+
+- [Dot skills](https://skills.amditis.tech/dot-skills/): Community workflow previews for status cards, incident updates, visual audits, and source evidence. Includes public-safe source-evidence preview download and explicit permission/runtime limits.

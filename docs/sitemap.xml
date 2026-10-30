@@ -395,4 +395,10 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+<url><loc>https://skills.amditis.tech/dot-skills/</loc></url>
+<url><loc>https://skills.amditis.tech/dot-skills/status-cards/</loc></url>
+<url><loc>https://skills.amditis.tech/dot-skills/incident-updates/</loc></url>
+<url><loc>https://skills.amditis.tech/dot-skills/visual-audits/</loc></url>
+<url><loc>https://skills.amditis.tech/dot-skills/source-evidence/</loc></url>
+<url><loc>https://skills.amditis.tech/dot-skills/rough-edges/</loc></url>
 </urlset>

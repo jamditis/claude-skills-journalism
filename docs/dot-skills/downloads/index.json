@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "packages": [
+    {
+      "name": "verify-source-evidence",
+      "version": "1.0.0-public-preview",
+      "file": "verify-source-evidence-1.0.0-preview.zip",
+      "bytes": 11435,
+      "sha256": "f7a27c105c1ebe8b62329770eaf90b20faf8b4713516b3c9cfe5c7a874ca9426",
+      "license": "MIT",
+      "status": "portable-document-preview",
+      "validation": "Static document/archive checks and written-procedure fixtures passed; no live host or connector tests.",
+      "documentation_directory": "verify-source-evidence/",
+      "source_location": "Complete procedure, references and manifest are inside the ZIP."
+    }
+  ]
+}
