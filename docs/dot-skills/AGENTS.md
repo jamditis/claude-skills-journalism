@@ -26,4 +26,4 @@ Run `node --test scripts/dot-skills.test.mjs`, then the applicable repository ch
 
 ## The field report
 
-`field-report/` is the long version of the field notebook: the full story from an interview with the author, including the support cases, the agent he built himself, and the Blender work. Keep it first person and specific. Quote dots and support replies only with colleague names, channel IDs, and private identifiers removed. Do not add claims the author did not make or the sources do not support.
+`field-report/` is the long version of the field notebook: the full story from an interview with the author, including the support cases, the agent the author built before dots existed, and the Blender work. Keep it first person and specific. Quote dots and support replies only with colleague names, channel IDs, and private identifiers removed. Do not add claims the author did not make or the sources do not support.
