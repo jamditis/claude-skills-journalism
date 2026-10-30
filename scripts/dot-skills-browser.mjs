@@ -107,6 +107,9 @@ try {
   assert.ok(await page.locator('.approval-rain').count() > 0);
   await page.keyboard.type('devil');
   assert.equal(await page.locator('.jersey-devil').count(), 1);
+  await page.getByRole('button', { name: 'Pause animations', exact: true }).click();
+  await page.waitForTimeout(150);
+  assert.equal(await page.locator('.jersey-devil, .approval-rain, .projectile').count(), 0, 'paused motion must stop running egg animations');
   const staticReport = await noJS.newPage();
   await load(staticReport, 'field-report');
   assert.equal(await staticReport.locator('[data-approval-loop] button').first().isVisible(), false);

@@ -54,8 +54,17 @@
   let userPaused = false;
   try { userPaused = localStorage.getItem('dot-skills-motion') === 'paused'; } catch (_) { /* Storage is optional. */ }
   let paused;
+  // Easter-egg animations run through the Web Animations API, which CSS pause rules
+  // cannot reach, so they are tracked here and finished as soon as motion pauses.
+  const running = new Set();
+  function track(animation) {
+    running.add(animation);
+    animation.finished.finally(() => running.delete(animation)).catch(() => {});
+    return animation;
+  }
   function applyMotion() {
     paused = preference.matches || userPaused;
+    if (paused) running.forEach(animation => animation.finish());
     document.documentElement.classList.toggle('paused', paused);
     if (!motion) return;
     motion.disabled = preference.matches;
@@ -207,11 +216,11 @@
       scene.append(bit);
       const dx = to.left - from.left + (Math.random() * 20 - 10);
       const lift = 40 + Math.random() * 50;
-      bit.animate([
+      track(bit.animate([
         { transform: 'translate(0, 0) rotate(0deg)' },
         { transform: `translate(${dx / 2}px, ${-lift}px) rotate(180deg)` },
         { transform: `translate(${dx}px, ${Math.random() * 16}px) rotate(360deg)` }
-      ], { duration: 650, delay: i * 170, easing: 'ease-in-out', fill: 'forwards' }).finished.then(() => bit.remove());
+      ], { duration: 650, delay: i * 170, easing: 'ease-in-out', fill: 'forwards' })).finished.then(() => bit.remove());
     }
   }
   function fight() {
@@ -236,7 +245,7 @@
     wyndle.classList.add('is-fighting');
     syl.classList.add('is-fighting');
     throwAt('wyndle', 'syl', 'rock', 6);
-    setTimeout(() => throwAt('syl', 'wyndle', 'drop', 6), 500);
+    setTimeout(() => { if (!paused) throwAt('syl', 'wyndle', 'drop', 6); }, 500);
     setTimeout(() => { wyndle.classList.remove('is-fighting'); syl.classList.remove('is-fighting'); finish(); }, 2400);
   }
   document.querySelectorAll('[data-poke]').forEach(button => button.addEventListener('click', () => {
@@ -283,10 +292,10 @@
       if (paused) card.style.transform = 'translateX(-50%)';
       document.body.append(card);
       if (paused) { setTimeout(() => card.remove(), 2500); continue; }
-      card.animate([
+      track(card.animate([
         { transform: `translateY(-120px) rotate(${Math.random() * 30 - 15}deg)` },
         { transform: `translateY(110vh) rotate(${Math.random() * 60 - 30}deg)` }
-      ], { duration: 2600 + Math.random() * 1400, delay: i * 140, easing: 'ease-in', fill: 'backwards' }).finished.then(() => card.remove());
+      ], { duration: 2600 + Math.random() * 1400, delay: i * 140, easing: 'ease-in', fill: 'backwards' })).finished.then(() => card.remove());
     }
   }
   function walkDevil() {
@@ -296,10 +305,10 @@
     devil.innerHTML = devilSvg;
     document.body.append(devil);
     if (paused) { setTimeout(() => devil.remove(), 2500); return; }
-    devil.animate([
+    track(devil.animate([
       { transform: 'translateX(-140px)' },
       { transform: `translateX(${window.innerWidth + 20}px)` }
-    ], { duration: 7000, easing: 'linear' }).finished.then(() => devil.remove());
+    ], { duration: 7000, easing: 'linear' })).finished.then(() => devil.remove());
   }
   document.addEventListener?.('keydown', event => {
     if (event.isComposing || event.metaKey || event.ctrlKey || event.altKey || event.key.length !== 1) return;
