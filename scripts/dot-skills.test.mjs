@@ -185,9 +185,10 @@ test('helpers blink without fighting the pointer-tracking helper', () => {
   assert.match(fs.readFileSync(path.join(root, 'style.css'), 'utf8'), /\.mascot\.blinky \.pupils\{[^}]*animation:blink/);
 });
 
-test('workshop animations stay finite', () => {
-  // docs/dot-skills/AGENTS.md asks for expressive but finite motion.
-  assert.doesNotMatch(fs.readFileSync(path.join(root, 'style.css'), 'utf8'), /\binfinite\b/);
+test('only gentle animations loop forever', () => {
+  // docs/dot-skills/AGENTS.md: blinking and a dozing helper may loop; bigger movement stays finite.
+  const loops = [...fs.readFileSync(path.join(root, 'style.css'), 'utf8').matchAll(/animation:(\w+)[^;}]*\binfinite\b/g)].map(match => match[1]).sort();
+  assert.deepEqual(loops, ['blink', 'doze']);
   const feature = fs.readFileSync('docs/index.html', 'utf8').match(/<style>\.dot-feature[\s\S]*?<\/style>/)[0];
   assert.doesNotMatch(feature, /\binfinite\b/);
 });

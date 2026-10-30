@@ -4,7 +4,7 @@ This directory is an intentional visual exception to the main documentation. Rea
 
 ## Preserve the character
 
-Keep the whimsical, bouncy, quirky workshop: warm paper, pixel helpers, off-kilter notes, tactile cards, and expressive but finite animations. Do not normalize it into the main site's restrained docs theme or a generic software landing page. Use sentence case. Give mouse and keyboard users equivalent useful controls. Respect the OS reduced-motion preference and a persistent manual pause; the static version must remain readable and functional.
+Keep the whimsical, bouncy, quirky workshop: warm paper, pixel helpers, off-kilter notes, tactile cards, and expressive animations (a few gentle loops, such as blinking or a dozing helper, are welcome; keep big movements finite). Do not normalize it into the main site's restrained docs theme or a generic software landing page. Use sentence case. Give mouse and keyboard users equivalent useful controls. Respect the OS reduced-motion preference and a persistent manual pause; the static version must remain readable and functional.
 
 ## Preserve the point
 
