@@ -8,7 +8,7 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const { calculateProgress, createState, transition } = require('../docs/dot-skills/workshop.js');
 const root = path.resolve('docs/dot-skills');
-const slugs = ['', 'status-cards', 'incident-updates', 'visual-audits', 'source-evidence', 'rough-edges'];
+const slugs = ['', 'status-cards', 'incident-updates', 'visual-audits', 'source-evidence', 'rough-edges', 'field-report'];
 // A connector-only checkout can test the changed files without fabricating old assets.
 // Normal repository/CI runs must leave this unset and validate every local link.
 const partial = process.env.DOT_SKILLS_PARTIAL_SNAPSHOT === '1';
@@ -154,4 +154,33 @@ test('main docs feature still precedes the Codex feature', { skip: partial ? 'Ma
 
 test('legacy preview assets remain present', { skip: partial ? 'Unchanged binary archive and original documentation not materialized' : false }, () => {
   for (const filename of legacyPaths) assert.ok(fs.statSync(filename).isFile(), filename);
+});
+
+test('every page shares a real preview image and links the field report', () => {
+  for (const slug of slugs) {
+    const html = fs.readFileSync(path.join(root, slug, 'index.html'), 'utf8');
+    for (const tag of ['og:title', 'og:description', 'og:url', 'og:image', 'twitter:card']) assert.match(html, new RegExp(`"${tag}"`), `${slug}: ${tag}`);
+    const image = html.match(/property="og:image" content="https:\/\/skills\.amditis\.tech\/(dot-skills\/[^"]+)"/)[1];
+    assert.ok(fs.statSync(path.resolve('docs', image)).isFile(), `${slug}: missing ${image}`);
+    assert.match(html, /field-report\/"[^>]*>Field report<\/a>|href="\.\/" aria-current="page">Field report<\/a>/, `${slug}: nav`);
+  }
+});
+
+test('field report media stays accessible and light', () => {
+  const dir = path.join(root, 'field-report');
+  const html = fs.readFileSync(path.join(dir, 'index.html'), 'utf8');
+  const alts = [...html.matchAll(/<img [^>]*alt="([^"]*)"/g)].map(match => match[1]);
+  assert.equal(alts.length, 4);
+  for (const alt of alts) assert.ok(alt.length > 40, alt);
+  assert.match(html, /<video controls preload="none" playsinline poster="pine-barrens-poster\.jpg"/);
+  assert.ok(fs.statSync(path.join(dir, 'pine-barrens-canoe.mp4')).size < 5e6);
+  assert.equal((html.match(/<button type="button">Allow<\/button>/g) || []).length, 3);
+  assert.match(html, /data-approval-loop/);
+  assert.match(html, /data-js-only hidden><button/);
+});
+
+test('helpers blink without fighting the pointer-tracking helper', () => {
+  const js = fs.readFileSync(path.join(root, 'workshop.js'), 'utf8');
+  assert.match(js, /if \(dot\.closest\('#helper'\)\) return;/);
+  assert.match(fs.readFileSync(path.join(root, 'style.css'), 'utf8'), /\.mascot\.blinky \.pupils\{[^}]*animation:blink/);
 });

@@ -23,3 +23,7 @@ Public examples must use fictional or explicitly cleared/redacted data. Do not c
 Update the relevant HTML, companion playbook, manifest, and top-level guide together. Preserve legacy download URLs. No remote services are called by the interactive demo. Its timestamps and progress are simulated; a failed check must not advance freshness, and 100% must require all agreed milestones.
 
 Run `node --test scripts/dot-skills.test.mjs`, then the applicable repository checks. Inspect desktop and mobile renders, keyboard interactions, repeated clicks, clipboard failure, blocked storage, manual pause, OS reduced motion, and no-JavaScript content. State any tests that could not run. Open ready-for-review pull requests; do not merge without the owner's explicit approval.
+
+## The field report
+
+`field-report/` is the long version of the field notebook: the full story from an interview with the author, including the support cases, the agent he built himself, and the Blender work. Keep it first person and specific. Quote dots and support replies only with colleague names, channel IDs, and private identifiers removed. Do not add claims the author did not make or the sources do not support.
