@@ -62,6 +62,7 @@ Do not rely on this helper as a complete sandbox. Revalidate redirect targets, d
 Implement multiple extraction strategies with automatic fallback:
 
 ```python
+import os
 from abc import ABC, abstractmethod
 from typing import Optional
 import requests
@@ -238,6 +239,33 @@ class PlaywrightScraper(Scraper):
         except Exception:
             return None
 
+class FirecrawlScraper(Scraper):
+    """Optional hosted rendering for an authorized public page."""
+
+    def fetch(self, url: str) -> Optional[ScrapingResult]:
+        api_key = os.getenv('FIRECRAWL_API_KEY')
+        if not api_key:
+            return None
+        try:
+            from firecrawl import Firecrawl
+
+            url = validate_public_url(url)
+            client = Firecrawl(api_key=api_key, origin='claude-skills-journalism')
+            doc = client.scrape(url, formats=['markdown'], proxy='basic')
+        except Exception:
+            return None
+
+        metadata = doc.metadata
+        if metadata and metadata.status_code in STOP_STATUS_CODES:
+            raise AccessDeniedError('The origin denied automated access')
+
+        content = doc.markdown or ''
+        if len(content) < 100:
+            return None
+
+        title = metadata.title if metadata and metadata.title else ''
+        return ScrapingResult(content, title, 'firecrawl')
+
 class PlaywrightScraperAsync:
     """Async Playwright scraper for Jupyter notebooks (.ipynb files).
     
@@ -314,6 +342,12 @@ class ScrapingCascade:
         return None
 ```
 
+### Optional hosted rendering
+
+`FirecrawlScraper` is an optional step for public, authorized pages that need JavaScript when no local browser is available, or when you prefer a hosted renderer to running Chromium yourself. Playwright stays the local default. To use it, install `firecrawl-py`, set `FIRECRAWL_API_KEY` in the environment (get one at [firecrawl.dev](https://www.firecrawl.dev/?utm_source=claude-skills-journalism&utm_medium=integration)), and add `FirecrawlScraper()` to `self.scrapers` after `PlaywrightScraper()`, or in its place on machines without a browser. Without a key, the step is skipped.
+
+The class checks the URL with `validate_public_url` before sending it, keeps `proxy='basic'` so the request never switches to enhanced proxies, and raises `AccessDeniedError` when the origin answers `401`, `403`, or `429`.
+
 ## Access-control and bot-protection failures
 
 Treat a login wall, paywall, CAPTCHA, `401`, `403`, `429`, Turnstile page, or explicit blocking response as a stop signal, not an invitation to escalate evasion.
@@ -326,7 +360,7 @@ Use this fallback order:
 4. Ask the user for documented authorization when authenticated or restricted access is genuinely required.
 5. Stop when authorization is absent or the site continues to deny automated access.
 
-Do not add stealth plugins, fingerprint spoofing, proxy rotation, CAPTCHA solvers, or session material merely to defeat a site's controls. Browser automation is for rendering authorized JavaScript content, not disguising the scraper.
+Do not add stealth plugins, fingerprint spoofing, proxy rotation, CAPTCHA solvers, or session material merely to defeat a site's controls. Browser automation is for rendering authorized JavaScript content, not disguising the scraper. The same rules apply to hosted rendering services: use them only for authorized public pages, and treat a block they report as the same stop signal.
 
 ## Observed web APIs
 
