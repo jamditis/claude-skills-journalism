@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added a 1024 px listing icon to all 14 plugins for the Claude plugin
+  directory, rendered from SVG sources in `assets/plugin-icons/`.
+- pdf-playground 1.3.8: commands no longer pre-approve all of Bash, Write,
+  or Edit. They pre-approve `.html` writes in the working folder, the exact
+  update command, and one plugin script for preview setup, serving, and
+  cleanup. The preview server now listens on `127.0.0.1` only.
 - Rewrote the dot field report in the author's voice with links to every dot
   workflow and related skills, and added easter eggs: pokeable dots with real
   quotes, a fight after ten fast pokes, typed "allow" and "devil", and more.
