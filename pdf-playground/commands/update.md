@@ -1,6 +1,6 @@
 ---
 description: Check for updates and install the latest version
-allowed-tools: Bash, Read
+allowed-tools: Read, Bash(claude plugin update pdf-playground@claude-skills-journalism)
 ---
 
 Check if the PDF Playground plugin is up to date and update if needed.

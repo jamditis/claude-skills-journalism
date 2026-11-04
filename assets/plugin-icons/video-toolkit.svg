@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="1024" height="1024">
+  <title>video-toolkit: video download, transcription, and frames</title>
+  <rect width="100" height="100" fill="#121212"/>
+  <rect x="18" y="28" width="64" height="44" rx="4" fill="#ede6d4"/>
+  <rect x="18" y="28" width="64" height="7" rx="2" fill="#3f6b4f"/>
+  <rect x="18" y="65" width="64" height="7" rx="2" fill="#3f6b4f"/>
+  <path d="M24 31.5 H28 M34 31.5 H38 M44 31.5 H48 M54 31.5 H58 M64 31.5 H68 M74 31.5 H78 M24 68.5 H28 M34 68.5 H38 M44 68.5 H48 M54 68.5 H58 M64 68.5 H68 M74 68.5 H78" stroke="#ede6d4" stroke-width="3" stroke-linecap="round"/>
+  <path d="M44 41 L60 50 L44 59 Z" fill="#CA3553" stroke="#CA3553" stroke-width="2" stroke-linejoin="round"/>
+</svg>

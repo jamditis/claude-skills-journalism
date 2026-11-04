@@ -1,7 +1,7 @@
 ---
 description: Create a program report or annual report with your organization's branding
 argument-hint: [report-name]
-allowed-tools: Read, Write, Edit, Glob, mcp__plugin_playwright_playwright__*
+allowed-tools: Read, Write(./*.html), Edit(./*.html), Glob, mcp__plugin_playwright_playwright__*
 ---
 
 Create a print-ready HTML program report document.

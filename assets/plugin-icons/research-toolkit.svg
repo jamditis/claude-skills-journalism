@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="1024" height="1024">
+  <title>research-toolkit: research and archives</title>
+  <rect width="100" height="100" fill="#121212"/>
+  <rect x="22" y="22" width="36" height="48" rx="3" fill="#3f6b4f"/>
+  <path d="M28 32 H52 M28 39 H52 M28 46 H44" stroke="#ede6d4" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+  <circle cx="54" cy="54" r="14" fill="#121212" stroke="#ede6d4" stroke-width="6"/>
+  <path d="M64 64 L78 78" stroke="#CA3553" stroke-width="8" stroke-linecap="round"/>
+</svg>

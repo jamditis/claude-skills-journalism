@@ -322,6 +322,12 @@ The brand config file might be in the wrong place or have a formatting error. Th
 
 The preview feature (`/pdf-playground:preview`) requires the Playwright plugin for Claude Code. If you don't have it, skip the preview and just open the HTML file directly in your browser.
 
+The preview also needs Python 3. It runs one plugin script, `scripts/playground.py`, to copy the control panel next to your document and serve it on `localhost` only.
+
+### Claude asks permission before saving a file
+
+The commands save `.html` files in your current folder without asking. Any other write, and any shell command other than the preview script and the update command, asks you first. This is deliberate: the plugin does not pre-approve broad file or shell access.
+
 ---
 
 ## Credits

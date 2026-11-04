@@ -1,7 +1,7 @@
 ---
 description: Create event materials (flyers, posters, signage) with your organization's branding
 argument-hint: [event-name]
-allowed-tools: Read, Write, Edit, Glob, mcp__plugin_playwright_playwright__*
+allowed-tools: Read, Write(./*.html), Edit(./*.html), Glob, mcp__plugin_playwright_playwright__*
 ---
 
 Create print-ready event materials.

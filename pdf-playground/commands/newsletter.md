@@ -1,7 +1,7 @@
 ---
 description: Create an HTML email newsletter with your organization's branding
 argument-hint: [newsletter-name]
-allowed-tools: Read, Write, Edit, Glob, mcp__plugin_playwright_playwright__*
+allowed-tools: Read, Write(./*.html), Edit(./*.html), Glob, mcp__plugin_playwright_playwright__*
 ---
 
 Create an HTML email newsletter.
