@@ -1,7 +1,7 @@
 ---
 description: Create a single-page fact sheet or program overview
 argument-hint: [topic]
-allowed-tools: Read, Write, Edit, Glob, mcp__plugin_playwright_playwright__*
+allowed-tools: Read, Write(./*.html), Edit(./*.html), Glob, mcp__plugin_playwright_playwright__*
 ---
 
 Create a print-ready single-page HTML fact sheet.

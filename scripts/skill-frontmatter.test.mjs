@@ -131,7 +131,7 @@ test('published package versions stay aligned with the marketplace', () => {
     ['newsroom-agent-ops', '1.0.0'],
     ['okf-wiki', '0.8.4'],
     ['pdf-design', '1.1.4'],
-    ['pdf-playground', '1.3.7'],
+    ['pdf-playground', '1.3.8'],
     ['project-templates-toolkit', '1.1.1'],
     ['research-toolkit', '1.1.4'],
     ['security-toolkit', '1.3.0'],

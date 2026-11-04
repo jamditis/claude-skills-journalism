@@ -57,5 +57,8 @@ nul
 !docs/og-image.png
 !docs/**/og-image.png
 
+# Plugin directory listing icons (source: assets/plugin-icons/)
+!*/.claude-plugin/icon.png
+
 # User-facing documentation example
 !docs/prose-question-guard/images/stop-hook-example-cropped.png

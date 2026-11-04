@@ -31,6 +31,7 @@ claude-skills-journalism/
 ├── CLAUDE.md                    # Claude Code import for AGENTS.md
 ├── README.md                    # User documentation
 ├── LICENSE
+├── assets/plugin-icons/         # SVG sources for each plugin's .claude-plugin/icon.png
 │
 ├── hooks/                       # Automated workflow checks (17 hooks)
 │   ├── ap-style-check.md        # Writing: AP Style violations
@@ -193,13 +194,14 @@ claude-skills-journalism/
 │   ├── templates/              # Lesson and archive templates
 │   └── tests/
 │
-├── # Plugin: pdf-playground (8 commands, v1.3.7), registered in marketplace.json
+├── # Plugin: pdf-playground (8 commands, v1.3.8), registered in marketplace.json
 ├── pdf-playground/              # Interactive proposal/report/slide builder with live control panel
 │   ├── .claude-plugin/plugin.json
 │   ├── brands/                  # Brand presets
 │   ├── commands/                # /proposal, /report, /onepager, /newsletter, /slides, /event, /preview, /update
 │   ├── controls/template-maps/  # Live design-editing control wiring
 │   ├── hooks/
+│   ├── scripts/playground.py    # Preview setup, localhost server, cleanup (the only pre-approved Bash)
 │   ├── templates/               # Document templates
 │   └── skills/                  # document-design/ + playground.md (user-invocable entry skill)
 │
@@ -238,6 +240,22 @@ python3 -m pytest okf-wiki/tests -q
 (cd okf-wiki/example && python3 ../scripts/validate.py)
 npm run a11y
 ```
+
+## Plugin directory submission
+
+Each plugin in `marketplace.json` ships a 1024 px PNG icon at
+`<plugin>/.claude-plugin/icon.png`. The SVG source lives in
+`assets/plugin-icons/<plugin>.svg`; render with
+`node scripts/render-plugin-icons.mjs [plugin ...]` (set `CHROMIUM_PATH` if
+Playwright's own browser is not installed). The portal locks a plugin's icon the
+first time the plugin is saved or submitted, so review the PNG before that.
+
+Command `allowed-tools` grants must be scoped: no bare `Bash`, `Write`, or
+`Edit`. Scope writes to a path (`Write(./*.html)`) and shell access to an exact
+command or a plugin script (`Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/x.py *)`).
+`scripts/pdf-playground-permissions.test.mjs` and `scripts/plugin-icons.test.mjs`
+enforce both. `claude plugin validate ./<plugin>` runs only a subset of the
+directory checks; it does not report the `allowed-tools` lints.
 
 ## Skill format
 

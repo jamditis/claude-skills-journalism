@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="1024" height="1024">
+  <title>pdf-playground: interactive document builder</title>
+  <rect width="100" height="100" fill="#121212"/>
+  <rect x="18" y="24" width="36" height="52" rx="3" fill="#ede6d4"/>
+  <rect x="23" y="30" width="26" height="6" rx="1.5" fill="#CA3553"/>
+  <path d="M24 44 H48 M24 51 H48 M24 58 H42 M24 65 H46" stroke="#121212" stroke-width="3" stroke-linecap="round"/>
+  <rect x="60" y="24" width="22" height="52" rx="3" fill="#3f6b4f"/>
+  <path d="M65 36 H77 M65 50 H77 M65 64 H77" stroke="#ede6d4" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+  <circle cx="70" cy="36" r="4" fill="#ede6d4"/>
+  <circle cx="74" cy="50" r="4" fill="#CA3553"/>
+  <circle cx="68" cy="64" r="4" fill="#ede6d4"/>
+</svg>
