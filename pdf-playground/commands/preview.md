@@ -1,7 +1,7 @@
 ---
 description: Launch interactive preview for document editing
 argument-hint: [file-path]
-allowed-tools: Read, Write, Edit, Glob, Bash, AskUserQuestion, mcp__plugin_playwright_playwright__*
+allowed-tools: Read, Edit(./**/*.html), Glob, AskUserQuestion, Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/playground.py *), Bash(python ${CLAUDE_PLUGIN_ROOT}/scripts/playground.py *), mcp__plugin_playwright_playwright__*
 ---
 
 Launch an interactive preview session for iterating on a document design.
@@ -10,65 +10,49 @@ Launch an interactive preview session for iterating on a document design.
 
 1. Read the document-design skill for guidance
 2. Resolve the HTML file path (see "File path" below)
-3. Start a local HTTP server to serve the file
-4. Set up the playground wrapper and controls
+3. Copy the playground wrapper and controls next to the file
+4. Start a local HTTP server to serve the file
 5. Open the wrapper in the Playwright browser
 
-## Pre-flight check
+## Helper script
 
-Before proceeding, verify the control panel files exist:
+Every shell step runs through one plugin script. This command pre-approves only
+that script, so use the exact form below. If `python3` is not found (common on
+Windows), use `python` in its place.
 
-1. Check if the controls directory exists:
-   ```bash
-   ls "${CLAUDE_PLUGIN_ROOT}/controls/control-panel.js" 2>/dev/null && echo "OK" || echo "MISSING"
-   ```
-2. If MISSING, tell the user:
-   > Your PDF Playground plugin is outdated and missing the interactive control panel.
-   > Run this command to update, then restart Claude Code:
-   > ```
-   > claude plugin update pdf-playground@claude-skills-journalism
-   > ```
-   Then STOP, do not continue with the preview workflow.
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/playground.py <setup|serve|clean> ...
+```
 
 ## Preview workflow
 
-**Step 1: Start local server**
-
-The Playwright browser cannot open `file://` URLs. Start a local HTTP server instead:
-
-1. Determine the directory containing the HTML file
-2. Check if port 8787 is available:
-   ```bash
-   python -c "import socket; s=socket.socket(); s.settimeout(1); result=s.connect_ex(('127.0.0.1',8787)); s.close(); print('free' if result!=0 else 'busy')"
-   ```
-3. If port 8787 is busy, try 8788, 8789, etc. until one is free
-4. Start the server in the background:
-   ```bash
-   cd <directory-containing-html> && python -m http.server <port>
-   ```
-   Run this with `run_in_background: true`
-5. Wait 1 second for the server to start
-
-**Step 2: Set up the playground wrapper**
+**Step 1: Set up the playground wrapper**
 
 The playground uses an iframe-based architecture: the document lives in an iframe, and the control panel sits alongside it as a sidebar. This keeps the document HTML clean for PDF export while providing interactive design controls.
 
-1. Create a `playground-controls/` directory in the same directory as the HTML file
-2. Copy the control files from the plugin:
-   ```bash
-   mkdir -p <html-dir>/playground-controls/template-maps
-   cp ${CLAUDE_PLUGIN_ROOT}/controls/control-panel.css <html-dir>/playground-controls/
-   cp ${CLAUDE_PLUGIN_ROOT}/controls/control-panel.js <html-dir>/playground-controls/
-   cp ${CLAUDE_PLUGIN_ROOT}/controls/prompt-generator.js <html-dir>/playground-controls/
-   ```
-3. Detect which template is being previewed and copy the matching template map:
-   ```bash
-   cp ${CLAUDE_PLUGIN_ROOT}/controls/template-maps/<template-name>.js <html-dir>/playground-controls/template-maps/
-   ```
-4. Copy the wrapper HTML to the same directory as the HTML file:
-   ```bash
-   cp ${CLAUDE_PLUGIN_ROOT}/controls/playground-wrapper.html <html-dir>/
-   ```
+Detect which template is being previewed (see "Template detection" below), then copy the control files and wrapper next to the HTML file:
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/playground.py setup <html-file> --template <template-name>
+```
+
+This creates `playground-controls/` and `playground-wrapper.html` in the same directory as the HTML file and prints the wrapper path to open.
+
+If the command prints that the control panel is missing, tell the user to run this command and restart Claude Code, then STOP:
+
+```
+claude plugin update pdf-playground@claude-skills-journalism
+```
+
+**Step 2: Start local server**
+
+The Playwright browser cannot open `file://` URLs. Start a local HTTP server instead, with `run_in_background: true`:
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/playground.py serve <directory-containing-html>
+```
+
+The script picks the first free port from 8787 upward, binds to `127.0.0.1` only, and prints `Serving http://localhost:<port>/`. Read the port from that line.
 
 **Step 3: Open the wrapper**
 
@@ -119,10 +103,10 @@ Tell the user:
 
 When the user is done:
 1. Close the browser: `browser_close`
-2. Kill the HTTP server (the background Bash process)
+2. Stop the HTTP server (the background process from step 2)
 3. Optionally remove the temporary playground files:
    ```bash
-   rm -rf <html-dir>/playground-controls <html-dir>/playground-wrapper.html
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/playground.py clean <html-file>
    ```
 
 ## File path

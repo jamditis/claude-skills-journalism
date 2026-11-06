@@ -1,7 +1,7 @@
 ---
 description: Create a multi-page funding proposal with your organization's branding
 argument-hint: [project-name]
-allowed-tools: Read, Write, Edit, Glob, Bash, AskUserQuestion, mcp__plugin_playwright_playwright__*
+allowed-tools: Read, Write(./*.html), Edit(./*.html), Glob, AskUserQuestion, Bash(python3 ${CLAUDE_PLUGIN_ROOT}/scripts/playground.py *), Bash(python ${CLAUDE_PLUGIN_ROOT}/scripts/playground.py *), mcp__plugin_playwright_playwright__*
 ---
 
 Create a print-ready HTML funding proposal document using a guided wizard.
@@ -187,11 +187,11 @@ Using the answers from Phases 1 and 2:
 
 **Step 2: Launch preview with control panel**
 
-1. Start a local HTTP server (see preview command for details):
+1. Start a local HTTP server in the background (`run_in_background: true`). This command pre-approves only this script; if `python3` is not found (common on Windows), use `python`:
    ```bash
-   python -c "import socket; s=socket.socket(); s.settimeout(1); result=s.connect_ex(('127.0.0.1',8787)); s.close(); print('free' if result!=0 else 'busy')"
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/playground.py serve .
    ```
-   Then start the server in the background on an available port.
+   The script picks the first free port from 8787 upward and prints `Serving http://localhost:<port>/`. Read the port from that line.
 
 2. Open in Playwright browser: `browser_navigate` to `http://localhost:<port>/<filename>.html`
 
@@ -260,7 +260,7 @@ AskUserQuestion:
 
 **If "Finalize and save":**
 1. Close the browser: `browser_close`
-2. Kill the HTTP server background process
+2. Stop the HTTP server background process
 3. Report the saved file path
 
 **If "Export to PDF":**

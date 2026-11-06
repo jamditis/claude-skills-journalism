@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added a 1024 px listing icon to all 14 plugins for the Claude plugin
+  directory, rendered from SVG sources in `assets/plugin-icons/`.
+- pdf-playground 1.3.8: commands no longer pre-approve all of Bash, Write,
+  or Edit. They pre-approve `.html` writes in the working folder, the exact
+  update command, and one plugin script for preview setup, serving, and
+  cleanup. The preview server now listens on `127.0.0.1` only.
 - Added an optional `FirecrawlScraper` step to the `web-scraping` cascade for
   public, authorized pages that need JavaScript when no local browser is
   available. Playwright stays the local default, and hosted renderers follow the
