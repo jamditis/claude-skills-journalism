@@ -101,7 +101,7 @@ claude-skills-journalism/
 │       ├── page-monitoring/            # Change detection, availability tracking
 │       └── web-archiving/              # Wayback, Archive.today, evidence preservation
 │
-├── # Plugin: dev-toolkit (14 skills), registered in marketplace.json
+├── # Plugin: dev-toolkit (15 skills), registered in marketplace.json
 ├── dev-toolkit/
 │   ├── .claude-plugin/plugin.json
 │   ├── README.md
@@ -116,6 +116,7 @@ claude-skills-journalism/
 │       ├── ponytail-dev/               # Minimal-code implementation with proportional checks
 │       ├── python-pipeline/            # Data pipelines (pandas, polars, DuckDB)
 │       ├── surface-completeness/       # UI coverage, quality signals, and docs
+│       ├── tv-debloat/                  # Reversible Google TV cleanup and launcher setup
 │       ├── vibe-coding/                # AI-assisted development
 │       ├── web-scraping/               # Ethical content extraction
 │       ├── web-ui-best-practices/      # Container queries, :has(), view transitions

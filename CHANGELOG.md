@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added `tv-debloat` to dev-toolkit 2.2.0 for reversible Google TV and Android TV cleanup, launcher setup, reduced motion, restart recovery, and saved rollback. Includes a device reference, public docs page, and social graphic.
+
 - Added a 1024 px listing icon to all 14 plugins for the Claude plugin
   directory, rendered from SVG sources in `assets/plugin-icons/`.
 - pdf-playground 1.3.8: commands no longer pre-approve all of Bash, Write,

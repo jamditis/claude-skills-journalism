@@ -1,0 +1,3 @@
+interface:
+  display_name: "TV debloat"
+  short_description: "Reversible Google TV cleanup, launcher setup, and checks"

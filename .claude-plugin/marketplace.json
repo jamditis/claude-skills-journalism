@@ -20,8 +20,8 @@
     },
     {
       "name": "dev-toolkit",
-      "description": "Fourteen development skills for newsroom and research dev teams: accessibility, context management, minimal-code implementation, UI completeness, directed multi-agent execution, Electron, mobile debugging, Python pipelines, ethical scraping, no-build frontends, web UI craft, and project instruction maintenance.",
-      "version": "2.1.1",
+      "description": "Fifteen development skills for newsroom and research dev teams: accessibility, context management, minimal-code implementation, UI completeness, directed multi-agent execution, Electron, mobile debugging, Python pipelines, ethical scraping, no-build frontends, web UI craft, TV device cleanup, and project instruction maintenance.",
+      "version": "2.2.0",
       "author": {
         "name": "Joe Amditis",
         "email": "jamditis@gmail.com"
