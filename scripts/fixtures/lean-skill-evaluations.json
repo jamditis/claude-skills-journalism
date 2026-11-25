@@ -98,6 +98,22 @@
       "expect": { "decision": "reject", "branch": "backend-debugging", "branchAlternatives": ["backend debugging", "server debugging", "systematic debugging"], "terms": ["server"] }
     },
     {
+      "id": "tvd-activation",
+      "skill": "tv-debloat",
+      "package": "dev-toolkit",
+      "category": "activation",
+      "prompt": "Clean up my Google TV Streamer over authorized ADB. Keep the streaming apps, reduce animations, save a rollback, and check that the setup works after a restart.",
+      "expect": { "decision": "use", "branch": "TV debloat", "branchAlternatives": ["TV debloat", "Google TV cleanup"], "terms": ["ADB", "rollback"] }
+    },
+    {
+      "id": "tvd-unrelated",
+      "skill": "tv-debloat",
+      "package": "dev-toolkit",
+      "category": "unrelated-non-trigger",
+      "prompt": "Debug a website layout that breaks only in Safari on my iPhone. Capture the browser console and inspect the viewport.",
+      "expect": { "decision": "reject", "branch": "mobile web debugging", "branchAlternatives": ["mobile web debugging", "browser debugging"], "terms": ["Safari"] }
+    },
+    {
       "id": "pp-activation",
       "skill": "python-pipeline",
       "package": "dev-toolkit",
