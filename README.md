@@ -61,7 +61,7 @@ Then restart Claude Code (close and reopen). See the [PDF Playground README](./p
 | Plugin | Description | Commands | Updated |
 |--------|-------------|----------|--------|
 | [autocontext](./autocontext/) | Cross-session knowledge persistence with skill evolution. Lessons accumulate per-skill, and `/autocontext:evolve` folds them back into skill files | `/autocontext:setup`, `/autocontext:init`, `/autocontext:review`, `/autocontext:status`, `/autocontext:evolve` | Nov 4, 2026 |
-| [dev-toolkit](./dev-toolkit/) | Fourteen development-focused skills for journalists, researchers, and small newsroom dev teams: accessibility, context management, minimal-code implementation, UI completeness, directed multi-agent execution, Electron, mobile debugging, Python pipelines, ethical scraping, no-build frontends, web UI craft, and project instruction maintenance | `/dev-toolkit:director`; other skills model-selected | Nov 4, 2026 |
+| [dev-toolkit](./dev-toolkit/) | Fifteen development-focused skills for journalists, researchers, and small newsroom dev teams: accessibility, context management, minimal-code implementation, UI completeness, directed multi-agent execution, Electron, mobile debugging, Python pipelines, ethical scraping, no-build frontends, web UI craft, TV device cleanup, and project instruction maintenance | `/dev-toolkit:director`; other skills model-selected | Nov 4, 2026 |
 | [journalism-core](./journalism-core/) | Sixteen core journalism skills, including AP-style writing, AI-slop detoxing, source verification (deepfakes/C2PA), FOIA + NJ OPRA requests, Brazilian LAI requests, fact-checking, interview prep, transcription + meeting actions, story pitches, editorial workflow, crisis communications, newsletter publishing with current Gmail / Yahoo / Outlook bulk-sender requirements, and embedded photo metadata for wire distribution | n/a, skills only | Nov 4, 2026 |
 | [newsroom-agent-ops](./newsroom-agent-ops/) | Nine skills for safe recurring newsroom work: unattended runs, briefings, intake, delivery, coordination, reconciliation, chat triage, deadline tracking, and issue progression | n/a, skills only | Nov 4, 2026 |
 | [okf-wiki](./okf-wiki/) | Scaffold an Open Knowledge Format (OKF) knowledge base: one-concept-per-file markdown with YAML frontmatter, directory navigation, and a validator. Generates a starter wiki that passes its own conformance and secret-leak checks, ships session-start hooks that orient Claude on the knowledge base before it works, and includes an optional GitHub-wiki bootstrap. For newsroom institutional memory, research atlases, decision logs, and infrastructure maps | n/a, skill only | Nov 4, 2026 |
@@ -261,7 +261,7 @@ These four skills ship together as the [project-templates-toolkit](./project-tem
 
 ### Development skills (in `dev-toolkit` plugin)
 
-These fourteen skills ship together as the [dev-toolkit](./dev-toolkit/) plugin. Install via `/plugin install dev-toolkit@claude-skills-journalism` to get all of them at once, or copy individual skills from `dev-toolkit/skills/<name>/`.
+These fifteen skills ship together as the [dev-toolkit](./dev-toolkit/) plugin. Install via `/plugin install dev-toolkit@claude-skills-journalism` to get all of them at once, or copy individual skills from `dev-toolkit/skills/<name>/`.
 
 | Skill | Description | Updated |
 |-------|-------------|--------|
@@ -275,6 +275,7 @@ These fourteen skills ship together as the [dev-toolkit](./dev-toolkit/) plugin.
 | [ponytail-dev](./dev-toolkit/skills/ponytail-dev/) | Implement or review software with minimal code and proportional checks | Oct 23, 2026 |
 | [python-pipeline](./dev-toolkit/skills/python-pipeline/) | Data pipelines (pandas, polars, DuckDB, asyncio) with modular architecture | Oct 23, 2026 |
 | [surface-completeness](./dev-toolkit/skills/surface-completeness/) | Verify UI coverage, accessibility, browser support, performance evidence, and current documentation | Oct 28, 2026 |
+| [tv-debloat](./dev-toolkit/skills/tv-debloat/) | Reversible Google TV cleanup, Projectivy, reduced motion, restart checks, and rollback | |
 | [vibe-coding](./dev-toolkit/skills/vibe-coding/) | AI-assisted development workflow (Claude Code, Cursor, Aider, Continue) | Oct 23, 2026 |
 | [web-scraping](./dev-toolkit/skills/web-scraping/) | Ethical scraping patterns (Playwright, robots.txt, anti-bot defense, terms-of-service) | Oct 23, 2026 |
 | [web-ui-best-practices](./dev-toolkit/skills/web-ui-best-practices/) | Container queries, `:has()`, view transitions, scroll-driven animations, signs of taste in web UI | Aug 21, 2026 |

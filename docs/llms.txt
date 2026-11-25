@@ -12,7 +12,7 @@ Source: https://github.com/jamditis/claude-skills-journalism
 Joe Amditis, associate director of operations, Center for Cooperative Media, Montclair State University.
 Personal site: https://jamditis.com
 
-## Skills (76 total)
+## Skills (77 total)
 
 ### Journalism and verification
 - source-verification, SIFT method, verification trails, source credibility, deepfakes/C2PA
@@ -53,6 +53,7 @@ Personal site: https://jamditis.com
 - python-pipeline, data pipeline workflows
 - web-scraping, content extraction
 - zero-build-frontend, no-build web apps
+- tv-debloat, reversible Google TV and Android TV cleanup through ADB, Projectivy launcher, reduced motion, restart checks, and rollback
 - mobile-debugging, Eruda, vConsole, remote debug
 - accessibility-compliance, WCAG, alt text, a11y
 - web-ui-best-practices, signs of craft in web UI
@@ -167,7 +168,7 @@ codex plugin add journalism-core@claude-skills-journalism
 
 This repository does not ship native Codex manifests. The route does not convert Claude-specific commands, agents, hooks, or root-level skills into Codex components.
 
-Plugins (14): `journalism-core` (16 skills), `newsroom-agent-ops` (9), `research-toolkit` (6), `dev-toolkit` (14), `security-toolkit` (5 skills + /hotpatch command), `project-templates-toolkit` (4), `pdf-design` (1), `pdf-playground` (1), `web-design-picker` (1), `visual-explainer` (1), `video-toolkit` (4), `okf-wiki` (1), `superjawn` (13), `autocontext` (cross-session knowledge persistence, hooks, commands, and agents rather than skills).
+Plugins (14): `journalism-core` (16 skills), `newsroom-agent-ops` (9), `research-toolkit` (6), `dev-toolkit` (15), `security-toolkit` (5 skills + /hotpatch command), `project-templates-toolkit` (4), `pdf-design` (1), `pdf-playground` (1), `web-design-picker` (1), `visual-explainer` (1), `video-toolkit` (4), `okf-wiki` (1), `superjawn` (13), `autocontext` (cross-session knowledge persistence, hooks, commands, and agents rather than skills).
 
 ## Alternate installation
 

@@ -64,6 +64,9 @@ skills:
   - name: surface-completeness
     package: dev-toolkit
     path: dev-toolkit/skills/surface-completeness
+  - name: tv-debloat
+    package: dev-toolkit
+    path: dev-toolkit/skills/tv-debloat
   - name: vibe-coding
     package: dev-toolkit
     path: dev-toolkit/skills/vibe-coding

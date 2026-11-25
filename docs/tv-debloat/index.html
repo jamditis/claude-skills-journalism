@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV debloat - Agent skills for journalism</title>
+    <meta name="description" content="A reversible Google TV and Android TV cleanup workflow: a clean launcher, fewer background packages, reduced motion, restart checks, and a saved restore path.">
+    <link rel="canonical" href="https://skills.amditis.tech/tv-debloat/">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../updated.css">
+    <meta property="og:title" content="TV debloat">
+    <meta property="og:description" content="Give Google TV a cleaner home screen. Keep your apps, save a rollback, and check what survives a restart.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skills.amditis.tech/tv-debloat/">
+    <meta property="og:image" content="https://skills.amditis.tech/tv-debloat/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="TV debloat: A cleaner home screen, reversible changes, and restart checks. A simple TV illustration on warm paper.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="TV debloat">
+    <meta name="twitter:description" content="A cleaner home screen, reversible changes, and restart checks for Google TV and Android TV.">
+    <meta name="twitter:image" content="https://skills.amditis.tech/tv-debloat/og-image.png">
+    <meta name="twitter:image:alt" content="TV debloat: A cleaner home screen, reversible changes, and restart checks.">
+    <script src="../ask-ai.js" defer></script>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <nav class="site-nav wrap" aria-label="Primary">
+        <a href="../" class="back-link"><span aria-hidden="true">←</span> All skills</a>
+        <a href="https://github.com/jamditis/claude-skills-journalism/tree/master/dev-toolkit/skills/tv-debloat">View source <span aria-hidden="true">↗</span></a>
+    </nav>
+
+    <header class="hero wrap">
+        <div class="hero-copy">
+            <p class="package-label">Part of <a href="../#development">dev-toolkit</a></p>
+            <h1>TV debloat</h1>
+            <p class="hero-deck">Give the TV a<br><em>quieter home.</em></p>
+            <p class="hero-description">Replace the busy home screen, turn down the motion, and disable the extras you do not use. Keep your streaming apps and a way to undo every change.</p>
+            <div class="hero-actions">
+                <a href="#install" class="button">Install the skill <span aria-hidden="true">↓</span></a>
+                <a href="#workflow" class="text-link">See the workflow</a>
+            </div>
+        </div>
+        <figure class="tv-figure">
+            <div class="tv-frame">
+                <div class="tv-screen">
+                    <div class="screen-top"><span>Your apps</span><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg></div>
+                    <div class="screen-landscape" aria-hidden="true"><span class="sun"></span><span class="ridge ridge-back"></span><span class="ridge ridge-front"></span></div>
+                    <div class="screen-apps" aria-hidden="true">
+                        <span class="app app-watch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="m10 8 5 3-5 3zM8 21h8"/></svg>Watch</span>
+                        <span class="app app-listen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 18V5l13-2v13M6 8l13-2"/><ellipse cx="3.5" cy="18.5" rx="2.5" ry="2"/><ellipse cx="16.5" cy="16.5" rx="2.5" ry="2"/></svg>Listen</span>
+                        <span class="app app-browse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Browse</span>
+                    </div>
+                </div>
+                <span class="power-light" aria-hidden="true"></span>
+            </div>
+            <div class="tv-stand" aria-hidden="true"></div>
+            <figcaption>A home screen with room for your apps.</figcaption>
+        </figure>
+    </header>
+
+    <main id="main" class="wrap">
+        <div class="scope-strip" aria-label="Skill scope">
+            <span>Google TV &amp; Android TV</span>
+            <span>ADB over LAN or Tailscale</span>
+            <span>Reversible by default</span>
+        </div>
+
+        <section class="split-section" aria-labelledby="changes-title">
+            <div><h2 id="changes-title">Less in the way.<br><em>Keep what matters.</em></h2><p>The agent checks your device and saves its state before it changes anything.</p></div>
+            <dl class="change-list">
+                <div><dt>A cleaner home screen</dt><dd>Projectivy replaces the stock home screen after its Home activity is verified. The existing streaming apps and sign-ins stay in place.</dd></div>
+                <div><dt>Optional packages disabled</dt><dd>Advertising, personalization, feedback, and game packages are reviewed against the device and how you use it. App data stays on the device.</dd></div>
+                <div><dt>Less motion, if you want it</dt><dd>Turn off window and app-transition animations, plus the launcher's wallpaper transitions. Save the original values for later.</dd></div>
+                <div><dt>A restore path</dt><dd>Keep a record of the original launcher, package states, and settings. Restore the stock Home app before removing its replacement.</dd></div>
+            </dl>
+        </section>
+
+        <section id="workflow" class="workflow-section" aria-labelledby="workflow-title">
+            <div class="section-intro"><h2 id="workflow-title">From connection<br>to a checked restart.</h2><p>A network connection starts the job. Readback and recovery finish it.</p></div>
+            <ol class="workflow">
+                <li><h3>Connect to the right device</h3><p>Resolve the named TV, obtain its ADB authorization, and confirm the model and Android version. Wireless debugging may need a Wi-Fi connection and a separate pairing port.</p></li>
+                <li><h3>Save, then change</h3><p>Record the installed apps, disabled packages, Home handler, and animation settings. Install and test the new launcher before disabling the old one.</p></li>
+                <li><h3>Check daily use</h3><p>Open Settings and representative streaming apps. Send Home and check the foreground activity. Read back the package and motion settings.</p></li>
+                <li><h3>Restart with a recovery path</h3><p>Confirm a new boot and check that the setup persists. If Tailscale does not reconnect, a known LAN endpoint can allow the existing app to be reopened.</p></li>
+            </ol>
+        </section>
+
+        <aside class="field-note" aria-labelledby="note-title">
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16v12H4zM8 3l4 3 4-3M8 21h8"/></svg>
+            <div><h2 id="note-title">The Streamer profile comes from a real setup</h2><p>The included reference records a Google TV Streamer on Android 14. Launcher replacement, Settings, app launches, reduced motion, and restart persistence were checked. Playback, casting, voice input, and physical remote input remain separate checks.</p><p>Package names and dependencies differ across TVs. A successful setup on one model is a starting point for inspection on the next.</p></div>
+        </aside>
+
+        <section class="split-section" aria-labelledby="kept-title">
+            <div><h2 id="kept-title">Keep the TV<br><em>useful.</em></h2></div>
+            <div class="preserve-copy"><p>The workflow protects the services behind streaming, casting, voice control, the remote, updates, accessibility, and networking. It leaves unknown system packages enabled.</p><p>A successful app launch proves that the app opens. Playing a video, casting from a phone, and testing the microphone each need their own check.</p><p>The free launcher supports the cleanup and reduced-motion setup. Premium customization is optional and follows the user's choice.</p></div>
+        </section>
+
+        <section id="install" class="install-section" aria-labelledby="install-title">
+            <div class="section-intro"><h2 id="install-title">Install TV debloat</h2><p>The skill uses the open Agent Skills format. It needs Android Platform Tools and authorized access to the TV. Tailscale is optional.</p></div>
+            <div class="install-method"><h3>Claude Code plugin</h3><pre tabindex="0" role="region" aria-label="Claude Code plugin installation"><code>/plugin marketplace add jamditis/claude-skills-journalism
+/plugin install dev-toolkit@claude-skills-journalism</code></pre><p>Invoke it as <code>/dev-toolkit:tv-debloat</code>, or describe the TV cleanup you need.</p></div>
+            <div class="install-method"><h3>Install a single skill</h3><pre tabindex="0" role="region" aria-label="Single skill installation"><code>npx skills@latest add jamditis/claude-skills-journalism --skill tv-debloat</code></pre><p>Choose your supported agent during installation. In Codex, invoke it as <code>$tv-debloat</code>.</p></div>
+            <div class="prompt-example"><h3>Try a request</h3><blockquote>Use tv-debloat to clean up my Google TV Streamer. Keep the streaming apps, reduce animations, and save the original settings so I can restore them.</blockquote></div>
+            <p class="compatibility-note">The Streamer setup was checked on a real device. Selection and installation tests for this skill have not yet run in Claude Code or Codex.</p>
+        </section>
+
+        <section class="sources-section" aria-labelledby="sources-title">
+            <h2 id="sources-title">Read the reference</h2>
+            <ul><li><a href="https://github.com/jamditis/claude-skills-journalism/blob/master/dev-toolkit/skills/tv-debloat/references/google-tv-streamer.md">Device profile, commands, and rollback</a></li><li><a href="https://developer.android.com/tools/adb">Google's ADB reference</a></li><li><a href="https://projectivylauncher.com/">Projectivy Launcher</a></li></ul>
+        </section>
+    </main>
+
+    <footer class="site-footer wrap"><span>Joe Amditis · Agent skills for journalism</span><a href="../mobile-debugging/">Related: Mobile debugging <span aria-hidden="true">↗</span></a></footer>
+    <script src="../updated.js" defer></script>
+</body>
+</html>

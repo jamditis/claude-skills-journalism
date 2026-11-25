@@ -1,6 +1,6 @@
 # dev-toolkit
 
-Fourteen development-focused skills for journalists, researchers, and small newsroom dev teams.
+Fifteen development-focused skills for journalists, researchers, and small newsroom dev teams.
 
 ## Skills in this plugin
 
@@ -16,6 +16,7 @@ Fourteen development-focused skills for journalists, researchers, and small news
 | ponytail-dev | Minimal-code implementation and review with proportional checks |
 | python-pipeline | Data pipeline patterns (pandas, polars, DuckDB, asyncio) |
 | surface-completeness | UI coverage, design compliance, accessibility, browser support, performance signals, and current documentation |
+| [tv-debloat](skills/tv-debloat/) | Reversible Google TV cleanup, launcher setup, reduced motion, restart checks, and rollback |
 | vibe-coding | AI-assisted development workflow (Claude Code, Cursor, Aider, Continue) |
 | web-scraping | Ethical scraping patterns (Playwright, robots.txt, anti-bot, terms-of-service) |
 | web-ui-best-practices | Container queries, `:has()`, view transitions, scroll-driven animations |

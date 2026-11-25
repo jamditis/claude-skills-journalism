@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">TV debloat</title>
+  <desc id="desc">A cleaner Google TV home screen, reversible changes, and restart checks.</desc>
+  <rect width="1200" height="630" fill="#ede6d4"/>
+  <path d="M64 108h1072M64 554h1072" stroke="#bcb9a5"/>
+  <text x="64" y="74" font-family="Arial, sans-serif" font-size="22" fill="#3d4b40">Agent skills for journalism</text>
+  <text x="64" y="242" font-family="Georgia, serif" font-size="83" fill="#20281f">TV debloat</text>
+  <text x="66" y="305" font-family="Georgia, serif" font-size="39" font-style="italic" fill="#3d4b40">A quieter home screen.</text>
+  <text x="67" y="378" font-family="Arial, sans-serif" font-size="24" fill="#50574b">Keep your apps. Save a rollback.</text>
+  <text x="67" y="416" font-family="Arial, sans-serif" font-size="24" fill="#50574b">Check the restart.</text>
+  <text x="66" y="507" font-family="Arial, sans-serif" font-size="19" fill="#3d4b40">Google TV · Android TV · ADB</text>
+  <rect x="651" y="167" width="482" height="304" rx="18" fill="#29332b"/>
+  <clipPath id="screen"><rect x="666" y="182" width="452" height="263" rx="5"/></clipPath>
+  <g clip-path="url(#screen)">
+    <rect x="666" y="182" width="452" height="263" fill="#d7dfce"/>
+    <circle cx="1030" cy="249" r="27" fill="#efce94"/>
+    <ellipse cx="1053" cy="443" rx="260" ry="110" fill="#b0c0a9" transform="rotate(-14 1053 443)"/>
+    <ellipse cx="765" cy="451" rx="270" ry="112" fill="#8fa78e" transform="rotate(12 765 451)"/>
+    <text x="689" y="220" font-family="Arial, sans-serif" font-size="18" fill="#29382c">Your apps</text>
+    <rect x="689" y="332" width="124" height="88" rx="7" fill="#f7eddb"/>
+    <rect x="831" y="332" width="124" height="88" rx="7" fill="#4c6553"/>
+    <rect x="973" y="332" width="124" height="88" rx="7" fill="#d5ad7d"/>
+    <path d="m744 350 19 12-19 12z" fill="none" stroke="#33422e" stroke-width="2"/>
+    <path d="M889 373v-23l15-3v23M889 354l15-3" fill="none" stroke="#fff" stroke-width="2"/>
+    <ellipse cx="885" cy="373" rx="4" ry="3" fill="none" stroke="#fff" stroke-width="2"/>
+    <ellipse cx="900" cy="370" rx="4" ry="3" fill="none" stroke="#fff" stroke-width="2"/>
+    <g fill="none" stroke="#302d24" stroke-width="2"><rect x="1021" y="350" width="10" height="10" rx="1"/><rect x="1038" y="350" width="10" height="10" rx="1"/><rect x="1021" y="367" width="10" height="10" rx="1"/><rect x="1038" y="367" width="10" height="10" rx="1"/></g>
+    <g font-family="Arial, sans-serif" font-size="13" text-anchor="middle"><text x="751" y="403" fill="#33422e">Watch</text><text x="893" y="403" fill="#fff">Listen</text><text x="1035" y="403" fill="#302d24">Browse</text></g>
+  </g>
+  <circle cx="892" cy="458" r="2" fill="#b9cba0"/>
+  <path d="M870 471h44l12 28h39v7H819v-7h39z" fill="#29332b"/>
+  <text x="64" y="595" font-family="Arial, sans-serif" font-size="19" fill="#50574b">skills.amditis.tech/tv-debloat</text>
+</svg>

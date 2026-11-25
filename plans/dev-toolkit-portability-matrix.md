@@ -8,7 +8,7 @@ Classes: **shared** runs as written; **adapter-required** needs a documented
 Codex mapping (instruction file, tool vocabulary, or hook); **Claude-only**
 depends on a Claude runtime mechanic with no Codex equivalent.
 
-Inventory: 14 skills discovered from `dev-toolkit/skills` (13 shared, 1 adapter-required, 0 Claude-only).
+Inventory: 15 skills discovered from `dev-toolkit/skills` (14 shared, 1 adapter-required, 0 Claude-only).
 
 | Skill | Class | Auto-activation | Reason |
 | --- | --- | --- | --- |
@@ -22,6 +22,7 @@ Inventory: 14 skills discovered from `dev-toolkit/skills` (13 shared, 1 adapter-
 | `ponytail-dev` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
 | `python-pipeline` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
 | `surface-completeness` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
+| `tv-debloat` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
 | `vibe-coding` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
 | `web-scraping` | shared | no | No Claude-specific mechanic; runs under Codex as written. |
 | `web-ui-best-practices` | shared | no | No Claude-specific mechanic; runs under Codex as written. |

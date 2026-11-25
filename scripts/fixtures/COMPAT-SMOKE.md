@@ -10,13 +10,13 @@ node scripts/skill-behavior-eval.mjs \
   --fixtures scripts/fixtures/compat-smoke.json \
   --runtime both \
   --all \
-  --max-cases 227 \
+  --max-cases 230 \
   --concurrency 3 \
   --output /tmp/compat-smoke-<date>
 ```
 
 `--max-cases` must be at least the number of cases in the selection.
-This fixture contains 76 skills and 227 prompt cases. Each case runs once in
+This fixture contains 77 skills and 230 prompt cases. Each case runs once in
 each selected client. The report keeps fixture order even when client processes
 run concurrently.
 
